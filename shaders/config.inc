@@ -136,7 +136,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter bloom_size "[Bloom] Radius"										0.25 	0.1 3.0 0.05
 #pragma parameter bloom_directions "[Bloom] Directions: more is better but slower"	8.0	4.0 64.0 4.0
 #pragma parameter bloom_quality "[Bloom] Quality: more is better but slower"		8.0		2.0 32.0 1.0
-#pragma parameter bloom_gamma "[Bloom] Bloom gamma"									2.0		1.0 9.0 0.25
+#pragma parameter bloom_gamma "[Bloom] Bloom gamma"									2.0		1.0 9.0 1.0
 #pragma parameter bloom_power "[Bloom] Bloom power multiplier"						2.0		1.0 10.0 0.1
 #pragma parameter bloom_on_dark_only "[Bloom] Bloom only over dark areas"			1.0		0.0 1.0 1.0
 
