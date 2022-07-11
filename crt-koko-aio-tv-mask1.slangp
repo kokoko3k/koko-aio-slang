@@ -1,0 +1,28 @@
+#reference "crt-koko-aio.slangp"
+DO_FXAA = "1.0"
+SCANLINE_DARK = "1.0"
+in_glow_power = "0.45"
+in_glow_wh = "2.5"	
+in_glow_gamma = "1.0" 
+IN_GLOW_ADD = "0.0"
+DO_RGB_MASK = "0.75"
+VMASK_OVERWHITE = "1.0"
+DO_DARKLINES = "0.3"
+DO_DARKLINES_VOFFSET = "1.0"
+DARKLINES_PERIOD = "4.0" 	
+DRKLN_OVERWHITE = "1.0"
+halo_power = "0.9" 
+halo_wh = "1.75"
+halo_gamma = "2.0" 
+
+DO_BLOOM = "0.2"
+bloom_size = "0.25"
+bloom_directions = "8.0"
+bloom_quality = "8.0"
+bloom_gamma = "2.0"
+
+GAMMA_R = "0.70"	
+GAMMA_G = "0.69"	
+GAMMA_B = "0.68"
+saturation 1.0
+DO_ALT_BLANK 0.0

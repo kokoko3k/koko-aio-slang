@@ -1,0 +1,292 @@
+#version 450
+#include "config.inc"
+
+// RGB mask:       R     G     B
+ #define m1 vec3 ( 1.0 , 0.0 , 0.0 )    //col 1
+ #define m2 vec3 ( 0.0 , 1.0 , 0.0 )    //col 2
+ #define m3 vec3 ( 0.0 , 0.0 , 1.0  )   //col 3
+
+// Blur sizes must not depend on input resolution
+#define scalemod (params.SourceSize.x/320.0)
+
+#pragma stage vertex
+layout(location = 0) in vec4 Position;
+layout(location = 1) in vec2 TexCoord;
+layout(location = 0) out vec2 vTexCoord;
+
+void main()
+{
+   gl_Position = global.MVP * Position;
+   vTexCoord = TexCoord;
+}
+
+#pragma stage fragment
+layout(location = 0) in vec2 vTexCoord;
+layout(location = 0) out vec4 FragColor;
+layout(set = 0, binding = 2) uniform sampler2D Source;
+layout(set = 0, binding = 3) uniform sampler2D Original;
+
+#define rubyTexture Source
+#define rubyTextureSize params.SourceSize
+#define texture2D(a,b) texture(a,b)
+
+//Is it really faster that way?
+vec3 int_pow3(vec3 v, float fpow){
+    if ( fpow == 1.0 ) { return v; };
+    if ( fpow == 2.0 ) { return v*v; };
+    if ( fpow == 3.0 ) { return v*v*v; };
+    if ( fpow == 4.0 ) { return v*v*v*v; };
+    if ( fpow == 5.0 ) { return v*v*v*v*v; };
+    if ( fpow == 6.0 ) { return v*v*v*v*v*v; };
+    if ( fpow == 7.0 ) { return v*v*v*v*v*v*v; };
+    if ( fpow == 8.0 ) { return v*v*v*v*v*v*v*v; };
+    if ( fpow == 9.0 ) { return v*v*v*v*v*v*v*v*v; };
+}
+
+vec4 pixel_glow(float my_glowpix, float my_glowpixy, float my_glow, float glow_gamma) {
+
+    // Calculating texel coordinates
+    vec2 tex = vTexCoord.xy * 1.00001;
+    vec4 SourceSize1 = params.SourceSize;
+    vec4 size     = rubyTextureSize;
+    vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5);
+    vec2 fp = fract(OGL2Pos);
+    vec2 dx = vec2(SourceSize1.z,0.0);
+    vec2 dy = vec2(0.0,SourceSize1.w);
+    vec2 pC4 = (floor(OGL2Pos) + vec2(0.5)) * params.SourceSize.zw;
+
+    vec2 x2 = 2.0*dx; vec2 x3 = 3.0*dx;
+    vec2 y2 = 2.0*dy;
+
+    my_glowpix = my_glowpix / scalemod ; // <-- Make it not dependant on the input resolution.
+    my_glowpixy = my_glowpixy / scalemod ;
+
+    float wl3 = 2.0 + fp.x; wl3*=wl3; wl3 = exp2(-my_glowpix*wl3);
+    float wl2 = 1.0 + fp.x; wl2*=wl2; wl2 = exp2(-my_glowpix*wl2);
+    float wl1 =       fp.x; wl1*=wl1; wl1 = exp2(-my_glowpix*wl1);
+    float wr1 = 1.0 - fp.x; wr1*=wr1; wr1 = exp2(-my_glowpix*wr1);
+    float wr2 = 2.0 - fp.x; wr2*=wr2; wr2 = exp2(-my_glowpix*wr2);
+    float wr3 = 3.0 - fp.x; wr3*=wr3; wr3 = exp2(-my_glowpix*wr3);
+
+    float wt = 1.0/(wl3+wl2+wl1+wr1+wr2+wr3);
+
+    vec3 l3 = texture2D(rubyTexture, pC4 -x2 ).rgb;
+    vec3 l2 = texture2D(rubyTexture, pC4 -dx ).rgb;
+    vec3 l1 = texture2D(rubyTexture, pC4     ).rgb;
+    vec3 r1 = texture2D(rubyTexture, pC4 +dx ).rgb;
+    vec3 r2 = texture2D(rubyTexture, pC4 +x2 ).rgb;
+    vec3 r3 = texture2D(rubyTexture, pC4 +x3 ).rgb;
+    l3=int_pow3(l3,glow_gamma); l2=int_pow3(l2,glow_gamma); l1=int_pow3(l1,glow_gamma);
+    r1=int_pow3(r1,glow_gamma); r2=int_pow3(r2,glow_gamma); r3=int_pow3(r3,glow_gamma);
+
+    vec3 t1 = (l3*wl3 + l2*wl2 + l1*wl1 + r1*wr1 + r2*wr2 + r3*wr3)*wt;
+
+    l3 = texture2D(rubyTexture, pC4 -x2 -dy).rgb;
+    l2 = texture2D(rubyTexture, pC4 -dx -dy).rgb;
+    l1 = texture2D(rubyTexture, pC4     -dy).rgb;
+    r1 = texture2D(rubyTexture, pC4 +dx -dy).rgb;
+    r2 = texture2D(rubyTexture, pC4 +x2 -dy).rgb;
+    r3 = texture2D(rubyTexture, pC4 +x3 -dy).rgb;
+    l3=int_pow3(l3,glow_gamma); l2=int_pow3(l2,glow_gamma); l1=int_pow3(l1,glow_gamma);
+    r1=int_pow3(r1,glow_gamma); r2=int_pow3(r2,glow_gamma); r3=int_pow3(r3,glow_gamma);
+
+    vec3 t2 = (l3*wl3 + l2*wl2 + l1*wl1 + r1*wr1 + r2*wr2 + r3*wr3)*wt;
+
+    l3 = texture2D(rubyTexture, pC4 -x2 +dy).rgb;
+    l2 = texture2D(rubyTexture, pC4 -dx +dy).rgb;
+    l1 = texture2D(rubyTexture, pC4     +dy).rgb;
+    r1 = texture2D(rubyTexture, pC4 +dx +dy).rgb;
+    r2 = texture2D(rubyTexture, pC4 +x2 +dy).rgb;
+    r3 = texture2D(rubyTexture, pC4 +x3 +dy).rgb;
+    l3=int_pow3(l3,glow_gamma); l2=int_pow3(l2,glow_gamma); l1=int_pow3(l1,glow_gamma);
+    r1=int_pow3(r1,glow_gamma); r2=int_pow3(r2,glow_gamma); r3=int_pow3(r3,glow_gamma);
+
+    vec3 b1 = (l3*wl3 + l2*wl2 + l1*wl1 + r1*wr1 + r2*wr2 + r3*wr3)*wt;
+
+    l3 = texture2D(rubyTexture, pC4 -x2 +y2).rgb;
+    l2 = texture2D(rubyTexture, pC4 -dx +y2).rgb;
+    l1 = texture2D(rubyTexture, pC4     +y2).rgb;
+    r1 = texture2D(rubyTexture, pC4 +dx +y2).rgb;
+    r2 = texture2D(rubyTexture, pC4 +x2 +y2).rgb;
+    r3 = texture2D(rubyTexture, pC4 +x3 +y2).rgb;
+    l3=int_pow3(l3,glow_gamma); l2=int_pow3(l2,glow_gamma); l1=int_pow3(l1,glow_gamma);
+    r1=int_pow3(r1,glow_gamma); r2=int_pow3(r2,glow_gamma); r3=int_pow3(r3,glow_gamma);
+
+    vec3 b2 = (l3*wl3 + l2*wl2 + l1*wl1 + r1*wr1 + r2*wr2 + r3*wr3)*wt;
+
+    wl2 = 1.0 + fp.y; wl2*=wl2; wl2 = exp2(-my_glowpixy*wl2);
+    wl1 =       fp.y; wl1*=wl1; wl1 = exp2(-my_glowpixy*wl1);
+    wr1 = 1.0 - fp.y; wr1*=wr1; wr1 = exp2(-my_glowpixy*wr1);
+    wr2 = 2.0 - fp.y; wr2*=wr2; wr2 = exp2(-my_glowpixy*wr2);
+
+    wt = 1.0/(wl2+wl1+wr1+wr2);
+
+    vec3 Bloom = (t2*wl2 + t1*wl1 + b1*wr1 + b2*wr2)*wt;
+
+    return vec4(Bloom*my_glow,0.0);
+}
+    
+    
+vec3 fix_scanlines() {
+    return pixel_glow(scanline_sharpness,scanline_sharpness,1.0,1.0).rgb;
+}
+
+vec3 pixel_vmask(vec3 source4, vec3 lm1,vec3 lm2,vec3 lm3,
+                 vec3 white_reference, float over_white,bool is_scanlined) {
+
+    float glfragcoord_x = vTexCoord.x * params.OutputSize.x;
+    float col = float(int(glfragcoord_x));
+    vec3 pixel_out;
+    vec3 vmasked;
+    vec3 source = source4.rgb;
+    if (int(mod(col, 3.0)) < 1) {
+        vmasked = lm1*source;
+    }
+    else if (int(mod(col, 3.0)) < 2) {
+        vmasked = lm2*source;
+    }
+    else {
+        vmasked = lm3*source;
+    }
+    if (over_white == 1.0) {
+        pixel_out = vmasked;
+    } else {
+        float whiteness=(white_reference.r+white_reference.g+white_reference.b)/3.0;
+        whiteness-=over_white;
+        whiteness=min(whiteness,1.0);
+        whiteness=max(whiteness,0.0);
+        pixel_out =  mix(vmasked,source,whiteness);
+    }
+    // originale fa: vec4 lookup=texture2D(rubyTexture, gl_TexCoord[0].xy);
+    //vec3 pixel_in = texture(Source, vTexCoord).rgb;
+    //vec3 pixel_in = texture2D(rubyTexture, gl_TexCoord[0].xy).rgb;
+    //return pixel_out * lookup.a;
+    //vec4 lookup=source4.a;
+    //if (is_scanlined)  {
+    //    vec4 lookup = texture(Source,vTexCoord);
+    //	return pixel_out * lookup.a;
+    //} else {
+        return pixel_out;
+    //}
+}
+
+    
+
+vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
+                     float do_offset, vec3 white_reference,float over_white) {
+
+    vec3 pixel_out=source;
+    float col_2 =  vTexCoord.x * params.OutputSize.x;
+    float line_2 = vTexCoord.y * params.OutputSize.y;
+
+    float fDarkline_part_w=3.0 ;       //Triads width, float type
+    float fDarkline_part_w_x2 = 6.0 ;  //Triads width, float type, *2
+    int iDarkline_part_w = 3 ;         //Triads width, integer type
+                                       //(3 pixels unless changing m1,m2,m3 datatype
+
+    if (over_white != 1.0) {
+        //less effect on bright colors.
+        float whiteness=(white_reference.r+white_reference.g+white_reference.b)/3.0;
+        darkline_trans+=(whiteness-over_white);
+        darkline_trans=max(darkline_trans,0.0);
+        darkline_trans=min(darkline_trans,1.0);
+    }
+
+    if (do_offset == 1.0) {
+        int hmask_shape_offset = int (darkline_every/2.0) + 1 ;
+        if  (int(mod(line_2, darkline_every)) == 1) {
+            if (int(mod(col_2, fDarkline_part_w_x2)) < iDarkline_part_w) {
+                pixel_out =  pixel_out * darkline_trans;
+            }
+        } else if  (int(mod(line_2, darkline_every)) == hmask_shape_offset ) {
+            // DRAW WITH OFFSET:
+            col_2+=fDarkline_part_w;
+            if ((int(mod(col_2, fDarkline_part_w_x2))) < iDarkline_part_w) {
+                pixel_out =  pixel_out * darkline_trans;
+            }
+        }
+    } else {
+
+        if ( darkline_every >= 0.0) {
+            if  (int(mod(line_2, darkline_every)) == 1) {
+                pixel_out =  pixel_out * darkline_trans;
+            }
+        }
+
+        if ( darkline_every < 0.0) {
+            if  (int(mod(line_2, abs(darkline_every)       )) != 1) {
+                pixel_out =  pixel_out * darkline_trans;
+            }
+        }
+    }
+
+    return pixel_out;
+}
+    
+    
+vec3 pixel_alternate(vec3 source) {
+    float line = vTexCoord.y * params.OutputSize.y;
+    vec3 pixel_out = source;
+    if  (int(mod(float(params.FrameCount),2.0  )) == 1) {
+        if  (int(mod(line,2.0  )) == 1) {
+            pixel_out=vec3(0.0,0.0,0.0) ; 
+        }
+    } else {
+        if  (int(mod(line,2.0  )) == 0) {
+            pixel_out=vec3(0.0,0.0,0.0) ; 
+        }
+    }
+    return pixel_out;
+}
+    
+void main(void) {
+    vec3 pixel_in = texture(Source, vTexCoord).rgb;
+    vec3 pixel_out = pixel_in;
+    vec3 haloed = pixel_in;
+    vec3 glowed = pixel_in;
+
+    /* Input signal is blurred and glows.
+       glow power versus blur power is defined by IN_GLOW_ADD.
+       this allows the rgb vmask to light up on the black scanline.
+     */
+    if (in_glow_power > 0.0) {
+        float in_glow_h = in_glow_wh;
+        if (SCANLINE_DARK < 1.0) {
+            in_glow_h = scanline_sharpness ;
+         }
+        glowed = pixel_glow(in_glow_wh,in_glow_h,in_glow_power,in_glow_gamma).rgb;
+        if (IN_GLOW_ADD>0.0) {
+            pixel_out =mix(glowed,glowed+pixel_out,IN_GLOW_ADD);
+        } else {
+            pixel_out =  glowed;
+        }
+    } else if (SCANLINE_DARK < 1.0) {
+        pixel_out=fix_scanlines();
+    }
+
+    //Vertical RGB Mask
+    if (DO_RGB_MASK > 0.0 ) {
+        vec3 m1f = m1 + 1.0 - DO_RGB_MASK ;
+        vec3 m2f = m2 + 1.0 - DO_RGB_MASK ;
+        vec3 m3f = m3 + 1.0 - DO_RGB_MASK ;
+        m1f = min(vec3(1.0,1.0,1.0),m1f) ;
+        m2f = min(vec3(1.0,1.0,1.0),m2f) ;
+        m3f = min(vec3(1.0,1.0,1.0),m3f) ;
+        pixel_out = pixel_vmask(pixel_out,m1f,m2f,m3f,pixel_in,VMASK_OVERWHITE,(SCANLINE_DARK < 1.0));
+    }
+
+    //Horizontal screen lines
+    if (DO_DARKLINES > 0.0 ) {
+    float MYDARKLINES_TRANSPARENCY = 1.0 - DO_DARKLINES;
+        pixel_out = pixel_darklines(pixel_out,DARKLINES_PERIOD,MYDARKLINES_TRANSPARENCY,DO_DARKLINES_VOFFSET,pixel_in,DRKLN_OVERWHITE);
+    }
+
+    //Halo
+    if (halo_power >= 0.0 ) {
+        haloed = pixel_glow(halo_wh,halo_wh,halo_power,halo_gamma).rgb;
+        pixel_out +=haloed;
+    }
+
+    //Out
+    FragColor = vec4(pixel_out,0.0);
+}

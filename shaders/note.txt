@@ -1,0 +1,46 @@
+Vediamo se un passaggio non utilizzato influenza le prestazioni.
+    creiamo un passaggio pesante
+    nel successivo riferiamoci a original invece che a source.
+
+    * Risultato: Lo shader viene eseguito anche se è inutile.
+
+
+Che impatto ha l'algoritmo passthrough rispetto a un confronto ed a un ritorno vec0?
+    Consumo senza confronto e ritorno vec4 nero: 0.33
+    Consumo con lookup e ritorno vec4 nero: 0.33
+    Consumo con lookup e ritorno lookup: 0.335
+    Consumo senza confronto e ritorno vec4 nero con scalatura 1.0: 0.32
+    Consumo con controllo su originalsize e ritorno nero senza lookup con scalatura a 2: 0.33
+
+
+Hi there, i'm writing a new multipass slangp/slang shader aimed mainly to p-uae.
+My shader works best when input texture is >= 640x480, so i made a pass that doubles in size the original resolution, because 90% of the times the resolution is low.
+Problem is, that Amiga can switch resolutions at runtime and p-uae emulates that feature.
+If that happens (eg: it switches from 320x200 to 720x576), the pass that scales the resolution produces an extremely big texture that slows things down.
+...and even if i sample the original texture in (say) pass #1, but pass#0 already doubled the size, pass#1 will output the doubled size anyway, right?
+Is there a way to overcome to that problem?
+I already searched for a way to do a conditional pass based on input resolution, but did not found anything.
+Is there something i'm not considering here, maybe?
+
+
+
+320x240 -> scale2x - 640x480 -> fxaa 1x -> 640x480
+640x480 -> scale2x - 1280x800 -> fxaa1x -> 1280x800
+
+
+Idea:
+Antonio Orefice, [08/07/22 09:54]
+imponi la scalata doppia e crea un alias per essa.
+lo shader che la userebbe come sorgente, fará un controllo preventivo sulla dimebsione di original.
+ossia, se la dimensione di original supera un threshold, allora usa original, altrimenti usa la sua versione scalata.
+
+Antonio Orefice, [08/07/22 09:56]
+ciò rusolve il problema di usare una texture gramde 4 volte.
+rimane il problema di uno spreco di risorse, perché comunque il passaggio dello shader di scalatura é presente nello slangp.
+
+Antonio Orefice, [08/07/22 10:00]
+ciò che forse possiamo fare é annullare l'impatto dell'algoritmo di scalatura.
+ossia fargli ritornare semplicemente un vec4(0.0), senza nemmeno fare i lookup della texture,sempre nella cpndizione verificata che priginal sia maggiore di x
+
+
+...l'idea non funziona, perchè anche se io vado a fare il sample della texture non doppia, avrò sempre dimensioni doppie solo per il fatto che la mia passata viene dopo un raddoppio.

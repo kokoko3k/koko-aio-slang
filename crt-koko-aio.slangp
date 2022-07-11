@@ -1,0 +1,146 @@
+/*TODO:
+  * Separa gli include dalla configurazione vera e propria.
+
+  * non fare proprio fix_scanlines se il valore di sharpness scelto per le scanlines
+    è negativo (linea 322 di mainpass (else if (SCANLINE_DARK < 1.0) {))
+
+    Il glowing andrebbe clampato prima di vmask?? altrimenti sbianca anche la maschera rgb
+    per valori elevatissimi.
+
+    Se la texture è maggiore del viewport, è possibile fare un crop?
+*/
+
+/*
+    Koko-aio shader is meant to be an all-in one crt shader.
+    It can be configured with many parameters, so that can be
+    scaled to run on even on modest gpus while still developed to
+    run with heavier presets on at least Haswell+ iGpus.
+    It is not meant to simulate the internal behaviour of CRT displays,
+    but to give users the parameters to make their monitors to look similar.
+    Several presets are included.
+
+    Actually it provides emulation for:
+        scanlines, screenlines, RGB vertical masks, horizontal slot masks,
+        glowing, haloing, blooming, gamma and saturation correction,
+        black frame insertions, interlace emulation, antialiasing.
+
+    External code by:
+    * CRT - Guest - Dr.Venom (single pass bloom function)
+    * Nvidia (FXAA)
+
+
+
+    * Pipeline *
+    ------------
+
+    → Original image from emulator
+     ↓
+    Double the input size
+     ↓
+    FXAA antialiasing
+     ↓
+    Emulates scanlines and interlacing
+     ↓
+    Input Glow/Scanline dephasing → phosphors → slot mask/aperture grill →  halo → →
+                                                                                    ↓
+                                                                                    ↓
+    → Original image from emulator                                                  ↓
+     ↓                                                                              ↓
+    Bloom                                                                           ↓
+     ↓                                                                              ↓
+    mix  ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ←
+     ↓
+    Color correction → Black frame insertion
+                                        ↓
+                                     Viewport
+
+
+*/
+
+shaders = 9
+
+/*For P-uae defaults, doubling just y0 seems the best option.
+  90% of games are lowres in vertical size and p-uae defaults
+  to 720 pixels width, which is enough for this preset to work as intended.
+  Rest warned, that when a game sets an interlaced resolution, p-uae
+  will output even 560 h-lines which, doubled, will result in
+  1120 h lines. too much even for a 1080p screen.
+  Auto-Cropping/overscan emulation could be added in a future release.
+  For other emulators/systems, probably it is best and safe to doulbe x0 too.
+*/
+    shader0 = shaders/passthrough.slang
+    alias0 = "doublesize_pass"
+    filter_linear0 = false
+    scale_type0 = source
+    scale_x0 = "1.0"
+    scale_y0 = "2.0"
+
+/* Nvidia fxaa pass:
+   works good for "SD" resolutions
+*/
+    shader1 = shaders/fxaa.slang
+    alias1 = "FXAA_pass"
+    filter_linear1 = true
+    scale_type1 = source
+    scale1 = "1.0"
+
+/* Pretty dumb scanline shader.
+   It just blank alternate lines and can optionally emulate interlacing.
+   It relies on subsequent passes to correct dephasing due to viewport size.
+*/
+    shader2 = shaders/scanline.slang
+    alias2 = "scanline_pass"
+    filter_linear2 = false
+    scale_type2 = source
+    scale2 = "1.0"
+
+/* In this pass we emulate glowing,
+   fix scanline dephasing, RGB vertical mask,
+   slot mask,haloing
+*/
+    shader3 = shaders/main_pass.slang
+    alias3 = "main_pass"
+    filter_linear3= true
+    scale_type3 = viewport
+    scale3 = "1.0"
+
+/* In the subsequent passes we do first a fast blOOm by first
+   sampling the original texture and scale it down to keep
+   it fast, next we do subsequent blURs of the bloomed
+   pass.
+*/
+    shader4 = shaders/bloom_pass_1.slang
+    alias4 = "bloom_pass_1"
+    filter_linear4 = true
+    scale_type4 = absolute
+    scale_x4 = "160"
+    scale_y4 = "120"
+
+    shader5 = shaders/bloom_pass_2.slang
+    alias5 = "bloom_pass_2"
+    filter_linear5 = true
+    scale_type5 = source
+    scale5 = "1"
+
+    //shader6 = shaders/passthrough.slang
+    shader6 = shaders/bloom_pass_2.slang
+    alias6 = "bloom_pass_3"
+    filter_linear6 = true
+    scale_type6 = source
+    scale6 = "1"
+
+    //shader7 = shaders/passthrough.slang
+    shader7 = shaders/bloom_pass_2.slang
+    alias7 = "bloom_pass_final"
+    filter_linear7 = true
+    scale_type7 = source
+    scale7 = "1"
+
+/* Last pass will do the composition of the previous passes
+   with the bloomed image, color corrections and
+   black frame insertions.
+*/
+    shader8 =shaders/final_pass.slang
+    filter_linear8 =true
+    scale_type8 =viewport
+    scale8 = "1.0"
