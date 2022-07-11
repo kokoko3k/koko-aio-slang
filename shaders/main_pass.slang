@@ -50,8 +50,8 @@ vec4 pixel_glow(float my_glowpix, float my_glowpixy, float my_glow, float glow_g
     vec2 x2 = 2.0*dx; vec2 x3 = 3.0*dx;
     vec2 y2 = 2.0*dy;
 
-    my_glowpix = my_glowpix / scalemod ; // <-- Make it not dependant on the input resolution.
-    my_glowpixy = my_glowpixy / scalemod ;
+    my_glowpix = my_glowpix / scalemod * 2 ; // <-- Make it not dependant on the input resolution.
+    my_glowpixy = my_glowpixy / scalemod *2 ;
 
     float wl3 = 2.0 + fp.x; wl3*=wl3; wl3 = exp2(-my_glowpix*wl3);
     float wl2 = 1.0 + fp.x; wl2*=wl2; wl2 = exp2(-my_glowpix*wl2);

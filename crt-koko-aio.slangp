@@ -113,8 +113,8 @@ shaders = 9
     alias4 = "bloom_pass_1"
     filter_linear4 = true
     scale_type4 = absolute
-    scale_x4 = "160"
-    scale_y4 = "120"
+    scale_x4 = "320"
+    scale_y4 = "240"
 
     shader5 = shaders/bloom_pass_2.slang
     alias5 = "bloom_pass_2"

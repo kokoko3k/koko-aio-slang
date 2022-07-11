@@ -34,7 +34,7 @@ vec3 bloom(float Directions, float Quality, float Size, float fbloom_gamma) {
     float steps=0.0;
     for( float d=0.0; d<Pi; d+=Pi/Directions) {
         for(float i=1.0/Quality; i<=1.0; i+=1.0/Quality) {
-            lookup = texture( Original, uv + vec2(cos(d) -0.20  ,  0.25 +   sin(d))*Radius*i     ).rgb ;
+            lookup = texture( Original, uv + vec2(cos(d) -0.20  ,   sin(d))*Radius*i     ).rgb ;
             color +=pow3(lookup.rgb,fbloom_gamma);
             steps+=1.0;
         }
