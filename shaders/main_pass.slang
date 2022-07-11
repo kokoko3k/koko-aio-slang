@@ -30,17 +30,9 @@ layout(set = 0, binding = 3) uniform sampler2D Original;
 #define rubyTextureSize params.SourceSize
 #define texture2D(a,b) texture(a,b)
 
-//Is it really faster that way?
-vec3 int_pow3(vec3 v, float fpow){
-    if ( fpow == 1.0 ) { return v; };
-    if ( fpow == 2.0 ) { return v*v; };
-    if ( fpow == 3.0 ) { return v*v*v; };
-    if ( fpow == 4.0 ) { return v*v*v*v; };
-    if ( fpow == 5.0 ) { return v*v*v*v*v; };
-    if ( fpow == 6.0 ) { return v*v*v*v*v*v; };
-    if ( fpow == 7.0 ) { return v*v*v*v*v*v*v; };
-    if ( fpow == 8.0 ) { return v*v*v*v*v*v*v*v; };
-    if ( fpow == 9.0 ) { return v*v*v*v*v*v*v*v*v; };
+vec3 pow3(vec3 v, float p)
+{
+    return vec3(pow(v.x, p), pow(v.y, p), pow(v.z, p));
 }
 
 vec4 pixel_glow(float my_glowpix, float my_glowpixy, float my_glow, float glow_gamma) {
@@ -76,8 +68,8 @@ vec4 pixel_glow(float my_glowpix, float my_glowpixy, float my_glow, float glow_g
     vec3 r1 = texture2D(rubyTexture, pC4 +dx ).rgb;
     vec3 r2 = texture2D(rubyTexture, pC4 +x2 ).rgb;
     vec3 r3 = texture2D(rubyTexture, pC4 +x3 ).rgb;
-    l3=int_pow3(l3,glow_gamma); l2=int_pow3(l2,glow_gamma); l1=int_pow3(l1,glow_gamma);
-    r1=int_pow3(r1,glow_gamma); r2=int_pow3(r2,glow_gamma); r3=int_pow3(r3,glow_gamma);
+    l3=pow3(l3,glow_gamma); l2=pow3(l2,glow_gamma); l1=pow3(l1,glow_gamma);
+    r1=pow3(r1,glow_gamma); r2=pow3(r2,glow_gamma); r3=pow3(r3,glow_gamma);
 
     vec3 t1 = (l3*wl3 + l2*wl2 + l1*wl1 + r1*wr1 + r2*wr2 + r3*wr3)*wt;
 
@@ -87,8 +79,8 @@ vec4 pixel_glow(float my_glowpix, float my_glowpixy, float my_glow, float glow_g
     r1 = texture2D(rubyTexture, pC4 +dx -dy).rgb;
     r2 = texture2D(rubyTexture, pC4 +x2 -dy).rgb;
     r3 = texture2D(rubyTexture, pC4 +x3 -dy).rgb;
-    l3=int_pow3(l3,glow_gamma); l2=int_pow3(l2,glow_gamma); l1=int_pow3(l1,glow_gamma);
-    r1=int_pow3(r1,glow_gamma); r2=int_pow3(r2,glow_gamma); r3=int_pow3(r3,glow_gamma);
+    l3=pow3(l3,glow_gamma); l2=pow3(l2,glow_gamma); l1=pow3(l1,glow_gamma);
+    r1=pow3(r1,glow_gamma); r2=pow3(r2,glow_gamma); r3=pow3(r3,glow_gamma);
 
     vec3 t2 = (l3*wl3 + l2*wl2 + l1*wl1 + r1*wr1 + r2*wr2 + r3*wr3)*wt;
 
@@ -98,8 +90,8 @@ vec4 pixel_glow(float my_glowpix, float my_glowpixy, float my_glow, float glow_g
     r1 = texture2D(rubyTexture, pC4 +dx +dy).rgb;
     r2 = texture2D(rubyTexture, pC4 +x2 +dy).rgb;
     r3 = texture2D(rubyTexture, pC4 +x3 +dy).rgb;
-    l3=int_pow3(l3,glow_gamma); l2=int_pow3(l2,glow_gamma); l1=int_pow3(l1,glow_gamma);
-    r1=int_pow3(r1,glow_gamma); r2=int_pow3(r2,glow_gamma); r3=int_pow3(r3,glow_gamma);
+    l3=pow3(l3,glow_gamma); l2=pow3(l2,glow_gamma); l1=pow3(l1,glow_gamma);
+    r1=pow3(r1,glow_gamma); r2=pow3(r2,glow_gamma); r3=pow3(r3,glow_gamma);
 
     vec3 b1 = (l3*wl3 + l2*wl2 + l1*wl1 + r1*wr1 + r2*wr2 + r3*wr3)*wt;
 
@@ -109,8 +101,8 @@ vec4 pixel_glow(float my_glowpix, float my_glowpixy, float my_glow, float glow_g
     r1 = texture2D(rubyTexture, pC4 +dx +y2).rgb;
     r2 = texture2D(rubyTexture, pC4 +x2 +y2).rgb;
     r3 = texture2D(rubyTexture, pC4 +x3 +y2).rgb;
-    l3=int_pow3(l3,glow_gamma); l2=int_pow3(l2,glow_gamma); l1=int_pow3(l1,glow_gamma);
-    r1=int_pow3(r1,glow_gamma); r2=int_pow3(r2,glow_gamma); r3=int_pow3(r3,glow_gamma);
+    l3=pow3(l3,glow_gamma); l2=pow3(l2,glow_gamma); l1=pow3(l1,glow_gamma);
+    r1=pow3(r1,glow_gamma); r2=pow3(r2,glow_gamma); r3=pow3(r3,glow_gamma);
 
     vec3 b2 = (l3*wl3 + l2*wl2 + l1*wl1 + r1*wr1 + r2*wr2 + r3*wr3)*wt;
 
