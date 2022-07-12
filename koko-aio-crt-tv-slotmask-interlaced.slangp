@@ -1,7 +1,7 @@
 #reference "koko-aio.slangp"
 DO_FXAA = "1.0"
 SCANLINE_DARK = "0.0"
-scanline_sharpness = 3.0
+scanline_sharpness = 2.2
 scanline_flickering = 1.0
 
 in_glow_power = "1.10"
