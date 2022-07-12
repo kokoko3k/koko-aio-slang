@@ -59,7 +59,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter SCANLINE_DARK "[Scanlines] Dark scanline brightness, (1.0=off)"		  	1.0 	0.0 1.0 0.05
 
 // The amount of scanline sharpness. Very high values may cause visual artifacts when using not integer scaling
-#pragma parameter scanline_sharpness "[Scanlines] Sharpness (use 15 for maximum on integer scaling)"	  	10.0 	0.0 15.0 0.2
+#pragma parameter scanline_sharpness "[Scanlines] Sharpness (use 15 for maximum on integer scaling)"	  	10.0 	1.0 15.0 0.2
 
 // Alternate the drawing of the scanlines between frames. this will produce a flickering typical of
 // interlaced screens; 0 disable the effect, 1 always enables it, 2 enables it only when

@@ -120,7 +120,7 @@ vec4 pixel_glow(float my_glowpix, float my_glowpixy, float my_glow, float glow_g
     
     
 vec3 fix_scanlines() {
-    return pixel_glow(scanline_sharpness,scanline_sharpness,1.0,1.0).rgb;
+    return pixel_glow(scanline_sharpness*2,scanline_sharpness,1.0,1.0).rgb;
 }
 
 vec3 pixel_vmask(vec3 source4, vec3 lm1,vec3 lm2,vec3 lm3,
