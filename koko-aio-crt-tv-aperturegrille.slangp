@@ -21,16 +21,17 @@ halo_wh = "1.2"
 halo_gamma = "3.0" 
 
 DO_BLOOM = "0.05"
-bloom_size = "0.30"
+bloom_size = "0.20"
 bloom_directions = "8.0"
 bloom_quality = "8.0"
-bloom_gamma = "2.0"
-bloom_power = "1.0"
+bloom_gamma = 5.0"
+bloom_power = "5.0"
+bloom_on_dark_only = 1.0
 
 GAMMA_R = "0.6"	
 GAMMA_G = "0.6"	
 GAMMA_B = "0.6"
 
-saturation 1.0
+saturation 0.9
 
 DO_ALT_BLANK 0.0
