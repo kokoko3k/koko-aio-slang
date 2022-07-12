@@ -247,6 +247,7 @@ void main(void) {
             in_glow_h = scanline_sharpness ;
          }
         glowed = pixel_glow(in_glow_wh,in_glow_h,in_glow_power,in_glow_gamma).rgb;
+        glowed = min(glowed,1.0); //Input signal glow dont have "to white" the phosphors.
         if (IN_GLOW_ADD>0.0) {
             pixel_out =mix(glowed,glowed+pixel_out,IN_GLOW_ADD);
         } else {

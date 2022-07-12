@@ -1,12 +1,5 @@
 /*TODO:
   * Separa gli include dalla configurazione vera e propria.
-
-  * non fare proprio fix_scanlines se il valore di sharpness scelto per le scanlines
-    è negativo (linea 322 di mainpass (else if (SCANLINE_DARK < 1.0) {))
-
-    Il glowing andrebbe clampato prima di vmask?? altrimenti sbianca anche la maschera rgb
-    per valori elevatissimi.
-
     Se la texture è maggiore del viewport, è possibile fare un crop?
 */
 
