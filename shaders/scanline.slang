@@ -62,7 +62,6 @@ void main()
          //(blank odd lines on odd frames and even lines on even frames)
          if ((scanline_flickering == 1.0) ||
             ((scanline_flickering==2.0) && (is_interlaced == 1))) {
-               //if  (int(mod(float(params.FrameCount),2.0  )) == 1) {
                if  (int(mod(float(params.FrameCount),2  )) <  1.0 ) {
                      if (mymod >= scanline_period_half) { pixel *= SCANLINE_DARK; }
                } else {

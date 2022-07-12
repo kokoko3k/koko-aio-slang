@@ -1,0 +1,10 @@
+#reference "koko-aio-crt-monitor-bloom.slangp"
+
+
+scanline_sharpness = 2.6
+
+scanline_flickering = 1.0
+
+
+
+
