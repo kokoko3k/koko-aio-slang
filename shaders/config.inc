@@ -59,7 +59,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter SCANLINE_DARK "[Scanlines] Dark scanline brightness, (1.0=off)"		  	1.0 	0.0 1.0 0.05
 
 // The amount of scanline sharpness. Very high values may cause visual artifacts when using not integer scaling
-#pragma parameter scanline_sharpness "[Scanlines] Sharpness"		  	10.0 	0.0 15.0 0.2
+#pragma parameter scanline_sharpness "[Scanlines] Sharpness (use 15 for maximum on integer scaling)"	  	10.0 	0.0 15.0 0.2
 
 // Alternate the drawing of the scanlines between frames. this will produce a flickering typical of
 // interlaced screens; 0 disable the effect, 1 always enables it, 2 enables it only when
@@ -78,7 +78,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // or slot mask applied to the image.
 #pragma parameter in_glow_power "[In Glow] Input signal glow strength (neg=off)"			0.45 	-0.05 10.0 0.05
 #pragma parameter in_glow_wh    "[In Glow] Sharpness"										2.5 	0.0 10.0 0.05
-#pragma parameter in_glow_gamma "[In Glow] The higher, the less the glow on dark colors"	1.0 	1.0 9.0 1.0
+#pragma parameter in_glow_gamma "[In Glow] Gamma, the higher, the less the glow on dark colors"	1.0 	1.0 9.0 1.0
 #pragma parameter IN_GLOW_ADD   "[In Glow] Overflows from the scanlines, sharper image"		0.0 	0.0 1.0 0.05
 
 
@@ -92,7 +92,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // This is handy  if you want to keep a good image contrast/brightness, but keep in mind that other
 // parameters like haloing and bloom.
 #pragma parameter DO_RGB_MASK "[RGB Mask] Strength (0.0=off)"					0.75  	0.0 1.0 0.05
-#pragma parameter VMASK_OVERWHITE "[RGB Mask] Affects bright colors" 			1.0 	0.0 1.0 0.05
+#pragma parameter VMASK_OVERWHITE "[RGB Mask] Affects bright colors" 				1.0 	0.0 1.0 0.05
 
 
 
@@ -104,10 +104,10 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // "DARKLINES_PERIOD" expresses every how many lines draw a black one.
 // "DO_DARKLINES_VOFFSET" lets you to vertically offset by ""DARKLINES_PERIOD/2" the lines every 3 screen pixels,
 // allowing, in conjunction with RGB mask, to emulate slot mask
-#pragma parameter DO_DARKLINES "[Dark screenlines] Slotmask strength"				0.3 	0.0 1.0 0.05
+#pragma parameter DO_DARKLINES "[Dark screenlines] Slotmask/aperture grille strength"	0.3 	0.0 1.0 0.05
 #pragma parameter DO_DARKLINES_VOFFSET "[Dark screenlines]  Offset by triads"		1.0 	0.0 1.0 1.0
-#pragma parameter DARKLINES_PERIOD "[Dark screenlines] Period"						4.0 	-8.0 8.0 2.0
-#pragma parameter DRKLN_OVERWHITE "[Dark screenlines] Affec bright colors"			1.0 	0.0 1.0 0.05
+#pragma parameter DARKLINES_PERIOD "[Dark screenlines] Period"				4.0 	-8.0 8.0 2.0
+#pragma parameter DRKLN_OVERWHITE "[Dark screenlines] Affects bright colors"		1.0 	0.0 1.0 0.05
 
 
 
@@ -117,9 +117,9 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // multiplying the resulting picture by the source one, it is added.
 // this means that haloing will produce solid colors,
 // lessening afromentioned effects on bright colors.
-#pragma parameter halo_power "[Halo] Strength (neg=off)"							0.9 	-0.05 10.0 0.05
-#pragma parameter halo_wh "[Halo] Sharpness"										1.75 	0.0  10.0 0.05
-#pragma parameter halo_gamma "[Halo] The higher, the less the halo on dark colors"	2.0 	2.0  9.0 1.0
+#pragma parameter halo_power "[Halo] Strength (neg=off)"					0.9 	-0.05 10.0 0.05
+#pragma parameter halo_wh "[Halo] Sharpness"							1.75 	0.0  10.0 0.05
+#pragma parameter halo_gamma "[Halo] Gamma, the higher, the less the halo on dark colors"	2.0 	2.0  9.0 1.0
 
 
 
@@ -132,13 +132,13 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // "bloom_power" is the additional gain applied to the bloom
 // "bloom_on_dark_only" will mix the bloomed image with the original depending on the brightness of
 // the original image.
-#pragma parameter DO_BLOOM "[Bloom] final mix, (0.0=off)"							0.15	0.0 1.0 0.01
-#pragma parameter bloom_size "[Bloom] Radius"										0.25 	0.1 3.0 0.05
+#pragma parameter DO_BLOOM "[Bloom] final mix, (0.0=off)"				0.15	0.0 1.0 0.01
+#pragma parameter bloom_size "[Bloom] Radius"						0.25 	0.1 3.0 0.05
 #pragma parameter bloom_directions "[Bloom] Directions: more is better but slower"	8.0	4.0 64.0 4.0
-#pragma parameter bloom_quality "[Bloom] Quality: more is better but slower"		8.0		2.0 32.0 1.0
-#pragma parameter bloom_gamma "[Bloom] Bloom gamma"									2.0		1.0 9.0 1.0
-#pragma parameter bloom_power "[Bloom] Bloom power multiplier"						2.0		1.0 10.0 0.1
-#pragma parameter bloom_on_dark_only "[Bloom] Bloom only over dark areas"			1.0		0.0 1.0 1.0
+#pragma parameter bloom_quality "[Bloom] Quality: more is better but slower"		8.0	2.0 32.0 1.0
+#pragma parameter bloom_gamma "[Bloom] Bloom gamma"					2.0	1.0 9.0 1.0
+#pragma parameter bloom_power "[Bloom] Bloom power multiplier"				2.0	1.0 10.0 0.1
+#pragma parameter bloom_on_dark_only "[Bloom] Bloom only over dark areas"		1.0	0.0 1.0 1.0
 
 
 

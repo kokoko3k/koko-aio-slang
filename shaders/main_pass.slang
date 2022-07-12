@@ -253,7 +253,9 @@ void main(void) {
             pixel_out =  glowed;
         }
     } else if (SCANLINE_DARK < 1.0) {
-        pixel_out=fix_scanlines();
+        if (scanline_sharpness < 15.0) {
+            pixel_out=fix_scanlines();
+        }
     }
 
     //Vertical RGB Mask
