@@ -2,6 +2,7 @@
 DO_FXAA = "1.0"
 SCANLINE_DARK = "1.0"
 
+
 in_glow_power = "0.80"
 in_glow_wh = "5.0"	
 in_glow_gamma = "1.0" 

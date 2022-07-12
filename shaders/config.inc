@@ -41,6 +41,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float DO_FXAA ;
 	float scanline_sharpness ;
 	float scanline_flickering ;
+	float SCANLINE_OVERWHITE ;
 } global;
 
 
@@ -56,10 +57,13 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // Scanlines
 // Blank even source lines, the value from 0.0 to 1.0 expresses the darkness of the blanked lines
 // 1.0 means no blank at all.
-#pragma parameter SCANLINE_DARK "[Scanlines] Dark scanline brightness, (1.0=off)"		  	1.0 	0.0 1.0 0.05
+#pragma parameter SCANLINE_DARK "[Scanlines] Dark scanlines brightness, (1.0=off)"		  		1.0 	0.0 1.0 0.05
 
 // The amount of scanline sharpness. Very high values may cause visual artifacts when using not integer scaling
 #pragma parameter scanline_sharpness "[Scanlines] Sharpness (use 15 for maximum on integer scaling)"	  	10.0 	1.0 15.0 0.2
+
+
+#pragma parameter SCANLINE_OVERWHITE "[Scanlines] Affects bright colors" 					1.0 	0.0 1.0 0.05
 
 // Alternate the drawing of the scanlines between frames. this will produce a flickering typical of
 // interlaced screens; 0 disable the effect, 1 always enables it, 2 enables it only when
@@ -69,12 +73,13 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 
 // Input glowing
-// Emulates the glowing of the input signal by blurring it with "in_glow_wh" sharpness,
-// apply a gamma filter "in_glow_gamma" to "light" it, multiplying the result by "in_glow_power" and
+// Emulates the glowing of the input signal by blurring it with "in_glow_wh" sharpness.
+// The blur always affects horizontal sharpness, vertical sharpness is affected only if Dark scanline brightness is < 1.0.
+// Apply a gamma filter "in_glow_gamma" to "light" it, multiplying the result by "in_glow_power" and
 // finally interpolating(*) it with the source image.
 // "IN_GLOW_ADD" allows to modulate from interpolation(*) to a sum. This will allow the glow to light the unscanned
 // line, wihch may (or not) produce better effects when emulating scanlines.
-// With "IN_GLOW_ADD=0" input glowing does not normally alter the RGB mask
+// With "IN_GLOW_ADD=0" input glowing does not alter the RGB mask
 // or slot mask applied to the image.
 #pragma parameter in_glow_power "[In Glow] Input signal glow strength (neg=off)"			0.45 	-0.05 10.0 0.05
 #pragma parameter in_glow_wh    "[In Glow] Sharpness"										2.5 	0.0 10.0 0.05
@@ -119,7 +124,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // lessening afromentioned effects on bright colors.
 #pragma parameter halo_power "[Halo] Strength (neg=off)"					0.9 	-0.05 10.0 0.05
 #pragma parameter halo_wh "[Halo] Sharpness"							1.75 	0.0  10.0 0.05
-#pragma parameter halo_gamma "[Halo] Gamma, the higher, the less the halo on dark colors"	2.0 	2.0  9.0 1.0
+#pragma parameter halo_gamma "[Halo] Gamma, the higher, the less the halo on dark colors"	2.0 	1.0  9.0 1.0
 
 
 
@@ -165,6 +170,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 #define SCANLINE_DARK params.SCANLINE_DARK
 #define scanline_sharpness global.scanline_sharpness
+#define SCANLINE_OVERWHITE global.SCANLINE_OVERWHITE
 #define scanline_flickering global.scanline_flickering
 
 #define IN_GLOW_ADD params.IN_GLOW_ADD
