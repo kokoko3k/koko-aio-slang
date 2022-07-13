@@ -156,7 +156,7 @@ float saturation ; //1
 #pragma parameter bloom_size         "        Radius"					0.25 0.1 3.0  0.05
 #pragma parameter bloom_directions   "        Directions: more is better but slower"	8.0  4.0 64.0 4.0
 #pragma parameter bloom_quality      "        Quality: more is better but slower"	8.0  2.0 32.0 1.0
-#pragma parameter bloom_gamma        "        Gamma"					2.0  1.0 10.0 0.25
+#pragma parameter bloom_gamma        "        Gamma"					2.0  1.0 10.0 1.0
 #pragma parameter bloom_power        "        Power multiplier"				2.0  1.0 10.0 0.1
 #pragma parameter bloom_on_dark_only "        Apply less over bright areas"		1.0  0.0 1.0  1.0
 

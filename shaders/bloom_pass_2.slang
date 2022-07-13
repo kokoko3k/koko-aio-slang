@@ -17,6 +17,8 @@ layout(location = 0) in vec2 vTexCoord;
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D Source;
 
+#define SourceTexture Source
+#define SourceTextureSize params.SourceSize
 
 vec3 pow3(vec3 v, float fpow) {
      
@@ -69,51 +71,15 @@ vec3 pow3(vec3 v, float fpow) {
     }
 }
 
-vec3 bloom(float Directions, float Quality, float Size, float fbloom_gamma) {
-    vec4 iResolution = params.SourceSize*0.2;
-    float Pi = 6.28318530718; // Pi*2
-    vec2 Radius = Size/iResolution.xy ;
-
-    vec2 uv = vTexCoord;
-    vec3 color  = vec3(0.0,0.0,0.0);//texture(Source, uv).rgb;
-    vec3 lookup = vec3(0.0,0.0,0.0);//texture(Source, uv).rgb;
-    float steps=0.0;
-    for( float d=0.0; d<Pi; d+=Pi/Directions) {
-        for(float i=1.0/Quality; i<=1.0; i+=1.0/Quality) {
-            lookup = texture( Source, uv+vec2(cos(d) -0.20 ,     sin(d))*Radius*i).rgb ;
-            color +=pow3(lookup.rgb,fbloom_gamma);
-            steps+=1.0;
-        }
-    }
-    color /= (steps-1); //(Quality * Directions - 15.0);
-    return color;
-}
-
-vec3 blur(float Directions, float Quality, float Size, float fbloom_gamma) {
-    vec4 iResolution = params.SourceSize*0.2;
-    float Pi = 6.28318530718; // Pi*2
-    vec2 Radius = Size/iResolution.xy ;
-
-    vec2 uv = vTexCoord;
-    vec3 color  = vec3(0.0,0.0,0.0);//texture(Source, uv).rgb;
-    vec3 lookup = vec3(0.0,0.0,0.0);//texture(Source, uv).rgb;
-    float steps=0.0;
-    for( float d=0.0; d<Pi; d+=Pi/Directions) {
-        for(float i=1.0/Quality; i<=1.0; i+=1.0/Quality) {
-            lookup = texture( Source, uv+vec2(cos(d) -0.20 ,     sin(d))*Radius*i).rgb ;
-            color +=lookup.rgb;
-            steps+=1.0;
-        }
-    }
-    color /= (steps-1); //(Quality * Directions - 15.0);
-    return color;
-}
+// What follows is an ugly optimization with a lot of code copied and pasted repeated multiple times,
+// shamlessly hidden into an include:
+#include "blooms.slang" 
 
 
 void main() {
     if (DO_BLOOM > 0.0 ) {
-        FragColor = vec4(blur(bloom_directions,bloom_quality,bloom_size,bloom_gamma),0.0);
+        FragColor = vec4(bloom(bloom_directions,bloom_quality,bloom_size,1),0.0);
     } else {
-        FragColor = texture( Source, vTexCoord);
+        FragColor = texture( SourceTexture, vTexCoord);
     }
 }
