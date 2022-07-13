@@ -1,6 +1,7 @@
 #version 450
 #include "config.inc"
 
+
 // RGB mask:       R     G     B
  #define m1 vec3 ( 1.0 , 0.0 , 0.0 )    //col 1
  #define m2 vec3 ( 0.0 , 1.0 , 0.0 )    //col 2
@@ -30,140 +31,10 @@ layout(set = 0, binding = 3) uniform sampler2D Original;
 #define rubyTextureSize params.SourceSize
 #define texture2D(a,b) texture(a,b)
 
-vec3 pow3(vec3 v, float fpow) {
-     
-    //Depending on the hardware and shader compiler (and maybe on the exponent)
-    //one may prefer to use the default pow or the integer optimized one.
-    if (prefer_std_pow == 1) {
-        return pow(v,vec3(fpow));
-    }
-    
-    vec3 v2,v4;
-    if (fpow == 1) {
-        return v;
-    } else if (fpow == 2) {
-        return v*v;
-        
-    } else if (fpow == 3) {
-        return v*v*v;
-        
-    } else if (fpow == 4) {
-        v2=v*v;
-        return v2*v2;
-        
-    } else if (fpow == 5) {
-        v2=v*v;
-        return v2*v2*v;
-        
-    } else if (fpow == 6) {
-        v2=v*v;
-        return v2*v2*v2;
-        
-    } else if (fpow == 7) {
-        v2=v*v;
-        return v2*v2*v2*v;
-        
-    } else if (fpow == 8) {
-        v2=v*v;
-        v4=v2*v2;
-        return v4*v4;
-        
-    } else if (fpow == 9) {
-        v2=v*v;
-        v4=v2*v2;
-        return v4*v4*v;
-        
-    } else if (fpow == 10) {
-        v2=v*v;
-        v4=v2*v2;
-        vec3 v8=v4*v4;
-        return v8*v2;        
-    }
-}
 
-vec4 pixel_glow(float my_glowpix, float my_glowpixy, float my_glow, float glow_gamma) {
-
-    // Calculating texel coordinates
-    vec2 tex = vTexCoord.xy * 1.00001;
-    vec4 SourceSize1 = params.SourceSize;
-    vec4 size     = rubyTextureSize;
-    vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5);
-    vec2 fp = fract(OGL2Pos);
-    vec2 dx = vec2(SourceSize1.z,0.0);
-    vec2 dy = vec2(0.0,SourceSize1.w);
-    vec2 pC4 = (floor(OGL2Pos) + vec2(0.5)) * params.SourceSize.zw;
-
-    vec2 x2 = 2.0*dx; vec2 x3 = 3.0*dx;
-    vec2 y2 = 2.0*dy;
-
-    my_glowpix = my_glowpix / scalemod * 2 ; // <-- Make it not dependant on the input resolution.
-    my_glowpixy = my_glowpixy / scalemod *2 ;
-
-    float wl3 = 2.0 + fp.x; wl3*=wl3; wl3 = exp2(-my_glowpix*wl3);
-    float wl2 = 1.0 + fp.x; wl2*=wl2; wl2 = exp2(-my_glowpix*wl2);
-    float wl1 =       fp.x; wl1*=wl1; wl1 = exp2(-my_glowpix*wl1);
-    float wr1 = 1.0 - fp.x; wr1*=wr1; wr1 = exp2(-my_glowpix*wr1);
-    float wr2 = 2.0 - fp.x; wr2*=wr2; wr2 = exp2(-my_glowpix*wr2);
-    float wr3 = 3.0 - fp.x; wr3*=wr3; wr3 = exp2(-my_glowpix*wr3);
-
-    float wt = 1.0/(wl3+wl2+wl1+wr1+wr2+wr3);
-
-    vec3 l3 = texture2D(rubyTexture, pC4 -x2 ).rgb;
-    vec3 l2 = texture2D(rubyTexture, pC4 -dx ).rgb;
-    vec3 l1 = texture2D(rubyTexture, pC4     ).rgb;
-    vec3 r1 = texture2D(rubyTexture, pC4 +dx ).rgb;
-    vec3 r2 = texture2D(rubyTexture, pC4 +x2 ).rgb;
-    vec3 r3 = texture2D(rubyTexture, pC4 +x3 ).rgb;
-    l3=pow3(l3,glow_gamma); l2=pow3(l2,glow_gamma); l1=pow3(l1,glow_gamma);
-    r1=pow3(r1,glow_gamma); r2=pow3(r2,glow_gamma); r3=pow3(r3,glow_gamma);
-
-    vec3 t1 = (l3*wl3 + l2*wl2 + l1*wl1 + r1*wr1 + r2*wr2 + r3*wr3)*wt;
-
-    l3 = texture2D(rubyTexture, pC4 -x2 -dy).rgb;
-    l2 = texture2D(rubyTexture, pC4 -dx -dy).rgb;
-    l1 = texture2D(rubyTexture, pC4     -dy).rgb;
-    r1 = texture2D(rubyTexture, pC4 +dx -dy).rgb;
-    r2 = texture2D(rubyTexture, pC4 +x2 -dy).rgb;
-    r3 = texture2D(rubyTexture, pC4 +x3 -dy).rgb;
-    l3=pow3(l3,glow_gamma); l2=pow3(l2,glow_gamma); l1=pow3(l1,glow_gamma);
-    r1=pow3(r1,glow_gamma); r2=pow3(r2,glow_gamma); r3=pow3(r3,glow_gamma);
-
-    vec3 t2 = (l3*wl3 + l2*wl2 + l1*wl1 + r1*wr1 + r2*wr2 + r3*wr3)*wt;
-
-    l3 = texture2D(rubyTexture, pC4 -x2 +dy).rgb;
-    l2 = texture2D(rubyTexture, pC4 -dx +dy).rgb;
-    l1 = texture2D(rubyTexture, pC4     +dy).rgb;
-    r1 = texture2D(rubyTexture, pC4 +dx +dy).rgb;
-    r2 = texture2D(rubyTexture, pC4 +x2 +dy).rgb;
-    r3 = texture2D(rubyTexture, pC4 +x3 +dy).rgb;
-    l3=pow3(l3,glow_gamma); l2=pow3(l2,glow_gamma); l1=pow3(l1,glow_gamma);
-    r1=pow3(r1,glow_gamma); r2=pow3(r2,glow_gamma); r3=pow3(r3,glow_gamma);
-
-    vec3 b1 = (l3*wl3 + l2*wl2 + l1*wl1 + r1*wr1 + r2*wr2 + r3*wr3)*wt;
-
-    l3 = texture2D(rubyTexture, pC4 -x2 +y2).rgb;
-    l2 = texture2D(rubyTexture, pC4 -dx +y2).rgb;
-    l1 = texture2D(rubyTexture, pC4     +y2).rgb;
-    r1 = texture2D(rubyTexture, pC4 +dx +y2).rgb;
-    r2 = texture2D(rubyTexture, pC4 +x2 +y2).rgb;
-    r3 = texture2D(rubyTexture, pC4 +x3 +y2).rgb;
-    l3=pow3(l3,glow_gamma); l2=pow3(l2,glow_gamma); l1=pow3(l1,glow_gamma);
-    r1=pow3(r1,glow_gamma); r2=pow3(r2,glow_gamma); r3=pow3(r3,glow_gamma);
-
-    vec3 b2 = (l3*wl3 + l2*wl2 + l1*wl1 + r1*wr1 + r2*wr2 + r3*wr3)*wt;
-
-    wl2 = 1.0 + fp.y; wl2*=wl2; wl2 = exp2(-my_glowpixy*wl2);
-    wl1 =       fp.y; wl1*=wl1; wl1 = exp2(-my_glowpixy*wl1);
-    wr1 = 1.0 - fp.y; wr1*=wr1; wr1 = exp2(-my_glowpixy*wr1);
-    wr2 = 2.0 - fp.y; wr2*=wr2; wr2 = exp2(-my_glowpixy*wr2);
-
-    wt = 1.0/(wl2+wl1+wr1+wr2);
-
-    vec3 Bloom = (t2*wl2 + t1*wl1 + b1*wr1 + b2*wr2)*wt;
-
-    return vec4(Bloom*my_glow,0.0);
-}
-    
+// What follows is an ugly optimization with a lot of code copied and pasted repeated multiple times,
+// shamlessly hidden into an include:
+#include "pixel_glows.slang"    
     
 vec3 fix_scanlines() {
     return pixel_glow(scanline_sharpness*2,scanline_sharpness,1.0,1.0).rgb;

@@ -6,6 +6,7 @@ layout(push_constant) uniform Push
 	vec4 OriginalSize;
 	vec4 OutputSize;
 	uint FrameCount;
+	
 	float SCANLINE_DARK;
 	float IN_GLOW_ADD ;
 	float in_glow_wh ;
@@ -21,28 +22,29 @@ layout(push_constant) uniform Push
 	float halo_wh ;
 	float halo_power ;
 	float halo_gamma ;
-	float DO_BLOOM ;
- 	float bloom_directions ;
- 	float bloom_quality ;
- 	float bloom_size ;
+	float DO_BLOOM ; //4
+ 	float bloom_directions ; //1
+ 	float bloom_quality ; //1
+	float prefer_std_pow; 
 } params;
 
 layout(std140, set = 0, binding = 0) uniform UBO
 {
 	mat4 MVP;
-	float prefer_std_pow;
-	float bloom_gamma;
-	float bloom_on_dark_only;
-	float bloom_power;
-  	float GAMMA_R ;
-  	float GAMMA_G ;
-  	float GAMMA_B ;
-  	float saturation ;
-  	float DO_ALT_BLANK ;
-	float DO_FXAA ;
-	float scanline_sharpness ;
-	float scanline_flickering ;
-	float SCANLINE_OVERWHITE ;
+ 	float bloom_size ; //1
+	float bloom_gamma; //1
+	float bloom_on_dark_only; //1
+	float bloom_power; //1
+  	float DO_ALT_BLANK ; //2 FIXME to 1
+	float DO_FXAA ; //1
+	float scanline_sharpness ; //2..3 FIXME in fix_scanlines
+	float scanline_flickering ; //2
+	
+float GAMMA_R ; //1
+float GAMMA_G ; //1
+float GAMMA_B ; //1
+float saturation ; //1
+	
 } global;
 
 
@@ -210,7 +212,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #define DO_BLOOM params.DO_BLOOM
 #define bloom_directions params.bloom_directions
 #define bloom_quality params.bloom_quality
-#define bloom_size params.bloom_size
+#define bloom_size global.bloom_size
 #define bloom_gamma global.bloom_gamma
 #define bloom_power global.bloom_power
 #define bloom_on_dark_only global.bloom_on_dark_only
@@ -226,4 +228,4 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 #define DO_FXAA global.DO_FXAA
 
-#define prefer_std_pow global.prefer_std_pow
+#define prefer_std_pow params.prefer_std_pow
