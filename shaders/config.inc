@@ -30,6 +30,7 @@ layout(push_constant) uniform Push
 layout(std140, set = 0, binding = 0) uniform UBO
 {
 	mat4 MVP;
+	float prefer_std_pow;
 	float bloom_gamma;
 	float bloom_on_dark_only;
 	float bloom_power;
@@ -48,27 +49,34 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // PARAMETERS AND MEANING
 
 
+
+//Misc
+//Depending on the compiler and exponent size, one may prefer to use the standard pow or the
+//integer optimized one.
+#pragma parameter str_1          "Optimizations:" 						0.0 	0.0 1.0 1.0
+#pragma parameter prefer_std_pow "        Use standard pow: (Switch to see which is faster)"	1.0 	0.0 1.0 1.0
+
+
+
 // FXAA
 // Apply an antialiasing filter via FXAA from nvidia, Boolean.
-#pragma parameter DO_FXAA "[FXAA]  1.0 to enable"	1.0 	0.0 1.0 1.0
-
+#pragma parameter str_2   "FXAA:"		0.0 	0.0 1.0 1.0
+#pragma parameter DO_FXAA "        1.0 to enable"	1.0 	0.0 1.0 1.0
 
 
 // Scanlines
 // Blank even source lines, the value from 0.0 to 1.0 expresses the darkness of the blanked lines
 // 1.0 means no blank at all.
-#pragma parameter SCANLINE_DARK "[Scanlines] Dark scanlines brightness, (1.0=off)"		  		1.0 	0.0 1.0 0.05
+#pragma parameter str_3		"Scanlines:" 0.0 0.0 1.0 1.0
+#pragma parameter SCANLINE_DARK "        Dark scanlines brightness, (1.0=off)"		  		1.0 	0.0 1.0 0.05
 
 // The amount of scanline sharpness. Very high values may cause visual artifacts when using not integer scaling
-#pragma parameter scanline_sharpness "[Scanlines] Sharpness (use 15 for maximum on integer scaling)"	  	10.0 	1.0 15.0 0.2
-
-
-#pragma parameter SCANLINE_OVERWHITE "[Scanlines] Affects bright colors" 					1.0 	0.0 1.0 0.05
+#pragma parameter scanline_sharpness "        Sharpness (use 15 for maximum on integer scaling)"	  	10.0 	1.0 15.0 0.2
 
 // Alternate the drawing of the scanlines between frames. this will produce a flickering typical of
 // interlaced screens; 0 disable the effect, 1 always enables it, 2 enables it only when
 // the shader detects an interlaced signal, which actually means that the vertical resoution is "high enough"
-#pragma parameter scanline_flickering "[Scanlines] Flicker (0=off,1=on,2=if interlaced)"		  	2.0 	0.0 2.0 1.0
+#pragma parameter scanline_flickering "        Flicker (0=off,1=on,2=if interlaced)"		  	2.0 	0.0 2.0 1.0
 
 
 
@@ -81,10 +89,11 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // line, wihch may (or not) produce better effects when emulating scanlines.
 // With "IN_GLOW_ADD=0" input glowing does not alter the RGB mask
 // or slot mask applied to the image.
-#pragma parameter in_glow_power "[In Glow] Input signal glow strength (neg=off)"			0.45 	-0.05 10.0 0.05
-#pragma parameter in_glow_wh    "[In Glow] Sharpness"										2.5 	0.0 10.0 0.05
-#pragma parameter in_glow_gamma "[In Glow] Gamma, the higher, the less the glow on dark colors"	1.0 	1.0 9.0 1.0
-#pragma parameter IN_GLOW_ADD   "[In Glow] Overflows from the scanlines, sharper image"		0.0 	0.0 1.0 0.05
+#pragma parameter str_4         "Input glowing:" 					0.0 0.0 1.0 1.0
+#pragma parameter in_glow_power "        Input signal glow strength (neg=off)"			0.45 	-0.05 10.0 0.05
+#pragma parameter in_glow_wh    "        Sharpness"							2.5 0.0 10.0 0.05
+#pragma parameter in_glow_gamma "        Gamma, the higher, the less the glow on dark colors"	1.0 	1.0 10.0 1.0
+#pragma parameter IN_GLOW_ADD   "        Overflows from the scanlines, sharper image"		0.0 	0.0 1.0 0.05
 
 
 
@@ -96,8 +105,9 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // "VMASK_OVERWHITE" modulates the strenght of the effect depending on the source pixel brightness,
 // This is handy  if you want to keep a good image contrast/brightness, but keep in mind that other
 // parameters like haloing and bloom.
-#pragma parameter DO_RGB_MASK "[RGB Mask] Strength (0.0=off)"					0.75  	0.0 1.0 0.05
-#pragma parameter VMASK_OVERWHITE "[RGB Mask] Affects bright colors" 				1.0 	0.0 1.0 0.05
+#pragma parameter str_5           "RGB Mask:" 				0.0 0.0 1.0 1.0
+#pragma parameter DO_RGB_MASK     "        Strength (0.0=off)"			0.75  	0.0 1.0 0.05
+#pragma parameter VMASK_OVERWHITE "        How much to affect bright colors"	1.0 	0.0 1.0 0.05
 
 
 
@@ -109,10 +119,11 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // "DARKLINES_PERIOD" expresses every how many lines draw a black one.
 // "DO_DARKLINES_VOFFSET" lets you to vertically offset by ""DARKLINES_PERIOD/2" the lines every 3 screen pixels,
 // allowing, in conjunction with RGB mask, to emulate slot mask
-#pragma parameter DO_DARKLINES "[Dark screenlines] Slotmask/aperture grille strength"	0.3 	0.0 1.0 0.05
-#pragma parameter DO_DARKLINES_VOFFSET "[Dark screenlines]  Offset by triads"		1.0 	0.0 1.0 1.0
-#pragma parameter DARKLINES_PERIOD "[Dark screenlines] Period"				4.0 	-8.0 8.0 2.0
-#pragma parameter DRKLN_OVERWHITE "[Dark screenlines] Affects bright colors"		1.0 	0.0 1.0 0.05
+#pragma parameter str_6                 "Slotmask/Aperture grille"		0.0 0.0 1.0 1.0
+#pragma parameter DO_DARKLINES          "        Strength"				0.3 	0.0 1.0 0.05
+#pragma parameter DO_DARKLINES_VOFFSET  "        Offset by triads"			1.0 	0.0 1.0 1.0
+#pragma parameter DARKLINES_PERIOD      "        Period"				4.0 	-8.0 8.0 2.0
+#pragma parameter DRKLN_OVERWHITE       "        How much to affect bright colors"	1.0 	0.0 1.0 0.05
 
 
 
@@ -122,9 +133,10 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // multiplying the resulting picture by the source one, it is added.
 // this means that haloing will produce solid colors,
 // lessening afromentioned effects on bright colors.
-#pragma parameter halo_power "[Halo] Strength (neg=off)"					0.9 	-0.05 10.0 0.05
-#pragma parameter halo_wh "[Halo] Sharpness"							1.75 	0.0  10.0 0.05
-#pragma parameter halo_gamma "[Halo] Gamma, the higher, the less the halo on dark colors"	2.0 	1.0  9.0 1.0
+#pragma parameter str_7         "Halo:" 				0.0 0.0 1.0 1.0
+#pragma parameter halo_power    "        Strength (neg=off)"					0.9 	-0.05 10.0 0.05
+#pragma parameter halo_wh       "        Sharpness"						1.75	0.0  10.0 0.05
+#pragma parameter halo_gamma    "        Gamma, the higher, the less the halo on dark colors"	2.0 	1.0  10.0 1.0
 
 
 
@@ -137,13 +149,14 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // "bloom_power" is the additional gain applied to the bloom
 // "bloom_on_dark_only" will mix the bloomed image with the original depending on the brightness of
 // the original image.
-#pragma parameter DO_BLOOM "[Bloom] final mix, (0.0=off)"				0.15	0.0 1.0 0.01
-#pragma parameter bloom_size "[Bloom] Radius"						0.25 	0.1 3.0 0.05
-#pragma parameter bloom_directions "[Bloom] Directions: more is better but slower"	8.0	4.0 64.0 4.0
-#pragma parameter bloom_quality "[Bloom] Quality: more is better but slower"		8.0	2.0 32.0 1.0
-#pragma parameter bloom_gamma "[Bloom] Bloom gamma"					2.0	1.0 9.0 0.25
-#pragma parameter bloom_power "[Bloom] Bloom power multiplier"				2.0	1.0 10.0 0.1
-#pragma parameter bloom_on_dark_only "[Bloom] Bloom only over dark areas"		1.0	0.0 1.0 1.0
+#pragma parameter str_8              "Bloom:" 				                0.0 0.0  1.0  1.0
+#pragma parameter DO_BLOOM           "        Final mix, (0.0=off)"			0.15 0.0 1.0  0.01
+#pragma parameter bloom_size         "        Radius"					0.25 0.1 3.0  0.05
+#pragma parameter bloom_directions   "        Directions: more is better but slower"	8.0  4.0 64.0 4.0
+#pragma parameter bloom_quality      "        Quality: more is better but slower"	8.0  2.0 32.0 1.0
+#pragma parameter bloom_gamma        "        Gamma"					2.0  1.0 10.0 0.25
+#pragma parameter bloom_power        "        Power multiplier"				2.0  1.0 10.0 0.1
+#pragma parameter bloom_on_dark_only "        Apply less over bright areas"		1.0  0.0 1.0  1.0
 
 
 
@@ -151,20 +164,19 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // Correct the final gamma of the image; you can tint it by assign different values to
 // GAMMA_R, GAMMA_G and GAMMA_B
 // To have more or less saturated colors use "saturation" > 1 or "saturation" < 1
-#pragma parameter GAMMA_R "[Gamma] red. The higher, the darker."	0.69	 0.1 9.0  0.025
-#pragma parameter GAMMA_G "[Gamma] green. The higher, the darker."	0.69	 0.1 9.0  0.025
-#pragma parameter GAMMA_B "[Gamma] blue. The higher, the darker."	0.69	 0.1 9.0  0.025
-#pragma parameter saturation "[Saturation] modifier (1.0=off)"		1.0	 0.0 10.0 0.025
-
+#pragma parameter str_9      "Color corrections:" 			0.0 0.0 1.0 1.0
+#pragma parameter GAMMA_R    "        red. The higher, the darker."		0.69	0.1 9.0  0.025
+#pragma parameter GAMMA_G    "        green. The higher, the darker."	0.69	0.1 9.0  0.025
+#pragma parameter GAMMA_B    "        blue. The higher, the darker."	0.69	0.1 9.0  0.025
+#pragma parameter saturation "        Saturation modifier (1.0=off)"	1.0	0.0 10.0 0.025
 
 
 // Alternative blanking.
 // Emulates the low pixel persistance of CRT monitors and reduces the motion blur,
 // typical of LCD displays, by blanking even/odd screen lines on even/odd frames.
 // DO_ALT_BLANK expresses the strength of the "blank".
-#pragma parameter DO_ALT_BLANK "Black frame insertion strength" 	0.0 0.0 1.0 0.1
-
-
+#pragma parameter str_10       "Alternate blanking: " 				0.0 0.0 1.0 1.0
+#pragma parameter DO_ALT_BLANK "Alternate black frame insertion strength" 	0.0 0.0 1.0 0.1
 
 
 
@@ -213,3 +225,5 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #define DO_ALT_BLANK global.DO_ALT_BLANK
 
 #define DO_FXAA global.DO_FXAA
+
+#define prefer_std_pow global.prefer_std_pow

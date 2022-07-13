@@ -18,9 +18,55 @@ layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D Source;
 
 
-vec3 pow3(vec3 v, float p)
-{
-    return vec3(pow(v.x, p), pow(v.y, p), pow(v.z, p));
+vec3 pow3(vec3 v, float fpow) {
+     
+    //Depending on the hardware and shader compiler (and maybe on the exponent)
+    //one may prefer to use the default pow or the integer optimized one.
+    if (prefer_std_pow == 1) {
+        return pow(v,vec3(fpow));
+    }
+    
+    vec3 v2,v4;
+    if (fpow == 1) {
+        return v;
+    } else if (fpow == 2) {
+        return v*v;
+        
+    } else if (fpow == 3) {
+        return v*v*v;
+        
+    } else if (fpow == 4) {
+        v2=v*v;
+        return v2*v2;
+        
+    } else if (fpow == 5) {
+        v2=v*v;
+        return v2*v2*v;
+        
+    } else if (fpow == 6) {
+        v2=v*v;
+        return v2*v2*v2;
+        
+    } else if (fpow == 7) {
+        v2=v*v;
+        return v2*v2*v2*v;
+        
+    } else if (fpow == 8) {
+        v2=v*v;
+        v4=v2*v2;
+        return v4*v4;
+        
+    } else if (fpow == 9) {
+        v2=v*v;
+        v4=v2*v2;
+        return v4*v4*v;
+        
+    } else if (fpow == 10) {
+        v2=v*v;
+        v4=v2*v2;
+        vec3 v8=v4*v4;
+        return v8*v2;        
+    }
 }
 
 vec3 bloom(float Directions, float Quality, float Size, float fbloom_gamma) {
