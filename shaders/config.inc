@@ -56,7 +56,7 @@ float saturation ; //1
 //Depending on the compiler and exponent size, one may prefer to use the standard pow or the
 //integer optimized one.
 #pragma parameter str_1          "Optimizations:" 						0.0 	0.0 1.0 1.0
-#pragma parameter prefer_std_pow "        Use standard pow: (Switch to see which is faster)"	1.0 	0.0 1.0 1.0
+#pragma parameter prefer_std_pow "        Use standard pow: (Switch to see which is faster)"	0.0 	0.0 1.0 1.0
 
 
 
