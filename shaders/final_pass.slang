@@ -44,6 +44,12 @@ void main(void) {
     //Mix bloom texture
     if (DO_BLOOM > 0.0 ) {
         bloomed=texture(bloom_pass_final, vTexCoord).rgb * bloom_power ;
+        //Reverse the effect of the gamma so that the bloom will be unaffected:
+            //float avg_gamma=(GAMMA_R+GAMMA_B+GAMMA_G)/3.0;
+            //Give it a little help to spread more
+            //avg_gamma*=1.25;
+            //bloomed = pow(bloomed,vec3(1/avg_gamma));
+            
         if ( bloom_on_dark_only  == 1.0) {
            float source_whiteness = (pixel_out.r+pixel_out.g+pixel_out.b)/3;
            float source_darkness = 1-source_whiteness;
@@ -53,20 +59,24 @@ void main(void) {
            pixel_out = mix(pixel_out,bloomed,DO_BLOOM);
         }
     }
-
+    
     //Gamma correction
-	vec3 cc = vec3(1.0,1.0,1.0);
+	vec3 cc = vec3(1.0);
 	if  ((GAMMA_R != 1.0) || (GAMMA_G != 1.0) || (GAMMA_B != 1.0)) {
 		cc=vec3(GAMMA_R, GAMMA_G, GAMMA_B);
 	}
-	pixel_out = pow(vec4(pixel_out,0.0),vec4(cc,0.0)).rgb;
+	pixel_out = pow(pixel_out,cc);
 
-	//Saturation modifier
+
+    //Saturation modifier
     if (!(saturation == 1.0)) {
-        float l = length(pixel_out.rgb);
-        pixel_out =  normalize( pow(pixel_out.rgb + vec3(eps,eps,eps), vec3(saturation,saturation,saturation)))*l  ;
+        float l = length(pixel_out);
+        pixel_out =  normalize( pow(pixel_out.rgb + vec3(eps), vec3(saturation)))*l  ;
     }
+    
 
+
+    
     //Black frame insertion
     if (DO_ALT_BLANK > 0.0 ) {
         pixel_out = pixel_alternate(pixel_out.rgb, 1 - DO_ALT_BLANK );
