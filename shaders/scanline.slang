@@ -57,7 +57,7 @@ void main()
       //No flickering (dumbly blank even lines)
       if ((scanline_flickering == 0.0) ||
          ((scanline_flickering==2.0) && (is_interlaced == 0))) {
-               if (mymod < scanline_period_half) { pixel *= SCANLINE_DARK ;}
+               if (mymod > scanline_period_half) { pixel *= SCANLINE_DARK ;}
       } else {
          //Do flickering based on user prefs.
          //(blank odd lines on odd frames and even lines on even frames)

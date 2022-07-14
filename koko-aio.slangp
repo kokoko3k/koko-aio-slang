@@ -25,7 +25,7 @@
     * Pipeline *
     ------------
 
-→→→ Original image from emulator
+    → Original image from emulator
      ↓
     Double the input size
      ↓
@@ -36,11 +36,11 @@
     Input Glow/Scanline dephasing → phosphors → slot mask/aperture grill →  halo → →
                                                                                     ↓
                                                                                     ↓
-→→→ Original image from emulator                                                    ↓
+    → Original image from emulator                                                  ↓
      ↓                                                                              ↓
     Bloom                                                                           ↓
      ↓                                                                              ↓
-    mix  ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← 
+    mix  ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ←
      ↓
     Color correction → Black frame insertion
                                         ↓
@@ -64,10 +64,8 @@ shaders = 9
     alias0 = "doublesize_pass"
     filter_linear0 = false
     scale_type0 = source
-    
     scale_x0 = "1.0"
-    scale_y0 = "2.0"    
-    
+    scale_y0 = "2.0"
 
 /* Nvidia fxaa pass:
    works good for "SD" resolutions
@@ -84,7 +82,7 @@ shaders = 9
 */
     shader2 = shaders/scanline.slang
     alias2 = "scanline_pass"
-    filter_linear2 = false
+    filter_linear2 = true
     scale_type2 = source
     scale2 = "1.0"
 

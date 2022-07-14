@@ -8,7 +8,8 @@
  #define m3 vec3 ( 0.0 , 0.0 , 1.0  )   //col 3
 
 // Blur sizes must not depend on input resolution
-#define scalemod (params.SourceSize.x/360.0)
+#define scalemod_x (params.SourceSize.x/360.0)
+#define scalemod_y (params.SourceSize.y/270.0)
 
 
 #pragma stage vertex
@@ -196,7 +197,7 @@ void main(void) {
 
     //Halo
     if (halo_power >= 0.0 ) {
-        haloed = pixel_glow(halo_wh,halo_wh,halo_power,halo_gamma).rgb;
+        haloed = pixel_glow(halo_w,halo_h,halo_power,halo_gamma).rgb;
         pixel_out +=haloed;
     }
 

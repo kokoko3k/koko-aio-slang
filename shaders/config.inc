@@ -12,14 +12,14 @@ layout(push_constant) uniform Push
 	float in_glow_wh ;
 	float in_glow_power ;
 	float in_glow_gamma ;
-	float DO_RGB_MASK ;
 	float VMASK_OVERWHITE ;
 	float DO_DARKLINES ;
 	float DRKLN_OVERWHITE ;
 	float DO_DARKLINES_VOFFSET ;
 	float DARKLINES_PERIOD ;
 	float DO_HALO ;
-	float halo_wh ;
+	float halo_w ;
+	float halo_h ;
 	float halo_power ;
 	float halo_gamma ;
 	float DO_BLOOM ; //4
@@ -39,11 +39,11 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float DO_FXAA ; //1
 	float scanline_sharpness ; //2..3 FIXME in fix_scanlines
 	float scanline_flickering ; //2
-	
-float GAMMA_R ; //1
-float GAMMA_G ; //1
-float GAMMA_B ; //1
-float saturation ; //1
+	float DO_RGB_MASK ;
+	float GAMMA_R ; //1
+	float GAMMA_G ; //1
+	float GAMMA_B ; //1
+	float saturation ; //1
 	
 } global;
 
@@ -95,7 +95,7 @@ float saturation ; //1
 // or slot mask applied to the image.
 #pragma parameter str_4         "Input glowing:" 					0.0 0.0 1.0 1.0
 #pragma parameter in_glow_power "        Input signal glow strength (neg=off)"			0.45 	-0.05 10.0 0.05
-#pragma parameter in_glow_wh    "        Sharpness"							2.5 0.0 10.0 0.05
+#pragma parameter in_glow_wh    "        Sharpness"						2.5	0.0 10.0 0.05
 #pragma parameter in_glow_gamma "        Gamma, the higher, the less the glow on dark colors"	1.0 	1.0 10.0 1.0
 #pragma parameter IN_GLOW_ADD   "        Overflows from the scanlines, sharper image"		0.0 	0.0 1.0 0.05
 
@@ -139,7 +139,8 @@ float saturation ; //1
 // lessening afromentioned effects on bright colors.
 #pragma parameter str_7         "Halo:" 				0.0 0.0 1.0 1.0
 #pragma parameter halo_power    "        Strength (neg=off)"					0.9 	-0.05 10.0 0.05
-#pragma parameter halo_wh       "        Sharpness"						1.75	0.0  10.0 0.05
+#pragma parameter halo_w       "         Horizontal sharpness"					1.75	0.0  10.0 0.05
+#pragma parameter halo_h       "         Vertical sharpness"					1.75	0.0  10.0 0.05
 #pragma parameter halo_gamma    "        Gamma, the higher, the less the halo on dark colors"	2.0 	1.0  10.0 1.0
 
 
@@ -196,7 +197,7 @@ float saturation ; //1
 #define in_glow_power params.in_glow_power
 #define in_glow_gamma params.in_glow_gamma
 
-#define DO_RGB_MASK params.DO_RGB_MASK
+#define DO_RGB_MASK global.DO_RGB_MASK
 #define VMASK_OVERWHITE params.VMASK_OVERWHITE
 
 #define DO_DARKLINES params.DO_DARKLINES
@@ -207,7 +208,8 @@ float saturation ; //1
 #define DO_HALO params.DO_HALO
 // #define halo_w params.halo_w
 // #define halo_h params.halo_h
-#define halo_wh params.halo_wh
+#define halo_w params.halo_w
+#define halo_h params.halo_h
 #define halo_power params.halo_power
 #define halo_gamma params.halo_gamma
 

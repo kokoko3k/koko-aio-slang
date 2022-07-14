@@ -17,7 +17,8 @@ DARKLINES_PERIOD = "4.0"
 DRKLN_OVERWHITE = "1.0"
 
 halo_power = "0.9" 
-halo_wh = "2.00"
+halo_w = "1.75"
+halo_h = "1.75"
 halo_gamma = "2.0" 
 
 DO_BLOOM = "0.05"
