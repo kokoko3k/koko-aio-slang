@@ -39,6 +39,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float DO_FXAA ; //1
 	float scanline_sharpness ; //2..3 FIXME in fix_scanlines
 	float scanline_flickering ; //2
+	float scanline_disable_on_interlace;
 	float DO_RGB_MASK ;
 	float GAMMA_R ; //1
 	float GAMMA_G ; //1
@@ -80,7 +81,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // the shader detects an interlaced signal, which actually means that the vertical resoution is "high enough"
 #pragma parameter scanline_flickering "        Interlace Flicker (0=off,1=on,2=if interlaced)"		  	2.0 	0.0 2.0 1.0
 
-#pragma parameter scanline_disable_on_interlace "        Disable on interlaced screens (unimplmented)"	  	0.0 	0.0 1.0 1.0
+#pragma parameter scanline_disable_on_interlace "        Disable on interlaced screen"			  	0.0 	0.0 1.0 1.0
 
 
 
@@ -189,6 +190,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #define scanline_sharpness global.scanline_sharpness
 #define SCANLINE_OVERWHITE global.SCANLINE_OVERWHITE
 #define scanline_flickering global.scanline_flickering
+#define scanline_disable_on_interlace global.scanline_disable_on_interlace
 
 #define IN_GLOW_ADD params.IN_GLOW_ADD
 // #define in_glow_w params.in_glow_w

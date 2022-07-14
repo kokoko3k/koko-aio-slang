@@ -51,57 +51,33 @@ void main()
    }
 
    vec4 pixel = vec4(texture(FXAA_pass, vTexCoord).xyz,1.0);
-   if ( SCANLINE_DARK < 1.0 ) {
-      float mymod = mod(vTexCoord.y * params.OutputSize.y , scanline_period);
+   
+   //Skip scanlines on interlaced content?
+   if  (! ((is_interlaced==1) && (scanline_disable_on_interlace == 1.0))  ) {
       
-      //No flickering (dumbly blank even lines)
-      if ((scanline_flickering == 0.0) ||
-         ((scanline_flickering==2.0) && (is_interlaced == 0))) {
-               if (mymod > scanline_period_half) { pixel *= SCANLINE_DARK ;}
-      } else {
-         //Do flickering based on user prefs.
-         //(blank odd lines on odd frames and even lines on even frames)
-         if ((scanline_flickering == 1.0) ||
-            ((scanline_flickering==2.0) && (is_interlaced == 1))) {
-               if  (int(mod(float(params.FrameCount),2  )) <  1.0 ) {
-                     if (mymod >= scanline_period_half) { pixel *= SCANLINE_DARK; }
-               } else {
-                     if (mymod < scanline_period_half) { pixel *= SCANLINE_DARK; }
-               }
+      //Do we want scanlines?
+      if ( SCANLINE_DARK < 1.0 ) {
+         float mymod = mod(vTexCoord.y * params.OutputSize.y , scanline_period);
+         
+         //No flickering (dumbly blank even lines)
+         if ((scanline_flickering == 0.0) ||
+            ((scanline_flickering==2.0) && (is_interlaced == 0))) {
+                  if (mymod > scanline_period_half) { pixel *= SCANLINE_DARK ;}
+         } else {
+            //Do flickering based on user prefs.
+            //(blank odd lines on odd frames and even lines on even frames)
+            if ((scanline_flickering == 1.0) ||
+               ((scanline_flickering==2.0) && (is_interlaced == 1))) {
+                  if  (int(mod(float(params.FrameCount),2  )) <  1.0 ) {
+                        if (mymod >= scanline_period_half) { pixel *= SCANLINE_DARK; }
+                  } else {
+                        if (mymod < scanline_period_half) { pixel *= SCANLINE_DARK; }
+                  }
+            }
          }
       }
    }
 
-
-/*   float mymod = mod(vTexCoord.y * params.OutputSize.y , scanline_period);
-   
-
-   if  (int(mod(float(params.FrameCount),20.0  )) <  10.0 ) {
-      if (mymod >= 2.0) { pixel *= SCANLINE_DARK; }
-   } else {
-      if (mymod <= 2.0) { pixel *= SCANLINE_DARK; } 
-   }
-   
-*/
    FragColor = pixel;
 }
-
-
-
-
-
-/*void main()
-{
-   vec4 pixel = vec4(texture(FXAA_pass, vTexCoord).xyz,1.0);
-        if ( SCANLINE_DARK < 1.0 ) {
-            float mymod = mod(vTexCoord.y * params.OutputSize.y , 2.0);
-            if  (int(mod(float(params.FrameCount),2.0  )) == 1) {
-                  if (mymod < 1.0) { pixel *= SCANLINE_DARK; }
-            } else {
-                  if (mymod >= 1.0) { pixel *= SCANLINE_DARK; }
-            }
-        }
-   FragColor = pixel;
-}*/
-
 
