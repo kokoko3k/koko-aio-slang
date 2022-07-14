@@ -36,10 +36,11 @@ void main()
       to double y resolution on low resolution to simulate scanlines
       and providing sd-res to fxaa, we can check if a screen is
       interlaced by testing v-resolution of source image.
-      which could be even 288*2(puae)*2(ourselves)=1152.
-      Rest assured that everything over 800px is interlaced
+      which could be at least 200*2(puae)*2(ourselves)=800px.
+      Rest assured that everything over 576,
+      (maximum pal overscanned) is interlaced.
    */
-   if (params.SourceSize.y > 800) {
+   if (params.SourceSize.y > 580) {
       scanline_period=4;
       scanline_period_half=2;
       is_interlaced=1;

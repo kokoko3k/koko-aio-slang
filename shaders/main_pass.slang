@@ -8,7 +8,8 @@
  #define m3 vec3 ( 0.0 , 0.0 , 1.0  )   //col 3
 
 // Blur sizes must not depend on input resolution
-#define scalemod (params.SourceSize.x/320.0)
+#define scalemod (params.SourceSize.x/360.0)
+
 
 #pragma stage vertex
 layout(location = 0) in vec4 Position;

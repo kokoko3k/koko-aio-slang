@@ -70,15 +70,17 @@ float saturation ; //1
 // Blank even source lines, the value from 0.0 to 1.0 expresses the darkness of the blanked lines
 // 1.0 means no blank at all.
 #pragma parameter str_3		"Scanlines:" 0.0 0.0 1.0 1.0
-#pragma parameter SCANLINE_DARK "        Dark scanlines brightness, (1.0=off)"		  		1.0 	0.0 1.0 0.05
+#pragma parameter SCANLINE_DARK "        Dark scanlines brightness, (1.0=off)"		  			1.0 	0.0 1.0 0.05
 
 // The amount of scanline sharpness. Very high values may cause visual artifacts when using not integer scaling
-#pragma parameter scanline_sharpness "        Sharpness (use 15 for maximum on integer scaling)"	  	10.0 	1.0 15.0 0.2
+#pragma parameter scanline_sharpness  "        Sharpness (use 15 for maximum on integer scaling)"	  	10.0 	1.0 15.0 0.2
 
 // Alternate the drawing of the scanlines between frames. this will produce a flickering typical of
 // interlaced screens; 0 disable the effect, 1 always enables it, 2 enables it only when
 // the shader detects an interlaced signal, which actually means that the vertical resoution is "high enough"
-#pragma parameter scanline_flickering "        Flicker (0=off,1=on,2=if interlaced)"		  	2.0 	0.0 2.0 1.0
+#pragma parameter scanline_flickering "        Interlace Flicker (0=off,1=on,2=if interlaced)"		  	2.0 	0.0 2.0 1.0
+
+#pragma parameter scanline_disable_on_interlace "        Disable on interlaced screens (unimplmented)"	  	0.0 	0.0 1.0 1.0
 
 
 

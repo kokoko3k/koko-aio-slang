@@ -1,6 +1,5 @@
 /*TODO:
-  * Separa gli include dalla configurazione vera e propria.
-    Se la texture è maggiore del viewport, è possibile fare un crop?
+    Add a way to disable scanlines when detecting interlaced content?
 */
 
 /*
@@ -26,7 +25,7 @@
     * Pipeline *
     ------------
 
-    → Original image from emulator
+→→→ Original image from emulator
      ↓
     Double the input size
      ↓
@@ -37,11 +36,11 @@
     Input Glow/Scanline dephasing → phosphors → slot mask/aperture grill →  halo → →
                                                                                     ↓
                                                                                     ↓
-    → Original image from emulator                                                  ↓
+→→→ Original image from emulator                                                    ↓
      ↓                                                                              ↓
     Bloom                                                                           ↓
      ↓                                                                              ↓
-    mix  ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ←
+    mix  ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← 
      ↓
     Color correction → Black frame insertion
                                         ↓
@@ -65,8 +64,10 @@ shaders = 9
     alias0 = "doublesize_pass"
     filter_linear0 = false
     scale_type0 = source
+    
     scale_x0 = "1.0"
-    scale_y0 = "2.0"
+    scale_y0 = "2.0"    
+    
 
 /* Nvidia fxaa pass:
    works good for "SD" resolutions
