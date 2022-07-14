@@ -68,6 +68,21 @@ vec3 pixel_vmask(vec3 source4, vec3 lm1,vec3 lm2,vec3 lm3,
         whiteness=max(whiteness,0.0);
         pixel_out =  mix(vmasked,source,whiteness);
     }
+    
+    if (is_scanlined)  {
+        vec4 lookup=texture(Source, vTexCoord);
+        return pixel_out * lookup.a;
+         } else {
+        return pixel_out;
+    }
+    
+    
+    
+    
+    //return pixel_out * lookup.a;
+    //return pixel_out;
+    
+    
     // originale fa: vec4 lookup=texture2D(rubyTexture, gl_TexCoord[0].xy);
     //vec3 pixel_in = texture(Source, vTexCoord).rgb;
     //vec3 pixel_in = texture2D(rubyTexture, gl_TexCoord[0].xy).rgb;
@@ -166,7 +181,7 @@ void main(void) {
             in_glow_h = scanline_sharpness ;
          }
         glowed = pixel_glow(in_glow_wh,in_glow_h,in_glow_power,in_glow_gamma).rgb;
-        glowed = min(glowed,1.0); //Input signal glow dont have "to white" the phosphors.
+        //glowed = min(glowed,1.0); //Input signal glow dont have "to white" the phosphors. //FIXME: In dubt to turn it on; previous glsl version did not have this.
         if (IN_GLOW_ADD>0.0) {
             pixel_out =mix(glowed,glowed+pixel_out,IN_GLOW_ADD);
         } else {

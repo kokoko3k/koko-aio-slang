@@ -5,7 +5,7 @@ SCANLINE_DARK = "0.0"
 scanline_sharpness = 3.0
 								scanline_flickering = 0.0
 
-in_glow_power = "3.0"
+in_glow_power = "1.5"
 in_glow_wh = "0.75"
 in_glow_gamma = "1.0" 
 								IN_GLOW_ADD = "0.0"
