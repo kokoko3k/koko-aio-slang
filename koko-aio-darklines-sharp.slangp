@@ -31,9 +31,7 @@ bloom_gamma = 9.0"
 bloom_power = "2.5"
 bloom_on_dark_only = 1.0
 
-GAMMA_R = "0.85"
-GAMMA_G = "0.85"
-GAMMA_B = "0.85"
+GAMMA_OUT = "0.85"
 saturation = "1.00"
 
 DO_ALT_BLANK 0.0

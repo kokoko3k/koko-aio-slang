@@ -49,7 +49,7 @@
 
 */
 
-shaders = 9
+shaders = 10
 
 /*For P-uae defaults, doubling just y0 seems the best option.
   90% of games are lowres in vertical size and p-uae defaults
@@ -64,8 +64,8 @@ shaders = 9
     alias0 = "doublesize_pass"
     filter_linear0 = false
     scale_type0 = source
-    scale_x0 = "1.0"
-    scale_y0 = "2.0"
+    scale_x0 = 1.0
+    scale_y0 = 2.0
 
 /* Nvidia fxaa pass:
    works good for "SD" resolutions
@@ -74,7 +74,7 @@ shaders = 9
     alias1 = "FXAA_pass"
     filter_linear1 = true
     scale_type1 = source
-    scale1 = "1.0"
+    scale1 = 1.0
 
 /* Pretty dumb scanline shader.
    It just blank alternate lines and can optionally emulate interlacing.
@@ -84,7 +84,7 @@ shaders = 9
     alias2 = "scanline_pass"
     filter_linear2 = false
     scale_type2 = source
-    scale2 = "1.0"
+    scale2 = 1.0
 
 /* In this pass we emulate glowing,
    fix scanline dephasing, RGB vertical mask,
@@ -94,45 +94,51 @@ shaders = 9
     alias3 = "main_pass"
     filter_linear3= true
     scale_type3 = viewport
-    scale3 = "1.0"
+    scale3 = 1.0
 
 /* In the subsequent passes we do first a fast blOOm by first
    sampling the original texture and scale it down to keep
    it fast, next we do subsequent blURs of the bloomed
    pass.
 */
-    shader4 = shaders/bloom_pass_1.slang
-    alias4 = "bloom_pass_1"
-    filter_linear4 = true
-    scale_type4 = absolute
-    scale_x4 = "320"
-    scale_y4 = "240"
+        shader4 = shaders/passthrough_original.slang
+        alias4 = "bloom_pass_0"
+        filter_linear4 = true
+        scale_type4 = absolute
+        scale_x4 = 320
+        scale_y4 = 240
 
-    shader5 = shaders/bloom_pass_2.slang
-    alias5 = "bloom_pass_2"
-    filter_linear5 = true
-    scale_type5 = source
-    scale5 = "1"
+        shader5 = shaders/bloom_pass_1.slang
+        alias5 = "bloom_pass_1"
+        filter_linear5 = true
+        scale_type5 = source
+        scale5 = 1
 
-    //shader6 = shaders/passthrough.slang
-    shader6 = shaders/bloom_pass_2.slang
-    alias6 = "bloom_pass_3"
-    filter_linear6 = true
-    scale_type6 = source
-    scale6 = "1"
+        shader6 = shaders/bloom_pass_2.slang
+        alias6 = "bloom_pass_2"
+        filter_linear6 = true
+        scale_type6 = source
+        scale6 = 1
 
-    //shader7 = shaders/passthrough.slang
-    shader7 = shaders/bloom_pass_2.slang
-    alias7 = "bloom_pass_final"
-    filter_linear7 = true
-    scale_type7 = source
-    scale7 = "1"
+        //shader6 = shaders/passthrough.slang
+        shader7 = shaders/bloom_pass_2.slang
+        alias7 = "bloom_pass_3"
+        filter_linear7 = true
+        scale_type7 = source
+        scale7 = 1
+
+        //shader8 = shaders/passthrough.slang
+        shader8 = shaders/bloom_pass_2.slang
+        alias8 = "bloom_pass_final"
+        filter_linear8 = true
+        scale_type8 = source
+        scale8 = 1
 
 /* Last pass will do the composition of the previous passes
    with the bloomed image, color corrections and
    black frame insertions.
 */
-    shader8 =shaders/final_pass.slang
-    filter_linear8 =true
-    scale_type8 =viewport
-    scale8 = "1.0"
+    shader9 =shaders/final_pass.slang
+    filter_linear9 =true
+    scale_type9 =viewport
+    scale9 = 1.0

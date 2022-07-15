@@ -3,10 +3,10 @@ DO_FXAA = "1.0"
 SCANLINE_DARK = "1.0"
 
 
-in_glow_power = "0.80"
+in_glow_power = "1.0"
 in_glow_wh = "4.0"	
 in_glow_gamma = "1.0" 
-IN_GLOW_ADD = "0.0"
+IN_GLOW_ADD = "0.3"
 
 DO_RGB_MASK = "1.0"
 VMASK_OVERWHITE = "1.0"
@@ -16,23 +16,21 @@ DO_DARKLINES_VOFFSET = "0.0"
 DARKLINES_PERIOD = "2.0" 	
 DRKLN_OVERWHITE = "1.0"
 
-halo_power = "1.1" 
-halo_w = "1.25"
-halo_h = "1.25"
+halo_power = "0.8" 
+halo_w = "1.8"
+halo_h = "1.8"
 halo_gamma = "3.0" 
 
-DO_BLOOM = "0.025"
-bloom_size = "0.20"
-bloom_directions = "8.0"
-bloom_quality = "8.0"
-bloom_gamma = 5.0"
-bloom_power = "5.0"
+DO_BLOOM = "0.02"
+bloom_size = "2.5"
+bloom_quality = "4.0"
+bloom_gamma = 4.0"
+bloom_power = "4.0"
+bloom_output_gamma = "1"
 bloom_on_dark_only = 1.0
 
-GAMMA_R = "0.54"	
-GAMMA_G = "0.53"	
-GAMMA_B = "0.52"
 
+GAMMA_OUT = "0.56"	
 saturation 1.0
 
 DO_ALT_BLANK 0.0

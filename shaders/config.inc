@@ -23,7 +23,7 @@ layout(push_constant) uniform Push
 	float halo_power ;
 	float halo_gamma ;
 	float DO_BLOOM ; //4
- 	float bloom_directions ; //1
+ 	//float bloom_directions ; //1
  	float bloom_quality ; //1
 	float prefer_std_pow; 
 } params;
@@ -41,11 +41,9 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float scanline_flickering ; //2
 	float scanline_disable_on_interlace;
 	float DO_RGB_MASK ;
-	float GAMMA_R ; //1
-	float GAMMA_G ; //1
-	float GAMMA_B ; //1
+	float GAMMA_OUT ; //1
 	float saturation ; //1
-	
+	float bloom_gamma_out; 
 } global;
 
 
@@ -150,30 +148,28 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // The image is downsampled, bloomed and mixed back with the original image.
 // "DO_BLOOM" is the final mix strength
 // "bloom_size" is the radius of the blurred image
-// "bloom_directions" and "bloom_quality" express a tradeoff between quality and effect speed.
+// "bloom_quality" express a tradeoff between quality and effect speed.
 // "bloom_gamma" allows to apply more bloom on the bright colors of the source image
 // "bloom_power" is the additional gain applied to the bloom
 // "bloom_on_dark_only" will mix the bloomed image with the original depending on the brightness of
 // the original image.
 #pragma parameter str_8              "Bloom:" 				                0.0 0.0  1.0  1.0
 #pragma parameter DO_BLOOM           "        Final mix, (0.0=off)"			0.15 0.0 1.0  0.01
-#pragma parameter bloom_size         "        Radius"					0.25 0.1 3.0  0.05
-#pragma parameter bloom_directions   "        Directions: more is better but slower"	8.0  4.0 64.0 4.0
+#pragma parameter bloom_size         "        Radius"					4.0  0.5 30.0 0.5
+//#pragma parameter bloom_directions   "        Directions: more is better but slower"	8.0  4.0 64.0 4.0
 #pragma parameter bloom_quality      "        Quality: more is better but slower"	8.0  2.0 32.0 1.0
-#pragma parameter bloom_gamma        "        Gamma"					2.0  1.0 10.0 1.0
+#pragma parameter bloom_gamma        "        Input Gamma"				2.0  1.0 10.0 1.0
 #pragma parameter bloom_power        "        Power multiplier"				2.0  1.0 10.0 0.1
+#pragma parameter bloom_gamma_out    "        Output Gamma"				1.0  0.1 10.0 0.05
 #pragma parameter bloom_on_dark_only "        Apply less over bright areas"		1.0  0.0 1.0  1.0
 
 
 
 // Gamma and saturation correction
-// Correct the final gamma of the image; you can tint it by assign different values to
-// GAMMA_R, GAMMA_G and GAMMA_B
+// Correct the final gamma of the image
 // To have more or less saturated colors use "saturation" > 1 or "saturation" < 1
 #pragma parameter str_9      "Color corrections:" 			0.0 0.0 1.0 1.0
-#pragma parameter GAMMA_R    "        red. The higher, the darker."		0.69	0.1 9.0  0.025
-#pragma parameter GAMMA_G    "        green. The higher, the darker."	0.69	0.1 9.0  0.025
-#pragma parameter GAMMA_B    "        blue. The higher, the darker."	0.69	0.1 9.0  0.025
+#pragma parameter GAMMA_OUT  "        Gamma output"			0.69	0.1 9.0  0.025
 #pragma parameter saturation "        Saturation modifier (1.0=off)"	1.0	0.0 10.0 0.025
 
 
@@ -216,17 +212,15 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #define halo_gamma params.halo_gamma
 
 #define DO_BLOOM params.DO_BLOOM
-#define bloom_directions params.bloom_directions
+//#define bloom_directions params.bloom_directions
 #define bloom_quality params.bloom_quality
 #define bloom_size global.bloom_size
 #define bloom_gamma global.bloom_gamma
 #define bloom_power global.bloom_power
+#define bloom_gamma_out global.bloom_gamma_out
 #define bloom_on_dark_only global.bloom_on_dark_only
 
-#define GAMMA global.GAMMA
-#define GAMMA_R global.GAMMA_R
-#define GAMMA_G global.GAMMA_G
-#define GAMMA_B global.GAMMA_B
+#define GAMMA_OUT global.GAMMA_OUT
 
 #define saturation global.saturation
 
