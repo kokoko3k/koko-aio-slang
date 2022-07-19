@@ -71,11 +71,12 @@ vec3 pixel_vmask(vec3 source4, vec3 lm1,vec3 lm2,vec3 lm3,
     
     if (is_scanlined)  {
         vec4 lookup=texture(Source, vTexCoord);
-        return pixel_out * lookup.a;
+        return pixel_out;
+        //return pixel_out*lookup.a;
          } else {
         return pixel_out;
     }
-  
+    
     
     
     

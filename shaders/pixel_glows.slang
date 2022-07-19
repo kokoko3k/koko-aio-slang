@@ -823,9 +823,9 @@ vec4 pixel_glow_std_pow(float my_glowpix, float my_glowpixy, float my_glow, floa
 
     // Calculating texel coordinates
     vec2 tex = vTexCoord.xy * 1.00001;
-    vec4 SourceSize1 = params.SourceSize;
-    vec4 size     = rubyTextureSize;
-    vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5);
+    vec4 SourceSize1 = params.SourceSize; // vec4 SourceSize1 = rubyTextureSize;
+    //vec4 size     = rubyTextureSize;
+    vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5); // vec2 OGL2Pos = tex * params.SourceSize.xy - vec2(0.5,0.5);
     vec2 fp = fract(OGL2Pos);
     vec2 dx = vec2(SourceSize1.z,0.0);
     vec2 dy = vec2(0.0,SourceSize1.w);
