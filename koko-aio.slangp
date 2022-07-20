@@ -32,10 +32,10 @@
     FXAA antialiasing
      ↓
     Emulates scanlines and interlacing
-     ↓        ↓
-     ↓      Filter scanlines alpha value to correct phasing issues when drawing phosphors
-     ↓              ↓
-     ↓              ↓
+     ↓
+    Linear filter scanlines
+     ↓              
+     ↓              
     Input Glow → phosphors → slot mask/aperture grill →  halo → → → → → → → → → → → 
                                                                                     ↓
                                                                                     ↓
