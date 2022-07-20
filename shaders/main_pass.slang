@@ -193,8 +193,8 @@ void main(void) {
     }
 
     //Horizontal screen lines
-    if (DO_DARKLINES > 0.0 ) {
-    float MYDARKLINES_TRANSPARENCY = 1.0 - DO_DARKLINES;
+    if (DO_DARKLINES == 1.0 ) {
+    float MYDARKLINES_TRANSPARENCY = 1.0 - DARKLINES_STRENGTH;
         pixel_out = pixel_darklines(pixel_out,DARKLINES_PERIOD,MYDARKLINES_TRANSPARENCY,DO_DARKLINES_VOFFSET,pixel_in,DRKLN_OVERWHITE);
     }
 

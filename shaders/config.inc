@@ -13,7 +13,7 @@ layout(push_constant) uniform Push
 	float in_glow_power ;
 	float in_glow_gamma ;
 	float VMASK_OVERWHITE ;
-	float DO_DARKLINES ;
+
 	float DRKLN_OVERWHITE ;
 	float DO_DARKLINES_VOFFSET ;
 	float DARKLINES_PERIOD ;
@@ -34,6 +34,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float DO_SCANLINES;
 	float DO_IN_GLOW;
 	float DO_RGB_MASK ;
+	float DO_DARKLINES ;
  	float bloom_size ; //1
 	float bloom_gamma; //1
 	float bloom_on_dark_only; //1
@@ -44,6 +45,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float scanline_flickering ; //2
 	float scanline_disable_on_interlace;
 	float RGB_MASK_STRENGTH;
+	float DARKLINES_STRENGTH;
 	float GAMMA_OUT ; //1
 	float saturation ; //1
 	float bloom_gamma_out; 
@@ -126,8 +128,8 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // "DARKLINES_PERIOD" expresses every how many lines draw a black one.
 // "DO_DARKLINES_VOFFSET" lets you to vertically offset by ""DARKLINES_PERIOD/2" the lines every 3 screen pixels,
 // allowing, in conjunction with RGB mask, to emulate slot mask
-#pragma parameter str_6                 "Slotmask/Aperture grille"		0.0 0.0 1.0 1.0
-#pragma parameter DO_DARKLINES          "        Strength"				0.3 	0.0 1.0 0.05
+#pragma parameter DO_DARKLINES          "Slotmask/Aperture grille"			0.0 	0.0 1.0 1.0
+#pragma parameter DARKLINES_STRENGTH    "        Strength"				0.3 	0.0 1.0 0.05
 #pragma parameter DO_DARKLINES_VOFFSET  "        Offset by triads"			1.0 	0.0 1.0 1.0
 #pragma parameter DARKLINES_PERIOD      "        Period"				4.0 	-8.0 8.0 2.0
 #pragma parameter DRKLN_OVERWHITE       "        How much to affect bright colors"	1.0 	0.0 1.0 0.05
@@ -204,7 +206,8 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #define RGB_MASK_STRENGTH global.RGB_MASK_STRENGTH
 #define VMASK_OVERWHITE params.VMASK_OVERWHITE
 
-#define DO_DARKLINES params.DO_DARKLINES
+#define DO_DARKLINES global.DO_DARKLINES
+#define DARKLINES_STRENGTH global.DARKLINES_STRENGTH
 #define DRKLN_OVERWHITE params.DRKLN_OVERWHITE
 #define DO_DARKLINES_VOFFSET params.DO_DARKLINES_VOFFSET
 #define DARKLINES_PERIOD params.DARKLINES_PERIOD
