@@ -199,7 +199,7 @@ void main(void) {
     }
 
     //Halo
-    if (halo_power >= 0.0 ) {
+    if (DO_HALO == 1.0 ) {
         haloed = pixel_glow(halo_w,halo_h,halo_power,halo_gamma).rgb;
         pixel_out +=haloed;
     }

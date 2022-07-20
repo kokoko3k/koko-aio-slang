@@ -35,6 +35,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float DO_IN_GLOW;
 	float DO_RGB_MASK ;
 	float DO_DARKLINES ;
+	float DO_HALO ;
  	float bloom_size ; //1
 	float bloom_gamma; //1
 	float bloom_on_dark_only; //1
@@ -142,10 +143,10 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // multiplying the resulting picture by the source one, it is added.
 // this means that haloing will produce solid colors,
 // lessening afromentioned effects on bright colors.
-#pragma parameter str_7         "Halo:" 				0.0 0.0 1.0 1.0
+#pragma parameter DO_HALO       "Halo:" 							1.0	0.0 1.0 1.0
 #pragma parameter halo_power    "        Strength (neg=off)"					0.9 	-0.05 10.0 0.05
-#pragma parameter halo_w       "         Horizontal sharpness"					1.75	0.0  10.0 0.05
-#pragma parameter halo_h       "         Vertical sharpness"					1.75	0.0  10.0 0.05
+#pragma parameter halo_w        "        Horizontal sharpness"					1.75	0.0  10.0 0.05
+#pragma parameter halo_h        "        Vertical sharpness"					1.75	0.0  10.0 0.05
 #pragma parameter halo_gamma    "        Gamma, the higher, the less the halo on dark colors"	2.0 	1.0  10.0 1.0
 
 
@@ -212,7 +213,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #define DO_DARKLINES_VOFFSET params.DO_DARKLINES_VOFFSET
 #define DARKLINES_PERIOD params.DARKLINES_PERIOD
 
-#define DO_HALO params.DO_HALO
+#define DO_HALO global.DO_HALO
 // #define halo_w params.halo_w
 // #define halo_h params.halo_h
 #define halo_w params.halo_w
