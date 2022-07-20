@@ -1,6 +1,8 @@
 #version 450
 #include "config.inc"
 
+#define eps 1e-8
+
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
@@ -69,10 +71,7 @@ void main(void) {
             pixel_out =  normalize( pow(pixel_out.rgb + vec3(eps), vec3(saturation)))*l  ;
         }
     }
-    
 
-
-    
     //Black frame insertion
     if (DO_ALT_BLANK == 1.0 ) {
         pixel_out = pixel_alternate(pixel_out.rgb, 1 - ALT_BLANK_STRENGTH );

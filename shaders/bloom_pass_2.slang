@@ -25,10 +25,10 @@ layout(set = 0, binding = 2) uniform sampler2D Source;
 // shamlessly hidden into an include:
 #include "blooms.slang" 
 
+
 void main() {
-      
     if (DO_BLOOM == 1.0 ) {
-        vec3 bloomed=(bloom(bloom_directions,bloom_quality,bloom_size,1));
+        vec3 bloomed = (bloom(bloom_directions,bloom_quality,bloom_size,1));
         FragColor = vec4(bloomed,0.0);
     } else {
         FragColor = texture( SourceTexture, vTexCoord);

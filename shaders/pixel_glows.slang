@@ -904,8 +904,18 @@ vec4 pixel_glow_std_pow(float my_glowpix, float my_glowpixy, float my_glow, floa
     return vec4(Bloom*my_glow,0.0);
 }
 
+vec4 dumb_glow(float my_glow, float glow_gamma) {
+    vec3 pixel_in = texture2D(rubyTexture, vTexCoord ).rgb;
+    pixel_in = pow(pixel_in,vec3(glow_gamma))*my_glow;
+    return vec4(pixel_in,0.0);
+}
 
 vec4 pixel_glow(float my_glowpix, float my_glowpixy, float my_glow, float glow_gamma) {
+
+    if ( (my_glowpix >= GLOW_SHARP_MAX) && (my_glowpixy >= GLOW_SHARP_MAX) ) {
+        return dumb_glow(my_glow,glow_gamma);
+    }
+
     if (prefer_std_pow != 1.0)
     {
         if (glow_gamma == 1) { return pixel_glow_gamma_1(my_glowpix,my_glowpixy,my_glow);   }

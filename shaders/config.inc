@@ -1,4 +1,5 @@
-#define eps 1e-8
+#define GLOW_SHARP_MAX 15 		//This has to be the same as the max used for in_glow_wh
+#define SCANLINES_SHARP_MAX 15 		//This has to be the same as the max used for scanline_sharpness
 
 layout(push_constant) uniform Push
 {
@@ -103,7 +104,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // or slot mask applied to the image.
 #pragma parameter DO_IN_GLOW    "Input power/glowing:"	 					1.0	0.0 1.0 1.0
 #pragma parameter in_glow_power "        Input signal glow strength"				0.45 	0.0 10.0 0.05
-#pragma parameter in_glow_wh    "        Sharpness"						2.5	0.0 10.0 0.05
+#pragma parameter in_glow_wh    "        Sharpness"						2.5	0.0 15.0 0.05
 #pragma parameter in_glow_gamma "        Gamma, the higher, the less the glow on dark colors"	1.0 	1.0 10.0 1.0
 #pragma parameter IN_GLOW_ADD   "        Overflows from the scanlines, sharper image"		0.0 	0.0 1.0 0.05
 
@@ -147,8 +148,8 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // lessening afromentioned effects on bright colors.
 #pragma parameter DO_HALO       "Halo:" 							1.0	0.0 1.0 1.0
 #pragma parameter halo_power    "        Strength (neg=off)"					0.9 	-0.05 10.0 0.05
-#pragma parameter halo_w        "        Horizontal sharpness"					1.75	0.0  10.0 0.05
-#pragma parameter halo_h        "        Vertical sharpness"					1.75	0.0  10.0 0.05
+#pragma parameter halo_w        "        Horizontal sharpness"					1.75	0.0  15.0 0.05
+#pragma parameter halo_h        "        Vertical sharpness"					1.75	0.0  15.0 0.05
 #pragma parameter halo_gamma    "        Gamma, the higher, the less the halo on dark colors"	2.0 	1.0  10.0 1.0
 
 

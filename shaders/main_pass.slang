@@ -176,7 +176,7 @@ void main(void) {
             pixel_out =  glowed;
         }
     } else if  (DO_SCANLINES == 1.0) {
-        if (scanline_sharpness < 15.0) {
+        if (scanline_sharpness < SCANLINES_SHARP_MAX) {
             pixel_out=fix_scanlines();
         }
     }
