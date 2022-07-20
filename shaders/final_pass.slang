@@ -55,26 +55,27 @@ void main(void) {
         }
     }
     
-    //Gamma correction
-	vec3 cc = vec3(1.0);
-	if  (GAMMA_OUT != 1.0) {
-		cc=vec3(GAMMA_OUT);
-	}
-	pixel_out = pow(pixel_out,cc);
+    if (DO_CCORRECTION == 1.0) {
+        //Gamma correction
+            vec3 cc = vec3(1.0);
+            if  (GAMMA_OUT != 1.0) {
+                    cc=vec3(GAMMA_OUT);
+            }
+            pixel_out = pow(pixel_out,cc);
 
-
-    //Saturation modifier
-    if (!(saturation == 1.0)) {
-        float l = length(pixel_out);
-        pixel_out =  normalize( pow(pixel_out.rgb + vec3(eps), vec3(saturation)))*l  ;
+        //Saturation modifier
+        if (!(saturation == 1.0)) {
+            float l = length(pixel_out);
+            pixel_out =  normalize( pow(pixel_out.rgb + vec3(eps), vec3(saturation)))*l  ;
+        }
     }
     
 
 
     
     //Black frame insertion
-    if (DO_ALT_BLANK > 0.0 ) {
-        pixel_out = pixel_alternate(pixel_out.rgb, 1 - DO_ALT_BLANK );
+    if (DO_ALT_BLANK == 1.0 ) {
+        pixel_out = pixel_alternate(pixel_out.rgb, 1 - ALT_BLANK_STRENGTH );
     }
 
     //Out

@@ -35,12 +35,14 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float DO_RGB_MASK ;
 	float DO_DARKLINES ;
 	float DO_HALO ;
+	float DO_CCORRECTION;
+	float DO_ALT_BLANK;
 	float BLOOM_MIX;
  	float bloom_size ; //1
 	float bloom_gamma; //1
 	float bloom_on_dark_only; //1
 	float bloom_power; //1
-  	float DO_ALT_BLANK ; //2 FIXME to 1
+  	float ALT_BLANK_STRENGTH ; //2 FIXME to 1
 	float DO_FXAA ; //1
 	float scanline_sharpness ; //2..3 FIXME in fix_scanlines
 	float scanline_flickering ; //2
@@ -160,7 +162,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // "bloom_power" is the additional gain applied to the bloom
 // "bloom_on_dark_only" will mix the bloomed image with the original depending on the brightness of
 // the original image.
-#pragma parameter DO_BLOOM           "Bloom:" 				                0.0 0.0  1.0  1.0
+#pragma parameter DO_BLOOM           "Bloom:" 				                0.0  0.0  1.0  1.0
 #pragma parameter BLOOM_MIX          "        Final mix, (0.0=off)"			0.15 0.0 1.0  0.01
 #pragma parameter bloom_size         "        Radius"					4.0  0.5 30.0 0.5
 //#pragma parameter bloom_directions   "        Directions: more is better but slower"	8.0  4.0 64.0 4.0
@@ -175,18 +177,26 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // Gamma and saturation correction
 // Correct the final gamma of the image
 // To have more or less saturated colors use "saturation" > 1 or "saturation" < 1
-#pragma parameter str_9      "Color corrections:" 			0.0 0.0 1.0 1.0
-#pragma parameter GAMMA_OUT  "        Gamma output"			0.69	0.1 9.0  0.025
-#pragma parameter saturation "        Saturation modifier (1.0=off)"	1.0	0.0 10.0 0.025
+#pragma parameter DO_CCORRECTION "Color corrections:" 			0.0 0.0 1.0 1.0
+#pragma parameter GAMMA_OUT      "        Gamma output"			0.69	0.1 9.0  0.025
+#pragma parameter saturation     "        Saturation modifier (1.0=off)"	1.0	0.0 10.0 0.025
 
 
 // Alternative blanking.
 // Emulates the low pixel persistance of CRT monitors and reduces the motion blur,
 // typical of LCD displays, by blanking even/odd screen lines on even/odd frames.
 // DO_ALT_BLANK expresses the strength of the "blank".
-#pragma parameter str_10       "Alternate blanking: " 				0.0 0.0 1.0 1.0
-#pragma parameter DO_ALT_BLANK "Alternate black frame insertion strength" 	0.0 0.0 1.0 0.1
+#pragma parameter DO_ALT_BLANK       "Alternate blanking: " 					0.0 0.0 1.0 1.0
+#pragma parameter ALT_BLANK_STRENGTH "        Alternate black frame insertion strength" 	0.0 0.0 1.0 0.1
 
+
+
+
+
+
+
+#define DO_FXAA global.DO_FXAA
+#define prefer_std_pow params.prefer_std_pow
 
 #define DO_SCANLINES global.DO_SCANLINES
 #define SCANLINE_DARK params.SCANLINE_DARK
@@ -231,12 +241,11 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #define bloom_gamma_out global.bloom_gamma_out
 #define bloom_on_dark_only global.bloom_on_dark_only
 
+#define DO_CCORRECTION global.DO_CCORRECTION
 #define GAMMA_OUT global.GAMMA_OUT
-
 #define saturation global.saturation
 
 #define DO_ALT_BLANK global.DO_ALT_BLANK
+#define ALT_BLANK_STRENGTH global.ALT_BLANK_STRENGTH
 
-#define DO_FXAA global.DO_FXAA
 
-#define prefer_std_pow params.prefer_std_pow
