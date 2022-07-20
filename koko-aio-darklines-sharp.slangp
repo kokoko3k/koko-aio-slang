@@ -1,29 +1,37 @@
 #reference "koko-aio.slangp"
+prefer_std_pow = "0.0"
+
 DO_FXAA = "0.0"
 
+DO_SCANLINES = "0.0"
 SCANLINE_DARK = "1.0"
 scanline_sharpness = 1.0
 scanline_flickering = 2.0
 
+DO_IN_GLOW = "1.0"
 in_glow_power = "1.0"
 in_glow_wh = "2.5"
 in_glow_gamma = "1.0"
 IN_GLOW_ADD = "0.0"
 
-DO_RGB_MASK = "0.0"
+DO_RGB_MASK = "1.0"
+RGB_MASK_STRENGTH = "1.0"
 VMASK_OVERWHITE = "1.0"
 
-DO_DARKLINES = "1.0"
+DO_DARKLINES = "0.0"
+DARKLINES_STRENGTH = "1.0"
 DO_DARKLINES_VOFFSET = "0.0"
 DARKLINES_PERIOD = "2.0"
 DRKLN_OVERWHITE = "1.0"
 
-halo_power = "-0.05"
+DO_HALO = "0.0"
+halo_power = "0.5" 
 halo_w = "1.35"
 halo_h = "1.35"
 halo_gamma = "4.0"
 
-DO_BLOOM = "0.00"
+DO_BLOOM = "0.0"
+BLOOM_MIX = "0.05"
 bloom_size = "0.25"
 bloom_directions = "8.0"
 bloom_quality = "8.0"
@@ -31,10 +39,12 @@ bloom_gamma = 9.0"
 bloom_power = "2.5"
 bloom_on_dark_only = 1.0
 
+DO_CCORRECTION = "1.0"
 GAMMA_OUT = "0.85"
 saturation = "1.00"
 
-DO_ALT_BLANK 0.0
+DO_ALT_BLANK = 0.0
+ALT_BLANK_STRENGTH = 0.0
 
 
 

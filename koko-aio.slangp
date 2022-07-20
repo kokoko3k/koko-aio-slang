@@ -1,5 +1,5 @@
 /*TODO:
-    Update presets, add switches to functionalities, where needed.
+    If in glow sharpness is high ehough, skip blur filtering
 */
 
 /*

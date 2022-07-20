@@ -112,7 +112,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // RGB Mask
 // Emulates CRT RGB phosphors.
 // This is done by multiplying the source image pixels, in turn, by red green or blue.
-// The strenght of the multiplication, and so of the final effect is affected by "DO_RGB_MASK" value.
+// The strenght of the multiplication, and so of the final effect is affected by "RGB_MASK_STRENGTH" value.
 // A Value of 0 completely disable the effect.
 // "VMASK_OVERWHITE" modulates the strenght of the effect depending on the source pixel brightness,
 // This is handy  if you want to keep a good image contrast/brightness, but keep in mind that other
@@ -126,7 +126,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // Aperture grille/slot mask (shadow mask not implemented)
 // Draw darklines on screen coordinates, by mixing black pixels with the source image
 // on final viewport coordinates.
-// "DO_DARKILNES" expresses the final strenght of the effect.
+// "DARKLINES_STRENGTH" expresses the final strenght of the effect.
 // if "DO_DARKLINES_VOFFSET" is 0, straight horizontal black lines will be painted that emulates an aperture grille.
 // "DARKLINES_PERIOD" expresses every how many lines draw a black one.
 // "DO_DARKLINES_VOFFSET" lets you to vertically offset by ""DARKLINES_PERIOD/2" the lines every 3 screen pixels,
@@ -185,7 +185,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // Alternative blanking.
 // Emulates the low pixel persistance of CRT monitors and reduces the motion blur,
 // typical of LCD displays, by blanking even/odd screen lines on even/odd frames.
-// DO_ALT_BLANK expresses the strength of the "blank".
+// ALT_BLANK_STRENGTH expresses the strength of the "blank".
 #pragma parameter DO_ALT_BLANK       "Alternate blanking: " 					0.0 0.0 1.0 1.0
 #pragma parameter ALT_BLANK_STRENGTH "        Alternate black frame insertion strength" 	0.0 0.0 1.0 0.1
 
