@@ -30,9 +30,10 @@ layout(push_constant) uniform Push
 
 layout(std140, set = 0, binding = 0) uniform UBO
 {
+	mat4 MVP;
 	float DO_SCANLINES;
 	float DO_IN_GLOW;
-	mat4 MVP;
+	float DO_RGB_MASK ;
  	float bloom_size ; //1
 	float bloom_gamma; //1
 	float bloom_on_dark_only; //1
@@ -42,7 +43,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float scanline_sharpness ; //2..3 FIXME in fix_scanlines
 	float scanline_flickering ; //2
 	float scanline_disable_on_interlace;
-	float DO_RGB_MASK ;
+	float RGB_MASK_STRENGTH;
 	float GAMMA_OUT ; //1
 	float saturation ; //1
 	float bloom_gamma_out; 
@@ -71,7 +72,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // Blank even source lines, the value from 0.0 to 1.0 expresses the darkness of the blanked lines
 // 1.0 means no blank at all.
 
-#pragma parameter DO_SCANLINES		"Scanlines:"								1.0 	0.0 1.0 1.0
+#pragma parameter DO_SCANLINES	"Scanlines:"									1.0 	0.0 1.0 1.0
 #pragma parameter SCANLINE_DARK "        Scanlines gap brightness"			  			0.0 	0.0 1.0 0.05
 
 // The amount of scanline sharpness. Very high values may cause visual artifacts when using not integer scaling
@@ -95,7 +96,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // line, wihch may (or not) produce better effects when emulating scanlines.
 // With "IN_GLOW_ADD=0" input glowing does not alter the RGB mask
 // or slot mask applied to the image.
-#pragma parameter DO_IN_GLOW             "Input power/glowing:"	 				1.0	0.0 1.0 1.0
+#pragma parameter DO_IN_GLOW    "Input power/glowing:"	 					1.0	0.0 1.0 1.0
 #pragma parameter in_glow_power "        Input signal glow strength"				0.45 	0.0 10.0 0.05
 #pragma parameter in_glow_wh    "        Sharpness"						2.5	0.0 10.0 0.05
 #pragma parameter in_glow_gamma "        Gamma, the higher, the less the glow on dark colors"	1.0 	1.0 10.0 1.0
@@ -111,9 +112,9 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // "VMASK_OVERWHITE" modulates the strenght of the effect depending on the source pixel brightness,
 // This is handy  if you want to keep a good image contrast/brightness, but keep in mind that other
 // parameters like haloing and bloom.
-#pragma parameter str_5           "RGB Mask:" 				0.0 0.0 1.0 1.0
-#pragma parameter DO_RGB_MASK     "        Strength (0.0=off)"			0.75  	0.0 1.0 0.05
-#pragma parameter VMASK_OVERWHITE "        How much to affect bright colors"	1.0 	0.0 1.0 0.05
+#pragma parameter DO_RGB_MASK        "RGB Mask:"         				1.0 	0.0 1.0 1.0
+#pragma parameter RGB_MASK_STRENGTH  "        Strength (0.0=off)"			0.75  	0.0 1.0 0.05
+#pragma parameter VMASK_OVERWHITE    "        How much to affect bright colors"	1.0 	0.0 1.0 0.05
 
 
 
@@ -200,6 +201,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #define in_glow_gamma params.in_glow_gamma
 
 #define DO_RGB_MASK global.DO_RGB_MASK
+#define RGB_MASK_STRENGTH global.RGB_MASK_STRENGTH
 #define VMASK_OVERWHITE params.VMASK_OVERWHITE
 
 #define DO_DARKLINES params.DO_DARKLINES

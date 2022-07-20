@@ -163,7 +163,7 @@ void main(void) {
        glow power versus blur power is defined by IN_GLOW_ADD.
        this allows the rgb vmask to light up on the black scanline.
      */
-    if (DO_IN_GLOW == 1.0) {
+    if (DO_IN_GLOW == 1) {
         float in_glow_h = in_glow_wh;
         if (DO_SCANLINES == 1.0) {
             in_glow_h = scanline_sharpness ;
@@ -182,10 +182,10 @@ void main(void) {
     }
 
     //Vertical RGB Mask
-    if (DO_RGB_MASK > 0.0 ) {
-        vec3 m1f = m1 + 1.0 - DO_RGB_MASK ;
-        vec3 m2f = m2 + 1.0 - DO_RGB_MASK ;
-        vec3 m3f = m3 + 1.0 - DO_RGB_MASK ;
+    if (DO_RGB_MASK == 1.0 ) {
+        vec3 m1f = m1 + 1.0 - RGB_MASK_STRENGTH ;
+        vec3 m2f = m2 + 1.0 - RGB_MASK_STRENGTH ;
+        vec3 m3f = m3 + 1.0 - RGB_MASK_STRENGTH ;
         m1f = min(vec3(1.0,1.0,1.0),m1f) ;
         m2f = min(vec3(1.0,1.0,1.0),m2f) ;
         m3f = min(vec3(1.0,1.0,1.0),m3f) ;
