@@ -31,6 +31,7 @@ layout(push_constant) uniform Push
 layout(std140, set = 0, binding = 0) uniform UBO
 {
 	float DO_SCANLINES;
+	float DO_IN_GLOW;
 	mat4 MVP;
  	float bloom_size ; //1
 	float bloom_gamma; //1
@@ -70,7 +71,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // Blank even source lines, the value from 0.0 to 1.0 expresses the darkness of the blanked lines
 // 1.0 means no blank at all.
 
-#pragma parameter DO_SCANLINES		"Scanlines "								0.0 	0.0 1.0 1.0
+#pragma parameter DO_SCANLINES		"Scanlines:"								1.0 	0.0 1.0 1.0
 #pragma parameter SCANLINE_DARK "        Scanlines gap brightness"			  			0.0 	0.0 1.0 0.05
 
 // The amount of scanline sharpness. Very high values may cause visual artifacts when using not integer scaling
@@ -94,8 +95,8 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // line, wihch may (or not) produce better effects when emulating scanlines.
 // With "IN_GLOW_ADD=0" input glowing does not alter the RGB mask
 // or slot mask applied to the image.
-#pragma parameter str_4         "Input glowing:" 					0.0 0.0 1.0 1.0
-#pragma parameter in_glow_power "        Input signal glow strength (neg=off)"			0.45 	-0.05 10.0 0.05
+#pragma parameter DO_IN_GLOW             "Input power/glowing:"	 				1.0	0.0 1.0 1.0
+#pragma parameter in_glow_power "        Input signal glow strength"				0.45 	0.0 10.0 0.05
 #pragma parameter in_glow_wh    "        Sharpness"						2.5	0.0 10.0 0.05
 #pragma parameter in_glow_gamma "        Gamma, the higher, the less the glow on dark colors"	1.0 	1.0 10.0 1.0
 #pragma parameter IN_GLOW_ADD   "        Overflows from the scanlines, sharper image"		0.0 	0.0 1.0 0.05
@@ -190,6 +191,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #define scanline_flickering global.scanline_flickering
 #define scanline_disable_on_interlace global.scanline_disable_on_interlace
 
+#define DO_IN_GLOW global.DO_IN_GLOW
 #define IN_GLOW_ADD params.IN_GLOW_ADD
 // #define in_glow_w params.in_glow_w
 // #define in_glow_h params.in_glow_h

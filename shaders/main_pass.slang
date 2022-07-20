@@ -163,7 +163,7 @@ void main(void) {
        glow power versus blur power is defined by IN_GLOW_ADD.
        this allows the rgb vmask to light up on the black scanline.
      */
-    if (in_glow_power > 0.0) {
+    if (DO_IN_GLOW == 1.0) {
         float in_glow_h = in_glow_wh;
         if (DO_SCANLINES == 1.0) {
             in_glow_h = scanline_sharpness ;
