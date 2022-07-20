@@ -69,32 +69,19 @@ vec3 pixel_vmask(vec3 source4, vec3 lm1,vec3 lm2,vec3 lm3,
         pixel_out =  mix(vmasked,source,whiteness);
     }
     
-    if (is_scanlined)  {
+
+   //Unsure if the following logic has some real usefulness.
+   //Maybe it is too complicated, comment by now.
+   /* if (is_scanlined)  {
         vec4 lookup=texture(Source, vTexCoord);
         return pixel_out;
         //return pixel_out*lookup.a;
          } else {
         return pixel_out;
     }
-    
-    
-    
-    
-    //return pixel_out * lookup.a;
-    //return pixel_out;
-    
-    
-    // originale fa: vec4 lookup=texture2D(rubyTexture, gl_TexCoord[0].xy);
-    //vec3 pixel_in = texture(Source, vTexCoord).rgb;
-    //vec3 pixel_in = texture2D(rubyTexture, gl_TexCoord[0].xy).rgb;
-    //return pixel_out * lookup.a;
-    //vec4 lookup=source4.a;
-    //if (is_scanlined)  {
-    //    vec4 lookup = texture(Source,vTexCoord);
-    //	return pixel_out * lookup.a;
-    //} else {
-        return pixel_out;
-    //}
+   */
+   return pixel_out;
+
 }
 
     
@@ -202,7 +189,7 @@ void main(void) {
         m1f = min(vec3(1.0,1.0,1.0),m1f) ;
         m2f = min(vec3(1.0,1.0,1.0),m2f) ;
         m3f = min(vec3(1.0,1.0,1.0),m3f) ;
-        pixel_out = pixel_vmask(pixel_out,m1f,m2f,m3f,pixel_in,VMASK_OVERWHITE,(SCANLINE_DARK < 1.0));
+        pixel_out = pixel_vmask(pixel_out,m1f,m2f,m3f,pixel_in,VMASK_OVERWHITE,(DO_SCANLINES == 1));
     }
 
     //Horizontal screen lines
