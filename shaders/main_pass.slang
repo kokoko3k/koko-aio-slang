@@ -178,7 +178,7 @@ void main(void) {
      */
     if (in_glow_power > 0.0) {
         float in_glow_h = in_glow_wh;
-        if (SCANLINE_DARK < 1.0) {
+        if (DO_SCANLINES == 1.0) {
             in_glow_h = scanline_sharpness ;
          }
         glowed = pixel_glow(in_glow_wh,in_glow_h,in_glow_power,in_glow_gamma).rgb;
@@ -188,7 +188,7 @@ void main(void) {
         } else {
             pixel_out =  glowed;
         }
-    } else if (SCANLINE_DARK < 1.0) {
+    } else if  (DO_SCANLINES == 1.0) {
         if (scanline_sharpness < 15.0) {
             pixel_out=fix_scanlines();
         }

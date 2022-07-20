@@ -56,7 +56,7 @@ void main()
    if  (! ((is_interlaced==1) && (scanline_disable_on_interlace == 1.0))  ) {
       
       //Do we want scanlines?
-      if ( SCANLINE_DARK < 1.0 ) {
+      if ( DO_SCANLINES == 1.0 ) {
          float mymod = mod(vTexCoord.y * params.OutputSize.y , scanline_period);
          
          //No flickering (dumbly blank even lines)
