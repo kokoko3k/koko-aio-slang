@@ -27,7 +27,7 @@ layout(set = 0, binding = 2) uniform sampler2D Source;
 
 
 void main() {
-    if (DO_BLOOM > 0.0 ) {
+    if (DO_BLOOM == 1.0 ) {
         vec3 bloomed = bloom(bloom_directions,bloom_quality,bloom_size,bloom_gamma) * bloom_power;
         FragColor = vec4(pow(bloomed,vec3(bloom_gamma_out)),0.0);
     } else {

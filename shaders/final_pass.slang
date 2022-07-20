@@ -42,16 +42,16 @@ void main(void) {
     vec3 bloomed;
 
     //Mix bloom texture
-    if (DO_BLOOM > 0.0 ) {
+    if (DO_BLOOM == 1.0 ) {
         bloomed=texture(bloom_pass_final, vTexCoord).rgb ;
             
         if ( bloom_on_dark_only  == 1.0) {
            float source_whiteness = (pixel_out.r+pixel_out.g+pixel_out.b)/3;
            float source_darkness = 1-source_whiteness;
-           float bloom_mix = DO_BLOOM*source_darkness;
-           pixel_out = mix(pixel_out,bloomed,bloom_mix);
+           float local_bloom_mix = BLOOM_MIX*source_darkness;
+           pixel_out = mix(pixel_out,bloomed,local_bloom_mix);
         } else {
-           pixel_out = mix(pixel_out,bloomed,DO_BLOOM);
+           pixel_out = mix(pixel_out,bloomed,BLOOM_MIX);
         }
     }
     

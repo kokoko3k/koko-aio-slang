@@ -17,7 +17,6 @@ layout(push_constant) uniform Push
 	float DRKLN_OVERWHITE ;
 	float DO_DARKLINES_VOFFSET ;
 	float DARKLINES_PERIOD ;
-	float DO_HALO ;
 	float halo_w ;
 	float halo_h ;
 	float halo_power ;
@@ -36,6 +35,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float DO_RGB_MASK ;
 	float DO_DARKLINES ;
 	float DO_HALO ;
+	float BLOOM_MIX;
  	float bloom_size ; //1
 	float bloom_gamma; //1
 	float bloom_on_dark_only; //1
@@ -153,15 +153,15 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 // Bloom
 // The image is downsampled, bloomed and mixed back with the original image.
-// "DO_BLOOM" is the final mix strength
+// "BLOOM_MIX" is the final mix strength
 // "bloom_size" is the radius of the blurred image
 // "bloom_quality" express a tradeoff between quality and effect speed.
 // "bloom_gamma" allows to apply more bloom on the bright colors of the source image
 // "bloom_power" is the additional gain applied to the bloom
 // "bloom_on_dark_only" will mix the bloomed image with the original depending on the brightness of
 // the original image.
-#pragma parameter str_8              "Bloom:" 				                0.0 0.0  1.0  1.0
-#pragma parameter DO_BLOOM           "        Final mix, (0.0=off)"			0.15 0.0 1.0  0.01
+#pragma parameter DO_BLOOM           "Bloom:" 				                0.0 0.0  1.0  1.0
+#pragma parameter BLOOM_MIX          "        Final mix, (0.0=off)"			0.15 0.0 1.0  0.01
 #pragma parameter bloom_size         "        Radius"					4.0  0.5 30.0 0.5
 //#pragma parameter bloom_directions   "        Directions: more is better but slower"	8.0  4.0 64.0 4.0
 #pragma parameter bloom_quality      "        Quality: more is better but slower"	8.0  2.0 32.0 1.0
@@ -222,6 +222,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #define halo_gamma params.halo_gamma
 
 #define DO_BLOOM params.DO_BLOOM
+#define BLOOM_MIX global.BLOOM_MIX
 //#define bloom_directions params.bloom_directions
 #define bloom_quality params.bloom_quality
 #define bloom_size global.bloom_size
