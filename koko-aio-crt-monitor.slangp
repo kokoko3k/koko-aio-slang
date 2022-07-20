@@ -40,7 +40,7 @@ bloom_output_gamma = "1"
 bloom_on_dark_only = 1.0
 
 DO_CCORRECTION = "1.0"
-GAMMA_OUT = "0.60"
+GAMMA_OUT = "0.70"
 saturation = 1.00
 
 DO_ALT_BLANK = 0.0

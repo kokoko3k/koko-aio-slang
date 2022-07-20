@@ -5,14 +5,14 @@ DO_FXAA = "1.0"
 
 DO_SCANLINES = "1.0"
 SCANLINE_DARK = "0.0"
-scanline_sharpness = 4.0
+scanline_sharpness = 2.0
 scanline_flickering = 1.0
 
 DO_IN_GLOW = "1.0"
 in_glow_power = "1.50"
 in_glow_wh = "3.5"	
 in_glow_gamma = "1.0" 
-IN_GLOW_ADD = "0.6"
+IN_GLOW_ADD = "0.0"
 
 DO_RGB_MASK = "1.0"
 RGB_MASK_STRENGTH = "0.8"
@@ -27,7 +27,7 @@ DRKLN_OVERWHITE = "1.0"
 DO_HALO = "1.0"
 halo_power = "2.00" 
 halo_w = "1.75"
-halo_h = "1.75"
+halo_h = "1.00"
 halo_gamma = "4.0" 
 
 DO_BLOOM = "1.0"
