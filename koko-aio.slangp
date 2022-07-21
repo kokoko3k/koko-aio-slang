@@ -105,7 +105,7 @@ shaders = 11
 */
     shader4 = shaders/main_pass.slang
     alias4 = "main_pass"
-    filter_linear4= true
+    filter_linear4 = true
     scale_type4 = viewport
     scale4 = 1.0
 
@@ -151,7 +151,7 @@ shaders = 11
    with the bloomed image, color corrections and
    black frame insertions.
 */
-    shader10 =shaders/final_pass.slang
-    filter_linear10 =true
-    scale_type10 =viewport
+    shader10 = shaders/final_pass.slang
+    filter_linear10 = true
+    scale_type10 = viewport
     scale10 = 1.0
