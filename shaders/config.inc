@@ -6,13 +6,11 @@ layout(push_constant) uniform Push
 	vec4 SourceSize;
 	vec4 OriginalSize;
 	vec4 OutputSize;
+	vec4 scanline_passSize;
 	uint FrameCount;
 	
 	float SCANLINE_DARK;
-	float IN_GLOW_ADD ;
-	float in_glow_wh ;
-	float in_glow_power ;
-	float in_glow_gamma ;
+
 	float VMASK_OVERWHITE ;
 
 	float DRKLN_OVERWHITE ;
@@ -38,21 +36,33 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float DO_HALO ;
 	float DO_CCORRECTION;
 	float DO_ALT_BLANK;
+	
+	float IN_GLOW_ADD ;
+	float in_glow_wh ;
+	float in_glow_power ;
+	float in_glow_gamma ;
+	
 	float BLOOM_MIX;
  	float bloom_size ; //1
 	float bloom_gamma; //1
 	float bloom_on_dark_only; //1
 	float bloom_power; //1
+  	float bloom_gamma_out; 
+	
   	float ALT_BLANK_STRENGTH ; //2 FIXME to 1
+	
 	float DO_FXAA ; //1
+	
 	float scanline_sharpness ; //2..3 FIXME in fix_scanlines
 	float scanline_flickering ; //2
 	float scanline_disable_on_interlace;
+	
 	float RGB_MASK_STRENGTH;
 	float DARKLINES_STRENGTH;
+	
 	float GAMMA_OUT ; //1
 	float saturation ; //1
-	float bloom_gamma_out; 
+	
 } global;
 
 
@@ -191,11 +201,6 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter ALT_BLANK_STRENGTH "        Alternate black frame insertion strength" 	0.0 0.0 1.0 0.1
 
 
-
-
-
-
-
 #define DO_FXAA global.DO_FXAA
 #define prefer_std_pow params.prefer_std_pow
 
@@ -207,12 +212,13 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #define scanline_disable_on_interlace global.scanline_disable_on_interlace
 
 #define DO_IN_GLOW global.DO_IN_GLOW
-#define IN_GLOW_ADD params.IN_GLOW_ADD
+#define IN_GLOW_ADD global.IN_GLOW_ADD
+#define in_glow_wh global.in_glow_wh
+#define in_glow_power global.in_glow_power
+#define in_glow_gamma global.in_glow_gamma
 // #define in_glow_w params.in_glow_w
 // #define in_glow_h params.in_glow_h
-#define in_glow_wh params.in_glow_wh
-#define in_glow_power params.in_glow_power
-#define in_glow_gamma params.in_glow_gamma
+
 
 #define DO_RGB_MASK global.DO_RGB_MASK
 #define RGB_MASK_STRENGTH global.RGB_MASK_STRENGTH

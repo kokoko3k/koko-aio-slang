@@ -9,12 +9,12 @@ scanline_sharpness = 4.0
 scanline_flickering = 0.0
 
 DO_IN_GLOW = "1.0"
-in_glow_power = "2.0"
+in_glow_power = "1.0"
 in_glow_wh = "4.0"	
-in_glow_gamma = "1.0" 
+in_glow_gamma = "2.0" 
 IN_GLOW_ADD = "0.0"
 
-DO_RGB_MASK = "1.0"
+DO_RGB_MASK = "0.0"
 RGB_MASK_STRENGTH = "1.0"
 VMASK_OVERWHITE = "1.0"
 
@@ -24,13 +24,13 @@ DO_DARKLINES_VOFFSET = "1.0"
 DARKLINES_PERIOD = "4.0" 	
 DRKLN_OVERWHITE = "1.0"
 
-DO_HALO = "1.0"
+DO_HALO = "0.0"
 halo_power = "2" 
 halo_w = "1.2"
 halo_h = "1.2"
 halo_gamma = "4.0" 
 
-DO_BLOOM = "1.0"
+DO_BLOOM = "0.0"
 BLOOM_MIX = "0.16"
 bloom_size = "0.50"
 bloom_quality = "2.0"
@@ -39,7 +39,7 @@ bloom_power = "4.0"
 bloom_gamma_out = "2"
 bloom_on_dark_only = "1.0"
 
-DO_CCORRECTION = "1.0"
+DO_CCORRECTION = "0.0"
 GAMMA_OUT = "0.57"	
 saturation = "1.15"
 

@@ -63,7 +63,7 @@ shaders = 11
   Auto-Cropping/overscan emulation could be added in a future release.
   For other emulators/systems, probably it is best and safe to doulbe x0 too.
 */
-    shader0 = shaders/passthrough.slang
+    shader0 = shaders/passthrough_debug.slang
     alias0 = "doublesize_pass"
     filter_linear0 = false
     scale_type0 = source

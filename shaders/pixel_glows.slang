@@ -1,5 +1,11 @@
 #include "pows.slang"
 
+
+//Those functions will sample from source texture (the previous), but with a precision taken from scanline_pass.
+//This is needed because the source texture has been scaled up to the dimension of the viewport to allow
+//the scanlines to be linear filtered.
+
+
 vec4 pixel_glow_gamma_1(float my_glowpix, float my_glowpixy, float my_glow) {
 
     // Calculating texel coordinates
@@ -8,8 +14,8 @@ vec4 pixel_glow_gamma_1(float my_glowpix, float my_glowpixy, float my_glow) {
     vec4 size     = rubyTextureSize;
     vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5);
     vec2 fp = fract(OGL2Pos);
-    vec2 dx = vec2(SourceSize1.z,0.0);
-    vec2 dy = vec2(0.0,SourceSize1.w);
+    vec2 dx = vec2(params.scanline_passSize.z,0.0) ; // vec2 dx = vec2(SourceSize1.z,0.0) ;
+    vec2 dy = vec2(0.0,params.scanline_passSize.w);  // vec2 dy = vec2(0.0,SourceSize1.w) ;
     vec2 pC4 = (floor(OGL2Pos) + vec2(0.5)) * params.SourceSize.zw;
 
     vec2 x2 = 2.0*dx; vec2 x3 = 3.0*dx;
@@ -88,8 +94,8 @@ vec4 pixel_glow_gamma_2(float my_glowpix, float my_glowpixy, float my_glow) {
     vec4 size     = rubyTextureSize;
     vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5);
     vec2 fp = fract(OGL2Pos);
-    vec2 dx = vec2(SourceSize1.z,0.0);
-    vec2 dy = vec2(0.0,SourceSize1.w);
+    vec2 dx = vec2(params.scanline_passSize.z,0.0) ; // vec2 dx = vec2(SourceSize1.z,0.0) ;
+    vec2 dy = vec2(0.0,params.scanline_passSize.w);  // vec2 dy = vec2(0.0,SourceSize1.w) ;
     vec2 pC4 = (floor(OGL2Pos) + vec2(0.5)) * params.SourceSize.zw;
 
     vec2 x2 = 2.0*dx; vec2 x3 = 3.0*dx;
@@ -170,8 +176,8 @@ vec4 pixel_glow_gamma_3(float my_glowpix, float my_glowpixy, float my_glow) {
     vec4 size     = rubyTextureSize;
     vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5);
     vec2 fp = fract(OGL2Pos);
-    vec2 dx = vec2(SourceSize1.z,0.0);
-    vec2 dy = vec2(0.0,SourceSize1.w);
+    vec2 dx = vec2(params.scanline_passSize.z,0.0) ; // vec2 dx = vec2(SourceSize1.z,0.0) ;
+    vec2 dy = vec2(0.0,params.scanline_passSize.w);  // vec2 dy = vec2(0.0,SourceSize1.w) ;
     vec2 pC4 = (floor(OGL2Pos) + vec2(0.5)) * params.SourceSize.zw;
 
     vec2 x2 = 2.0*dx; vec2 x3 = 3.0*dx;
@@ -252,8 +258,8 @@ vec4 pixel_glow_gamma_4(float my_glowpix, float my_glowpixy, float my_glow) {
     vec4 size     = rubyTextureSize;
     vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5);
     vec2 fp = fract(OGL2Pos);
-    vec2 dx = vec2(SourceSize1.z,0.0);
-    vec2 dy = vec2(0.0,SourceSize1.w);
+    vec2 dx = vec2(params.scanline_passSize.z,0.0) ; // vec2 dx = vec2(SourceSize1.z,0.0) ;
+    vec2 dy = vec2(0.0,params.scanline_passSize.w);  // vec2 dy = vec2(0.0,SourceSize1.w) ;
     vec2 pC4 = (floor(OGL2Pos) + vec2(0.5)) * params.SourceSize.zw;
 
     vec2 x2 = 2.0*dx; vec2 x3 = 3.0*dx;
@@ -334,8 +340,8 @@ vec4 pixel_glow_gamma_5(float my_glowpix, float my_glowpixy, float my_glow) {
     vec4 size     = rubyTextureSize;
     vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5);
     vec2 fp = fract(OGL2Pos);
-    vec2 dx = vec2(SourceSize1.z,0.0);
-    vec2 dy = vec2(0.0,SourceSize1.w);
+    vec2 dx = vec2(params.scanline_passSize.z,0.0) ; // vec2 dx = vec2(SourceSize1.z,0.0) ;
+    vec2 dy = vec2(0.0,params.scanline_passSize.w);  // vec2 dy = vec2(0.0,SourceSize1.w) ;
     vec2 pC4 = (floor(OGL2Pos) + vec2(0.5)) * params.SourceSize.zw;
 
     vec2 x2 = 2.0*dx; vec2 x3 = 3.0*dx;
@@ -416,8 +422,8 @@ vec4 pixel_glow_gamma_6(float my_glowpix, float my_glowpixy, float my_glow) {
     vec4 size     = rubyTextureSize;
     vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5);
     vec2 fp = fract(OGL2Pos);
-    vec2 dx = vec2(SourceSize1.z,0.0);
-    vec2 dy = vec2(0.0,SourceSize1.w);
+    vec2 dx = vec2(params.scanline_passSize.z,0.0) ; // vec2 dx = vec2(SourceSize1.z,0.0) ;
+    vec2 dy = vec2(0.0,params.scanline_passSize.w);  // vec2 dy = vec2(0.0,SourceSize1.w) ;
     vec2 pC4 = (floor(OGL2Pos) + vec2(0.5)) * params.SourceSize.zw;
 
     vec2 x2 = 2.0*dx; vec2 x3 = 3.0*dx;
@@ -498,8 +504,8 @@ vec4 pixel_glow_gamma_7(float my_glowpix, float my_glowpixy, float my_glow) {
     vec4 size     = rubyTextureSize;
     vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5);
     vec2 fp = fract(OGL2Pos);
-    vec2 dx = vec2(SourceSize1.z,0.0);
-    vec2 dy = vec2(0.0,SourceSize1.w);
+    vec2 dx = vec2(params.scanline_passSize.z,0.0) ; // vec2 dx = vec2(SourceSize1.z,0.0) ;
+    vec2 dy = vec2(0.0,params.scanline_passSize.w);  // vec2 dy = vec2(0.0,SourceSize1.w) ;
     vec2 pC4 = (floor(OGL2Pos) + vec2(0.5)) * params.SourceSize.zw;
 
     vec2 x2 = 2.0*dx; vec2 x3 = 3.0*dx;
@@ -580,8 +586,8 @@ vec4 pixel_glow_gamma_8(float my_glowpix, float my_glowpixy, float my_glow) {
     vec4 size     = rubyTextureSize;
     vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5);
     vec2 fp = fract(OGL2Pos);
-    vec2 dx = vec2(SourceSize1.z,0.0);
-    vec2 dy = vec2(0.0,SourceSize1.w);
+    vec2 dx = vec2(params.scanline_passSize.z,0.0) ; // vec2 dx = vec2(SourceSize1.z,0.0) ;
+    vec2 dy = vec2(0.0,params.scanline_passSize.w);  // vec2 dy = vec2(0.0,SourceSize1.w) ;
     vec2 pC4 = (floor(OGL2Pos) + vec2(0.5)) * params.SourceSize.zw;
 
     vec2 x2 = 2.0*dx; vec2 x3 = 3.0*dx;
@@ -662,8 +668,8 @@ vec4 pixel_glow_gamma_9(float my_glowpix, float my_glowpixy, float my_glow) {
     vec4 size     = rubyTextureSize;
     vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5);
     vec2 fp = fract(OGL2Pos);
-    vec2 dx = vec2(SourceSize1.z,0.0);
-    vec2 dy = vec2(0.0,SourceSize1.w);
+    vec2 dx = vec2(params.scanline_passSize.z,0.0) ; // vec2 dx = vec2(SourceSize1.z,0.0) ;
+    vec2 dy = vec2(0.0,params.scanline_passSize.w);  // vec2 dy = vec2(0.0,SourceSize1.w) ;
     vec2 pC4 = (floor(OGL2Pos) + vec2(0.5)) * params.SourceSize.zw;
 
     vec2 x2 = 2.0*dx; vec2 x3 = 3.0*dx;
@@ -744,8 +750,8 @@ vec4 pixel_glow_gamma_10(float my_glowpix, float my_glowpixy, float my_glow) {
     vec4 size     = rubyTextureSize;
     vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5);
     vec2 fp = fract(OGL2Pos);
-    vec2 dx = vec2(SourceSize1.z,0.0);
-    vec2 dy = vec2(0.0,SourceSize1.w);
+    vec2 dx = vec2(params.scanline_passSize.z,0.0) ; // vec2 dx = vec2(SourceSize1.z,0.0) ;
+    vec2 dy = vec2(0.0,params.scanline_passSize.w);  // vec2 dy = vec2(0.0,SourceSize1.w) ;
     vec2 pC4 = (floor(OGL2Pos) + vec2(0.5)) * params.SourceSize.zw;
 
     vec2 x2 = 2.0*dx; vec2 x3 = 3.0*dx;
@@ -823,12 +829,12 @@ vec4 pixel_glow_std_pow(float my_glowpix, float my_glowpixy, float my_glow, floa
 
     // Calculating texel coordinates
     vec2 tex = vTexCoord.xy * 1.00001;
-    vec4 SourceSize1 = params.SourceSize; // vec4 SourceSize1 = rubyTextureSize;
-    //vec4 size     = rubyTextureSize;
-    vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5); // vec2 OGL2Pos = tex * params.SourceSize.xy - vec2(0.5,0.5);
+    vec4 SourceSize1 = rubyTextureSize; //vec4 SourceSize1 = params.SourceSize; //
+    // vec4 size     = rubyTextureSize;
+    vec2 OGL2Pos = tex * params.SourceSize.xy - vec2(0.5,0.5); // vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5); 
     vec2 fp = fract(OGL2Pos);
-    vec2 dx = vec2(SourceSize1.z,0.0);
-    vec2 dy = vec2(0.0,SourceSize1.w);
+    vec2 dx = vec2(params.scanline_passSize.z,0.0) ; // vec2 dx = vec2(SourceSize1.z,0.0) ;
+    vec2 dy = vec2(0.0,params.scanline_passSize.w);  // vec2 dy = vec2(0.0,SourceSize1.w) ;
     vec2 pC4 = (floor(OGL2Pos) + vec2(0.5)) * params.SourceSize.zw;
 
     vec2 x2 = 2.0*dx; vec2 x3 = 3.0*dx;

@@ -49,9 +49,9 @@ void main()
       scanline_period_half=1;
       is_interlaced=0;
    }
-
-   vec4 pixel = vec4(texture(FXAA_pass, vTexCoord).xyz,1.0);
    
+   vec4 pixel = vec4(texture(FXAA_pass, vTexCoord).xyz,1.0);
+                                                                                                      //pixel = vec4(1.0); <-use to debug
    //Skip scanlines on interlaced content?
    if  (! ((is_interlaced==1) && (scanline_disable_on_interlace == 1.0))  ) {
       
