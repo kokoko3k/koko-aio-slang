@@ -197,7 +197,7 @@ void main(void) {
         vec3 pixel_glowed = pixel_glow(Source, in_glow_wh,in_glow_wh,in_glow_power,in_glow_gamma,params.SourceSize).rgb;
         //glowed = min(glowed,1.0); //Input signal glow dont have "to white" the phosphors. //FIXME: In dubt to turn it on; previous glsl version did not have this.
         if (IN_GLOW_ADD>0.0) {
-            pixel_glowed = mix(pixel_out,pixel_out+pixel_out,IN_GLOW_ADD);
+            pixel_glowed = mix(pixel_glowed,pixel_out+pixel_glowed,IN_GLOW_ADD);
         }
         //Mix scanline and glow pixel; depending on whiteness.
         if (DO_SCANLINES == 1) {
