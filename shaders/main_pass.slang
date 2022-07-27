@@ -83,8 +83,7 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
         //less effect on bright colors.
         float whiteness=(white_reference.r+white_reference.g+white_reference.b)/3.0;
         darkline_trans+=(whiteness-over_white);
-        darkline_trans=max(darkline_trans,0.0);
-        darkline_trans=min(darkline_trans,1.0);
+        darkline_trans=clamp(darkline_trans,0.0,1.0);
     }
 
     if (do_offset == 1.0) {
