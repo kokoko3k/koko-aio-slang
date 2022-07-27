@@ -61,17 +61,6 @@ vec3 pixel_vmask(vec3 source4, vec3 lm1,vec3 lm2,vec3 lm3,
         pixel_out=  mix(vmasked,source,whiteness);
     }
     
-
-   //Unsure if the following logic has some real usefulness.
-   //Maybe it is too complicated, comment by now.
-   /* if (is_scanlined)  {
-        vec4 lookup=texture(Source, vTexCoord);
-        return pixel_out;
-        //return pixel_out*lookup.a;
-         } else {
-        return pixel_out;
-    }
-   */
    return pixel_out;
 
 }
