@@ -215,9 +215,9 @@ void main(void) {
         vec3 m1f = m1 + 1.0 - RGB_MASK_STRENGTH ;
         vec3 m2f = m2 + 1.0 - RGB_MASK_STRENGTH ;
         vec3 m3f = m3 + 1.0 - RGB_MASK_STRENGTH ;
-        m1f = min(vec3(1.0,1.0,1.0),m1f) ;
-        m2f = min(vec3(1.0,1.0,1.0),m2f) ;
-        m3f = min(vec3(1.0,1.0,1.0),m3f) ;
+        m1f = min(vec3(1.0),m1f) ;
+        m2f = min(vec3(1.0),m2f) ;
+        m3f = min(vec3(1.0),m3f) ;
         pixel_out = pixel_vmask(pixel_out,m1f,m2f,m3f,pixel_in,VMASK_OVERWHITE,(DO_SCANLINES == 1));
     }
 
