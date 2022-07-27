@@ -138,10 +138,8 @@ vec3 pixel_scanline_static(vec3 color) {
     float offset = 0.0;
     float lines_black = SCANLINE_DARK;
     int period = (params.OriginalSize.y > MIN_LINES_INTERLACED ) ? 2 : 1 ;
-    float angle = vTexCoord.y * omega * period * params.OriginalSize.y ;
-    
+    float angle = vTexCoord.y * omega * period * params.OriginalSize.y ;   
     float lines = abs(sin(angle));
-
 
     /* //Modulate the blackness via the input color so that scanlines disappear on bright ones?
         float in_luminance = (color.r+color.g+color.b) /4.5; // <<-- FIXME: may need to tune this 
@@ -152,13 +150,11 @@ vec3 pixel_scanline_static(vec3 color) {
     */
     lines = lines * (ps_lines_white - lines_black) + lines_black;
     lines = (lines*lines);
-    
     //lines = (lines*lines);
     //lines = (lines*lines); 
     color *= min(lines,1.0); // <-- not clamping here may produce scanline dephasing.
     return color;
 }
-
 
 bool scanline_have_to_flicker(int is_interlaced) {
     return ((scanline_flickering == 1.0) || ((scanline_flickering==2.0) && (is_interlaced == 1)));
