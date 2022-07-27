@@ -125,15 +125,17 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
     return pixel_out;
 }
 
-#define ps_freq 0.500000
+/* freq = 0.500000
+   omega = pi x 2 * freq --> omega = pi x 2 x 0.5 = pi. (is the Angular frequency)
+*/
+#define omega 3.14159265358979
 #define ps_lines_white 1.0000
+
 vec3 pixel_scanline(vec3 color, int inversion) {
    /* Code modified from scanlines-sine-abs.glsl by RiskyJumps
       license: public domain
    */
-    float freq  =           0.500000 ;
     float lines_black = SCANLINE_DARK;
-    float omega = 2.0 * pi * ps_freq; // Angular frequency
     float angle = vTexCoord.y * omega * params.OriginalSize.y;
     float lines;
     
@@ -153,9 +155,9 @@ vec3 pixel_scanline(vec3 color, int inversion) {
     */
     lines *= ps_lines_white - lines_black;
     lines += lines_black;
-    lines= (lines*lines);
-    //lines= (lines*lines);
-    //lines= (lines*lines); 
+    lines = (lines*lines);
+    //lines = (lines*lines);
+    //lines = (lines*lines); 
     color *= min(lines,1.0); // <-- not clamping here may produce scanline dephasing.
     return color;
 }
