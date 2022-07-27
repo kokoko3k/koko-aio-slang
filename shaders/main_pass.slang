@@ -161,7 +161,6 @@ vec3 pixel_scanline_and_flicker(vec3 color) {
     //Is interlaced?
     int is_interlaced = (params.OriginalSize.y > MIN_LINES_INTERLACED) ? 1 : 0 ;
 
-    
     //Skip scanlines on interlaced content?
     if ((is_interlaced == 1) && (scanline_disable_on_interlace == 1)) { return color; }
    
@@ -182,8 +181,6 @@ vec3 pixel_scanline_and_flicker(vec3 color) {
 void main(void) {
     vec3 pixel_in = texture(Source, vTexCoord).rgb;
     vec3 pixel_out = pixel_in;
-    vec3 pixel_haloed = pixel_in;
-    vec3 pixel_glowed = pixel_in;
 
     // Scanlines, interlacing, flickering
     if ( DO_SCANLINES == 1.0 ) {
@@ -200,7 +197,7 @@ void main(void) {
         vec3 pixel_glowed = pixel_glow(Source, in_glow_wh,in_glow_wh,in_glow_power,in_glow_gamma,params.SourceSize).rgb;
         //glowed = min(glowed,1.0); //Input signal glow dont have "to white" the phosphors. //FIXME: In dubt to turn it on; previous glsl version did not have this.
         if (IN_GLOW_ADD>0.0) {
-            pixel_glowed =mix(pixel_out,pixel_out+pixel_out,IN_GLOW_ADD);
+            pixel_glowed = mix(pixel_out,pixel_out+pixel_out,IN_GLOW_ADD);
         }
         //Mix scanline and glow pixel; depending on whiteness.
         if (DO_SCANLINES == 1) {
@@ -232,7 +229,7 @@ void main(void) {
 
     //Halo
     if (DO_HALO == 1.0 ) {
-        pixel_haloed = pixel_glow(Source, halo_w,halo_h,halo_power,halo_gamma, params.SourceSize).rgb;
+        vec3 pixel_haloed = pixel_glow(Source, halo_w,halo_h,halo_power,halo_gamma, params.SourceSize).rgb;
         pixel_out += pixel_haloed;
     }
 
