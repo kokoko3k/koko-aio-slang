@@ -29,10 +29,6 @@ layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D Source;
 layout(set = 0, binding = 3) uniform sampler2D Original;
 
-#define rubyTexture Source
-#define rubyTextureSize params.SourceSize
-#define texture2D(a,b) texture(a,b)
-
 
 // What follows is an ugly optimization with a lot of code copied and pasted repeated multiple times,
 // shamlessly hidden into an include:

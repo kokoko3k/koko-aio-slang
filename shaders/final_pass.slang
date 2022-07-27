@@ -20,9 +20,6 @@ layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D main_pass;
 layout(set = 0, binding = 4) uniform sampler2D bloom_pass_final;
 
-#define rubyTexture main_pass
-#define texture2D(a,b) texture(a,b)
-
 vec3 pixel_alternate(vec3 source, float darkness) {
     float line = vTexCoord.y * params.OutputSize.y;
     vec3 pixel_out = source;
@@ -40,7 +37,7 @@ vec3 pixel_alternate(vec3 source, float darkness) {
 
 
 void main(void) {
-    vec3 pixel_out = texture(rubyTexture, vTexCoord).rgb;
+    vec3 pixel_out = texture(main_pass, vTexCoord).rgb;
     vec3 bloomed;
 
     //Mix bloom texture
