@@ -39,14 +39,14 @@ vec3 pixel_vmask(vec3 source4, vec3 lm1,vec3 lm2,vec3 lm3,
                  vec3 white_reference, float over_white,bool is_scanlined) {
 
     float glfragcoord_x = vTexCoord.x * params.OutputSize.x;
-    float col = float(int(glfragcoord_x));
+    int col = int(glfragcoord_x);
     vec3 pixel_out;
     vec3 vmasked;
     vec3 source = source4.rgb;
-    if (int(mod(col, 3.0)) < 1) {
+    if (mod(col, 3) < 1) {
         vmasked = lm1*source;
     }
-    else if (int(mod(col, 3.0)) < 2) {
+    else if (mod(col, 3) < 2) {
         vmasked = lm2*source;
     }
     else {
