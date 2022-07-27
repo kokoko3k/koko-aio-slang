@@ -832,8 +832,8 @@ vec4 pixel_glow_std_pow(sampler2D in_texture, float my_glowpix, float my_glowpix
 
     vec2 OGL2Pos = tex * params.SourceSize.xy - vec2(0.5,0.5); // vec2 OGL2Pos = tex * params.SourceSize.xy - vec2(0.5,0.5); // vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5);  
     vec2 fp = fract(OGL2Pos);
-    vec2 dx = vec2(SourceSize1.z,0.0)*2 ; // vec2 dx = vec2(params.passthrough_and_cc_passSize.z,0.0) ; // 
-    vec2 dy = vec2(0.0,SourceSize1.w)*2 ; // vec2 dy = vec2(0.0,params.passthrough_and_cc_passSize.w);  //
+    vec2 dx = vec2(SourceSize1.z,0.0) ; // vec2 dx = vec2(params.passthrough_and_cc_passSize.z,0.0) ; // 
+    vec2 dy = vec2(0.0,SourceSize1.w) ; // vec2 dy = vec2(0.0,params.passthrough_and_cc_passSize.w);  //
     vec2 pC4 = (floor(OGL2Pos) + vec2(0.5)) * params.SourceSize.zw;
 
     vec2 x2 = 2.0*dx; vec2 x3 = 3.0*dx;
