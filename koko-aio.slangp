@@ -129,8 +129,7 @@ shaders = 10
         scale8 = 1
 
 /* Last pass will do the composition of the previous passes
-   with the bloomed image, color corrections and
-   black frame insertions.
+   with the bloomed image, and black frame insertions.
 */
     shader9 = shaders/final_pass.slang
     filter_linear9 = true
