@@ -136,10 +136,10 @@ vec3 pixel_scanline(vec3 color, int inversion) {
       license: public domain
    */
     float lines_black = SCANLINE_DARK;
-    float angle = vTexCoord.y * omega * params.OriginalSize.y;
-    float lines;
+    int period = (params.OriginalSize.y > 300) ? 2 : 1 ;
+    float angle = vTexCoord.y * omega * period * params.OriginalSize.y;
     
-    lines = (inversion == 1) ? abs(sin(angle)) : abs(cos(angle));
+    float lines = (inversion == 1) ? abs(sin(angle)) : abs(cos(angle));
     
     /* //Modulate the blackness via the input color so that scanlines disappear on bright ones?
         float in_luminance = (color.r+color.g+color.b) /4.5; // <<-- FIXME: may need to tune this 
@@ -159,11 +159,9 @@ vec3 pixel_scanline(vec3 color, int inversion) {
 
 vec3 pixel_scanline_and_flicker(vec3 color) {
     //Is interlaced?
-    int is_interlaced=0;
-    if (params.OriginalSize.y > 300) {
-        is_interlaced=1;
-    }
+    int is_interlaced = (params.OriginalSize.y > 300) ? 1 : 0 ;
 
+    
     //Skip scanlines on interlaced content?
     if ((is_interlaced == 1) && (scanline_disable_on_interlace == 1)) { return color; }
    
