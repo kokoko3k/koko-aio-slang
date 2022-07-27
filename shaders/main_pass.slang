@@ -165,17 +165,12 @@ vec3 pixel_scanline(vec3 color, int inversion) {
 }
 
 vec3 pixel_scanline_and_flicker(vec3 color) {
-    int is_interlaced;
-    int scanline_period;
-    int scanline_period_half;
-
     //Is interlaced?
+    int is_interlaced=0;
     if (params.OriginalSize.y > 300) {
         is_interlaced=1;
-    } else {
-        is_interlaced=0;
     }
-   
+
     //Skip scanlines on interlaced content?
     if ((is_interlaced == 1) && (scanline_disable_on_interlace == 1)) { return color; }
    
