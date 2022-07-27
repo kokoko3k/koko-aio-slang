@@ -109,18 +109,17 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
 
     return source;
 }
-    
-    
-vec3 pixel_alternate(vec3 source) {
+
+ vec3 pixel_alternate(vec3 source) {
     float line = vTexCoord.y * params.OutputSize.y;
     vec3 pixel_out = source;
     if  (int(mod(float(params.FrameCount),2.0  )) == 1) {
         if  (int(mod(line,2.0  )) == 1) {
-            pixel_out=vec3(0.0,0.0,0.0) ; 
+            return vec3(0.0,0.0,0.0) ; 
         }
     } else {
         if  (int(mod(line,2.0  )) == 0) {
-            pixel_out=vec3(0.0,0.0,0.0) ; 
+            return vec3(0.0,0.0,0.0) ; 
         }
     }
     return pixel_out;
