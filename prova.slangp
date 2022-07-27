@@ -3,12 +3,11 @@ prefer_std_pow = "1.0"
 
 DO_FXAA = "0.0"
 
-DO_SCANLINES = "0.0"
+DO_SCANLINES = "1.0"
 SCANLINE_DARK = "0.0"
-scanline_sharpness = 4.0
 scanline_flickering = 0.0
 
-DO_IN_GLOW = "1.0"
+DO_IN_GLOW = "0.0"
 in_glow_power = "1.0"
 in_glow_wh = "4.0"	
 in_glow_gamma = "1.0" 

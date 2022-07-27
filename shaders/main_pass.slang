@@ -139,7 +139,7 @@ vec3 pixel_scanline(vec3 color, int inversion) {
     int period = (params.OriginalSize.y > MIN_LINES_INTERLACED ) ? 2 : 1 ;
     float angle = vTexCoord.y * omega * period * params.OriginalSize.y;
     
-    float lines = (inversion == 1) ? abs(sin(angle)) : abs(cos(angle));
+    float lines = (inversion == 0) ? abs(sin(angle)) : abs(cos(angle));
     
     /* //Modulate the blackness via the input color so that scanlines disappear on bright ones?
         float in_luminance = (color.r+color.g+color.b) /4.5; // <<-- FIXME: may need to tune this 
