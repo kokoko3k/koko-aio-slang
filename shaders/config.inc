@@ -159,7 +159,6 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter DO_BLOOM           "Bloom:" 				                0.0  0.0  1.0  1.0
 #pragma parameter BLOOM_MIX          "        Final mix, (0.0=off)"			0.15 0.0 1.0  0.01
 #pragma parameter bloom_size         "        Radius"					4.0  0.5 30.0 0.5
-//#pragma parameter bloom_directions   "        Directions: more is better but slower"	8.0  4.0 64.0 4.0
 #pragma parameter bloom_quality      "        Quality: more is better but slower"	8.0  2.0 32.0 1.0
 #pragma parameter bloom_gamma        "        Input Gamma"				2.0  1.0 10.0 1.0
 #pragma parameter bloom_power        "        Power multiplier"				2.0  1.0 10.0 0.1
@@ -198,9 +197,6 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #define in_glow_wh global.in_glow_wh
 #define in_glow_power global.in_glow_power
 #define in_glow_gamma global.in_glow_gamma
-// #define in_glow_w params.in_glow_w
-// #define in_glow_h params.in_glow_h
-
 
 #define DO_RGB_MASK global.DO_RGB_MASK
 #define RGB_MASK_STRENGTH global.RGB_MASK_STRENGTH
@@ -213,8 +209,6 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #define DARKLINES_PERIOD params.DARKLINES_PERIOD
 
 #define DO_HALO global.DO_HALO
-// #define halo_w params.halo_w
-// #define halo_h params.halo_h
 #define halo_w params.halo_w
 #define halo_h params.halo_h
 #define halo_power params.halo_power
@@ -222,7 +216,6 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 #define DO_BLOOM params.DO_BLOOM
 #define BLOOM_MIX global.BLOOM_MIX
-//#define bloom_directions params.bloom_directions
 #define bloom_quality params.bloom_quality
 #define bloom_size global.bloom_size
 #define bloom_gamma global.bloom_gamma
