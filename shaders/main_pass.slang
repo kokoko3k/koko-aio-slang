@@ -39,7 +39,7 @@ layout(set = 0, binding = 3) uniform sampler2D Original;
 #include "pixel_glows.slang"    
     
 vec3 fix_scanlines() {
-    return pixel_glow(scanline_sharpness*2,scanline_sharpness,1.0,1.0).rgb;
+    return pixel_glow(Source, scanline_sharpness*2,scanline_sharpness,1.0,1.0,params.SourceSize).rgb;
 }
 
 vec3 pixel_vmask(vec3 source4, vec3 lm1,vec3 lm2,vec3 lm3,
@@ -168,7 +168,7 @@ void main(void) {
         if (DO_SCANLINES == 1.0) {
             in_glow_h = scanline_sharpness ;
          }
-        glowed = pixel_glow(in_glow_wh,in_glow_h,in_glow_power,in_glow_gamma).rgb;
+        glowed = pixel_glow(Source, in_glow_wh,in_glow_wh,in_glow_power,in_glow_gamma,params.SourceSize).rgb;
         //glowed = min(glowed,1.0); //Input signal glow dont have "to white" the phosphors. //FIXME: In dubt to turn it on; previous glsl version did not have this.
         if (IN_GLOW_ADD>0.0) {
             pixel_out =mix(glowed,glowed+pixel_out,IN_GLOW_ADD);
@@ -200,7 +200,7 @@ void main(void) {
 
     //Halo
     if (DO_HALO == 1.0 ) {
-        haloed = pixel_glow(halo_w,halo_h,halo_power,halo_gamma).rgb;
+        haloed = haloed = pixel_glow(Source, halo_w,halo_h,halo_power,halo_gamma, params.SourceSize).rgb;
         pixel_out +=haloed;
     }
 
