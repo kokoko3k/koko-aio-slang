@@ -35,12 +35,11 @@ layout(set = 0, binding = 3) uniform sampler2D Original;
 // shamlessly hidden into an include:
 #include "pixel_glows.slang"    
     
-vec3 pixel_vmask(vec3 source4, vec3 lm1,vec3 lm2,vec3 lm3,
+vec3 pixel_vmask(vec3 source, vec3 lm1,vec3 lm2,vec3 lm3,
                  vec3 white_reference, float over_white,bool is_scanlined) {
     int col = int( vTexCoord.x * params.OutputSize.x );
     vec3 pixel_out;
     vec3 vmasked;
-    vec3 source = source4.rgb;
     if (mod(col, 3) < 1) {
         vmasked = lm1*source;
     }
