@@ -35,10 +35,6 @@ layout(set = 0, binding = 3) uniform sampler2D Original;
 // shamlessly hidden into an include:
 #include "pixel_glows.slang"    
     
-vec3 fix_scanlines() {
-    return pixel_glow(Source, scanline_sharpness*2,scanline_sharpness,1.0,1.0,params.SourceSize).rgb;
-}
-
 vec3 pixel_vmask(vec3 source4, vec3 lm1,vec3 lm2,vec3 lm3,
                  vec3 white_reference, float over_white,bool is_scanlined) {
 

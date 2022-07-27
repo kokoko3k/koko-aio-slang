@@ -31,12 +31,7 @@
      ↓
     FXAA antialiasing
      ↓
-    Emulates scanlines and interlacing
-     ↓
-    Linear filter scanlines
-     ↓              
-     ↓              
-    Input Glow → phosphors → slot mask/aperture grill →  halo → → → → → → → → → → → 
+    Emulate scanlines → Input Glow → phosphors → slot mask/aperture grill →  halo → 
                                                                                     ↓
                                                                                     ↓
     → Original image from emulator                                                  ↓

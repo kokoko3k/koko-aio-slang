@@ -1,5 +1,4 @@
 #define GLOW_SHARP_MAX 15 		//This has to be the same as the max used for in_glow_wh
-#define SCANLINES_SHARP_MAX 15 		//This has to be the same as the max used for scanline_sharpness
 
 layout(push_constant) uniform Push
 {
@@ -8,11 +7,9 @@ layout(push_constant) uniform Push
 	vec4 OutputSize;
 	vec4 scanline_passSize;
 	uint FrameCount;
-	
+
 	float SCANLINE_DARK;
-
 	float VMASK_OVERWHITE ;
-
 	float DRKLN_OVERWHITE ;
 	float DO_DARKLINES_VOFFSET ;
 	float DARKLINES_PERIOD ;
@@ -36,33 +33,24 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float DO_HALO ;
 	float DO_CCORRECTION;
 	float DO_ALT_BLANK;
-	
 	float IN_GLOW_ADD ;
 	float in_glow_wh ;
 	float in_glow_power ;
 	float in_glow_gamma ;
-	
 	float BLOOM_MIX;
  	float bloom_size ; //1
 	float bloom_gamma; //1
 	float bloom_on_dark_only; //1
 	float bloom_power; //1
   	float bloom_gamma_out; 
-	
   	float ALT_BLANK_STRENGTH ; //2 FIXME to 1
-	
 	float DO_FXAA ; //1
-	
-	float scanline_sharpness ; //2..3 FIXME in fix_scanlines
 	float scanline_flickering ; //2
 	float scanline_disable_on_interlace;
-	
 	float RGB_MASK_STRENGTH;
 	float DARKLINES_STRENGTH;
-	
 	float GAMMA_OUT ; //1
 	float saturation ; //1
-	
 } global;
 
 
@@ -90,9 +78,6 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 #pragma parameter DO_SCANLINES	"Scanlines:"									1.0 	0.0 1.0 1.0
 #pragma parameter SCANLINE_DARK "        Scanlines gap brightness"			  			0.0 	0.0 1.0 0.05
-
-// The amount of scanline sharpness. Very high values may cause visual artifacts when using not integer scaling
-#pragma parameter scanline_sharpness  "        Sharpness (use 15 for maximum on integer scaling)"	  	10.0 	1.0 15.0 0.2
 
 // Alternate the drawing of the scanlines between frames. this will produce a flickering typical of
 // interlaced screens; 0 disable the effect, 1 always enables it, 2 enables it only when
@@ -206,7 +191,6 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 #define DO_SCANLINES global.DO_SCANLINES
 #define SCANLINE_DARK params.SCANLINE_DARK
-#define scanline_sharpness global.scanline_sharpness
 #define SCANLINE_OVERWHITE global.SCANLINE_OVERWHITE
 #define scanline_flickering global.scanline_flickering
 #define scanline_disable_on_interlace global.scanline_disable_on_interlace
