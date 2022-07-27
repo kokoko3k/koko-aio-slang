@@ -152,8 +152,8 @@ vec3 pixel_alternate(vec3 source) {
 void main(void) {
     vec3 pixel_in = texture(Source, vTexCoord).rgb;
     vec3 pixel_out = pixel_in;
-    vec3 haloed = pixel_in;
-    vec3 glowed = pixel_in;
+    vec3 pixel_haloed = pixel_in;
+    vec3 pixel_glowed = pixel_in;
 
     /* Input signal is blurred and glows.
        glow power versus blur power is defined by IN_GLOW_ADD.
@@ -164,12 +164,12 @@ void main(void) {
         if (DO_SCANLINES == 1.0) {
             in_glow_h = scanline_sharpness ;
          }
-        glowed = pixel_glow(Source, in_glow_wh,in_glow_wh,in_glow_power,in_glow_gamma,params.SourceSize).rgb;
+        pixel_glowed = pixel_glow(Source, in_glow_wh,in_glow_wh,in_glow_power,in_glow_gamma,params.SourceSize).rgb;
         //glowed = min(glowed,1.0); //Input signal glow dont have "to white" the phosphors. //FIXME: In dubt to turn it on; previous glsl version did not have this.
         if (IN_GLOW_ADD>0.0) {
-            pixel_out =mix(glowed,glowed+pixel_out,IN_GLOW_ADD);
+            pixel_out =mix(pixel_glowed,pixel_glowed+pixel_out,IN_GLOW_ADD);
         } else {
-            pixel_out =  glowed;
+            pixel_out =  pixel_glowed;
         }
     } else if  (DO_SCANLINES == 1.0) {
         if (scanline_sharpness < SCANLINES_SHARP_MAX) {
@@ -196,8 +196,8 @@ void main(void) {
 
     //Halo
     if (DO_HALO == 1.0 ) {
-        haloed = haloed = pixel_glow(Source, halo_w,halo_h,halo_power,halo_gamma, params.SourceSize).rgb;
-        pixel_out +=haloed;
+        pixel_haloed = pixel_glow(Source, halo_w,halo_h,halo_power,halo_gamma, params.SourceSize).rgb;
+        pixel_out += pixel_haloed;
     }
 
     if (DO_CCORRECTION == 1.0) {
