@@ -37,9 +37,7 @@ layout(set = 0, binding = 3) uniform sampler2D Original;
     
 vec3 pixel_vmask(vec3 source4, vec3 lm1,vec3 lm2,vec3 lm3,
                  vec3 white_reference, float over_white,bool is_scanlined) {
-
-    float glfragcoord_x = vTexCoord.x * params.OutputSize.x;
-    int col = int(glfragcoord_x);
+    int col = int( vTexCoord.x * params.OutputSize.x );
     vec3 pixel_out;
     vec3 vmasked;
     vec3 source = source4.rgb;
