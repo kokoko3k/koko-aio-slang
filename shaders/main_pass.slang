@@ -136,7 +136,7 @@ vec3 pixel_scanline(vec3 color, int inversion) {
       license: public domain
    */
     float lines_black = SCANLINE_DARK;
-    int period = (params.OriginalSize.y > 300) ? 2 : 1 ;
+    int period = (params.OriginalSize.y > MIN_LINES_INTERLACED ) ? 2 : 1 ;
     float angle = vTexCoord.y * omega * period * params.OriginalSize.y;
     
     float lines = (inversion == 1) ? abs(sin(angle)) : abs(cos(angle));
@@ -159,7 +159,7 @@ vec3 pixel_scanline(vec3 color, int inversion) {
 
 vec3 pixel_scanline_and_flicker(vec3 color) {
     //Is interlaced?
-    int is_interlaced = (params.OriginalSize.y > 300) ? 1 : 0 ;
+    int is_interlaced = (params.OriginalSize.y > MIN_LINES_INTERLACED) ? 1 : 0 ;
 
     
     //Skip scanlines on interlaced content?

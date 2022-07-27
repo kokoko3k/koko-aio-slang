@@ -1,5 +1,5 @@
 #define GLOW_SHARP_MAX 15 		//This has to be the same as the max used for in_glow_wh
-
+#define MIN_LINES_INTERLACED 300	//Consider content interlaced if lines are more than this
 layout(push_constant) uniform Push
 {
 	vec4 SourceSize;
