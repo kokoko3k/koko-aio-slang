@@ -18,16 +18,16 @@ layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D main_pass;
 layout(set = 0, binding = 4) uniform sampler2D bloom_pass_final;
 
-vec3 pixel_alternate(vec3 source, float darkness) {
+vec3 pixel_alternate(vec3 source, float whiteness) {
     float line = vTexCoord.y * params.OutputSize.y;
     vec3 pixel_out = source;
     if  (int(mod(float(params.FrameCount),2.0  )) == 1) {
         if  (int(mod(line,2.0  )) == 1) {
-            pixel_out=mix(vec3(0),source,darkness) ;
+            pixel_out=mix(source,vec3(0), whiteness) ;
         }
     } else {
         if  (int(mod(line,2.0  )) == 0) {
-            pixel_out=mix(vec3(0),source,darkness) ;
+            pixel_out=mix(source,vec3(0),whiteness) ;
         }
     }
     return pixel_out;
@@ -44,18 +44,16 @@ void main(void) {
             
         if ( bloom_on_dark_only  == 1.0) {
            float source_whiteness = (pixel_out.r+pixel_out.g+pixel_out.b)/3;
-           float source_darkness = 1-source_whiteness;
-           float local_bloom_mix = BLOOM_MIX*source_darkness;
-           pixel_out = mix(pixel_out,bloomed,local_bloom_mix);
+           //1-source_whiteness is the "source darkness";
+           pixel_out = mix(pixel_out,bloomed,BLOOM_MIX * (1-source_whiteness) );
         } else {
            pixel_out = mix(pixel_out,bloomed,BLOOM_MIX);
         }
     }
 
-
     //Black frame insertion
     if (DO_ALT_BLANK == 1.0 ) {
-        pixel_out = pixel_alternate(pixel_out.rgb, 1 - ALT_BLANK_STRENGTH );
+        pixel_out = pixel_alternate(pixel_out.rgb, ALT_BLANK_STRENGTH );
     }
 
     //Out
