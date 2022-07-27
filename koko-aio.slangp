@@ -79,20 +79,15 @@ shaders = 10
     scale_type1 = source
     scale1 = 1.0
 
-/* Pretty dumb scanline shader.
-   It just blank alternate lines and can optionally emulate interlacing.
-   It relies on subsequent passes to correct dephasing due to viewport size.
-*/
-    shader2 = shaders/scanline.slang
-    alias2 = "scanline_pass"
-    filter_linear2 = true
+    //this is somehow important for the main pass to work good, why?
+    shader2 = shaders/passthrough.slang
     scale_type2 = source
+    filter_linear2 = true
     scale2 = 1.0
     
 
-/* In this pass we emulate glowing,
-   fix scanline dephasing, RGB vertical mask,
-   slot mask,haloing
+/* In this pass we emulate scanlines, glowing,
+   RGB vertical mask, slot mask,haloing and color corrections
 */
     shader3 = shaders/main_pass.slang
     alias3 = "main_pass"

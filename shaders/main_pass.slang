@@ -220,27 +220,33 @@ void main(void) {
     vec3 pixel_haloed = pixel_in;
     vec3 pixel_glowed = pixel_in;
 
+    // Scanlines, interlacing, flickering
+    if ( DO_SCANLINES == 1.0 ) {
+        vec3 pixel_scanlined = pixel_scanline_and_flicker(pixel_in);
+        pixel_out = pixel_scanlined.rgb;
+        pixel_out = min(vec3(1.0),pixel_out);
+    }     
+    
     /* Input signal is blurred and glows.
        glow power versus blur power is defined by IN_GLOW_ADD.
        this allows the rgb vmask to light up on the black scanline.
      */
     if (DO_IN_GLOW == 1) {
-        float in_glow_h = in_glow_wh;
-        if (DO_SCANLINES == 1.0) {
-            in_glow_h = scanline_sharpness ;
-         }
-        pixel_glowed = pixel_glow(Source, in_glow_wh,in_glow_wh,in_glow_power,in_glow_gamma,params.SourceSize).rgb;
+        vec3 pixel_glowed = pixel_glow(Source, in_glow_wh,in_glow_wh,in_glow_power,in_glow_gamma,params.SourceSize).rgb;
         //glowed = min(glowed,1.0); //Input signal glow dont have "to white" the phosphors. //FIXME: In dubt to turn it on; previous glsl version did not have this.
         if (IN_GLOW_ADD>0.0) {
-            pixel_out =mix(pixel_glowed,pixel_glowed+pixel_out,IN_GLOW_ADD);
-        } else {
-            pixel_out =  pixel_glowed;
+            pixel_glowed =mix(pixel_out,pixel_out+pixel_out,IN_GLOW_ADD);
         }
-    } else if  (DO_SCANLINES == 1.0) {
-        if (scanline_sharpness < SCANLINES_SHARP_MAX) {
-            pixel_out=fix_scanlines();
+        //Mix scanline and glow pixel; depending on whiteness.
+        if (DO_SCANLINES == 1) {
+            float in_luminance = (pixel_glowed.r+pixel_glowed.g+pixel_glowed.b)/3;
+            pixel_out = mix(pixel_out,pixel_glowed,in_luminance) ;
+            } else {
+            pixel_out = pixel_glowed;
         }
+        pixel_out = min(vec3(1.0),pixel_out);
     }
+
 
     //Vertical RGB Mask
     if (DO_RGB_MASK == 1.0 ) {
@@ -280,7 +286,7 @@ void main(void) {
         }
     }
     
-    
+
     //Out
     FragColor = vec4(pixel_out,0.0);
 }
