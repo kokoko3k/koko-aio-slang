@@ -56,10 +56,9 @@ vec3 pixel_vmask(vec3 source4, vec3 lm1,vec3 lm2,vec3 lm3,
         pixel_out = vmasked;
     } else {
         float whiteness=(white_reference.r+white_reference.g+white_reference.b)/3.0;
-        whiteness-=over_white;
-        whiteness=min(whiteness,1.0);
-        whiteness=max(whiteness,0.0);
-        pixel_out =  mix(vmasked,source,whiteness);
+        whiteness-= over_white;
+        whiteness=  clamp(whiteness,0.0,1.0);
+        pixel_out=  mix(vmasked,source,whiteness);
     }
     
 
