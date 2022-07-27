@@ -47,7 +47,7 @@
 
 */
 
-shaders = 11
+shaders = 10
 
 /*For P-uae defaults, doubling just y0 seems the best option.
   90% of games are lowres in vertical size and p-uae defaults
