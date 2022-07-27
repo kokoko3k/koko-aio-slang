@@ -65,19 +65,15 @@ vec3 pixel_vmask(vec3 source4, vec3 lm1,vec3 lm2,vec3 lm3,
 
 }
 
-    
-
+//(3 pixels unless changing m1,m2,m3 datatype)
+#define Darkline_part_w 3 
+#define Darkline_part_w_x2 6
 vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
                      float do_offset, vec3 white_reference,float over_white) {
 
     vec3 pixel_out=source;
     float col_2 =  vTexCoord.x * params.OutputSize.x;
     float line_2 = vTexCoord.y * params.OutputSize.y;
-
-    float fDarkline_part_w=3.0 ;       //Triads width, float type
-    float fDarkline_part_w_x2 = 6.0 ;  //Triads width, float type, *2
-    int iDarkline_part_w = 3 ;         //Triads width, integer type
-                                       //(3 pixels unless changing m1,m2,m3 datatype
 
     if (over_white != 1.0) {
         //less effect on bright colors.
@@ -89,13 +85,13 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
     if (do_offset == 1.0) {
         int hmask_shape_offset = int (darkline_every/2.0) + 1 ;
         if  (int(mod(line_2, darkline_every)) == 1) {
-            if (int(mod(col_2, fDarkline_part_w_x2)) < iDarkline_part_w) {
+            if (int(mod(col_2, Darkline_part_w_x2)) < Darkline_part_w) {
                 pixel_out =  pixel_out * darkline_trans;
             }
         } else if  (int(mod(line_2, darkline_every)) == hmask_shape_offset ) {
             // DRAW WITH OFFSET:
-            col_2+=fDarkline_part_w;
-            if ((int(mod(col_2, fDarkline_part_w_x2))) < iDarkline_part_w) {
+            col_2+=Darkline_part_w;
+            if ((int(mod(col_2, Darkline_part_w_x2))) < Darkline_part_w) {
                 pixel_out =  pixel_out * darkline_trans;
             }
         }
@@ -108,7 +104,7 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
         }
 
         if ( darkline_every < 0.0) {
-            if  (int(mod(line_2, abs(darkline_every)       )) != 1) {
+            if  (int(mod(line_2, abs(darkline_every) )) != 1) {
                 pixel_out =  pixel_out * darkline_trans;
             }
         }
@@ -244,7 +240,7 @@ void main(void) {
 
     //Horizontal screen lines
     if (DO_DARKLINES == 1.0 ) {
-    float MYDARKLINES_TRANSPARENCY = 1.0 - DARKLINES_STRENGTH;
+        float MYDARKLINES_TRANSPARENCY = 1.0 - DARKLINES_STRENGTH;
         pixel_out = pixel_darklines(pixel_out,DARKLINES_PERIOD,MYDARKLINES_TRANSPARENCY,DO_DARKLINES_VOFFSET,pixel_in,DRKLN_OVERWHITE);
     }
 
