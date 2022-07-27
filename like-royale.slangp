@@ -27,7 +27,7 @@ DRKLN_OVERWHITE = "1.0"
 DO_HALO = "1.0"
 halo_power = "2" 
 halo_w = "1.2"
-halo_h = "1.2"
+halo_h = "3.0"
 halo_gamma = "4.0" 
 
 DO_BLOOM = "1.0"

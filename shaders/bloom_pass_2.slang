@@ -33,6 +33,4 @@ void main() {
     } else {
         FragColor = texture( SourceTexture, vTexCoord);
     }
-  
-
 }

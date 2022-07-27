@@ -1,6 +1,5 @@
 #include "pows.slang"
-#define Pi  (3.14159265358979*2) // Pi*2
-
+#define Pi  (3.14159265358979*2)
 #define bloom_directions 8
 
 vec3 radial_bloom_std_pow(float Quality, float Directions, float Size, float fbloom_gamma) {

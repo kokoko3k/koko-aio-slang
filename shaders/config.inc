@@ -18,7 +18,6 @@ layout(push_constant) uniform Push
 	float halo_power ;
 	float halo_gamma ;
 	float DO_BLOOM ; //4
- 	//float bloom_directions ; //1
  	float bloom_quality ; //1
 	float prefer_std_pow; 
 } params;
@@ -67,9 +66,8 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 
 // FXAA
-// Apply an antialiasing filter via FXAA from nvidia, Boolean.
-#pragma parameter str_2   "FXAA:"		0.0 	0.0 1.0 1.0
-#pragma parameter DO_FXAA "        1.0 to enable"	1.0 	0.0 1.0 1.0
+// Apply an antialiasing filter via FXAA from Nvidia.
+#pragma parameter DO_FXAA "FXAA:"	1.0 	0.0 1.0 1.0
 
 
 // Scanlines
