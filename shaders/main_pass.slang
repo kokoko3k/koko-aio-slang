@@ -1,6 +1,7 @@
 #version 450
 #include "config.inc"
 #define eps 1e-8
+#define pi 3.141592654
 
 // RGB mask:       R     G     B
  #define m1 vec3 ( 1.0 , 0.0 , 0.0 )    //col 1
@@ -148,7 +149,71 @@ vec3 pixel_alternate(vec3 source) {
     }
     return pixel_out;
 }
+
+#define ps_freq 0.500000
+#define ps_lines_white 1.0000
+vec3 pixel_scanline(vec3 color, int inversion) {
+   /* Code modified from scanlines-sine-abs.glsl by RiskyJumps
+      license: public domain
+   */
+    float freq  =           0.500000 ;
+    float lines_black = SCANLINE_DARK;
+    float omega = 2.0 * pi * ps_freq; // Angular frequency
+    float angle = vTexCoord.y * omega * params.OriginalSize.y;
+    float lines;
     
+    if (inversion == 1) {
+        lines = sin(angle);
+    } else {
+        lines = cos(angle);
+    }
+    lines = abs(lines);
+    
+    /* //Modulate the blackness via the input color so that scanlines disappear on bright ones?
+        float in_luminance = (color.r+color.g+color.b) /4.5; // <<-- FIXME: may need to tune this 
+        float in_luminance = max(max(color.r,color.g),color.b)/1;
+        float in_luminance = (color.r + color.g + color.b)/3;
+        float in_luminance = 0.0;
+        lines_black = max(lines_black,in_luminance);
+    */
+    lines *= ps_lines_white - lines_black;
+    lines += lines_black;
+    lines= (lines*lines);
+    //lines= (lines*lines);
+    //lines= (lines*lines); 
+    color *= min(lines,1.0); // <-- not clamping here may produce scanline dephasing.
+    return color;
+}
+
+vec3 pixel_scanline_and_flicker(vec3 color) {
+    int is_interlaced;
+    int scanline_period;
+    int scanline_period_half;
+
+    //Is interlaced?
+    if (params.OriginalSize.y > 300) {
+        is_interlaced=1;
+    } else {
+        is_interlaced=0;
+    }
+   
+    //Skip scanlines on interlaced content?
+    if ((is_interlaced == 1) && (scanline_disable_on_interlace == 1)) { return color; }
+   
+    //Do flickering based on user prefs?
+    //(blank odd lines on odd frames and even lines on even frames)
+    if ((scanline_flickering == 1.0) || ((scanline_flickering==2.0) && (is_interlaced == 1))) {
+        if  (int(mod(float(params.FrameCount),2  )) <  1.0 ) {
+            return  pixel_scanline(color, 0);
+        } else {
+            return  pixel_scanline(color, 1);
+        }
+    }
+    //Do simple scanlines:
+    return pixel_scanline(color,0);
+}
+
+
 void main(void) {
     vec3 pixel_in = texture(Source, vTexCoord).rgb;
     vec3 pixel_out = pixel_in;
