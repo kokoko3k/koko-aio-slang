@@ -43,8 +43,9 @@ void main(void) {
         bloomed=texture(bloom_pass_final, vTexCoord).rgb ;
             
         if ( bloom_on_dark_only  == 1.0) {
-           float source_whiteness = (pixel_out.r+pixel_out.g+pixel_out.b)/3;
-           //1-source_whiteness is the "source darkness";
+           //float source_whiteness = (pixel_out.r+pixel_out.g+pixel_out.b) /3;
+           float source_whiteness = (pixel_out.r+pixel_out.g+pixel_out.b);
+           source_whiteness=min(source_whiteness,1.0);
            pixel_out = mix(pixel_out,bloomed,BLOOM_MIX * (1-source_whiteness) );
         } else {
            pixel_out = mix(pixel_out,bloomed,BLOOM_MIX);

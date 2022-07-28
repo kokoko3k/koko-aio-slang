@@ -30,7 +30,7 @@ DO_HALO = "0.0"
 	halo_gamma = "4.0" 
 
 DO_BLOOM = "0.0"
-	BLOOM_MIX = "0.16"
+	BLOOM_MIX = "0.2"
 	bloom_size = "0.50"
 	bloom_quality = "2.0"
 	bloom_gamma = "3.0"
