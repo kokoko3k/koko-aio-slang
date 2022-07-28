@@ -8,7 +8,7 @@ DO_SCANLINES = "1.0"
 	scanline_flickering = 1.0
 
 DO_IN_GLOW = "1.0"
-	in_glow_power = "15"
+	in_glow_power = "1"
 	in_glow_wh = "15"	
 	in_glow_gamma = "1.0" 
 	IN_GLOW_ADD = "0.0"

@@ -41,7 +41,7 @@ DO_BLOOM = "0.0"
 
 DO_CCORRECTION = "1.0"
 	GAMMA_OUT = "0.57"	
-	saturation = "1.15"
+	saturation = "1.00"
 
 DO_ALT_BLANK = 0.0
 	ALT_BLANK_STRENGTH = 0.0
