@@ -261,9 +261,6 @@ void main(void) {
         }
     }
     
-
- 
-    
     //Out
     FragColor = vec4(pixel_out,0.0);
 }

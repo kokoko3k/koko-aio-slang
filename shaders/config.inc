@@ -59,11 +59,11 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 //Misc
 //Depending on the compiler and exponent size, one may prefer to use the standard pow or the
-//integer optimized one.
-#pragma parameter str_1          "Optimizations:" 						0.0 	0.0 1.0 1.0
-#pragma parameter prefer_std_pow "        Use standard pow: (Switch to see which is faster)"	0.0 	0.0 1.0 1.0
+//integer optimized one. The optimize version will use only integer values.
+#pragma parameter str_1          "Optimizations: see which is faster" 								0.0 	0.0 1.0 1.0
+#pragma parameter prefer_std_pow "       Use pow (choose fractional gamma too for halo and glow)"				0.0 	0.0 1.0 1.0
 
-
+                                                                                        
 
 // FXAA
 // Apply an antialiasing filter via FXAA from Nvidia.
@@ -91,14 +91,13 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // The blur always affects horizontal sharpness, vertical sharpness is affected only if Dark scanline brightness is < 1.0.
 // Apply a gamma filter "in_glow_gamma" to "light" it, multiplying the result by "in_glow_power" and
 // finally interpolating(*) it with the source image.
-// "IN_GLOW_ADD" allows to modulate from interpolation(*) to a sum. This will allow the glow to light the unscanned
-// line, wihch may (or not) produce better effects when emulating scanlines.
+// "IN_GLOW_ADD" allows to modulate from interpolation(*) to a sum, wihch may (or not) produce better effects.
 // With "IN_GLOW_ADD=0" input glowing does not alter the RGB mask
 // or slot mask applied to the image.
 #pragma parameter DO_IN_GLOW    "Input power/glowing:"	 					1.0	0.0 1.0 1.0
 #pragma parameter in_glow_power "        Input signal glow strength"				0.45 	0.0 10.0 0.05
 #pragma parameter in_glow_wh    "        Sharpness"						2.5	0.0 15.0 0.05
-#pragma parameter in_glow_gamma "        Gamma, the higher, the less the glow on dark colors"	1.0 	1.0 10.0 1.0
+#pragma parameter in_glow_gamma "        Gamma, the higher, the less the glow on dark colors"	1.0 	1.0 10.0 0.1
 #pragma parameter IN_GLOW_ADD   "        Overflows from the scanlines, sharper image"		0.0 	0.0 1.0 0.05
 
 
@@ -143,7 +142,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter halo_power    "        Strength (neg=off)"					0.9 	-0.05 10.0 0.05
 #pragma parameter halo_w        "        Horizontal sharpness"					1.75	0.0  15.0 0.05
 #pragma parameter halo_h        "        Vertical sharpness"					1.75	0.0  15.0 0.05
-#pragma parameter halo_gamma    "        Gamma, the higher, the less the halo on dark colors"	2.0 	1.0  10.0 1.0
+#pragma parameter halo_gamma    "        Gamma, the higher, the less the halo on dark colors"	2.0 	1.0  10.0 0.1
 
 
 

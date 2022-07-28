@@ -951,14 +951,14 @@ vec4 dumb_glow(sampler2D in_texture, float my_glow, float glow_gamma) {
 }
 
 vec4 pixel_glow(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, float glow_gamma, vec4 SourceSize1) {
-    //SourceSize1 is used to determine dx and dY
+
     if ( (my_glowpix >= GLOW_SHARP_MAX) && (my_glowpixy >= GLOW_SHARP_MAX) ) {
         return dumb_glow(in_texture, my_glow,glow_gamma);
-        
     }
 
     if (prefer_std_pow != 1.0)
     {
+        glow_gamma = floor(glow_gamma);
         if (glow_gamma == 1) { return pixel_glow_gamma_1(in_texture, my_glowpix,my_glowpixy,my_glow,SourceSize1);   }
         if (glow_gamma == 2) { return pixel_glow_gamma_2(in_texture, my_glowpix,my_glowpixy,my_glow,SourceSize1);   }
         if (glow_gamma == 3) { return pixel_glow_gamma_3(in_texture,my_glowpix,my_glowpixy,my_glow,SourceSize1);   }
