@@ -825,6 +825,41 @@ vec4 pixel_glow_gamma_10(sampler2D in_texture, float my_glowpix, float my_glowpi
     return vec4(Bloom*my_glow,0.0);
 }
 
+vec3 blur_v(sampler2D in_texture, float my_glowpixy, vec4 SourceSize1) {
+
+    // Calculating texel coordinates
+    vec2 tex = vTexCoord.xy * 1.00001;
+
+    vec2 OGL2Pos = tex * params.SourceSize.xy - vec2(0.5,0.5);
+    vec2 fp = fract(OGL2Pos);
+  
+    vec2 dy = vec2(0.0,SourceSize1.w) ;
+    vec2 pC4 = (floor(OGL2Pos) + vec2(0.5)) * params.SourceSize.zw;
+
+    vec2 y2 = 2.0*dy;
+    
+    my_glowpixy = my_glowpixy / scalemod_y *2 ;
+
+    vec3 t1 = texture(in_texture, pC4     ).rgb;
+    vec3 t2 = texture(in_texture, pC4  -dy).rgb;
+    vec3 b1 = texture(in_texture, pC4  +dy).rgb;
+    vec3 b2 = texture(in_texture, pC4  +y2).rgb;
+
+    float wl2 = 1.0 + fp.y; wl2*=wl2; wl2 = exp2(-my_glowpixy*wl2);
+    float wl1 =       fp.y; wl1*=wl1; wl1 = exp2(-my_glowpixy*wl1);
+    float wr1 = 1.0 - fp.y; wr1*=wr1; wr1 = exp2(-my_glowpixy*wr1);
+    float wr2 = 2.0 - fp.y; wr2*=wr2; wr2 = exp2(-my_glowpixy*wr2);
+
+    float wt = 1.0/(wl2+wl1+wr1+wr2);
+
+    vec3 smoothed = (t2*wl2 + t1*wl1 + b1*wr1 + b2*wr2)*wt;
+ 
+    return smoothed;
+
+return vec3(1.0);
+
+}
+
 vec4 pixel_glow_std_pow(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, float glow_gamma, vec4 SourceSize1) {
 
     // Calculating texel coordinates

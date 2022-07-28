@@ -173,9 +173,14 @@ void main(void) {
                 pixel_out = pixel_scanlined.rgb;
                 pixel_out = min(vec3(1.0),pixel_out);
             }
+        } else {
+            pixel_out = blur_v(Source, 4.0 ,params.SourceSize); //Just do a little vertical blur 
+            //pixel_out = pixel_in;
         }
     }     
-    
+
+
+
     /* Input signal is blurred and glows.
        glow power versus blur power is defined by IN_GLOW_ADD.
        this allows the rgb vmask to light up on the black scanline.
