@@ -24,20 +24,20 @@ layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D FXAA_pass;
 
 
-bool scanline_have_to_flicker(int is_interlaced) {
-    return ((scanline_flickering == 1.0) || ((scanline_flickering==2.0) && (is_interlaced == 1)));
+bool scanline_have_to_flicker(bool is_interlaced) {
+    return ((scanline_flickering == 1.0) || ((scanline_flickering==2.0) && is_interlaced ));
 }
 
 void main()
 { 
    vec4 pixel = vec4(texture(FXAA_pass, vTexCoord).xyz,1.0);
-   int is_interlaced = (params.OriginalSize.y > MIN_LINES_INTERLACED) ? 1 : 0 ;
+   bool is_interlaced = (params.OriginalSize.y > MIN_LINES_INTERLACED) ? true : false ;
 
    if ( scanline_have_to_flicker(is_interlaced) ) {
 
       int scanline_period;
       int scanline_period_half;
-      int is_interlaced;
+
       /* Puae switches from lowres to sdres on interlaced screens
          since we blindly double the h-resolution, because we need
          to double y resolution on low resolution to simulate scanlines
@@ -47,7 +47,7 @@ void main()
          Rest assured that everything over 576,
          (maximum pal overscanned) is interlaced.
       */
-      if (is_interlaced == 1) {
+      if (is_interlaced) {
          scanline_period=4;
          scanline_period_half=2;
       } else {
@@ -56,7 +56,7 @@ void main()
       }
       
       //Skip scanlines on interlaced content?
-      if  (! ((is_interlaced==1) && (scanline_disable_on_interlace == 1.0))  ) {
+      if  (! ( is_interlaced && (scanline_disable_on_interlace == 1.0))  ) {
          
          //Do we want scanlines?
          if ( DO_SCANLINES == 1.0 ) {
@@ -64,13 +64,13 @@ void main()
             
             //No flickering (dumbly blank even lines)
             if ((scanline_flickering == 0.0) ||
-               ((scanline_flickering==2.0) && (is_interlaced == 0))) {
+               ((scanline_flickering==2.0) && !is_interlaced )) {
                      if (mymod > scanline_period_half) { pixel *= SCANLINE_DARK ;}
             } else {
                //Do flickering based on user prefs.
                //(blank odd lines on odd frames and even lines on even frames)
                if ((scanline_flickering == 1.0) ||
-                  ((scanline_flickering==2.0) && (is_interlaced == 1))) {
+                  ((scanline_flickering==2.0) && is_interlaced )) {
                      if  (int(mod(float(params.FrameCount),2  )) <  1.0 ) {
                            if (mymod >= scanline_period_half) { pixel *= SCANLINE_DARK; }
                      } else {
@@ -83,5 +83,7 @@ void main()
    }
    
    FragColor = pixel;
+   
+   
 }
 
