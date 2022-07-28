@@ -1,11 +1,11 @@
 #reference "koko-aio.slangp"
 prefer_std_pow = "0.0"
 
-DO_FXAA = "1.0"
+DO_FXAA = "0.0"
 
 DO_SCANLINES = "1.0"
 	SCANLINE_DARK = "0.0"
-	scanline_flickering = 1.0
+	scanline_flickering = 0.0
 
 DO_IN_GLOW = "0.0"
 	in_glow_power = "1.50"
