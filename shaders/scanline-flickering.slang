@@ -31,6 +31,11 @@ bool scanline_have_to_flicker(bool is_interlaced) {
 void main()
 { 
    vec4 pixel = vec4(texture(FXAA_pass, vTexCoord).xyz,1.0);
+   
+   
+   //Use to debug: 
+   //pixel=vec4(abs(sin(params.FrameCount/3.14/100)));
+   
    bool is_interlaced = (params.OriginalSize.y > MIN_LINES_INTERLACED) ? true : false ;
 
    if ( scanline_have_to_flicker(is_interlaced) ) {
