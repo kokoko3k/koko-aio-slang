@@ -200,9 +200,9 @@ layout(std140, set = 0, binding = 0) uniform UBO
 //Curvature parameters:
 #pragma parameter DO_CURVATURE	     "Emulate curvature:"			1.0   0.0 1.0 1.0
 #pragma parameter GEOM_CURVATURE     "        Curvature"			0.02  0.0 0.1 0.01
-#pragma parameter GEOM_WARP          "        Warp"				0.03  0.0 0.1 0.01
-#pragma parameter GEOM_CORNER_SIZE   "        Corner Size"			0.02  0.0 0.1 0.01
-#pragma parameter GEOM_CORNER_SMOOTH "        Corner Smoothness"		125.0 50.0 1000.0 25.0
+#pragma parameter GEOM_WARP          "        Warp"				0.0  0.0 0.1 0.01
+#pragma parameter GEOM_CORNER_SIZE   "        Corner Size"			0.01  0.0 0.1 0.01
+#pragma parameter GEOM_CORNER_SMOOTH "        Corner Smoothness"		225.0 50.0 1000.0 25.0
 #pragma parameter SHARPNESS_H        "        Sharpness Horizontal"		0.6   0.0 1.0 0.05
 #pragma parameter SHARPNESS_V        "        Sharpness Vertical"		1.0   0.0 1.0 0.05
 
