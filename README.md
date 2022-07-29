@@ -20,6 +20,7 @@ Several presets are included.<br>
 * Black frame insertions through alternate blanking
 * Interlace forcing and emulation
 * Antialiasing
+* More to come (probably curvature)
 
 ***External code by:***
 * CRT - Guest - Dr.Venom (single pass bloom function)
