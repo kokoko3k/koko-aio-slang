@@ -1,5 +1,9 @@
 #define GLOW_SHARP_MAX 15 		//This has to be the same as the max used for in_glow_wh
 #define MIN_LINES_INTERLACED 300	//Consider content interlaced if lines are more than this
+
+
+
+
 layout(push_constant) uniform Push
 {
 	vec4 SourceSize;
@@ -50,7 +54,26 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float DARKLINES_STRENGTH;
 	float GAMMA_OUT ; //1
 	float saturation ; //1
+	
+	float DO_CURVATURE;
+	float SHARPNESS_H;
+	float SHARPNESS_V;
+	float GEOM_CURVATURE;
+	float GEOM_WARP;
+	float GEOM_CORNER_SIZE;
+	float GEOM_CORNER_SMOOTH;
+	
 } global;
+
+
+
+#define DO_CURVATURE global.DO_CURVATURE
+#define SHARPNESS_H        global.SHARPNESS_H
+#define SHARPNESS_V        global.SHARPNESS_V
+#define GEOM_CURVATURE     global.GEOM_CURVATURE
+#define GEOM_WARP global.GEOM_WARP
+#define GEOM_CORNER_SIZE   global.GEOM_CORNER_SIZE
+#define GEOM_CORNER_SMOOTH global.GEOM_CORNER_SMOOTH
 
 
 // PARAMETERS AND MEANING
@@ -174,6 +197,16 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter saturation     "        Saturation modifier (1.0=off)"	1.0	0.0 10.0 0.025
 
 
+//Curvature parameters:
+#pragma parameter DO_CURVATURE	     "Emulate curvature:"			1.0   0.0 1.0 1.0
+#pragma parameter GEOM_CURVATURE     "        Curvature"			0.02  0.0 0.1 0.01
+#pragma parameter GEOM_WARP          "        Warp"				0.03  0.0 0.1 0.01
+#pragma parameter GEOM_CORNER_SIZE   "        Corner Size"			0.02  0.0 0.1 0.01
+#pragma parameter GEOM_CORNER_SMOOTH "        Corner Smoothness"		125.0 50.0 1000.0 25.0
+#pragma parameter SHARPNESS_H        "        Sharpness Horizontal"		0.6   0.0 1.0 0.05
+#pragma parameter SHARPNESS_V        "        Sharpness Vertical"		1.0   0.0 1.0 0.05
+
+
 // Alternative blanking.
 // Emulates the low pixel persistance of CRT monitors and reduces the motion blur,
 // typical of LCD displays, by blanking even/odd screen lines on even/odd frames.
@@ -182,51 +215,51 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter ALT_BLANK_STRENGTH "        Alternate black frame insertion strength" 	0.0 0.0 1.0 0.1
 
 
-#define DO_FXAA global.DO_FXAA
+#define DO_FXAA        global.DO_FXAA
 #define prefer_std_pow params.prefer_std_pow
 
-#define DO_SCANLINES global.DO_SCANLINES
-#define SCANLINE_DARK params.SCANLINE_DARK
-#define SCANLINE_OVERWHITE global.SCANLINE_OVERWHITE
-#define scanline_flickering global.scanline_flickering
+#define DO_SCANLINES                  global.DO_SCANLINES
+#define SCANLINE_DARK                 params.SCANLINE_DARK
+#define SCANLINE_OVERWHITE            global.SCANLINE_OVERWHITE
+#define scanline_flickering           global.scanline_flickering
 #define scanline_disable_on_interlace global.scanline_disable_on_interlace
 
-#define DO_IN_GLOW global.DO_IN_GLOW
-#define IN_GLOW_ADD global.IN_GLOW_ADD
-#define in_glow_wh global.in_glow_wh
+#define DO_IN_GLOW   global.DO_IN_GLOW
+#define IN_GLOW_ADD   global.IN_GLOW_ADD
+#define in_glow_wh    global.in_glow_wh
 #define in_glow_power global.in_glow_power
 #define in_glow_gamma global.in_glow_gamma
 
-#define DO_RGB_MASK global.DO_RGB_MASK
+#define DO_RGB_MASK       global.DO_RGB_MASK
 #define RGB_MASK_STRENGTH global.RGB_MASK_STRENGTH
-#define VMASK_OVERWHITE params.VMASK_OVERWHITE
+#define VMASK_OVERWHITE   params.VMASK_OVERWHITE
 
-#define DO_DARKLINES global.DO_DARKLINES
-#define DARKLINES_STRENGTH global.DARKLINES_STRENGTH
-#define DRKLN_OVERWHITE params.DRKLN_OVERWHITE
+#define DO_DARKLINES         global.DO_DARKLINES
+#define DARKLINES_STRENGTH   global.DARKLINES_STRENGTH
+#define DRKLN_OVERWHITE      params.DRKLN_OVERWHITE
 #define DO_DARKLINES_VOFFSET params.DO_DARKLINES_VOFFSET
-#define DARKLINES_PERIOD params.DARKLINES_PERIOD
+#define DARKLINES_PERIOD     params.DARKLINES_PERIOD
 
-#define DO_HALO global.DO_HALO
-#define halo_w params.halo_w
-#define halo_h params.halo_h
+#define DO_HALO    global.DO_HALO
+#define halo_w     params.halo_w
+#define halo_h     params.halo_h
 #define halo_power params.halo_power
 #define halo_gamma params.halo_gamma
 
-#define DO_BLOOM params.DO_BLOOM
-#define BLOOM_MIX global.BLOOM_MIX
-#define bloom_quality params.bloom_quality
-#define bloom_size global.bloom_size
-#define bloom_gamma global.bloom_gamma
-#define bloom_power global.bloom_power
-#define bloom_gamma_out global.bloom_gamma_out
+#define DO_BLOOM           params.DO_BLOOM
+#define BLOOM_MIX          global.BLOOM_MIX
+#define bloom_quality      params.bloom_quality
+#define bloom_size         global.bloom_size
+#define bloom_gamma        global.bloom_gamma
+#define bloom_power        global.bloom_power
+#define bloom_gamma_out    global.bloom_gamma_out
 #define bloom_on_dark_only global.bloom_on_dark_only
 
 #define DO_CCORRECTION global.DO_CCORRECTION
-#define GAMMA_OUT global.GAMMA_OUT
-#define saturation global.saturation
+#define GAMMA_OUT      global.GAMMA_OUT
+#define saturation     global.saturation
 
-#define DO_ALT_BLANK global.DO_ALT_BLANK
+#define DO_ALT_BLANK       global.DO_ALT_BLANK
 #define ALT_BLANK_STRENGTH global.ALT_BLANK_STRENGTH
 
 

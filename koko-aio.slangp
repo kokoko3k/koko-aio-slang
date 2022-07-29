@@ -47,7 +47,7 @@
 
 */
 
-shaders = 10
+shaders = 11
 
 /*For P-uae defaults, doubling just y0 seems the best option.
   90% of games are lowres in vertical size and p-uae defaults
@@ -129,10 +129,17 @@ shaders = 10
         scale_type8 = source
         scale8 = 1
 
-/* Last pass will do the composition of the previous passes
+/* This pass pass will do the composition of the previous passes
    with the bloomed image, and black frame insertions.
 */
     shader9 = shaders/final_pass.slang
     filter_linear9 = true
     scale_type9 = viewport
     scale9 = 1.0
+   
+   
+    shader10 = shaders/curvature.slang
+    scale_type10 = viewport
+    scale10 = 1.0
+    filter_linear10 = true
+    
