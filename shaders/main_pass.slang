@@ -56,7 +56,7 @@ pixel_out*=noise;
 #include "pixel_glows.slang"    
     
 vec3 pixel_vmask(vec3 source, vec3 lm1,vec3 lm2,vec3 lm3,
-                 vec3 white_reference, float over_white,bool is_scanlined) {
+                 vec3 white_reference, float over_white) {
     int col = int( vTexCoord.x * params.OutputSize.x );
     vec3 pixel_out;
     vec3 vmasked;
@@ -230,7 +230,7 @@ void main(void) {
         m1f = min(vec3(1.0),m1f) ;
         m2f = min(vec3(1.0),m2f) ;
         m3f = min(vec3(1.0),m3f) ;
-        pixel_out = pixel_vmask(pixel_out,m1f,m2f,m3f,pixel_in,VMASK_OVERWHITE,(DO_SCANLINES == 1));
+        pixel_out = pixel_vmask(pixel_out,m1f,m2f,m3f,pixel_in,VMASK_OVERWHITE);
     }
 
     //Horizontal screen lines
