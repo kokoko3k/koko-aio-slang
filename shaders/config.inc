@@ -59,21 +59,13 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float SHARPNESS_H;
 	float SHARPNESS_V;
 	float GEOM_CURVATURE;
-	float GEOM_WARP;
+	float GEOM_WARP_X;
+	float GEOM_WARP_Y;
 	float GEOM_CORNER_SIZE;
 	float GEOM_CORNER_SMOOTH;
 	
 } global;
 
-
-
-#define DO_CURVATURE global.DO_CURVATURE
-#define SHARPNESS_H        global.SHARPNESS_H
-#define SHARPNESS_V        global.SHARPNESS_V
-#define GEOM_CURVATURE     global.GEOM_CURVATURE
-#define GEOM_WARP global.GEOM_WARP
-#define GEOM_CORNER_SIZE   global.GEOM_CORNER_SIZE
-#define GEOM_CORNER_SMOOTH global.GEOM_CORNER_SMOOTH
 
 
 // PARAMETERS AND MEANING
@@ -200,9 +192,10 @@ layout(std140, set = 0, binding = 0) uniform UBO
 //Curvature parameters:
 #pragma parameter DO_CURVATURE	     "Emulate curvature:"			1.0   0.0 1.0 1.0
 #pragma parameter GEOM_CURVATURE     "        Curvature"			0.02  0.0 0.1 0.01
-#pragma parameter GEOM_WARP          "        Warp"				0.0  0.0 0.1 0.01
-#pragma parameter GEOM_CORNER_SIZE   "        Corner Size"			0.01  0.0 0.1 0.01
-#pragma parameter GEOM_CORNER_SMOOTH "        Corner Smoothness"		225.0 50.0 1000.0 25.0
+#pragma parameter GEOM_WARP_X        "        Warp X"				0.0   0.0 0.1 0.01
+#pragma parameter GEOM_WARP_Y        "        Warp Y"				0.03  0.0 0.1 0.01
+#pragma parameter GEOM_CORNER_SIZE   "        Corner Size"			0.01  0.0 0.1 0.005
+#pragma parameter GEOM_CORNER_SMOOTH "        Corner sharpness"			350.0 50.0 1000.0 25.0
 #pragma parameter SHARPNESS_H        "        Sharpness Horizontal"		0.6   0.0 1.0 0.05
 #pragma parameter SHARPNESS_V        "        Sharpness Vertical"		1.0   0.0 1.0 0.05
 
@@ -263,3 +256,11 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #define ALT_BLANK_STRENGTH global.ALT_BLANK_STRENGTH
 
 
+#define DO_CURVATURE global.DO_CURVATURE
+#define SHARPNESS_H        global.SHARPNESS_H
+#define SHARPNESS_V        global.SHARPNESS_V
+#define GEOM_CURVATURE     global.GEOM_CURVATURE
+#define GEOM_WARP_X        global.GEOM_WARP_X
+#define GEOM_WARP_Y        global.GEOM_WARP_Y
+#define GEOM_CORNER_SIZE   global.GEOM_CORNER_SIZE
+#define GEOM_CORNER_SMOOTH global.GEOM_CORNER_SMOOTH

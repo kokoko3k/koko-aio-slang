@@ -37,18 +37,9 @@ vec4 filter_lanczos(vec4 coeffs, mat4x4 color_matrix)
     return col;
 }
 
-vec3 get_scanline_weight(float pos, float beam, float strength)
+vec2 curve_coordinate(vec2 co, float curvature_x, float curvature_y)
 {
-    float weight = 1.0 - pow(cos(pos * 2.0 * PI) * 0.5 + 0.5, beam);
-    
-    weight = weight * strength * 2.0 + (1.0 - strength);
-    
-    return vec3(weight);
-}
-
-vec2 curve_coordinate(vec2 co, float curvature)
-{
-    vec2 curve = vec2(curvature, curvature * 0.75);
+    vec2 curve = vec2(curvature_x, curvature_y);
     vec2 co2 = co + co * curve - curve / 2.0;
     vec2 co_weight = vec2(co.y, co.x) * 2.0 - 1.0;
 
@@ -91,8 +82,10 @@ vec3 do_curvature(){
     vec2 midpoint = vec2(0.5, 0.5);
 
     vec2 co = vTexCoord * tex_size * params.SourceSize.zw;
-    vec2 xy = curve_coordinate(co, GEOM_WARP);
-    float corner_weight = get_corner_weight(curve_coordinate(co, GEOM_CURVATURE), vec2(GEOM_CORNER_SIZE), GEOM_CORNER_SMOOTH);
+    
+    vec2 xy = curve_coordinate(co, GEOM_WARP_X,GEOM_WARP_Y );
+    
+    float corner_weight = get_corner_weight(curve_coordinate(co, GEOM_CURVATURE, GEOM_CURVATURE ), vec2(GEOM_CORNER_SIZE), GEOM_CORNER_SMOOTH);
 
     xy *= params.SourceSize.xy / tex_size;
 
