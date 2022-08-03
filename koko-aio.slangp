@@ -22,10 +22,10 @@
 
 
 
-    * Pipeline *
-    ------------
+* Pipeline *
+------------
 
-    → Original image from emulator
+→ → Original image from emulator
      ↓
     Double the input size
      ↓
@@ -34,15 +34,15 @@
     Emulate scanlines → Input Glow → phosphors → slot mask/aperture grill →  halo → 
                                                                                     ↓
                                                                                     ↓
-    → Original image from emulator                                                  ↓
+→ → Original image from emulator                                                    ↓
      ↓                                                                              ↓
     Bloom                                                                           ↓
      ↓                                                                              ↓
     mix  ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ←
      ↓
-    Color correction → Black frame insertion
-                                        ↓
-                                     Viewport
+    Color correction → Vignette, spot → Black frame insertion 
+                                                ↓
+                                            Viewport
 
 
 */
@@ -129,7 +129,7 @@ shaders = 11
         scale8 = 1
 
 /* This pass pass will do the composition of the previous passes
-   with the bloomed image, and black frame insertions.
+   with the bloomed image, vignette and spot light,  and black frame insertions.
 */
     shader9 = shaders/final_pass.slang
     filter_linear9 = true
