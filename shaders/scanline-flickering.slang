@@ -34,7 +34,8 @@ void main()
    
    
    //Use to debug: 
-   //pixel=vec4(abs(sin(params.FrameCount/3.14/100)));
+      //pixel=vec4(abs(sin(params.FrameCount/3.14/20))); //white fade
+      //pixel=vec4(abs(sin(params.FrameCount/3.14/20)),0.0,0.0,0.0); //red fade
    
    bool is_interlaced = (params.OriginalSize.y > MIN_LINES_INTERLACED) ? true : false ;
 
