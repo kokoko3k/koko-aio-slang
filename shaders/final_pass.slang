@@ -70,16 +70,12 @@ float gauss_xy(float pos_x, float pos_y, float size, float power, float gmin, fl
 #define s_center_y 0.4
 #define s_g_size 0.15
 #define s_g_power 0.25
-#define s_g_min 0.0
-#define s_g_max 1.0
 #define s_g_bypass 0.0
 
 // non-uniformità del pannello, da moltiplicare
 #define v_noisepower 0.015
 #define v_g_size 12
 #define v_g_power 0.8
-#define v_g_min 0.1
-#define v_g_max 1.0
 #define v_g_bypass 0.0
 
 
@@ -111,7 +107,7 @@ void main(void) {
 
  
     //vignette
-    float vignette = gauss_xy(0.0, 0.0, v_g_size, v_g_power, v_g_min, v_g_max);
+    float vignette = gauss_xy(0.0, 0.0, v_g_size, v_g_power, 0.0, 1.0);
     if (v_g_bypass < 1.0) {
         pixel_out = vec3(vignette) * pixel_out;
     } else {
@@ -119,7 +115,7 @@ void main(void) {
     }
     
     //Spot
-    float spot =     gauss_xy(s_center_x, s_center_y, s_g_size, s_g_power, s_g_min, s_g_max);
+    float spot =     gauss_xy(s_center_x, s_center_y, s_g_size, s_g_power, 0.0, 1.0);
     if (s_g_bypass < 1.0) {
         pixel_out = vec3(spot) + pixel_out;
     } else {
