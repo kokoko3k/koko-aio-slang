@@ -103,18 +103,14 @@ void main(void) {
         pixel_out = vec3(vignette) ;
     }
     
-    //Spot
+    //Spot 
+    float spot =     gauss_xy(s_center_x, s_center_y, s_size, s_power, 0.0, 1.0);
     
-    float prova;
-    prova = s_power;
-    
-    //float spot =     gauss_xy(s_center_x, s_center_y, s_size, s_power, 0.0, 1.0);
-    
-    //if (s_center_x < 1.0) {
-    //    pixel_out = vec3(spot) + pixel_out;
-    //} else {
-    //    pixel_out = vec3(spot) ;
-    //}
+    if (s_bypass < 1.0) {
+        pixel_out = vec3(spot) + pixel_out;
+    } else {
+        pixel_out = vec3(spot) ;
+    }
 
     //Noise
     float noise = random() * noisepower;

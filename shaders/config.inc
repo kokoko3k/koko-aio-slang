@@ -216,15 +216,15 @@ layout(std140, set = 0, binding = 0) uniform UBO
 //Vignette and spot
 
 #pragma parameter DO_VIGNETTE	"Emulate vignette effect:"	1.0  0.0  1.0  1.0
-#pragma parameter v_bypass	"    bypass "	        	1.0  0.0  1.0  1.0
-#pragma parameter v_size	"        size"			12   0.1  30   0.05
+#pragma parameter v_bypass	"    bypass "	        	0.0  0.0  1.0  1.0
+#pragma parameter v_size	"        size"			12   0.1  10   0.05
 #pragma parameter v_power	"        power"			0.8  0.05 2.0  0.05
 
 #pragma parameter DO_SPOT	"Emulate spot effect:"	1.0   0.0   1.0 1.0
-#pragma parameter s_bypass	"    bypass"	        1.0   0.0   1.0 1.0
+#pragma parameter s_bypass	"    bypass"	        0.0   0.0   1.0 1.0
 #pragma parameter s_center_x 	"    x position"		-0.4  -1.5  0.0 0.05
 #pragma parameter s_center_y	"    y postion "		0.4   -1.5  0.0 0.05
-#pragma parameter s_size	"    size"			0.15  0.1   30  0.05
+#pragma parameter s_size	"    size"			0.15  0.1   10  0.05
 #pragma parameter s_power	"    power" 			0.25  0.05  2.0 0.05
 
 
@@ -302,17 +302,19 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 
 #define DO_SPOT    global.DO_SPOT
+#define s_bypass   global.s_bypass
 #define s_center_x global.s_center_x
 #define s_center_y global.s_center_y
 #define s_size     global.s_size
 #define s_power    global.s_power
-#define s_bypass   global.s_bypass
+
 
 #define DO_VIGNETTE  global.DO_VIGNETTE
+#define v_bypass     global.v_bypass
 #define v_noisepower global.v_noisepower
 #define v_size       global.v_size
 #define v_power      global.v_power
-#define v_bypass     global.v_bypass
+
 
 
 
