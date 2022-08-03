@@ -83,7 +83,15 @@ void main(void) {
            //float source_whiteness = (pixel_out.r+pixel_out.g+pixel_out.b) /3;
            float source_whiteness = (pixel_out.r+pixel_out.g+pixel_out.b);
            source_whiteness=min(source_whiteness,1.0);
-           pixel_out = mix(pixel_out,bloomed,BLOOM_MIX * (1-source_whiteness) );
+           //pixel_out = mix(pixel_out,bloomed,BLOOM_MIX * (1-source_whiteness) );*/
+           
+                        float bloom_light = bloomed.r+bloomed.g+bloomed.b;
+                        float pixel_light = pixel_out.r+pixel_out.g+pixel_out.b;
+                        if (bloom_light > pixel_light) {
+                            //pixel_out = mix(pixel_out,bloomed,BLOOM_MIX );
+                            pixel_out = mix(pixel_out,bloomed,BLOOM_MIX * (1-source_whiteness) );
+                        }
+           
         } else {
            pixel_out = mix(pixel_out,bloomed,BLOOM_MIX);
         }
