@@ -63,6 +63,19 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float GEOM_WARP_Y;
 	float GEOM_CORNER_SIZE;
 	float GEOM_CORNER_SMOOTH;
+
+	float DO_SPOT;
+	float s_center_x;
+	float s_center_y; 
+	float s_size;
+	float s_power;
+	float s_bypass;
+
+	float DO_VIGNETTE;
+	float v_noisepower;
+	float v_size;
+	float v_power;
+	float v_bypass;
 	
 } global;
 
@@ -200,6 +213,28 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter SHARPNESS_V        "        Sharpness Vertical"		1.0   0.0 1.0 0.05
 
 
+//Vignette and spot
+
+#pragma parameter DO_VIGNETTE	"Emulate vignette effect:"	1.0  0.0  1.0  1.0
+#pragma parameter v_bypass	"    bypass "	        	1.0  0.0  1.0  1.0
+#pragma parameter v_size	"        size"			12   0.1  30   0.05
+#pragma parameter v_power	"        power"			0.8  0.05 2.0  0.05
+
+#pragma parameter DO_SPOT	"Emulate spot effect:"	1.0   0.0   1.0 1.0
+#pragma parameter s_bypass	"    bypass"	        1.0   0.0   1.0 1.0
+#pragma parameter s_center_x 	"    x position"		-0.4  -1.5  0.0 0.05
+#pragma parameter s_center_y	"    y postion "		0.4   -1.5  0.0 0.05
+#pragma parameter s_size	"    size"			0.15  0.1   30  0.05
+#pragma parameter s_power	"    power" 			0.25  0.05  2.0 0.05
+
+
+
+
+
+
+
+
+
 // Alternative blanking.
 // Emulates the low pixel persistance of CRT monitors and reduces the motion blur,
 // typical of LCD displays, by blanking even/odd screen lines on even/odd frames.
@@ -264,3 +299,23 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #define GEOM_WARP_Y        global.GEOM_WARP_Y
 #define GEOM_CORNER_SIZE   global.GEOM_CORNER_SIZE
 #define GEOM_CORNER_SMOOTH global.GEOM_CORNER_SMOOTH
+
+
+#define DO_SPOT    global.DO_SPOT
+#define s_center_x global.s_center_x
+#define s_center_y global.s_center_y
+#define s_size     global.s_size
+#define s_power    global.s_power
+#define s_bypass   global.s_bypass
+
+#define DO_VIGNETTE  global.DO_VIGNETTE
+#define v_noisepower global.v_noisepower
+#define v_size       global.v_size
+#define v_power      global.v_power
+#define v_bypass     global.v_bypass
+
+
+
+
+
+
