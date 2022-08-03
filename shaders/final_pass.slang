@@ -36,12 +36,13 @@ vec3 pixel_alternate(vec3 source, float whiteness) {
 
 
 
-// www.stackoverflow.com/questions/5149544/can-i-generate-a-random-number-inside-a-pixel-shader/
 
-float random(vec2 seed)
-{
-	vec2 i = vec2(23.140692, 2.6651442);
-	return fract(cos(dot(seed, i)) * 123456.0f);
+
+float random() {
+    // www.stackoverflow.com/questions/5149544/can-i-generate-a-random-number-inside-a-pixel-shader/
+    vec2 seed = vTexCoord * params.FrameCount;
+    vec2 i = vec2(23.140692, 2.6651442);
+    return fract(cos(dot(seed, i)) * 123456.0f);
 }
 
 
@@ -53,25 +54,35 @@ float gauss(float x, float x0, float sx, float size, float power){
     return a*exp(arg) * power;
 }
 
+float gauss_xy(float pos_x, float pos_y, float size, float power, float gmin, float gmax) {
+	vec2 uv = vTexCoord.xy + vec2(pos_x,pos_y);
+	float scale_uv = params.SourceSize.x / params.SourceSize.y;
+        float gx = gauss(uv.x* scale_uv,  0.5*scale_uv,  0.1,    size, power);
+	float gy = gauss(uv.y,            0.5,           0.1,    size, power);
+	float light = gx*gy;
+	return clamp(light,gmin,gmax);
+}
+
+
 
 // Spot da aggiungere 
-#define spot_center_x -0.4
-#define spot_center_y 0.4
-#define spot_g_size 0.15
-#define spot_g_power 0.25
-#define spot_l_min 0.0
-#define spot_l_max 1.0
-#define spot_g_bypass 0.0
+#define s_center_x -0.4
+#define s_center_y 0.4
+#define s_g_size 0.15
+#define s_g_power 0.25
+#define s_g_min 0.0
+#define s_g_max 1.0
+#define s_g_bypass 0.0
 
 // non-uniformità del pannello, da moltiplicare
-#define vignette_noisepower 0.015
-#define vignette_center_x -0.0
-#define vignette_center_y 0.0
-#define vignette_g_size 12
-#define vignette_g_power 0.8
-#define vignette_l_min 0.1
-#define vignette_l_max 1.0
-#define vignette_g_bypass 0.0
+#define v_noisepower 0.015
+#define v_center_x -0.0
+#define v_center_y 0.0
+#define v_g_size 12
+#define v_g_power 0.8
+#define v_g_min 0.1
+#define v_g_max 1.0
+#define v_g_bypass 0.0
 
 
 #define noisepower 0.015
@@ -106,43 +117,28 @@ void main(void) {
         pixel_out = pixel_alternate(pixel_out.rgb, ALT_BLANK_STRENGTH );
     }
 
-    
+ 
     //vignette
-    vec2 uv = vTexCoord.xy + vec2(vignette_center_x,vignette_center_y);
-    float scale_uv = params.SourceSize.x / params.SourceSize.y;
-    float gx = gauss(uv.x* scale_uv,         0.5*scale_uv,       0.1, vignette_g_size, vignette_g_power);
-    float gy = gauss(uv.y, 0.5, 0.1, vignette_g_size, vignette_g_power);
-    float light = gx*gy;
-    light = clamp(light,vignette_l_min,vignette_l_max);
-    vec2 randseed = vTexCoord * params.FrameCount;
-    float noise = random(randseed) * noisepower;
-    light+=noise;
-    if (vignette_g_bypass < 1.0) {
-        pixel_out = vec3(light) * pixel_out;
+    float vignette = gauss_xy(v_center_x, v_center_y, v_g_size, v_g_power, v_g_min, v_g_max);
+    if (v_g_bypass < 1.0) {
+        pixel_out = vec3(vignette) * pixel_out;
     } else {
-        pixel_out = vec3(light) ;
+        pixel_out = vec3(vignette) ;
     }
     
     //Spot
-    uv = vTexCoord.xy + vec2(spot_center_x,spot_center_y);
-    scale_uv = params.SourceSize.x / params.SourceSize.y;
-    gx = gauss(uv.x* scale_uv,         0.5*scale_uv,       0.1, spot_g_size, spot_g_power);
-    gy = gauss(uv.y, 0.5, 0.1, spot_g_size, spot_g_power);
-    light = gx*gy;
-    light = clamp(light,spot_l_min,spot_l_max);
-    randseed = vTexCoord * params.FrameCount;
-    noise = random(randseed) * noisepower;
-    light+=noise;
-    if (spot_g_bypass < 1.0) {
-        pixel_out = vec3(light) + pixel_out;
+    float spot =     gauss_xy(s_center_x, s_center_y, s_g_size, s_g_power, s_g_min, s_g_max);
+    if (s_g_bypass < 1.0) {
+        pixel_out = vec3(spot) + pixel_out;
     } else {
-        pixel_out = vec3(light) ;
+        pixel_out = vec3(spot) ;
     }
-    
-    
 
-    
-    
+    //Noise
+    float noise = random() * noisepower;
+    pixel_out = pixel_out + noise;
+
+        
     //Out
     FragColor = vec4(pixel_out,0.0);
 }
