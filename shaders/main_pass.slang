@@ -60,23 +60,17 @@ vec3 pixel_vmask(vec3 source, vec3 lm1,vec3 lm2,vec3 lm3,
     int col = int( vTexCoord.x * params.OutputSize.x );
     vec3 pixel_out;
     vec3 vmasked;
-    if (mod(col, 3) < 1) {
-        vmasked = lm1*source;
-    }
-    else if (mod(col, 3) < 2) {
-        vmasked = lm2*source;
-    }
-    else {
-        vmasked = lm3*source;
-    }
-    if (over_white == 1.0) {
-        pixel_out = vmasked;
-    } else {
-        float whiteness=(white_reference.r+white_reference.g+white_reference.b)/3.0;
-        whiteness-= over_white;
-        whiteness=  clamp(whiteness,0.0,1.0);
-        pixel_out=  mix(vmasked,source,whiteness);
-    }
+    if (mod(col, 3) < 1) vmasked = lm1*source;
+    else if (mod(col, 3) < 2) vmasked = lm2*source;
+    else vmasked = lm3*source;
+
+    if (over_white == 1.0) pixel_out = vmasked;
+        else {
+            float whiteness=(white_reference.r+white_reference.g+white_reference.b)/3.0;
+            whiteness-= over_white;
+            whiteness=  clamp(whiteness,0.0,1.0);
+            pixel_out=  mix(vmasked,source,whiteness);
+        }
     
    return pixel_out;
 
@@ -195,11 +189,8 @@ void main(void) {
             }
         } else {
             pixel_out = blur_v(Source, 4.0 ,params.SourceSize); //Just do a little vertical blur 
-            //pixel_out = pixel_in;
         }
     }     
-
-
 
     /* Input signal is blurred and glows.
        glow power versus blur power is defined by IN_GLOW_ADD.
@@ -208,9 +199,9 @@ void main(void) {
     if (DO_IN_GLOW == 1) {
         vec3 pixel_glowed = pixel_glow(Source, in_glow_wh,in_glow_wh,in_glow_power,in_glow_gamma,params.SourceSize).rgb;
         //glowed = min(glowed,1.0); //Input signal glow dont have "to white" the phosphors. //FIXME: In dubt to turn it on; previous glsl version did not have this.
-        if (IN_GLOW_ADD>0.0) {
-            pixel_glowed = mix(pixel_glowed,pixel_out+pixel_glowed,IN_GLOW_ADD);
-        }
+
+        if (IN_GLOW_ADD>0.0) pixel_glowed = mix(pixel_glowed,pixel_out+pixel_glowed,IN_GLOW_ADD);
+
         //Mix scanline and glow pixel; depending on whiteness.
         if (DO_SCANLINES == 1) {
             float in_luminance = (pixel_glowed.r+pixel_glowed.g+pixel_glowed.b)/3;
@@ -248,18 +239,19 @@ void main(void) {
     
     if (DO_CCORRECTION == 1.0) {
         //Gamma correction
-            vec3 cc = vec3(1.0);
-            if  (GAMMA_OUT != 1.0) {
-                    cc=vec3(GAMMA_OUT);
-            }
+        vec3 cc = vec3(1.0);
+        if  (GAMMA_OUT != 1.0) {
+            cc=vec3(GAMMA_OUT);
             pixel_out = pow(pixel_out,cc);
-
-        //Saturation modifier
-        if (!(saturation == 1.0)) {
-            float l = length(pixel_out);
-            pixel_out =  normalize( pow(pixel_out.rgb + vec3(eps), vec3(saturation)))*l  ;
         }
     }
+
+    //Saturation modifier
+    if (!(saturation == 1.0)) {
+        float l = length(pixel_out);
+        pixel_out =  normalize( pow(pixel_out.rgb + vec3(eps), vec3(saturation)))*l  ;
+    }
+
     
     //Out
     FragColor = vec4(pixel_out,0.0);

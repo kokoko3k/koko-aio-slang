@@ -1,5 +1,7 @@
 #version 450
 #include "config.inc"
+#define noisepower 0.015
+
 
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
@@ -22,21 +24,12 @@ vec3 pixel_alternate(vec3 source, float whiteness) {
     float line = vTexCoord.y * params.OutputSize.y;
     vec3 pixel_out = source;
     if  (int(mod(float(params.FrameCount),2.0  )) == 1) {
-        if  (int(mod(line,2.0  )) == 1) {
-            pixel_out=mix(source,vec3(0), whiteness) ;
-        }
+        if  (int(mod(line,2.0  )) == 1) pixel_out=mix(source,vec3(0), whiteness) ;
     } else {
-        if  (int(mod(line,2.0  )) == 0) {
-            pixel_out=mix(source,vec3(0),whiteness) ;
-        }
+        if  (int(mod(line,2.0  )) == 0) pixel_out=mix(source,vec3(0), whiteness) ;
     }
     return pixel_out;
 }
-
-
-
-
-
 
 float random() {
     // www.stackoverflow.com/questions/5149544/can-i-generate-a-random-number-inside-a-pixel-shader/
@@ -44,8 +37,6 @@ float random() {
     vec2 i = vec2(23.140692, 2.6651442);
     return fract(cos(dot(seed, i)) * 123456.0f);
 }
-
-
 
 float gauss(float x, float x0, float sx, float size, float power){
     float arg = x-x0;
@@ -63,14 +54,6 @@ float gauss_xy(float pos_x, float pos_y, float size, float power, float gmin, fl
 	return clamp(light,gmin,gmax);
 }
 
-
-
-
-
-
-#define noisepower 0.015
-
-
 void main(void) {
     vec3 pixel_out = texture(main_pass, vTexCoord).rgb;
     vec3 bloomed;
@@ -81,17 +64,12 @@ void main(void) {
             
         if ( bloom_on_dark_only  == 1.0) {
            //float source_whiteness = (pixel_out.r+pixel_out.g+pixel_out.b) /3;
-           float source_whiteness = (pixel_out.r+pixel_out.g+pixel_out.b);
-           source_whiteness=min(source_whiteness,1.0);
-           //pixel_out = mix(pixel_out,bloomed,BLOOM_MIX * (1-source_whiteness) );*/
-           
-                        float bloom_light = bloomed.r+bloomed.g+bloomed.b;
-                        float pixel_light = pixel_out.r+pixel_out.g+pixel_out.b;
-                        if (bloom_light > pixel_light) {
-                            //pixel_out = mix(pixel_out,bloomed,BLOOM_MIX );
-                            pixel_out = mix(pixel_out,bloomed,BLOOM_MIX * (1-source_whiteness) );
-                        }
-           
+            float source_whiteness = (pixel_out.r+pixel_out.g+pixel_out.b);
+            source_whiteness=min(source_whiteness,1.0);
+            //Bloom must not darken the source:
+                float bloom_light = bloomed.r+bloomed.g+bloomed.b;
+                float pixel_light = pixel_out.r+pixel_out.g+pixel_out.b;
+                if (bloom_light > pixel_light) pixel_out = mix(pixel_out,bloomed,BLOOM_MIX * (1-source_whiteness) );
         } else {
            pixel_out = mix(pixel_out,bloomed,BLOOM_MIX);
         }
@@ -108,23 +86,18 @@ void main(void) {
     if (DO_VIGNETTE == 1.0) {
         DO_NOISE = true;
         float vignette = gauss_xy(0.0, 0.0, v_size, v_power, 0.0, 1.0);       
-        if (v_bypass < 1.0) {
-            pixel_out = vec3(vignette) * pixel_out;
-        } else {
-
-            pixel_out = pixel_out * vec3(vignette) ;
-        }
+        if (v_bypass < 1.0) pixel_out = vec3(vignette) * pixel_out;
+            else
+        pixel_out = pixel_out * vec3(vignette) ;
     }
     
     //Spot 
     if (DO_SPOT == 1.0) {
         DO_NOISE = true;
-        float spot =     gauss_xy(s_center_x, s_center_y, s_size, s_power, 0.0, 1.0);
-        if (s_bypass < 1.0) {     
-            pixel_out = mix(pixel_out,vec3(1.0), spot);
-                } else {
-            pixel_out = vec3(spot) ;
-        }
+        float spot =  gauss_xy(s_center_x, s_center_y, s_size, s_power, 0.0, 1.0);
+        if (s_bypass < 1.0) pixel_out = mix(pixel_out,vec3(1.0), spot);
+            else
+        pixel_out = vec3(spot) ;
     }
 
     //Deband
