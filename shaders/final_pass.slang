@@ -76,8 +76,6 @@ float gauss_xy(float pos_x, float pos_y, float size, float power, float gmin, fl
 
 // non-uniformità del pannello, da moltiplicare
 #define v_noisepower 0.015
-#define v_center_x -0.0
-#define v_center_y 0.0
 #define v_g_size 12
 #define v_g_power 0.8
 #define v_g_min 0.1
@@ -86,13 +84,7 @@ float gauss_xy(float pos_x, float pos_y, float size, float power, float gmin, fl
 
 
 #define noisepower 0.015
-#define center_x -0.0
-#define center_y 0.0
-#define g_size 12
-#define g_power 0.8
-#define l_min 0.1
-#define l_max 1.0
-#define g_bypass 0.0
+
 
 void main(void) {
     vec3 pixel_out = texture(main_pass, vTexCoord).rgb;
@@ -119,7 +111,7 @@ void main(void) {
 
  
     //vignette
-    float vignette = gauss_xy(v_center_x, v_center_y, v_g_size, v_g_power, v_g_min, v_g_max);
+    float vignette = gauss_xy(0.0, 0.0, v_g_size, v_g_power, v_g_min, v_g_max);
     if (v_g_bypass < 1.0) {
         pixel_out = vec3(vignette) * pixel_out;
     } else {
