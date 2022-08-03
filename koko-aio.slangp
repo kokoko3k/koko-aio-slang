@@ -94,8 +94,7 @@ shaders = 11
 /* In the subsequent passes we do first a fast blOOm by first
    sampling the original texture and scale it down to keep
    it fast, next we do subsequent blURs of the bloomed
-   pass.
-*/
+   pass.*/
         shader4 = shaders/passthrough_original.slang
         alias4 = "bloom_pass_0"
         filter_linear4 = true

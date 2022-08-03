@@ -85,41 +85,47 @@ vec3 do_curvature(){
     
     vec2 xy = curve_coordinate(co, GEOM_WARP_X,GEOM_WARP_Y );
     
+    vec3 col; 
     float corner_weight = get_corner_weight(curve_coordinate(co, GEOM_CURVATURE, GEOM_CURVATURE ), vec2(GEOM_CORNER_SIZE), GEOM_CORNER_SMOOTH);
 
-    xy *= params.SourceSize.xy / tex_size;
+    
+    if ( (GEOM_WARP_X > 0) || (GEOM_WARP_Y > 0) ) {
+        xy *= params.SourceSize.xy / tex_size;
 
-    vec2 dx = vec2(1.0 / tex_size.x, 0.0);
-    vec2 dy = vec2(0.0, 1.0 / tex_size.y);
-    vec2 pix_co = xy * tex_size - midpoint;
-    vec2 tex_co = (floor(pix_co) + midpoint) / tex_size;
-    vec2 dist = fract(pix_co);
-    float curve_x, curve_y;
-    vec3 col, col2, diff;
+        vec2 dx = vec2(1.0 / tex_size.x, 0.0);
+        vec2 dy = vec2(0.0, 1.0 / tex_size.y);
+        vec2 pix_co = xy * tex_size - midpoint;
+        vec2 tex_co = (floor(pix_co) + midpoint) / tex_size;
+        vec2 dist = fract(pix_co);
+        float curve_x, curve_y;
+        vec3 col2, diff;
 
-    curve_x = curve_distance(dist.x, SHARPNESS_H * SHARPNESS_H);
-    curve_y = curve_distance(dist.y, SHARPNESS_V * SHARPNESS_V);
+        curve_x = curve_distance(dist.x, SHARPNESS_H * SHARPNESS_H);
+        curve_y = curve_distance(dist.y, SHARPNESS_V * SHARPNESS_V);
 
-    vec4 coeffs_x = PI * vec4(1.0 + curve_x, curve_x, 1.0 - curve_x, 2.0 - curve_x);
-    vec4 coeffs_y = PI * vec4(1.0 + curve_y, curve_y, 1.0 - curve_y, 2.0 - curve_y);
+        vec4 coeffs_x = PI * vec4(1.0 + curve_x, curve_x, 1.0 - curve_x, 2.0 - curve_x);
+        vec4 coeffs_y = PI * vec4(1.0 + curve_y, curve_y, 1.0 - curve_y, 2.0 - curve_y);
 
-    coeffs_x = FIX(coeffs_x);
-    coeffs_x = 2.0 * sin(coeffs_x) * sin(coeffs_x / 2.0) / (coeffs_x * coeffs_x);
-    coeffs_x /= dot(coeffs_x, vec4(1.0));
+        coeffs_x = FIX(coeffs_x);
+        coeffs_x = 2.0 * sin(coeffs_x) * sin(coeffs_x / 2.0) / (coeffs_x * coeffs_x);
+        coeffs_x /= dot(coeffs_x, vec4(1.0));
 
-    coeffs_y = FIX(coeffs_y);
-    coeffs_y = 2.0 * sin(coeffs_y) * sin(coeffs_y / 2.0) / (coeffs_y * coeffs_y);
-    coeffs_y /= dot(coeffs_y, vec4(1.0));
+        coeffs_y = FIX(coeffs_y);
+        coeffs_y = 2.0 * sin(coeffs_y) * sin(coeffs_y / 2.0) / (coeffs_y * coeffs_y);
+        coeffs_y /= dot(coeffs_y, vec4(1.0));
 
-    mat4x4 color_matrix;
+        mat4x4 color_matrix;
 
 
-    color_matrix[0] = filter_lanczos(coeffs_x, get_color_matrix(Source, tex_co - dy, dx));
-    color_matrix[1] = filter_lanczos(coeffs_x, get_color_matrix(Source, tex_co, dx));
-    color_matrix[2] = filter_lanczos(coeffs_x, get_color_matrix(Source, tex_co + dy, dx));
-    color_matrix[3] = filter_lanczos(coeffs_x, get_color_matrix(Source, tex_co + 2.0 * dy, dx));
+        color_matrix[0] = filter_lanczos(coeffs_x, get_color_matrix(Source, tex_co - dy, dx));
+        color_matrix[1] = filter_lanczos(coeffs_x, get_color_matrix(Source, tex_co, dx));
+        color_matrix[2] = filter_lanczos(coeffs_x, get_color_matrix(Source, tex_co + dy, dx));
+        color_matrix[3] = filter_lanczos(coeffs_x, get_color_matrix(Source, tex_co + 2.0 * dy, dx));
 
-    col = filter_lanczos(coeffs_y, color_matrix).rgb;
+        col = filter_lanczos(coeffs_y, color_matrix).rgb;
+            } else {
+        col = texture(Source, vTexCoord).rgb;
+    }
     col *= vec3(corner_weight);
     return col;
 }

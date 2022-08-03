@@ -95,8 +95,10 @@ void main(void) {
     }
 
  
+    bool DO_NOISE = false;
     //vignette
     if (DO_VIGNETTE == 1.0) {
+        DO_NOISE = true;
         float vignette = gauss_xy(0.0, 0.0, v_size, v_power, 0.0, 1.0);       
         if (v_bypass < 1.0) {
             pixel_out = vec3(vignette) * pixel_out;
@@ -108,6 +110,7 @@ void main(void) {
     
     //Spot 
     if (DO_SPOT == 1.0) {
+        DO_NOISE = true;
         float spot =     gauss_xy(s_center_x, s_center_y, s_size, s_power, 0.0, 1.0);
         if (s_bypass < 1.0) {     
             pixel_out = mix(pixel_out,vec3(1.0), spot);
@@ -116,10 +119,11 @@ void main(void) {
         }
     }
 
-    //Noise
-    //float noise = random() * noisepower;
-    //pixel_out = pixel_out + noise;
-
+    //Deband
+    if (DO_NOISE) {
+        float noise = random() * noisepower;
+        pixel_out = pixel_out + noise;
+    }
         
     //Out
     FragColor = vec4(pixel_out,0.0);
