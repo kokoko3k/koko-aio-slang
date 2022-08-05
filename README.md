@@ -44,3 +44,11 @@ Several presets are included.<br>
 **Just Scanlines:**
 ![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots.2022-29-07/crt-monitor-scanlines-clean.png?raw=true)
 
+**Some fun with Ambilight-like effect:**
+![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots.2022-22-08/Screenshot_20220805_141059.png?raw=true)
+
+![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots.2022-22-08/Screenshot_20220805_143004.png?raw=true)
+
+![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots.2022-22-08/Screenshot_20220805_143427.png?raw=true)
+
+![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots.2022-22-08/Screenshot_20220805_144938.png?raw=true)
