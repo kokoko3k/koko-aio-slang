@@ -30,7 +30,7 @@ vec3 pixel_ambilight() {
     vec3 cref  = texture(get_avg_lum_pass, vTexCoord).rgb;
     float ref_diff = abs( ((pref.r+pref.g+pref.b)/3) - ((cref.r+cref.g+cref.b)/3) );
     */
-    float fade_speed = 0.03;
+    float fade_speed = 0.05;
     //if (ref_diff > 0.1) fade_speed = 0.5;
     vec3 previous_pixel = texture(PreviousSampler, vTexCoord).rgb;
     vec3 current_pixel =  texture(CurrentSampler, vTexCoord).rgb;

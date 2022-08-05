@@ -105,7 +105,7 @@ vec4 main_wrap() {
     //Spot 
     if (DO_SPOT == 1.0) {
         DO_NOISE = true;
-        float spot =  gauss_xy(s_center_x, s_center_y, s_size, s_power, 0.0, 1.0);
+        float spot =  gauss_xy(s_center_x, s_center_y, s_size, s_power, 0.0, 10.0);
         if (s_bypass < 1.0) pixel_out = mix(pixel_out,vec3(1.0), spot);
             else
         pixel_out = vec3(spot) ;

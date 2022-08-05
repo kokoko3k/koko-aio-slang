@@ -50,6 +50,7 @@ bool is_outer_frame(vec4 pixel) {
 
 
 float get_in_aspect() {
+    return 1.333;
     float size_x = params.OriginalSize.x;
     float size_y = params.OriginalSize.y;
     //P-uae outputs something like 640x256 by default, but the aspect is not it, adapt:

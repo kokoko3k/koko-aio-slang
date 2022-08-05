@@ -1,6 +1,5 @@
 /*TODO:
-    It seems to be possible to pass parameters to the shaders via .slangp
-    Do that to pass the sampling texture to various passthrough (now duplicated) shaders (?)
+    Make aspect ratio configurable.
 */
 
 /*
