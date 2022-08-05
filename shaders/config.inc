@@ -1,7 +1,8 @@
 #define GLOW_SHARP_MAX 15 		//This has to be the same as the max used for in_glow_wh
 #define MIN_LINES_INTERLACED 300	//Consider content interlaced if lines are more than this
-
-
+//#define in_aspect (1.23)
+#define in_aspect (1.33)
+#define noisepower 0.015
 
 
 layout(push_constant) uniform Push
@@ -9,7 +10,7 @@ layout(push_constant) uniform Push
 	vec4 SourceSize;
 	vec4 OriginalSize;
 	vec4 OutputSize;
-	vec4 scanline_passSize;
+	vec4 final_passSize;
 	uint FrameCount;
 
 	float SCANLINE_DARK;

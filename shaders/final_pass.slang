@@ -1,21 +1,31 @@
 #version 450
 #include "config.inc"
-#define noisepower 0.015
 
 
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
+layout(location = 1) out vec2 vOutputCoord;
 
 void main()
 {
    gl_Position = global.MVP * Position;
-   vTexCoord = TexCoord;
+
+   float scale_x = params.OutputSize.x/(in_aspect * params.OutputSize.y);
+   float scale_y = 1.0;
+   float offset_x = (0.5 * scale_x ) - 0.5 ;
+   
+   vec2 scale_coord=vec2(TexCoord.x*scale_x - offset_x,TexCoord.y*scale_y);
+   
+   vTexCoord = scale_coord;
+   vOutputCoord = TexCoord;
 }
+
 
 #pragma stage fragment
 layout(location = 0) in vec2 vTexCoord;
+layout(location = 1) in vec2 vOutputCoord;
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D main_pass;
 layout(set = 0, binding = 4) uniform sampler2D bloom_pass_final;
@@ -54,8 +64,8 @@ float gauss_xy(float pos_x, float pos_y, float size, float power, float gmin, fl
 	return clamp(light,gmin,gmax);
 }
 
-void main(void) {
-    vec3 pixel_out = texture(main_pass, vTexCoord).rgb;
+vec4 main_wrap() {
+    vec3 pixel_out = texture(main_pass, vOutputCoord).rgb;
     vec3 bloomed;
 
     //Mix bloom texture
@@ -88,7 +98,7 @@ void main(void) {
         float vignette = gauss_xy(0.0, 0.0, v_size, v_power, 0.0, 1.0);       
         if (v_bypass < 1.0) pixel_out = vec3(vignette) * pixel_out;
             else
-        pixel_out = pixel_out * vec3(vignette) ;
+        pixel_out = vec3(vignette) ;
     }
     
     //Spot 
@@ -107,5 +117,14 @@ void main(void) {
     }
         
     //Out
-    FragColor = vec4(pixel_out,0.0);
+    return vec4(pixel_out,0.0);
+}
+
+#include "functions.include"
+void main() {
+    vec4 psample = texture(main_pass, vOutputCoord);
+    if (is_outer_frame(psample))
+        FragColor = mark_outer_frame(vec3(0.5));
+            else
+        FragColor = main_wrap();
 }

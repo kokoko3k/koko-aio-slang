@@ -1,0 +1,49 @@
+#define alpha_mark 0.1
+//content_x(y)_scale are the sizes of the viewport relative to the game content
+float content_x_scale(){
+    return params.OutputSize.x/(in_aspect * params.OutputSize.y);
+}
+
+float content_y_scale(){
+    return 1.0;
+}
+
+float calc_offset_x(float uv_scale_x){
+    return (0.5 * uv_scale_x ) - 0.5 ;
+}
+
+vec2 calc_uv() {
+    vec2 uv_scale = vec2( content_x_scale() , content_y_scale() );
+    vec2 uv ;
+    uv.x = vTexCoord.x * uv_scale.x;
+    uv.y = vTexCoord.y * uv_scale.y;
+
+    float offset_x = calc_offset_x(uv_scale.x);
+    uv.x = uv.x - offset_x ;
+
+    return uv;
+}
+
+vec4 mark_outer_frame(vec3 pixel) {
+    //For my mental sanity, I use a specific alpha channel value to mark a frame as a border
+    return vec4(pixel.r,pixel.g,pixel.b,alpha_mark) ;
+}
+
+bool is_outer_frame(vec4 pixel) {
+    /*Check if a pixel is marked as border by comparing the value of its alpha channel
+      Tolerance is needed, because precision can be as low as 1/256; since I don't need
+      alpha channel, use an even large tolerance.
+    */
+    return  abs(pixel.a - alpha_mark) < 0.05; //<-- 0.05 allow about 20 alpha levels (1*0.05)
+}
+
+/*bool coord_is_inside_frame(vec2 pixelcoord) {
+    vec2 uv=calc_uv();
+    float offset_x = calc_offset_x( content_x_scale() ) ; 
+    if (pixelcoord.x > offset_x)
+        if (pixelcoord.x < 1.0-offset_x)
+            return true;
+    return false; //giallo
+
+}
+*/

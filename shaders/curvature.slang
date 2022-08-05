@@ -12,6 +12,36 @@
 #define FIX(c) max(abs(c), 1e-5)
 #define PI 3.141592653589
 #define TEX2D(c) texture(tex, c)
+#define in_texture final_pass
+#define in_textureSize final_passSize
+//#define in_textureSize SourceSize
+
+#pragma stage vertex
+layout(location = 0) in vec4 Position;
+layout(location = 1) in vec2 TexCoord;
+layout(location = 0) out vec2 vTexCoord;
+layout(location = 1) out vec2 vOutputCoord;
+
+
+void main()
+{
+   gl_Position = global.MVP * Position;
+
+   float scale_x = params.OutputSize.x/(in_aspect * params.OutputSize.y);
+   float scale_y = 1.0;
+   float offset_x = (0.5 * scale_x ) - 0.5 ;
+   
+   vec2 scale_coord=vec2(TexCoord.x*scale_x - offset_x,TexCoord.y*scale_y);
+   
+   vTexCoord = scale_coord;
+   vOutputCoord = TexCoord;
+}
+
+#pragma stage fragment
+layout(location = 0) in vec2 vTexCoord;
+layout(location = 1) in vec2 vOutputCoord;
+layout(location = 0) out vec4 FragColor;
+layout(set = 0, binding = 2) uniform sampler2D in_texture;
 
 float curve_distance(float x, float sharp)
 {
@@ -60,37 +90,21 @@ float get_corner_weight(vec2 co, vec2 corner, float smoothfunc)
     return corner_weight;
 }
 
-#pragma stage vertex
-layout(location = 0) in vec4 Position;
-layout(location = 1) in vec2 TexCoord;
-layout(location = 0) out vec2 vTexCoord;
-
-void main()
-{
-   gl_Position = global.MVP * Position;
-   vTexCoord = TexCoord;
-}
-
-#pragma stage fragment
-layout(location = 0) in vec2 vTexCoord;
-layout(location = 0) out vec4 FragColor;
-layout(set = 0, binding = 2) uniform sampler2D Source;
-
 
 vec3 do_curvature(){
-    vec2 tex_size = params.SourceSize.xy;
+    vec2 tex_size = params.in_textureSize.xy ;
     vec2 midpoint = vec2(0.5, 0.5);
 
-    vec2 co = vTexCoord * tex_size * params.SourceSize.zw;
-    
-    vec2 xy = curve_coordinate(co, GEOM_WARP_X,GEOM_WARP_Y );
+    vec2 co = vOutputCoord * tex_size * params.in_textureSize.zw;
+    vec2 co2 = vTexCoord * tex_size * params.in_textureSize.zw;
+    vec2 xy = curve_coordinate(co, GEOM_WARP_X,GEOM_WARP_Y  );
     
     vec3 col; 
-    float corner_weight = get_corner_weight(curve_coordinate(co, GEOM_CURVATURE, GEOM_CURVATURE ), vec2(GEOM_CORNER_SIZE), GEOM_CORNER_SMOOTH);
+    float corner_weight = get_corner_weight(curve_coordinate(co2, GEOM_CURVATURE, GEOM_CURVATURE ), vec2(GEOM_CORNER_SIZE), GEOM_CORNER_SMOOTH);
 
     
     if ( (GEOM_WARP_X > 0) || (GEOM_WARP_Y > 0) ) {
-        xy *= params.SourceSize.xy / tex_size;
+        xy *= params.in_textureSize.xy / tex_size;
 
         vec2 dx = vec2(1.0 / tex_size.x, 0.0);
         vec2 dy = vec2(0.0, 1.0 / tex_size.y);
@@ -117,26 +131,38 @@ vec3 do_curvature(){
         mat4x4 color_matrix;
 
 
-        color_matrix[0] = filter_lanczos(coeffs_x, get_color_matrix(Source, tex_co - dy, dx));
-        color_matrix[1] = filter_lanczos(coeffs_x, get_color_matrix(Source, tex_co, dx));
-        color_matrix[2] = filter_lanczos(coeffs_x, get_color_matrix(Source, tex_co + dy, dx));
-        color_matrix[3] = filter_lanczos(coeffs_x, get_color_matrix(Source, tex_co + 2.0 * dy, dx));
+        color_matrix[0] = filter_lanczos(coeffs_x, get_color_matrix(in_texture, tex_co - dy, dx));
+        color_matrix[1] = filter_lanczos(coeffs_x, get_color_matrix(in_texture, tex_co, dx));
+        color_matrix[2] = filter_lanczos(coeffs_x, get_color_matrix(in_texture, tex_co + dy, dx));
+        color_matrix[3] = filter_lanczos(coeffs_x, get_color_matrix(in_texture, tex_co + 2.0 * dy, dx));
 
         col = filter_lanczos(coeffs_y, color_matrix).rgb;
             } else {
-        col = texture(Source, vTexCoord).rgb;
+        col = texture(in_texture, vOutputCoord).rgb;
     }
+    
     col *= vec3(corner_weight);
     return col;
 }
 
 
-void main()
+vec4 main_wrap()
 {
     
     if (DO_CURVATURE == 1.0) {
-        FragColor = vec4(do_curvature(), 1.0);
+        return vec4(do_curvature(), 1.0);
     } else {
-        FragColor = texture(Source, vTexCoord);
+        return texture(in_texture, vOutputCoord);
     }
+}
+
+#include "functions.include"
+void main() {
+    vec4 psample = texture(in_texture, vOutputCoord);
+    if (is_outer_frame(psample))
+        FragColor = mark_outer_frame(vec3(0.5));
+            else
+        FragColor = main_wrap();
+
+        
 }

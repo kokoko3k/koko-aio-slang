@@ -1,7 +1,9 @@
 #version 450
 #include "config.inc"
+
 #define eps 1e-8
 #define pi 3.141592654
+
 
 // RGB mask:       R     G     B
  #define m1 vec3 ( 1.0 , 0.0 , 0.0 )    //col 1
@@ -17,15 +19,27 @@
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
+layout(location = 1) out vec2 vOutputCoord;
+
+
 
 void main()
 {
    gl_Position = global.MVP * Position;
-   vTexCoord = TexCoord;
+
+   float scale_x = params.OutputSize.x/(in_aspect * params.OutputSize.y);
+   float scale_y = 1.0;
+   float offset_x = (0.5 * scale_x ) - 0.5 ;
+   
+   vec2 scale_coord=vec2(TexCoord.x*scale_x - offset_x,TexCoord.y*scale_y);
+   
+   vTexCoord = scale_coord;
+   vOutputCoord = TexCoord;
 }
 
 #pragma stage fragment
 layout(location = 0) in vec2 vTexCoord;
+layout(location = 1) in vec2 vOutputCoord;
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D Source;
 layout(set = 0, binding = 3) uniform sampler2D Original;
@@ -57,7 +71,7 @@ pixel_out*=noise;
     
 vec3 pixel_vmask(vec3 source, vec3 lm1,vec3 lm2,vec3 lm3,
                  vec3 white_reference, float over_white,bool is_scanlined) {
-    int col = int( vTexCoord.x * params.OutputSize.x );
+    int col = int( vOutputCoord.x * params.OutputSize.x );
     vec3 pixel_out;
     vec3 vmasked;
     if (mod(col, 3) < 1) vmasked = lm1*source;
@@ -83,8 +97,8 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
                      float do_offset, vec3 white_reference,float over_white) {
 
     //vec3 pixel_out=source;
-    float col_2 =  vTexCoord.x * params.OutputSize.x;
-    float line_2 = vTexCoord.y * params.OutputSize.y;
+    float col_2 =  vOutputCoord.x * params.OutputSize.x;
+    float line_2 = vOutputCoord.y * params.OutputSize.y;
 
     if (over_white != 1.0) {
         //less effect on bright colors.
@@ -174,7 +188,7 @@ bool scanline_have_to_flicker(bool is_interlaced) {
     return ((scanline_flickering == 1.0) || ((scanline_flickering==2.0) && is_interlaced ));
 }
 
-void main(void) {
+vec4 main_wrap(void) {
     vec3 pixel_in = texture(Source, vTexCoord).rgb;
     vec3 pixel_out = pixel_in;
 
@@ -254,5 +268,13 @@ void main(void) {
 
     
     //Out
-    FragColor = vec4(pixel_out,0.0);
+    return vec4(pixel_out,0.0);
+}
+
+#include "functions.include"
+void main() {
+    if ((vTexCoord.x > 1.0 ) || (vTexCoord.x < 0.0 ) )
+        FragColor = mark_outer_frame(vec3(0.5));
+            else
+        FragColor = main_wrap();
 }
