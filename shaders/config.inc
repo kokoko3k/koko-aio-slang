@@ -78,6 +78,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float v_power;
 	float v_bypass;
 	
+	float DO_AMBILIGHT;
 } global;
 
 
@@ -229,8 +230,8 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter s_power	"    power" 			0.25  0.05  2.0 0.05
 
 
-
-
+//Ambilight effect
+#pragma parameter DO_AMBILIGHT	"Emulate Ambient led lights"	1.0  0.0  1.0  1.0
 
 
 
@@ -316,6 +317,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #define v_size       global.v_size
 #define v_power      global.v_power
 
+#define DO_AMBILIGHT global.DO_AMBILIGHT
 
 
 

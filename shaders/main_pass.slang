@@ -274,7 +274,7 @@ vec4 main_wrap(void) {
 #include "functions.include"
 void main() {
     if ((vTexCoord.x > 1.0 ) || (vTexCoord.x < 0.0 ) )
-        FragColor = mark_outer_frame(vec3(0.5));
+        FragColor = mark_outer_frame(vec3(0.0));
             else
         FragColor = main_wrap();
 }

@@ -44,15 +44,21 @@ vec4 pixel_border() {
     return texture(ambi_temporal_pass, vOutputCoord);
 }
 
+vec3 mixed() {
+    float noise = random() * noisepower;
+    return pixel_border().rgb + vec3(noise);
+}
 
 #include "functions.include"
 void main() {
     vec4 psample = texture(Source, vOutputCoord);
-    if (is_outer_frame(psample)) {
-        float noise = random() * noisepower;
-        vec3 myborder = pixel_border().rgb + vec3(noise);
-        FragColor = mark_outer_frame(myborder);
+    if (DO_AMBILIGHT == 1) {
+        if (is_outer_frame(psample)) {
+            FragColor = mark_outer_frame(mixed());
+        } else {
+            FragColor = psample;
+        }
     } else {
-        FragColor = psample;
+        FragColor = psample ;
     }
 }

@@ -34,14 +34,8 @@ vec3 pixel_ambilight() {
 
 #include "functions.include"
 void main() {
-/*    vec4 psample = texture(Original, vTexCoord);
-    if (is_outer_frame(psample))
-        FragColor = mark_outer_frame(vec3(0.5));
+    if (DO_AMBILIGHT == 1.0)
+        FragColor = vec4(pixel_ambilight(),0.0);
             else
-        FragColor = psample;
-*/ 
-
-
-
-    FragColor = vec4(pixel_ambilight(),0.0);
+        FragColor = vec4(0.0);
 }

@@ -160,7 +160,7 @@ vec4 main_wrap()
 void main() {
     vec4 psample = texture(in_texture, vOutputCoord);
     if (is_outer_frame(psample))
-        FragColor = mark_outer_frame(vec3(0.5));
+        FragColor = mark_outer_frame(vec3(0.0));
             else
         FragColor = main_wrap();
 
