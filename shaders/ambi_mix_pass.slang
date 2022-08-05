@@ -9,11 +9,12 @@ layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
 layout(location = 1) out vec2 vOutputCoord;
 
+#include "functions.include"
 void main()
 {
    gl_Position = global.MVP * Position;
 
-   float scale_x = params.OutputSize.x/(in_aspect * params.OutputSize.y);
+   float scale_x = params.OutputSize.x/(guess_in_aspect() * params.OutputSize.y);
    float scale_y = 1.0;
    float offset_x = (0.5 * scale_x ) - 0.5 ;
    

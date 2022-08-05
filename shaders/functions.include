@@ -47,3 +47,14 @@ bool is_outer_frame(vec4 pixel) {
 
 }
 */
+
+
+float guess_in_aspect() {
+    float size_x = params.OriginalSize.x;
+    float size_y = params.OriginalSize.y;
+    if ((size_x/size_y) > 1.8)
+        size_x = size_x / 2.0;
+        
+    return size_x/size_y;
+
+}
