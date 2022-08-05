@@ -2,6 +2,7 @@
 #include "config.inc"
 #define noisepower 0.015
 
+#define eps 1e-8
 
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
@@ -42,7 +43,11 @@ float random() {
 
 
 vec4 pixel_border() {
-    return texture(ambi_temporal_pass, vOutputCoord);
+    vec3 ambi = texture(ambi_temporal_pass, vOutputCoord).rgb;
+    float l = length(ambi);
+    float sat = 1.5;
+    ambi =  normalize( pow(ambi.rgb + vec3(eps), vec3(sat)))*l  ;
+    return vec4(ambi,0.0);
 }
 
 vec3 mixed() {

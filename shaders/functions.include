@@ -52,9 +52,10 @@ bool is_outer_frame(vec4 pixel) {
 float guess_in_aspect() {
     float size_x = params.OriginalSize.x;
     float size_y = params.OriginalSize.y;
-    if ((size_x/size_y) > 1.8)
-        size_x = size_x / 2.0;
-        
+    //P-uae outputs something like 640x256 by default, but the aspect is not it, adapt:
+        if ((size_x/size_y) > 1.8)
+            size_x = size_x / 2.0;
+
     return size_x/size_y;
 
 }

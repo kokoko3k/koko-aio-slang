@@ -63,8 +63,8 @@ shaders = 16
     alias0 = "doublesize_pass"
     filter_linear0 = false
     scale_type0 = source
-    scale_x0 = 1.0
-    scale_y0 = 1.0
+    scale_x0 = 2.0
+    scale_y0 = 2.0
 
 /* Nvidia fxaa pass:
    works good for "SD" resolutions
