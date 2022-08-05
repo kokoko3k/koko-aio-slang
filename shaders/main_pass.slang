@@ -28,7 +28,7 @@ void main()
 {
    gl_Position = global.MVP * Position;
 
-   float scale_x = params.OutputSize.x/(guess_in_aspect() * params.OutputSize.y);
+   float scale_x = params.OutputSize.x/(get_in_aspect() * params.OutputSize.y);
    float scale_y = 1.0;
    float offset_x = (0.5 * scale_x ) - 0.5 ;
    
