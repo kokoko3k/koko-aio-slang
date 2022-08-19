@@ -15,17 +15,13 @@ void main()
    vTexCoord = TexCoord;
 }
 
-
-
 #pragma stage fragment
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D CurrentSampler;
 layout(set = 0, binding = 3) uniform sampler2D PreviousSampler;
-
 layout(set = 0, binding = 4) uniform sampler2D ambi_avglum_pass;
 layout(set = 0, binding = 5) uniform sampler2D ambi_avglum_passFeedback;
-
 
 
 vec3 pixel_ambilight() {
@@ -45,7 +41,6 @@ vec3 pixel_ambilight() {
 
     return outmix;
 }
-
 
 
 #include "functions.include"

@@ -17,10 +17,11 @@ layout(location = 0) in vec2 vTexCoord;
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D Source;
 
-
 void main() {
-    //always sample the middle of the screen at a very low resolution
-    //using mipmapping.
-   FragColor = textureLod(Source, vec2(0.5,0.5),10);
-    //FragColor = textureLod(Source, vTexCoord,0.1);
+    if (DO_AMBILIGHT == 1) {
+        //Always sample the middle of the screen at a very low resolution via mipmap
+        FragColor = textureLod(Source, vec2(0.5,0.5),10);
+    } else {
+        FragColor = vec4(1.0);
+    }
 }
