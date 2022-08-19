@@ -31,7 +31,7 @@
      ↓
     FXAA antialiasing
      ↓
-    Emulate scanlines → Input Glow → phosphors → slot mask/aperture grill →  halo → 
+    Emulate scanlines → Input Glow → phosphors → slot mask/aperture grill →  halo →
                                                                                     ↓
                                                                                     ↓
 → → Original image from emulator                                                    ↓
@@ -40,14 +40,14 @@
      ↓                                                                              ↓
     mix  ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ←
      ↓
-    Color correction → Vignette, spot → Black frame insertion 
+    Color correction → Vignette, spot → Black frame insertion
                                                 ↓
                                             Viewport
 
 
 */
 
-shaders = 16
+shaders = 17
 
 /*For P-uae defaults, doubling just y0 seems the best option.
   90% of games are lowres in vertical size and p-uae defaults
@@ -80,7 +80,7 @@ shaders = 16
     scale_type2 = source
     filter_linear2 = true
     scale2 = 1.0
-    
+
 
 /* In this pass we emulate scanlines, glowing,
    RGB vertical mask, slot mask,haloing and color corrections
@@ -94,7 +94,7 @@ shaders = 16
 /* In the subsequent passes we do first a fast blOOm by first
    sampling the original texture and scale it down to keep
    it fast, next we do subsequent blURs of the bloomed
-   pass.   
+   pass.
    */
         shader4 = shaders/passthrough_original.slang
         alias4 = "bloom_pass_0"
@@ -128,7 +128,7 @@ shaders = 16
         filter_linear8 = true
         scale_type8 = source
         scale8 = 1
-        
+
 
 /* This pass pass will do the composition of the previous passes
    with the bloomed image, vignette and spot light,  and black frame insertions.
@@ -140,6 +140,7 @@ shaders = 16
     scale9 = 1.0
 
 /* Create the ambilight magic: */
+        //(**)
         shader10 = shaders/passthrough_original.slang
         alias10 = "ambi_downscale_pass"
         filter_linear10 = true
@@ -151,34 +152,45 @@ shaders = 16
         alias11 = "ambi_pre_pass0"
         filter_linear11 = true
         scale_type11 = source
-        
+
         shader12 = shaders/ambi_pre_pass.slang
         alias12 = "ambi_pre_pass1"
         filter_linear12 = true
         scale_type12 = source
-        
-        shader13 = shaders/ambi_temporal_pass.slang
-        alias13 = "ambi_temporal_pass"
-        filter_linear13 = true
+        /*
+          The following pass should really stay before the downscale (**),
+          but unfortunately, maybe due to a bug in my system,
+          moving it there produces weird graphical glitches
+        */
+        shader13 = shaders/ambi_avglum_pass.slang
+        alias13 = "ambi_avglum_pass"
+        filter_linear13 = false
         scale_type13 = source
-        
-                
+        mipmap_input13 = false
+
+
+        shader14 = shaders/ambi_temporal_pass.slang
+        alias14 = "ambi_temporal_pass"
+        filter_linear14 = true
+        scale_type14 = source
+
+
         //shader14 = shaders/passthrough.slang
         //alias14 = "ambi_last_pass"
         //filter_linear14 = true
         //scale_type14 = viewport
         //scale13 = 1.0
-        
 
-    shader14 = shaders/curvature.slang
-    alias14 = "curvature_pass"
-    scale_type14 = viewport
-    scale14 = 1.0
-    filter_linear14 = true
-    
-    shader15 = shaders/ambi_mix_pass.slang
-    alias15 = "ambientmix_pass"
+
+    shader15 = shaders/curvature.slang
+    alias15 = "curvature_pass"
     scale_type15 = viewport
     scale15 = 1.0
     filter_linear15 = true
-    
+
+    shader16 = shaders/ambi_mix_pass.slang
+    alias16 = "ambientmix_pass"
+    scale_type16 = viewport
+    scale16 = 1.0
+    filter_linear16 = true
+

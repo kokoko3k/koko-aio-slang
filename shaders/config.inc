@@ -1,9 +1,9 @@
-#define GLOW_SHARP_MAX 15 		//This has to be the same as the max used for in_glow_wh
+#define GLOW_SHARP_MAX 15 		    //This has to be the same as the max used for in_glow_wh
 #define MIN_LINES_INTERLACED 300	//Consider content interlaced if lines are more than this
 //#define in_aspect (1.23)
-#define in_aspect (1.33)
-#define noisepower 0.015
-
+#define in_aspect (1.33)            //FIXME: Make me configurable!
+#define noisepower 0.015            //Sort of dithering
+#define scene_change_threshold 0.25  // 0.0-1.0: sensitivity to scene change (ambilike stuff)
 
 layout(push_constant) uniform Push
 {
