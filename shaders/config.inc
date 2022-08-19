@@ -79,6 +79,8 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float v_bypass;
 	
 	float DO_AMBILIGHT;
+	float aspect_x;
+	float aspect_y;
 } global;
 
 
@@ -154,9 +156,9 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // "DARKLINES_PERIOD" expresses every how many lines draw a black one.
 // "DO_DARKLINES_VOFFSET" lets you to vertically offset by ""DARKLINES_PERIOD/2" the lines every 3 screen pixels,
 // allowing, in conjunction with RGB mask, to emulate slot mask
-#pragma parameter DO_DARKLINES          "Slotmask/Aperture grille"			0.0 	0.0 1.0 1.0
+#pragma parameter DO_DARKLINES          "Slotmask/Aperture grille"		0.0 	0.0 1.0 1.0
 #pragma parameter DARKLINES_STRENGTH    "        Strength"				0.3 	0.0 1.0 0.05
-#pragma parameter DO_DARKLINES_VOFFSET  "        Offset by triads"			1.0 	0.0 1.0 1.0
+#pragma parameter DO_DARKLINES_VOFFSET  "        Offset by triads"		1.0 	0.0 1.0 1.0
 #pragma parameter DARKLINES_PERIOD      "        Period"				4.0 	-8.0 8.0 2.0
 #pragma parameter DRKLN_OVERWHITE       "        How much to affect bright colors"	1.0 	0.0 1.0 0.05
 
@@ -169,9 +171,9 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // this means that haloing will produce solid colors,
 // lessening afromentioned effects on bright colors.
 #pragma parameter DO_HALO       "Halo:" 							1.0	0.0 1.0 1.0
-#pragma parameter halo_power    "        Strength (neg=off)"					0.9 	-0.05 10.0 0.05
-#pragma parameter halo_w        "        Horizontal sharpness"					1.75	0.0  15.0 0.05
-#pragma parameter halo_h        "        Vertical sharpness"					1.75	0.0  15.0 0.05
+#pragma parameter halo_power    "        Strength (neg=off)"			0.9 	-0.05 10.0 0.05
+#pragma parameter halo_w        "        Horizontal sharpness"			1.75	0.0  15.0 0.05
+#pragma parameter halo_h        "        Vertical sharpness"			1.75	0.0  15.0 0.05
 #pragma parameter halo_gamma    "        Gamma, the higher, the less the halo on dark colors"	2.0 	1.0  10.0 0.1
 
 
@@ -187,11 +189,11 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // the original image.
 #pragma parameter DO_BLOOM           "Bloom:" 				                0.0  0.0  1.0  1.0
 #pragma parameter BLOOM_MIX          "        Final mix, (0.0=off)"			0.15 0.0 1.0  0.01
-#pragma parameter bloom_size         "        Radius"					4.0  0.5 30.0 0.5
+#pragma parameter bloom_size         "        Radius"						4.0  0.5 30.0 0.5
 #pragma parameter bloom_quality      "        Quality: more is better but slower"	8.0  2.0 32.0 1.0
-#pragma parameter bloom_gamma        "        Input Gamma"				2.0  1.0 10.0 1.0
-#pragma parameter bloom_power        "        Power multiplier"				2.0  1.0 10.0 0.1
-#pragma parameter bloom_gamma_out    "        Output Gamma"				1.0  0.1 10.0 0.05
+#pragma parameter bloom_gamma        "        Input Gamma"						2.0  1.0 10.0 1.0
+#pragma parameter bloom_power        "        Power multiplier"					2.0  1.0 10.0 0.1
+#pragma parameter bloom_gamma_out    "        Output Gamma"						1.0  0.1 10.0 0.05
 #pragma parameter bloom_on_dark_only "        Apply less over bright areas"		1.0  0.0 1.0  1.0
 
 
@@ -218,22 +220,22 @@ layout(std140, set = 0, binding = 0) uniform UBO
 //Vignette and spot
 
 #pragma parameter DO_VIGNETTE	"Emulate vignette effect:"	1.0  0.0  1.0  1.0
-#pragma parameter v_bypass	"    bypass "	        	0.0  0.0  1.0  1.0
-#pragma parameter v_size	"        size"			12   0.1  10   0.05
-#pragma parameter v_power	"        power"			0.8  0.05 2.0  0.05
+#pragma parameter v_bypass	"    bypass "	        0.0  0.0  1.0  1.0
+#pragma parameter v_size	"        size"				12   0.1  10   0.05
+#pragma parameter v_power	"        power"				0.8  0.05 2.0  0.05
 
 #pragma parameter DO_SPOT	"Emulate spot effect:"	1.0   0.0   1.0 1.0
-#pragma parameter s_bypass	"    bypass"	        0.0   0.0   1.0 1.0
+#pragma parameter s_bypass	"    bypass"	        	0.0   0.0   1.0 1.0
 #pragma parameter s_center_x 	"    x position"		-0.4  -1.5  1.5 0.05
 #pragma parameter s_center_y	"    y postion "		0.4   -1.5  1.5 0.05
-#pragma parameter s_size	"    size"			0.15  0.01   10  0.01rep
-#pragma parameter s_power	"    power" 			0.25  0.05  2.0 0.05
+#pragma parameter s_size	"    size"					0.15  0.01   10  0.01
+#pragma parameter s_power	"    power" 				0.25  0.05  2.0 0.05
 
 
 //Ambilight effect
-#pragma parameter DO_AMBILIGHT	"Emulate Ambient led lights"	1.0  0.0  1.0  1.0
-
-
+#pragma parameter DO_AMBILIGHT	"Ambient led lights (needs Retroarch aspect ratio set to full!)"	1.0  0.0  1.0  1.0
+#pragma parameter aspect_x "    Aspect Ratio Numerator (use 0 for smart)"   4.0 0.0 256. 1.0
+#pragma parameter aspect_y "    Aspect Ratio Denominator"	  				3.0 0.0 256. 1.0
 
 
 
@@ -318,9 +320,5 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #define v_power      global.v_power
 
 #define DO_AMBILIGHT global.DO_AMBILIGHT
-
-
-
-
-
-
+#define aspect_x	global.aspect_x
+#define aspect_y	global.aspect_y

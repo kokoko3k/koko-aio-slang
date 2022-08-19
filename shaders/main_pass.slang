@@ -24,17 +24,9 @@ layout(location = 1) out vec2 vOutputCoord;
 
 
 #include "functions.include"
-void main()
-{
+void main() {
    gl_Position = global.MVP * Position;
-
-   float scale_x = params.OutputSize.x/(get_in_aspect() * params.OutputSize.y);
-   float scale_y = 1.0;
-   float offset_x = (0.5 * scale_x ) - 0.5 ;
-   
-   vec2 scale_coord=vec2(TexCoord.x*scale_x - offset_x,TexCoord.y*scale_y);
-   
-   vTexCoord = scale_coord;
+   vTexCoord = get_scaled_coords(TexCoord);
    vOutputCoord = TexCoord;
 }
 

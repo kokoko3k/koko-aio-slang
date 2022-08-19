@@ -50,13 +50,28 @@ bool is_outer_frame(vec4 pixel) {
 
 
 float get_in_aspect() {
-    return 1.333;
-    float size_x = params.OriginalSize.x;
-    float size_y = params.OriginalSize.y;
-    //P-uae outputs something like 640x256 by default, but the aspect is not it, adapt:
-        if ((size_x/size_y) > 1.8)
-            size_x = size_x / 2.0;
+    //320x224 -> 4:3
 
-    return size_x/size_y;
+    if ( aspect_x == 0 ) {
+        //Try to detect original aspect ratio (...)
+        return 4./3. ; // FIXME: Stub
 
+        float size_x = params.OriginalSize.x;
+        float size_y = params.OriginalSize.y;
+        //P-uae outputs something like 640x256 by default, but the aspect is not it, adapt:
+        if ((size_x/size_y) > 1.8) size_x = size_x / 2.0;
+        return size_x/size_y;
+    }
+    //else return user defined one
+    return aspect_x/aspect_y;
+}
+
+vec2 get_scaled_coords(vec2 pTexCoord){
+    if (DO_AMBILIGHT == 0) return pTexCoord;
+        //else
+    float scale_x = params.OutputSize.x/(get_in_aspect() * params.OutputSize.y);
+    float scale_y = 1.0;
+    float offset_x = (0.5 * scale_x ) - 0.5 ;
+    vec2 scale_coord=vec2(pTexCoord.x*scale_x - offset_x,pTexCoord.y*scale_y);
+    return scale_coord;
 }
