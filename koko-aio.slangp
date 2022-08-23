@@ -1,5 +1,8 @@
 /*TODO:
-    Make aspect ratio configurable.
+    Guess more aspect ratios: edit. nope: Guessing is pointless.
+    Update presets with new switchable functions
+    Update pipeline graph
+    Investigate the possible use of mipmapping when scaling down
 */
 
 /*

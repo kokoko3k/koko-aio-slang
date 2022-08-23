@@ -1,7 +1,5 @@
 #define GLOW_SHARP_MAX 15 		    //This has to be the same as the max used for in_glow_wh
 #define MIN_LINES_INTERLACED 300	//Consider content interlaced if lines are more than this
-//#define in_aspect (1.23)
-#define in_aspect (1.33)            //FIXME: Make me configurable!
 #define noisepower 0.015            //Sort of dithering
 #define scene_change_threshold 0.25  // 0.0-1.0: sensitivity to scene change (ambilike stuff)
 
@@ -234,9 +232,15 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 //Ambilight effect
 #pragma parameter DO_AMBILIGHT	"Ambient led lights (needs Retroarch aspect ratio set to full!)"	1.0  0.0  1.0  1.0
-#pragma parameter aspect_x "    Aspect Ratio Numerator (use 0 for smart)"   4.0 0.0 256. 1.0
-#pragma parameter aspect_y "    Aspect Ratio Denominator"	  				3.0 0.0 256. 1.0
 
+#pragma parameter label_aspect_presets "Aspect ratio presets:" 0.0 0.0 0.0 1.0
+#pragma parameter label_aspect_preset1 "    -1 = NTSC" 0.0 0.0 0.0 1.0
+#pragma parameter label_aspect_preset2 "    -2 = PAL" 0.0 0.0 0.0 1.0
+#pragma parameter label_aspect_preset3 "    -3 = Snes 8/7" 0.0 0.0 0.0 1.0
+#pragma parameter label_aspect_preset4 "    -4 = Megadrive 10/7" 0.0 0.0 0.0 1.0
+#pragma parameter label_aspect_preset5 "    -5 = Uncorrected" 0.0 0.0 0.0 1.0
+#pragma parameter aspect_x "    Aspect Ratio Numerator (0 for mame, -x for presets)"   0.0  -5.0 256. 1.0
+#pragma parameter aspect_y "    Aspect Ratio Denominator"	  				3.0   0.0 256. 1.0
 
 
 // Alternative blanking.
