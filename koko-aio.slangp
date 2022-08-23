@@ -3,6 +3,8 @@
     Update presets with new switchable functions
     Update pipeline graph
     Investigate the possible use of mipmapping when scaling down
+    Make ambilight works with retroarch rotated games.
+        ...which means make it work on up and down borders too.
 */
 
 /*

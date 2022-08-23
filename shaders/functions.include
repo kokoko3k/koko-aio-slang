@@ -14,6 +14,19 @@ bool is_outer_frame(vec4 pixel) {
 }
 
 
+bool is_rotated() {
+	/*
+		Exploit the fact that since retroarch rotates the view after the shader,
+		the resulting aspect will differ from the source one.
+		Be warned, that this function probably works only if called from a pass
+		that scales to viewport (FIXME: untested)
+	*/
+	return (
+		(params.OriginalSize.x > params.OriginalSize.y) &&
+		(params.OutputSize.x   < params.OutputSize.y)
+	) ;
+}
+
 float get_in_aspect() {
 		if (aspect_x ==  -1) return 1.5;   // ntsc
 		if (aspect_x ==  -2) return 1.25;  // pal
@@ -22,27 +35,30 @@ float get_in_aspect() {
 		if (aspect_x ==  -5) return params.OriginalSize.x/params.OriginalSize.y; //uncorrected
 
 		if (aspect_x == 0) {
-			//MAME 1.33333 or 0.75
-			if (params.OriginalSize.x >= params.OriginalSize.y) {
-				return 1.3333333333333; //all mame games, not rotated
-			}   else {
-				return 0.75; //all mame games, rotated
-			}
+			return 1.3333333333333; //all mame games, not rotated
 		}
 
-		//User specified one:
-		return aspect_x/aspect_y ;
-
-    }
+		return aspect_x / aspect_y ;
+}
 
 
 vec2 get_scaled_coords(vec2 pTexCoord){
     if (DO_AMBILIGHT == 0) return pTexCoord;
         //else
-    float scale_x = params.OutputSize.x/(get_in_aspect() * params.OutputSize.y);
-    float scale_y = 1.0;
-    float offset_x = (0.5 * scale_x ) - 0.5 ;
-    vec2 scale_coord=vec2(pTexCoord.x*scale_x - offset_x,pTexCoord.y*scale_y);
+	float scale_x = 1.0;
+	float scale_y = 1.0;
+	float offset_x = 0.0 ;
+	float offset_y = 0.0 ;
+	float in_aspect = get_in_aspect();
+	if (is_rotated()) {
+		scale_y = params.OutputSize.y/(params.OutputSize.x / in_aspect );
+		offset_y = (0.5 * scale_y ) - 0.5 ;
+	} else {
+		scale_x = params.OutputSize.x/(params.OutputSize.y * in_aspect);
+		offset_x = (0.5 * scale_x ) - 0.5 ;
+	}
+
+    vec2 scale_coord=vec2(pTexCoord.x*scale_x - offset_x , pTexCoord.y*scale_y - offset_y);
     return scale_coord;
 }
 

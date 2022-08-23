@@ -120,4 +120,10 @@ void main() {
         FragColor = mark_outer_frame(vec3(0.0));
             else
         FragColor = main_wrap();
+
+
+    /*if (params.OutputSize.y == 1920) {
+    FragColor = vec4(1.0);
+    }*/
+
 }
