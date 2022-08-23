@@ -266,7 +266,12 @@ vec4 main_wrap(void) {
 
 #include "functions.include"
 void main() {
-    if ((vTexCoord.x > 1.0 ) || (vTexCoord.x < 0.0 ) )
+    bool b_is_rotated = is_rotated();
+    bool is_outside_x = ((vTexCoord.x > 1.0 ) || (vTexCoord.x < 0.0 ) );
+    bool is_outside_y = ((vTexCoord.y > 1.0 ) || (vTexCoord.y < 0.0 ) );
+    bool is_border = (b_is_rotated && is_outside_y) || (!b_is_rotated && is_outside_x);
+
+    if (is_border)
         FragColor = mark_outer_frame(vec3(0.0));
             else
         FragColor = main_wrap();
