@@ -3,7 +3,6 @@
     Update presets with new switchable functions
     Update pipeline graph
     Investigate the possible use of mipmapping when scaling down
-    Mirror the ambilight texture: [1234] -> [2143]
 */
 
 /*
@@ -145,7 +144,7 @@ shaders = 17
 
 /* Create the ambilight magic: */
         //(**)
-        shader10 = shaders/passthrough_original.slang
+        shader10 = shaders/ambi_warp_original.slang
         alias10 = "ambi_downscale_pass"
         filter_linear10 = true
         scale_type10 = absolute
