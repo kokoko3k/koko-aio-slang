@@ -169,7 +169,7 @@ shaders = 17
         alias13 = "ambi_avglum_pass"
         filter_linear13 = false
         scale_type13 = source
-        mipmap_input13 = false
+        mipmap_input13 = true
 
 
         shader14 = shaders/ambi_temporal_pass.slang
