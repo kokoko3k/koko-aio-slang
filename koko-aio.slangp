@@ -142,18 +142,20 @@ shaders = 18
     scale9 = 1.0
 
 /* Create the ambilight magic: */
-        //Put a passthrough of the original (expanded) texture here...(*)
-        shader10 = shaders/passthrough_original.slang
+
+        //shader10 = shaders/ambi_warp.slang
+        shader10 = shaders/passthrough.slang
+        //alias10 = "ambi_warp_pass"
         filter_linear10 = true
         scale_type10 = source
 
-        //(*)...so that it can be used via mipmapping here:
-        shader11 = shaders/ambi_warp.slang
+        //...then just downscale via mipmapping here:
+        shader11 = shaders/passthrough.slang
         alias11 = "ambi_downscale_pass"
         filter_linear11 = true
         scale_type11 = absolute
         scale_x11 = 32
-        scale_y11 = 32
+        scale_y11 = 24
         mipmap_input11 = true
 
         shader12 = shaders/ambi_pre_pass.slang
