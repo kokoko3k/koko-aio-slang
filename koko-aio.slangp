@@ -2,7 +2,10 @@
     Guess more aspect ratios: edit. nope: Guessing is pointless.
     Update presets with new switchable functions
     Update pipeline graph
-    Investigate the possible use of mipmapping when scaling down
+    Investigate the possible use of mipmapping in bloom function too.
+    optimize:
+    vignette and spot (try with lower resolution)
+    curvature (warp is really slow, try other algs).
 */
 
 /*

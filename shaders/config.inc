@@ -206,7 +206,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 
 //Curvature parameters:
-#pragma parameter DO_CURVATURE	     "Emulate curvature:"			1.0   0.0 1.0 1.0
+#pragma parameter DO_CURVATURE	     "Emulate curvature:"			0.0   0.0 1.0 1.0
 #pragma parameter GEOM_CURVATURE     "        Curvature"			0.02  0.0 0.1 0.01
 #pragma parameter GEOM_WARP_X        "        Warp X"				0.0   0.0 0.1 0.01
 #pragma parameter GEOM_WARP_Y        "        Warp Y"				0.03  0.0 0.1 0.01
@@ -218,12 +218,12 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 //Vignette and spot
 
-#pragma parameter DO_VIGNETTE	"Emulate vignette effect:"	1.0  0.0  1.0  1.0
+#pragma parameter DO_VIGNETTE	"Emulate vignette effect:"	0.0  0.0  1.0  1.0
 #pragma parameter v_bypass	"    bypass "	        0.0  0.0  1.0  1.0
 #pragma parameter v_size	"        size"				12   0.1  10   0.05
 #pragma parameter v_power	"        power"				0.8  0.05 2.0  0.05
 
-#pragma parameter DO_SPOT	"Emulate spot effect:"	1.0   0.0   1.0 1.0
+#pragma parameter DO_SPOT	"Emulate spot effect:"	0.0   0.0   1.0 1.0
 #pragma parameter s_bypass	"    bypass"	        	0.0   0.0   1.0 1.0
 #pragma parameter s_center_x 	"    x position"		-0.4  -1.5  1.5 0.05
 #pragma parameter s_center_y	"    y postion "		0.4   -1.5  1.5 0.05
