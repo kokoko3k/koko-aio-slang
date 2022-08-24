@@ -15,7 +15,7 @@ void main()
 #pragma stage fragment
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 0) out vec4 FragColor;
-layout(set = 0, binding = 2) uniform sampler2D Original;
+layout(set = 0, binding = 2) uniform sampler2D Source;
 
 
 float warp_x(float coord_x, float strength){
@@ -38,7 +38,7 @@ float warp_x(float coord_x, float strength){
 void main() {
 
    vec2 warp_coords = vec2(warp_x(vTexCoord.x,0.7),vTexCoord.y);
-   FragColor = vec4(texture(Original, warp_coords).xyz,1.0);
+   FragColor = vec4(texture(Source, warp_coords).xyz,1.0);
 
 
 //   FragColor = vec4(texture(Original, vTexCoord).xyz,1.0);
