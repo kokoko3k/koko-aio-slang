@@ -36,7 +36,7 @@ float warp_x(float coord_x, float strength){
 
 
 void main() {
-
+//0.7
    vec2 warp_coords = vec2(warp_x(vTexCoord.x,0.7),vTexCoord.y);
    FragColor = vec4(texture(Source, warp_coords).xyz,1.0);
 

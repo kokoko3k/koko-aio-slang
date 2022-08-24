@@ -39,7 +39,8 @@ vec4 pixel_border() {
     float l = length(ambi);
     float sat = 1.5;
     float bright = 1.3;
-    ambi =  normalize( pow(ambi.rgb + vec3(eps), vec3(sat)))*l * bright  ;
+    //ambi =  normalize( pow(ambi.rgb + vec3(eps), vec3(sat)))*l * bright  ;
+    ambi*=bright;
     return vec4(ambi,0.0);
 }
 
