@@ -9,8 +9,6 @@
     also check if double scaling at beginning is really useful.
     mix vignette and spotlight in another pass or they will be used by ambilight.
 
-    bloom have to use original texture, or weird things happen.
-
     Base gpu (use% blitter + render) no shader: 7+6 = 13
     shader, no effects: 35+5 = 40
     shader + spot +vignette 40.8= 41
@@ -65,7 +63,7 @@
 
 */
 
-shaders = 12
+shaders = 20
 /*For P-uae defaults, doubling just y0 seems the best option.
   90% of games are lowres in vertical size and p-uae defaults
   to 720 pixels width, which is enough for this preset to work as intended.
