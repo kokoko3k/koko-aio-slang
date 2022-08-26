@@ -51,7 +51,7 @@ vec4 main_wrap() {
 
     //Mix bloom texture
     if (DO_BLOOM == 1.0 ) {
-        bloomed=texture(bloom_pass_final, vOutputCoord).rgb ;
+        bloomed=texture(bloom_pass_final, vTexCoord).rgb ;
             
         if ( bloom_on_dark_only  == 1.0) {
            //float source_whiteness = (pixel_out.r+pixel_out.g+pixel_out.b) /3;

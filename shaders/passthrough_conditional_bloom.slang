@@ -15,12 +15,12 @@ void main()
 #pragma stage fragment
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 0) out vec4 FragColor;
-layout(set = 0, binding = 2) uniform sampler2D Source;
+layout(set = 0, binding = 2) uniform sampler2D Original;
 
 
 void main() {
    if (DO_BLOOM == 1)
-      FragColor = texture(Source, vTexCoord);
+      FragColor = texture(Original, vTexCoord);
          else
       FragColor = vec4(0.0);
 }

@@ -9,7 +9,7 @@
     also check if double scaling at beginning is really useful.
     mix vignette and spotlight in another pass or they will be used by ambilight.
 
-    bloom coords are plain wrong when using ambilight.
+    bloom have to use original texture, or weird things happen.
 
     Base gpu (use% blitter + render) no shader: 7+6 = 13
     shader, no effects: 35+5 = 40
