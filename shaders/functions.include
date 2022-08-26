@@ -65,7 +65,7 @@ float get_in_aspect() {
 
 
 vec2 get_scaled_coords(vec2 pTexCoord){
-    if (border_needed()) return pTexCoord;
+    if (!border_needed()) return pTexCoord;
         //else
 	float scale_x = 1.0;
 	float scale_y = 1.0;
