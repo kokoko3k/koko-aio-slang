@@ -49,4 +49,8 @@ DO_AMBILIGHT = 1.0
 
 DO_CURVATURE = 0.0
 DO_VIGNETTE = 0.0
-DO_SPOT = 0.0
+DO_SPOT = 1.0
+s_bypass = 1.0
+s_center_x = 0.0
+s_center_y = 0.0
+s_power = 1.0

@@ -7,7 +7,7 @@
     vignette and spot (try with lower resolution)
     curvature (warp is really slow, try other algs, or put it before anything).
     also check if double scaling at beginning is really useful.
-
+    mix vignette and spotlight in another pass or they will be used by ambilight.
 
     Base gpu (use% blitter + render) no shader: 7+6 = 13
     shader, no effects: 35+5 = 40
