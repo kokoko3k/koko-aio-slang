@@ -1,5 +1,22 @@
 #define alpha_mark 0.1
 
+float gauss(float x, float x0, float sx, float size, float power){
+    float arg = x-x0;
+    arg = -(1/size)/2.*arg*arg/sx;
+    float a = 1./(pow(2.*3.1415*sx, 0.5));
+    return a*exp(arg) * power;
+}
+
+float gauss_xy(float pos_x, float pos_y, float size, float power, float gmin, float gmax) {
+	vec2 uv = vTexCoord.xy + vec2(pos_x,pos_y);
+	float scale_uv = params.SourceSize.x / params.SourceSize.y;
+	float gx = gauss(uv.x* scale_uv,  0.5*scale_uv,  0.1,    size, power);
+	float gy = gauss(uv.y,            0.5,           0.1,    size, power);
+	float light = gx*gy;
+	return clamp(light,gmin,gmax);
+}
+
+
 bool border_needed() {
 	//returns if we need to draw on the border
 	return (DO_AMBILIGHT == 1.0);

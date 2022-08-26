@@ -21,7 +21,11 @@ layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in vec2 vOutputCoord;
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D main_pass;
-layout(set = 0, binding = 4) uniform sampler2D bloom_pass_final;
+layout(set = 0, binding = 3) uniform sampler2D bloom_pass_final;
+layout(set = 0, binding = 4) uniform sampler2D spot_pass;
+layout(set = 0, binding = 5) uniform sampler2D vignette_pass;
+
+#include "functions.include"
 
 vec3 pixel_alternate(vec3 source, float whiteness) {
     float line = vTexCoord.y * params.OutputSize.y;
@@ -39,22 +43,6 @@ float random() {
     vec2 seed = vTexCoord * params.FrameCount;
     vec2 i = vec2(23.140692, 2.6651442);
     return fract(cos(dot(seed, i)) * 123456.0f);
-}
-
-float gauss(float x, float x0, float sx, float size, float power){
-    float arg = x-x0;
-    arg = -(1/size)/2.*arg*arg/sx;
-    float a = 1./(pow(2.*3.1415*sx, 0.5));
-    return a*exp(arg) * power;
-}
-
-float gauss_xy(float pos_x, float pos_y, float size, float power, float gmin, float gmax) {
-	vec2 uv = vTexCoord.xy + vec2(pos_x,pos_y);
-	float scale_uv = params.SourceSize.x / params.SourceSize.y;
-        float gx = gauss(uv.x* scale_uv,  0.5*scale_uv,  0.1,    size, power);
-	float gy = gauss(uv.y,            0.5,           0.1,    size, power);
-	float light = gx*gy;
-	return clamp(light,gmin,gmax);
 }
 
 vec4 main_wrap() {
@@ -88,16 +76,18 @@ vec4 main_wrap() {
     //vignette
     if (DO_VIGNETTE == 1.0) {
         DO_NOISE = true;
-        float vignette = gauss_xy(0.0, 0.0, v_size, v_power, 0.0, 1.0);       
-        if (v_bypass < 1.0) pixel_out = vec3(vignette) * pixel_out;
+        //float vignette = gauss_xy(0.0, 0.0, v_size, v_power, 0.0, 1.0);
+        vec3 vignette = texture(vignette_pass,vTexCoord).rgb;
+        if (v_bypass < 1.0) pixel_out = vignette * pixel_out;
             else
-        pixel_out = vec3(vignette) ;
+        pixel_out = vignette ;
     }
     
     //Spot 
     if (DO_SPOT == 1.0) {
         DO_NOISE = true;
-        float spot =  gauss_xy(s_center_x, s_center_y, s_size, s_power, 0.0, 10.0);
+        //float spot =  gauss_xy(s_center_x, s_center_y, s_size, s_power, 0.0, 10.0);
+        vec3 spot = texture(spot_pass,vTexCoord).rgb;
         if (s_bypass < 1.0) pixel_out = mix(pixel_out,vec3(1.0), spot);
             else
         pixel_out = vec3(spot) ;
@@ -113,7 +103,7 @@ vec4 main_wrap() {
     return vec4(pixel_out,0.0);
 }
 
-#include "functions.include"
+
 void main() {
     vec4 psample = texture(main_pass, vOutputCoord);
     if ( border_needed() ) {
