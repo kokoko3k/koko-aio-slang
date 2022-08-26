@@ -6,10 +6,15 @@ layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
 
+#include "functions.include"
 void main()
 {
    gl_Position = global.MVP * Position;
-   vTexCoord = TexCoord;
+   if (DO_SPOT == 1.0) {
+      float dasp = global.FinalViewportSize.x/global.FinalViewportSize.y;
+      vTexCoord.x = TexCoord.x* dasp - ((0.5 * dasp) - 0.5);
+      vTexCoord.y = TexCoord.y;
+   }
 }
 
 #pragma stage fragment
