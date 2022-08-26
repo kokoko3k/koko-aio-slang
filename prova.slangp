@@ -23,7 +23,7 @@ DO_DARKLINES = "0.0"
 	DARKLINES_PERIOD = "4.0" 	
 	DRKLN_OVERWHITE = "0.75"
 
-DO_HALO = "1.0"
+DO_HALO = "0.0"
 	halo_power = "1.00" 
 	halo_w = "0.5"
 	halo_h = "0.5"
@@ -45,7 +45,8 @@ DO_CCORRECTION = "0.0"
 DO_ALT_BLANK = 0.0
 	ALT_BLANK_STRENGTH = 0.0
 
-DO_AMBILIGHT = 1.0
+DO_AMBILIGHT = 0.0
 
 DO_CURVATURE = 0.0
-
+DO_VIGNETTE = 0.0
+DO_SPOT = 0.0

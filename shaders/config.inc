@@ -91,7 +91,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 //Misc
 //Depending on the compiler and exponent size, one may prefer to use the standard pow or the
 //integer optimized one. The optimize version will use only integer values.
-#pragma parameter str_1          "Optimizations: see which is faster" 								0.0 	0.0 1.0 1.0
+#pragma parameter str_1          "Optimizations: see which is faster" 								0.0 	0.0 0.0 1.0
 #pragma parameter prefer_std_pow "       Use pow (choose fractional gamma too for halo and glow)"				0.0 	0.0 1.0 1.0
 
                                                                                         
