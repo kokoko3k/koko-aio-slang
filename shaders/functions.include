@@ -1,5 +1,10 @@
 #define alpha_mark 0.1
 
+bool border_needed() {
+	//returns if we need to draw on the border
+	return (DO_AMBILIGHT == 1.0);
+}
+
 vec4 mark_outer_frame(vec3 pixel) {
     //For my mental sanity, I use a specific alpha channel value to mark a frame as a border
     return vec4(pixel.r,pixel.g,pixel.b,alpha_mark) ;
