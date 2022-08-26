@@ -116,11 +116,14 @@ vec4 main_wrap() {
 #include "functions.include"
 void main() {
     vec4 psample = texture(main_pass, vOutputCoord);
-    if (is_outer_frame(psample))
-        FragColor = mark_outer_frame(vec3(0.0));
-            else
+    if ( border_needed() ) {
+        if (is_outer_frame(psample))
+            FragColor = mark_outer_frame(vec3(0.0));
+                else
+            FragColor = main_wrap();
+    } else {
         FragColor = main_wrap();
-
+    }
 
     /*if (params.OutputSize.y == 1920) {
     FragColor = vec4(1.0);
