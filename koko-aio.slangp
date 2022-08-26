@@ -109,7 +109,7 @@ shaders = 18
    it fast, next we do subsequent blURs of the bloomed
    pass.
    */
-        shader4 = shaders/passthrough.slang
+        shader4 = shaders/passthrough_conditional_bloom.slang
         alias4 = "bloom_pass_0"
         filter_linear4 = true
         scale_type4 = absolute
