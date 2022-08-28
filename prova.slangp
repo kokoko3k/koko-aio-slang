@@ -1,9 +1,5 @@
 #reference "koko-aio.slangp"
 
-#perchè do_ambilight non funziona come se non capisse che l'ho attivata?
-DO_AMBILIGHT = "1.0"
-#perchè anche se l'attivo da shader, poi vedo solo nero?
-
 prefer_std_pow = "1.0"
 
 DO_FXAA = "0.0"
@@ -51,3 +47,8 @@ DO_ALT_BLANK = 0.0
 	ALT_BLANK_STRENGTH = 0.0
 
 
+
+DO_CURVATURE = 1.0
+#GEOM_WARP_X = 0.5
+#GEOM_WARP_y = 0.5
+DO_AMBILIGHT = "0.0"

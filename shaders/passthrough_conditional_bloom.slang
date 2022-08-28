@@ -17,12 +17,15 @@ layout(location = 0) in vec2 vTexCoord;
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D Original;
 
-
+#include "functions.include""
 void main() {
-   if (DO_BLOOM == 1)
-      FragColor = texture(Original, vTexCoord);
-         else
+   vec2 coords = vTexCoord;
+   if (DO_BLOOM == 1) {
+      if ((DO_CURVATURE == 1.0) && (GEOM_WARP_X > 0.0) && (GEOM_WARP_Y > 0.0)) coords = Warp(vTexCoord);
+      FragColor = texture(Original, coords);
+         } else {
       FragColor = vec4(0.0);
+   }
 }
  
   

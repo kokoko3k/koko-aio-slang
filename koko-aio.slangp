@@ -3,11 +3,11 @@
     Update presets with new switchable functions
     Update pipeline graph
     Investigate the possible use of mipmapping in bloom function too.
-    optimize:
-    vignette and spot (try with lower resolution)
-    curvature (warp is really slow, try other algs, or put it before anything).
+
+
     also check if double scaling at beginning is really useful.
     mix vignette and spotlight in another pass or they will be used by ambilight.
+
 
     Base gpu (use% blitter + render) no shader: 7+6 = 13
     shader, no effects: 35+5 = 40
@@ -63,7 +63,7 @@
 
 */
 
-shaders = 20
+shaders = 19
 /*For P-uae defaults, doubling just y0 seems the best option.
   90% of games are lowres in vertical size and p-uae defaults
   to 720 pixels width, which is enough for this preset to work as intended.
@@ -192,6 +192,8 @@ shaders = 20
         alias15 = "ambi_pre_pass1"
         filter_linear15 = true
         scale_type15 = source
+
+
         /*
           The following pass should really stay before the downscale (**),
           but unfortunately, maybe due to a bug in my system,
@@ -217,15 +219,15 @@ shaders = 20
         //scale13 = 1.0
 
 
-    shader18 = shaders/curvature.slang
-    alias18 = "curvature_pass"
+    //shader18 = shaders/curvature.slang
+    //alias18 = "curvature_pass"
+    //scale_type18 = viewport
+    //scale18 = 1.0
+    //filter_linear18 = true
+
+    shader18 = shaders/ambi_mix_pass.slang
+    alias18 = "ambientmix_pass"
     scale_type18 = viewport
     scale18 = 1.0
     filter_linear18 = true
-
-    shader19 = shaders/ambi_mix_pass.slang
-    alias19 = "ambientmix_pass"
-    scale_type19 = viewport
-    scale19 = 1.0
-    filter_linear19 = true
 

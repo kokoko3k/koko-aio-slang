@@ -195,7 +195,6 @@ vec3 radial_bloom_gamma_10(float Quality, float Directions, float Size) {
 
 
 vec3 bloom(float Directions, float Quality, float Size, float fbloom_gamma) {
-
     if (prefer_std_pow != 1.0) {
         if (fbloom_gamma == 1)  { return radial_bloom_gamma_1(Quality, Directions, Size); }
         if (fbloom_gamma == 2)  { return radial_bloom_gamma_2(Quality, Directions, Size); }

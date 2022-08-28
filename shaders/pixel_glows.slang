@@ -6,10 +6,10 @@
 //the scanlines to be linear filtered.
 
 
-vec4 pixel_glow_gamma_1(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec4 SourceSize1) {
+vec4 pixel_glow_gamma_1(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec2 coords, vec4 SourceSize1) {
 
     // Calculating texel coordinates
-    vec2 tex = vTexCoord.xy * 1.00001;
+    vec2 tex = coords.xy * 1.00001;
     // vec4 SourceSize1 = params.SourceSize;
     
     vec2 OGL2Pos = tex * params.SourceSize.xy - vec2(0.5,0.5); // vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5); 
@@ -86,10 +86,10 @@ vec4 pixel_glow_gamma_1(sampler2D in_texture, float my_glowpix, float my_glowpix
 }
     
 
-vec4 pixel_glow_gamma_2(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec4 SourceSize1) {
+vec4 pixel_glow_gamma_2(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec2 coords, vec4 SourceSize1) {
 
     // Calculating texel coordinates
-    vec2 tex = vTexCoord.xy * 1.00001;
+    vec2 tex = coords.xy * 1.00001;
     // vec4 SourceSize1 = params.SourceSize;
     
     vec2 OGL2Pos = tex * params.SourceSize.xy - vec2(0.5,0.5); // vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5); 
@@ -168,10 +168,10 @@ vec4 pixel_glow_gamma_2(sampler2D in_texture, float my_glowpix, float my_glowpix
 
     return vec4(Bloom*my_glow,0.0);
 }
-vec4 pixel_glow_gamma_3(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec4 SourceSize1) {
+vec4 pixel_glow_gamma_3(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec2 coords, vec4 SourceSize1) {
 
     // Calculating texel coordinates
-    vec2 tex = vTexCoord.xy * 1.00001;
+    vec2 tex = coords.xy * 1.00001;
     // vec4 SourceSize1 = params.SourceSize;
     
     vec2 OGL2Pos = tex * params.SourceSize.xy - vec2(0.5,0.5); // vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5); 
@@ -250,10 +250,10 @@ vec4 pixel_glow_gamma_3(sampler2D in_texture, float my_glowpix, float my_glowpix
 
     return vec4(Bloom*my_glow,0.0);
 }
-vec4 pixel_glow_gamma_4(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec4 SourceSize1) {
+vec4 pixel_glow_gamma_4(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec2 coords, vec4 SourceSize1) {
 
     // Calculating texel coordinates
-    vec2 tex = vTexCoord.xy * 1.00001;
+    vec2 tex = coords.xy * 1.00001;
     // vec4 SourceSize1 = params.SourceSize;
     
     vec2 OGL2Pos = tex * params.SourceSize.xy - vec2(0.5,0.5); // vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5); 
@@ -332,10 +332,10 @@ vec4 pixel_glow_gamma_4(sampler2D in_texture, float my_glowpix, float my_glowpix
 
     return vec4(Bloom*my_glow,0.0);
 }
-vec4 pixel_glow_gamma_5(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec4 SourceSize1) {
+vec4 pixel_glow_gamma_5(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec2 coords, vec4 SourceSize1) {
 
     // Calculating texel coordinates
-    vec2 tex = vTexCoord.xy * 1.00001;
+    vec2 tex = coords.xy * 1.00001;
     // vec4 SourceSize1 = params.SourceSize;
     
     vec2 OGL2Pos = tex * params.SourceSize.xy - vec2(0.5,0.5); // vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5); 
@@ -414,10 +414,10 @@ vec4 pixel_glow_gamma_5(sampler2D in_texture, float my_glowpix, float my_glowpix
 
     return vec4(Bloom*my_glow,0.0);
 }
-vec4 pixel_glow_gamma_6(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec4 SourceSize1) {
+vec4 pixel_glow_gamma_6(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec2 coords, vec4 SourceSize1) {
 
     // Calculating texel coordinates
-    vec2 tex = vTexCoord.xy * 1.00001;
+    vec2 tex = coords.xy * 1.00001;
     // vec4 SourceSize1 = params.SourceSize;
     
     vec2 OGL2Pos = tex * params.SourceSize.xy - vec2(0.5,0.5); // vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5); 
@@ -496,10 +496,10 @@ vec4 pixel_glow_gamma_6(sampler2D in_texture, float my_glowpix, float my_glowpix
 
     return vec4(Bloom*my_glow,0.0);
 }
-vec4 pixel_glow_gamma_7(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec4 SourceSize1) {
+vec4 pixel_glow_gamma_7(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec2 coords, vec4 SourceSize1) {
 
     // Calculating texel coordinates
-    vec2 tex = vTexCoord.xy * 1.00001;
+    vec2 tex = coords.xy * 1.00001;
     // vec4 SourceSize1 = params.SourceSize;
     
     vec2 OGL2Pos = tex * params.SourceSize.xy - vec2(0.5,0.5); // vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5); 
@@ -578,10 +578,10 @@ vec4 pixel_glow_gamma_7(sampler2D in_texture, float my_glowpix, float my_glowpix
 
     return vec4(Bloom*my_glow,0.0);
 }
-vec4 pixel_glow_gamma_8(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec4 SourceSize1) {
+vec4 pixel_glow_gamma_8(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec2 coords, vec4 SourceSize1) {
 
     // Calculating texel coordinates
-    vec2 tex = vTexCoord.xy * 1.00001;
+    vec2 tex = coords.xy * 1.00001;
     // vec4 SourceSize1 = params.SourceSize;
     
     vec2 OGL2Pos = tex * params.SourceSize.xy - vec2(0.5,0.5); // vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5); 
@@ -660,10 +660,10 @@ vec4 pixel_glow_gamma_8(sampler2D in_texture, float my_glowpix, float my_glowpix
 
     return vec4(Bloom*my_glow,0.0);
 }
-vec4 pixel_glow_gamma_9(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec4 SourceSize1) {
+vec4 pixel_glow_gamma_9(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec2 coords, vec4 SourceSize1) {
 
     // Calculating texel coordinates
-    vec2 tex = vTexCoord.xy * 1.00001;
+    vec2 tex = coords.xy * 1.00001;
     // vec4 SourceSize1 = params.SourceSize;
     
     vec2 OGL2Pos = tex * params.SourceSize.xy - vec2(0.5,0.5); // vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5); 
@@ -742,10 +742,10 @@ vec4 pixel_glow_gamma_9(sampler2D in_texture, float my_glowpix, float my_glowpix
 
     return vec4(Bloom*my_glow,0.0);
 }
-vec4 pixel_glow_gamma_10(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec4 SourceSize1) {
+vec4 pixel_glow_gamma_10(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec2 coords, vec4 SourceSize1) {
 
     // Calculating texel coordinates
-    vec2 tex = vTexCoord.xy * 1.00001;
+    vec2 tex = coords.xy * 1.00001;
     // vec4 SourceSize1 = params.SourceSize;
     
     vec2 OGL2Pos = tex * params.SourceSize.xy - vec2(0.5,0.5); // vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5); 
@@ -825,10 +825,10 @@ vec4 pixel_glow_gamma_10(sampler2D in_texture, float my_glowpix, float my_glowpi
     return vec4(Bloom*my_glow,0.0);
 }
 
-vec3 blur_v(sampler2D in_texture, float my_glowpixy, vec4 SourceSize1) {
+vec3 blur_v(sampler2D in_texture, float my_glowpixy, vec2 coords, vec4 SourceSize1) {
 
     // Calculating texel coordinates
-    vec2 tex = vTexCoord.xy * 1.00001;
+    vec2 tex = coords.xy * 1.00001;
 
     vec2 OGL2Pos = tex * params.SourceSize.xy - vec2(0.5,0.5);
     vec2 fp = fract(OGL2Pos);
@@ -860,10 +860,10 @@ return vec3(1.0);
 
 }
 
-vec4 pixel_glow_std_pow(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, float glow_gamma, vec4 SourceSize1) {
+vec4 pixel_glow_std_pow(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, float glow_gamma, vec2 coords, vec4 SourceSize1) {
 
     // Calculating texel coordinates
-    vec2 tex = vTexCoord.xy * 1.00001;
+    vec2 tex = coords.xy * 1.00001;
 
     vec2 OGL2Pos = tex * params.SourceSize.xy - vec2(0.5,0.5); // vec2 OGL2Pos = tex * params.SourceSize.xy - vec2(0.5,0.5); // vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5);  
     vec2 fp = fract(OGL2Pos);
@@ -944,33 +944,33 @@ vec4 pixel_glow_std_pow(sampler2D in_texture, float my_glowpix, float my_glowpix
     return vec4(Bloom*my_glow,0.0);
 }
 
-vec4 dumb_glow(sampler2D in_texture, float my_glow, float glow_gamma) {
-    vec3 pixel_in = texture(in_texture, vTexCoord ).rgb;
+vec4 dumb_glow(sampler2D in_texture, float my_glow, float glow_gamma, vec2 coords) {
+    vec3 pixel_in = texture(in_texture, coords ).rgb;
     pixel_in = pow(pixel_in,vec3(glow_gamma))*my_glow;
     return vec4(pixel_in,0.0);
 }
 
-vec4 pixel_glow(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, float glow_gamma, vec4 SourceSize1) {
+vec4 pixel_glow(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, float glow_gamma, vec2 coords, vec4 SourceSize1) {
 
     if ( (my_glowpix >= GLOW_SHARP_MAX) && (my_glowpixy >= GLOW_SHARP_MAX) ) {
-        return dumb_glow(in_texture, my_glow,glow_gamma);
+        return dumb_glow(in_texture, my_glow,glow_gamma,coords);
     }
 
     if (prefer_std_pow != 1.0)
     {
         glow_gamma = floor(glow_gamma);
-        if (glow_gamma == 1) { return pixel_glow_gamma_1(in_texture, my_glowpix,my_glowpixy,my_glow,SourceSize1);   }
-        if (glow_gamma == 2) { return pixel_glow_gamma_2(in_texture, my_glowpix,my_glowpixy,my_glow,SourceSize1);   }
-        if (glow_gamma == 3) { return pixel_glow_gamma_3(in_texture,my_glowpix,my_glowpixy,my_glow,SourceSize1);   }
-        if (glow_gamma == 4) { return pixel_glow_gamma_4(in_texture,my_glowpix,my_glowpixy,my_glow,SourceSize1);   }
-        if (glow_gamma == 5) { return pixel_glow_gamma_5(in_texture,my_glowpix,my_glowpixy,my_glow,SourceSize1);   }
-        if (glow_gamma == 6) { return pixel_glow_gamma_6(in_texture,my_glowpix,my_glowpixy,my_glow,SourceSize1);   }
-        if (glow_gamma == 7) { return pixel_glow_gamma_7(in_texture,my_glowpix,my_glowpixy,my_glow,SourceSize1);   }
-        if (glow_gamma == 8) { return pixel_glow_gamma_8(in_texture,my_glowpix,my_glowpixy,my_glow,SourceSize1);   }
-        if (glow_gamma == 9) { return pixel_glow_gamma_9(in_texture,my_glowpix,my_glowpixy,my_glow,SourceSize1);   }
-        if (glow_gamma == 10) { return pixel_glow_gamma_10(in_texture,my_glowpix,my_glowpixy,my_glow,SourceSize1); }
+        if (glow_gamma == 1) { return pixel_glow_gamma_1(in_texture, my_glowpix,my_glowpixy,my_glow,coords,SourceSize1);   }
+        if (glow_gamma == 2) { return pixel_glow_gamma_2(in_texture, my_glowpix,my_glowpixy,my_glow,coords,SourceSize1);   }
+        if (glow_gamma == 3) { return pixel_glow_gamma_3(in_texture,my_glowpix,my_glowpixy,my_glow,coords,SourceSize1);   }
+        if (glow_gamma == 4) { return pixel_glow_gamma_4(in_texture,my_glowpix,my_glowpixy,my_glow,coords,SourceSize1);   }
+        if (glow_gamma == 5) { return pixel_glow_gamma_5(in_texture,my_glowpix,my_glowpixy,my_glow,coords,SourceSize1);   }
+        if (glow_gamma == 6) { return pixel_glow_gamma_6(in_texture,my_glowpix,my_glowpixy,my_glow,coords,SourceSize1);   }
+        if (glow_gamma == 7) { return pixel_glow_gamma_7(in_texture,my_glowpix,my_glowpixy,my_glow,coords,SourceSize1);   }
+        if (glow_gamma == 8) { return pixel_glow_gamma_8(in_texture,my_glowpix,my_glowpixy,my_glow,coords,SourceSize1);   }
+        if (glow_gamma == 9) { return pixel_glow_gamma_9(in_texture,my_glowpix,my_glowpixy,my_glow,coords,SourceSize1);   }
+        if (glow_gamma == 10) { return pixel_glow_gamma_10(in_texture,my_glowpix,my_glowpixy,my_glow,coords,SourceSize1); }
     } else {
-        return pixel_glow_std_pow(in_texture,my_glowpix,my_glowpixy,my_glow,glow_gamma,SourceSize1);
+        return pixel_glow_std_pow(in_texture,my_glowpix,my_glowpixy,my_glow,glow_gamma,coords,SourceSize1);
     }
 }
  

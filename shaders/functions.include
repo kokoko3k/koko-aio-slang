@@ -1,88 +1,120 @@
 #define alpha_mark 0.1
 
-float gauss(float x, float x0, float sx, float size, float power){
-    float arg = x-x0;
-    arg = -(1/size)/2.*arg*arg/sx;
-    float a = 1./(pow(2.*3.1415*sx, 0.5));
-    return a*exp(arg) * power;
-}
+//CURVATURE
+	#define corner_aspect vec2(1.0,  0.75)
+	float corner(vec2 coord)
+	{
+		coord = (coord - vec2(0.5)) + vec2(0.5, 0.5);
+		coord = min(coord, vec2(1.0) - coord) * corner_aspect;
+		vec2 cdist = vec2(GEOM_CORNER_SIZE);
+		coord = (cdist - min(coord, cdist));
+		float dist = sqrt(dot(coord, coord));
 
-float gauss_xy(float pos_x, float pos_y, float size, float power, float gmin, float gmax) {
-	vec2 uv = vTexCoord.xy + vec2(pos_x,pos_y);
-	float scale_uv = params.SourceSize.x / params.SourceSize.y;
-	float gx = gauss(uv.x* scale_uv,  0.5*scale_uv,  0.1,    size, power);
-	float gy = gauss(uv.y,            0.5,           0.1,    size, power);
-	float light = gx*gy;
-	return clamp(light,gmin,gmax);
-}
-
-
-bool border_needed() {
-	//returns if we need to draw on the border
-	return (DO_AMBILIGHT == 1.0);
-}
-
-vec4 mark_outer_frame(vec3 pixel) {
-    //For my mental sanity, I use a specific alpha channel value to mark a frame as a border
-    return vec4(pixel.r,pixel.g,pixel.b,alpha_mark) ;
-}
-
-bool is_outer_frame(vec4 pixel) {
-    /*Check if a pixel is marked as border by comparing the value of its alpha channel
-      Tolerance is needed, because precision can be as low as 1/256; since I don't need
-      alpha channel, use an even large tolerance.
-    */
-    return  abs(pixel.a - alpha_mark) < 0.05; //<-- 0.05 allow about 20 alpha levels (1*0.05)
-}
-
-
-bool is_rotated() {
-	/*
-		Exploit the fact that since retroarch rotates the view after the shader,
-		the resulting aspect will differ from the source one.
-		Be warned, that this function probably works only if called from a pass
-		that scales to viewport (FIXME: untested)
-	*/
-	return (
-		(params.OriginalSize.x > params.OriginalSize.y) &&
-		(params.OutputSize.x   < params.OutputSize.y)
-	) ;
-}
-
-float get_in_aspect() {
-		if (aspect_x ==  -1) return 1.5;   // ntsc
-		if (aspect_x ==  -2) return 1.25;  // pal
-		if (aspect_x ==  -3) return 1.143; // 8/7 snes
-		if (aspect_x ==  -4) return 1.428; // 10/7 megadrive
-		if (aspect_x ==  -5) return params.OriginalSize.x/params.OriginalSize.y; //uncorrected
-
-		if (aspect_x == 0) {
-			return 1.3333333333333; //all mame games, not rotated
-		}
-
-		return aspect_x / aspect_y ;
-}
-
-
-vec2 get_scaled_coords(vec2 pTexCoord){
-    if (!border_needed()) return pTexCoord;
-        //else
-	float scale_x = 1.0;
-	float scale_y = 1.0;
-	float offset_x = 0.0 ;
-	float offset_y = 0.0 ;
-	float in_aspect = get_in_aspect();
-	if (is_rotated()) {
-		scale_y = params.OutputSize.y/(params.OutputSize.x / in_aspect );
-		offset_y = (0.5 * scale_y ) - 0.5 ;
-	} else {
-		scale_x = params.OutputSize.x/(params.OutputSize.y * in_aspect);
-		offset_x = (0.5 * scale_x ) - 0.5 ;
+		return clamp((cdist.x - dist)*GEOM_CORNER_SMOOTH, 0.0, 1.0);
 	}
 
-    vec2 scale_coord=vec2(pTexCoord.x*scale_x - offset_x , pTexCoord.y*scale_y - offset_y);
-    return scale_coord;
-}
+
+	vec2 Warp(vec2 texCoord){
+
+	vec2 curvedCoords = texCoord * 2.0 - 1.0;
+	vec2 CRT_Distortion = vec2(GEOM_WARP_X, GEOM_WARP_Y) * 15.;
+	float curvedCoordsDistance = sqrt(curvedCoords.x*curvedCoords.x+curvedCoords.y*curvedCoords.y);
+
+	curvedCoords = curvedCoords / curvedCoordsDistance;
+
+	curvedCoords = curvedCoords * (1.0-pow(vec2(1.0-(curvedCoordsDistance/1.4142135623730950488016887242097)),(1.0/(1.0+CRT_Distortion*0.2))));
+
+	curvedCoords = curvedCoords / (1.0-pow(vec2(0.29289321881345247559915563789515),(1.0/(vec2(1.0)+CRT_Distortion*0.2))));
+
+	curvedCoords = curvedCoords * 0.5 + 0.5;
+	return curvedCoords;
+	}
+
+
+//VIGNETTE - SPOT
+	float gauss(float x, float x0, float sx, float size, float power){
+		float arg = x-x0;
+		arg = -(1/size)/2.*arg*arg/sx;
+		float a = 1./(pow(2.*3.1415*sx, 0.5));
+		return a*exp(arg) * power;
+	}
+
+	float gauss_xy(float pos_x, float pos_y, float size, float power, float gmin, float gmax) {
+		vec2 uv = vTexCoord.xy + vec2(pos_x,pos_y);
+		float scale_uv = params.SourceSize.x / params.SourceSize.y;
+		float gx = gauss(uv.x* scale_uv,  0.5*scale_uv,  0.1,    size, power);
+		float gy = gauss(uv.y,            0.5,           0.1,    size, power);
+		float light = gx*gy;
+		return clamp(light,gmin,gmax);
+	}
+
+//AMBILIGHT RELATED
+	bool border_needed() {
+		//returns if we need to draw on the border
+		return (DO_AMBILIGHT == 1.0);
+	}
+
+	vec4 mark_outer_frame(vec3 pixel) {
+		//For my mental sanity, I use a specific alpha channel value to mark a frame as a border
+		return vec4(pixel.r,pixel.g,pixel.b,alpha_mark) ;
+	}
+
+	bool is_outer_frame(vec4 pixel) {
+		/*Check if a pixel is marked as border by comparing the value of its alpha channel
+		Tolerance is needed, because precision can be as low as 1/256; since I don't need
+		alpha channel, use an even large tolerance.
+		*/
+		return  abs(pixel.a - alpha_mark) < 0.05; //<-- 0.05 allow about 20 alpha levels (1*0.05)
+	}
+
+
+	bool is_rotated() {
+		/*
+			Exploit the fact that since retroarch rotates the view after the shader,
+			the resulting aspect will differ from the source one.
+			Be warned, that this function probably works only if called from a pass
+			that scales to viewport (FIXME: untested)
+		*/
+		return (
+			(params.OriginalSize.x > params.OriginalSize.y) &&
+			(params.OutputSize.x   < params.OutputSize.y)
+		) ;
+	}
+
+	float get_in_aspect() {
+			if (aspect_x ==  -1) return 1.5;   // ntsc
+			if (aspect_x ==  -2) return 1.25;  // pal
+			if (aspect_x ==  -3) return 1.143; // 8/7 snes
+			if (aspect_x ==  -4) return 1.428; // 10/7 megadrive
+			if (aspect_x ==  -5) return params.OriginalSize.x/params.OriginalSize.y; //uncorrected
+
+			if (aspect_x == 0) {
+				return 1.3333333333333; //all mame games, not rotated
+			}
+
+			return aspect_x / aspect_y ;
+	}
+
+
+	vec2 get_scaled_coords(vec2 pTexCoord){
+		if (!border_needed()) return pTexCoord;
+			//else
+		float scale_x = 1.0;
+		float scale_y = 1.0;
+		float offset_x = 0.0 ;
+		float offset_y = 0.0 ;
+		float in_aspect = get_in_aspect();
+		if (is_rotated()) {
+			scale_y = params.OutputSize.y/(params.OutputSize.x / in_aspect );
+			offset_y = (0.5 * scale_y ) - 0.5 ;
+		} else {
+			scale_x = params.OutputSize.x/(params.OutputSize.y * in_aspect);
+			offset_x = (0.5 * scale_x ) - 0.5 ;
+		}
+
+		vec2 scale_coord=vec2(pTexCoord.x*scale_x - offset_x , pTexCoord.y*scale_y - offset_y);
+		return scale_coord;
+	}
 
 
 /*

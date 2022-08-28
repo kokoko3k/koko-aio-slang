@@ -22,7 +22,7 @@ void main() {
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in vec2 vOutputCoord;
 layout(location = 0) out vec4 FragColor;
-layout(set = 0, binding = 2) uniform sampler2D Source;
+layout(set = 0, binding = 2) uniform sampler2D final_pass;
 layout(set = 0, binding = 4) uniform sampler2D ambi_temporal_pass;
 
 
@@ -51,7 +51,7 @@ vec3 mixed() {
 
 #include "functions.include"
 void main() {
-    vec4 psample = texture(Source, vOutputCoord);
+    vec4 psample = texture(final_pass, vOutputCoord);
     if (DO_AMBILIGHT == 1) {
         if (is_outer_frame(psample)) {
             FragColor = mark_outer_frame(mixed());
