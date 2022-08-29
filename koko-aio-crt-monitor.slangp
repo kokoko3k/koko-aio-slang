@@ -25,8 +25,8 @@ DO_DARKLINES = "0.0"
 
 DO_HALO = "1.0"
 	halo_power = "0.9" 
-	halo_w = "2.0"
-	halo_h = "2.0"
+	halo_w = "4.0"
+	halo_h = "4.0"
 	halo_gamma = "3.0" 
 
 DO_BLOOM = "0.0"

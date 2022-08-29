@@ -12,8 +12,8 @@
  #define m3 vec3 ( 0.0 , 0.0 , 1.0  )   //col 3
 
 // Blur sizes must not depend on input resolution
-#define scalemod_x (params.SourceSize.x/360.0)
-#define scalemod_y (params.SourceSize.y/270.0)
+#define scalemod_x (global.scanline_flickering_passSize.x/360.0)
+#define scalemod_y (global.scanline_flickering_passSize.y/270.0)
 
 
 #pragma stage vertex
@@ -34,8 +34,9 @@ void main() {
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in vec2 vOutputCoord;
 layout(location = 0) out vec4 FragColor;
-layout(set = 0, binding = 2) uniform sampler2D Source;
+layout(set = 0, binding = 2) uniform sampler2D scanline_flickering_pass;
 layout(set = 0, binding = 3) uniform sampler2D Original;
+layout(set = 0, binding = 4) uniform sampler2D halo_pass;
 
 
 
@@ -207,7 +208,7 @@ vec4 main_wrap(void) {
         fborder = border(border_coords);
     }
     
-    vec3 pixel_in = texture(Source,coords).rgb ;
+    vec3 pixel_in = texture(scanline_flickering_pass,coords).rgb ;
     vec3 pixel_out = pixel_in;
 
     // Non flickering scanlines
@@ -220,7 +221,7 @@ vec4 main_wrap(void) {
                 pixel_out = min(vec3(1.0),pixel_out);
             }
         } else {
-            pixel_out = blur_v(Source, 4.0 , coords, params.SourceSize); //Just do a little vertical blur
+            pixel_out = blur_v(scanline_flickering_pass, 4.0 , coords, global.scanline_flickering_passSize); //Just do a little vertical blur
         }
     }     
 
@@ -229,7 +230,7 @@ vec4 main_wrap(void) {
        this allows the rgb vmask to light up on the black scanline.
      */
     if (DO_IN_GLOW == 1) {
-        vec3 pixel_glowed = pixel_glow(Source, in_glow_wh,in_glow_wh,in_glow_power,in_glow_gamma,coords, params.SourceSize).rgb;
+        vec3 pixel_glowed = pixel_glow(scanline_flickering_pass, in_glow_wh,in_glow_wh,in_glow_power,in_glow_gamma,coords, global.scanline_flickering_passSize).rgb;
         //glowed = min(glowed,1.0); //Input signal glow dont have "to white" the phosphors. //FIXME: In dubt to turn it on; previous glsl version did not have this.
 
         if (IN_GLOW_ADD>0.0) pixel_glowed = mix(pixel_glowed,pixel_out+pixel_glowed,IN_GLOW_ADD);
@@ -264,7 +265,8 @@ vec4 main_wrap(void) {
 
     //Halo
     if (DO_HALO == 1.0 ) {
-        vec3 pixel_haloed = pixel_glow(Source, halo_w,halo_h,halo_power,halo_gamma,coords, params.SourceSize).rgb;
+        //vec3 pixel_haloed = pixel_glow(Source, halo_w,halo_h,halo_power,halo_gamma,coords, params.SourceSize).rgb;
+        vec3 pixel_haloed = texture(halo_pass,vOutputCoord).rgb;
         pixel_out += pixel_haloed;
     }
 
