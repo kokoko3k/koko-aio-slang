@@ -37,6 +37,7 @@ layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D scanline_flickering_pass;
 layout(set = 0, binding = 3) uniform sampler2D Original;
 layout(set = 0, binding = 4) uniform sampler2D halo_pass;
+layout(set = 0, binding = 5) uniform sampler2D in_glow_pass;
 
 
 
@@ -230,7 +231,8 @@ vec4 main_wrap(void) {
        this allows the rgb vmask to light up on the black scanline.
      */
     if (DO_IN_GLOW == 1) {
-        vec3 pixel_glowed = pixel_glow(scanline_flickering_pass, in_glow_wh,in_glow_wh,in_glow_power,in_glow_gamma,coords, global.scanline_flickering_passSize).rgb;
+        //vec3 pixel_glowed = pixel_glow(scanline_flickering_pass, in_glow_wh,in_glow_wh,in_glow_power,in_glow_gamma,coords, global.scanline_flickering_passSize).rgb;
+        vec3 pixel_glowed = texture(in_glow_pass,vOutputCoord).rgb;
         //glowed = min(glowed,1.0); //Input signal glow dont have "to white" the phosphors. //FIXME: In dubt to turn it on; previous glsl version did not have this.
 
         if (IN_GLOW_ADD>0.0) pixel_glowed = mix(pixel_glowed,pixel_out+pixel_glowed,IN_GLOW_ADD);
