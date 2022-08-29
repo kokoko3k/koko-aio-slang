@@ -956,8 +956,8 @@ vec4 pixel_glow(sampler2D in_texture, float my_glowpix, float my_glowpixy, float
         return dumb_glow(in_texture, my_glow,glow_gamma,coords);
     }
 
-    if (prefer_std_pow != 1.0)
-    {
+    //if (prefer_std_pow != 1.0)
+    //{
         glow_gamma = floor(glow_gamma);
         if (glow_gamma == 1) { return pixel_glow_gamma_1(in_texture, my_glowpix,my_glowpixy,my_glow,coords,SourceSize1);   }
         if (glow_gamma == 2) { return pixel_glow_gamma_2(in_texture, my_glowpix,my_glowpixy,my_glow,coords,SourceSize1);   }
@@ -969,8 +969,8 @@ vec4 pixel_glow(sampler2D in_texture, float my_glowpix, float my_glowpixy, float
         if (glow_gamma == 8) { return pixel_glow_gamma_8(in_texture,my_glowpix,my_glowpixy,my_glow,coords,SourceSize1);   }
         if (glow_gamma == 9) { return pixel_glow_gamma_9(in_texture,my_glowpix,my_glowpixy,my_glow,coords,SourceSize1);   }
         if (glow_gamma == 10) { return pixel_glow_gamma_10(in_texture,my_glowpix,my_glowpixy,my_glow,coords,SourceSize1); }
-    } else {
+    //} else {
         return pixel_glow_std_pow(in_texture,my_glowpix,my_glowpixy,my_glow,glow_gamma,coords,SourceSize1);
-    }
+    //}
 }
  

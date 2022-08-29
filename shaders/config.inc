@@ -22,7 +22,7 @@ layout(push_constant) uniform Push
 	float halo_gamma ;
 	float DO_BLOOM ; //4
  	float bloom_quality ; //1
-	float prefer_std_pow; 
+	//float prefer_std_pow; 
 } params;
 
 layout(std140, set = 0, binding = 0) uniform UBO
@@ -92,8 +92,8 @@ layout(std140, set = 0, binding = 0) uniform UBO
 //Misc
 //Depending on the compiler and exponent size, one may prefer to use the standard pow or the
 //integer optimized one. The optimize version will use only integer values.
-#pragma parameter str_1          "Optimizations: see which is faster" 								0.0 	0.0 0.0 1.0
-#pragma parameter prefer_std_pow "       Use pow (choose fractional gamma too for halo and glow)"				0.0 	0.0 1.0 1.0
+//#pragma parameter str_1          "Optimizations: see which is faster" 								0.0 	0.0 0.0 1.0
+//#pragma parameter prefer_std_pow "       Use pow (choose fractional gamma too for halo and glow)"				0.0 	0.0 1.0 1.0
 
                                                                                         
 
@@ -255,7 +255,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 
 #define DO_FXAA        global.DO_FXAA
-#define prefer_std_pow params.prefer_std_pow
+//#define prefer_std_pow params.prefer_std_pow
 
 #define DO_SCANLINES                  global.DO_SCANLINES
 #define SCANLINE_DARK                 params.SCANLINE_DARK

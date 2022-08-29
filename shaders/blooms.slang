@@ -195,7 +195,7 @@ vec3 radial_bloom_gamma_10(float Quality, float Directions, float Size) {
 
 
 vec3 bloom(float Directions, float Quality, float Size, float fbloom_gamma) {
-    if (prefer_std_pow != 1.0) {
+    //if (prefer_std_pow != 1.0) {
         if (fbloom_gamma == 1)  { return radial_bloom_gamma_1(Quality, Directions, Size); }
         if (fbloom_gamma == 2)  { return radial_bloom_gamma_2(Quality, Directions, Size); }
         if (fbloom_gamma == 3)  { return radial_bloom_gamma_3(Quality, Directions, Size); }
@@ -206,9 +206,9 @@ vec3 bloom(float Directions, float Quality, float Size, float fbloom_gamma) {
         if (fbloom_gamma == 8)  { return radial_bloom_gamma_8(Quality, Directions, Size); }
         if (fbloom_gamma == 9)  { return radial_bloom_gamma_9(Quality, Directions, Size); }
         if (fbloom_gamma == 10) { return radial_bloom_gamma_10(Quality, Directions, Size);}
-    } else {
+    //} else {
         return radial_bloom_std_pow(Quality, Directions, Size, fbloom_gamma);
-    }
+    //}
 
 }
 
