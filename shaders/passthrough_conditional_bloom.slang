@@ -21,10 +21,10 @@ layout(set = 0, binding = 2) uniform sampler2D Original;
 void main() {
    vec2 coords = vTexCoord;
    if (DO_BLOOM == 1) {
-      if (DO_CURVATURE == 1.0) { 
-         if ((GEOM_WARP_X > 0.0) && (GEOM_WARP_Y > 0.0)) coords = Warp(vTexCoord,GEOM_WARP_X,GEOM_WARP_Y);
-         if ((GEOM_BORDER_WX > 0.0) && (GEOM_BORDER_WY > 0.0)) coords = Warp(vTexCoord,GEOM_BORDER_WX,GEOM_BORDER_WY);
-      }
+      /*if (DO_CURVATURE == 1.0) { 
+         if ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0)) coords = Warp(vTexCoord,GEOM_WARP_X,GEOM_WARP_Y);
+         //if ((GEOM_BORDER_WX > 0.0) && (GEOM_BORDER_WY > 0.0)) coords = Warp(vTexCoord,GEOM_BORDER_WX,GEOM_BORDER_WY);
+      }*/
       FragColor = texture(Original, coords);
          } else {
       FragColor = vec4(0.0,0.0,0.0,1.0);

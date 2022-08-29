@@ -46,7 +46,8 @@ float random() {
 }
 
 vec4 main_wrap() {
-    vec3 pixel_out = texture(main_pass, vOutputCoord).rgb;
+    vec4 pixel_in = texture(main_pass, vOutputCoord);
+    vec3 pixel_out = pixel_in.rgb;
     vec3 bloomed;
 
     //Mix bloom texture
@@ -100,7 +101,7 @@ vec4 main_wrap() {
     }
         
     //Out
-    return vec4(pixel_out,1.0);
+    return vec4(pixel_out,pixel_in.a);
 }
 
 

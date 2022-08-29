@@ -4,7 +4,6 @@
 	#define corner_aspect vec2(1.0,  0.75)
 	float border(vec2 coord)
 	{
-		if (GEOM_CORNER_SIZE == 0.0) return 1.0;
 		coord = (coord - vec2(0.5)) + vec2(0.5, 0.5);
 		coord = min(coord, vec2(1.0) - coord) * corner_aspect;
 		vec2 cdist = vec2(GEOM_CORNER_SIZE);
@@ -58,7 +57,7 @@
 	}
 
 	bool is_outer_frame(vec4 pixel) {
-		return pixel.a < 1.0;
+		return pixel.a == 0.0;
 		/*Check if a pixel is marked as border by comparing the value of its alpha channel
 		Tolerance is needed, because precision can be as low as 1/256; since I don't need
 		alpha channel, use an even large tolerance.

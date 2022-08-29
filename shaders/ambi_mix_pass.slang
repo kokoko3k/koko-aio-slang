@@ -37,14 +37,14 @@ float random() {
 vec4 pixel_border() {
     vec3 ambi = texture(ambi_temporal_pass, vOutputCoord).rgb;
     float l = length(ambi);
-    float sat = 1.5;
-    float bright = 2.0;
-    //ambi =  normalize( pow(ambi.rgb + vec3(eps), vec3(sat)))*l * bright  ;
+    float sat = 1.25;
+    float bright = 1.5;
+    ambi =  normalize( pow(ambi.rgb + vec3(eps), vec3(sat)))*l * bright  ;
     ambi*=bright;
     return vec4(ambi,0.0);
 }
 
-vec3 mixed() {
+vec3 ambi_noised() {
     float noise = random() * noisepower;
     return pixel_border().rgb + vec3(noise);
 }
@@ -53,12 +53,16 @@ vec3 mixed() {
 void main() {
     vec4 psample = texture(final_pass, vOutputCoord);
     if (DO_AMBILIGHT == 1) {
+        vec3 ambinoised = ambi_noised();
         if (is_outer_frame(psample)) {
-            FragColor = mark_outer_frame(mixed());
+            FragColor = mark_outer_frame(ambi_noised());
         } else {
-            FragColor = psample;
+            FragColor = vec4(mix(ambinoised.rgb,psample.rgb,min(psample.a*1.5,1.0)),psample.a);
         }
     } else {
         FragColor = psample ;
     }
+
+
 }
+//82..85-73..76

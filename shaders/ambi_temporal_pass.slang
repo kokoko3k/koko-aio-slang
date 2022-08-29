@@ -51,11 +51,11 @@ vec3 pixel_ambilight() {
     float curr_avg_lum = curr_avg_lum_vec.r+curr_avg_lum_vec.g+curr_avg_lum_vec.b;
     float diff_avg_lum = abs(prev_avg_lum - curr_avg_lum) / 3.0 ;
 
-    float fade_speed = 0.05;
+    //float fade_speed = 0.05;
     float mystep = 0.004;
     if (diff_avg_lum > scene_change_threshold ) mystep = 1;
 
-    if (diff_avg_lum > scene_change_threshold ) fade_speed = 1.0;
+    //if (diff_avg_lum > scene_change_threshold ) fade_speed = 1.0;
 
     vec3 previous_pixel = texture(PreviousSampler, vTexCoord).rgb;
     vec3 current_pixel =  texture(CurrentSampler, vTexCoord).rgb;
@@ -75,7 +75,7 @@ vec3 pixel_ambilight() {
 #include "functions.include"
 void main() {
     if (DO_AMBILIGHT == 1.0)
-        FragColor = vec4(pixel_ambilight(),1.0);
+        FragColor = vec4(pixel_ambilight(),0.0);
             else
-        FragColor = vec4(0.0,0.0,0.0,1.0);
+        FragColor = vec4(0.0);
 }
