@@ -56,8 +56,6 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float saturation ; //1
 	
 	float DO_CURVATURE;
-	float SHARPNESS_H;
-	float SHARPNESS_V;
 	float GEOM_BORDER_WX;
 	float GEOM_BORDER_WY;
 	float GEOM_WARP_X;
@@ -214,8 +212,6 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter GEOM_BORDER_WY     "        Border Curve Y (neg=use Warp Y)"	0.02  -0.01 0.1 0.01
 #pragma parameter GEOM_CORNER_SIZE   "        Corner Size"			0.01  0.0 0.1 0.005
 #pragma parameter GEOM_CORNER_SMOOTH "        Corner sharpness"			350.0 50.0 1000.0 25.0
-#pragma parameter SHARPNESS_H        "        Sharpness Horizontal"		0.6   0.0 1.0 0.05
-#pragma parameter SHARPNESS_V        "        Sharpness Vertical"		1.0   0.0 1.0 0.05
 
 
 //Vignette and spot
@@ -303,8 +299,6 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 
 #define DO_CURVATURE       global.DO_CURVATURE
-#define SHARPNESS_H        global.SHARPNESS_H
-#define SHARPNESS_V        global.SHARPNESS_V
 #define GEOM_WARP_X        global.GEOM_WARP_X
 #define GEOM_WARP_Y        global.GEOM_WARP_Y
 #define GEOM_BORDER_WX     global.GEOM_BORDER_WX

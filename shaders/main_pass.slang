@@ -183,6 +183,11 @@ bool scanline_have_to_flicker(bool is_interlaced) {
 }
 
 
+
+
+
+
+
 #include "functions.include"
 
 vec4 main_wrap(void) {
@@ -197,11 +202,11 @@ vec4 main_wrap(void) {
         vec2 border_coords = coords;
         
         if ((GEOM_BORDER_WX > 0.0) || (GEOM_BORDER_WY > 0.0))
-            border_coords = Warp(vTexCoord,GEOM_BORDER_WX,GEOM_BORDER_WY);
+            border_coords = Warp(coords,GEOM_BORDER_WX,GEOM_BORDER_WY);
             
         fborder = border(border_coords);
     }
-
+    
     vec3 pixel_in = texture(Source,coords).rgb ;
     vec3 pixel_out = pixel_in;
 
@@ -281,7 +286,6 @@ vec4 main_wrap(void) {
 
     
     //Out
-    if (fborder < 1.0) return mark_outer_frame(vec3(0.0));
     return vec4(pixel_out,0.0) * fborder;
 }
 
