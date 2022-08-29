@@ -63,7 +63,7 @@
 
 */
 
-shaders = 4
+shaders = 19
 /*For P-uae defaults, doubling just y0 seems the best option.
   90% of games are lowres in vertical size and p-uae defaults
   to 720 pixels width, which is enough for this preset to work as intended.
