@@ -183,22 +183,25 @@ bool scanline_have_to_flicker(bool is_interlaced) {
 }
 
 
-
-
-
-
-
 #include "functions.include"
 
 vec4 main_wrap(void) {
     //Curvature
     vec2 coords = vTexCoord ;
-    float fcorner = 1.0;
+    float fborder = 1.0;
+    
     if (DO_CURVATURE == 1.0) {
         if ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0))
-            coords = Warp(coords);
-        fcorner = corner(coords);
+            coords = Warp(coords,GEOM_WARP_X,GEOM_WARP_Y);
+
+        vec2 border_coords = coords;
+        
+        if ((GEOM_BORDER_WX > 0.0) || (GEOM_BORDER_WY > 0.0))
+            border_coords = Warp(vTexCoord,GEOM_BORDER_WX,GEOM_BORDER_WY);
+            
+        fborder = border(border_coords);
     }
+
     vec3 pixel_in = texture(Source,coords).rgb ;
     vec3 pixel_out = pixel_in;
 
@@ -278,7 +281,8 @@ vec4 main_wrap(void) {
 
     
     //Out
-    return vec4(pixel_out,0.0) * fcorner;
+    if (fborder < 1.0) return mark_outer_frame(vec3(0.0));
+    return vec4(pixel_out,0.0) * fborder;
 }
 
 

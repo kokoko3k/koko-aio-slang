@@ -58,7 +58,8 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float DO_CURVATURE;
 	float SHARPNESS_H;
 	float SHARPNESS_V;
-	float GEOM_CURVATURE;
+	float GEOM_BORDER_WX;
+	float GEOM_BORDER_WY;
 	float GEOM_WARP_X;
 	float GEOM_WARP_Y;
 	float GEOM_CORNER_SIZE;
@@ -207,9 +208,10 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 //Curvature parameters:
 #pragma parameter DO_CURVATURE	     "Emulate curvature:"			0.0   0.0 1.0 1.0
-#pragma parameter GEOM_CURVATURE     "        Curvature"			0.02  0.0 0.1 0.01
 #pragma parameter GEOM_WARP_X        "        Warp X"				0.0   0.0 0.1 0.01
 #pragma parameter GEOM_WARP_Y        "        Warp Y"				0.03  0.0 0.1 0.01
+#pragma parameter GEOM_BORDER_WX     "        Border Curve X (neg=use Warp X)"	0.02  -0.01 0.1 0.01
+#pragma parameter GEOM_BORDER_WY     "        Border Curve Y (neg=use Warp Y)"	0.02  -0.01 0.1 0.01
 #pragma parameter GEOM_CORNER_SIZE   "        Corner Size"			0.01  0.0 0.1 0.005
 #pragma parameter GEOM_CORNER_SMOOTH "        Corner sharpness"			350.0 50.0 1000.0 25.0
 #pragma parameter SHARPNESS_H        "        Sharpness Horizontal"		0.6   0.0 1.0 0.05
@@ -300,12 +302,13 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #define ALT_BLANK_STRENGTH global.ALT_BLANK_STRENGTH
 
 
-#define DO_CURVATURE global.DO_CURVATURE
+#define DO_CURVATURE       global.DO_CURVATURE
 #define SHARPNESS_H        global.SHARPNESS_H
 #define SHARPNESS_V        global.SHARPNESS_V
-#define GEOM_CURVATURE     global.GEOM_CURVATURE
 #define GEOM_WARP_X        global.GEOM_WARP_X
 #define GEOM_WARP_Y        global.GEOM_WARP_Y
+#define GEOM_BORDER_WX     global.GEOM_BORDER_WX
+#define GEOM_BORDER_WY     global.GEOM_BORDER_WY
 #define GEOM_CORNER_SIZE   global.GEOM_CORNER_SIZE
 #define GEOM_CORNER_SMOOTH global.GEOM_CORNER_SMOOTH
 

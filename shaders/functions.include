@@ -2,33 +2,25 @@
 
 //CURVATURE
 	#define corner_aspect vec2(1.0,  0.75)
-	float corner(vec2 coord)
-	{
+	float border(vec2 coord) {
 		if (GEOM_CORNER_SIZE == 0.0) return 1.0;
 		coord = (coord - vec2(0.5)) + vec2(0.5, 0.5);
 		coord = min(coord, vec2(1.0) - coord) * corner_aspect;
 		vec2 cdist = vec2(GEOM_CORNER_SIZE);
-		cdist = vec2(0.01,0.01);
 		coord = (cdist - min(coord, cdist));
 		float dist = sqrt(dot(coord, coord));
 		return clamp((cdist.x - dist)*GEOM_CORNER_SMOOTH, 0.0, 1.0);
 	}
 
-
-	vec2 Warp(vec2 texCoord){
-
-	vec2 curvedCoords = texCoord * 2.0 - 1.0;
-	vec2 CRT_Distortion = vec2(GEOM_WARP_X, GEOM_WARP_Y) * 15.;
-	float curvedCoordsDistance = sqrt(curvedCoords.x*curvedCoords.x+curvedCoords.y*curvedCoords.y);
-
-	curvedCoords = curvedCoords / curvedCoordsDistance;
-
-	curvedCoords = curvedCoords * (1.0-pow(vec2(1.0-(curvedCoordsDistance/1.4142135623730950488016887242097)),(1.0/(1.0+CRT_Distortion*0.2))));
-
-	curvedCoords = curvedCoords / (1.0-pow(vec2(0.29289321881345247559915563789515),(1.0/(vec2(1.0)+CRT_Distortion*0.2))));
-
-	curvedCoords = curvedCoords * 0.5 + 0.5;
-	return curvedCoords;
+	vec2 Warp(vec2 texCoord,float WX, float WY) {
+		vec2 curvedCoords = texCoord * 2.0 - 1.0;
+		vec2 CRT_Distortion = vec2(WX, WY) * 15.;
+		float curvedCoordsDistance = sqrt(curvedCoords.x*curvedCoords.x+curvedCoords.y*curvedCoords.y);
+		curvedCoords = curvedCoords / curvedCoordsDistance;
+		curvedCoords = curvedCoords * (1.0-pow(vec2(1.0-(curvedCoordsDistance/1.4142135623730950488016887242097)),(1.0/(1.0+CRT_Distortion*0.2))));
+		curvedCoords = curvedCoords / (1.0-pow(vec2(0.29289321881345247559915563789515),(1.0/(vec2(1.0)+CRT_Distortion*0.2))));
+		curvedCoords = curvedCoords * 0.5 + 0.5;
+		return curvedCoords;
 	}
 
 
@@ -56,7 +48,7 @@
 	}
 
 	vec4 mark_outer_frame(vec3 pixel) {
-		//For my mental sanity, I use a specific alpha channel value to mark a frame as a border
+		//For my mental sanity, Use alpha channel to mark a frame as a border
 		return vec4(pixel.r,pixel.g,pixel.b,alpha_mark) ;
 	}
 

@@ -85,84 +85,57 @@ float get_corner_weight(vec2 co, vec2 corner, float smoothfunc)
 #define GEOM_ANTIALIAS 1.0
 
 vec3 curve_antialias(vec2 xy,vec2 tex_size){
-    xy *= params.in_textureSize.xy / tex_size;
     vec2 midpoint = vec2(0.5, 0.5);
-    vec2 dx = vec2(1.0 / tex_size.x, 0.0);
-    vec2 dy = vec2(0.0, 1.0 / tex_size.y);
-    vec2 pix_co = xy * tex_size - midpoint;
-    vec2 tex_co = (floor(pix_co) + midpoint) / tex_size;
-    vec2 dist = fract(pix_co);
-    float curve_x, curve_y;
-    vec3 col2, diff;
-
-    curve_x = curve_distance(dist.x, SHARPNESS_H * SHARPNESS_H);
-    curve_y = curve_distance(dist.y, SHARPNESS_V * SHARPNESS_V);
-
-    vec4 coeffs_x = PI * vec4(1.0 + curve_x, curve_x, 1.0 - curve_x, 2.0 - curve_x);
-    vec4 coeffs_y = PI * vec4(1.0 + curve_y, curve_y, 1.0 - curve_y, 2.0 - curve_y);
-
-    coeffs_x = FIX(coeffs_x);
-    coeffs_x = 2.0 * sin(coeffs_x) * sin(coeffs_x / 2.0) / (coeffs_x * coeffs_x);
-    coeffs_x /= dot(coeffs_x, vec4(1.0));
-
-    coeffs_y = FIX(coeffs_y);
-    coeffs_y = 2.0 * sin(coeffs_y) * sin(coeffs_y / 2.0) / (coeffs_y * coeffs_y);
-    coeffs_y /= dot(coeffs_y, vec4(1.0));
-
-    mat4x4 color_matrix;
-
-
-    color_matrix[0] = filter_lanczos(coeffs_x, get_color_matrix(in_texture, tex_co - dy, dx));
-    color_matrix[1] = filter_lanczos(coeffs_x, get_color_matrix(in_texture, tex_co, dx));
-    color_matrix[2] = filter_lanczos(coeffs_x, get_color_matrix(in_texture, tex_co + dy, dx));
-    color_matrix[3] = filter_lanczos(coeffs_x, get_color_matrix(in_texture, tex_co + 2.0 * dy, dx));
-
-    return filter_lanczos(coeffs_y, color_matrix).rgb;
-
-}
-
-vec3 do_curvature_antialias(){
-    vec2 tex_size = params.in_textureSize.xy ;
 
     vec2 co = vOutputCoord * tex_size * params.in_textureSize.zw;
     vec2 co2 = vTexCoord * tex_size * params.in_textureSize.zw;
-    vec2 curved_xy = curve_coordinate(co, GEOM_WARP_X,GEOM_WARP_Y  );
     
     vec3 col; 
-    float corner_weight = get_corner_weight(curve_coordinate(co2, GEOM_CURVATURE, GEOM_CURVATURE ), vec2(GEOM_CORNER_SIZE), GEOM_CORNER_SMOOTH);
-
+    float corner_weight = get_corner_weight(curve_coordinate(co2, GEOM_BORDER_WX, GEOM_BORDER_WY ), vec2(GEOM_CORNER_SIZE), GEOM_CORNER_SMOOTH);
     
     if ( (GEOM_WARP_X > 0) || (GEOM_WARP_Y > 0) ) {
-        if (GEOM_ANTIALIAS == 1.0)
-            col = curve_antialias(curved_xy,tex_size);
-        else
-            col = texture(in_texture,curved_xy).rgb;
+        xy *= params.in_textureSize.xy / tex_size;
+
+        vec2 dx = vec2(1.0 / tex_size.x, 0.0);
+        vec2 dy = vec2(0.0, 1.0 / tex_size.y);
+        vec2 pix_co = xy * tex_size - midpoint;
+        vec2 tex_co = (floor(pix_co) + midpoint) / tex_size;
+        vec2 dist = fract(pix_co);
+        float curve_x, curve_y;
+        vec3 col2, diff;
+
+        curve_x = curve_distance(dist.x, SHARPNESS_H * SHARPNESS_H);
+        curve_y = curve_distance(dist.y, SHARPNESS_V * SHARPNESS_V);
+
+        vec4 coeffs_x = PI * vec4(1.0 + curve_x, curve_x, 1.0 - curve_x, 2.0 - curve_x);
+        vec4 coeffs_y = PI * vec4(1.0 + curve_y, curve_y, 1.0 - curve_y, 2.0 - curve_y);
+
+        coeffs_x = FIX(coeffs_x);
+        coeffs_x = 2.0 * sin(coeffs_x) * sin(coeffs_x / 2.0) / (coeffs_x * coeffs_x);
+        coeffs_x /= dot(coeffs_x, vec4(1.0));
+
+        coeffs_y = FIX(coeffs_y);
+        coeffs_y = 2.0 * sin(coeffs_y) * sin(coeffs_y / 2.0) / (coeffs_y * coeffs_y);
+        coeffs_y /= dot(coeffs_y, vec4(1.0));
+
+        mat4x4 color_matrix;
+
+
+        color_matrix[0] = filter_lanczos(coeffs_x, get_color_matrix(in_texture, tex_co - dy, dx));
+        color_matrix[1] = filter_lanczos(coeffs_x, get_color_matrix(in_texture, tex_co, dx));
+        color_matrix[2] = filter_lanczos(coeffs_x, get_color_matrix(in_texture, tex_co + dy, dx));
+        color_matrix[3] = filter_lanczos(coeffs_x, get_color_matrix(in_texture, tex_co + 2.0 * dy, dx));
+
+        col = filter_lanczos(coeffs_y, color_matrix).rgb;
             } else {
         col = texture(in_texture, vOutputCoord).rgb;
     }
     
     col *= vec3(corner_weight);
-
-
-
     return col;
 }
 
-const vec2 corner_aspect   = vec2(1.0,  0.75);
-
-float corner(vec2 coord)
-{
-    coord = (coord - vec2(0.5)) + vec2(0.5, 0.5);
-    coord = min(coord, vec2(1.0) - coord) * corner_aspect;
-    vec2 cdist = vec2(GEOM_CORNER_SIZE);
-    coord = (cdist - min(coord, cdist));
-    float dist = sqrt(dot(coord, coord));
-
-    return clamp((cdist.x - dist)*GEOM_CORNER_SMOOTH, 0.0, 1.0);
-}
-
-
-vec2 Warp(vec2 texCoord){
+vec2 Warp2(vec2 texCoord){
 
   vec2 curvedCoords = texCoord * 2.0 - 1.0;
   vec2 CRT_Distortion = vec2(GEOM_WARP_X, GEOM_WARP_Y) * 15.;
@@ -178,15 +151,58 @@ vec2 Warp(vec2 texCoord){
   return curvedCoords;
 }
 
+vec3 do_curvature_antialias(){
+    vec2 tex_size = params.in_textureSize.xy ;
+
+    vec2 co = vOutputCoord * tex_size * params.in_textureSize.zw;
+    vec2 co2 = vTexCoord * tex_size * params.in_textureSize.zw;
+    vec2 curved_xy = curve_coordinate(co, GEOM_WARP_X,GEOM_WARP_Y  );
+    
+    vec3 col; 
+    //float corner_weight = get_corner_weight(curve_coordinate(co2, GEOM_BORDER_WX, GEOM_BORDER_WY ), vec2(GEOM_CORNER_SIZE), GEOM_CORNER_SMOOTH);
+    float corner_weight = get_corner_weight(Warp2(co), vec2(GEOM_CORNER_SIZE), GEOM_CORNER_SMOOTH);
+
+    
+    if ( (GEOM_WARP_X > 0) || (GEOM_WARP_Y > 0) ) {
+        if (GEOM_ANTIALIAS == 1.0)
+            col = curve_antialias(curved_xy,tex_size);
+        else
+            col = texture(in_texture,curved_xy).rgb;
+            } else {
+        col = texture(in_texture, vOutputCoord).rgb;
+    }
+    
+    col *= vec3(corner_weight) ;
+
+
+
+    return col;
+}
+
+const vec2 corner_aspect   = vec2(1.0,  0.75);
+
+float corner2(vec2 coord)
+{
+    coord = (coord - vec2(0.5)) + vec2(0.5, 0.5);
+    coord = min(coord, vec2(1.0) - coord) * corner_aspect;
+    vec2 cdist = vec2(GEOM_CORNER_SIZE);
+    coord = (cdist - min(coord, cdist));
+    float dist = sqrt(dot(coord, coord));
+
+    return clamp((cdist.x - dist)*GEOM_CORNER_SMOOTH, 0.0, 1.0);
+}
+
+
+
+
 
 vec3 do_curvature_alias(){
-    vec2 curved_xy = Warp(vOutputCoord);
-    return texture(in_texture,curved_xy ).rgb * corner(curved_xy);
+    vec2 curved_xy = Warp2(vOutputCoord);
+    return texture(in_texture,curved_xy ).rgb * corner2(curved_xy);
 }
 
 vec4 main_wrap()
 {
-    
     if (DO_CURVATURE == 1.0) {
         return vec4(do_curvature_antialias(), 1.0);
     } else {
@@ -205,10 +221,6 @@ void main() {
     } else {
         FragColor = main_wrap();
     }
-
-
-    FragColor = psample;
-
 }
 
 
