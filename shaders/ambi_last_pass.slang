@@ -50,8 +50,8 @@ void main() {
 */ 
 
     if (DO_AMBILIGHT == 1) {
-        FragColor = vec4(pixel_ambilight(),0.0);
+        FragColor = vec4(pixel_ambilight(),1.0);
     } else {
-        FragColor = vec4(0.0);
+        FragColor = vec4(0.0,0.0,0.0,1.0);
     }
 }

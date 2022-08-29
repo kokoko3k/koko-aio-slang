@@ -20,8 +20,10 @@ layout(set = 0, binding = 2) uniform sampler2D Source;
 
 #include "functions.include"
 void main() {
-   if (DO_VIGNETTE == 1.0)
-      FragColor = vec4(gauss_xy(0.0, 0.0, v_size, v_power, 0.0, 1.0));
+   if (DO_VIGNETTE == 1.0) {
+      float gaussxy = gauss_xy(0.0, 0.0, v_size, v_power, 0.0, 1.0);
+      FragColor = vec4(gaussxy,gaussxy,gaussxy,1.0);
+   }
 }
  
   

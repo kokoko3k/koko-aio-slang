@@ -32,5 +32,5 @@ void main() {
     if (DO_AMBILIGHT == 1.0)
         FragColor = vec4 (bloom(bloom_directions,8,4,1), 0.0);
             else
-        FragColor = vec4(0.0);
+        FragColor = vec4(0.0,0.0,0.0,1.0);
 }

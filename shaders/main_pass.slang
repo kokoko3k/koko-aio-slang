@@ -286,7 +286,7 @@ vec4 main_wrap(void) {
 
     
     //Out
-    return vec4(pixel_out,0.0) * fborder;
+    return vec4(pixel_out,1.0) * fborder;
 }
 
 

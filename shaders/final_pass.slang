@@ -100,7 +100,7 @@ vec4 main_wrap() {
     }
         
     //Out
-    return vec4(pixel_out,0.0);
+    return vec4(pixel_out,1.0);
 }
 
 

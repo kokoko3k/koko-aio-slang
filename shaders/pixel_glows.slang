@@ -82,7 +82,7 @@ vec4 pixel_glow_gamma_1(sampler2D in_texture, float my_glowpix, float my_glowpix
 
     vec3 Bloom = (t2*wl2 + t1*wl1 + b1*wr1 + b2*wr2)*wt;
 
-    return vec4(Bloom*my_glow,0.0);
+    return vec4(Bloom*my_glow,1.0);
 }
     
 
@@ -166,7 +166,7 @@ vec4 pixel_glow_gamma_2(sampler2D in_texture, float my_glowpix, float my_glowpix
 
     vec3 Bloom = (t2*wl2 + t1*wl1 + b1*wr1 + b2*wr2)*wt;
 
-    return vec4(Bloom*my_glow,0.0);
+    return vec4(Bloom*my_glow,1.0);
 }
 vec4 pixel_glow_gamma_3(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec2 coords, vec4 SourceSize1) {
 
@@ -248,7 +248,7 @@ vec4 pixel_glow_gamma_3(sampler2D in_texture, float my_glowpix, float my_glowpix
 
     vec3 Bloom = (t2*wl2 + t1*wl1 + b1*wr1 + b2*wr2)*wt;
 
-    return vec4(Bloom*my_glow,0.0);
+    return vec4(Bloom*my_glow,1.0);
 }
 vec4 pixel_glow_gamma_4(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec2 coords, vec4 SourceSize1) {
 
@@ -330,7 +330,7 @@ vec4 pixel_glow_gamma_4(sampler2D in_texture, float my_glowpix, float my_glowpix
 
     vec3 Bloom = (t2*wl2 + t1*wl1 + b1*wr1 + b2*wr2)*wt;
 
-    return vec4(Bloom*my_glow,0.0);
+    return vec4(Bloom*my_glow,1.0);
 }
 vec4 pixel_glow_gamma_5(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec2 coords, vec4 SourceSize1) {
 
@@ -412,7 +412,7 @@ vec4 pixel_glow_gamma_5(sampler2D in_texture, float my_glowpix, float my_glowpix
 
     vec3 Bloom = (t2*wl2 + t1*wl1 + b1*wr1 + b2*wr2)*wt;
 
-    return vec4(Bloom*my_glow,0.0);
+    return vec4(Bloom*my_glow,1.0);
 }
 vec4 pixel_glow_gamma_6(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec2 coords, vec4 SourceSize1) {
 
@@ -494,7 +494,7 @@ vec4 pixel_glow_gamma_6(sampler2D in_texture, float my_glowpix, float my_glowpix
 
     vec3 Bloom = (t2*wl2 + t1*wl1 + b1*wr1 + b2*wr2)*wt;
 
-    return vec4(Bloom*my_glow,0.0);
+    return vec4(Bloom*my_glow,1.0);
 }
 vec4 pixel_glow_gamma_7(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec2 coords, vec4 SourceSize1) {
 
@@ -576,7 +576,7 @@ vec4 pixel_glow_gamma_7(sampler2D in_texture, float my_glowpix, float my_glowpix
 
     vec3 Bloom = (t2*wl2 + t1*wl1 + b1*wr1 + b2*wr2)*wt;
 
-    return vec4(Bloom*my_glow,0.0);
+    return vec4(Bloom*my_glow,1.0);
 }
 vec4 pixel_glow_gamma_8(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec2 coords, vec4 SourceSize1) {
 
@@ -658,7 +658,7 @@ vec4 pixel_glow_gamma_8(sampler2D in_texture, float my_glowpix, float my_glowpix
 
     vec3 Bloom = (t2*wl2 + t1*wl1 + b1*wr1 + b2*wr2)*wt;
 
-    return vec4(Bloom*my_glow,0.0);
+    return vec4(Bloom*my_glow,1.0);
 }
 vec4 pixel_glow_gamma_9(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec2 coords, vec4 SourceSize1) {
 
@@ -740,7 +740,7 @@ vec4 pixel_glow_gamma_9(sampler2D in_texture, float my_glowpix, float my_glowpix
 
     vec3 Bloom = (t2*wl2 + t1*wl1 + b1*wr1 + b2*wr2)*wt;
 
-    return vec4(Bloom*my_glow,0.0);
+    return vec4(Bloom*my_glow,1.0);
 }
 vec4 pixel_glow_gamma_10(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec2 coords, vec4 SourceSize1) {
 
@@ -822,7 +822,7 @@ vec4 pixel_glow_gamma_10(sampler2D in_texture, float my_glowpix, float my_glowpi
 
     vec3 Bloom = (t2*wl2 + t1*wl1 + b1*wr1 + b2*wr2)*wt;
 
-    return vec4(Bloom*my_glow,0.0);
+    return vec4(Bloom*my_glow,1.0);
 }
 
 vec3 blur_v(sampler2D in_texture, float my_glowpixy, vec2 coords, vec4 SourceSize1) {
@@ -941,7 +941,7 @@ vec4 pixel_glow_std_pow(sampler2D in_texture, float my_glowpix, float my_glowpix
 
     vec3 Bloom = (t2*wl2 + t1*wl1 + b1*wr1 + b2*wr2)*wt;
 
-    return vec4(Bloom*my_glow,0.0);
+    return vec4(Bloom*my_glow,1.0);
 }
 
 vec4 dumb_glow(sampler2D in_texture, float my_glow, float glow_gamma, vec2 coords) {

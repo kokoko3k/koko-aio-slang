@@ -24,8 +24,10 @@ layout(set = 0, binding = 2) uniform sampler2D Source;
 
 #include "functions.include"
 void main() {
-   if (DO_SPOT == 1.0)
-      FragColor = vec4(gauss_xy(s_center_x, s_center_y, s_size, s_power, 0.0, 10.0));
+   if (DO_SPOT == 1.0) {
+      float gaussxy = gauss_xy(s_center_x, s_center_y, s_size, s_power, 0.0, 10.0);
+      FragColor = vec4(gaussxy,gaussxy,gaussxy,1.0);
+   }
 }
 
 

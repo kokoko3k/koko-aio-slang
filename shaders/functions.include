@@ -52,13 +52,13 @@
 	}
 
 	vec4 mark_outer_frame(vec3 pixel) {
-		//return vec4(pixel.r,pixel.g,pixel.b,0.0) ;
+		return vec4(pixel.r,pixel.g,pixel.b,0.0) ;
 		//For my mental sanity, I use a specific alpha channel value to mark a frame as a border
 		return vec4(pixel.r,pixel.g,pixel.b,alpha_mark) ;
 	}
 
 	bool is_outer_frame(vec4 pixel) {
-		//return pixel.a < 1.0;
+		return pixel.a < 1.0;
 		/*Check if a pixel is marked as border by comparing the value of its alpha channel
 		Tolerance is needed, because precision can be as low as 1/256; since I don't need
 		alpha channel, use an even large tolerance.
