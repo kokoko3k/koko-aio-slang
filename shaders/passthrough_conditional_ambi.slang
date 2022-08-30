@@ -17,12 +17,21 @@ layout(location = 0) in vec2 vTexCoord;
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D Source;
 
+#define eps 1e-8
 
 void main() {
    if (DO_AMBILIGHT == 1.0)
-      FragColor = texture(Source, vTexCoord);
-         else
+   {
+      vec3 ambi = texture(Source, vTexCoord).rgb;
+      float l = length(ambi);
+      float sat = 1.5;
+      float bright = 1.5;
+      ambi =  normalize( pow(ambi.rgb + vec3(eps), vec3(sat)))*l * bright  ;
+      ambi*=bright;
+      FragColor = vec4(ambi,1.0); 
+   } else {
       FragColor = vec4(0.0,0.0,0.0,1.0);
+   }
 }
 
 

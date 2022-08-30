@@ -2,11 +2,10 @@
     Guess more aspect ratios: edit. nope: Guessing is pointless.
     Update presets with new switchable functions
     Update pipeline graph
+
     Investigate the possible use of mipmapping in bloom function too.
-
-
-    also check if double scaling at beginning is really useful.
     mix vignette and spotlight in another pass or they will be used by ambilight.
+    Smoother (less flickering) ambilight; need higher resolution?
 
 Performances on haswell igp, 1080p, 60fps: (before putting halo and in_glow into lower resolution pass)
     aspect full (16:9)
@@ -83,7 +82,7 @@ Performances on haswell igp, 1080p, 60fps: (before putting halo and in_glow into
 
 */
 
-shaders = 21
+shaders = 23
 /*For P-uae defaults, doubling just y0 seems the best option.
   90% of games are lowres in vertical size and p-uae defaults
   to 720 pixels width, which is enough for this preset to work as intended.
@@ -213,19 +212,34 @@ shaders = 21
                 alias15 = "ambi_downscale_pass"
         filter_linear15 = true
            scale_type15 = absolute
-              scale_x15 = 32
-              scale_y15 = 24
+              scale_x15 = 16
+              scale_y15 = 12
          mipmap_input15 = true
 
-               shader16 = shaders/ambi_pre_pass.slang
-                alias16 = "ambi_pre_pass0"
+               shader16 = shaders/passthrough.slang //shaders/ambi_pre_pass.slang
         filter_linear16 = true
+         mipmap_input16 = true
            scale_type16 = source
-
-               shader17 = shaders/ambi_pre_pass.slang
-                alias17 = "ambi_pre_pass1"
+                scale16 = 2.0
+                
+               shader17 = shaders/passthrough.slang //shaders/ambi_pre_pass.slang
         filter_linear17 = true
+         mipmap_input17 = true
            scale_type17 = source
+                scale17 = 2.0
+                
+               shader18 = shaders/passthrough.slang //shaders/ambi_pre_pass.slang
+        filter_linear18 = true
+         mipmap_input18 = true
+           scale_type18 = source
+                scale18 = 2.0
+
+               shader19 = shaders/ambi_pre_pass.slang
+                alias19 = "ambi_pre_pass1"
+        filter_linear19 = true
+         mipmap_input19 = true
+           scale_type19 = source
+                scale19 = 2.0
 
 
         /*
@@ -233,17 +247,17 @@ shaders = 21
           but unfortunately, maybe due to a bug in my system,
           moving it there produces weird graphical glitches
         */
-               shader18 = shaders/ambi_avglum_pass.slang
-                alias18 = "ambi_avglum_pass"
-        filter_linear18 = false
-           scale_type18 = source
-         mipmap_input18 = true
+               shader20 = shaders/ambi_avglum_pass.slang
+                alias20 = "ambi_avglum_pass"
+        filter_linear20 = false
+           scale_type20 = source
+         mipmap_input20 = true
 
 
-               shader19 = shaders/ambi_temporal_pass.slang
-                alias19 = "ambi_temporal_pass"
-        filter_linear19 = true
-           scale_type19 = source
+               shader21 = shaders/ambi_temporal_pass.slang
+                alias21 = "ambi_temporal_pass"
+        filter_linear21 = true
+           scale_type21 = source
 
 
 
@@ -253,9 +267,9 @@ shaders = 21
     //scale18 = 1.0
     //filter_linear18 = true
 
-           shader20 = shaders/ambi_mix_pass.slang
-            alias20 = "ambientmix_pass"
-       scale_type20 = viewport
-            scale20 = 1.0
-    filter_linear20 = true
+           shader22 = shaders/ambi_mix_pass.slang
+            alias22 = "ambientmix_pass"
+       scale_type22 = viewport
+            scale22 = 1.0
+    filter_linear22 = true
 

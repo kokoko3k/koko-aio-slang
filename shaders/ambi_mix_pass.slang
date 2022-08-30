@@ -36,11 +36,11 @@ float random() {
 
 vec4 pixel_border() {
     vec3 ambi = texture(ambi_temporal_pass, vOutputCoord).rgb;
-    float l = length(ambi);
+/*    float l = length(ambi);
     float sat = 1.25;
     float bright = 1.5;
     ambi =  normalize( pow(ambi.rgb + vec3(eps), vec3(sat)))*l * bright  ;
-    ambi*=bright;
+    ambi*=bright;*/
     return vec4(ambi,0.0);
 }
 
@@ -64,5 +64,8 @@ void main() {
     }
 
 
+//FragColor = vec4(ambi_noised(), 1.0);
+    
+    
 }
 //82..85-73..76

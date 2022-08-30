@@ -29,8 +29,13 @@ void main() {
 
 //vec3 bloom(float Directions, float Quality, float Size, float fbloom_gamma) {
 
+//FragColor = vec4(0.0,0.0,0.0,1.0);
+//return;
+
     if (DO_AMBILIGHT == 1.0)
-        FragColor = vec4 (bloom(bloom_directions,4,3,1.0), 0.0);
+        //                            directions,quality, size,gamma
+        FragColor = vec4 (bloom(      8,         4,       16,   1.0), 0.0);
+        //FragColor = texture(Source,vTexCoord);
             else
         FragColor = vec4(0.0,0.0,0.0,1.0);
 }
