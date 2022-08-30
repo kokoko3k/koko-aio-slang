@@ -29,7 +29,7 @@ void main() {
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in vec2 vOutputCoord;
 layout(location = 0) out vec4 FragColor;
-layout(set = 0, binding = 2) uniform sampler2D scanline_flickering_pass;
+layout(set = 0, binding = 2) uniform sampler2D FXAA_pass;
 layout(set = 0, binding = 3) uniform sampler2D Original;
 
 // What follows is an ugly optimization with a lot of code copied and pasted repeated multiple times,
@@ -47,7 +47,7 @@ vec4 main_wrap(void) {
             if ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0))
                 halo_coords = Warp(vTexCoord,GEOM_WARP_X,GEOM_WARP_Y);
         }
-        vec3 pixel_haloed = pixel_glow(scanline_flickering_pass, halo_w,halo_h,halo_power,halo_gamma,halo_coords, global.scanline_flickering_passSize).rgb;
+        vec3 pixel_haloed = pixel_glow(FXAA_pass, halo_w,halo_h,halo_power,halo_gamma,halo_coords, global.FXAA_passSize, global.FXAA_passSize).rgb;
         return vec4(pixel_haloed.rgb,1.0);
     }
     //Out

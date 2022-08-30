@@ -6,17 +6,17 @@
 //the scanlines to be linear filtered.
 
 
-vec4 pixel_glow_gamma_1(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec2 coords, vec4 SourceSize1) {
+vec4 pixel_glow_gamma_1(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec2 coords, vec4 SourceSize1, vec4 SourceSize2) {
 
     // Calculating texel coordinates
     vec2 tex = coords.xy * 1.00001;
     // vec4 SourceSize1 = params.SourceSize;
     
-    vec2 OGL2Pos = tex * params.SourceSize.xy - vec2(0.5,0.5); // vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5); 
+    vec2 OGL2Pos = tex * SourceSize2.xy - vec2(0.5,0.5); // vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5); 
     vec2 fp = fract(OGL2Pos);
     vec2 dx = vec2(SourceSize1.z,0.0) ; // vec2 dx = vec2(params.passthrough_and_cc_passSize.z,0.0) ; // 
     vec2 dy = vec2(0.0,SourceSize1.w) ; // vec2 dy = vec2(0.0,params.passthrough_and_cc_passSize.w);  //
-    vec2 pC4 = (floor(OGL2Pos) + vec2(0.5)) * params.SourceSize.zw;
+    vec2 pC4 = (floor(OGL2Pos) + vec2(0.5)) * SourceSize2.zw;
 
     vec2 x2 = 2.0*dx; vec2 x3 = 3.0*dx;
     vec2 y2 = 2.0*dy;
@@ -86,17 +86,17 @@ vec4 pixel_glow_gamma_1(sampler2D in_texture, float my_glowpix, float my_glowpix
 }
     
 
-vec4 pixel_glow_gamma_2(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec2 coords, vec4 SourceSize1) {
+vec4 pixel_glow_gamma_2(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec2 coords, vec4 SourceSize1, vec4 SourceSize2) {
 
     // Calculating texel coordinates
     vec2 tex = coords.xy * 1.00001;
     // vec4 SourceSize1 = params.SourceSize;
     
-    vec2 OGL2Pos = tex * params.SourceSize.xy - vec2(0.5,0.5); // vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5); 
+    vec2 OGL2Pos = tex * SourceSize2.xy - vec2(0.5,0.5); // vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5); 
     vec2 fp = fract(OGL2Pos);
     vec2 dx = vec2(SourceSize1.z,0.0) ; // vec2 dx = vec2(params.passthrough_and_cc_passSize.z,0.0) ; // 
     vec2 dy = vec2(0.0,SourceSize1.w) ; // vec2 dy = vec2(0.0,params.passthrough_and_cc_passSize.w);  //
-    vec2 pC4 = (floor(OGL2Pos) + vec2(0.5)) * params.SourceSize.zw;
+    vec2 pC4 = (floor(OGL2Pos) + vec2(0.5)) * SourceSize2.zw;
 
     vec2 x2 = 2.0*dx; vec2 x3 = 3.0*dx;
     vec2 y2 = 2.0*dy;
@@ -168,17 +168,17 @@ vec4 pixel_glow_gamma_2(sampler2D in_texture, float my_glowpix, float my_glowpix
 
     return vec4(Bloom*my_glow,1.0);
 }
-vec4 pixel_glow_gamma_3(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec2 coords, vec4 SourceSize1) {
+vec4 pixel_glow_gamma_3(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec2 coords, vec4 SourceSize1, vec4 SourceSize2) {
 
     // Calculating texel coordinates
     vec2 tex = coords.xy * 1.00001;
     // vec4 SourceSize1 = params.SourceSize;
     
-    vec2 OGL2Pos = tex * params.SourceSize.xy - vec2(0.5,0.5); // vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5); 
+    vec2 OGL2Pos = tex * SourceSize2.xy - vec2(0.5,0.5); // vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5); 
     vec2 fp = fract(OGL2Pos);
     vec2 dx = vec2(SourceSize1.z,0.0) ; // vec2 dx = vec2(params.passthrough_and_cc_passSize.z,0.0) ; // 
     vec2 dy = vec2(0.0,SourceSize1.w) ; // vec2 dy = vec2(0.0,params.passthrough_and_cc_passSize.w);  //
-    vec2 pC4 = (floor(OGL2Pos) + vec2(0.5)) * params.SourceSize.zw;
+    vec2 pC4 = (floor(OGL2Pos) + vec2(0.5)) * SourceSize2.zw;
 
     vec2 x2 = 2.0*dx; vec2 x3 = 3.0*dx;
     vec2 y2 = 2.0*dy;
@@ -250,17 +250,17 @@ vec4 pixel_glow_gamma_3(sampler2D in_texture, float my_glowpix, float my_glowpix
 
     return vec4(Bloom*my_glow,1.0);
 }
-vec4 pixel_glow_gamma_4(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec2 coords, vec4 SourceSize1) {
+vec4 pixel_glow_gamma_4(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec2 coords, vec4 SourceSize1, vec4 SourceSize2) {
 
     // Calculating texel coordinates
     vec2 tex = coords.xy * 1.00001;
     // vec4 SourceSize1 = params.SourceSize;
     
-    vec2 OGL2Pos = tex * params.SourceSize.xy - vec2(0.5,0.5); // vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5); 
+    vec2 OGL2Pos = tex * SourceSize2.xy - vec2(0.5,0.5); // vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5); 
     vec2 fp = fract(OGL2Pos);
     vec2 dx = vec2(SourceSize1.z,0.0) ; // vec2 dx = vec2(params.passthrough_and_cc_passSize.z,0.0) ; // 
     vec2 dy = vec2(0.0,SourceSize1.w) ; // vec2 dy = vec2(0.0,params.passthrough_and_cc_passSize.w);  //
-    vec2 pC4 = (floor(OGL2Pos) + vec2(0.5)) * params.SourceSize.zw;
+    vec2 pC4 = (floor(OGL2Pos) + vec2(0.5)) * SourceSize2.zw;
 
     vec2 x2 = 2.0*dx; vec2 x3 = 3.0*dx;
     vec2 y2 = 2.0*dy;
@@ -332,17 +332,17 @@ vec4 pixel_glow_gamma_4(sampler2D in_texture, float my_glowpix, float my_glowpix
 
     return vec4(Bloom*my_glow,1.0);
 }
-vec4 pixel_glow_gamma_5(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec2 coords, vec4 SourceSize1) {
+vec4 pixel_glow_gamma_5(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec2 coords, vec4 SourceSize1, vec4 SourceSize2) {
 
     // Calculating texel coordinates
     vec2 tex = coords.xy * 1.00001;
     // vec4 SourceSize1 = params.SourceSize;
     
-    vec2 OGL2Pos = tex * params.SourceSize.xy - vec2(0.5,0.5); // vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5); 
+    vec2 OGL2Pos = tex * SourceSize2.xy - vec2(0.5,0.5); // vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5); 
     vec2 fp = fract(OGL2Pos);
     vec2 dx = vec2(SourceSize1.z,0.0) ; // vec2 dx = vec2(params.passthrough_and_cc_passSize.z,0.0) ; // 
     vec2 dy = vec2(0.0,SourceSize1.w) ; // vec2 dy = vec2(0.0,params.passthrough_and_cc_passSize.w);  //
-    vec2 pC4 = (floor(OGL2Pos) + vec2(0.5)) * params.SourceSize.zw;
+    vec2 pC4 = (floor(OGL2Pos) + vec2(0.5)) * SourceSize2.zw;
 
     vec2 x2 = 2.0*dx; vec2 x3 = 3.0*dx;
     vec2 y2 = 2.0*dy;
@@ -414,17 +414,17 @@ vec4 pixel_glow_gamma_5(sampler2D in_texture, float my_glowpix, float my_glowpix
 
     return vec4(Bloom*my_glow,1.0);
 }
-vec4 pixel_glow_gamma_6(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec2 coords, vec4 SourceSize1) {
+vec4 pixel_glow_gamma_6(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec2 coords, vec4 SourceSize1, vec4 SourceSize2) {
 
     // Calculating texel coordinates
     vec2 tex = coords.xy * 1.00001;
     // vec4 SourceSize1 = params.SourceSize;
     
-    vec2 OGL2Pos = tex * params.SourceSize.xy - vec2(0.5,0.5); // vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5); 
+    vec2 OGL2Pos = tex * SourceSize2.xy - vec2(0.5,0.5); // vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5); 
     vec2 fp = fract(OGL2Pos);
     vec2 dx = vec2(SourceSize1.z,0.0) ; // vec2 dx = vec2(params.passthrough_and_cc_passSize.z,0.0) ; // 
     vec2 dy = vec2(0.0,SourceSize1.w) ; // vec2 dy = vec2(0.0,params.passthrough_and_cc_passSize.w);  //
-    vec2 pC4 = (floor(OGL2Pos) + vec2(0.5)) * params.SourceSize.zw;
+    vec2 pC4 = (floor(OGL2Pos) + vec2(0.5)) * SourceSize2.zw;
 
     vec2 x2 = 2.0*dx; vec2 x3 = 3.0*dx;
     vec2 y2 = 2.0*dy;
@@ -496,17 +496,17 @@ vec4 pixel_glow_gamma_6(sampler2D in_texture, float my_glowpix, float my_glowpix
 
     return vec4(Bloom*my_glow,1.0);
 }
-vec4 pixel_glow_gamma_7(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec2 coords, vec4 SourceSize1) {
+vec4 pixel_glow_gamma_7(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec2 coords, vec4 SourceSize1, vec4 SourceSize2) {
 
     // Calculating texel coordinates
     vec2 tex = coords.xy * 1.00001;
     // vec4 SourceSize1 = params.SourceSize;
     
-    vec2 OGL2Pos = tex * params.SourceSize.xy - vec2(0.5,0.5); // vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5); 
+    vec2 OGL2Pos = tex * SourceSize2.xy - vec2(0.5,0.5); // vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5); 
     vec2 fp = fract(OGL2Pos);
     vec2 dx = vec2(SourceSize1.z,0.0) ; // vec2 dx = vec2(params.passthrough_and_cc_passSize.z,0.0) ; // 
     vec2 dy = vec2(0.0,SourceSize1.w) ; // vec2 dy = vec2(0.0,params.passthrough_and_cc_passSize.w);  //
-    vec2 pC4 = (floor(OGL2Pos) + vec2(0.5)) * params.SourceSize.zw;
+    vec2 pC4 = (floor(OGL2Pos) + vec2(0.5)) * SourceSize2.zw;
 
     vec2 x2 = 2.0*dx; vec2 x3 = 3.0*dx;
     vec2 y2 = 2.0*dy;
@@ -578,17 +578,17 @@ vec4 pixel_glow_gamma_7(sampler2D in_texture, float my_glowpix, float my_glowpix
 
     return vec4(Bloom*my_glow,1.0);
 }
-vec4 pixel_glow_gamma_8(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec2 coords, vec4 SourceSize1) {
+vec4 pixel_glow_gamma_8(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec2 coords, vec4 SourceSize1, vec4 SourceSize2) {
 
     // Calculating texel coordinates
     vec2 tex = coords.xy * 1.00001;
     // vec4 SourceSize1 = params.SourceSize;
     
-    vec2 OGL2Pos = tex * params.SourceSize.xy - vec2(0.5,0.5); // vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5); 
+    vec2 OGL2Pos = tex * SourceSize2.xy - vec2(0.5,0.5); // vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5); 
     vec2 fp = fract(OGL2Pos);
     vec2 dx = vec2(SourceSize1.z,0.0) ; // vec2 dx = vec2(params.passthrough_and_cc_passSize.z,0.0) ; // 
     vec2 dy = vec2(0.0,SourceSize1.w) ; // vec2 dy = vec2(0.0,params.passthrough_and_cc_passSize.w);  //
-    vec2 pC4 = (floor(OGL2Pos) + vec2(0.5)) * params.SourceSize.zw;
+    vec2 pC4 = (floor(OGL2Pos) + vec2(0.5)) * SourceSize2.zw;
 
     vec2 x2 = 2.0*dx; vec2 x3 = 3.0*dx;
     vec2 y2 = 2.0*dy;
@@ -660,17 +660,17 @@ vec4 pixel_glow_gamma_8(sampler2D in_texture, float my_glowpix, float my_glowpix
 
     return vec4(Bloom*my_glow,1.0);
 }
-vec4 pixel_glow_gamma_9(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec2 coords, vec4 SourceSize1) {
+vec4 pixel_glow_gamma_9(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec2 coords, vec4 SourceSize1, vec4 SourceSize2) {
 
     // Calculating texel coordinates
     vec2 tex = coords.xy * 1.00001;
     // vec4 SourceSize1 = params.SourceSize;
     
-    vec2 OGL2Pos = tex * params.SourceSize.xy - vec2(0.5,0.5); // vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5); 
+    vec2 OGL2Pos = tex * SourceSize2.xy - vec2(0.5,0.5); // vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5); 
     vec2 fp = fract(OGL2Pos);
     vec2 dx = vec2(SourceSize1.z,0.0) ; // vec2 dx = vec2(params.passthrough_and_cc_passSize.z,0.0) ; // 
     vec2 dy = vec2(0.0,SourceSize1.w) ; // vec2 dy = vec2(0.0,params.passthrough_and_cc_passSize.w);  //
-    vec2 pC4 = (floor(OGL2Pos) + vec2(0.5)) * params.SourceSize.zw;
+    vec2 pC4 = (floor(OGL2Pos) + vec2(0.5)) * SourceSize2.zw;
 
     vec2 x2 = 2.0*dx; vec2 x3 = 3.0*dx;
     vec2 y2 = 2.0*dy;
@@ -742,17 +742,17 @@ vec4 pixel_glow_gamma_9(sampler2D in_texture, float my_glowpix, float my_glowpix
 
     return vec4(Bloom*my_glow,1.0);
 }
-vec4 pixel_glow_gamma_10(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec2 coords, vec4 SourceSize1) {
+vec4 pixel_glow_gamma_10(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec2 coords, vec4 SourceSize1, vec4 SourceSize2) {
 
     // Calculating texel coordinates
     vec2 tex = coords.xy * 1.00001;
     // vec4 SourceSize1 = params.SourceSize;
     
-    vec2 OGL2Pos = tex * params.SourceSize.xy - vec2(0.5,0.5); // vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5); 
+    vec2 OGL2Pos = tex * SourceSize2.xy - vec2(0.5,0.5); // vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5); 
     vec2 fp = fract(OGL2Pos);
     vec2 dx = vec2(SourceSize1.z,0.0) ; // vec2 dx = vec2(params.passthrough_and_cc_passSize.z,0.0) ; // 
     vec2 dy = vec2(0.0,SourceSize1.w) ; // vec2 dy = vec2(0.0,params.passthrough_and_cc_passSize.w);  //
-    vec2 pC4 = (floor(OGL2Pos) + vec2(0.5)) * params.SourceSize.zw;
+    vec2 pC4 = (floor(OGL2Pos) + vec2(0.5)) * SourceSize2.zw;
 
     vec2 x2 = 2.0*dx; vec2 x3 = 3.0*dx;
     vec2 y2 = 2.0*dy;
@@ -825,16 +825,16 @@ vec4 pixel_glow_gamma_10(sampler2D in_texture, float my_glowpix, float my_glowpi
     return vec4(Bloom*my_glow,1.0);
 }
 
-vec3 blur_v(sampler2D in_texture, float my_glowpixy, vec2 coords, vec4 SourceSize1) {
+vec3 blur_v(sampler2D in_texture, float my_glowpixy, vec2 coords, vec4 SourceSize1, vec4 SourceSize2) {
 
     // Calculating texel coordinates
     vec2 tex = coords.xy * 1.00001;
 
-    vec2 OGL2Pos = tex * params.SourceSize.xy - vec2(0.5,0.5);
+    vec2 OGL2Pos = tex * SourceSize2.xy - vec2(0.5,0.5);
     vec2 fp = fract(OGL2Pos);
   
     vec2 dy = vec2(0.0,SourceSize1.w) ;
-    vec2 pC4 = (floor(OGL2Pos) + vec2(0.5)) * params.SourceSize.zw;
+    vec2 pC4 = (floor(OGL2Pos) + vec2(0.5)) * SourceSize2.zw;
 
     vec2 y2 = 2.0*dy;
     
@@ -860,16 +860,16 @@ return vec3(1.0);
 
 }
 
-vec4 pixel_glow_std_pow(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, float glow_gamma, vec2 coords, vec4 SourceSize1) {
+vec4 pixel_glow_std_pow(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, float glow_gamma, vec2 coords, vec4 SourceSize1, vec4 SourceSize2) {
 
     // Calculating texel coordinates
     vec2 tex = coords.xy * 1.00001;
 
-    vec2 OGL2Pos = tex * params.SourceSize.xy - vec2(0.5,0.5); // vec2 OGL2Pos = tex * params.SourceSize.xy - vec2(0.5,0.5); // vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5);  
+    vec2 OGL2Pos = tex * SourceSize2.xy - vec2(0.5,0.5); // vec2 OGL2Pos = tex * SourceSize2.xy - vec2(0.5,0.5); // vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5);  
     vec2 fp = fract(OGL2Pos);
     vec2 dx = vec2(SourceSize1.z,0.0) ; // vec2 dx = vec2(params.passthrough_and_cc_passSize.z,0.0) ; // 
     vec2 dy = vec2(0.0,SourceSize1.w) ; // vec2 dy = vec2(0.0,params.passthrough_and_cc_passSize.w);  //
-    vec2 pC4 = (floor(OGL2Pos) + vec2(0.5)) * params.SourceSize.zw;
+    vec2 pC4 = (floor(OGL2Pos) + vec2(0.5)) * SourceSize2.zw;
 
     vec2 x2 = 2.0*dx; vec2 x3 = 3.0*dx;
     vec2 y2 = 2.0*dy;
@@ -950,7 +950,7 @@ vec4 dumb_glow(sampler2D in_texture, float my_glow, float glow_gamma, vec2 coord
     return vec4(pixel_in,0.0);
 }
 
-vec4 pixel_glow(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, float glow_gamma, vec2 coords, vec4 SourceSize1) {
+vec4 pixel_glow(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, float glow_gamma, vec2 coords, vec4 SourceSize1, vec4 SourceSize2) {
 
     if ( (my_glowpix >= GLOW_SHARP_MAX) && (my_glowpixy >= GLOW_SHARP_MAX) ) {
         return dumb_glow(in_texture, my_glow,glow_gamma,coords);
@@ -959,18 +959,18 @@ vec4 pixel_glow(sampler2D in_texture, float my_glowpix, float my_glowpixy, float
     //if (prefer_std_pow != 1.0)
     //{
         //glow_gamma = floor(glow_gamma);
-        if (glow_gamma == 1) { return pixel_glow_gamma_1(in_texture, my_glowpix,my_glowpixy,my_glow,coords,SourceSize1);   }
-        if (glow_gamma == 2) { return pixel_glow_gamma_2(in_texture, my_glowpix,my_glowpixy,my_glow,coords,SourceSize1);   }
-        if (glow_gamma == 3) { return pixel_glow_gamma_3(in_texture,my_glowpix,my_glowpixy,my_glow,coords,SourceSize1);   }
-        if (glow_gamma == 4) { return pixel_glow_gamma_4(in_texture,my_glowpix,my_glowpixy,my_glow,coords,SourceSize1);   }
-        if (glow_gamma == 5) { return pixel_glow_gamma_5(in_texture,my_glowpix,my_glowpixy,my_glow,coords,SourceSize1);   }
-        if (glow_gamma == 6) { return pixel_glow_gamma_6(in_texture,my_glowpix,my_glowpixy,my_glow,coords,SourceSize1);   }
-        if (glow_gamma == 7) { return pixel_glow_gamma_7(in_texture,my_glowpix,my_glowpixy,my_glow,coords,SourceSize1);   }
-        if (glow_gamma == 8) { return pixel_glow_gamma_8(in_texture,my_glowpix,my_glowpixy,my_glow,coords,SourceSize1);   }
-        if (glow_gamma == 9) { return pixel_glow_gamma_9(in_texture,my_glowpix,my_glowpixy,my_glow,coords,SourceSize1);   }
-        if (glow_gamma == 10) { return pixel_glow_gamma_10(in_texture,my_glowpix,my_glowpixy,my_glow,coords,SourceSize1); }
+        if (glow_gamma == 1) { return pixel_glow_gamma_1(in_texture, my_glowpix,my_glowpixy,my_glow,coords,SourceSize1, SourceSize2);   }
+        if (glow_gamma == 2) { return pixel_glow_gamma_2(in_texture, my_glowpix,my_glowpixy,my_glow,coords,SourceSize1, SourceSize2);   }
+        if (glow_gamma == 3) { return pixel_glow_gamma_3(in_texture,my_glowpix,my_glowpixy,my_glow,coords,SourceSize1, SourceSize2);   }
+        if (glow_gamma == 4) { return pixel_glow_gamma_4(in_texture,my_glowpix,my_glowpixy,my_glow,coords,SourceSize1, SourceSize2);   }
+        if (glow_gamma == 5) { return pixel_glow_gamma_5(in_texture,my_glowpix,my_glowpixy,my_glow,coords,SourceSize1, SourceSize2);   }
+        if (glow_gamma == 6) { return pixel_glow_gamma_6(in_texture,my_glowpix,my_glowpixy,my_glow,coords,SourceSize1, SourceSize2);   }
+        if (glow_gamma == 7) { return pixel_glow_gamma_7(in_texture,my_glowpix,my_glowpixy,my_glow,coords,SourceSize1, SourceSize2);   }
+        if (glow_gamma == 8) { return pixel_glow_gamma_8(in_texture,my_glowpix,my_glowpixy,my_glow,coords,SourceSize1, SourceSize2);   }
+        if (glow_gamma == 9) { return pixel_glow_gamma_9(in_texture,my_glowpix,my_glowpixy,my_glow,coords,SourceSize1, SourceSize2);   }
+        if (glow_gamma == 10) { return pixel_glow_gamma_10(in_texture,my_glowpix,my_glowpixy,my_glow,coords,SourceSize1, SourceSize2); }
     //} else {
-        return pixel_glow_std_pow(in_texture,my_glowpix,my_glowpixy,my_glow,glow_gamma,coords,SourceSize1);
+        return pixel_glow_std_pow(in_texture,my_glowpix,my_glowpixy,my_glow,glow_gamma,coords,SourceSize1, SourceSize2);
     //}
 }
  

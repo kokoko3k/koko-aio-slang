@@ -222,7 +222,7 @@ vec4 main_wrap(void) {
                 pixel_out = min(vec3(1.0),pixel_out);
             }
         } else {
-            pixel_out = blur_v(scanline_flickering_pass, 4.0 , coords, global.scanline_flickering_passSize); //Just do a little vertical blur
+            pixel_out = blur_v(scanline_flickering_pass, 4.0 , coords, global.scanline_flickering_passSize, global.scanline_flickering_passSize); //Just do a little vertical blur
         }
     }     
 

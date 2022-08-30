@@ -8,7 +8,7 @@
     also check if double scaling at beginning is really useful.
     mix vignette and spotlight in another pass or they will be used by ambilight.
 
-Performances on haswell igp, 1080p, 60fps:
+Performances on haswell igp, 1080p, 60fps: (before putting halo and in_glow into lower resolution pass)
     aspect full (16:9)
 
     base: 46%
