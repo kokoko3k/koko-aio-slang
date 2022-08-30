@@ -958,7 +958,7 @@ vec4 pixel_glow(sampler2D in_texture, float my_glowpix, float my_glowpixy, float
 
     //if (prefer_std_pow != 1.0)
     //{
-        glow_gamma = floor(glow_gamma);
+        //glow_gamma = floor(glow_gamma);
         if (glow_gamma == 1) { return pixel_glow_gamma_1(in_texture, my_glowpix,my_glowpixy,my_glow,coords,SourceSize1);   }
         if (glow_gamma == 2) { return pixel_glow_gamma_2(in_texture, my_glowpix,my_glowpixy,my_glow,coords,SourceSize1);   }
         if (glow_gamma == 3) { return pixel_glow_gamma_3(in_texture,my_glowpix,my_glowpixy,my_glow,coords,SourceSize1);   }
