@@ -202,18 +202,21 @@ shaders = 23
             scale13 = 1.0
 
 /* Create the ambilight magic: */
-
-               shader14 = shaders/passthrough_conditional_ambi.slang
+        //...repeat left and right borders
+               shader14 = shaders/ambi_displace.slang
+                alias14 = "ambi_displace_pass"
         filter_linear14 = true
            scale_type14 = source
+               scale_14  = 0.5
+         mipmap_input14 = true
 
         //...then just downscale via mipmapping here:
                shader15 = shaders/passthrough_conditional_ambi.slang
                 alias15 = "ambi_downscale_pass"
         filter_linear15 = true
            scale_type15 = absolute
-              scale_x15 = 16
-              scale_y15 = 12
+              scale_x15 = 32
+              scale_y15 = 24
          mipmap_input15 = true
 
                shader16 = shaders/passthrough.slang //shaders/ambi_pre_pass.slang
