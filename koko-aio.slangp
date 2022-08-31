@@ -261,6 +261,7 @@ shaders = 23
                 alias21 = "ambi_temporal_pass"
         filter_linear21 = true
            scale_type21 = source
+    float_framebuffer21 = true
 
 
 
