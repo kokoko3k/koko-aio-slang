@@ -1,11 +1,12 @@
 /*TODO:
-    Guess more aspect ratios: edit. nope: Guessing is pointless.
+    Guess more aspect ratios: edit. nope: Guessing is impossible..
     Update presets with new switchable functions
     Update pipeline graph
 
     Investigate the possible use of mipmapping in bloom function too.
     mix vignette and spotlight in another pass or they will be used by ambilight.
-    Smoother (less flickering) ambilight; need higher resolution?
+    vignette has wrong aspect.
+    
 
 Performances on haswell igp, 1080p, 60fps: (before putting halo and in_glow into lower resolution pass)
     aspect full (16:9)
@@ -158,7 +159,7 @@ shaders = 23
    it fast, next we do subsequent blURs of the bloomed
    pass.
    */
-               shader7 = shaders/passthrough_conditional_bloom.slang
+               shader7 = shaders/bloom_passthrough_conditional.slang
                 alias7 = "bloom_pass_0"
         filter_linear7 = true
            scale_type7 = absolute
@@ -224,7 +225,7 @@ shaders = 23
          mipmap_input15 = true
 
         //...then just downscale via mipmapping here:
-               shader16 = shaders/passthrough_conditional_ambi.slang
+               shader16 = shaders/ambi_passthrough_conditional.slang
                 alias16 = "ambi_downscale_pass"
         filter_linear16 = true
            scale_type16 = absolute
