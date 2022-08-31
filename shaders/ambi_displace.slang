@@ -40,12 +40,12 @@ vec3 main_wrap(){
    vec3 pixel_out = texture(Original, newcoords).rgb;
 
    //Push sat and brightness:
-   float l = length(pixel_out);
-   float sat = 1.5;
+   /*float l = length(pixel_out);
+   float sat = 2.0;
    float bright = 1.25;
    pixel_out =  normalize( pow(pixel_out.rgb + vec3(eps), vec3(sat)))*l * bright  ;
    pixel_out*=bright;
-  
+  */
    return pixel_out;
 }
 

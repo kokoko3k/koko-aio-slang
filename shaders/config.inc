@@ -1,7 +1,7 @@
 #define GLOW_SHARP_MAX 15 		    //This has to be the same as the max used for in_glow_wh
 #define MIN_LINES_INTERLACED 300	//Consider content interlaced if lines are more than this
-#define noisepower 0.015            //Sort of dithering
-#define scene_change_threshold 0.25  // 0.0-1.0: sensitivity to scene change (ambilike stuff)
+#define noisepower -0.05            //Sort of dithering
+#define scene_change_threshold 0.1  // 0.0-1.0: sensitivity to scene change (ambilike stuff)
 
 layout(push_constant) uniform Push
 {
@@ -75,7 +75,6 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float s_bypass;
 
 	float DO_VIGNETTE;
-	float v_noisepower;
 	float v_size;
 	float v_power;
 	float v_bypass;
@@ -325,7 +324,6 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 #define DO_VIGNETTE  global.DO_VIGNETTE
 #define v_bypass     global.v_bypass
-#define v_noisepower global.v_noisepower
 #define v_size       global.v_size
 #define v_power      global.v_power
 

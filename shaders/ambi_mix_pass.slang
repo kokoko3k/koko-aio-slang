@@ -1,6 +1,5 @@
 #version 450
 #include "config.inc"
-#define noisepower 0.015
 
 #define eps 1e-8
 
@@ -38,7 +37,7 @@ vec4 pixel_border() {
     vec3 ambi = texture(ambi_temporal_pass, vOutputCoord).rgb;
     float l = length(ambi);
     float sat = 1.25;
-    float bright = 1.0;
+    float bright = 1.25;
     ambi =  normalize( pow(ambi.rgb + vec3(eps), vec3(sat)))*l * bright  ;
     ambi*=bright;
     return vec4(ambi,0.0);
