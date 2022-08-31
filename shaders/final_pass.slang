@@ -88,10 +88,7 @@ vec4 main_wrap() {
     }
 
     //Deband
-    if (DO_NOISE) {
-        float noise = random() * noisepower;
-        pixel_out = pixel_out + noise;
-    }
+    if (DO_NOISE) pixel_out = pixel_out + random();
         
     //Out
     return vec4(pixel_out,pixel_in.a);

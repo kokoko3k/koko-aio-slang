@@ -41,26 +41,6 @@ layout(set = 0, binding = 5) uniform sampler2D in_glow_pass;
 
 
 
-
-
-/*
-// www.stackoverflow.com/questions/5149544/can-i-generate-a-random-number-inside-a-pixel-shader/
-#define noisepower 0.1
-float random(vec2 seed)
-{
-	vec2 i = vec2(23.140692, 2.6651442);
-	return fract(cos(dot(seed, i)) * 123456.0f);
-}
-
-vec2 randseed = vTexCoord * params.FrameCount;
-float noise = random(randseed) * noisepower;
-pixel_out*=noise;
-*/
-
-
-
-
-
 // What follows is an ugly optimization with a lot of code copied and pasted repeated multiple times,
 // shamlessly hidden into an include:
 #include "pixel_glows.slang"    

@@ -1,6 +1,6 @@
 #define GLOW_SHARP_MAX 15 		    //This has to be the same as the max used for in_glow_wh
 #define MIN_LINES_INTERLACED 300	//Consider content interlaced if lines are more than this
-#define noisepower -0.05            //Sort of dithering
+#define noisepower 0.010            //Sort of dithering
 #define scene_change_threshold 0.1  // 0.0-1.0: sensitivity to scene change (ambilike stuff)
 
 layout(push_constant) uniform Push

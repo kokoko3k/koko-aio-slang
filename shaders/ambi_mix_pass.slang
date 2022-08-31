@@ -37,8 +37,7 @@ vec4 pixel_border() {
 }
 
 vec3 ambi_noised() {
-    float noise = random() * noisepower;
-    return pixel_border().rgb + vec3(noise);
+    return pixel_border().rgb + random();
 }
 
 
