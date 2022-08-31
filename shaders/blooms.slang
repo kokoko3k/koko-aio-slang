@@ -2,7 +2,7 @@
 #define Pi  (3.14159265358979*2)
 #define bloom_directions 8
 
-#define b_offset_x -0.06
+#define b_offset_x -0.05 //Why is this needed by bloom?
 
 vec3 radial_bloom_std_pow(float Quality, float Directions, float Size, float fbloom_gamma) {
     vec4 iResolution = SourceTextureSize;

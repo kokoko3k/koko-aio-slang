@@ -195,6 +195,8 @@ bool scanline_have_to_flicker(bool is_interlaced) {
 vec4 main_wrap(void) {
     //Curvature
     vec2 coords = vTexCoord ;
+    float l_GEOM_BORDER_WX = GEOM_BORDER_WX;
+    float l_GEOM_BORDER_WY = GEOM_BORDER_WY;
     float fborder = 1.0;
     
     if (DO_CURVATURE == 1.0) {
@@ -202,9 +204,11 @@ vec4 main_wrap(void) {
             coords = Warp(coords,GEOM_WARP_X,GEOM_WARP_Y);
 
         vec2 border_coords = coords;
+        if (GEOM_BORDER_WX < 0.0) l_GEOM_BORDER_WX = GEOM_WARP_X;
+        if (GEOM_BORDER_WY < 0.0) l_GEOM_BORDER_WY = GEOM_WARP_Y;
         
         if ((GEOM_BORDER_WX > 0.0) || (GEOM_BORDER_WY > 0.0))
-            border_coords = Warp(vTexCoord,GEOM_BORDER_WX,GEOM_BORDER_WY);
+            border_coords = Warp(vTexCoord,l_GEOM_BORDER_WX,l_GEOM_BORDER_WY);
             
         fborder = border(border_coords);
     }

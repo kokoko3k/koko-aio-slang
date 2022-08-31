@@ -23,7 +23,7 @@ layout(set = 0, binding = 3) uniform sampler2D PreviousSampler;
 layout(set = 0, binding = 4) uniform sampler2D ambi_avglum_pass;
 layout(set = 0, binding = 5) uniform sampler2D ambi_avglum_passFeedback;
 
-#define max_steps 60.0
+#define max_steps ambi_steps
 #define min_steps 1.0
 #define min_step_size 0.004 //roughly 1/255
 
