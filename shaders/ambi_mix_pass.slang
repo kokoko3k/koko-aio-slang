@@ -24,14 +24,7 @@ layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D final_pass;
 layout(set = 0, binding = 4) uniform sampler2D ambi_temporal_pass;
 
-
-float random() {
-    // www.stackoverflow.com/questions/5149544/can-i-generate-a-random-number-inside-a-pixel-shader/
-    vec2 seed = vTexCoord * params.FrameCount;
-    vec2 i = vec2(23.140692, 2.6651442);
-    return fract(cos(dot(seed, i)) * 123456.0f);
-}
-
+#include "functions.include"
 
 vec4 pixel_border() {
     vec3 ambi = texture(ambi_temporal_pass, vOutputCoord).rgb;
@@ -48,7 +41,7 @@ vec3 ambi_noised() {
     return pixel_border().rgb + vec3(noise);
 }
 
-#include "functions.include"
+
 void main() {
     vec4 psample = texture(final_pass, vOutputCoord);
     if (DO_AMBILIGHT == 1) {

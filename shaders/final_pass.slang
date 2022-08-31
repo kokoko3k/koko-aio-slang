@@ -15,7 +15,7 @@ void main() {
     vOutputCoord = TexCoord;
 }
 
-
+// 
 #pragma stage fragment
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in vec2 vOutputCoord;
@@ -36,13 +36,6 @@ vec3 pixel_alternate(vec3 source, float whiteness) {
         if  (int(mod(line,2.0  )) == 0) pixel_out=mix(source,vec3(0), whiteness) ;
     }
     return pixel_out;
-}
-
-float random() {
-    // www.stackoverflow.com/questions/5149544/can-i-generate-a-random-number-inside-a-pixel-shader/
-    vec2 seed = vTexCoord * params.FrameCount;
-    vec2 i = vec2(23.140692, 2.6651442);
-    return fract(cos(dot(seed, i)) * 123456.0f);
 }
 
 vec4 main_wrap() {
