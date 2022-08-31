@@ -11,7 +11,22 @@ void main()
 {
    gl_Position = global.MVP * Position;
    vTexCoord = TexCoord;
+   float aspect_prev = (params.SourceSize.y / params.SourceSize.x);
+   if (border_needed() ) {
+      vTexCoord.x = vTexCoord.x * aspect_prev - ((0.5 * aspect_prev) - 0.5);
+      float in_aspect = get_in_aspect();
+      vTexCoord.x = vTexCoord.x * in_aspect - ((0.5 * in_aspect) - 0.5);
+   } else {
+      vTexCoord.x = vTexCoord.x * aspect_prev - ((0.5 * aspect_prev) - 0.5);
+      float dasp = global.FinalViewportSize.x/global.FinalViewportSize.y;
+      vTexCoord.x = (vTexCoord.x* dasp - ((0.5 * dasp) - 0.5)) ;
+   }
 }
+
+
+
+
+
 
 #pragma stage fragment
 layout(location = 0) in vec2 vTexCoord;

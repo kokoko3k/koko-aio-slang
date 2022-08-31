@@ -5,7 +5,6 @@
 
     Investigate the possible use of mipmapping in bloom function too.
     mix vignette and spotlight in another pass or they will be used by ambilight.
-    vignette has wrong aspect.
     
 
 Performances on haswell igp, 1080p, 60fps: (before putting halo and in_glow into lower resolution pass)
@@ -83,7 +82,7 @@ Performances on haswell igp, 1080p, 60fps: (before putting halo and in_glow into
 
 */
 
-shaders = 6
+shaders = 23
 /*For P-uae defaults, doubling just y0 seems the best option.
   90% of games are lowres in vertical size and p-uae defaults
   to 720 pixels width, which is enough for this preset to work as intended.
@@ -192,19 +191,16 @@ shaders = 6
 
 // Draw vignette and spot on lower resolution
            shader12 = shaders/vignette.slang
-       scale_type12 = absolute
+       scale_type12 = viewport
             alias12 = vignette_pass
     filter_linear12 = true
-          scale_x12 = 256
-          scale_y12 = 256
+          scale_12  = 0.25
 
            shader13 = shaders/spot.slang
-       scale_type13 = absolute
+       scale_type13 = viewport
     filter_linear13 = true
             alias13 = spot_pass
-          scale_x13 = 256
-          scale_y13 = 256
-
+           scale_13 = 0.25
 
 /* This pass pass will do the composition of the previous passes
    with the bloomed image, vignette and spot light,  and black frame insertions.
@@ -257,10 +253,6 @@ shaders = 6
          mipmap_input20 = true
            scale_type20 = source
                 scale20 = 2.0
-
-
-
-
 
                shader21 = shaders/ambi_temporal_pass.slang
                 alias21 = "ambi_temporal_pass"

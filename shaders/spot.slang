@@ -10,10 +10,16 @@ layout(location = 0) out vec2 vTexCoord;
 void main()
 {
    gl_Position = global.MVP * Position;
+   vTexCoord = TexCoord;
    if (DO_SPOT == 1.0) {
-      float dasp = global.FinalViewportSize.x/global.FinalViewportSize.y;
-      vTexCoord.x = TexCoord.x* dasp - ((0.5 * dasp) - 0.5);
-      vTexCoord.y = TexCoord.y;
+      if (border_needed()) {
+         //vTexCoord = TexCoord;
+         float in_aspect = get_in_aspect();
+         float spot_offset = 0.5 - s_center_x  ; //;* in_aspect * 0.5;
+         float dasp = global.FinalViewportSize.y/global.FinalViewportSize.x;
+         vTexCoord.x = TexCoord.x* dasp - ((spot_offset * dasp) - spot_offset);
+         vTexCoord.x = vTexCoord.x* in_aspect - ((spot_offset * in_aspect) - spot_offset);
+      }
    }
 }
 
