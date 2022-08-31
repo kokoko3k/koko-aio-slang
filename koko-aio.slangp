@@ -122,13 +122,15 @@ shaders = 23
     filter_linear3 = true
             scale3 = 0.5
        scale_type3 = viewport    
+float_framebuffer3 = true
             
     //Put halo in its own pass so that we can use lower resolution
            shader4 = shaders/halo.slang
             alias4 = "halo_pass"
     filter_linear4 = true
             scale4 = 0.5
-       scale_type4 = viewport    
+       scale_type4 = viewport
+float_framebuffer4 = true
 
 
 /* In this pass we emulate scanlines, glowing,
