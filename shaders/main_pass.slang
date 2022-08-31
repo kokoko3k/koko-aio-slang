@@ -195,42 +195,43 @@ vec4 main_wrap(void) {
     
     vec3 pixel_in = texture(scanline_flickering_pass,coords).rgb ;
     vec3 pixel_out = pixel_in;
+    
 
+    /* Input signal is blurred and glows.
+       glow power versus blur power is defined by IN_GLOW_ADD.
+       this allows the rgb vmask to light up on the black scanline.
+     */
+    vec3 pixel_glowed;
+    if (DO_IN_GLOW == 1) {
+        //vec3 pixel_glowed = pixel_glow(scanline_flickering_pass, in_glow_wh,in_glow_wh,in_glow_power,in_glow_gamma,coords, global.scanline_flickering_passSize).rgb;
+        pixel_glowed = texture(in_glow_pass,vOutputCoord).rgb;
+        //glowed = min(glowed,1.0); //Input signal glow dont have "to white" the phosphors. //FIXME: In dubt to turn it on; previous glsl version did not have this.
+
+        if (IN_GLOW_ADD>0.0) pixel_glowed = mix(pixel_glowed,pixel_out+pixel_glowed,IN_GLOW_ADD);
+        pixel_out = pixel_glowed;
+    }
+    
     // Non flickering scanlines
     if ( DO_SCANLINES == 1.0 )  {
         bool is_interlaced = (params.OriginalSize.y > MIN_LINES_INTERLACED) ? true : false ;
         if  ( !(scanline_have_to_flicker(is_interlaced)) ) {  //flickering scanlines are handled in previous pass
             if  (! ( is_interlaced  && (scanline_disable_on_interlace == 1.0))  ) {
                 vec3 pixel_scanlined = pixel_scanline_static(pixel_out,coords);
-                pixel_out = pixel_scanlined.rgb;
+                pixel_scanlined = min(vec3(1.0),pixel_scanlined);
+                
+                //Mix scanline and glow pixel; depending on whiteness.
+                if (DO_IN_GLOW == 1) {
+                    float in_luminance = (pixel_glowed.r+pixel_glowed.g+pixel_glowed.b)/3;
+                    pixel_out = mix(pixel_scanlined,pixel_glowed,in_luminance) ;
+                    } else {
+                    pixel_out = pixel_scanlined;
+                }
                 pixel_out = min(vec3(1.0),pixel_out);
             }
         } else {
             pixel_out = blur_v(scanline_flickering_pass, 4.0 , coords, global.scanline_flickering_passSize, global.scanline_flickering_passSize); //Just do a little vertical blur
         }
     }     
-
-    /* Input signal is blurred and glows.
-       glow power versus blur power is defined by IN_GLOW_ADD.
-       this allows the rgb vmask to light up on the black scanline.
-     */
-    if (DO_IN_GLOW == 1) {
-        //vec3 pixel_glowed = pixel_glow(scanline_flickering_pass, in_glow_wh,in_glow_wh,in_glow_power,in_glow_gamma,coords, global.scanline_flickering_passSize).rgb;
-        vec3 pixel_glowed = texture(in_glow_pass,vOutputCoord).rgb;
-        //glowed = min(glowed,1.0); //Input signal glow dont have "to white" the phosphors. //FIXME: In dubt to turn it on; previous glsl version did not have this.
-
-        if (IN_GLOW_ADD>0.0) pixel_glowed = mix(pixel_glowed,pixel_out+pixel_glowed,IN_GLOW_ADD);
-
-        //Mix scanline and glow pixel; depending on whiteness.
-        if (DO_SCANLINES == 1) {
-            float in_luminance = (pixel_glowed.r+pixel_glowed.g+pixel_glowed.b)/3;
-            pixel_out = mix(pixel_out,pixel_glowed,in_luminance) ;
-            } else {
-            pixel_out = pixel_glowed;
-        }
-        pixel_out = min(vec3(1.0),pixel_out);
-    }
-
 
     //Vertical RGB Mask
     if (DO_RGB_MASK == 1.0 ) {

@@ -5,7 +5,7 @@
 
     Investigate the possible use of mipmapping in bloom function too.
     mix vignette and spotlight in another pass or they will be used by ambilight.
-    
+    Why input glowing is not effective when using scanlines?
 
 Performances on haswell igp, 1080p, 60fps: (before putting halo and in_glow into lower resolution pass)
     aspect full (16:9)
