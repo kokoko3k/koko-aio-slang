@@ -55,8 +55,7 @@ void main() {
     }
 
 
-//FragColor = vec4(ambi_noised(), 1.0);
-    
+    //FragColor = vec4(ambi_noised(), 1.0);
     
 }
-//82..85-73..76
+

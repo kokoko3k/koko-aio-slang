@@ -144,29 +144,26 @@ vec3 pixel_scanline_static(vec3 color, vec2 coords) {
     int period = (params.OriginalSize.y > MIN_LINES_INTERLACED ) ? 2 : 1 ;
     float angle = coords.y * omega * period * params.OriginalSize.y ;
     float lines = abs(sin(angle));
-
-    /* //Modulate the blackness via the input color so that scanlines disappear on bright ones?
-        float in_luminance = (color.r+color.g+color.b) /4.5; // <<-- FIXME: may need to tune this 
-        float in_luminance = max(max(color.r,color.g),color.b)/1;
-        float in_luminance = (color.r + color.g + color.b)/3;
-        float in_luminance = 0.0;
-        lines_black = max(lines_black,in_luminance);
-    */
-    lines = lines * (ps_lines_white - lines_black) + lines_black;
+  
     lines = (lines*lines);
-    //lines = (lines*lines);
-    //lines = (lines*lines); 
+  
+    if (SCANLINE_DARK >= 0.0) {
+        lines = lines * (ps_lines_white - SCANLINE_DARK) + SCANLINE_DARK;
+    } else {        
+        //float deepness = -SCANLINE_DARK;
+        //lines = lines * ((1+deepness) ) - deepness ;
+        float deepness = -SCANLINE_DARK;
+        lines = lines * ((1-SCANLINE_DARK) ) + SCANLINE_DARK ;
+    }
+
     color *= min(lines,1.0); // <-- not clamping here may produce scanline dephasing.
+    
     return color;
 }
 
 bool scanline_have_to_flicker(bool is_interlaced) {
     return ((scanline_flickering == 1.0) || ((scanline_flickering==2.0) && is_interlaced ));
 }
-
-
-
-
 
 
 
@@ -213,24 +210,25 @@ vec4 main_wrap(void) {
     
     // Non flickering scanlines
     if ( DO_SCANLINES == 1.0 )  {
+        vec3 pixel_scanlined;
         bool is_interlaced = (params.OriginalSize.y > MIN_LINES_INTERLACED) ? true : false ;
         if  ( !(scanline_have_to_flicker(is_interlaced)) ) {  //flickering scanlines are handled in previous pass
             if  (! ( is_interlaced  && (scanline_disable_on_interlace == 1.0))  ) {
-                vec3 pixel_scanlined = pixel_scanline_static(pixel_out,coords);
+                pixel_scanlined = pixel_scanline_static(pixel_out,coords);
                 pixel_scanlined = min(vec3(1.0),pixel_scanlined);
-                
-                //Mix scanline and glow pixel; depending on whiteness.
-                if (DO_IN_GLOW == 1) {
-                    float in_luminance = (pixel_glowed.r+pixel_glowed.g+pixel_glowed.b)/3;
-                    //float in_luminance = max(max(pixel_glowed.r,pixel_glowed.g),pixel_glowed.b);
-                    pixel_out = mix(pixel_scanlined,pixel_glowed,in_luminance) ;
-                    } else {
-                    pixel_out = pixel_scanlined;
-                }
                 pixel_out = min(vec3(1.0),pixel_out);
             }
         } else {
-            pixel_out = blur_v(scanline_flickering_pass, 4.0 , coords, global.scanline_flickering_passSize, global.scanline_flickering_passSize); //Just do a little vertical blur
+            pixel_scanlined = blur_v(scanline_flickering_pass, 4.0 , coords, global.scanline_flickering_passSize, global.scanline_flickering_passSize); //Just do a little vertical blur
+        }
+        pixel_out = pixel_scanlined;
+        //Mix scanline and glow pixel; depending on whiteness.
+        if (DO_IN_GLOW == 1) {
+            float in_luminance = (pixel_glowed.r+pixel_glowed.g+pixel_glowed.b)/3;
+            //float in_luminance = max(max(pixel_glowed.r,pixel_glowed.g),pixel_glowed.b);
+            pixel_out = mix(pixel_scanlined,pixel_glowed,in_luminance) ;
+            } else {
+            pixel_out = pixel_scanlined;
         }
     }     
 

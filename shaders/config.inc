@@ -108,8 +108,8 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // Blank even source lines, the value from 0.0 to 1.0 expresses the darkness of the blanked lines
 // 1.0 means no blank at all.
 
-#pragma parameter DO_SCANLINES	"Scanlines:"									1.0 	0.0 1.0 1.0
-#pragma parameter SCANLINE_DARK "        Scanlines gap brightness"			  			0.0 	0.0 1.0 0.05
+#pragma parameter DO_SCANLINES	"Scanlines:"									1.0 	0.0  1.0 1.0
+#pragma parameter SCANLINE_DARK "        Scanlines gap brightness"			  			0.0 	-1.0 1.0 0.05
 
 // Alternate the drawing of the scanlines between frames. this will produce a flickering typical of
 // interlaced screens; 0 disable the effect, 1 always enables it, 2 enables it only when
@@ -237,13 +237,13 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 //Ambilight effect
 #pragma parameter DO_AMBILIGHT	 "Ambient led lights (needs Retroarch aspect ratio set to full!)"	1.0  0.0  1.0     1.0
-#pragma parameter ambi_steps	 "Slowness"								60.0 1.0  1000.0  5.0
+#pragma parameter ambi_steps	 "        Slowness"							60.0 1.0  1000.0  5.0
 #pragma parameter label_aspect_presets "Aspect ratio presets list:" 0.0 0.0 0.0 1.0
-#pragma parameter label_aspect_preset1 "    -1 = NTSC" 0.0 0.0 0.0 1.0
-#pragma parameter label_aspect_preset2 "    -2 = PAL" 0.0 0.0 0.0 1.0
-#pragma parameter label_aspect_preset3 "    -3 = Snes 8/7" 0.0 0.0 0.0 1.0
-#pragma parameter label_aspect_preset4 "    -4 = Megadrive 10/7" 0.0 0.0 0.0 1.0
-#pragma parameter label_aspect_preset5 "    -5 = Uncorrected" 0.0 0.0 0.0 1.0
+#pragma parameter label_aspect_preset1 "    (-1 = NTSC)" 0.0 0.0 0.0 1.0
+#pragma parameter label_aspect_preset2 "    (-2 = PAL)" 0.0 0.0 0.0 1.0
+#pragma parameter label_aspect_preset3 "    (-3 = Snes 8/7)" 0.0 0.0 0.0 1.0
+#pragma parameter label_aspect_preset4 "    (-4 = Megadrive) 10/7" 0.0 0.0 0.0 1.0
+#pragma parameter label_aspect_preset5 "    (-5 = Uncorrected)" 0.0 0.0 0.0 1.0
 #pragma parameter aspect_x "    Aspect Ratio Numerator (0 for mame, -x for presets above)"   0.0  -5.0 256. 1.0
 #pragma parameter aspect_y "    Aspect Ratio Denominator"	  				3.0   0.0 256. 1.0
 
