@@ -33,7 +33,9 @@ void main() {
    if (DO_SPOT == 1.0) {
       float gaussxy = gauss_xy(s_center_x, s_center_y, s_size, s_power, 0.0, 10.0);
       FragColor = vec4(gaussxy,gaussxy,gaussxy,1.0);
-   }
+   } else {
+        return;
+    }
 }
 
 

@@ -38,7 +38,9 @@ void main() {
    if (DO_VIGNETTE == 1.0) {
       float gaussxy = gauss_xy(0.0, 0.0, v_size, v_power, 0.0, 1.0);
       FragColor = vec4(gaussxy,gaussxy,gaussxy,1.0);
-   }
+   } else {
+        return;
+    }
 }
  
   

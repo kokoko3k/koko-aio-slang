@@ -108,21 +108,21 @@ shaders = 23
        scale_type1 = source
             scale1 = 1.0
 
+    //Put in_glow in its own pass so that we can use lower resolution
+           shader2 = shaders/in_glow.slang
+            alias2 = "in_glow_pass"
+    filter_linear2 = true
+            scale2 = 1
+       scale_type2 = source    
+float_framebuffer2 = true
+            
     //this as a "pass" is somehow important for the main pass to work good.
     //also, there it will do flickering scanlines.
-           shader2 = shaders/scanline-flickering.slang
-            alias2 = "scanline_flickering_pass"
-       scale_type2 = source
-    filter_linear2 = true
-            scale2 = 1.0
-
-    //Put in_glow in its own pass so that we can use lower resolution
-           shader3 = shaders/in_glow.slang
-            alias3 = "in_glow_pass"
+           shader3 = shaders/scanline-flickering.slang
+            alias3 = "scanline_flickering_pass"
+       scale_type3 = source
     filter_linear3 = true
-            scale3 = 0.5
-       scale_type3 = viewport    
-float_framebuffer3 = true
+            scale3 = 1.0
             
     //Put halo in its own pass so that we can use lower resolution
            shader4 = shaders/halo.slang

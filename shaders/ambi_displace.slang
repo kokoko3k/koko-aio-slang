@@ -49,49 +49,23 @@ vec3 main_wrap(){
    return pixel_out;
 }
 
-
-
-
-
-
 void main() {
    if (DO_AMBILIGHT == 1.0) {
+      bool is_border = false;
+      if (border_needed()) {
+         bool b_is_rotated = is_rotated();
+         bool is_outside_x = ((vTexCoord.x > 1.0 ) || (vTexCoord.x < 0.0 ) );
+         bool is_outside_y = ((vTexCoord.y > 1.0 ) || (vTexCoord.y < 0.0 ) );
+         is_border = (b_is_rotated && is_outside_y) || (!b_is_rotated && is_outside_x);
+      }
 
-   bool is_border = false;
-   if (border_needed()) {
-      bool b_is_rotated = is_rotated();
-      bool is_outside_x = ((vTexCoord.x > 1.0 ) || (vTexCoord.x < 0.0 ) );
-      bool is_outside_y = ((vTexCoord.y > 1.0 ) || (vTexCoord.y < 0.0 ) );
-      is_border = (b_is_rotated && is_outside_y) || (!b_is_rotated && is_outside_x);
-   }
-
-   if (is_border)
-      FragColor = vec4(0.0);
-   else
-      FragColor = vec4(main_wrap(),1.0);
-   
-   
-     
-   } else {
-      FragColor = vec4(0.0,0.0,0.0,1.0);
-   }
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
+      if (is_border)
+          FragColor = vec4(0.0);
+            else
+          FragColor = vec4(main_wrap(),1.0);
+      } else {
+         return;
+      }
 }
 
 

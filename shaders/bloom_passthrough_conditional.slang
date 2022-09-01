@@ -26,8 +26,8 @@ void main() {
          //if ((GEOM_BORDER_WX > 0.0) && (GEOM_BORDER_WY > 0.0)) coords = Warp(vTexCoord,GEOM_BORDER_WX,GEOM_BORDER_WY);
       }
       FragColor = texture(Original, coords);
-         } else {
-      FragColor = vec4(0.0,0.0,0.0,1.0);
+   } else {
+      return;
    }
 }
  

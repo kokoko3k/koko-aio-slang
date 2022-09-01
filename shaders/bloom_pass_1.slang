@@ -31,6 +31,6 @@ void main() {
         vec3 bloomed = bloom(bloom_directions,bloom_quality,bloom_size,bloom_gamma) * bloom_power;
         FragColor = vec4(pow(bloomed,vec3(bloom_gamma_out)),1.0);
     } else {
-        FragColor = texture( SourceTexture, vTexCoord);
+        return ;
     }
 }

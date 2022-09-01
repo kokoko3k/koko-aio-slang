@@ -265,12 +265,9 @@ layout(set = 0, binding = 2) uniform sampler2D Source;
 
 void main()
 {
-
-    if ( DO_FXAA > 0.0 ) {
+    if ( DO_FXAA == 1.0 ) {
         FragColor = vec4(FxaaPixelShader(vTexCoord, Source, vec2(params.SourceSize.z, params.SourceSize.w)), 1.0) * 1.0;
     } else {
-        FragColor = texture(Source, vTexCoord);
+        return;
     }
-
-     
 }

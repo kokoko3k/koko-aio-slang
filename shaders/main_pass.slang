@@ -34,10 +34,14 @@ void main() {
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in vec2 vOutputCoord;
 layout(location = 0) out vec4 FragColor;
-layout(set = 0, binding = 2) uniform sampler2D scanline_flickering_pass;
-layout(set = 0, binding = 3) uniform sampler2D Original;
-layout(set = 0, binding = 4) uniform sampler2D halo_pass;
-layout(set = 0, binding = 5) uniform sampler2D in_glow_pass;
+layout(set = 0, binding = 2) uniform sampler2D Original;
+layout(set = 0, binding = 3) uniform sampler2D FXAA_pass;
+layout(set = 0, binding = 4) uniform sampler2D in_glow_pass;
+layout(set = 0, binding = 5) uniform sampler2D scanline_flickering_pass;
+layout(set = 0, binding = 6) uniform sampler2D halo_pass;
+
+
+
 
 
 
@@ -189,19 +193,24 @@ vec4 main_wrap(void) {
             
         fborder = border(border_coords);
     }
-    
-    vec3 pixel_in = texture(scanline_flickering_pass,coords).rgb ;
+    vec3 pixel_in;
+    if (DO_FXAA == 1.0)
+        pixel_in = texture(FXAA_pass,coords).rgb ;
+            else
+        pixel_in = texture(Original,coords).rgb ;
+        
     vec3 pixel_out = pixel_in;
+    vec3 pixel_glowed;
+    vec3 pixel_scanlined;
     
-
     /* Input signal is blurred and glows.
        glow power versus blur power is defined by IN_GLOW_ADD.
        this allows the rgb vmask to light up on the black scanline.
      */
-    vec3 pixel_glowed;
+
     if (DO_IN_GLOW == 1) {
         //vec3 pixel_glowed = pixel_glow(scanline_flickering_pass, in_glow_wh,in_glow_wh,in_glow_power,in_glow_gamma,coords, global.scanline_flickering_passSize).rgb;
-        pixel_glowed = texture(in_glow_pass,vOutputCoord).rgb;
+        pixel_glowed = texture(in_glow_pass,vTexCoord).rgb;
         //glowed = min(glowed,1.0); //Input signal glow dont have "to white" the phosphors. //FIXME: In dubt to turn it on; previous glsl version did not have this.
 
         if (IN_GLOW_ADD>0.0) pixel_glowed = mix(pixel_glowed,pixel_out+pixel_glowed,IN_GLOW_ADD);
@@ -210,7 +219,6 @@ vec4 main_wrap(void) {
     
     // Non flickering scanlines
     if ( DO_SCANLINES == 1.0 )  {
-        vec3 pixel_scanlined;
         bool is_interlaced = (params.OriginalSize.y > MIN_LINES_INTERLACED) ? true : false ;
         if  ( !(scanline_have_to_flicker(is_interlaced)) ) {  //flickering scanlines are handled in previous pass
             if  (! ( is_interlaced  && (scanline_disable_on_interlace == 1.0))  ) {
@@ -219,7 +227,8 @@ vec4 main_wrap(void) {
                 pixel_out = min(vec3(1.0),pixel_out);
             }
         } else {
-            pixel_scanlined = blur_v(scanline_flickering_pass, 4.0 , coords, global.scanline_flickering_passSize, global.scanline_flickering_passSize); //Just do a little vertical blur
+            //pixel_scanlined = blur_v(scanline_flickering_pass, 4.0 , coords, global.scanline_flickering_passSize, global.scanline_flickering_passSize); //Just do a little vertical blur
+            pixel_scanlined = texture(scanline_flickering_pass,coords).rgb ;
         }
         pixel_out = pixel_scanlined;
         //Mix scanline and glow pixel; depending on whiteness.
@@ -229,9 +238,9 @@ vec4 main_wrap(void) {
             pixel_out = mix(pixel_scanlined,pixel_glowed,in_luminance) ;
             } else {
             pixel_out = pixel_scanlined;
-        }
+        }   
     }     
-
+    
     //Vertical RGB Mask
     if (DO_RGB_MASK == 1.0 ) {
         vec3 m1f = m1 + 1.0 - RGB_MASK_STRENGTH ;
@@ -276,8 +285,6 @@ vec4 main_wrap(void) {
     //Out
     return vec4(pixel_out,1.0) * fborder;
 }
-
-
 
 void main() {
     bool is_border = false;

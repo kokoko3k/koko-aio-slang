@@ -22,6 +22,6 @@ void main() {
         //Always sample the middle of the screen at a very low resolution via mipmap
         FragColor = textureLod(Source, vec2(0.5,0.5),10);
     } else {
-        FragColor = vec4(1.0);
+        return;
     }
 }
