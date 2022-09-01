@@ -34,7 +34,7 @@ void main() {
 
     if (DO_AMBILIGHT == 1.0) {
         //                            directions,quality, size,gamma
-        FragColor = vec4 (bloom(      8,         8,       32,   1.0), 0.0);
+        FragColor = vec4 (bloom(      16,         4,       32,   1.0), 0.0);
             } else {
         return;
     }

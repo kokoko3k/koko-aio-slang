@@ -35,6 +35,12 @@ Performances on haswell igp, 1080p, 60fps: (before putting halo and in_glow into
     curvature 2%
 
 
+    base: 58
+    FXAA: 60
+    input glow gamma 3: 65
+    ambient light: 71
+    
+    
 */
 
 /*
@@ -82,7 +88,7 @@ Performances on haswell igp, 1080p, 60fps: (before putting halo and in_glow into
 
 */
 
-shaders = 23
+shaders = 21
 /*For P-uae defaults, doubling just y0 seems the best option.
   90% of games are lowres in vertical size and p-uae defaults
   to 720 pixels width, which is enough for this preset to work as intended.
@@ -231,36 +237,22 @@ float_framebuffer4 = true
               scale_y16 = 24
          mipmap_input16 = true
 
-               shader17 = shaders/passthrough.slang //shaders/ambi_pre_pass.slang
+               shader17 = shaders/ambi_passthrough_conditional.slang //shaders/ambi_pre_pass.slang
         filter_linear17 = true
-         mipmap_input17 = true
            scale_type17 = source
-                scale17 = 2.0
-                
-               shader18 = shaders/passthrough.slang //shaders/ambi_pre_pass.slang
+                scale17 = 8.0
+
+               shader18 = shaders/ambi_pre_pass.slang
+                alias18 = "ambi_pre_pass1"
         filter_linear18 = true
-         mipmap_input18 = true
            scale_type18 = source
-                scale18 = 2.0
-                
-               shader19 = shaders/passthrough.slang //shaders/ambi_pre_pass.slang
+                scale18 = 1.0
+
+               shader19 = shaders/ambi_temporal_pass.slang
+                alias19 = "ambi_temporal_pass"
         filter_linear19 = true
-         mipmap_input19 = true
            scale_type19 = source
-                scale19 = 2.0
-
-               shader20 = shaders/ambi_pre_pass.slang
-                alias20 = "ambi_pre_pass1"
-        filter_linear20 = true
-         mipmap_input20 = true
-           scale_type20 = source
-                scale20 = 2.0
-
-               shader21 = shaders/ambi_temporal_pass.slang
-                alias21 = "ambi_temporal_pass"
-        filter_linear21 = true
-           scale_type21 = source
-    float_framebuffer21 = true
+    float_framebuffer19 = true
 
 
 
@@ -270,9 +262,9 @@ float_framebuffer4 = true
     //scale18 = 1.0
     //filter_linear18 = true
 
-           shader22 = shaders/ambi_mix_pass.slang
-            alias22 = "ambientmix_pass"
-       scale_type22 = viewport
-            scale22 = 1.0
-    filter_linear22 = true
+           shader20 = shaders/ambi_mix_pass.slang
+            alias20 = "ambientmix_pass"
+       scale_type20 = viewport
+            scale20 = 1.0
+    filter_linear20 = true
 
