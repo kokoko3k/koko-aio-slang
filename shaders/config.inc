@@ -29,7 +29,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 {
 	mat4 MVP;
 	vec4 FinalViewportSize;
-	vec4 scanline_flickering_passSize;
+	vec4 in_glow_and_scanline_flickering_passSize;
 	vec4 FXAA_passSize;
 	float DO_SCANLINES;
 	float DO_IN_GLOW;

@@ -7,8 +7,8 @@
 
 
 // Blur sizes must not depend on input resolution
-#define scalemod_x (global.scanline_flickering_passSize.x/360.0)
-#define scalemod_y (global.scanline_flickering_passSize.y/270.0)
+#define scalemod_x (global.in_glow_and_scanline_flickering_passSize.x/360.0)
+#define scalemod_y (global.in_glow_and_scanline_flickering_passSize.y/270.0)
 
 
 #pragma stage vertex
@@ -43,10 +43,11 @@ vec4 main_wrap(void) {
     //Halo
     vec3 pixel_haloed;
     vec2 halo_coords = vTexCoord;
+    /*
         if (DO_CURVATURE == 1.0) {
             if ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0))
                 halo_coords = Warp(vTexCoord,GEOM_WARP_X,GEOM_WARP_Y);
-        }
+        }*/
         if (DO_FXAA == 1.0)
             pixel_haloed = pixel_glow(FXAA_pass, halo_w,halo_h,halo_power,halo_gamma,halo_coords, global.FXAA_passSize, global.FXAA_passSize).rgb;
                 else
