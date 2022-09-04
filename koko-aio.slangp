@@ -217,7 +217,7 @@ float_framebuffer3 = true
         filter_linear13 = true
            scale_type13 = source
                scale_13  = 0.5
-         mipmap_input13 = true
+         mipmap_input13 = false
 
         //...then just downscale via mipmapping here:
                shader14 = shaders/ambi_passthrough_conditional.slang

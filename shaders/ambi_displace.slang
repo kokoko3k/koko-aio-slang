@@ -12,10 +12,10 @@ layout(location = 0) out vec2 vTexCoord;
 void main()
 {
    gl_Position = global.MVP * Position;
-   //vTexCoord.x = TexCoord.x * 0.75 + (1-0.75)/2.0;   
+   //vTexCoord.x = TexCoord.x * 0.75 + (1-0.75)/2.0;
    //vTexCoord.y = TexCoord.y;
    //vTexCoord = TexCoord;
-   //vTexCoord = (get_scaled_coords(TexCoord) + TexCoord) / 2.0; 
+   //vTexCoord = (get_scaled_coords(TexCoord) + TexCoord) / 2.0;
    vTexCoord = get_scaled_coords(TexCoord);
 }
 
