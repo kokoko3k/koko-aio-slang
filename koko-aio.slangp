@@ -153,6 +153,7 @@ float_framebuffer3 = true
                 alias5 = "ambi_avglum_pass"
         filter_linear5 = false
            scale_type5 = source
+                scale5 = 0.01
          mipmap_input5 = true
 
 
