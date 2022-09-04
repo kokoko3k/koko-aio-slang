@@ -194,10 +194,11 @@ float_framebuffer3 = true
 
 // Draw vignette and spot on lower resolution
            shader11 = shaders/vignette_and_spot.slang
-       scale_type11 = viewport
+       scale_type11 = absolute
             alias11 = vignette_and_spot_pass
     filter_linear11 = true
-           scale_11  = 0.25
+          scale_x11  = 256
+          scale_y11  = 256
 
 /* This pass pass will do the composition of the previous passes
    with the bloomed image, vignette and spot light,  and black frame insertions.
@@ -242,14 +243,6 @@ float_framebuffer3 = true
         filter_linear17 = true
            scale_type17 = source
     float_framebuffer17 = true
-
-
-
-    //shader18 = shaders/curvature.slang
-    //alias18 = "curvature_pass"
-    //scale_type18 = viewport
-    //scale18 = 1.0
-    //filter_linear18 = true
 
            shader18 = shaders/ambi_mix_pass.slang
             alias18 = "ambientmix_pass"
