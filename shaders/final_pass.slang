@@ -22,8 +22,7 @@ layout(location = 1) in vec2 vOutputCoord;
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D main_pass;
 layout(set = 0, binding = 3) uniform sampler2D bloom_pass_final;
-layout(set = 0, binding = 4) uniform sampler2D spot_pass;
-layout(set = 0, binding = 5) uniform sampler2D vignette_pass;
+layout(set = 0, binding = 4) uniform sampler2D vignette_and_spot_pass;
 
 #include "functions.include"
 
@@ -71,7 +70,7 @@ vec4 main_wrap() {
     if (DO_VIGNETTE == 1.0) {
         DO_NOISE = true;
         //float vignette = gauss_xy(0.0, 0.0, v_size, v_power, 0.0, 1.0);
-        vec3 vignette = texture(vignette_pass,vTexCoord).rgb;
+        vec3 vignette = vec3(texture(vignette_and_spot_pass,vTexCoord).r);
         if (v_bypass < 1.0) pixel_out = vignette * pixel_out;
             else
         pixel_out = vignette ;
@@ -81,7 +80,7 @@ vec4 main_wrap() {
     if (DO_SPOT == 1.0) {
         DO_NOISE = true;
         //float spot =  gauss_xy(s_center_x, s_center_y, s_size, s_power, 0.0, 10.0);
-        vec3 spot = texture(spot_pass,vTexCoord).rgb;
+        vec3 spot = vec3(texture(vignette_and_spot_pass,vTexCoord).g);
         if (s_bypass < 1.0) pixel_out = mix(pixel_out,vec3(1.0), spot);
             else
         pixel_out = vec3(spot) ;
