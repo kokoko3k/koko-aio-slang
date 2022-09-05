@@ -11,7 +11,7 @@ layout(location = 1) out vec2 vOutputCoord;
 #include "functions.include"
 void main() {
     gl_Position = global.MVP * Position;
-    vTexCoord = get_scaled_coords(TexCoord);
+    vTexCoord = get_scaled_coords(TexCoord,global.FinalViewportSize);
     vOutputCoord = TexCoord;
 }
 
@@ -59,7 +59,7 @@ vec4 main_wrap() {
 
     //Mix bloom texture
     if (DO_BLOOM == 1.0 ) {
-        bloomed=texture(bloom_pass_final, vTexCoord).rgb ;
+        bloomed=texture(bloom_pass_final, vOutputCoord).rgb ;
             
         if ( bloom_on_dark_only  == 1.0) {
            //float source_whiteness = (pixel_out.r+pixel_out.g+pixel_out.b) /3;

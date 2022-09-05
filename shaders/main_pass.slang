@@ -26,7 +26,7 @@ layout(location = 1) out vec2 vOutputCoord;
 #include "functions.include"
 void main() {
    gl_Position = global.MVP * Position;
-   vTexCoord = get_scaled_coords(TexCoord);
+   vTexCoord = get_scaled_coords(TexCoord,params.OutputSize);
    vOutputCoord = TexCoord;
 }
 
@@ -38,9 +38,6 @@ layout(set = 0, binding = 2) uniform sampler2D Original;
 layout(set = 0, binding = 3) uniform sampler2D FXAA_pass;
 layout(set = 0, binding = 4) uniform sampler2D in_glow_and_scanline_flickering_pass;
 layout(set = 0, binding = 5) uniform sampler2D halo_pass;
-
-
-
 
 
 
