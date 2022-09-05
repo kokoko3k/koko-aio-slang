@@ -129,8 +129,8 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // With "IN_GLOW_ADD=0" input glowing does not alter the RGB mask
 // or slot mask applied to the image.
 #pragma parameter DO_IN_GLOW    "Input power/glowing:"	 					1.0	0.0 1.0 1.0
-#pragma parameter in_glow_power "        Input signal glow strength"				0.45 	0.0 10.0 0.05
-#pragma parameter in_glow_wh    "        Sharpness"						2.5	0.0 15.0 0.05
+#pragma parameter in_glow_power "        Input signal glow strength"				0.45 	0.0 5.0 0.05
+#pragma parameter in_glow_wh    "        Sharpness"						2.5	0.2 15.0 0.05
 #pragma parameter in_glow_gamma "        Gamma, the higher, the less the glow on dark colors"	1.0 	1.0 10.0 0.1
 #pragma parameter IN_GLOW_ADD   "        Overflows from the scanlines, sharper image"		0.0 	0.0 1.0 0.05
 
@@ -173,9 +173,9 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // this means that haloing will produce solid colors,
 // lessening afromentioned effects on bright colors.
 #pragma parameter DO_HALO       "Halo:" 							1.0	0.0 1.0 1.0
-#pragma parameter halo_power    "        Strength (neg=off)"			0.9 	-0.05 10.0 0.05
-#pragma parameter halo_w        "        Horizontal sharpness"			1.75	0.0  15.0 0.05
-#pragma parameter halo_h        "        Vertical sharpness"			1.75	0.0  15.0 0.05
+#pragma parameter halo_power    "        Strength (neg=off)"			0.9 	0.0  5.0 0.05
+#pragma parameter halo_w        "        Horizontal sharpness"			1.75	0.2  15.0 0.05
+#pragma parameter halo_h        "        Vertical sharpness"			1.75	0.2  15.0 0.05
 #pragma parameter halo_gamma    "        Gamma, the higher, the less the halo on dark colors"	2.0 	1.0  10.0 0.1
 
 
@@ -190,12 +190,12 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // "bloom_on_dark_only" will mix the bloomed image with the original depending on the brightness of
 // the original image.
 #pragma parameter DO_BLOOM           "Bloom:" 				                0.0  0.0  1.0  1.0
-#pragma parameter BLOOM_MIX          "        Final mix, (0.0=off)"			0.15 0.0 1.0  0.01
-#pragma parameter bloom_size         "        Radius"						4.0  0.5 30.0 0.5
-#pragma parameter bloom_quality      "        Quality: more is better but slower"	8.0  2.0 32.0 1.0
-#pragma parameter bloom_gamma        "        Input Gamma"						2.0  1.0 10.0 1.0
-#pragma parameter bloom_power        "        Power multiplier"					2.0  1.0 10.0 0.1
-#pragma parameter bloom_gamma_out    "        Output Gamma"						1.0  0.1 10.0 0.05
+#pragma parameter BLOOM_MIX          "        Final mix, (0.0=off)"			0.2 0.0 1.0  0.01
+#pragma parameter bloom_size         "        Radius"					2.0  0.5 30.0 0.5
+#pragma parameter bloom_quality      "        Quality: more is better but slower"	2.0  2.0 32.0 1.0
+#pragma parameter bloom_gamma        "        Input Gamma"				4.0  1.0 10.0 1.0
+#pragma parameter bloom_power        "        Power multiplier"				8.0  1.0 10.0 0.1
+#pragma parameter bloom_gamma_out    "        Output Gamma"				1.5  0.1 10.0 0.05
 #pragma parameter bloom_on_dark_only "        Apply less over bright areas"		1.0  0.0 1.0  1.0
 
 
@@ -223,16 +223,16 @@ layout(std140, set = 0, binding = 0) uniform UBO
 //Vignette and spot
 
 #pragma parameter DO_VIGNETTE	"Emulate vignette effect:"	0.0  0.0  1.0  1.0
-#pragma parameter v_bypass	"    bypass "	        0.0  0.0  1.0  1.0
-#pragma parameter v_size	"        size"				12   0.1  10   0.05
-#pragma parameter v_power	"        power"				0.8  0.05 2.0  0.05
+#pragma parameter v_bypass	"    bypass "	        	0.0  0.0  1.0  1.0
+#pragma parameter v_size	"        size"			4.0  1.0  10   0.1
+#pragma parameter v_power	"        power"			0.8  0.05 2.0  0.05
 
 #pragma parameter DO_SPOT	"Emulate spot effect:"	0.0   0.0   1.0 1.0
-#pragma parameter s_bypass	"    bypass"	        	0.0   0.0   1.0 1.0
-#pragma parameter s_center_x 	"    x position"		-0.4  -1.5  1.5 0.05
-#pragma parameter s_center_y	"    y postion "		0.4   -1.5  1.5 0.05
-#pragma parameter s_size	"    size"					0.15  0.01   10  0.01
-#pragma parameter s_power	"    power" 				0.25  0.05  2.0 0.05
+#pragma parameter s_bypass	"    bypass"	        0.0   0.0   1.0 1.0
+#pragma parameter s_center_x 	"    x position"	-0.4  -1.5  1.5 0.05
+#pragma parameter s_center_y	"    y postion "	0.4   -1.5  1.5 0.05
+#pragma parameter s_size	"    size"		0.15  0.01  3.0 0.01
+#pragma parameter s_power	"    power" 		0.25  0.05  2.0 0.05
 
 
 //Ambilight effect
