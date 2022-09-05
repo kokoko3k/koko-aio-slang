@@ -108,7 +108,6 @@ vec4 main_wrap() {
     return vec4(pixel_out,pixel_in.a);
 }
 
-
 void main() {
     bool IsOuterFrame;
     vec4 psample = texture(main_pass, vOutputCoord);
@@ -123,17 +122,18 @@ void main() {
         pixel_out = main_wrap();
     }
 
-if (DO_AMBILIGHT == 1) {
-    vec3 ambinoised = ambi_noised();
-    if (IsOuterFrame) {
-        FragColor = mark_outer_frame(ambi_noised());
+    if (DO_AMBILIGHT == 1) {
+        vec3 ambinoised = ambi_noised();  //Mix ambilight and noise
+        if (IsOuterFrame) {
+            //put ambilight on the outher frame
+            FragColor = mark_outer_frame(ambi_noised()); 
+        } else {
+            //mix ambilight in the inner frame too, as curvature could shrink into the inner frame.
+            FragColor = vec4(mix(ambinoised.rgb,pixel_out.rgb,min(pixel_out.a*1.5,1.0)),pixel_out.a);
+        }
     } else {
-        FragColor = vec4(mix(ambinoised.rgb,pixel_out.rgb,min(pixel_out.a*1.5,1.0)),pixel_out.a);
+        FragColor = pixel_out ;
     }
-} else {
-    FragColor = pixel_out ;
-}
-    
     
     
     /*if (params.OutputSize.y == 1920) {

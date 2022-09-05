@@ -4,9 +4,8 @@
     Update pipeline graph
 
     Investigate the possible use of mipmapping in bloom function too.
-    mix vignette and spotlight in another pass or they will be used by ambilight.
     Try to move flickering scanlines into main?
-    is initial doublesize pass really needed by fxaa or in_glow, or we can just play with tex coordinate?
+    bloom and flickering scanline conflicts
     
     
 Performances on haswell igp, 1080p, 60fps: (before putting halo and in_glow into lower resolution pass)
