@@ -20,7 +20,7 @@ input: mame, dynamite dux:
 input glow gamma 3: 40          5.4
           rgb mask: 35.7        1.1
           slotmask: 36.5        1.9
-      halo gamma 3: 44.5        9.9
+      halo gamma 3: 40.0        5.4
           bloom,hq: 38-43       3.4-8.4
  color corrections: 35          0.4
     curvature warp: 39.2        4.6
@@ -114,8 +114,8 @@ float_framebuffer2 = true
            shader3 = shaders/halo.slang
             alias3 = "halo_pass"
     filter_linear3 = true
-            scale3 = 0.5
-       scale_type3 = viewport
+            scale3 = 1
+       scale_type3 = source
 float_framebuffer3 = true
 
 
