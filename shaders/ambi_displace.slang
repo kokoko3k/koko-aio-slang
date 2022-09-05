@@ -33,15 +33,22 @@ layout(set = 0, binding = 3) uniform sampler2D main_pass;
 #include "functions.include"
 
 
+bool border_updown(){
+   //Return if black bars are up and down or left and right.
+   //Why this one work?
+   return ((params.OriginalSize.x > params.OriginalSize.y) && (global.main_passSize.x < global.main_passSize.y )) || 
+         (params.OriginalSize.x < params.OriginalSize.y) && (global.main_passSize.x > global.main_passSize.y ) ;
+}
+
 vec3 main_wrap(){
 
-   float myborder = 0.125; //20% border to be displaced
+   float myborder = 0.025; //20% border to be displaced
    vec2 newcoords = vTexCoord;
    vec3 pixel_out;
    float mydiv;
    float myoffset;
 
-   if (!is_rotated()) {
+   if (!border_updown()) {
       mydiv = vTexCoord.x / myborder;
       myoffset = (1.0-myborder) * floor(mydiv);
 
@@ -76,40 +83,19 @@ vec3 main_wrap(){
 }
 
 void main() {
-/*   if (DO_AMBILIGHT == 1.0) {
-      bool is_border = false;
-      if (border_needed()) {
-         bool b_is_rotated = is_rotated();
-         bool is_outside_x = ((vTexCoord.x > 1.0 ) || (vTexCoord.x < 0.0 ) );
-         bool is_outside_y = ((vTexCoord.y > 1.0 ) || (vTexCoord.y < 0.0 ) );
-         is_border = (b_is_rotated && is_outside_y) || (!b_is_rotated && is_outside_x);
-      }
-      
-      if (is_border)
-          FragColor = vec4(0.0);
-            else
-          FragColor = vec4(main_wrap(),1.0);
-      } else {
-         return;
-      }
-      
-*/
    vec4 psample = texture(main_pass,vTexCoord);
    bool IsOuterFrame;
    vec4 pixel_out;
+
    if ( border_needed() ) {
-        IsOuterFrame = is_outer_frame(psample);
-        if (IsOuterFrame)
-            pixel_out = mark_outer_frame(vec3(0.0));
-                else
-            pixel_out = vec4(main_wrap().rgb,1.0);
+      if (DO_AMBILIGHT == 1.0) {
+         IsOuterFrame = is_outer_frame(psample);
+         if (IsOuterFrame)
+               FragColor = mark_outer_frame(vec3(0.0));
+                  else
+               FragColor = vec4(main_wrap().rgb,1.0);
+      }      
    }
-   
-FragColor = pixel_out;
-      
-   //if (DO_AMBILIGHT == 1.0)
-   //FragColor = vec4(main_wrap(),1.0);
-      
 }
 
 
