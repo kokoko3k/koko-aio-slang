@@ -137,12 +137,12 @@ float random() {
 		float offset_y = 0.0 ;
 		float in_aspect = get_in_aspect();
 		if (is_rotated()) {
-			scale_y = params.OutputSize.y/(params.OutputSize.x / in_aspect );
-			//scale_y = global.FinalViewportSize.y/(global.FinalViewportSize.x / in_aspect );
+			//scale_y = params.OutputSize.y/(params.OutputSize.x / in_aspect );
+			scale_y = global.FinalViewportSize.y/(global.FinalViewportSize.x / in_aspect );
 			offset_y = (0.5 * scale_y ) - 0.5 ;
 		} else {
-			scale_x = params.OutputSize.x/(params.OutputSize.y * in_aspect);
-			//scale_x = global.FinalViewportSize.x/(global.FinalViewportSize.y * in_aspect);
+			//scale_x = params.OutputSize.x/(params.OutputSize.y * in_aspect);
+			scale_x = global.FinalViewportSize.x/(global.FinalViewportSize.y * in_aspect);
 			offset_x = (0.5 * scale_x ) - 0.5 ;
 		}
 
