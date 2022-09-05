@@ -249,9 +249,9 @@ float_framebuffer3 = true
             scale17 = 1.0
             
     
-           shader18 = shaders/ambi_mix_pass.slang
-            alias18 = "ambientmix_pass"
-       scale_type18 = viewport
-            scale18 = 1.0
-    filter_linear18 = true
+//           shader18 = shaders/ambi_mix_pass.slang
+//            alias18 = "ambientmix_pass"
+//       scale_type18 = viewport
+//            scale18 = 1.0
+//    filter_linear18 = true
 
