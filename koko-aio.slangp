@@ -208,7 +208,7 @@ float_framebuffer3 = true
                shader12 = shaders/ambi_displace.slang
                 alias12 = "ambi_displace_pass"
         filter_linear12 = true
-           scale_type12 = source
+           scale_type12 = viewport
                scale_12  = 0.5
          mipmap_input12 = true
 
