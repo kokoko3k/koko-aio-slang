@@ -44,6 +44,7 @@ layout(set = 0, binding = 5) uniform sampler2D halo_pass;
 
 
 
+#include "functions.include"
 // What follows is an ugly optimization with a lot of code copied and pasted repeated multiple times,
 // shamlessly hidden into an include:
 #include "pixel_glows.slang"    
@@ -164,16 +165,9 @@ vec3 pixel_scanline_static(vec3 color, vec2 coords) {
     return color;
 }
 
-bool scanline_have_to_flicker(bool is_interlaced) {
-    return ((scanline_flickering == 1.0) || ((scanline_flickering==2.0) && is_interlaced ));
-}
-
-
-#include "functions.include"
-
 vec4 main_wrap(void) {
-    bool is_interlaced = (params.OriginalSize.y > MIN_LINES_INTERLACED) ? true : false ;
-    bool flickering_scanlines = (DO_SCANLINES == 1.0) && scanline_have_to_flicker(is_interlaced) ;
+    bool isinterlaced = is_interlaced();
+    bool flickering_scanlines = (DO_SCANLINES == 1.0) && scanline_have_to_flicker(isinterlaced) ;
 
     //Curvature
     vec2 coords = vTexCoord ;
@@ -227,7 +221,7 @@ vec4 main_wrap(void) {
     // Non flickering scanlines
     if ( DO_SCANLINES == 1.0 )  {
         if  (!flickering_scanlines) {  //flickering scanlines are handled in previous pass
-            if  (! ( is_interlaced  && (scanline_disable_on_interlace == 1.0))  ) {
+            if  (! ( isinterlaced  && (scanline_disable_on_interlace == 1.0))  ) {
                 pixel_scanlined = pixel_scanline_static(pixel_out,coords);
                 pixel_scanlined = min(vec3(1.0),pixel_scanlined);
                 pixel_out = min(vec3(1.0),pixel_out);

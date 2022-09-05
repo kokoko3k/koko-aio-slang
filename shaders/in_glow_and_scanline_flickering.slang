@@ -36,11 +36,6 @@ layout(set = 0, binding = 4) uniform sampler2D doublesize_pass;
 #include "functions.include"
 
 
-bool scanline_have_to_flicker(bool is_interlaced) {
-    return ((scanline_flickering == 1.0) || ((scanline_flickering==2.0) && is_interlaced ));
-}
-
-
 bool flickering_scanline_needed(bool is_interlaced){
    if (DO_SCANLINES == 1.0) {
       if (scanline_flickering != 0.0) {
