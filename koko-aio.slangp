@@ -5,42 +5,28 @@
 
     Investigate the possible use of mipmapping in bloom function too.
     Try to move flickering scanlines into main?
-    bloom and flickering scanline conflicts
     
     
-Performances on haswell igp, 1080p, 60fps: (before putting halo and in_glow into lower resolution pass)
-    aspect full (16:9)
+Performances:
+haswell igp: i5-4590 CPU @ 3.30GHz
+Ouutput on aspect: full, 1080p, 16:9, 60fps
+input: mame, dynamite dux:
+                    GPU%        Delta% vs Basal:
+         no shader: 11          -23.6
+             basal: 34.6        0.0
+              FXAA: 37.5        2.9
+         scanlines: 36.5        1.9
+     ...flickering: 36.2        1.6
+input glow gamma 3: 40          5.4
+          rgb mask: 35.7        1.1
+          slotmask: 36.5        1.9
+      halo gamma 3: 44.5        9.9
+          bloom,hq: 38-43       3.4-8.4
+ color corrections: 35          0.4
+    curvature warp: 39.2        4.6
+     vignette+spot: 35.2        0.6
+     ambient light: 38          3.4
 
-    base: 46%
-    FXAA: +2%
-    scanlines: +3%
-    input glow gamma 3: +31%
-    rgb mask +1%
-    slotmask +1%
-    halo gamma 3: +31%
-    bloom: +3%
-    color corrections: +0%
-    curvature no warp o warp: +4%
-    vignette: 0%
-    spot: 0%
-    ambient light: 1% 
-
-    Aspect full + ambient light:
-    base: 48%
-    fxaa 3
-    scanlines: 3
-    input glow gamma 3: 25%
-    rgb mask: 1%
-    slot mask: 1%
-    halo gamma 3: 25%
-    curvature 2%
-
-
-    base: 58
-    FXAA: 60
-    input glow gamma 3: 65
-    ambient light: 71
-    
     
 */
 
@@ -160,7 +146,7 @@ float_framebuffer3 = true
    sampling the original texture and scale it down to keep
    it fast, next we do subsequent blURs of the bloomed
    pass.
-   */
+*/
                shader6 = shaders/bloom_passthrough_conditional.slang
                 alias6 = "bloom_pass_0"
         filter_linear6 = true
