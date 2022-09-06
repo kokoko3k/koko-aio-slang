@@ -184,11 +184,10 @@ vec4 main_wrap(void) {
         if ((GEOM_BORDER_WX > 0.0) || (GEOM_BORDER_WY > 0.0))
             border_coords = Warp(vTexCoord,l_GEOM_BORDER_WX,l_GEOM_BORDER_WY);
 
-        if (GEOM_ZOOMOUT != 0.0)
-            coords = zoomout_coords(coords, GEOM_ZOOMOUT, 1.0);
-        if (GEOM_GAP_SIZE != 0.0)
-            border_coords = zoomout_coords(border_coords, GEOM_ZOOMOUT - GEOM_GAP_SIZE, 1.0);    
-            
+        if (GEOM_ZOOMOUT != 0.0) {
+            coords = zoomout_coords(border_coords, GEOM_ZOOMOUT, 1.0);
+            border_coords = zoomout_coords(border_coords, GEOM_ZOOMOUT-GEOM_GAP_SIZE, 1.0);
+        }
         fborder = border(border_coords);
     }
     vec3 pixel_in;
