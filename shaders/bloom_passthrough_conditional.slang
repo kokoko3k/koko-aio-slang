@@ -15,7 +15,7 @@ void main()
 #pragma stage fragment
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 0) out vec4 FragColor;
-layout(set = 0, binding = 2) uniform sampler2D doublesize_pass;
+layout(set = 0, binding = 2) uniform sampler2D main_pass;
 
 #include "functions.include""
 void main() {
@@ -26,7 +26,7 @@ void main() {
             coords = Warp(vTexCoord,GEOM_WARP_X,GEOM_WARP_Y);
          //if ((GEOM_BORDER_WX > 0.0) && (GEOM_BORDER_WY > 0.0)) coords = Warp(vTexCoord,GEOM_BORDER_WX,GEOM_BORDER_WY);
       }
-         FragColor = texture(doublesize_pass,coords);
+         FragColor = texture(main_pass,coords);
          return;
    } else {
       //No bloom requested

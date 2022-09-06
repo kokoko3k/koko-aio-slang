@@ -129,7 +129,7 @@ float_framebuffer3 = true
     filter_linear4 = true
             scale4 = 1.0
        scale_type4 = viewport
-       
+        wrap_mode4 = "clamp_to_edge" //can't use clamp_to edge due to unzoom function
      
 /*      Get the average luminance needed by ambilight here, because:
         * mipmap_input only works on "Source" texture
