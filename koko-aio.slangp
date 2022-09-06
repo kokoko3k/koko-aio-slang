@@ -92,7 +92,7 @@ shaders = 18
        scale_type0 = source
           scale_x0 = 2.0
           scale_y0 = 2.0
-        wrap_mode0 = "clamp_to_edge"
+
 /* Nvidia fxaa pass:
    works good for "SD" resolutions
 */
@@ -109,7 +109,7 @@ shaders = 18
             scale2 = 1
        scale_type2 = source    
 float_framebuffer2 = true
-        wrap_mode2 = "clamp_to_edge"
+      //wrap_mode2 = "clamp_to_edge" //can't use clamp_to edge due to unzoom function
             
           
     //Put halo in its own pass so that we can use lower resolution
@@ -119,7 +119,7 @@ float_framebuffer2 = true
             scale3 = 1
        scale_type3 = source
 float_framebuffer3 = true
-        wrap_mode3 = "clamp_to_edge"
+      //wrap_mode3 = "clamp_to_edge" //can't use clamp_to edge due to unzoom function
 
 /* In this pass we emulate scanlines, glowing,
    RGB vertical mask, slot mask,haloing and color corrections

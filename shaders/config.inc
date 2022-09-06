@@ -3,6 +3,7 @@
 #define noisepower 0.010            //Sort of dithering
 #define scene_change_threshold 0.1  // 0.0-1.0: sensitivity to scene change (ambilike stuff)
 
+
 layout(push_constant) uniform Push
 {
 	vec4 SourceSize;
@@ -69,7 +70,8 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float GEOM_WARP_Y;
 	float GEOM_CORNER_SIZE;
 	float GEOM_CORNER_SMOOTH;
-
+	float GEOM_ZOOMOUT;
+	float GEOM_GAP_SIZE;
 	float DO_SPOT;
 	float s_center_x;
 	float s_center_y; 
@@ -219,8 +221,9 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter GEOM_BORDER_WY     "        Border Curve Y (neg=use Warp Y)"	0.02  -0.01 0.1 0.01
 #pragma parameter GEOM_CORNER_SIZE   "        Corner Size"			0.01  0.005 0.1 0.005
 #pragma parameter GEOM_CORNER_SMOOTH "        Corner sharpness"			350.0 50.0 1000.0 25.0
-//#pragma parameter SHARPNESS_H        "        Sharpness Horizontal"		0.6   0.0 1.0 0.05
-//#pragma parameter SHARPNESS_V        "        Sharpness Vertical"		1.0   0.0 1.0 0.05
+#pragma parameter GEOM_ZOOMOUT       "        Monitor zoom out"			0.0   0.0 0.3 0.01
+#pragma parameter GEOM_GAP_SIZE      "        Monitor Gap"			0.0   0.0 0.3 0.005
+
 
 
 //Vignette and spot
@@ -319,6 +322,8 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #define GEOM_BORDER_WY     global.GEOM_BORDER_WY
 #define GEOM_CORNER_SIZE   global.GEOM_CORNER_SIZE
 #define GEOM_CORNER_SMOOTH global.GEOM_CORNER_SMOOTH
+#define GEOM_ZOOMOUT       global.GEOM_ZOOMOUT	
+#define GEOM_GAP_SIZE      global.GEOM_GAP_SIZE
 
 
 #define DO_SPOT    global.DO_SPOT
