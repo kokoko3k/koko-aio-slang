@@ -4,7 +4,7 @@
     Update pipeline graph
 
     Investigate the possible use of mipmapping in bloom function too.
-    Try to move flickering scanlines into main?
+    Try to move flickering scanlines into main, maybe by faking them with screenlines?
     
     
 Performances:
@@ -109,6 +109,7 @@ shaders = 18
             scale2 = 1
        scale_type2 = source    
 float_framebuffer2 = true
+        wrap_mode2 = "clamp_to_edge"
             
           
     //Put halo in its own pass so that we can use lower resolution
@@ -118,7 +119,7 @@ float_framebuffer2 = true
             scale3 = 1
        scale_type3 = source
 float_framebuffer3 = true
-
+        wrap_mode3 = "clamp_to_edge"
 
 /* In this pass we emulate scanlines, glowing,
    RGB vertical mask, slot mask,haloing and color corrections

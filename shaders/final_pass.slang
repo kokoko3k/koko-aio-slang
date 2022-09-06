@@ -44,10 +44,11 @@ vec3 ambi_noised() {
 vec3 pixel_alternate(vec3 source, float whiteness) {
     float line = vTexCoord.y * params.OutputSize.y;
     vec3 pixel_out = source;
+    int l_period_half = int(ALT_BLANK_PERIOD) / 2;
     if  (int(mod(float(params.FrameCount),2.0  )) == 1) {
-        if  (int(mod(line,2.0  )) == 1) pixel_out=mix(source,vec3(0), whiteness) ;
+        if  ((mod(line,ALT_BLANK_PERIOD  )) > l_period_half) pixel_out=mix(source,vec3(0), whiteness) ;
     } else {
-        if  (int(mod(line,2.0  )) == 0) pixel_out=mix(source,vec3(0), whiteness) ;
+        if  ((mod(line,ALT_BLANK_PERIOD )) <= l_period_half) pixel_out=mix(source,vec3(0), whiteness) ;
     }
     return pixel_out;
 }

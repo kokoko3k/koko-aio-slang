@@ -50,6 +50,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float bloom_power; //1
   	float bloom_gamma_out; 
   	float ALT_BLANK_STRENGTH ; //2 FIXME to 1
+  	float ALT_BLANK_PERIOD ;
 	float DO_FXAA ; //1
 	float scanline_flickering ; //2
 	float scanline_disable_on_interlace;
@@ -253,8 +254,9 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // Emulates the low pixel persistance of CRT monitors and reduces the motion blur,
 // typical of LCD displays, by blanking even/odd screen lines on even/odd frames.
 // ALT_BLANK_STRENGTH expresses the strength of the "blank".
-#pragma parameter DO_ALT_BLANK       "Alternate blanking: " 					0.0 0.0 1.0 1.0
+#pragma parameter DO_ALT_BLANK       "Alternate line blanking: " 					0.0 0.0 1.0 1.0
 #pragma parameter ALT_BLANK_STRENGTH "        Alternate black frame insertion strength" 	0.0 0.0 1.0 0.1
+#pragma parameter ALT_BLANK_PERIOD "        Dark lines period" 	2.0 0.0 20.0 1.0
 
 
 #define DO_FXAA        global.DO_FXAA
@@ -303,6 +305,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 #define DO_ALT_BLANK       global.DO_ALT_BLANK
 #define ALT_BLANK_STRENGTH global.ALT_BLANK_STRENGTH
+#define ALT_BLANK_PERIOD global.ALT_BLANK_PERIOD
 
 
 #define DO_CURVATURE       global.DO_CURVATURE
