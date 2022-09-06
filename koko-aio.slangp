@@ -92,7 +92,7 @@ shaders = 18
        scale_type0 = source
           scale_x0 = 2.0
           scale_y0 = 2.0
-
+        wrap_mode0 = "clamp_to_edge"
 /* Nvidia fxaa pass:
    works good for "SD" resolutions
 */
@@ -155,31 +155,36 @@ float_framebuffer3 = true
            scale_type6 = absolute
               scale_x6 = 320
               scale_y6 = 240
-
+            wrap_mode6 = "clamp_to_edge"
+        
                shader7 = shaders/bloom_pass_1.slang
                 alias7 = "bloom_pass_1"
         filter_linear7 = true
            scale_type7 = source
                 scale7 = 1
-
+            wrap_mode7 = "clamp_to_edge"
+        
                shader8 = shaders/bloom_pass_2.slang
                 alias8 = "bloom_pass_2"
         filter_linear8 = true
            scale_type8 = source
                 scale8 = 1
-
+            wrap_mode8 = "clamp_to_edge"
+        
                shader9 = shaders/bloom_pass_2.slang
                 alias9 = "bloom_pass_3"
         filter_linear9 = true
            scale_type9 = source
                 scale9 = 1
-
+            wrap_mode9 = "clamp_to_edge"
+        
                shader10 = shaders/bloom_pass_2.slang
                 alias10 = "bloom_pass_final"
         filter_linear10 = true
            scale_type10 = source
                 scale10 = 1
-
+            wrap_mode10 = "clamp_to_edge"
+        
 // Draw vignette and spot on lower resolution
            shader11 = shaders/vignette_and_spot.slang
        scale_type11 = absolute
