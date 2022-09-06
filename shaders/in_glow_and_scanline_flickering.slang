@@ -59,7 +59,7 @@ vec3 get_scanline_mixed(vec3 pixel_in) {
    return vec3(1.0);
 }
 
-vec3 flickering_scanline(vec3 pixel_in, bool is_interlaced, vec2 coords) {
+vec3 flickering_scanline(vec3 pixel_in, bool is_interlaced, vec2 vTexCoord) {
    int scanline_period;
    int scanline_period_half;
    /* Puae switches from lowres to sdres on interlaced screens
@@ -79,7 +79,7 @@ vec3 flickering_scanline(vec3 pixel_in, bool is_interlaced, vec2 coords) {
       scanline_period_half=1;
    }
 
-   float mymod = mod(coords.y * params.OutputSize.y , scanline_period);
+   float mymod = mod(vTexCoord.y * params.OutputSize.y , scanline_period);
    
    //Do flickering based on user prefs.
    //(blank odd lines on odd frames and even lines on even frames)
@@ -94,38 +94,34 @@ vec3 flickering_scanline(vec3 pixel_in, bool is_interlaced, vec2 coords) {
 }
 
 
+void main() { 
+   //FIXME: flickering scanlines does not curve, and think they will never do due to moiree, not a big deal since they are barely visible.
 
-void main()
-{ 
-
-//FIXME: flickering scanlines does not curve, and think they will never do due to moiree, not a big deal since they are barely visible.
-
+   vec3 pixel_out;
    //Use to debug:
       //pixel_out=vec4(abs(sin(params.FrameCount/3.14/20))); //white fade
       //pixel_out=vec4(abs(sin(params.FrameCount/3.14/20)),0.0,0.0,0.0); //red fade
       //pixel_out=vec4(0.2);
-   vec3 pixel_out;
+
    bool is_interlaced = (params.OriginalSize.y > MIN_LINES_INTERLACED) ? true : false ;
    bool exec_scanline_code = flickering_scanline_needed(is_interlaced);
    
-   if (!exec_scanline_code && (DO_IN_GLOW == 0) ) return ;
+   if ((DO_IN_GLOW == 0.0) && !exec_scanline_code) return;
    
-   vec2 coords = vTexCoord;
-   /*if (DO_CURVATURE == 1.0) {
-      if ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0))
-            coords = Warp(vTexCoord,GEOM_WARP_X,GEOM_WARP_Y);
-   }*/
-   
+   if (DO_FXAA == 1.0)
+      pixel_out = texture(FXAA_pass, vTexCoord).rgb;
+         else
+      pixel_out = texture(doublesize_pass, vTexCoord).rgb;
+
    if (DO_IN_GLOW == 1.0) {
+      vec3 pixel_glowed;
       if (DO_FXAA == 1.0)
-         pixel_out = pixel_glow(FXAA_pass, in_glow_wh,in_glow_wh,in_glow_power,in_glow_gamma,coords, global.FXAA_passSize, global.FXAA_passSize).rgb;
+         pixel_glowed = pixel_glow(FXAA_pass, in_glow_wh,in_glow_wh,in_glow_power,in_glow_gamma,vTexCoord, global.FXAA_passSize, global.FXAA_passSize).rgb;
             else
-         pixel_out = pixel_glow(doublesize_pass, in_glow_wh,in_glow_wh,in_glow_power,in_glow_gamma,coords, global.FXAA_passSize, global.FXAA_passSize).rgb;
-   } else {
-      if (DO_FXAA == 1.0)
-         pixel_out = texture(FXAA_pass, vTexCoord).rgb;
-            else
-         pixel_out = texture(doublesize_pass, coords).rgb;  
+         pixel_glowed = pixel_glow(doublesize_pass, in_glow_wh,in_glow_wh,in_glow_power,in_glow_gamma,vTexCoord, global.FXAA_passSize, global.FXAA_passSize).rgb;
+         
+         if (IN_GLOW_ADD>0.0) pixel_glowed = mix(pixel_glowed,pixel_out+pixel_glowed,IN_GLOW_ADD);
+         pixel_out = pixel_glowed;
    }
       
    if (exec_scanline_code)
