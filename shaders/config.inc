@@ -40,6 +40,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float DO_CCORRECTION;
 	float DO_ALT_BLANK;
 	float IN_GLOW_ADD ;
+	float GLOW_OVER_DARK_SCANLINES ;
 	float in_glow_wh ;
 	float in_glow_power ;
 	float in_glow_gamma ;
@@ -130,12 +131,12 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // "IN_GLOW_ADD" allows to modulate from interpolation(*) to a sum, wihch may (or not) produce better effects.
 // With "IN_GLOW_ADD=0" input glowing does not alter the RGB mask
 // or slot mask applied to the image.
-#pragma parameter DO_IN_GLOW    "Input power/glowing:"	 					1.0	0.0 1.0 1.0
-#pragma parameter in_glow_power "        Input signal glow strength"				0.45 	0.0 5.0 0.05
-#pragma parameter in_glow_wh    "        Sharpness"						2.5	0.2 15.0 0.05
-#pragma parameter in_glow_gamma "        Gamma, the higher, the less the glow on dark colors"	1.0 	1.0 10.0 0.1
-#pragma parameter IN_GLOW_ADD   "        Overflows from the scanlines, sharper image"		0.0 	0.0 1.0 0.05
-
+#pragma parameter DO_IN_GLOW               "Input power/glowing:"	 					1.0	0.0 1.0 1.0
+#pragma parameter in_glow_power            "        Input signal glow strength"					0.45 	0.0 5.0 0.05
+#pragma parameter in_glow_wh               "        Sharpness"							2.5	0.2 15.0 0.05
+#pragma parameter in_glow_gamma            "        Gamma, the higher, the less the glow on dark colors"	1.0 	1.0 10.0 0.1
+#pragma parameter IN_GLOW_ADD              "        Overflows from the scanlines, sharper image"		0.0 	0.0 1.0 0.05
+#pragma parameter GLOW_OVER_DARK_SCANLINES "        How much glowing affects dark scanlines"			1.0 	0.0 3.0 0.1
 
 
 // RGB Mask
@@ -268,11 +269,12 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #define scanline_flickering           global.scanline_flickering
 #define scanline_disable_on_interlace global.scanline_disable_on_interlace
 
-#define DO_IN_GLOW   global.DO_IN_GLOW
-#define IN_GLOW_ADD   global.IN_GLOW_ADD
-#define in_glow_wh    global.in_glow_wh
-#define in_glow_power global.in_glow_power
-#define in_glow_gamma global.in_glow_gamma
+#define DO_IN_GLOW               global.DO_IN_GLOW
+#define IN_GLOW_ADD              global.IN_GLOW_ADD
+#define GLOW_OVER_DARK_SCANLINES global.GLOW_OVER_DARK_SCANLINES
+#define in_glow_wh               global.in_glow_wh
+#define in_glow_power            global.in_glow_power
+#define in_glow_gamma            global.in_glow_gamma
 
 #define DO_RGB_MASK       global.DO_RGB_MASK
 #define RGB_MASK_STRENGTH global.RGB_MASK_STRENGTH

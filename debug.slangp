@@ -3,13 +3,13 @@ prefer_std_pow = "1.0"
 
 DO_FXAA = "0.0"
 
-DO_SCANLINES = "0.0"
+DO_SCANLINES = "1.0"
 	SCANLINE_DARK = "0.0"
 	scanline_flickering = 2.0
 
-DO_IN_GLOW = "0.0"
-	in_glow_power = "0.4"
-	in_glow_wh = "15.0"	
+DO_IN_GLOW = "1.0"
+	in_glow_power = "1.0"
+	in_glow_wh = "2.0"	
 	in_glow_gamma = "2.0" 
 	IN_GLOW_ADD = "0.0"
 
@@ -29,7 +29,7 @@ DO_HALO = "0.0"
 	halo_h = "15.0"
 	halo_gamma = "2.0" 
 
-DO_BLOOM = "1.0"
+DO_BLOOM = "0.0"
 	BLOOM_MIX = "1.0"
 	bloom_size = "6.0"
 	bloom_quality = "4.0"
