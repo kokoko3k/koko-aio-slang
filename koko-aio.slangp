@@ -149,7 +149,7 @@ float_framebuffer3 = true
    it fast, next we do subsequent blURs of the bloomed
    pass.
 */
-               shader6 = shaders/bloom_passthrough_conditional.slang
+               shader6 = shaders/passthrough_original.slang ///bloom_passthrough_conditional.slang
                 alias6 = "bloom_pass_0"
         filter_linear6 = true
            scale_type6 = absolute

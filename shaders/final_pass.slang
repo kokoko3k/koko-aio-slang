@@ -11,7 +11,7 @@ layout(location = 1) out vec2 vOutputCoord;
 #include "functions.include"
 void main() {
     gl_Position = global.MVP * Position;
-    vTexCoord = get_scaled_coords(TexCoord,global.FinalViewportSize);
+    vTexCoord = get_scaled_coords(TexCoord,params.OutputSize);
     vOutputCoord = TexCoord;
 }
 
