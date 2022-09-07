@@ -5,10 +5,10 @@ It can be configured with many parameters, so that can be
 scaled to run on even on modest gpus while still developed to
 run with heavier presets on at least Haswell+ iGpus.<br>
 While it is not meant to simulate the internal behaviour of CRT displays,<br>
-it aims to give users "visual" parameters to make their monitors to look similar.<br>
+it aims to give users "visual" parameters to make their monitors look similar.<br>
 Several presets are included.<br>
 
-***Actually it provides emulation for:***
+***Actually, it provides emulation for:***
 * Scanlines
 * Screenlines
 * RGB phosphors

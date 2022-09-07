@@ -58,10 +58,34 @@ vec4 main_wrap() {
     vec3 pixel_out = pixel_in.rgb;
     vec3 bloomed;
 
+    //Curvature
+    vec2 coords = vTexCoord ;
+    float l_GEOM_BORDER_WX = GEOM_BORDER_WX;
+    float l_GEOM_BORDER_WY = GEOM_BORDER_WY;
+    float fborder = 1.0;
+    
+    if (DO_CURVATURE == 1.0) {
+        if ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0))
+            coords = Warp(coords,GEOM_WARP_X,GEOM_WARP_Y);
+
+        vec2 border_coords = coords;
+        if (GEOM_BORDER_WX < 0.0) l_GEOM_BORDER_WX = GEOM_WARP_X;
+        if (GEOM_BORDER_WY < 0.0) l_GEOM_BORDER_WY = GEOM_WARP_Y;
+        
+        if ((GEOM_BORDER_WX > 0.0) || (GEOM_BORDER_WY > 0.0))
+            border_coords = Warp(vTexCoord,l_GEOM_BORDER_WX,l_GEOM_BORDER_WY);
+
+        if ((GEOM_ZOOMOUT + GEOM_GAP_SIZE) > 0.0) {
+            coords = zoomout_coords(border_coords, GEOM_ZOOMOUT, 1.0);
+            border_coords = zoomout_coords(border_coords, GEOM_ZOOMOUT-GEOM_GAP_SIZE, 1.0);
+        }
+        fborder = border(border_coords);
+    }
+    
     //Mix bloom texture
     if (DO_BLOOM == 1.0 ) {
-        bloomed=texture(bloom_pass_final, vTexCoord).rgb ;
-            
+        bloomed=texture(bloom_pass_final, coords).rgb ;
+
         if ( bloom_on_dark_only  == 1.0) {
            //float source_whiteness = (pixel_out.r+pixel_out.g+pixel_out.b) /3;
             float source_whiteness = (pixel_out.r+pixel_out.g+pixel_out.b);
