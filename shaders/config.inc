@@ -2,7 +2,7 @@
 #define MIN_LINES_INTERLACED 300	//Consider content interlaced if lines are more than this
 #define noisepower 0.010            //Sort of dithering
 #define scene_change_threshold 0.1  // 0.0-1.0: sensitivity to scene change (ambilike stuff)
-
+#define BLOOM_THRESHOLD 0.5
 
 layout(push_constant) uniform Push
 {
@@ -48,7 +48,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float BLOOM_MIX;
  	float bloom_size ; //1
 	float bloom_gamma; //1
-	float bloom_on_dark_only; //1
+	float bloom_bypass; //1
 	float bloom_power; //1
   	float bloom_gamma_out; 
   	float ALT_BLANK_STRENGTH ; //2 FIXME to 1
@@ -192,7 +192,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // "bloom_quality" express a tradeoff between quality and effect speed.
 // "bloom_gamma" allows to apply more bloom on the bright colors of the source image
 // "bloom_power" is the additional gain applied to the bloom
-// "bloom_on_dark_only" will mix the bloomed image with the original depending on the brightness of
+// "bloom_bypass" will show only the bloomed component
 // the original image.
 #pragma parameter DO_BLOOM           "Bloom:" 				                0.0  0.0  1.0  1.0
 #pragma parameter BLOOM_MIX          "        Final mix, (0.0=off)"			0.2 0.0 1.0  0.01
@@ -201,7 +201,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter bloom_gamma        "        Input Gamma"				4.0  1.0 10.0 1.0
 #pragma parameter bloom_power        "        Power multiplier"				8.0  1.0 10.0 0.1
 #pragma parameter bloom_gamma_out    "        Output Gamma"				1.5  0.1 10.0 0.05
-#pragma parameter bloom_on_dark_only "        Apply less over bright areas"		1.0  0.0 1.0  1.0
+#pragma parameter bloom_bypass       "        Bypass"					0.0  0.0 1.0  1.0
 
 
 
@@ -302,7 +302,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #define bloom_gamma        global.bloom_gamma
 #define bloom_power        global.bloom_power
 #define bloom_gamma_out    global.bloom_gamma_out
-#define bloom_on_dark_only global.bloom_on_dark_only
+#define bloom_bypass       global.bloom_bypass
 
 #define DO_CCORRECTION global.DO_CCORRECTION
 #define GAMMA_OUT      global.GAMMA_OUT
