@@ -54,13 +54,15 @@ vec3 pixel_alternate(vec3 source, float whiteness) {
     return pixel_out;
 }
 
+
+
 vec4 main_wrap() {
     vec4 pixel_in = texture(main_pass, vOutputCoord);
     vec3 pixel_out = pixel_in.rgb;
     vec3 bloomed;
-
+    vec2 coords = vTexCoord;
     //Curvature
-    vec2 coords = vTexCoord ;
+    //vec2 coords = vTexCoord ;
     float l_GEOM_BORDER_WX = GEOM_BORDER_WX;
     float l_GEOM_BORDER_WY = GEOM_BORDER_WY;
     float fborder = 1.0;
@@ -161,16 +163,43 @@ void main() {
     
     
     if (DO_CURVATURE == 1.0) {
+    
+       /* float xmin=0.07;
+        float xmax=0.93;
+        float ymin=0.07;
+        float ymax=0.93;
+    
+        float K = 1.0;
+        if (vTexCoord.x > xmin)
+            if (vTexCoord.y > ymin) 
+                if (vTexCoord.x < xmax) 
+                    if (vTexCoord.y < ymax) {
+                        K = abs(xmin - vTexCoord.x);
+                    }
+        */
+        
+        /*if (vTexCoord.x > xmin)
+            if (vTexCoord.x < xmax)  
+                //K = 1.0 - abs(xmin - vTexCoord.x);
+                K = 2.0;
+        */
+    
+    
         if (GEOM_SHOW_BEZEL == 1.0) {
             vec4 lut = texture(monitor_body,vTexCoord);
-            pixel_out = mix(pixel_out, lut, lut.a*0.8) ;
+            
+            
+            //pixel_out = mix(pixel_out, lut, lut.a *K) ;
+            pixel_out = mix(pixel_out, lut, lut.a) ;
         }
     }
-        
-        
-    
     
     FragColor = pixel_out;
+    
+    //calcolo distanza di vtexcoord dal bordo?
+    //vec2 vdistance = vec2(abs(vTexCoord.x - coords.x) , abs(vTexCoord.y - coords.y));
+    //float prova = distance( Warp(vec2(0.0,0.0),GEOM_WARP_X,GEOM_WARP_Y)  ,vTexCoord);
+    //FragColor = vec4(prova);
     
     
     

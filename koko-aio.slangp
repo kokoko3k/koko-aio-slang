@@ -97,7 +97,7 @@ shaders = 18
        scale_type0 = source
           scale_x0 = 2.0
           scale_y0 = 2.0
-
+        wrap_mode0 = "mirrored_repeat"
 /* Nvidia fxaa pass:
    works good for "SD" resolutions
 */
@@ -106,7 +106,8 @@ shaders = 18
     filter_linear1 = true
        scale_type1 = source
             scale1 = 1.0
-
+        wrap_mode1 = "mirrored_repeat"
+        
     //Put in_glow in its own pass so that we can use lower resolution
            shader2 = shaders/in_glow_and_scanline_flickering.slang
             alias2 = "in_glow_and_scanline_flickering_pass"
@@ -114,7 +115,7 @@ shaders = 18
             scale2 = 1
        scale_type2 = source    
 float_framebuffer2 = true
-      //wrap_mode2 = "clamp_to_edge" //can't use clamp_to edge due to unzoom function
+        wrap_mode2 = "mirrored_repeat"
             
           
     //Put halo in its own pass so that we can use lower resolution
@@ -124,7 +125,7 @@ float_framebuffer2 = true
             scale3 = 1
        scale_type3 = source
 float_framebuffer3 = true
-      //wrap_mode3 = "clamp_to_edge" //can't use clamp_to edge due to unzoom function
+        wrap_mode3 = "mirrored_repeat"
 
 /* In this pass we emulate scanlines, glowing,
    RGB vertical mask, slot mask,haloing and color corrections
@@ -134,7 +135,7 @@ float_framebuffer3 = true
     filter_linear4 = true
             scale4 = 1.0
        scale_type4 = viewport
-        wrap_mode4 = "clamp_to_edge" //can't use clamp_to edge due to unzoom function
+        wrap_mode4 = "mirrored_repeat"
      
 /*      Get the average luminance needed by ambilight here, because:
         * mipmap_input only works on "Source" texture
@@ -188,7 +189,7 @@ float_framebuffer3 = true
         filter_linear10 = true
            scale_type10 = source
                 scale10 = 1
-            wrap_mode10 = "clamp_to_edge"
+            wrap_mode10 = "mirrored_repeat"
         
 // Draw vignette and spot on lower resolution
            shader11 = shaders/vignette_and_spot.slang
