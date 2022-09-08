@@ -177,11 +177,11 @@ vec4 main_wrap(void) {
         if ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0))
             coords = Warp(coords,GEOM_WARP_X,GEOM_WARP_Y);
 
-        vec2 border_coords = coords;
+        vec2 border_coords = vTexCoord;
         if (GEOM_BORDER_WX < 0.0) l_GEOM_BORDER_WX = GEOM_WARP_X;
         if (GEOM_BORDER_WY < 0.0) l_GEOM_BORDER_WY = GEOM_WARP_Y;
         
-        if ((GEOM_BORDER_WX > 0.0) || (GEOM_BORDER_WY > 0.0))
+        if ((l_GEOM_BORDER_WX > 0.0) || (l_GEOM_BORDER_WY > 0.0))
             border_coords = Warp(vTexCoord,l_GEOM_BORDER_WX,l_GEOM_BORDER_WY);
 
         if ((GEOM_ZOOMOUT + GEOM_GAP_SIZE) > 0.0) {
