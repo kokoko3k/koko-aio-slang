@@ -213,8 +213,8 @@ float_framebuffer3 = true
                 alias13 = "ambi_downscale_pass"
         filter_linear13 = true
            scale_type13 = absolute
-              scale_x13 = 320
-              scale_y13 = 240
+              scale_x13 = 32
+              scale_y13 = 24
          mipmap_input13 = true
 
                shader14 = shaders/ambi_passthrough_conditional.slang //shaders/ambi_pre_pass.slang
