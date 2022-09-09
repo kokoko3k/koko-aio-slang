@@ -17,6 +17,16 @@ layout(location = 0) in vec2 vTexCoord;
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D Source;
 
+#define SourceTexture Source
+#define SourceTextureSize params.SourceSize
+
+#include "blooms.slang"
 void main() {
-    FragColor = textureLod(Source, vec2(0.5,0.5),20.0);
+   //FragColor = texture(Source, vTexCoord);
+   vec2 res = vec2(params.SourceSize.x, params.SourceSize.y);
+   vec2 dir = vec2(1.0,0.0);
+   FragColor = blur9(Source, vTexCoord,res,dir);
 }
+ 
+ 
+  

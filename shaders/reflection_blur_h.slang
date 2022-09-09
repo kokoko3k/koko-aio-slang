@@ -15,8 +15,18 @@ void main()
 #pragma stage fragment
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 0) out vec4 FragColor;
-layout(set = 0, binding = 2) uniform sampler2D Source;
+layout(set = 0, binding = 2) uniform sampler2D main_pass;
 
+#define SourceTexture main_pass
+#define SourceTextureSize global.main_passSize
+
+#include "blooms.slang"
 void main() {
-    FragColor = textureLod(Source, vec2(0.5,0.5),20.0);
+   //FragColor = texture(Source, vTexCoord);
+   vec2 res = vec2(global.main_passSize.x, global.main_passSize.y);
+   vec2 dir = vec2(1.0,0.0);
+   FragColor = blur9(main_pass, vTexCoord,res,dir);
 }
+ 
+ 
+  
