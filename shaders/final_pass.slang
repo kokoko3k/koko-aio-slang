@@ -68,8 +68,11 @@ vec4 main_wrap() {
     float l_GEOM_BORDER_WX = GEOM_BORDER_WX;
     float l_GEOM_BORDER_WY = GEOM_BORDER_WY;
     float fborder = 1.0;
-                                                                    
+
     if (DO_CURVATURE == 1.0) {
+        float geom_gap_size_adj = GEOM_GAP_SIZE;
+        if (GEOM_GAP_SIZE < 0.0) geom_gap_size_adj = GEOM_ZOOMOUT;
+
         if ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0))
             coords = Warp(coords,GEOM_WARP_X,GEOM_WARP_Y);
 
@@ -80,9 +83,9 @@ vec4 main_wrap() {
         if ((l_GEOM_BORDER_WX > 0.0) || (l_GEOM_BORDER_WY > 0.0))
             border_coords = Warp(vTexCoord,l_GEOM_BORDER_WX,l_GEOM_BORDER_WY);
 
-        if ((GEOM_ZOOMOUT + GEOM_GAP_SIZE) > 0.0) {
+        if ((GEOM_ZOOMOUT + geom_gap_size_adj) > 0.0) {
             coords = zoomout_coords(coords, GEOM_ZOOMOUT, 1.0);
-            border_coords = zoomout_coords(border_coords, GEOM_ZOOMOUT-GEOM_GAP_SIZE, 1.0);
+            border_coords = zoomout_coords(border_coords, GEOM_ZOOMOUT-geom_gap_size_adj, 1.0);
         }
         fborder = border(border_coords);
     }
@@ -159,36 +162,47 @@ void main() {
     }
     
     
-    
+
     if (DO_CURVATURE == 1.0) {
        
-    
-        float xmin=0.07;
-        float xmax=0.93;
-        float ymin=0.07;
-        float ymax=0.93;
-    
-        float K = 1.0;
+        //bezel not reflective size in percent of the game size
+        float bezel_out_percent=0.026;
 
+        //Calculate the reflection factor K (more near screen borders)
+        float K;
+        vec2 coordsz = zoomout_coords(vTexCoord, GEOM_ZOOMOUT, 1.0);
+        K=max(-coordsz.x,coordsz.x - 1.0);
+        K=max(K,-coordsz.y);
+        K=max(K,coordsz.y - 1.0);
+        K=K*(1/GEOM_ZOOMOUT)*1.1;
+        K=K+0.7;
+        K=min(K,1.0);
+
+
+        //Where to start and end drawing the reflection
+        float xmin = bezel_out_percent;
+        float xmax = 1-bezel_out_percent;
+        float ymin = bezel_out_percent;
+        float ymax = 1-bezel_out_percent;
         vec2 curved_coords = coords;
+        bool is_reflection_area = (
+                ((vTexCoord.x > xmin) && (vTexCoord.x < xmax) && (vTexCoord.y > ymin) && (vTexCoord.y < ymax )) &&
+                ((curved_coords.x < 0.0 ) || (curved_coords.x > 1.0) || (curved_coords.y < 0.0) || (curved_coords.y > 1.0))
+                );
+
+
         if (GEOM_SHOW_BEZEL == 1.0) {
-            
             vec4 lut = texture(monitor_body,vTexCoord);
             pixel_out = mix(pixel_out, lut, lut.a ) ;
             
-            if (
-                    ((vTexCoord.x > xmin) && (vTexCoord.x < xmax) && (vTexCoord.y > ymin) && (vTexCoord.y < ymax )) &&
-                    ((curved_coords.x < 0.0 ) || (curved_coords.x > 1.0) || (curved_coords.y < 0.0) || (curved_coords.y > 1.0))
-                ) {
-                        K = 0.8;
-                        pixel_out  = texture(reflected_blurred_pass2,vOutputCoord);
-                        pixel_out = mix(pixel_out, lut, K ) ;
-                    }
+            if ( is_reflection_area ){
+                pixel_out = texture(reflected_blurred_pass2,vOutputCoord);
+                pixel_out = mix(pixel_out, lut, K ) ;
+                //pixel_out = mix (vec4(0.0,0.0,K,0.0),lut,0.1);
             }
+        }
     }
-    
 
-    
     FragColor = pixel_out;
 
 }
