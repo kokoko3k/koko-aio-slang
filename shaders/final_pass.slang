@@ -127,35 +127,46 @@ vec4 main_wrap() {
 }
 
 void main() {
-    bool IsOuterFrame;
-    vec4 psample = texture(main_pass, vOutputCoord);
     vec4 pixel_out;
-    if ( border_needed() ) {
-        IsOuterFrame = is_outer_frame(psample);
-        if (IsOuterFrame)
-            pixel_out = mark_outer_frame(vec3(0.0));
-                else
-            pixel_out = main_wrap();
-    } else {
-        pixel_out = main_wrap();
-    }
-
-    if (DO_AMBILIGHT == 1) {
-        vec3 ambinoised = ambi_noised();  //Mix ambilight and noise
-        if (IsOuterFrame) {
-            //put ambilight on the outher frame
-            FragColor = mark_outer_frame(ambi_noised()); 
-        } else {
-            //mix ambilight in the inner frame too, as curvature could shrink into the inner frame.
-            FragColor = vec4(mix(ambinoised.rgb,pixel_out.rgb,min(pixel_out.a*1.5,1.0)),pixel_out.a);
-        }
-    } else {
-        FragColor = pixel_out ;
+    
+    //Just do main_wrap and exit when there is no need to paint border.
+    if (!border_needed()) {
+        FragColor = main_wrap();
+        return;
     }
     
+    //From now on, we need a border.
+        vec4 psample = texture(main_pass, vOutputCoord); //Use psample from main_pass to know if is a border or not //FIXME: use coords <0 or >1 instead?
+        bool IsOuterFrame = is_outer_frame(psample);
+        bool bIs_outer_frame = is_outer_frame(psample);
+        
+        
+        //Handle outer frame cases
+            //if we want ambilights in the outer frame, draw it and return
+            if ((bIs_outer_frame) && (DO_AMBILIGHT == 1)) {
+                FragColor = vec4(ambi_noised(),1.0);
+                return;
+            }
+            
+            //But if it is just outer frame, just make it black.
+            if (bIs_outer_frame) {
+                FragColor = vec4(0.0);
+                return;
+            }
+        
+        //Handle inner frame cases
+            vec4 pixel_main_wrap = main_wrap();
+            if (DO_AMBILIGHT == 1) {
+                //mix ambilight in the inner frame too, as curvature could shrink into the inner frame.
+                FragColor = vec4(mix(ambi_noised().rgb,pixel_main_wrap.rgb,min(pixel_main_wrap.a*1.5,1.0)),pixel_main_wrap.a);
+                return;
+            }
+            
+            
+            //Last case, inner border without ambilight:
+            FragColor = pixel_main_wrap;
+            return;
     
-    /*if (params.OutputSize.y == 1920) {
-    FragColor = vec4(1.0);
-    }*/
+    
 
 }
