@@ -53,6 +53,7 @@ vec3 pixel_alternate(vec3 source, float whiteness) {
     return pixel_out;
 }
 
+
 vec4 main_wrap() {
     vec4 pixel_in = texture(main_pass, vOutputCoord);
     vec3 pixel_out = pixel_in.rgb;
@@ -136,10 +137,7 @@ void main() {
     }
     
     //From now on, we need a border.
-        vec4 psample = texture(main_pass, vOutputCoord); //Use psample from main_pass to know if is a border or not //FIXME: use coords <0 or >1 instead?
-        bool IsOuterFrame = is_outer_frame(psample);
-        bool bIs_outer_frame = is_outer_frame(psample);
-        
+        bool bIs_outer_frame = ((vTexCoord.x < 0.0) || (vTexCoord.x > 1.0));
         
         //Handle outer frame cases
             //if we want ambilights in the outer frame, draw it and return
