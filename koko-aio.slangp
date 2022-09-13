@@ -5,7 +5,7 @@
 
     Investigate the possible use of mipmapping in bloom function too.
     Try to move flickering scanlines into main, maybe by faking them with screenlines?
-    
+    Halo should take in_glow if available (?)
     
 Performances:
 haswell igp: i5-4590 CPU @ 3.30GHz
@@ -42,7 +42,8 @@ Total basal + all the features: 72.2
 
     Actually it provides emulation for:
         scanlines, screenlines, RGB vertical masks, horizontal slot masks,
-        glowing, haloing, blooming, gamma and saturation correction,
+        glowing, haloing, blooming, gamma and saturation correction,pixel_outi
+        
         black frame insertions, interlace emulation, antialiasing.
 
     External code by:
@@ -76,13 +77,11 @@ Total basal + all the features: 72.2
 
 */
 
-
            textures = "monitor_body"
        monitor_body = "textures/f1.png"
 monitor_body_linear = "true"
 
-
-shaders = 18
+shaders = 19
 /*For P-uae defaults, doubling just y0 seems the best option.
   90% of games are lowres in vertical size and p-uae defaults
   to 720 pixels width, which is enough for this preset to work as intended.
@@ -92,13 +91,16 @@ shaders = 18
   Auto-Cropping/overscan emulation could be added in a future release.
   For other emulators/systems, probably it is best and safe to doulbe x0 too.
 */
+
+
+
            shader0 = shaders/passthrough.slang
             alias0 = "doublesize_pass"
     filter_linear0 = false
        scale_type0 = source
           scale_x0 = 2.0
           scale_y0 = 2.0
-
+        wrap_mode0 = "mirrored_repeat"
 /* Nvidia fxaa pass:
    works good for "SD" resolutions
 */
@@ -107,7 +109,8 @@ shaders = 18
     filter_linear1 = true
        scale_type1 = source
             scale1 = 1.0
-
+        wrap_mode1 = "mirrored_repeat"
+        
     //Put in_glow in its own pass so that we can use lower resolution
            shader2 = shaders/in_glow_and_scanline_flickering.slang
             alias2 = "in_glow_and_scanline_flickering_pass"
@@ -115,7 +118,7 @@ shaders = 18
             scale2 = 1
        scale_type2 = source    
 float_framebuffer2 = true
-      //wrap_mode2 = "clamp_to_edge" //can't use clamp_to edge due to unzoom function
+        wrap_mode2 = "mirrored_repeat"
             
           
     //Put halo in its own pass so that we can use lower resolution
@@ -125,7 +128,7 @@ float_framebuffer2 = true
             scale3 = 1
        scale_type3 = source
 float_framebuffer3 = true
-      //wrap_mode3 = "clamp_to_edge" //can't use clamp_to edge due to unzoom function
+        wrap_mode3 = "mirrored_repeat"
 
 /* In this pass we emulate scanlines, glowing,
    RGB vertical mask, slot mask,haloing and color corrections
@@ -135,19 +138,35 @@ float_framebuffer3 = true
     filter_linear4 = true
             scale4 = 1.0
        scale_type4 = viewport
-        wrap_mode4 = "clamp_to_edge" //can't use clamp_to edge due to unzoom function
+        wrap_mode4 = "mirrored_repeat"
      
 /*      Get the average luminance needed by ambilight here, because:
         * mipmap_input only works on "Source" texture
         * the following pass does not use the previous one 
         * the previous pass represents scene changes.
 */
+
                shader5 = shaders/ambi_avglum_pass.slang
                 alias5 = "ambi_avglum_pass"
-        filter_linear5 = false
-           scale_type5 = source
-                scale5 = 0.01
+        filter_linear5 = true
+           scale_type5 = absolute
+              scale_x5 = 320
+              scale_y5 = 240
          mipmap_input5 = true
+
+               shader6 = shaders/reflection_blur_h.slang
+                alias6 = "reflected_blurred_pass1"
+        filter_linear6 = true
+           scale_type6 = source
+                scale6 = 1.0
+            wrap_mode6 = "mirrored_repeat"
+
+               shader7 = shaders/reflection_blur_v.slang
+                alias7 = "reflected_blurred_pass2"
+        filter_linear7 = true
+           scale_type7 = source
+            wrap_mode7 = "mirrored_repeat"
+            
 
 
 /* In the subsequent passes we do first a fast blOOm by first
@@ -155,95 +174,98 @@ float_framebuffer3 = true
    it fast, next we do subsequent blURs of the bloomed
    pass.
 */
-               shader6 = shaders/passthrough_original.slang ///bloom_passthrough_conditional.slang
-                alias6 = "bloom_pass_0"
-        filter_linear6 = true
-           scale_type6 = absolute
-              scale_x6 = 320
-              scale_y6 = 240
-            wrap_mode6 = "clamp_to_edge"
+   
+   //
+   //            shader8 = shaders/passthrough_original.slang ///bloom_passthrough_conditional.slang
+   //             alias8 = "bloom_pass_0"
+   //     filter_linear8 = true
+   //        scale_type8 = absolute
+   //           scale_x8 = 320
+   //           scale_y8 = 240
+   //         wrap_mode8 = "clamp_to_edge"
         
-               shader7 = shaders/bloom_pass_1.slang
-                alias7 = "bloom_pass_1"
-        filter_linear7 = true
-           scale_type7 = source
-                scale7 = 1
-            wrap_mode7 = "clamp_to_edge"
-        
-               shader8 = shaders/bloom_pass_2.slang
-                alias8 = "bloom_pass_2"
+               shader8 = shaders/bloom_pass_1.slang
+                alias8 = "bloom_pass_1"
         filter_linear8 = true
-           scale_type8 = source
-                scale8 = 1
+           scale_type8 = absolute
+              scale_x8 = 320
+              scale_y8 = 240
             wrap_mode8 = "clamp_to_edge"
         
                shader9 = shaders/bloom_pass_2.slang
-                alias9 = "bloom_pass_3"
+                alias9 = "bloom_pass_2"
         filter_linear9 = true
            scale_type9 = source
                 scale9 = 1
             wrap_mode9 = "clamp_to_edge"
         
                shader10 = shaders/bloom_pass_2.slang
-                alias10 = "bloom_pass_final"
+                alias10 = "bloom_pass_3"
         filter_linear10 = true
            scale_type10 = source
                 scale10 = 1
             wrap_mode10 = "clamp_to_edge"
         
+               shader11 = shaders/bloom_pass_2.slang
+                alias11 = "bloom_pass_final"
+        filter_linear11 = true
+           scale_type11 = source
+                scale11 = 1
+            wrap_mode11 = "mirrored_repeat"
+        
 // Draw vignette and spot on lower resolution
-           shader11 = shaders/vignette_and_spot.slang
-       scale_type11 = absolute
-            alias11 = vignette_and_spot_pass
-    filter_linear11 = true
-          scale_x11  = 256
-          scale_y11  = 256
+           shader12 = shaders/vignette_and_spot.slang
+       scale_type12 = absolute
+            alias12 = vignette_and_spot_pass
+    filter_linear12 = true
+          scale_x12  = 256
+          scale_y12  = 256
 
 
 /* Create the ambilight magic: */
         //...repeat left and right borders
-               shader12 = shaders/ambi_displace.slang
-                alias12 = "ambi_displace_pass"
-        filter_linear12 = true
-           scale_type12 = source
-               scale_12  = 1.0
-         mipmap_input12 = false
+               shader13 = shaders/ambi_displace.slang
+                alias13 = "ambi_displace_pass"
+        filter_linear13 = true
+           scale_type13 = source
+               scale_13  = 1.0
+         mipmap_input13 = false
 
         //...then just downscale via mipmapping here:
-               shader13 = shaders/ambi_passthrough_conditional.slang
-                alias13 = "ambi_downscale_pass"
-        filter_linear13 = true
-           scale_type13 = absolute
-              scale_x13 = 32
-              scale_y13 = 24
-         mipmap_input13 = true
-
-               shader14 = shaders/ambi_passthrough_conditional.slang //shaders/ambi_pre_pass.slang
+               shader14 = shaders/ambi_passthrough_conditional.slang
+                alias14 = "ambi_downscale_pass"
         filter_linear14 = true
-           scale_type14 = source
-                scale14 = 8.0
+           scale_type14 = absolute
+              scale_x14 = 32
+              scale_y14 = 24
+         mipmap_input14 = true
 
-               shader15 = shaders/ambi_pre_pass.slang
-                alias15 = "ambi_pre_pass1"
+               shader15 = shaders/ambi_passthrough_conditional.slang //shaders/ambi_pre_pass.slang
         filter_linear15 = true
            scale_type15 = source
-                scale15 = 1.0
+                scale15 = 8.0
 
-               shader16 = shaders/ambi_temporal_pass.slang
-                alias16 = "ambi_temporal_pass"
+               shader16 = shaders/ambi_pre_pass.slang
+                alias16 = "ambi_pre_pass1"
         filter_linear16 = true
            scale_type16 = source
-    float_framebuffer16 = true
+                scale16 = 1.0
+
+               shader17 = shaders/ambi_temporal_pass.slang
+                alias17 = "ambi_temporal_pass"
+        filter_linear17 = true
+           scale_type17 = source
+    float_framebuffer17 = true
 
     
 /* This pass pass will do the composition of the previous passes
    with the bloomed image, vignette and spot light,  and black frame insertions.
 */
-           shader17 = shaders/final_pass.slang
-            alias17 = "final_pass"
-    filter_linear17 = true
-       scale_type17 = viewport
-            scale17 = 1.0
+           shader18 = shaders/final_pass.slang
+            alias18 = "final_pass"
+    filter_linear18 = true
+       scale_type18 = viewport
+            scale18 = 1.0
             
     
 //           shader18 = shaders/ambi_mix_pass.slang
