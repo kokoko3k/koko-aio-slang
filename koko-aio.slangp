@@ -78,8 +78,7 @@ Total basal + all the features: 72.2
 */
 
 textures = "monitor_body"
-//monitor_body = "textures/monitor-frame1-1.png"
-monitor_body = "textures/frame2.png"
+monitor_body = "textures/monitor-frame1-1.png"
 square_linear = "true"
 
 shaders = 19
