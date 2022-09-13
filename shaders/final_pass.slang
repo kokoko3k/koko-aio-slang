@@ -73,19 +73,18 @@ vec3 bezel_color(float lum)  {
    
 }
 
-vec3 pixel_bezel(vec3 screen_content) {
+vec3 compose_bezel_over(vec3 screen_content) {
     vec4 bezel = texture(monitor_body,vTexCoord);
     
     //We use the red component of the bezel to express its luminance (define bezel_luminance bezel.r)
     vec3 bezel_colored = bezel_color(bezel_luminance);
 
-    
     return mix(screen_content, bezel_colored, bezel.a);
 
 }
 
 
-vec4 main_wrap() {
+vec4 pixel_inner_frame() {
     vec4 pixel_in = texture(main_pass, vOutputCoord);
     vec3 pixel_out = pixel_in.rgb;
     vec3 bloomed;
@@ -157,56 +156,54 @@ vec4 main_wrap() {
     //Deband
     if (DO_NOISE) pixel_out = pixel_out + random();
 
-    
-    //Bezel
-    if (DO_BEZEL == 1.0) {
-        pixel_out = pixel_bezel(pixel_out);
-    }
-    
-    
-    
+
     //Out
     return vec4(pixel_out,pixel_in.a);
 }
 
-void main() {
-    vec4 pixel_out;
+
+vec4 main_wrap(){
+    /* Handle inner border and outer border, not bezel */
     
-    //Just do main_wrap and exit when there is no need to paint border.
-    if (!border_needed()) {
-        FragColor = main_wrap();
-        return;
-    }
-    
+    //Just do pixel_inner_frame() and exit when there is no need to paint border.
+    if (!border_needed()) return pixel_inner_frame();
+
     //From now on, we need a border.
         bool bIs_outer_frame = ((vTexCoord.x < 0.0) || (vTexCoord.x > 1.0));
         
         //Handle outer frame cases
             //if we want ambilights in the outer frame, draw it and return
-            if ((bIs_outer_frame) && (DO_AMBILIGHT == 1)) {
-                FragColor = vec4(ambi_noised(),1.0);
-                return;
-            }
+            if ((bIs_outer_frame) && (DO_AMBILIGHT == 1))
+                return vec4(ambi_noised(),1.0);
             
             //But if it is just outer frame, just make it black.
-            if (bIs_outer_frame) {
-                FragColor = vec4(0.0);
-                return;
-            }
+            if (bIs_outer_frame) return vec4(0.0);
+
         
         //Handle inner frame cases
-            vec4 pixel_main_wrap = main_wrap();
+            vec4 vPixel_inner_frame = pixel_inner_frame();
             if (DO_AMBILIGHT == 1) {
                 //mix ambilight in the inner frame too, as curvature could shrink into the inner frame.
-                FragColor = vec4(mix(ambi_noised().rgb,pixel_main_wrap.rgb,min(pixel_main_wrap.a*1.5,1.0)),pixel_main_wrap.a);
-                return;
+                return vec4(mix(ambi_noised().rgb,vPixel_inner_frame.rgb,min(vPixel_inner_frame.a*1.5,1.0)),vPixel_inner_frame.a);
+                
             }
             
-            
             //Last case, inner border without ambilight:
-            FragColor = pixel_main_wrap;
-            return;
+            return vPixel_inner_frame;
+}
+
+
+void main() {
+    //"Just" handle inner and outer frame here:
+    vec4 pixel_out = main_wrap();
     
+    //Bezel
+    if (DO_BEZEL == 1.0) {
+        pixel_out = vec4(compose_bezel_over(pixel_out.rgb),1.0);
+    }
+    
+    FragColor = pixel_out;
+
     
 
 }

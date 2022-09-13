@@ -23,7 +23,8 @@ Several presets are included.<br>
 * Curvature
 * Ambient lights
 * Vignette and Spotlight
-* Bezel
+* Bezel (Thank you HyperspaceMadness for allowing me to rip his automagically generated bezel!)
+  https://github.com/HyperspaceMadness/
 
 ***External code by:***
 * CRT - Guest - Dr.Venom (single pass bloom function)
