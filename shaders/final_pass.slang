@@ -24,6 +24,7 @@ layout(set = 0, binding = 2) uniform sampler2D main_pass;
 layout(set = 0, binding = 3) uniform sampler2D bloom_pass_final;
 layout(set = 0, binding = 4) uniform sampler2D vignette_and_spot_pass;
 layout(set = 0, binding = 5) uniform sampler2D ambi_temporal_pass;
+layout(set = 0, binding = 6) uniform sampler2D monitor_body;
 
 #include "functions.include"
 
@@ -51,6 +52,13 @@ vec3 pixel_alternate(vec3 source, float whiteness) {
         if  ((mod(line,ALT_BLANK_PERIOD )) <= l_period_half) pixel_out=mix(source,vec3(0), whiteness) ;
     }
     return pixel_out;
+}
+
+vec3 pixel_bezel(vec3 screen_content) {
+    vec4 bezel = texture(monitor_body,vTexCoord);
+    vec3 bezel_luminance = vec3(bezel.r);
+    
+    return mix(screen_content,bezel_luminance,bezel.a);
 }
 
 
@@ -122,7 +130,14 @@ vec4 main_wrap() {
 
     //Deband
     if (DO_NOISE) pixel_out = pixel_out + random();
-        
+
+    
+    //Bezel
+    if (DO_BEZEL == 1.0) {
+        pixel_out = pixel_bezel(pixel_out);
+    }
+    
+    
     //Out
     return vec4(pixel_out,pixel_in.a);
 }
