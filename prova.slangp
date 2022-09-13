@@ -48,4 +48,8 @@ DO_ALT_BLANK = 0.0
 DO_AMBILIGHT = "1.000000"
 
 DO_BEZEL = "1.0"
+BEZEL_R = "0.2"
+BEZEL_G = "-0.2"
+BEZEL_B = "0.2"
+BEZEL_CON = "1.0"
 	

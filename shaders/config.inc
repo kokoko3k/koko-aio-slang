@@ -73,6 +73,10 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float GEOM_ZOOMOUT;
 	float GEOM_GAP_SIZE;
 	float DO_BEZEL;
+	float BEZEL_R;
+	float BEZEL_G;
+	float BEZEL_B;
+	float BEZEL_CON;
 	float DO_SPOT;
 	float s_center_x;
 	float s_center_y; 
@@ -227,6 +231,10 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 //Bezel related
 #pragma parameter DO_BEZEL	     "Emulate bezel:"			0.0   0.0 1.0 1.0
+#pragma parameter BEZEL_R            "        Bezel color: Red"		0.0   -0.5 0.5  0.01
+#pragma parameter BEZEL_G            "        Bezel color: Green"	0.0   -0.5 0.5  0.01
+#pragma parameter BEZEL_B            "        Bezel color: Blue"	0.0   -0.5 0.5  0.01
+#pragma parameter BEZEL_CON          "        Bezel Contrast"		1.0   0.0  10.0 0.01
 
 
 //Vignette and spot
@@ -329,7 +337,10 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #define GEOM_GAP_SIZE      global.GEOM_GAP_SIZE
 
 #define DO_BEZEL           global.DO_BEZEL
-
+#define BEZEL_R            global.BEZEL_R
+#define BEZEL_G            global.BEZEL_G
+#define BEZEL_B            global.BEZEL_B
+#define BEZEL_CON          global.BEZEL_CON
 
 #define DO_SPOT    global.DO_SPOT
 #define s_bypass   global.s_bypass

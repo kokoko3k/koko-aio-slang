@@ -54,11 +54,34 @@ vec3 pixel_alternate(vec3 source, float whiteness) {
     return pixel_out;
 }
 
+
+float scale_to_range(float x, float dmin, float dmax) {
+    //Scales 0..1 range to a..b range
+    return ( (dmax-dmin) * x ) + dmin;
+}
+
+#define bezel_luminance bezel.r
+vec3 bezel_color(float lum)  {
+    vec3 col = vec3(BEZEL_R,BEZEL_G,BEZEL_B) + lum;
+    
+    float con_min = -0.5*BEZEL_CON + 0.5;
+    float con_max =  0.5*BEZEL_CON + 0.5;
+    col.r = scale_to_range(col.r, con_min, con_max); //contrast
+    col.g = scale_to_range(col.g, con_min, con_max); //contrast
+    col.b = scale_to_range(col.b, con_min, con_max); //contrast
+
+    return clamp(col,0.0,1.0);
+    
+}
+
 vec3 pixel_bezel(vec3 screen_content) {
     vec4 bezel = texture(monitor_body,vTexCoord);
-    vec3 bezel_luminance = vec3(bezel.r);
     
-    return mix(screen_content,bezel_luminance,bezel.a);
+    //We use the red component of the bezel to express its luminance (define bezel_luminance bezel.r)
+    vec3 bezel_colored = bezel_color(bezel_luminance);
+    
+    return mix(screen_content, bezel_colored, bezel.a);
+
 }
 
 
