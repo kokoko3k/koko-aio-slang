@@ -72,7 +72,6 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float GEOM_CORNER_SMOOTH;
 	float GEOM_ZOOMOUT;
 	float GEOM_GAP_SIZE;
-	float GEOM_SHOW_BEZEL;
 	float DO_SPOT;
 	float s_center_x;
 	float s_center_y; 
@@ -224,7 +223,6 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter GEOM_CORNER_SMOOTH "        Corner sharpness"			350.0 50.0 1000.0 25.0
 #pragma parameter GEOM_ZOOMOUT       "        Monitor zoom out"			0.0   0.0 0.3 0.01
 #pragma parameter GEOM_GAP_SIZE      "        Monitor Gap"			0.0   0.0 0.3 0.005
-#pragma parameter GEOM_SHOW_BEZEL    "        Show monitor Frame"		0.0   0.0 1.0 1.0
 
 
 
@@ -326,7 +324,6 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #define GEOM_CORNER_SMOOTH global.GEOM_CORNER_SMOOTH
 #define GEOM_ZOOMOUT       global.GEOM_ZOOMOUT	
 #define GEOM_GAP_SIZE      global.GEOM_GAP_SIZE
-#define GEOM_SHOW_BEZEL    global.GEOM_SHOW_BEZEL
 
 
 #define DO_SPOT    global.DO_SPOT

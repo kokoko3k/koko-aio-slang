@@ -24,7 +24,6 @@ layout(set = 0, binding = 2) uniform sampler2D main_pass;
 layout(set = 0, binding = 3) uniform sampler2D bloom_pass_final;
 layout(set = 0, binding = 4) uniform sampler2D vignette_and_spot_pass;
 layout(set = 0, binding = 5) uniform sampler2D ambi_temporal_pass;
-layout(set = 0, binding = 6) uniform sampler2D monitor_body;
 
 #include "functions.include"
 
@@ -123,8 +122,6 @@ vec4 main_wrap() {
     //Deband
     if (DO_NOISE) pixel_out = pixel_out + random();
         
-    
-        
     //Out
     return vec4(pixel_out,pixel_in.a);
 }
@@ -147,38 +144,14 @@ void main() {
         vec3 ambinoised = ambi_noised();  //Mix ambilight and noise
         if (IsOuterFrame) {
             //put ambilight on the outher frame
-            pixel_out = mark_outer_frame(ambi_noised()); 
+            FragColor = mark_outer_frame(ambi_noised()); 
         } else {
             //mix ambilight in the inner frame too, as curvature could shrink into the inner frame.
-            pixel_out = vec4(mix(ambinoised.rgb,pixel_out.rgb,min(pixel_out.a*1.5,1.0)),pixel_out.a);
+            FragColor = vec4(mix(ambinoised.rgb,pixel_out.rgb,min(pixel_out.a*1.5,1.0)),pixel_out.a);
         }
+    } else {
+        FragColor = pixel_out ;
     }
-    
-    
-    
-    
-    
-    
-    
-    if (DO_CURVATURE == 1.0) {
-        if (GEOM_SHOW_BEZEL == 1.0) {
-            vec4 lut = texture(monitor_body,vTexCoord);
-            pixel_out = mix(pixel_out, lut, lut.a);
-        }
-    }
-        
-        
-    
-    
-    FragColor = pixel_out;
-    
-    
-    
-    
-    
-    
-    
-    
     
     
     /*if (params.OutputSize.y == 1920) {

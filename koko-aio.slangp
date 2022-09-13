@@ -42,8 +42,7 @@ Total basal + all the features: 72.2
 
     Actually it provides emulation for:
         scanlines, screenlines, RGB vertical masks, horizontal slot masks,
-        glowing, haloing, blooming, gamma and saturation correction,pixel_outi
-        
+        glowing, haloing, blooming, gamma and saturation correction,
         black frame insertions, interlace emulation, antialiasing.
 
     External code by:
@@ -76,10 +75,6 @@ Total basal + all the features: 72.2
 
 
 */
-
-textures = "monitor_body"
-monitor_body = "textures/monitor-frame1-1.png"
-square_linear = "true"
 
 shaders = 18
 /*For P-uae defaults, doubling just y0 seems the best option.
