@@ -25,7 +25,6 @@ layout(set = 0, binding = 3) uniform sampler2D bloom_pass_final;
 layout(set = 0, binding = 4) uniform sampler2D vignette_and_spot_pass;
 layout(set = 0, binding = 5) uniform sampler2D ambi_temporal_pass;
 layout(set = 0, binding = 6) uniform sampler2D monitor_body;
-layout(set = 0, binding = 7) uniform sampler2D reflected_blurred_pass;
 
 #include "functions.include"
 
@@ -55,14 +54,13 @@ vec3 pixel_alternate(vec3 source, float whiteness) {
     return pixel_out;
 }
 
-vec2 coords = vTexCoord;
-vec2 border_coords = vTexCoord;
+
 
 vec4 main_wrap() {
     vec4 pixel_in = texture(main_pass, vOutputCoord);
     vec3 pixel_out = pixel_in.rgb;
     vec3 bloomed;
-    //vec2 coords = vTexCoord;
+    vec2 coords = vTexCoord;
     //Curvature
     //vec2 coords = vTexCoord ;
     float l_GEOM_BORDER_WX = GEOM_BORDER_WX;
@@ -73,7 +71,7 @@ vec4 main_wrap() {
         if ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0))
             coords = Warp(coords,GEOM_WARP_X,GEOM_WARP_Y);
 
-        //vec2 border_coords = vTexCoord;
+        vec2 border_coords = vTexCoord;
         if (GEOM_BORDER_WX < 0.0) l_GEOM_BORDER_WX = GEOM_WARP_X;
         if (GEOM_BORDER_WY < 0.0) l_GEOM_BORDER_WY = GEOM_WARP_Y;
         
@@ -166,13 +164,13 @@ void main() {
     
     if (DO_CURVATURE == 1.0) {
     
-        float xmin=0.07;
+       /* float xmin=0.07;
         float xmax=0.93;
         float ymin=0.07;
         float ymax=0.93;
     
         float K = 1.0;
-      /*  if (vTexCoord.x > xmin)
+        if (vTexCoord.x > xmin)
             if (vTexCoord.y > ymin) 
                 if (vTexCoord.x < xmax) 
                     if (vTexCoord.y < ymax) {
@@ -187,54 +185,14 @@ void main() {
         */
     
     
-
-        
-    vec2 curved_coords = coords;
-    if (vTexCoord.x > xmin)
-        if (curved_coords.x < 0.0 )
-            if (vTexCoord.y > ymin) 
-                if (vTexCoord.y < ymax )
-                    K= 0.5;
-                    
-    if (curved_coords.x > 1.0)
-        if (vTexCoord.x < xmax)
-            if (vTexCoord.y > ymin)
-                if (vTexCoord.y < ymax)
-                    K=0.5;
-                    
-    if (vTexCoord.y > ymin)
-        if (curved_coords.y < 0.0)
-            if (vTexCoord.x > xmin)
-                if (vTexCoord.x < xmax)
-                    K=0.5;
-
-    if (vTexCoord.y > ymin)
-        if (curved_coords.y > 1.0)
-            if (vTexCoord.y < ymax)
-                if (vTexCoord.x > xmin)
-                if (vTexCoord.x < xmax)
-                    K=0.5;
-    
-    //if (vTexCoord.x > xmin)
-    
         if (GEOM_SHOW_BEZEL == 1.0) {
             vec4 lut = texture(monitor_body,vTexCoord);
-            pixel_out = mix(pixel_out, lut, lut.a ) ;
-        if (K == 0.5) {
-            pixel_out  = texture(reflected_blurred_pass,vOutputCoord);
-            //pixel_out = mix(pixel_out, lut, K) ;
-            pixel_out = mix(pixel_out, lut, K ) ;
-            }
+            
+            
+            //pixel_out = mix(pixel_out, lut, lut.a *K) ;
+            pixel_out = mix(pixel_out, lut, lut.a) ;
         }
-    
-    
-
-    
     }
-    
-
-    
-    
     
     FragColor = pixel_out;
     
