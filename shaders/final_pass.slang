@@ -25,6 +25,7 @@ layout(set = 0, binding = 3) uniform sampler2D bloom_pass_final;
 layout(set = 0, binding = 4) uniform sampler2D vignette_and_spot_pass;
 layout(set = 0, binding = 5) uniform sampler2D ambi_temporal_pass;
 layout(set = 0, binding = 6) uniform sampler2D monitor_body;
+layout(set = 0, binding = 7) uniform sampler2D reflected_blurred_pass2;
 
 #include "functions.include"
 
@@ -73,13 +74,59 @@ vec3 bezel_color(float lum)  {
    
 }
 
+vec2 coords = vTexCoord ; //FIXME how bad is this global variable?
+//bezel not reflective size in percent of the game size
+#define BEZEL_OUT_PERCENT 0.02
+#define rxmin (BEZEL_OUT_PERCENT)
+#define rxmax (1-BEZEL_OUT_PERCENT)
+#define rymin (BEZEL_OUT_PERCENT)
+#define rymax (1-BEZEL_OUT_PERCENT)
+
+bool is_reflection_area() {
+    return ((vTexCoord.x > rxmin) && (vTexCoord.x < rxmax) && (vTexCoord.y > rymin) && (vTexCoord.y < rymax )) &&
+           ((coords.x < 0.0 ) || (coords.x > 1.0) || (coords.y < 0.0) || (coords.y > 1.0));
+}
+
+
+float quad_smoothstep(vec2 co, float smooth_threshold) {
+    float mysmoothstep =              smoothstep(-smooth_threshold,smooth_threshold, co.x);
+    mysmoothstep = min( mysmoothstep, smoothstep(-smooth_threshold,smooth_threshold, co.y) );
+    mysmoothstep = min( mysmoothstep, smoothstep(1+smooth_threshold,1-smooth_threshold, co.y) );
+    mysmoothstep = min( mysmoothstep, smoothstep(1+smooth_threshold,1-smooth_threshold, co.x) );
+    return mysmoothstep;
+}
+
 vec3 compose_bezel_over(vec3 screen_content) {
+    //Main lut:
     vec4 bezel = texture(monitor_body,vTexCoord);
     
     //We use the red component of the bezel to express its luminance (define bezel_luminance bezel.r)
     vec3 bezel_colored = bezel_color(bezel_luminance);
 
-    return mix(screen_content, bezel_colored, bezel.a);
+    //This is the reflection to be composed over the bezel
+    vec3 pixel_mirrored = texture(reflected_blurred_pass2,vOutputCoord).rgb;
+    
+    vec3 bezel_out = bezel_colored;
+    
+     
+    vec3 screen_content_antialiased = screen_content;
+
+    float smooth_threshold_antialias = (params.OutputSize.z + params.OutputSize.w) * 0.0;
+    float smooth_threshold_reflection = (params.OutputSize.z + params.OutputSize.w) * 20.0; //FIXME: id should depend on bezel size, not output size
+    //float mysmootstep_antialias  = quad_smoothstep(coords,smooth_threshold_antialias);
+    float mysmootstep_reflection = quad_smoothstep(coords,smooth_threshold_reflection);
+    
+    //if (is_reflection_area()) 
+         bezel_out = mix(bezel_colored,pixel_mirrored,mysmootstep_reflection);   //FIXME: solo se la luce è più forte della superficie
+    
+    
+    //if (coords.x < 0.0)  screen_content_antialiased = vec3(0.0); //screen_content;
+    //if (is_reflection_area())  
+    //    screen_content_antialiased.rgb = screen_content.rgb * mysmootstep_antialias;
+
+    
+    //return vec3(mysmoothstep);
+    return mix(screen_content, bezel_out, bezel.a);
 
 }
 
@@ -90,7 +137,7 @@ vec4 pixel_inner_frame() {
     vec3 bloomed;
 
     //Curvature
-    vec2 coords = vTexCoord ;
+    //vec2 coords = vTexCoord ;
     float l_GEOM_BORDER_WX = GEOM_BORDER_WX;
     float l_GEOM_BORDER_WY = GEOM_BORDER_WY;
     float fborder = 1.0;
@@ -191,7 +238,6 @@ vec4 main_wrap(){
             //Last case, inner border without ambilight:
             return vPixel_inner_frame;
 }
-
 
 void main() {
     //"Just" handle inner and outer frame here:
