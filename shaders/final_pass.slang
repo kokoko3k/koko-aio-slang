@@ -163,7 +163,7 @@ void main() {
     if (DO_CURVATURE == 1.0) {
         if (GEOM_SHOW_BEZEL == 1.0) {
             vec4 lut = texture(monitor_body,vTexCoord);
-            pixel_out = mix(pixel_out, lut, lut.a) ;
+            pixel_out = mix(pixel_out, lut, lut.a);
         }
     }
         
