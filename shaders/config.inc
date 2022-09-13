@@ -222,8 +222,8 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter GEOM_BORDER_WY     "        Border Curve Y (neg=use Warp Y)"	0.02  -0.01 0.2 0.01
 #pragma parameter GEOM_CORNER_SIZE   "        Corner Size"			0.01  0.005 0.1 0.005
 #pragma parameter GEOM_CORNER_SMOOTH "        Corner sharpness"			350.0 50.0 1000.0 25.0
-#pragma parameter GEOM_ZOOMOUT       "        Monitor zoom out"			0.0      0.0 0.5 0.01
-#pragma parameter GEOM_GAP_SIZE      "        Monitor Gap"				-0.005   0.0 0.5 0.005
+#pragma parameter GEOM_ZOOMOUT       "        Monitor zoom out"			0.0   0.0 0.3 0.01
+#pragma parameter GEOM_GAP_SIZE      "        Monitor Gap"			0.0   0.0 0.3 0.005
 #pragma parameter GEOM_SHOW_BEZEL    "        Show monitor Frame"		0.0   0.0 1.0 1.0
 
 
