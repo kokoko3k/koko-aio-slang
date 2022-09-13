@@ -63,15 +63,14 @@ float scale_to_range(float x, float dmin, float dmax) {
 #define bezel_luminance bezel.r
 vec3 bezel_color(float lum)  {
     vec3 col = vec3(BEZEL_R,BEZEL_G,BEZEL_B) + lum;
-    
+
     float con_min = -0.5*BEZEL_CON + 0.5;
     float con_max =  0.5*BEZEL_CON + 0.5;
     col.r = scale_to_range(col.r, con_min, con_max); //contrast
     col.g = scale_to_range(col.g, con_min, con_max); //contrast
     col.b = scale_to_range(col.b, con_min, con_max); //contrast
-
     return clamp(col,0.0,1.0);
-    
+   
 }
 
 vec3 pixel_bezel(vec3 screen_content) {
@@ -79,6 +78,7 @@ vec3 pixel_bezel(vec3 screen_content) {
     
     //We use the red component of the bezel to express its luminance (define bezel_luminance bezel.r)
     vec3 bezel_colored = bezel_color(bezel_luminance);
+
     
     return mix(screen_content, bezel_colored, bezel.a);
 
@@ -97,19 +97,22 @@ vec4 main_wrap() {
     float fborder = 1.0;
     
     if (DO_CURVATURE == 1.0) {
+        float geom_gap_size_adj = GEOM_GAP_SIZE;
+        if (GEOM_GAP_SIZE < 0.0) geom_gap_size_adj = GEOM_ZOOMOUT;
+
         if ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0))
             coords = Warp(coords,GEOM_WARP_X,GEOM_WARP_Y);
 
-        vec2 border_coords = coords;
+        vec2 border_coords = vTexCoord;
         if (GEOM_BORDER_WX < 0.0) l_GEOM_BORDER_WX = GEOM_WARP_X;
         if (GEOM_BORDER_WY < 0.0) l_GEOM_BORDER_WY = GEOM_WARP_Y;
         
-        if ((GEOM_BORDER_WX > 0.0) || (GEOM_BORDER_WY > 0.0))
+        if ((l_GEOM_BORDER_WX > 0.0) || (l_GEOM_BORDER_WY > 0.0))
             border_coords = Warp(vTexCoord,l_GEOM_BORDER_WX,l_GEOM_BORDER_WY);
 
-        if ((GEOM_ZOOMOUT + GEOM_GAP_SIZE) > 0.0) {
-            coords = zoomout_coords(border_coords, GEOM_ZOOMOUT, 1.0);
-            border_coords = zoomout_coords(border_coords, GEOM_ZOOMOUT-GEOM_GAP_SIZE, 1.0);
+        if ((GEOM_ZOOMOUT + geom_gap_size_adj) > 0.0) {
+            coords = zoomout_coords(coords, GEOM_ZOOMOUT, 1.0);
+            border_coords = zoomout_coords(border_coords, GEOM_ZOOMOUT-geom_gap_size_adj, 1.0);
         }
         fborder = border(border_coords);
     }
@@ -159,6 +162,7 @@ vec4 main_wrap() {
     if (DO_BEZEL == 1.0) {
         pixel_out = pixel_bezel(pixel_out);
     }
+    
     
     
     //Out

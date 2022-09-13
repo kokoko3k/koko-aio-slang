@@ -174,22 +174,26 @@ vec4 main_wrap(void) {
     float fborder = 1.0;
     
     if (DO_CURVATURE == 1.0) {
+        float geom_gap_size_adj = GEOM_GAP_SIZE;
+        if (GEOM_GAP_SIZE < 0.0) geom_gap_size_adj = GEOM_ZOOMOUT;
+
         if ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0))
             coords = Warp(coords,GEOM_WARP_X,GEOM_WARP_Y);
 
-        vec2 border_coords = coords;
+        vec2 border_coords = vTexCoord;
         if (GEOM_BORDER_WX < 0.0) l_GEOM_BORDER_WX = GEOM_WARP_X;
         if (GEOM_BORDER_WY < 0.0) l_GEOM_BORDER_WY = GEOM_WARP_Y;
         
-        if ((GEOM_BORDER_WX > 0.0) || (GEOM_BORDER_WY > 0.0))
+        if ((l_GEOM_BORDER_WX > 0.0) || (l_GEOM_BORDER_WY > 0.0))
             border_coords = Warp(vTexCoord,l_GEOM_BORDER_WX,l_GEOM_BORDER_WY);
 
-        if ((GEOM_ZOOMOUT + GEOM_GAP_SIZE) > 0.0) {
-            coords = zoomout_coords(border_coords, GEOM_ZOOMOUT, 1.0);
-            border_coords = zoomout_coords(border_coords, GEOM_ZOOMOUT-GEOM_GAP_SIZE, 1.0);
+        if ((GEOM_ZOOMOUT + geom_gap_size_adj) > 0.0) {
+            coords = zoomout_coords(coords, GEOM_ZOOMOUT, 1.0);
+            border_coords = zoomout_coords(border_coords, GEOM_ZOOMOUT-geom_gap_size_adj, 1.0);
         }
         fborder = border(border_coords);
     }
+    
     vec3 pixel_in;
     vec3 pixel_glowed;
     vec3 pixel_scanlined;
