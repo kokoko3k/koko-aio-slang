@@ -287,11 +287,6 @@ void main() {
    else
        FragColor = main_wrap();
 
-       
-       
-       
-     //  FragColor = texture(in_glow_and_scanline_flickering_pass,vTexCoord);
-       
 }
 
 
