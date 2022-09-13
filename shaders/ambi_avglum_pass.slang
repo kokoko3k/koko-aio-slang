@@ -18,5 +18,10 @@ layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D Source;
 
 void main() {
-    FragColor = textureLod(Source, vec2(0.5,0.5),20.0);
+    if (DO_AMBILIGHT == 1) {
+        //Always sample the middle of the screen at a very low resolution via mipmap
+        FragColor = textureLod(Source, vec2(0.5,0.5),10);
+    } else {
+        return;
+    }
 }
