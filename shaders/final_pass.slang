@@ -96,7 +96,11 @@ float quad_smoothstep(vec2 co, float smooth_threshold) {
     return mysmoothstep;
 }
 
-vec3 compose_bezel_over(vec3 screen_content) {
+vec3 compose_bezel_over(vec3 full_viewport) {
+    
+    //No need to draw anything outside this:
+    if (vTexCoord.x < 0  || vTexCoord.y < 0 || vTexCoord.x > 1.0 || vTexCoord.y > 1.0) return full_viewport;
+
     //Main lut:
     vec4 bezel = texture(monitor_body,vTexCoord);
     
@@ -106,12 +110,20 @@ vec3 compose_bezel_over(vec3 screen_content) {
     //This is the reflection to be composed over the bezel
     vec3 pixel_mirrored = texture(reflected_blurred_pass2,vOutputCoord).rgb;
     
+
     vec3 bezel_out = bezel_colored;
     
-     
-    vec3 screen_content_antialiased = screen_content;
+    vec3 full_viewport_antialiased = full_viewport;
+    //(Optionally) draw a black border around the picture
+    float border_size = 0.03;
+    if ( coords.x + border_size > 0.0 && coords.y + border_size > 0.0 && 
+         coords.x - border_size < 1.0 && coords.y -border_size < 1.0  &&
+         coords.x > -border_size ) {
+        float smooth_threshold_antialias = (params.OutputSize.z + params.OutputSize.w) * 2.0;
+        full_viewport_antialiased *= quad_smoothstep(coords,smooth_threshold_antialias) ;
+    }
+    
 
-    float smooth_threshold_antialias = (params.OutputSize.z + params.OutputSize.w) * 0.0;
     float smooth_threshold_reflection = (params.OutputSize.z + params.OutputSize.w) * 40.0; //FIXME: id should depend on bezel size, not output size
     //float mysmootstep_antialias  = quad_smoothstep(coords,smooth_threshold_antialias);
     float mysmootstep_reflection = quad_smoothstep(coords,smooth_threshold_reflection);
@@ -126,7 +138,7 @@ vec3 compose_bezel_over(vec3 screen_content) {
 
     
     //return vec3(mysmoothstep);
-    return mix(screen_content, bezel_out, bezel.a);
+    return mix(full_viewport_antialiased, bezel_out, bezel.a);
 
 }
 
