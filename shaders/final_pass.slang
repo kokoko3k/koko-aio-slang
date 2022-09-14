@@ -125,24 +125,32 @@ vec3 compose_bezel_over(vec3 full_viewport) {
     //This is the reflection to be composed over the bezel);
     vec3 pixel_mirrored = texture(reflected_blurred_pass2,
                           vOutputCoord + displace( (global.FinalViewportSize.z+global.FinalViewportSize.w)*0.5 ) ).rgb;
-       
+
+                          
     //(Optionally) draw a black border around the picture //FIXME: make me optional
-    vec3 full_viewport_antialiased = full_viewport;
-    float border_size = 0.03;
-    if ( coords.x + border_size > 0.0 && coords.y + border_size > 0.0 && 
-         coords.x - border_size < 1.0 && coords.y -border_size < 1.0  &&
-         coords.x > -border_size ) {
-        float smooth_threshold_antialias = (params.OutputSize.z + params.OutputSize.w) * 2.0;
-        full_viewport_antialiased *= quad_smoothstep(coords,smooth_threshold_antialias) ;
-    }
+        vec3 full_viewport_antialiased = full_viewport;
+        float border_size = 0.03;
+        if ( coords.x + border_size > 0.0 && coords.y + border_size > 0.0 && 
+            coords.x - border_size < 1.0 && coords.y -border_size < 1.0  &&
+            coords.x > -border_size ) {
+            float smooth_threshold_antialias = (params.OutputSize.z + params.OutputSize.w) * 2.0;
+            full_viewport_antialiased *= quad_smoothstep(coords,smooth_threshold_antialias) ;
+        }
     
     
     //Generate the reflection area and mix it over the bezel:
-    float smooth_threshold_reflection = (params.OutputSize.z + params.OutputSize.w) * 40.0; //FIXME: it should depend on bezel size, not output size
-    float mysmootstep_reflection = quad_smoothstep(coords,smooth_threshold_reflection);
-    bezel_out = mix(bezel_colored,pixel_mirrored,mysmootstep_reflection);   //FIXME: solo se la luce è più forte della superficie
+        float smooth_threshold_reflection = (params.OutputSize.z + params.OutputSize.w) * 40.0; //FIXME: it should depend on bezel size, not output size
+        float reflection = quad_smoothstep(coords,smooth_threshold_reflection);
+        //Take the reflection modifier from the texture blue component into account; it is/may be used to lower the reflection in the corners.
+            reflection = reflection * bezel.b;
+            
+        //bezel_out = mix(bezel_colored,pixel_mirrored,reflection);   //FIXME: is it a mix or a sum?
+        bezel_out = bezel_colored + (pixel_mirrored *reflection) ;  
 
-        //We use the green component to express Hardness/Specularity; there the reflection will be completely diffused:
+            
+    
+    //We use the green component to express Hardness/Specularity; there the reflection will be completely diffused.
+    //FIXME: by now just use avglum pass to light the corners; in the future, maybe we can use 4 mipmaps.
         float lut_hardness = bezel.g;
         vec4 pixel_avglum = texture(ambi_avglum_pass,vOutputCoord);
         bezel_out = bezel_out + ( vec3(pixel_avglum.r+pixel_avglum.g+pixel_avglum.b)/3.0   * lut_hardness/10.0);
