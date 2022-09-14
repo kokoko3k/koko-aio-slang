@@ -20,7 +20,7 @@ bool is_interlaced() {
 	return (params.OriginalSize.y > MIN_LINES_INTERLACED);
 }
 
-float random() {
+float random(float power) {
     // www.stackoverflow.com/questions/5149544/can-i-generate-a-random-number-inside-a-pixel-shader/
     /*vec2 seed = vTexCoord * params.FrameCount;
     vec2 i = vec2(23.140692, 2.6651442);
@@ -39,7 +39,7 @@ float random() {
     float sn = mod(dt,3.14);
 
     float noise_out = fract(sin(sn) * c) - 0.5;
-    noise_out = clamp(noise_out, -noisepower, noisepower);
+    noise_out = clamp(noise_out, -power, power);
     return noise_out ; 
     
 }

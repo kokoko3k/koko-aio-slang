@@ -266,7 +266,7 @@ float_framebuffer3 = true
     filter_linear18 = true
        scale_type18 = viewport
             scale18 = 1.0
-            
+        wrap_mode18 = "mirrored_repeat"
     
 //           shader18 = shaders/ambi_mix_pass.slang
 //            alias18 = "ambientmix_pass"

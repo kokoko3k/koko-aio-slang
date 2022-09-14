@@ -43,7 +43,7 @@ float displace(float power) {
 }
 
 vec4 pixel_border() {
-    vec3 ambi = texture(ambi_temporal_pass, vOutputCoord).rgb;
+    vec3 ambi = texture(ambi_temporal_pass, vOutputCoord + random(noisepower) ).rgb;
     float l = length(ambi);
     float sat = 1.25;
     float bright = 1.25;
@@ -53,7 +53,7 @@ vec4 pixel_border() {
 }
 
 vec3 ambi_noised() {
-    return pixel_border().rgb + random();
+    return pixel_border().rgb;
 }
 
 vec3 pixel_alternate(vec3 source, float whiteness) {
@@ -122,7 +122,8 @@ vec3 compose_bezel_over(vec3 full_viewport) {
     vec3 bezel_colored = bezel_color(bezel_luminance);
 
     //This is the reflection to be composed over the bezel);
-    vec3 pixel_mirrored = texture(reflected_blurred_pass2,vOutputCoord + displace((global.FinalViewportSize.z+global.FinalViewportSize.w)*0.5) ).rgb;
+    vec3 pixel_mirrored = texture(reflected_blurred_pass2,
+                          vOutputCoord + displace( (global.FinalViewportSize.z+global.FinalViewportSize.w)*0.5 ) ).rgb;
        
     //(Optionally) draw a black border around the picture //FIXME: make me optional
     vec3 full_viewport_antialiased = full_viewport;
@@ -215,7 +216,7 @@ vec4 pixel_inner_frame() {
     }
 
     //Deband
-    if (DO_NOISE) pixel_out = pixel_out + random();
+    if (DO_NOISE) pixel_out = pixel_out + random(noisepower); //FIXME: Just use external luts pre-debanded
 
 
     //Out
