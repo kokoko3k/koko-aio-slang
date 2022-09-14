@@ -147,6 +147,10 @@ vec3 compose_bezel_over(vec3 full_viewport) {
             
         //bezel_out = mix(bezel_colored,pixel_mirrored,reflection);   //FIXME: is it a mix or a sum?
         bezel_out = bezel_colored + (pixel_mirrored *reflection) ;  
+        
+    //Mix a bit of ambient light over the bezel
+        vec4 pixel_avglum = texture(ambi_avglum_pass,vOutputCoord);
+        bezel_out = bezel_out + (pixel_avglum.rgb * 0.05);
 
             
     
@@ -154,7 +158,6 @@ vec3 compose_bezel_over(vec3 full_viewport) {
     //FIXME: by now just use avglum pass to light the corners; in the future, maybe we can use 4 mipmaps.
     //Also FIXME: the corners should not be so much visible in the luminance channel
         float lut_hardness = bezel.g;
-        vec4 pixel_avglum = texture(ambi_avglum_pass,vOutputCoord);
         bezel_out = bezel_out + ( vec3(pixel_avglum.r+pixel_avglum.g+pixel_avglum.b)/3.0   * lut_hardness/5.0);
          
    
