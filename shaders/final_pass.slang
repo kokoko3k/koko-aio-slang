@@ -29,6 +29,19 @@ layout(set = 0, binding = 7) uniform sampler2D reflected_blurred_pass2;
 
 #include "functions.include"
 
+float displace(float power) {
+    vec2 co = vTexCoord ;
+    float a  = 12.9898;
+    float b  = 78.233;
+    float c  = 43758.5453;
+    float dt = dot(co.xy, vec2(a, b));
+    float sn = mod(dt,3.14);
+
+    float noise_out = fract(sin(sn) * c) - 0.5;
+    noise_out = clamp(noise_out, -power, power);
+    return noise_out ; 
+}
+
 vec4 pixel_border() {
     vec3 ambi = texture(ambi_temporal_pass, vOutputCoord).rgb;
     float l = length(ambi);
@@ -108,8 +121,8 @@ vec3 compose_bezel_over(vec3 full_viewport) {
     //We use the red component of the bezel to express its luminance (define bezel_luminance bezel.r)
     vec3 bezel_colored = bezel_color(bezel_luminance);
 
-    //This is the reflection to be composed over the bezel
-    vec3 pixel_mirrored = texture(reflected_blurred_pass2,vOutputCoord).rgb;
+    //This is the reflection to be composed over the bezel);
+    vec3 pixel_mirrored = texture(reflected_blurred_pass2,vOutputCoord + displace((global.FinalViewportSize.z+global.FinalViewportSize.w)*0.5) ).rgb;
        
     //(Optionally) draw a black border around the picture //FIXME: make me optional
     vec3 full_viewport_antialiased = full_viewport;
