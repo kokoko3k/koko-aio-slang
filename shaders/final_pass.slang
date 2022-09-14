@@ -97,10 +97,11 @@ float quad_smoothstep(vec2 co, float smooth_threshold) {
 }
 
 vec3 compose_bezel_over(vec3 full_viewport) {
-    
     //No need to draw anything outside this:
     if (vTexCoord.x < 0  || vTexCoord.y < 0 || vTexCoord.x > 1.0 || vTexCoord.y > 1.0) return full_viewport;
 
+    vec3 bezel_out;
+    
     //Main lut:
     vec4 bezel = texture(monitor_body,vTexCoord);
     
@@ -109,12 +110,9 @@ vec3 compose_bezel_over(vec3 full_viewport) {
 
     //This is the reflection to be composed over the bezel
     vec3 pixel_mirrored = texture(reflected_blurred_pass2,vOutputCoord).rgb;
-    
-
-    vec3 bezel_out = bezel_colored;
-    
+       
+    //(Optionally) draw a black border around the picture //FIXME: make me optional
     vec3 full_viewport_antialiased = full_viewport;
-    //(Optionally) draw a black border around the picture
     float border_size = 0.03;
     if ( coords.x + border_size > 0.0 && coords.y + border_size > 0.0 && 
          coords.x - border_size < 1.0 && coords.y -border_size < 1.0  &&
@@ -123,23 +121,14 @@ vec3 compose_bezel_over(vec3 full_viewport) {
         full_viewport_antialiased *= quad_smoothstep(coords,smooth_threshold_antialias) ;
     }
     
-
-    float smooth_threshold_reflection = (params.OutputSize.z + params.OutputSize.w) * 40.0; //FIXME: id should depend on bezel size, not output size
-    //float mysmootstep_antialias  = quad_smoothstep(coords,smooth_threshold_antialias);
+    
+    //Generate the reflection area and mix it over the bezel:
+    float smooth_threshold_reflection = (params.OutputSize.z + params.OutputSize.w) * 40.0; //FIXME: it should depend on bezel size, not output size
     float mysmootstep_reflection = quad_smoothstep(coords,smooth_threshold_reflection);
+    bezel_out = mix(bezel_colored,pixel_mirrored,mysmootstep_reflection);   //FIXME: solo se la luce è più forte della superficie
     
-    //if (is_reflection_area()) 
-         bezel_out = mix(bezel_colored,pixel_mirrored,mysmootstep_reflection);   //FIXME: solo se la luce è più forte della superficie
-    
-    
-    //if (coords.x < 0.0)  screen_content_antialiased = vec3(0.0); //screen_content;
-    //if (is_reflection_area())  
-    //    screen_content_antialiased.rgb = screen_content.rgb * mysmootstep_antialias;
-
-    
-    //return vec3(mysmoothstep);
+   
     return mix(full_viewport_antialiased, bezel_out, bezel.a);
-
 }
 
 
