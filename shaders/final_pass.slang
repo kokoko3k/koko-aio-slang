@@ -112,7 +112,7 @@ vec3 compose_bezel_over(vec3 screen_content) {
     vec3 screen_content_antialiased = screen_content;
 
     float smooth_threshold_antialias = (params.OutputSize.z + params.OutputSize.w) * 0.0;
-    float smooth_threshold_reflection = (params.OutputSize.z + params.OutputSize.w) * 20.0; //FIXME: id should depend on bezel size, not output size
+    float smooth_threshold_reflection = (params.OutputSize.z + params.OutputSize.w) * 40.0; //FIXME: id should depend on bezel size, not output size
     //float mysmootstep_antialias  = quad_smoothstep(coords,smooth_threshold_antialias);
     float mysmootstep_reflection = quad_smoothstep(coords,smooth_threshold_reflection);
     

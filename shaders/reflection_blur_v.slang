@@ -9,8 +9,7 @@ layout(location = 0) out vec2 vTexCoord;
 void main()
 {
    gl_Position = global.MVP * Position;
-   vTexCoord =  zoomout_coords(get_scaled_coords(TexCoord,params.OutputSize), 2.0,1.33);
-   //vTexCoord = TexCoord;
+   vTexCoord = TexCoord;
 }
 
 #pragma stage fragment

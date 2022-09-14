@@ -11,11 +11,6 @@ void main()
 {
    gl_Position = global.MVP * Position;
    vTexCoord = TexCoord ;
-
-   float in_aspect = get_in_aspect();
-   float out_aspect =  (global.FinalViewportSize.x/global.FinalViewportSize.y);
-   float zoom_x = 1 - (  in_aspect/out_aspect ) ;
-   vTexCoord.x = zoomout_coords(TexCoord,-zoom_x,1.0).x;
 }
 
 #pragma stage fragment
