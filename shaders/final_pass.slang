@@ -24,8 +24,9 @@ layout(set = 0, binding = 2) uniform sampler2D main_pass;
 layout(set = 0, binding = 3) uniform sampler2D bloom_pass_final;
 layout(set = 0, binding = 4) uniform sampler2D vignette_and_spot_pass;
 layout(set = 0, binding = 5) uniform sampler2D ambi_temporal_pass;
-layout(set = 0, binding = 6) uniform sampler2D monitor_body;
-layout(set = 0, binding = 7) uniform sampler2D reflected_blurred_pass2;
+layout(set = 0, binding = 6) uniform sampler2D ambi_avglum_pass;
+layout(set = 0, binding = 7) uniform sampler2D monitor_body;
+layout(set = 0, binding = 8) uniform sampler2D reflected_blurred_pass2;
 
 #include "functions.include"
 
@@ -140,7 +141,12 @@ vec3 compose_bezel_over(vec3 full_viewport) {
     float smooth_threshold_reflection = (params.OutputSize.z + params.OutputSize.w) * 40.0; //FIXME: it should depend on bezel size, not output size
     float mysmootstep_reflection = quad_smoothstep(coords,smooth_threshold_reflection);
     bezel_out = mix(bezel_colored,pixel_mirrored,mysmootstep_reflection);   //FIXME: solo se la luce è più forte della superficie
-    
+
+        //We use the green component to express Hardness/Specularity; there the reflection will be completely diffused:
+        float lut_hardness = bezel.g;
+        vec4 pixel_avglum = texture(ambi_avglum_pass,vOutputCoord);
+        bezel_out = bezel_out + ( vec3(pixel_avglum.r+pixel_avglum.g+pixel_avglum.b)/3.0   * lut_hardness/10.0);
+         
    
     return mix(full_viewport_antialiased, bezel_out, bezel.a);
 }
