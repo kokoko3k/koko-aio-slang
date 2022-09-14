@@ -1,0 +1,33 @@
+#version 450
+#include "config.inc"
+
+#pragma stage vertex
+layout(location = 0) in vec4 Position;
+layout(location = 1) in vec2 TexCoord;
+layout(location = 0) out vec2 vTexCoord;
+#include "functions.include"
+void main()
+{
+   gl_Position = global.MVP * Position;
+   vTexCoord =  zoomout_coords(get_scaled_coords(TexCoord,params.OutputSize), 2.0,1.33);
+   //vTexCoord = TexCoord;
+}
+
+#pragma stage fragment
+layout(location = 0) in vec2 vTexCoord;
+layout(location = 0) out vec4 FragColor;
+layout(set = 0, binding = 2) uniform sampler2D Source;
+
+#define SourceTexture Source
+#define SourceTextureSize params.SourceSize
+
+#include "blooms.slang"
+void main() {
+   //FragColor = texture(Source, vTexCoord);
+   vec2 res = vec2(params.SourceSize.x, params.SourceSize.y);
+   vec2 dir = vec2(0.0,1.0);
+   FragColor = blur9(Source, vTexCoord,res,dir);
+}
+ 
+ 
+  
