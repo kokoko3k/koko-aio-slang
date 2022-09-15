@@ -177,15 +177,6 @@ float_framebuffer3 = true
    it fast, next we do subsequent blURs of the bloomed
    pass.
 */
-   
-   //
-   //            shader8 = shaders/passthrough_original.slang ///bloom_passthrough_conditional.slang
-   //             alias8 = "bloom_pass_0"
-   //     filter_linear8 = true
-   //        scale_type8 = absolute
-   //           scale_x8 = 320
-   //           scale_y8 = 240
-   //         wrap_mode8 = "clamp_to_edge"
         
                shader8 = shaders/bloom_pass_1.slang
                 alias8 = "bloom_pass_1"
@@ -261,10 +252,4 @@ float_framebuffer3 = true
        scale_type17 = viewport
             scale17 = 1.0
         wrap_mode17 = "mirrored_repeat"
-    
-//           shader18 = shaders/ambi_mix_pass.slang
-//            alias18 = "ambientmix_pass"
-//       scale_type18 = viewport
-//            scale18 = 1.0
-//    filter_linear18 = true
 

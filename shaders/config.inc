@@ -77,6 +77,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float BEZEL_G;
 	float BEZEL_B;
 	float BEZEL_CON;
+	float BEZEL_REF_SIZE;
 	float DO_SPOT;
 	float s_center_x;
 	float s_center_y; 
@@ -235,7 +236,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter BEZEL_G            "        Bezel color: Green"		0.0   -0.5 0.5  0.01
 #pragma parameter BEZEL_B            "        Bezel color: Blue"		0.0   -0.5 0.5  0.01
 #pragma parameter BEZEL_CON          "        Bezel Contrast"			1.0   0.0  10.0 0.01
-
+#pragma parameter BEZEL_REF_SIZE     "        Reflection area size"		0.08  0.0  1.0  0.01
 
 //Vignette and spot
 
@@ -341,6 +342,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #define BEZEL_G            global.BEZEL_G
 #define BEZEL_B            global.BEZEL_B
 #define BEZEL_CON          global.BEZEL_CON
+#define BEZEL_REF_SIZE     global.BEZEL_REF_SIZE
 
 #define DO_SPOT    global.DO_SPOT
 #define s_bypass   global.s_bypass

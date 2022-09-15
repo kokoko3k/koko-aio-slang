@@ -163,7 +163,7 @@ vec3 compose_bezel_over(vec3 full_viewport) {
     
     
     //Generate the reflection area and mix it over the bezel:
-        float smooth_threshold_reflection = (params.OutputSize.z + params.OutputSize.w) * 60.0; //FIXME: it should depend on bezel size, not output size
+        float smooth_threshold_reflection = BEZEL_REF_SIZE;
         float reflection = pow(quad_smoothstep( zoomout_coords(vTexCoord, GEOM_ZOOMOUT, 1.0) ,smooth_threshold_reflection),0.6);
         //Take the reflection modifier from the texture blue component into account; it is/may be used to lower the reflection in the corners.
             reflection = (reflection * 1.4 -  0.4)  * bezel.b ;
