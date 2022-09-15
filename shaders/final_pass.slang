@@ -179,11 +179,13 @@ vec3 compose_bezel_over(vec3 full_viewport) {
             
     
     //We use the green component to express Hardness/Specularity; there the reflection will be completely diffused.
-    //FIXME: by now just use avglum pass to light the corners; in the future, maybe we can use 4 mipmaps.
-    //Also FIXME: the corners should not be so much visible in the luminance channel
+    //For the task, we use a mipmap whit adeguate precision.
         float lut_hardness = bezel.g;
-        bezel_out = bezel_out + ( vec3(pixel_avglum.r+pixel_avglum.g+pixel_avglum.b)/3.0   * lut_hardness/5.0);
+        if (lut_hardness > 0.0) {
+            bezel_out = bezel_out + ( vec3(pixel_avglum.a)  * lut_hardness/3.5);
+        }
          
+   
    
     return mix(full_viewport_antialiased, bezel_out, bezel.a);
 }

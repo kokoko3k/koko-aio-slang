@@ -18,6 +18,23 @@ layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D Source;
 
 void main() {
-    if (DO_AMBILIGHT == 1.0 || DO_BEZEL == 1.0)
-        FragColor = textureLod(Source, vec2(0.5,0.5),20.0);
+    vec4 pixel_out;
+    if (DO_AMBILIGHT == 1.0 || DO_BEZEL == 1.0) {
+        if (DO_AMBILIGHT == 1.0) pixel_out.rgb = textureLod(Source, vec2(0.5,0.5),20.0).rgb;
+        
+        if (DO_BEZEL == 1.0) {
+            //Create a small mipmap to be used to light the bezel corners.
+            //iterate through lods 'till we find a small-enough texture
+            //put the luminosity into the alpha channel to spare a pass.
+            int min_w = 16; //20 pixel wide or less
+            int lod;
+            for( lod=1; lod<10; lod+=1) {
+                if (textureSize(Source,lod).x < min_w) break;
+            }
+            vec3 lut = textureLod(Source, vTexCoord,lod ).rgb;
+            pixel_out.a = (lut.r+lut.g+lut.b)/3.0;
+        }
+        FragColor = pixel_out;
+        
+    }
 }
