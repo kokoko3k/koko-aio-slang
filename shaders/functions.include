@@ -73,7 +73,7 @@ float random(float power) {
 
 
 //VIGNETTE - SPOT
-	float gauss(float x, float x0, float sx, float size, float power){
+/*	float gauss(float x, float x0, float sx, float size, float power){
 		float arg = x-x0;
 		arg = -(1/size)/2.*arg*arg/sx;
 		float a = 1./(pow(2.*3.1415*sx, 0.5));
@@ -88,6 +88,7 @@ float random(float power) {
 		float light = gx*gy;
 		return clamp(light,gmin,gmax);
 	}
+*/
 
 //AMBILIGHT RELATED
 	bool border_needed() {

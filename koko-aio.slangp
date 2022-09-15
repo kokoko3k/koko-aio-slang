@@ -80,7 +80,8 @@ Total basal + all the features: 72.2
                 textures = "monitor_body;circular_gradient"
             monitor_body = "textures/f1.png"
      monitor_body_linear = "true"
-       circular_gradient = "textures/circular_gradient.png"
+     //circular_gradient = "textures/circular_gradient.png"
+       circular_gradient = "textures/gaussian_gradient.png"
 circular_gradient_linear = "true"
 
 shaders = 18
