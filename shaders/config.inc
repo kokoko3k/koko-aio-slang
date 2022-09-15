@@ -1,6 +1,6 @@
 #define GLOW_SHARP_MAX 15 		    //This has to be the same as the max used for in_glow_wh
 #define MIN_LINES_INTERLACED 300	//Consider content interlaced if lines are more than this
-#define noisepower (params.OutputSize.w + params.OutputSize.z)          //Sort of dithering
+#define noisepower ((params.OutputSize.w + params.OutputSize.z)*2.0)         //Sort of dithering
 #define scene_change_threshold 0.1  // 0.0-1.0: sensitivity to scene change (ambilike stuff)
 #define BLOOM_THRESHOLD 0.5
 
@@ -241,15 +241,15 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 #pragma parameter DO_VIGNETTE	"Emulate vignette effect:"	0.0  0.0  1.0  1.0
 #pragma parameter v_bypass	"    bypass "	        	0.0  0.0  1.0  1.0
-#pragma parameter v_size	"        size"			4.0  1.0  10   0.1
-#pragma parameter v_power	"        power"			0.8  0.05 2.0  0.05
+#pragma parameter v_size	"        size"			1.7  0.0  2.0  0.05
+#pragma parameter v_power	"        power"			1.1  0.05 2.0  0.05
 
 #pragma parameter DO_SPOT	"Emulate spot effect:"	0.0   0.0   1.0 1.0
 #pragma parameter s_bypass	"    bypass"	        0.0   0.0   1.0 1.0
-#pragma parameter s_center_x 	"    x position"	-0.4  -1.5  1.5 0.05
-#pragma parameter s_center_y	"    y postion "	0.4   -1.5  1.5 0.05
-#pragma parameter s_size	"    size"		0.15  0.01  3.0 0.01
-#pragma parameter s_power	"    power" 		0.25  0.05  2.0 0.05
+#pragma parameter s_center_x 	"    x position"	0.65  -1.5  1.5 0.05
+#pragma parameter s_center_y	"    y postion "	-0.5  -1.5  1.5 0.05
+#pragma parameter s_size	"    size"		0.8   -15.0  1.5 0.01
+#pragma parameter s_power	"    power" 		0.15  0.05  2.0 0.05
 
 
 //Ambilight effect

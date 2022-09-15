@@ -22,11 +22,12 @@ layout(location = 1) in vec2 vOutputCoord;
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D main_pass;
 layout(set = 0, binding = 3) uniform sampler2D bloom_pass_final;
-layout(set = 0, binding = 4) uniform sampler2D vignette_and_spot_pass;
+layout(set = 0, binding = 4) uniform sampler2D circular_gradient;
 layout(set = 0, binding = 5) uniform sampler2D ambi_temporal_pass;
 layout(set = 0, binding = 6) uniform sampler2D ambi_avglum_pass;
 layout(set = 0, binding = 7) uniform sampler2D monitor_body;
 layout(set = 0, binding = 8) uniform sampler2D reflected_blurred_pass2;
+
 
 #include "functions.include"
 
@@ -42,6 +43,29 @@ float displace(float power) {
     noise_out = clamp(noise_out, -power, power);
     return noise_out ; 
 }
+
+vec2 pixel_vignette_and_spot(vec2 co){
+    float in_aspect = get_in_aspect();
+    vec2 sv_coords = vec2(co.x * in_aspect - ((0.5 * in_aspect) - 0.5) ,  co.y);
+    float f_random = random(noisepower);
+    vec2 pixel_out;
+
+    
+    if (DO_VIGNETTE == 1.0) {
+        vec2 vignette_coords = zoomout_coords(sv_coords,1-v_size,1.0) + vec2(f_random);
+        pixel_out.r = texture(circular_gradient,vignette_coords).r * v_power ;
+    }
+
+    if (DO_SPOT == 1.0) {
+        vec2 spot_coords = sv_coords + vec2(-s_center_x, -s_center_y);
+        spot_coords = zoomout_coords(spot_coords,1-s_size,1.0);
+        pixel_out.g = texture(circular_gradient,spot_coords).g * s_power + f_random;
+    }
+
+    
+    return pixel_out;
+}
+
 
 vec4 pixel_border() {
     vec3 ambi = texture(ambi_temporal_pass, vOutputCoord + random(noisepower) ).rgb;
@@ -212,31 +236,27 @@ vec4 pixel_inner_frame() {
         pixel_out = pixel_alternate(pixel_out.rgb, ALT_BLANK_STRENGTH );
     }
 
- 
-    bool DO_NOISE = false;
-    //vignette
-    if (DO_VIGNETTE == 1.0) {
-        DO_NOISE = true;
-        //float vignette = gauss_xy(0.0, 0.0, v_size, v_power, 0.0, 1.0);
-        vec3 vignette = vec3(texture(vignette_and_spot_pass,vTexCoord).r);
-        if (v_bypass < 1.0) pixel_out = vignette * pixel_out;
-            else
-        pixel_out = vignette ;
-    }
-    
-    //Spot 
-    if (DO_SPOT == 1.0) {
-        DO_NOISE = true;
-        //float spot =  gauss_xy(s_center_x, s_center_y, s_size, s_power, 0.0, 10.0);
-        vec3 spot = vec3(texture(vignette_and_spot_pass,vTexCoord).g);
-        if (s_bypass < 1.0) pixel_out = mix(pixel_out,vec3(1.0), spot);
-            else
-        pixel_out = vec3(spot) ;
-    }
 
-    //Deband
-    if (DO_NOISE) pixel_out = pixel_out + random(noisepower); //FIXME: Just use external luts pre-debanded
+    //vignette and spot
 
+    if (DO_VIGNETTE + DO_SPOT >0.0) {
+        vec2 vpixel_vignette_and_spot = pixel_vignette_and_spot(coords);
+
+        if (DO_VIGNETTE == 1.0) {
+            if (v_bypass < 1.0) pixel_out = vpixel_vignette_and_spot.r * pixel_out;
+                else
+            pixel_out = vec3(vpixel_vignette_and_spot.r) ;
+        }
+        
+        //Spot 
+        if (DO_SPOT == 1.0) {
+            //float spot =  gauss_xy(s_center_x, s_center_y, s_size, s_power, 0.0, 10.0);
+            //vec3 spot = vec3(texture(vignette_and_spot_pass,vTexCoord).g);
+            if (s_bypass < 1.0) pixel_out = mix(pixel_out,vec3(1.0), vpixel_vignette_and_spot.g);
+                else
+            pixel_out = vec3(vpixel_vignette_and_spot.g) ;
+        }
+    }
 
     //Out
     return vec4(pixel_out,pixel_in.a);
@@ -272,6 +292,7 @@ vec4 main_wrap(){
             //Last case, inner border without ambilight:
             return vPixel_inner_frame;
 }
+
 
 void main() {
     //"Just" handle inner and outer frame here:
