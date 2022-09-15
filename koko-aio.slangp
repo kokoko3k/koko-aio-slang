@@ -149,9 +149,10 @@ float_framebuffer3 = true
         * the following pass does not use the previous one 
         * the previous pass represents scene changes.
 */
-
-               shader5 = shaders/ambi_avglum_pass.slang
-                alias5 = "ambi_avglum_pass"
+         //The alpha channel of the following pass contains luminance info
+         //Used by the bezel code to light up the bezel corners.
+               shader5 = shaders/avglum_pass.slang
+                alias5 = "avglum_pass"
         filter_linear5 = true
            scale_type5 = absolute
               scale_x5 = 320

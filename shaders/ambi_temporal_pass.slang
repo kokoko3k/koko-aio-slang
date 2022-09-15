@@ -20,8 +20,8 @@ layout(location = 0) in vec2 vTexCoord;
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D CurrentSampler;
 layout(set = 0, binding = 3) uniform sampler2D PreviousSampler;
-layout(set = 0, binding = 4) uniform sampler2D ambi_avglum_pass;
-layout(set = 0, binding = 5) uniform sampler2D ambi_avglum_passFeedback;
+layout(set = 0, binding = 4) uniform sampler2D avglum_pass;
+layout(set = 0, binding = 5) uniform sampler2D avglum_passFeedback;
 
 #define max_steps ambi_steps
 #define min_steps 1.0
@@ -49,8 +49,8 @@ vec3 smooth_step_rgb(vec3 s,vec3 d, vec3 mystep){
 
 
 vec3 pixel_ambilight() {
-    vec3 prev_avg_lum_vec = texture(ambi_avglum_passFeedback,vec2(0.5,0.5)).rgb;
-    vec3 curr_avg_lum_vec = texture(ambi_avglum_pass        ,vec2(0.5,0.5)).rgb;
+    vec3 prev_avg_lum_vec = texture(avglum_passFeedback,vec2(0.5,0.5)).rgb;
+    vec3 curr_avg_lum_vec = texture(avglum_pass        ,vec2(0.5,0.5)).rgb;
     float prev_avg_lum = prev_avg_lum_vec.r+prev_avg_lum_vec.g+prev_avg_lum_vec.b;
     float curr_avg_lum = curr_avg_lum_vec.r+curr_avg_lum_vec.g+curr_avg_lum_vec.b;
     float diff_avg_lum = abs(prev_avg_lum - curr_avg_lum) / 3.0 ;
