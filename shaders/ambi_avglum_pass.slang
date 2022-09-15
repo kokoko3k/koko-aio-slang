@@ -18,5 +18,6 @@ layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D Source;
 
 void main() {
-    FragColor = textureLod(Source, vec2(0.5,0.5),20.0);
+    if (DO_AMBILIGHT == 1.0 || DO_BEZEL == 1.0)
+        FragColor = textureLod(Source, vec2(0.5,0.5),20.0);
 }

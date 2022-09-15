@@ -84,6 +84,7 @@ Total basal + all the features: 72.2
        circular_gradient = "textures/gaussian_gradient.png"
 circular_gradient_linear = "true"
 
+
 shaders = 18
 /*For P-uae defaults, doubling just y0 seems the best option.
   90% of games are lowres in vertical size and p-uae defaults
