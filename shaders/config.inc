@@ -230,11 +230,11 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter GEOM_GAP_SIZE      "        Monitor Gap"			0.0   0.0 0.3 0.005
 
 //Bezel related
-#pragma parameter DO_BEZEL	     "Emulate bezel:"			0.0   0.0 1.0 1.0
-#pragma parameter BEZEL_R            "        Bezel color: Red"		0.0   -0.5 0.5  0.01
-#pragma parameter BEZEL_G            "        Bezel color: Green"	0.0   -0.5 0.5  0.01
-#pragma parameter BEZEL_B            "        Bezel color: Blue"	0.0   -0.5 0.5  0.01
-#pragma parameter BEZEL_CON          "        Bezel Contrast"		1.0   0.0  10.0 0.01
+#pragma parameter DO_BEZEL	     "Emulate bezel (**NEEDS CURVATURE**):"	0.0   0.0 1.0 1.0
+#pragma parameter BEZEL_R            "        Bezel color: Red"			0.0   -0.5 0.5  0.01
+#pragma parameter BEZEL_G            "        Bezel color: Green"		0.0   -0.5 0.5  0.01
+#pragma parameter BEZEL_B            "        Bezel color: Blue"		0.0   -0.5 0.5  0.01
+#pragma parameter BEZEL_CON          "        Bezel Contrast"			1.0   0.0  10.0 0.01
 
 
 //Vignette and spot
