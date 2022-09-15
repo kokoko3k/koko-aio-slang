@@ -23,10 +23,11 @@ layout(set = 0, binding = 2) uniform sampler2D main_pass;
 
 #include "blooms.slang"
 void main() {
-   //FragColor = texture(Source, vTexCoord);
-   vec2 res = vec2(global.main_passSize.x, global.main_passSize.y);
-   vec2 dir = vec2(1.0,0.0);
-   FragColor = blur9(main_pass, vTexCoord,res,dir);
+   if (DO_BEZEL == 1.0) {
+      vec2 res = vec2(global.main_passSize.x, global.main_passSize.y);
+      vec2 dir = vec2(1.0,0.0);
+      FragColor = blur9(main_pass, vTexCoord,res,dir);
+   }
 }
  
  
