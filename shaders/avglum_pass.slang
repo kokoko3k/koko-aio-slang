@@ -26,11 +26,8 @@ void main() {
             //Create a small mipmap to be used to light the bezel corners.
             //iterate through lods 'till we find a small-enough texture
             //put the luminosity into the alpha channel to spare a pass.
-            int min_w = 16; //20 pixel wide or less
-            int lod;
-            for( lod=1; lod<10; lod+=1) {
-                if (textureSize(Source,lod).x < min_w) break;
-            }
+            float min_w = 16; //16 pixel wide or less
+            float lod = log2(params.SourceSize.y / min_w);
             vec3 lut = textureLod(Source, vTexCoord,lod ).rgb;
             pixel_out.a = (lut.r+lut.g+lut.b)/3.0;
         }
