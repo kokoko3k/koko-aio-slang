@@ -112,7 +112,7 @@ vec3 bezel_color(float lum)  {
    
 }
 
-vec2 coords = vTexCoord ; //FIXME how bad is this global variable?
+vec2 coords_curved = vTexCoord ; //FIXME how bad is this global variable?
 //bezel not reflective size in percent of the game size
 #define BEZEL_OUT_PERCENT 0.02
 #define rxmin (BEZEL_OUT_PERCENT)
@@ -122,53 +122,68 @@ vec2 coords = vTexCoord ; //FIXME how bad is this global variable?
 
 bool is_reflection_area() {
     return ((vTexCoord.x > rxmin) && (vTexCoord.x < rxmax) && (vTexCoord.y > rymin) && (vTexCoord.y < rymax )) &&
-           ((coords.x < 0.0 ) || (coords.x > 1.0) || (coords.y < 0.0) || (coords.y > 1.0));
+           ((coords_curved.x < 0.0 ) || (coords_curved.x > 1.0) || (coords_curved.y < 0.0) || (coords_curved.y > 1.0));
 }
 
 
-float quad_smoothstep(vec2 co, float smooth_threshold) {
-    float mysmoothstep =              smoothstep(-smooth_threshold,smooth_threshold, co.x);
-    mysmoothstep = min( mysmoothstep, smoothstep(-smooth_threshold,smooth_threshold, co.y) );
-    mysmoothstep = min( mysmoothstep, smoothstep(1+smooth_threshold,1-smooth_threshold, co.y) );
-    mysmoothstep = min( mysmoothstep, smoothstep(1+smooth_threshold,1-smooth_threshold, co.x) );
+float quad_smoothstep(vec2 co, float smooth_end, float smooth_start) {
+    float mysmoothstep = 1.0;
+    mysmoothstep =              smoothstep(smooth_start, smooth_end, co.x);
+    //return mysmoothstep;
+    mysmoothstep = min( mysmoothstep, smoothstep(1.0-smooth_start,1.0-smooth_end , co.x) );
+    //return mysmoothstep;
+    mysmoothstep = min( mysmoothstep, smoothstep(smooth_start, smooth_end, co.y) );
+    //return mysmoothstep;
+    mysmoothstep = min( mysmoothstep, smoothstep(1.0-smooth_start  , 1.0-smooth_end, co.y) );
     return mysmoothstep;
 }
 
+
 vec3 compose_bezel_over(vec3 full_viewport) {
+    vec2 coords_for_bezel = vTexCoord;
+    vec2 coords_for_mirror = vOutputCoord;
+    if (BEZEL_FRAME_ZOOM != 0.0) {
+        coords_for_bezel = zoomout_coords(vTexCoord,-BEZEL_FRAME_ZOOM,1.0);
+        //coords_for_mirror = zoomout_coords(vOutputCoord,-BEZEL_INNER_ZOOM,1.0);
+    }
+
     //No need to draw anything outside this:
-    if (vTexCoord.x < 0  || vTexCoord.y < 0 || vTexCoord.x > 1.0 || vTexCoord.y > 1.0) return full_viewport;
+    if (coords_for_bezel.x < 0  || coords_for_bezel.y < 0 || coords_for_bezel.x > 1.0 || coords_for_bezel.y > 1.0) return full_viewport;
 
     vec3 bezel_out;
     
     //Main lut:
-    vec4 bezel = texture(monitor_body,vTexCoord);
+    vec4 bezel = texture(monitor_body,coords_for_bezel);
+    
     
     //We use the red component of the bezel to express its luminance (define bezel_luminance bezel.r)
     vec3 bezel_colored = bezel_color(bezel_luminance);
 
     //This is the reflection to be composed over the bezel);
     vec3 pixel_mirrored = texture(reflected_blurred_pass2,
-                          vOutputCoord + displace( (global.FinalViewportSize.z+global.FinalViewportSize.w)*0.5 ) ).rgb;
+                          coords_for_mirror + displace( (global.FinalViewportSize.z+global.FinalViewportSize.w)*0.5 ) ).rgb;
 
-                          
+//return pixel_mirrored;
     //(Optionally) draw a black border around the picture //FIXME: make me optional
         vec3 full_viewport_antialiased = full_viewport;
-        float border_size = 0.03;
-        if ( coords.x + border_size > 0.0 && coords.y + border_size > 0.0 && 
-            coords.x - border_size < 1.0 && coords.y -border_size < 1.0  &&
-            coords.x > -border_size ) {
+        /*float border_size = 0.03;
+        if ( coords_curved.x + border_size > 0.0 && coords_curved.y + border_size > 0.0 && 
+            coords_curved.x - border_size < 1.0 && coords_curved.y -border_size < 1.0  &&
+            coords_curved.x > -border_size ) {
             float smooth_threshold_antialias = (params.OutputSize.z + params.OutputSize.w) * 2.0;
-            full_viewport_antialiased *= quad_smoothstep(coords,smooth_threshold_antialias) ;
-        }
+            full_viewport_antialiased *= quad_smoothstep(coords_curved,smooth_threshold_antialias) ;
+        }*/
+    
+    //return full_viewport_antialiased;
     
     
-    //Generate the reflection area and mix it over the bezel:
-        float smooth_threshold_reflection = BEZEL_REF_SIZE;
-        float reflection = pow(quad_smoothstep( zoomout_coords(vTexCoord, GEOM_ZOOMOUT, 1.0) ,smooth_threshold_reflection),0.6);
+    //Generate the reflection area and mix it over the bezel:    
+        float reflection = quad_smoothstep( zoomout_coords(vTexCoord, -BEZEL_FRAME_ZOOM, 1.0) , BEZEL_REF_START,BEZEL_REF_END ); //FIXME: check se bezel_zoom è ok
+//return vec3(reflection);
         //Take the reflection modifier from the texture blue component into account; it is/may be used to lower the reflection in the corners.
             reflection = (reflection * 1.4 -  0.4)  * bezel.b ;
             reflection = clamp (reflection, 0.0, 1.0);
-            
+//return vec3(reflection);
         //bezel_out = mix(bezel_colored,pixel_mirrored,reflection);   //FIXME: is it a mix or a sum?
         bezel_out = bezel_colored + (pixel_mirrored *reflection) ;  
         
@@ -197,17 +212,17 @@ vec4 pixel_inner_frame() {
     vec3 bloomed;
 
     //Curvature
-    //vec2 coords = vTexCoord ;
+    //vec2 coords_curved = vTexCoord ;
     float l_GEOM_BORDER_WX = GEOM_BORDER_WX;
     float l_GEOM_BORDER_WY = GEOM_BORDER_WY;
     float fborder = 1.0;
     
     if (DO_CURVATURE == 1.0) {
-        float geom_gap_size_adj = GEOM_GAP_SIZE;
-        if (GEOM_GAP_SIZE < 0.0) geom_gap_size_adj = GEOM_ZOOMOUT;
+        /*float geom_gap_size_adj = GEOM_GAP_SIZE;
+        if (GEOM_GAP_SIZE < 0.0) geom_gap_size_adj = GEOM_ZOOMOUT;*/
 
         if ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0))
-            coords = Warp(coords,GEOM_WARP_X,GEOM_WARP_Y);
+            coords_curved = Warp(coords_curved,GEOM_WARP_X,GEOM_WARP_Y);
 
         vec2 border_coords = vTexCoord;
         if (GEOM_BORDER_WX < 0.0) l_GEOM_BORDER_WX = GEOM_WARP_X;
@@ -216,16 +231,19 @@ vec4 pixel_inner_frame() {
         if ((l_GEOM_BORDER_WX > 0.0) || (l_GEOM_BORDER_WY > 0.0))
             border_coords = Warp(vTexCoord,l_GEOM_BORDER_WX,l_GEOM_BORDER_WY);
 
-        if ((GEOM_ZOOMOUT + geom_gap_size_adj) > 0.0) {
-            coords = zoomout_coords(coords, GEOM_ZOOMOUT, 1.0);
+        /*if ((GEOM_ZOOMOUT + geom_gap_size_adj) > 0.0) {
+            coords_curved = zoomout_coords(coords_curved, GEOM_ZOOMOUT, 1.0);
             border_coords = zoomout_coords(border_coords, GEOM_ZOOMOUT-geom_gap_size_adj, 1.0);
-        }
+        }*/
         fborder = border(border_coords);
     }
     
+    if (DO_BEZEL == 1.0) {
+        coords_curved = zoomout_coords(coords_curved, -BEZEL_INNER_ZOOM , 1.0);
+    }
     //Mix bloom texture
     if (DO_BLOOM == 1.0 ) {
-        bloomed=texture(bloom_pass_final, coords).rgb ;
+        bloomed=texture(bloom_pass_final, coords_curved).rgb ;
         if (bloom_bypass == 1.0)
             pixel_out = bloomed;
         else
@@ -242,7 +260,7 @@ vec4 pixel_inner_frame() {
     //vignette and spot
 
     if (DO_VIGNETTE + DO_SPOT >0.0) {
-        vec2 vpixel_vignette_and_spot = pixel_vignette_and_spot(coords);
+        vec2 vpixel_vignette_and_spot = pixel_vignette_and_spot(coords_curved);
 
         if (DO_VIGNETTE == 1.0) {
             if (v_bypass < 1.0) pixel_out = vpixel_vignette_and_spot.r * pixel_out;
@@ -290,7 +308,7 @@ vec4 main_wrap(){
                 return vec4(mix(ambi_noised().rgb,vPixel_inner_frame.rgb,min(vPixel_inner_frame.a*1.5,1.0)),vPixel_inner_frame.a);
                 
             }
-            
+
             //Last case, inner border without ambilight:
             return vPixel_inner_frame;
 }
@@ -309,4 +327,6 @@ void main() {
 
     
 
+    //FragColor = texture(reflected_blurred_pass2, vOutputCoord);
+    
 }

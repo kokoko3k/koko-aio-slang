@@ -33,6 +33,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	vec4 in_glow_and_scanline_flickering_passSize;
 	vec4 FXAA_passSize;
 	vec4 main_passSize;
+	vec4 monitor_bodySize;
 	float DO_SCANLINES;
 	float DO_IN_GLOW;
 	float DO_RGB_MASK ;
@@ -70,14 +71,17 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float GEOM_WARP_Y;
 	float GEOM_CORNER_SIZE;
 	float GEOM_CORNER_SMOOTH;
-	float GEOM_ZOOMOUT;
-	float GEOM_GAP_SIZE;
+	//float GEOM_ZOOMOUT;
+	//float GEOM_GAP_SIZE;
 	float DO_BEZEL;
 	float BEZEL_R;
 	float BEZEL_G;
 	float BEZEL_B;
 	float BEZEL_CON;
-	float BEZEL_REF_SIZE;
+	float BEZEL_REF_START;
+	float BEZEL_REF_END;
+	float BEZEL_INNER_ZOOM;
+	float BEZEL_FRAME_ZOOM;
 	float DO_SPOT;
 	float s_center_x;
 	float s_center_y; 
@@ -227,8 +231,8 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter GEOM_BORDER_WY     "        Border Curve Y (neg=use Warp Y)"	0.02  -0.01 0.1 0.01
 #pragma parameter GEOM_CORNER_SIZE   "        Corner Size"			0.01  0.005 0.1 0.005
 #pragma parameter GEOM_CORNER_SMOOTH "        Corner sharpness"			350.0 50.0 1000.0 25.0
-#pragma parameter GEOM_ZOOMOUT       "        Monitor zoom out"			0.0   0.0 0.3 0.01
-#pragma parameter GEOM_GAP_SIZE      "        Monitor Gap"			0.0   0.0 0.3 0.005
+//#pragma parameter GEOM_ZOOMOUT       "        Monitor zoom out"			0.0   0.0 0.3 0.01
+//#pragma parameter GEOM_GAP_SIZE      "        Monitor Gap"			0.0   0.0 0.3 0.005
 
 //Bezel related
 #pragma parameter DO_BEZEL	     "Emulate bezel (**NEEDS CURVATURE**):"	0.0   0.0 1.0 1.0
@@ -236,7 +240,10 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter BEZEL_G            "        Bezel color: Green"		0.0   -0.5 0.5  0.01
 #pragma parameter BEZEL_B            "        Bezel color: Blue"		0.0   -0.5 0.5  0.01
 #pragma parameter BEZEL_CON          "        Bezel Contrast"			1.0   0.0  10.0 0.01
-#pragma parameter BEZEL_REF_SIZE     "        Reflection area size"		0.08  0.0  1.0  0.01
+#pragma parameter BEZEL_REF_START    "        Reflection area start"		0.75   0.5  1.0  0.005
+#pragma parameter BEZEL_REF_END      "        Reflection area end"		0.90   0.5  1.0  0.005
+#pragma parameter BEZEL_INNER_ZOOM   "        Image zoom"			0.0   -0.5 0.5 0.01
+#pragma parameter BEZEL_FRAME_ZOOM   "        Frame zoom"			0.0   -0.5 0.5 0.01
 
 //Vignette and spot
 
@@ -334,15 +341,18 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #define GEOM_BORDER_WY     global.GEOM_BORDER_WY
 #define GEOM_CORNER_SIZE   global.GEOM_CORNER_SIZE
 #define GEOM_CORNER_SMOOTH global.GEOM_CORNER_SMOOTH
-#define GEOM_ZOOMOUT       global.GEOM_ZOOMOUT	
-#define GEOM_GAP_SIZE      global.GEOM_GAP_SIZE
+//#define GEOM_ZOOMOUT       global.GEOM_ZOOMOUT	
+//#define GEOM_GAP_SIZE      global.GEOM_GAP_SIZE
 
 #define DO_BEZEL           global.DO_BEZEL
 #define BEZEL_R            global.BEZEL_R
 #define BEZEL_G            global.BEZEL_G
 #define BEZEL_B            global.BEZEL_B
 #define BEZEL_CON          global.BEZEL_CON
-#define BEZEL_REF_SIZE     global.BEZEL_REF_SIZE
+#define BEZEL_REF_START    global.BEZEL_REF_START
+#define BEZEL_REF_END      global.BEZEL_REF_END
+#define BEZEL_INNER_ZOOM   global.BEZEL_INNER_ZOOM
+#define BEZEL_FRAME_ZOOM   global.BEZEL_FRAME_ZOOM
 
 #define DO_SPOT    global.DO_SPOT
 #define s_bypass   global.s_bypass

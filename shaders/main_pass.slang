@@ -163,34 +163,41 @@ vec3 pixel_scanline_static(vec3 color, vec2 coords) {
     return color;
 }
 
+vec2 coords_curved = vTexCoord;
 vec4 main_wrap(void) {
     bool isinterlaced = is_interlaced();
     bool flickering_scanlines = (DO_SCANLINES == 1.0) && scanline_have_to_flicker(isinterlaced) ;
 
     //Curvature
-    vec2 coords = vTexCoord ;
+
     float l_GEOM_BORDER_WX = GEOM_BORDER_WX;
     float l_GEOM_BORDER_WY = GEOM_BORDER_WY;
     float fborder = 1.0;
-    
+    vec2 border_coords = vTexCoord;
+
     if (DO_CURVATURE == 1.0) {
-        float geom_gap_size_adj = GEOM_GAP_SIZE;
-        if (GEOM_GAP_SIZE < 0.0) geom_gap_size_adj = GEOM_ZOOMOUT;
+        /*float geom_gap_size_adj = GEOM_GAP_SIZE;
+        if (GEOM_GAP_SIZE < 0.0) geom_gap_size_adj = GEOM_ZOOMOUT;*/
 
         if ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0))
-            coords = Warp(coords,GEOM_WARP_X,GEOM_WARP_Y);
+            coords_curved = Warp(coords_curved,GEOM_WARP_X,GEOM_WARP_Y);
 
-        vec2 border_coords = vTexCoord;
         if (GEOM_BORDER_WX < 0.0) l_GEOM_BORDER_WX = GEOM_WARP_X;
         if (GEOM_BORDER_WY < 0.0) l_GEOM_BORDER_WY = GEOM_WARP_Y;
         
         if ((l_GEOM_BORDER_WX > 0.0) || (l_GEOM_BORDER_WY > 0.0))
             border_coords = Warp(vTexCoord,l_GEOM_BORDER_WX,l_GEOM_BORDER_WY);
 
-        if ((GEOM_ZOOMOUT + geom_gap_size_adj) > 0.0) {
-            coords = zoomout_coords(coords, GEOM_ZOOMOUT, 1.0);
+        /*if ((GEOM_ZOOMOUT + geom_gap_size_adj) > 0.0) {
+            coords_curved = zoomout_coords(coords_curved, GEOM_ZOOMOUT, 1.0);
             border_coords = zoomout_coords(border_coords, GEOM_ZOOMOUT-geom_gap_size_adj, 1.0);
-        }
+        }*/
+    }
+    
+    if (DO_BEZEL == 1.0) {
+        coords_curved = zoomout_coords(coords_curved, -BEZEL_INNER_ZOOM , 1.0);
+        border_coords = zoomout_coords(border_coords, -1.0, 1.0); //FIXME i use this to make the picture wider and generate reflections via mirrored texture; i need to make this wider and higher than the screen for when the bezel needs reflections only on left and right sides (read: the content is not zoomed-out).
+        //for when the content is zoomed out, border coords do the same work of carrying the reflections because they simply are at the (unzoomed) border place.
         fborder = border(border_coords);
     }
     
@@ -200,14 +207,14 @@ vec4 main_wrap(void) {
     
     //Get the first available pixel_in:
     if  ((DO_IN_GLOW == 1.0) || flickering_scanlines) {
-            pixel_in = texture(in_glow_and_scanline_flickering_pass,coords).rgb;
+            pixel_in = texture(in_glow_and_scanline_flickering_pass,coords_curved).rgb;
             pixel_glowed = pixel_in;
             pixel_scanlined = pixel_in;
         }
             else if (DO_FXAA == 1.0) 
-        pixel_in = texture(FXAA_pass,coords).rgb ;
+        pixel_in = texture(FXAA_pass,coords_curved).rgb ;
             else
-        pixel_in = texture(doublesize_pass,coords).rgb ;
+        pixel_in = texture(doublesize_pass,coords_curved).rgb ;
         
     vec3 pixel_out = pixel_in;
 
@@ -216,7 +223,7 @@ vec4 main_wrap(void) {
     if ( DO_SCANLINES == 1.0 )  {
         if  (!flickering_scanlines) {  //flickering scanlines are handled in previous pass
             if  (! ( isinterlaced  && (scanline_disable_on_interlace == 1.0))  ) {
-                pixel_scanlined = pixel_scanline_static(pixel_out,coords);
+                pixel_scanlined = pixel_scanline_static(pixel_out,coords_curved);
                 pixel_scanlined = min(vec3(1.0),pixel_scanlined);
                 pixel_out = min(vec3(1.0),pixel_out);
             }
@@ -251,8 +258,8 @@ vec4 main_wrap(void) {
 
     //Halo
     if (DO_HALO == 1.0 ) {
-        //vec3 pixel_haloed = pixel_glow(Source, halo_w,halo_h,halo_power,halo_gamma,coords, params.SourceSize).rgb;
-        vec3 pixel_haloed = texture(halo_pass,coords).rgb;
+        //vec3 pixel_haloed = pixel_glow(Source, halo_w,halo_h,halo_power,halo_gamma,coords_curved, params.SourceSize).rgb;
+        vec3 pixel_haloed = texture(halo_pass,coords_curved).rgb;
         pixel_out += pixel_haloed;
     }
 
@@ -278,12 +285,18 @@ vec4 main_wrap(void) {
 }
 
 void main() {
+   //FIXME: bezel may need a wider border when zoomed in.
+            //But for performance reasons we can wide the border in relation to the desidered reflection area.
+            //by now, just wide it to the screen content.
+
     bool is_border = false;
     if (border_needed()) {
-        bool b_is_rotated = is_rotated();
-        bool is_outside_x = ((vTexCoord.x > 1.0 ) || (vTexCoord.x < 0.0 ) );
-        bool is_outside_y = ((vTexCoord.y > 1.0 ) || (vTexCoord.y < 0.0 ) );
-        is_border = (b_is_rotated && is_outside_y) || (!b_is_rotated && is_outside_x);
+        if (DO_BEZEL != 1.0) {
+            bool b_is_rotated = is_rotated();
+            bool is_outside_x = ((coords_curved.x > 1.0 ) || (coords_curved.x < 0.0 ) );
+            bool is_outside_y = ((coords_curved.y > 1.0 ) || (coords_curved.y < 0.0 ) );
+            is_border = (b_is_rotated && is_outside_y) || (!b_is_rotated && is_outside_x);
+        }
    }
    
    if (is_border)

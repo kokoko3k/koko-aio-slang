@@ -1,5 +1,8 @@
 #define alpha_mark 0.1
-
+vec2 zoom(vec2 in_coords, float zoom_factor) {
+   float off = 1.0/(zoom_factor*2.0) - 0.5;
+   return (in_coords/zoom_factor)-off;
+}
 
 vec2 zoomout_coords(vec2 in_coords, float zoom_out, float aspect) {
    vec2 zoom   = vec2( 1 + zoom_out, 
@@ -154,7 +157,7 @@ float random(float power) {
 			scale_y = destsize.y/(destsize.x / in_aspect );
 			offset_y = (0.5 * scale_y ) - 0.5 ;
 		} else {
-			scale_x = params.OutputSize.x/(params.OutputSize.y * in_aspect);
+			//scale_x = params.OutputSize.x/(params.OutputSize.y * in_aspect);
 			//scale_x = global.FinalViewportSize.x/(global.FinalViewportSize.y * in_aspect);
 			scale_x = destsize.x/(destsize.y * in_aspect);
 			offset_x = (0.5 * scale_x ) - 0.5 ;
