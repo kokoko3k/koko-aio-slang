@@ -172,7 +172,6 @@ vec4 main_wrap(void) {
 
     float l_GEOM_BORDER_WX = GEOM_BORDER_WX;
     float l_GEOM_BORDER_WY = GEOM_BORDER_WY;
-    float fborder = 1.0;
     vec2 border_coords = vTexCoord;
 
     if (DO_CURVATURE == 1.0) {
@@ -196,11 +195,9 @@ vec4 main_wrap(void) {
     
     if (DO_BEZEL == 1.0) {
         coords_curved = zoomout_coords(coords_curved, -BEZEL_INNER_ZOOM , 1.0);
-        border_coords = zoomout_coords(border_coords, -1.0, 1.0); //FIXME i use this to make the picture wider and generate reflections via mirrored texture; i need to make this wider and higher than the screen for when the bezel needs reflections only on left and right sides (read: the content is not zoomed-out).
-        //for when the content is zoomed out, border coords do the same work of carrying the reflections because they simply are at the (unzoomed) border place.
-        fborder = border(border_coords);
+        border_coords = zoomout_coords(border_coords, -1.0, 1.0);
     }
-    
+
     vec3 pixel_in;
     vec3 pixel_glowed;
     vec3 pixel_scanlined;
@@ -281,7 +278,7 @@ vec4 main_wrap(void) {
 
     
     //Out
-    return vec4(pixel_out,1.0) * fborder;
+    return vec4(pixel_out,1.0) ;
 }
 
 void main() {
@@ -303,7 +300,6 @@ void main() {
        FragColor = mark_outer_frame(vec3(0.0));
    else
        FragColor = main_wrap();
-
 }
 
 

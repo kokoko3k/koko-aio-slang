@@ -77,9 +77,19 @@ Total basal + all the features: 72.2
 
 */
 
+
+/* Bezel texture contains the following infomations:
+   - The red channel represents the luminance information
+   - The green channel represents the highlights
+   - The alpha channel in the inner frame represents the part of the bezel
+   that will be filled by the game content
+   - The blue channel represents the part of the bezel that will be filled by the game reflection.
+*/
+
                 textures = "monitor_body;circular_gradient"
             monitor_body = "textures/f1.png"
      monitor_body_linear = "true"
+  monitor_body_wrap_mode = "clamp_to_edge" //Does this work)
      //circular_gradient = "textures/circular_gradient.png"
        circular_gradient = "textures/gaussian_gradient.png"
 circular_gradient_linear = "true"

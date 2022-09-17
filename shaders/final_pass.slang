@@ -140,6 +140,9 @@ float quad_smoothstep(vec2 co, float smooth_end, float smooth_start) {
 
 
 vec3 compose_bezel_over(vec3 full_viewport) {
+
+
+
     vec2 coords_for_bezel = vTexCoord;
     vec2 coords_for_mirror = vOutputCoord;
     if (BEZEL_FRAME_ZOOM != 0.0) {
@@ -173,9 +176,9 @@ vec3 compose_bezel_over(vec3 full_viewport) {
             float smooth_threshold_antialias = (params.OutputSize.z + params.OutputSize.w) * 2.0;
             full_viewport_antialiased *= quad_smoothstep(coords_curved,smooth_threshold_antialias) ;
         }*/
-    
-    //return full_viewport_antialiased;
-    
+
+
+
     
     //Generate the reflection area and mix it over the bezel:    
         float reflection = quad_smoothstep( zoomout_coords(vTexCoord, -BEZEL_FRAME_ZOOM, 1.0) , BEZEL_REF_START,BEZEL_REF_END ); //FIXME: check se bezel_zoom è ok
@@ -186,7 +189,7 @@ vec3 compose_bezel_over(vec3 full_viewport) {
 //return vec3(reflection);
         //bezel_out = mix(bezel_colored,pixel_mirrored,reflection);   //FIXME: is it a mix or a sum?
         bezel_out = bezel_colored + (pixel_mirrored *reflection) ;  
-        
+
     //Mix a bit of ambient light over the bezel
         vec4 pixel_avglum = texture(avglum_pass,vOutputCoord);
         bezel_out = bezel_out + (pixel_avglum.rgb * 0.05);
@@ -200,11 +203,8 @@ vec3 compose_bezel_over(vec3 full_viewport) {
             bezel_out = bezel_out + ( vec3(pixel_avglum.a)  * lut_hardness/3.5);
         }
          
-   
-   
     return mix(full_viewport_antialiased, bezel_out, bezel.a);
 }
-
 
 vec4 pixel_inner_frame() {
     vec4 pixel_in = texture(main_pass, vOutputCoord);
@@ -215,7 +215,6 @@ vec4 pixel_inner_frame() {
     //vec2 coords_curved = vTexCoord ;
     float l_GEOM_BORDER_WX = GEOM_BORDER_WX;
     float l_GEOM_BORDER_WY = GEOM_BORDER_WY;
-    float fborder = 1.0;
     
     if (DO_CURVATURE == 1.0) {
         /*float geom_gap_size_adj = GEOM_GAP_SIZE;
@@ -230,12 +229,6 @@ vec4 pixel_inner_frame() {
         
         if ((l_GEOM_BORDER_WX > 0.0) || (l_GEOM_BORDER_WY > 0.0))
             border_coords = Warp(vTexCoord,l_GEOM_BORDER_WX,l_GEOM_BORDER_WY);
-
-        /*if ((GEOM_ZOOMOUT + geom_gap_size_adj) > 0.0) {
-            coords_curved = zoomout_coords(coords_curved, GEOM_ZOOMOUT, 1.0);
-            border_coords = zoomout_coords(border_coords, GEOM_ZOOMOUT-geom_gap_size_adj, 1.0);
-        }*/
-        fborder = border(border_coords);
     }
     
     if (DO_BEZEL == 1.0) {
@@ -305,6 +298,8 @@ vec4 main_wrap(){
             vec4 vPixel_inner_frame = pixel_inner_frame();
             if (DO_AMBILIGHT == 1) {
                 //mix ambilight in the inner frame too, as curvature could shrink into the inner frame.
+                //float border_inner_frame = border(coords_curved);
+                //vPixel_inner_frame.a = border_inner_frame;
                 return vec4(mix(ambi_noised().rgb,vPixel_inner_frame.rgb,min(vPixel_inner_frame.a*1.5,1.0)),vPixel_inner_frame.a);
                 
             }
@@ -322,10 +317,14 @@ void main() {
     if (DO_BEZEL == 1.0) {
         pixel_out = vec4(compose_bezel_over(pixel_out.rgb),1.0);
     }
-    
+
+
+
+
+
     FragColor = pixel_out;
 
-    
+
 
     //FragColor = texture(reflected_blurred_pass2, vOutputCoord);
     
