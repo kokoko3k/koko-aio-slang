@@ -145,7 +145,7 @@ vec3 compose_bezel_over(vec3 full_viewport) {
 
     //Main lut:
     vec4 bezel = texture(monitor_body,coords_for_bezel);
-    
+
     //We use the red component of the bezel to express its luminance (define bezel_luminance bezel.r)
     vec3 bezel_colored = bezel_color(bezel_luminance);
 
@@ -299,6 +299,6 @@ void main() {
         pixel_out = vec4(compose_bezel_over(pixel_out.rgb),1.0);
     }
 
-    FragColor = pixel_out;
+    FragColor = pixel_out ;
     
 }

@@ -186,17 +186,13 @@ vec4 main_wrap(void) {
         
         if ((l_GEOM_BORDER_WX > 0.0) || (l_GEOM_BORDER_WY > 0.0))
             border_coords = Warp(vTexCoord,l_GEOM_BORDER_WX,l_GEOM_BORDER_WY);
-
-        /*if ((GEOM_ZOOMOUT + geom_gap_size_adj) > 0.0) {
-            coords_curved = zoomout_coords(coords_curved, GEOM_ZOOMOUT, 1.0);
-            border_coords = zoomout_coords(border_coords, GEOM_ZOOMOUT-geom_gap_size_adj, 1.0);
-        }*/
     }
     
     if (DO_BEZEL == 1.0) {
         coords_curved = zoomout_coords(coords_curved, -BEZEL_INNER_ZOOM , 1.0);
         border_coords = zoomout_coords(border_coords, -1.0, 1.0);
     }
+
 
     vec3 pixel_in;
     vec3 pixel_glowed;
@@ -278,7 +274,7 @@ vec4 main_wrap(void) {
 
     
     //Out
-    return vec4(pixel_out,1.0) ;
+    return vec4(pixel_out,1.0) * border(border_coords);
 }
 
 void main() {
