@@ -298,8 +298,8 @@ vec4 main_wrap(){
             vec4 vPixel_inner_frame = pixel_inner_frame();
             if (DO_AMBILIGHT == 1) {
                 //mix ambilight in the inner frame too, as curvature could shrink into the inner frame.
-                //float border_inner_frame = border(coords_curved);
-                //vPixel_inner_frame.a = border_inner_frame;
+                float border_inner_frame = border(coords_curved);
+                vPixel_inner_frame.a = border_inner_frame;
                 return vec4(mix(ambi_noised().rgb,vPixel_inner_frame.rgb,min(vPixel_inner_frame.a*1.5,1.0)),vPixel_inner_frame.a);
                 
             }
