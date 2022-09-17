@@ -113,17 +113,6 @@ vec3 bezel_color(float lum)  {
 }
 
 vec2 coords_curved = vTexCoord ; //FIXME how bad is this global variable?
-//bezel not reflective size in percent of the game size
-#define BEZEL_OUT_PERCENT 0.02
-#define rxmin (BEZEL_OUT_PERCENT)
-#define rxmax (1-BEZEL_OUT_PERCENT)
-#define rymin (BEZEL_OUT_PERCENT)
-#define rymax (1-BEZEL_OUT_PERCENT)
-
-bool is_reflection_area() {
-    return ((vTexCoord.x > rxmin) && (vTexCoord.x < rxmax) && (vTexCoord.y > rymin) && (vTexCoord.y < rymax )) &&
-           ((coords_curved.x < 0.0 ) || (coords_curved.x > 1.0) || (coords_curved.y < 0.0) || (coords_curved.y > 1.0));
-}
 
 
 float quad_smoothstep(vec2 co, float smooth_end, float smooth_start) {
@@ -138,26 +127,24 @@ float quad_smoothstep(vec2 co, float smooth_end, float smooth_start) {
     return mysmoothstep;
 }
 
+float borderframe(vec2 co, float thickness) {
+    float borderout = border(co);
+    float borderin = border(zoom(co,1-thickness));
+    return borderout-borderin;
+}
 
 vec3 compose_bezel_over(vec3 full_viewport) {
 
-
-
     vec2 coords_for_bezel = vTexCoord;
     vec2 coords_for_mirror = vOutputCoord;
-    if (BEZEL_FRAME_ZOOM != 0.0) {
+    if (BEZEL_FRAME_ZOOM != 0.0)
         coords_for_bezel = zoomout_coords(vTexCoord,-BEZEL_FRAME_ZOOM,1.0);
-        //coords_for_mirror = zoomout_coords(vOutputCoord,-BEZEL_INNER_ZOOM,1.0);
-    }
 
     //No need to draw anything outside this:
     if (coords_for_bezel.x < 0  || coords_for_bezel.y < 0 || coords_for_bezel.x > 1.0 || coords_for_bezel.y > 1.0) return full_viewport;
 
-    vec3 bezel_out;
-    
     //Main lut:
     vec4 bezel = texture(monitor_body,coords_for_bezel);
-    
     
     //We use the red component of the bezel to express its luminance (define bezel_luminance bezel.r)
     vec3 bezel_colored = bezel_color(bezel_luminance);
@@ -166,36 +153,25 @@ vec3 compose_bezel_over(vec3 full_viewport) {
     vec3 pixel_mirrored = texture(reflected_blurred_pass2,
                           coords_for_mirror + displace( (global.FinalViewportSize.z+global.FinalViewportSize.w)*0.5 ) ).rgb;
 
-//return pixel_mirrored;
-    //(Optionally) draw a black border around the picture //FIXME: make me optional
-        vec3 full_viewport_antialiased = full_viewport;
-        /*float border_size = 0.03;
-        if ( coords_curved.x + border_size > 0.0 && coords_curved.y + border_size > 0.0 && 
-            coords_curved.x - border_size < 1.0 && coords_curved.y -border_size < 1.0  &&
-            coords_curved.x > -border_size ) {
-            float smooth_threshold_antialias = (params.OutputSize.z + params.OutputSize.w) * 2.0;
-            full_viewport_antialiased *= quad_smoothstep(coords_curved,smooth_threshold_antialias) ;
-        }*/
+    //Draw a black border around the frame to allow a bit underscanning
+        vec3 full_viewport_bordered = full_viewport;
+        float border_size = 0.05;
+        float fborderframe = borderframe(zoom(coords_curved,1+border_size),border_size);
+        full_viewport_bordered = full_viewport_bordered*(1-fborderframe);
 
-
-
-    
     //Generate the reflection area and mix it over the bezel:    
-        float reflection = quad_smoothstep( zoomout_coords(vTexCoord, -BEZEL_FRAME_ZOOM, 1.0) , BEZEL_REF_START,BEZEL_REF_END ); //FIXME: check se bezel_zoom è ok
-//return vec3(reflection);
+        float reflection = quad_smoothstep( zoomout_coords(vTexCoord, -BEZEL_FRAME_ZOOM, 1.0) , BEZEL_REF_START,BEZEL_REF_END );
+
         //Take the reflection modifier from the texture blue component into account; it is/may be used to lower the reflection in the corners.
             reflection = (reflection * 1.4 -  0.4)  * bezel.b ;
             reflection = clamp (reflection, 0.0, 1.0);
-//return vec3(reflection);
-        //bezel_out = mix(bezel_colored,pixel_mirrored,reflection);   //FIXME: is it a mix or a sum?
-        bezel_out = bezel_colored + (pixel_mirrored *reflection) ;  
+        vec3 bezel_out = bezel_colored + (pixel_mirrored *reflection) ;
 
     //Mix a bit of ambient light over the bezel
         vec4 pixel_avglum = texture(avglum_pass,vOutputCoord);
         bezel_out = bezel_out + (pixel_avglum.rgb * 0.05);
 
             
-    
     //We use the green component to express Hardness/Specularity; there the reflection will be completely diffused.
     //For the task, we use a mipmap whit adeguate precision.
         float lut_hardness = bezel.g;
@@ -203,7 +179,7 @@ vec3 compose_bezel_over(vec3 full_viewport) {
             bezel_out = bezel_out + ( vec3(pixel_avglum.a)  * lut_hardness/3.5);
         }
          
-    return mix(full_viewport_antialiased, bezel_out, bezel.a);
+    return mix(full_viewport_bordered, bezel_out, bezel.a);
 }
 
 vec4 pixel_inner_frame() {
@@ -323,14 +299,6 @@ void main() {
         pixel_out = vec4(compose_bezel_over(pixel_out.rgb),1.0);
     }
 
-
-
-
-
     FragColor = pixel_out;
-
-
-
-    //FragColor = texture(reflected_blurred_pass2, vOutputCoord);
     
 }
