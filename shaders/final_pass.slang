@@ -216,6 +216,7 @@ vec4 pixel_inner_frame() {
     float l_GEOM_BORDER_WX = GEOM_BORDER_WX;
     float l_GEOM_BORDER_WY = GEOM_BORDER_WY;
     
+
     if (DO_CURVATURE == 1.0) {
         /*float geom_gap_size_adj = GEOM_GAP_SIZE;
         if (GEOM_GAP_SIZE < 0.0) geom_gap_size_adj = GEOM_ZOOMOUT;*/
@@ -271,8 +272,14 @@ vec4 pixel_inner_frame() {
         }
     }
 
+
+    float border_inner_frame = 1.0;
+    if (DO_BEZEL==1.0 || DO_CURVATURE == 1.0)
+        border_inner_frame = border(coords_curved);
+
+    float pixel_out_alpha = pixel_in.a * border_inner_frame;
     //Out
-    return vec4(pixel_out,pixel_in.a);
+    return vec4(pixel_out,pixel_out_alpha) * border_inner_frame;
 }
 
 
@@ -298,8 +305,6 @@ vec4 main_wrap(){
             vec4 vPixel_inner_frame = pixel_inner_frame();
             if (DO_AMBILIGHT == 1) {
                 //mix ambilight in the inner frame too, as curvature could shrink into the inner frame.
-                float border_inner_frame = border(coords_curved);
-                vPixel_inner_frame.a = border_inner_frame;
                 return vec4(mix(ambi_noised().rgb,vPixel_inner_frame.rgb,min(vPixel_inner_frame.a*1.5,1.0)),vPixel_inner_frame.a);
                 
             }
