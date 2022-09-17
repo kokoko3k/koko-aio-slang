@@ -171,7 +171,7 @@ vec3 compose_bezel_over(vec3 full_viewport) {
         vec4 pixel_avglum = texture(avglum_pass,vOutputCoord);
         bezel_out = bezel_out + (pixel_avglum.rgb * 0.05);
 
-            
+
     //We use the green component to express Hardness/Specularity; there the reflection will be completely diffused.
     //For the task, we use a mipmap whit adeguate precision.
         float lut_hardness = bezel.g;
@@ -301,4 +301,5 @@ void main() {
 
     FragColor = pixel_out ;
     
+    //FragColor = texture(reflected_blurred_pass2, vOutputCoord);
 }
