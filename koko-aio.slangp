@@ -89,7 +89,7 @@ Total basal + all the features: 72.2
                 textures = "monitor_body"
             monitor_body = "textures/f1.png"
      monitor_body_linear = "true"
-  monitor_body_wrap_mode = "clamp_to_edge" //Does this work)
+  monitor_body_wrap_mode = "clamp_to_edge" //Does this work?
 
 
 
@@ -157,8 +157,10 @@ float_framebuffer3 = true
         * the following pass does not use the previous one 
         * the previous pass represents scene changes.
 */
-         //The alpha channel of the following pass contains luminance info
+         //The rgb channels of the following pass contains luminance info
          //Used by the bezel code to light up the bezel corners.
+         //The alpha channel contains the sum/3.0 of rgb channels
+         //used to detect scene changes.
                shader5 = shaders/avglum_pass.slang
                 alias5 = "avglum_pass"
         filter_linear5 = true

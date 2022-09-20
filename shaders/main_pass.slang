@@ -162,9 +162,7 @@ vec3 pixel_scanline_static(vec3 color, vec2 coords) {
     return color;
 }
 
-vec2 coords_curved;
-
-vec4 main_wrap(void) {
+vec4 main_wrap(vec2 co) {
     bool isinterlaced = is_interlaced();
     bool flickering_scanlines = (DO_SCANLINES == 1.0) && scanline_have_to_flicker(isinterlaced) ;
 
@@ -175,14 +173,14 @@ vec4 main_wrap(void) {
     
     //Get the first available pixel_in:
     if  ((DO_IN_GLOW == 1.0) || flickering_scanlines) {
-            pixel_in = texture(in_glow_and_scanline_flickering_pass,coords_curved).rgb;
+            pixel_in = texture(in_glow_and_scanline_flickering_pass,co).rgb;
             pixel_glowed = pixel_in;
             pixel_scanlined = pixel_in;
         }
             else if (DO_FXAA == 1.0) 
-        pixel_in = texture(FXAA_pass,coords_curved).rgb ;
+        pixel_in = texture(FXAA_pass,co).rgb ;
             else
-        pixel_in = texture(doublesize_pass,coords_curved).rgb ;
+        pixel_in = texture(doublesize_pass,co).rgb ;
         
     vec3 pixel_out = pixel_in;
 
@@ -191,7 +189,7 @@ vec4 main_wrap(void) {
     if ( DO_SCANLINES == 1.0 )  {
         if  (!flickering_scanlines) {  //flickering scanlines are handled in previous pass
             if  (! ( isinterlaced  && (scanline_disable_on_interlace == 1.0))  ) {
-                pixel_scanlined = pixel_scanline_static(pixel_out,coords_curved);
+                pixel_scanlined = pixel_scanline_static(pixel_out,co);
                 pixel_scanlined = min(vec3(1.0),pixel_scanlined);
                 pixel_out = min(vec3(1.0),pixel_out);
             }
@@ -226,8 +224,7 @@ vec4 main_wrap(void) {
 
     //Halo
     if (DO_HALO == 1.0 ) {
-        //vec3 pixel_haloed = pixel_glow(Source, halo_w,halo_h,halo_power,halo_gamma,coords_curved, params.SourceSize).rgb;
-        vec3 pixel_haloed = texture(halo_pass,coords_curved).rgb;
+        vec3 pixel_haloed = texture(halo_pass,co).rgb;
         pixel_out += pixel_haloed;
     }
 
@@ -253,29 +250,17 @@ vec4 main_wrap(void) {
 }
 
 void main() {
-    coords_curved = vTexCoord;
+    vec2 coords = vTexCoord;
+    vec2 coords_curved = vTexCoord;
     //Curvature: set coords_curved coordinate: (global var)
-        float l_GEOM_BORDER_WX = GEOM_BORDER_WX;
-        float l_GEOM_BORDER_WY = GEOM_BORDER_WY;
-        //vec2 border_coords = vTexCoord;
-
         if (DO_CURVATURE == 1.0) {
-            /*float geom_gap_size_adj = GEOM_GAP_SIZE;
-            if (GEOM_GAP_SIZE < 0.0) geom_gap_size_adj = GEOM_ZOOMOUT;*/
-
             if ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0))
                 coords_curved = Warp(coords_curved,GEOM_WARP_X,GEOM_WARP_Y);
-
-            if (GEOM_BORDER_WX < 0.0) l_GEOM_BORDER_WX = GEOM_WARP_X;
-            if (GEOM_BORDER_WY < 0.0) l_GEOM_BORDER_WY = GEOM_WARP_Y;
-            
-            //if ((l_GEOM_BORDER_WX > 0.0) || (l_GEOM_BORDER_WY > 0.0))
-            //    border_coords = Warp(vTexCoord,l_GEOM_BORDER_WX,l_GEOM_BORDER_WY);
         }
         
         if (DO_BEZEL == 1.0) {
             coords_curved = zoomout_coords(coords_curved, -BEZEL_INNER_ZOOM , 1.0);
-            //border_coords = zoomout_coords(border_coords, -1.0, 1.0);
+            coords = zoomout_coords(coords, -BEZEL_INNER_ZOOM , 1.0);
         }
     
    //FIXME: bezel may need a wider border when zoomed in.
@@ -289,8 +274,8 @@ void main() {
         if (DO_BEZEL == 1.0) WIDEN = BEZEL_REF_END - BEZEL_REF_START;
    
         bool b_is_rotated = is_rotated();
-        bool is_outside_x = ((coords_curved.x > 1.0+WIDEN ) || (coords_curved.x < 0.0 - WIDEN) );
-        bool is_outside_y = ((coords_curved.y > 1.0+WIDEN ) || (coords_curved.y < 0.0 - WIDEN) );
+        bool is_outside_x = ((coords.x > 1.0+WIDEN ) || (coords.x < 0.0 - WIDEN) );
+        bool is_outside_y = ((coords.y > 1.0+WIDEN ) || (coords.y < 0.0 - WIDEN) );
         is_border = (b_is_rotated && is_outside_y) || (!b_is_rotated && is_outside_x);
 
    }
@@ -298,7 +283,7 @@ void main() {
    if (is_border)
        FragColor = mark_outer_frame(vec3(0.0));
    else
-       FragColor = main_wrap();
+       FragColor = main_wrap(coords_curved);
 }
 
 
