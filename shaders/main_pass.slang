@@ -283,13 +283,16 @@ void main() {
             //by now, just wide it to the screen content.
 
     bool is_border = false;
+    
     if (border_needed()) {
-        if (DO_BEZEL != 1.0) {
-            bool b_is_rotated = is_rotated();
-            bool is_outside_x = ((coords_curved.x > 1.0 ) || (coords_curved.x < 0.0 ) );
-            bool is_outside_y = ((coords_curved.y > 1.0 ) || (coords_curved.y < 0.0 ) );
-            is_border = (b_is_rotated && is_outside_y) || (!b_is_rotated && is_outside_x);
-        }
+        float WIDEN = 0.0;
+        if (DO_BEZEL == 1.0) WIDEN = BEZEL_REF_END - BEZEL_REF_START;
+   
+        bool b_is_rotated = is_rotated();
+        bool is_outside_x = ((coords_curved.x > 1.0+WIDEN ) || (coords_curved.x < 0.0 - WIDEN) );
+        bool is_outside_y = ((coords_curved.y > 1.0+WIDEN ) || (coords_curved.y < 0.0 - WIDEN) );
+        is_border = (b_is_rotated && is_outside_y) || (!b_is_rotated && is_outside_x);
+
    }
    
    if (is_border)
