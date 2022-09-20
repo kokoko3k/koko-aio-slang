@@ -5,7 +5,7 @@
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
-#include "functions.include"
+
 void main()
 {
    gl_Position = global.MVP * Position;
@@ -20,7 +20,7 @@ layout(set = 0, binding = 2) uniform sampler2D Source;
 #define SourceTexture Source
 #define SourceTextureSize params.SourceSize
 
-#include "blooms.slang"
+#include "blurs.include.slang"
 void main() {
    if (DO_BEZEL == 1.0) {
       //FragColor = texture(Source, vTexCoord);

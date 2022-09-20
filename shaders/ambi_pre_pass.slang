@@ -24,7 +24,6 @@ layout(set = 0, binding = 2) uniform sampler2D Source;
 // shamlessly hidden into an include:
 #include "blooms.slang" 
 
-#include "functions.include"
 void main() {
 
 //vec3 bloom(float Directions, float Quality, float Size, float fbloom_gamma) {

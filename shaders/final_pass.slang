@@ -29,7 +29,6 @@ layout(set = 0, binding = 7) uniform sampler2D monitor_body;
 layout(set = 0, binding = 8) uniform sampler2D reflected_blurred_pass2;
 
 
-#include "functions.include"
 
 float displace(float power) {
     vec2 co = vTexCoord ;

@@ -36,27 +36,19 @@ layout(set = 0, binding = 3) uniform sampler2D doublesize_pass;
 // What follows is an ugly optimization with a lot of code copied and pasted repeated multiple times,
 // shamlessly hidden into an include:
 #include "pixel_glows.slang"    
-    
 
-#include "functions.include"
 
 vec4 main_wrap(void) {
     //Halo
     vec3 pixel_haloed;
     vec2 halo_coords = vTexCoord;
-    /*
-        if (DO_CURVATURE == 1.0) {
-            if ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0))
-                halo_coords = Warp(vTexCoord,GEOM_WARP_X,GEOM_WARP_Y);
-        }*/
-        if (DO_FXAA == 1.0)
-            pixel_haloed = pixel_glow(FXAA_pass, halo_w,halo_h,halo_power,halo_gamma,halo_coords, global.FXAA_passSize, global.FXAA_passSize).rgb;
-                else
-            pixel_haloed = pixel_glow(doublesize_pass, halo_w,halo_h,halo_power,halo_gamma,halo_coords, global.FXAA_passSize, global.FXAA_passSize).rgb;
-            
-        return vec4(pixel_haloed.rgb,1.0);
-    //Out
-    return vec4(vec3(0.0),1.0);
+
+    if (DO_FXAA == 1.0)
+        pixel_haloed = pixel_glow(FXAA_pass, halo_w,halo_h,halo_power,halo_gamma,halo_coords, global.FXAA_passSize, global.FXAA_passSize).rgb;
+            else
+        pixel_haloed = pixel_glow(doublesize_pass, halo_w,halo_h,halo_power,halo_gamma,halo_coords, global.FXAA_passSize, global.FXAA_passSize).rgb;
+        
+    return vec4(pixel_haloed.rgb,1.0);
 }
 
 

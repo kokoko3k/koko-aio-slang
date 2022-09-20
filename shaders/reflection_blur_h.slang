@@ -6,11 +6,10 @@ layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
 
-#include "functions.include"
 void main()
 {
    gl_Position = global.MVP * Position;
-   vTexCoord =TexCoord ;
+   vTexCoord = TexCoord;
 }
 
 #pragma stage fragment
@@ -21,8 +20,7 @@ layout(set = 0, binding = 2) uniform sampler2D main_pass;
 #define SourceTexture main_pass
 #define SourceTextureSize global.main_passSize
 
-#include "blooms.slang"
-#include "functions.include"
+#include "blurs.include.slang"
 void main() {
    if (DO_BEZEL == 1.0) {
       vec2 res = vec2(params.SourceSize.x, params.SourceSize.y);

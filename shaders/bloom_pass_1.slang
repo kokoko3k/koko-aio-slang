@@ -25,18 +25,7 @@ layout(set = 0, binding = 2) uniform sampler2D Original;
 // shamlessly hidden into an include:
 #include "blooms.slang" 
 
-
 void main() {
-
-//vec4 bloom_new(sampler2D tex, vec2 coords, vec2 size, float samples, float quality) {
-
-float size = 3;
-int samples = 9;
-float quality = 4.0;
-float threshold = 0.5;
-
-//FragColor = vec4(bloom_new(SourceTexture, vTexCoord, size, quality, BLOOM_THRESHOLD), 1.0);
-//return;
 
     if (DO_BLOOM == 1.0 ) {
         vec3 bloomed = bloom(bloom_directions,bloom_quality,bloom_size,bloom_gamma) * bloom_power;

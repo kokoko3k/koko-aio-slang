@@ -42,7 +42,6 @@ layout(set = 0, binding = 6) uniform sampler2D doublesize_pass;
 
 
 
-#include "functions.include"
 // What follows is an ugly optimization with a lot of code copied and pasted repeated multiple times,
 // shamlessly hidden into an include:
 #include "pixel_glows.slang"    

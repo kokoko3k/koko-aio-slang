@@ -8,20 +8,10 @@ layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
 
 
-#include "functions.include"
 void main()
 {
    gl_Position = global.MVP * Position;
-   //vTexCoord.x = TexCoord.x * 0.75 + (1-0.75)/2.0;
-   //vTexCoord.y = TexCoord.y;
-vTexCoord = TexCoord;
-   //vTexCoord = (get_scaled_coords(TexCoord) + TexCoord) / 2.0;
-   //vTexCoord = get_scaled_coords(TexCoord,params.OutputSize);
-//vTexCoord = get_scaled_coords(TexCoord,global.FinalViewportSize );
-   //global.FinalViewportSize 
-   
-   
-   
+   vTexCoord = TexCoord;
 }
 
 #pragma stage fragment
@@ -29,8 +19,6 @@ layout(location = 0) in vec2 vTexCoord;
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D Original;
 layout(set = 0, binding = 3) uniform sampler2D main_pass;
-
-#include "functions.include"
 
 
 bool border_updown(){
