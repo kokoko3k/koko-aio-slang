@@ -273,7 +273,7 @@ vec4 main_wrap(void) {
 
     
     //Out
-    return vec4(pixel_out,1.0) * border(border_coords);
+    return vec4(pixel_out,1.0) ;
 }
 
 void main() {
