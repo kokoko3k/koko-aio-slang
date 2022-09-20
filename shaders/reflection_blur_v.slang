@@ -17,8 +17,6 @@ layout(location = 0) in vec2 vTexCoord;
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D Source;
 
-#define SourceTexture Source
-#define SourceTextureSize params.SourceSize
 
 #include "blurs.include.slang"
 void main() {

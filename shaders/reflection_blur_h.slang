@@ -17,9 +17,6 @@ layout(location = 0) in vec2 vTexCoord;
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D main_pass;
 
-#define SourceTexture main_pass
-#define SourceTextureSize global.main_passSize
-
 #include "blurs.include.slang"
 void main() {
    if (DO_BEZEL == 1.0) {

@@ -167,16 +167,17 @@ float_framebuffer3 = true
            scale_type5 = absolute
               scale_x5 = 320
               scale_y5 = 240
-         mipmap_input5 = true
             wrap_mode5 = "mirrored_repeat"
-
+         mipmap_input5 = true
+         
                shader6 = shaders/reflection_blur_h.slang
                 alias6 = "reflected_blurred_pass1"
         filter_linear6 = true
            scale_type6 = source
                 scale6 = 1.0
             wrap_mode6 = "mirrored_repeat"
-
+         mipmap_input6 = true
+         
                shader7 = shaders/reflection_blur_v.slang
                 alias7 = "reflected_blurred_pass2"
         filter_linear7 = true
