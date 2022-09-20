@@ -23,8 +23,11 @@ layout(set = 0, binding = 3) uniform sampler2D PreviousSampler;
 layout(set = 0, binding = 4) uniform sampler2D avglum_pass;
 layout(set = 0, binding = 5) uniform sampler2D avglum_passFeedback;
 
-float smooth_step(float start, float end, float mystep) {
+#define max_steps ambi_steps
+#define min_steps 1.0
+#define min_step_size 0.004 //roughly 1/255
 
+float smooth_step(float start, float end, float mystep) {
     float diff = start-end;
     if (abs(diff) < mystep) return end;
     if (start >= end)
@@ -62,7 +65,7 @@ vec3 pixel_ambilight() {
 }
 
 
-#include "functions.include"
+#include "functions.include.slang"
 void main() {
     if (DO_AMBILIGHT == 1.0)
         FragColor = vec4(pixel_ambilight(),0.0);

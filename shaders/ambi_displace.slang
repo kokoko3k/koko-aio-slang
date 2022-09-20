@@ -70,6 +70,7 @@ vec3 main_wrap(){
    //return pixel_out;
 }
 
+#include "functions.include.slang"
 void main() {
    vec4 psample = texture(main_pass,vTexCoord);
    bool IsOuterFrame;

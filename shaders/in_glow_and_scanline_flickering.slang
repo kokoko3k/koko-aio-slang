@@ -30,7 +30,8 @@ layout(set = 0, binding = 4) uniform sampler2D doublesize_pass;
 
 // What follows is an ugly optimization with a lot of code copied and pasted repeated multiple times,
 // shamlessly hidden into an include:
-#include "pixel_glows.slang" 
+#include "pixel_glows.include.slang" 
+#include "functions.include.slang"
 
 bool flickering_scanline_needed(bool is_interlaced){
    if (DO_SCANLINES == 1.0) {

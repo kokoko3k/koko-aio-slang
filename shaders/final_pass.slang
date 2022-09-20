@@ -8,14 +8,14 @@ layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
 layout(location = 1) out vec2 vOutputCoord;
 
-#include "functions.include"
+#include "functions.include.slang"
 void main() {
     gl_Position = global.MVP * Position;
     vTexCoord = get_scaled_coords(TexCoord,params.OutputSize);
     vOutputCoord = TexCoord;
 }
 
-// 
+
 #pragma stage fragment
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in vec2 vOutputCoord;
@@ -28,7 +28,7 @@ layout(set = 0, binding = 6) uniform sampler2D avglum_pass;
 layout(set = 0, binding = 7) uniform sampler2D monitor_body;
 layout(set = 0, binding = 8) uniform sampler2D reflected_blurred_pass2;
 
-
+#include "functions.include.slang"
 
 float displace(float power) {
     vec2 co = vTexCoord ;

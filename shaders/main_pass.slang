@@ -23,7 +23,7 @@ layout(location = 0) out vec2 vTexCoord;
 layout(location = 1) out vec2 vOutputCoord;
 
 
-#include "functions.include"
+#include "functions.include.slang"
 void main() {
    gl_Position = global.MVP * Position;
    vTexCoord = get_scaled_coords(TexCoord,params.OutputSize);
@@ -44,8 +44,8 @@ layout(set = 0, binding = 6) uniform sampler2D doublesize_pass;
 
 // What follows is an ugly optimization with a lot of code copied and pasted repeated multiple times,
 // shamlessly hidden into an include:
-#include "pixel_glows.slang"    
-    
+#include "pixel_glows.include.slang"    
+#include "functions.include.slang"
 vec3 pixel_vmask(vec3 source, vec3 lm1,vec3 lm2,vec3 lm3,
                  vec3 white_reference, float over_white,bool is_scanlined) {
     int col = int( vOutputCoord.x * params.OutputSize.x );

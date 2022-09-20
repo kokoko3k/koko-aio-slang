@@ -1,4 +1,4 @@
-#include "pows.slang"
+#include "pows.include.slang"
 
 
 //Those functions will sample from source texture (the previous), but with a precision taken from passthrough_passSize.

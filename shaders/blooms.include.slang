@@ -1,4 +1,4 @@
-#include "pows.slang"
+#include "pows.include.slang"
 #define Pi  (3.14159265358979*2)
 #define bloom_directions 8
 
