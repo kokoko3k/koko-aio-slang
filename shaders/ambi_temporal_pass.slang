@@ -27,7 +27,7 @@ layout(set = 0, binding = 5) uniform sampler2D avglum_passFeedback;
 #define min_steps 1.0
 #define min_step_size 0.004 //roughly 1/255
 
-float smooth_step(float start, float end, float mystep) {
+float ambi_step(float start, float end, float mystep) {
     float diff = start-end;
     if (abs(diff) < mystep) return end;
     if (start >= end)
@@ -36,12 +36,12 @@ float smooth_step(float start, float end, float mystep) {
         return start + mystep;
 }
 
-vec3 smooth_step_rgb(vec3 s,vec3 d, vec3 mystep){
+vec3 ambi_step_rgb(vec3 s,vec3 d, vec3 mystep){
     //step fade (f) rom s to d
     vec3 f;
-    f.r = smooth_step(s.r,d.r,mystep.r);
-    f.g = smooth_step(s.g,d.g,mystep.g);
-    f.b = smooth_step(s.b,d.b,mystep.b);
+    f.r = ambi_step(s.r,d.r,mystep.r);
+    f.g = ambi_step(s.g,d.g,mystep.g);
+    f.b = ambi_step(s.b,d.b,mystep.b);
     return f;
 }
 
@@ -60,7 +60,7 @@ vec3 pixel_ambilight() {
     mystep = abs((previous_pixel-current_pixel) / max_steps);
     if (diff_avg_lum > scene_change_threshold ) mystep = vec3(1.0);
     
-    vec3 outmix=smooth_step_rgb(previous_pixel,current_pixel,mystep);
+    vec3 outmix=ambi_step_rgb(previous_pixel,current_pixel,mystep);
     return outmix;
 }
 
