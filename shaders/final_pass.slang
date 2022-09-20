@@ -164,79 +164,64 @@ vec4 pixel_inner_frame() {
     vec3 bloomed;
 
     //Curvature
-    //vec2 coords_curved = vTexCoord ;
-    float l_GEOM_BORDER_WX = GEOM_BORDER_WX;
-    float l_GEOM_BORDER_WY = GEOM_BORDER_WY;
-    
-
-    if (DO_CURVATURE == 1.0) {
-
-        if ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0))
-            coords_curved = Warp(coords_curved,GEOM_WARP_X,GEOM_WARP_Y);
-
-        vec2 border_coords = vTexCoord;
-        if (GEOM_BORDER_WX < 0.0) l_GEOM_BORDER_WX = GEOM_WARP_X;
-        if (GEOM_BORDER_WY < 0.0) l_GEOM_BORDER_WY = GEOM_WARP_Y;
+        if (DO_CURVATURE == 1.0) {
+            if ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0))
+                coords_curved = Warp(coords_curved,GEOM_WARP_X,GEOM_WARP_Y);
+        }
         
-        if ((l_GEOM_BORDER_WX > 0.0) || (l_GEOM_BORDER_WY > 0.0))
-            border_coords = Warp(vTexCoord,l_GEOM_BORDER_WX,l_GEOM_BORDER_WY);
-    }
+        if (DO_BEZEL == 1.0) {
+            coords_curved = zoomout_coords(coords_curved, -BEZEL_INNER_ZOOM , 1.0);
+        }
     
-    if (DO_BEZEL == 1.0) {
-        coords_curved = zoomout_coords(coords_curved, -BEZEL_INNER_ZOOM , 1.0);
-    }
     //Mix bloom texture
-    if (DO_BLOOM == 1.0 ) {
-        bloomed=texture(bloom_pass_final, coords_curved).rgb ;
-        if (bloom_bypass == 1.0)
-            pixel_out = bloomed;
-        else
-            pixel_out = pixel_out + (bloomed * BLOOM_MIX );
-    }
-
+        if (DO_BLOOM == 1.0 ) {
+            bloomed=texture(bloom_pass_final, coords_curved).rgb ;
+            if (bloom_bypass == 1.0)
+                pixel_out = bloomed;
+            else
+                pixel_out = pixel_out + (bloomed * BLOOM_MIX );
+        }
 
     //Black frame insertion
-    if (DO_ALT_BLANK == 1.0 ) {
-        pixel_out = pixel_alternate(pixel_out.rgb, ALT_BLANK_STRENGTH );
-    }
-
+        if (DO_ALT_BLANK == 1.0 ) {
+            pixel_out = pixel_alternate(pixel_out.rgb, ALT_BLANK_STRENGTH );
+        }
 
     //vignette and spot
-    if (DO_VIGNETTE + DO_SPOT >0.0) {
-        float rnoise = random(noisepower);
-        float in_aspect = get_in_aspect();
-        
-        if (DO_VIGNETTE == 1.0) {
-            float vignette;
-            float dist = length(vec2((coords_curved.x-0.5)*in_aspect,coords_curved.y-0.5)); //dist = length(vec2(coords_curved.x*in_aspect-(in_aspect*0.5),coords_curved.y-0.5));
-            vignette = smoothstep(v_size,0.0,dist)*v_power+rnoise;
-            if (v_bypass < 1.0) pixel_out = vignette * pixel_out;
+        if (DO_VIGNETTE + DO_SPOT >0.0) {
+            float rnoise = random(noisepower);
+            float in_aspect = get_in_aspect();
+            
+            if (DO_VIGNETTE == 1.0) {
+                float vignette;
+                float dist = length(vec2((coords_curved.x-0.5)*in_aspect,coords_curved.y-0.5)); //dist = length(vec2(coords_curved.x*in_aspect-(in_aspect*0.5),coords_curved.y-0.5));
+                vignette = smoothstep(v_size,0.0,dist)*v_power+rnoise;
+                if (v_bypass < 1.0) pixel_out = vignette * pixel_out;
+                    else
+                pixel_out = vec3(vignette);
+            }
+
+            if (DO_SPOT == 1.0) {
+            float spot;
+            vec2 s_offset = vec2(-s_center_x,-s_center_y);
+            float dist = length(vec2((coords_curved.x-0.5)*in_aspect,coords_curved.y-0.5)+s_offset); //dist = length(vec2(coords_curved.x*in_aspect-in_aspect*0.5),coords_curved.y-0.5));
+            spot = smoothstep(s_size,0.0,dist)*s_power+rnoise;
+            if (s_bypass < 1.0) pixel_out = spot + pixel_out;
                 else
-            pixel_out = vec3(vignette);
+            pixel_out = vec3(spot);
+            }
+            
         }
 
-        if (DO_SPOT == 1.0) {
-           float spot;
-           vec2 s_offset = vec2(-s_center_x,-s_center_y);
-           float dist = length(vec2((coords_curved.x-0.5)*in_aspect,coords_curved.y-0.5)+s_offset); //dist = length(vec2(coords_curved.x*in_aspect-in_aspect*0.5),coords_curved.y-0.5));
-           spot = smoothstep(s_size,0.0,dist)*s_power+rnoise;
-           if (s_bypass < 1.0) pixel_out = spot + pixel_out;
-               else
-           pixel_out = vec3(spot);
-        }
+    //Border
+        float border_inner_frame = 1.0;
+        if (DO_BEZEL==1.0 || DO_CURVATURE == 1.0)
+            border_inner_frame = border(coords_curved);
+
+        float pixel_out_alpha = pixel_in.a * border_inner_frame;
         
-    }
-    
-    
-
-
-    float border_inner_frame = 1.0;
-    if (DO_BEZEL==1.0 || DO_CURVATURE == 1.0)
-        border_inner_frame = border(coords_curved);
-
-    float pixel_out_alpha = pixel_in.a * border_inner_frame;
     //Out
-    return vec4(pixel_out,pixel_out_alpha) * border_inner_frame;
+        return vec4(pixel_out,pixel_out_alpha) * border_inner_frame;
 }
 
 
