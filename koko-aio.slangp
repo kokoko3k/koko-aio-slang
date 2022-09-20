@@ -86,13 +86,11 @@ Total basal + all the features: 72.2
    - The blue channel represents the part of the bezel that will be filled by the game reflection.
 */
 
-                textures = "monitor_body;circular_gradient"
+                textures = "monitor_body"
             monitor_body = "textures/f1.png"
      monitor_body_linear = "true"
   monitor_body_wrap_mode = "clamp_to_edge" //Does this work)
-     //circular_gradient = "textures/circular_gradient.png"
-       circular_gradient = "textures/gaussian_gradient.png"
-circular_gradient_linear = "true"
+
 
 
 shaders = 18

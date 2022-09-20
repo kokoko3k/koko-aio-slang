@@ -43,29 +43,6 @@ float displace(float power) {
     return noise_out ; 
 }
 
-vec2 pixel_vignette_and_spot(vec2 co){
-    float in_aspect = get_in_aspect();
-    vec2 sv_coords = vec2(co.x * in_aspect - ((0.5 * in_aspect) - 0.5) ,  co.y);
-    float f_random = random(noisepower);
-    vec2 pixel_out;
-
-    
-    if (DO_VIGNETTE == 1.0) {
-        vec2 vignette_coords = zoomout_coords(sv_coords,1-v_size,1.0) + vec2(f_random);
-        pixel_out.r = texture(circular_gradient,vignette_coords).r * v_power ;
-    }
-
-    if (DO_SPOT == 1.0) {
-        vec2 spot_coords = sv_coords + vec2(-s_center_x, -s_center_y);
-        spot_coords = zoomout_coords(spot_coords,1-s_size,1.0);
-        pixel_out.g = texture(circular_gradient,spot_coords).g * s_power + f_random;
-    }
-
-    
-    return pixel_out;
-}
-
-
 vec4 pixel_border() {
     vec3 ambi = texture(ambi_temporal_pass, vOutputCoord + random(noisepower) ).rgb;
     float l = length(ambi);
@@ -227,25 +204,32 @@ vec4 pixel_inner_frame() {
 
 
     //vignette and spot
-
     if (DO_VIGNETTE + DO_SPOT >0.0) {
-        vec2 vpixel_vignette_and_spot = pixel_vignette_and_spot(coords_curved);
-
+        float rnoise = random(noisepower);
+        float in_aspect = get_in_aspect();
+        
         if (DO_VIGNETTE == 1.0) {
-            if (v_bypass < 1.0) pixel_out = vpixel_vignette_and_spot.r * pixel_out;
+            float vignette;
+            float dist = length(vec2((coords_curved.x-0.5)*in_aspect,coords_curved.y-0.5)); //dist = length(vec2(coords_curved.x*in_aspect-(in_aspect*0.5),coords_curved.y-0.5));
+            vignette = smoothstep(v_size,0.0,dist)*v_power+rnoise;
+            if (v_bypass < 1.0) pixel_out = vignette * pixel_out;
                 else
-            pixel_out = vec3(vpixel_vignette_and_spot.r) ;
+            pixel_out = vec3(vignette);
+        }
+
+        if (DO_SPOT == 1.0) {
+           float spot;
+           vec2 s_offset = vec2(-s_center_x,-s_center_y);
+           float dist = length(vec2((coords_curved.x-0.5)*in_aspect,coords_curved.y-0.5)+s_offset); //dist = length(vec2(coords_curved.x*in_aspect-in_aspect*0.5),coords_curved.y-0.5));
+           spot = smoothstep(s_size,0.0,dist)*s_power+rnoise;
+           if (s_bypass < 1.0) pixel_out = spot + pixel_out;
+               else
+           pixel_out = vec3(spot);
         }
         
-        //Spot 
-        if (DO_SPOT == 1.0) {
-            //float spot =  gauss_xy(s_center_x, s_center_y, s_size, s_power, 0.0, 10.0);
-            //vec3 spot = vec3(texture(vignette_and_spot_pass,vTexCoord).g);
-            if (s_bypass < 1.0) pixel_out = mix(pixel_out,vec3(1.0), vpixel_vignette_and_spot.g);
-                else
-            pixel_out = vec3(vpixel_vignette_and_spot.g) ;
-        }
     }
+    
+    
 
 
     float border_inner_frame = 1.0;
@@ -299,6 +283,6 @@ void main() {
     }
 
     FragColor = pixel_out ;
-    
+                      
     //FragColor = texture(reflected_blurred_pass2, vOutputCoord);
 }
