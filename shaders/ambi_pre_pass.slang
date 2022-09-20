@@ -25,17 +25,7 @@ layout(set = 0, binding = 2) uniform sampler2D Source;
 #include "blooms.include.slang" 
 
 void main() {
-
-//vec3 bloom(float Directions, float Quality, float Size, float fbloom_gamma) {
-
-//FragColor = vec4(0.0,0.0,0.0,1.0);
-//return;
-
-    if (DO_AMBILIGHT == 1.0) {
-        //                            directions,quality, size,gamma
-        FragColor = vec4 (bloom(      16,         4,       32,   1.0), 0.0);
-            } else {
-        return;
-    }
+    if (DO_AMBILIGHT == 1.0) FragColor = vec4 (bloom(      16,      8,       50,  1.0), 0.0);
+                                                      //directions,quality, size,gamma
         
 }
