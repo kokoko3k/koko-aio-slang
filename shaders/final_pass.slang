@@ -22,11 +22,11 @@ layout(location = 1) in vec2 vOutputCoord;
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D main_pass;
 layout(set = 0, binding = 3) uniform sampler2D bloom_pass_final;
-layout(set = 0, binding = 4) uniform sampler2D circular_gradient;
+layout(set = 0, binding = 4) uniform sampler2D reflected_blurred_pass2;
 layout(set = 0, binding = 5) uniform sampler2D ambi_temporal_pass;
 layout(set = 0, binding = 6) uniform sampler2D avglum_pass;
 layout(set = 0, binding = 7) uniform sampler2D monitor_body;
-layout(set = 0, binding = 8) uniform sampler2D reflected_blurred_pass2;
+
 
 #include "functions.include.slang"
 
