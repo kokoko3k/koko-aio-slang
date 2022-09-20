@@ -47,10 +47,8 @@ vec3 ambi_step_rgb(vec3 s,vec3 d, vec3 mystep){
 
 
 vec3 pixel_ambilight() {
-    vec3 prev_avg_lum_vec = texture(avglum_passFeedback,vec2(0.5,0.5)).rgb;
-    vec3 curr_avg_lum_vec = texture(avglum_pass        ,vec2(0.5,0.5)).rgb;
-    float prev_avg_lum = prev_avg_lum_vec.r+prev_avg_lum_vec.g+prev_avg_lum_vec.b;
-    float curr_avg_lum = curr_avg_lum_vec.r+curr_avg_lum_vec.g+curr_avg_lum_vec.b;
+    float prev_avg_lum = texture(avglum_passFeedback,vec2(0.5,0.5)).a;
+    float curr_avg_lum = texture(avglum_pass        ,vec2(0.5,0.5)).a;
     float diff_avg_lum = abs(prev_avg_lum - curr_avg_lum) / 3.0 ;
 
     vec3 previous_pixel = texture(PreviousSampler, vTexCoord).rgb;

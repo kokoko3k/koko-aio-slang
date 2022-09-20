@@ -168,14 +168,14 @@ vec3 compose_bezel_over(vec3 full_viewport) {
 
     //Mix a bit of ambient light over the bezel
         vec4 pixel_avglum = texture(avglum_pass,vOutputCoord);
-        bezel_out = bezel_out + (pixel_avglum.rgb * 0.05);
+        bezel_out = bezel_out + (pixel_avglum.a * 0.05);
 
 
     //We use the green component to express Hardness/Specularity; there the reflection will be completely diffused.
     //For the task, we use a mipmap whit adeguate precision.
         float lut_hardness = bezel.g;
         if (lut_hardness > 0.0) {
-            bezel_out = bezel_out + ( vec3(pixel_avglum.a)  * lut_hardness/3.5);
+            bezel_out = bezel_out + ( pixel_avglum.rgb * lut_hardness/3.5);
         }
          
     return mix(full_viewport_bordered, bezel_out, bezel.a);
