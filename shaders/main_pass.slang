@@ -162,35 +162,11 @@ vec3 pixel_scanline_static(vec3 color, vec2 coords) {
     return color;
 }
 
-vec2 coords_curved = vTexCoord;
+vec2 coords_curved;
+
 vec4 main_wrap(void) {
     bool isinterlaced = is_interlaced();
     bool flickering_scanlines = (DO_SCANLINES == 1.0) && scanline_have_to_flicker(isinterlaced) ;
-
-    //Curvature
-
-    float l_GEOM_BORDER_WX = GEOM_BORDER_WX;
-    float l_GEOM_BORDER_WY = GEOM_BORDER_WY;
-    vec2 border_coords = vTexCoord;
-
-    if (DO_CURVATURE == 1.0) {
-        /*float geom_gap_size_adj = GEOM_GAP_SIZE;
-        if (GEOM_GAP_SIZE < 0.0) geom_gap_size_adj = GEOM_ZOOMOUT;*/
-
-        if ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0))
-            coords_curved = Warp(coords_curved,GEOM_WARP_X,GEOM_WARP_Y);
-
-        if (GEOM_BORDER_WX < 0.0) l_GEOM_BORDER_WX = GEOM_WARP_X;
-        if (GEOM_BORDER_WY < 0.0) l_GEOM_BORDER_WY = GEOM_WARP_Y;
-        
-        if ((l_GEOM_BORDER_WX > 0.0) || (l_GEOM_BORDER_WY > 0.0))
-            border_coords = Warp(vTexCoord,l_GEOM_BORDER_WX,l_GEOM_BORDER_WY);
-    }
-    
-    if (DO_BEZEL == 1.0) {
-        coords_curved = zoomout_coords(coords_curved, -BEZEL_INNER_ZOOM , 1.0);
-        border_coords = zoomout_coords(border_coords, -1.0, 1.0);
-    }
 
 
     vec3 pixel_in;
@@ -273,10 +249,35 @@ vec4 main_wrap(void) {
 
     
     //Out
-    return vec4(pixel_out,1.0) ;
+    return vec4(pixel_out,1.0) ; //* border(border_coords);
 }
 
 void main() {
+    coords_curved = vTexCoord;
+    //Curvature: set coords_curved coordinate: (global var)
+        float l_GEOM_BORDER_WX = GEOM_BORDER_WX;
+        float l_GEOM_BORDER_WY = GEOM_BORDER_WY;
+        //vec2 border_coords = vTexCoord;
+
+        if (DO_CURVATURE == 1.0) {
+            /*float geom_gap_size_adj = GEOM_GAP_SIZE;
+            if (GEOM_GAP_SIZE < 0.0) geom_gap_size_adj = GEOM_ZOOMOUT;*/
+
+            if ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0))
+                coords_curved = Warp(coords_curved,GEOM_WARP_X,GEOM_WARP_Y);
+
+            if (GEOM_BORDER_WX < 0.0) l_GEOM_BORDER_WX = GEOM_WARP_X;
+            if (GEOM_BORDER_WY < 0.0) l_GEOM_BORDER_WY = GEOM_WARP_Y;
+            
+            //if ((l_GEOM_BORDER_WX > 0.0) || (l_GEOM_BORDER_WY > 0.0))
+            //    border_coords = Warp(vTexCoord,l_GEOM_BORDER_WX,l_GEOM_BORDER_WY);
+        }
+        
+        if (DO_BEZEL == 1.0) {
+            coords_curved = zoomout_coords(coords_curved, -BEZEL_INNER_ZOOM , 1.0);
+            //border_coords = zoomout_coords(border_coords, -1.0, 1.0);
+        }
+    
    //FIXME: bezel may need a wider border when zoomed in.
             //But for performance reasons we can wide the border in relation to the desidered reflection area.
             //by now, just wide it to the screen content.

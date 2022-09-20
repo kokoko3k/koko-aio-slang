@@ -43,13 +43,13 @@ float displace(float power) {
     return noise_out ; 
 }
 
+#define AMBI_PUSH_SAT 1.25
+#define AMBI_PUSH_BRIGHT 1.25
 vec4 pixel_border() {
     vec3 ambi = texture(ambi_temporal_pass, vOutputCoord + random(noisepower) ).rgb;
     float l = length(ambi);
-    float sat = 1.25;
-    float bright = 1.25;
-    ambi =  normalize( pow(ambi.rgb + vec3(eps), vec3(sat)))*l * bright  ;
-    ambi*=bright;
+    ambi =  normalize( pow(ambi.rgb + vec3(eps), vec3(AMBI_PUSH_SAT)))*l * AMBI_PUSH_BRIGHT  ;
+    ambi*=AMBI_PUSH_BRIGHT;
     return vec4(ambi,0.0);
 }
 
@@ -170,8 +170,6 @@ vec4 pixel_inner_frame() {
     
 
     if (DO_CURVATURE == 1.0) {
-        /*float geom_gap_size_adj = GEOM_GAP_SIZE;
-        if (GEOM_GAP_SIZE < 0.0) geom_gap_size_adj = GEOM_ZOOMOUT;*/
 
         if ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0))
             coords_curved = Warp(coords_curved,GEOM_WARP_X,GEOM_WARP_Y);
