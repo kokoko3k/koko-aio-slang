@@ -114,18 +114,15 @@ float random(float power) {
 		return  abs(pixel.a - alpha_mark) < 0.05; //<-- 0.05 allow about 20 alpha levels (1*0.05)
 	}
 
-
+	#define tolerance 0.1 //To compensate when comparing different A/R 
 	bool is_rotated() {
 		/*
-			Exploit the fact that since retroarch rotates the view after the shader,
-			the resulting aspect will differ from the source one.
-			Be warned, that this function probably works only if called from a pass
-			that scales to viewport (FIXME: untested)
+			For some reason, probably retroarch rotates the view only on final viewport stage, transparent to the shader passes,
+			The OutputSize of a pass that scales to viewport will have different aspect from the real final viewport.
+			We exploit this to understand when a game is rotated.
+			-->> This function only works if the calling pass scales to viewport.
 		*/
-		return (
-			(params.OriginalSize.x > params.OriginalSize.y) &&
-			(params.OutputSize.x   < params.OutputSize.y)
-		) ;
+		return (abs((params.OutputSize.x/params.OutputSize.y) - (global.FinalViewportSize.x/global.FinalViewportSize.y)) > tolerance);
 	}
 
 	float get_in_aspect() {

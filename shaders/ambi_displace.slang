@@ -30,7 +30,6 @@ bool border_updown(){
 
 vec3 main_wrap(){
 
-
    float myborder = 0.025; //20% border to be displaced
    vec2 newcoords = vTexCoord;
    vec3 pixel_out;
