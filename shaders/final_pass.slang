@@ -121,6 +121,9 @@ vec3 compose_bezel_over(vec3 full_viewport) {
 
     //Main lut:
     vec4 bezel = texture(monitor_body,coords_for_bezel);
+    
+    //No need to draw anything on full alpha:
+    if (bezel.a == 0.0) return full_viewport;
 
     //We use the red component of the bezel to express its luminance (define bezel_luminance bezel.r)
     vec3 bezel_colored = bezel_color(bezel_luminance);
