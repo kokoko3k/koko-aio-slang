@@ -49,7 +49,7 @@ vec3 ambi_step_rgb(vec3 s,vec3 d, vec3 mystep){
 vec3 pixel_ambilight() {
     float prev_avg_lum = texture(avglum_passFeedback,vec2(0.5,0.5)).a;
     float curr_avg_lum = texture(avglum_pass        ,vec2(0.5,0.5)).a;
-    float diff_avg_lum = abs(prev_avg_lum - curr_avg_lum) / 3.0 ;
+    float diff_avg_lum = abs(prev_avg_lum - curr_avg_lum);
 
     vec3 previous_pixel = texture(PreviousSampler, vTexCoord).rgb;
     vec3 current_pixel =  texture(CurrentSampler, vTexCoord).rgb;
@@ -65,8 +65,7 @@ vec3 pixel_ambilight() {
 
 #include "functions.include.slang"
 void main() {
-    if (DO_AMBILIGHT == 1.0)
-        FragColor = vec4(pixel_ambilight(),0.0);
-            else
-        return;
+    if (DO_AMBILIGHT != 1.0) return;
+    FragColor = vec4(pixel_ambilight(),0.0);
+
 }

@@ -11,7 +11,7 @@ layout(location = 1) out vec2 vOutputCoord;
 #include "functions.include.slang"
 void main() {
     gl_Position = global.MVP * Position;
-    vTexCoord = get_scaled_coords(TexCoord,params.OutputSize);
+    vTexCoord = get_scaled_coords(TexCoord,global.FinalViewportSize, is_rotated());
     vOutputCoord = TexCoord;
 }
 
@@ -47,9 +47,9 @@ float displace(float power) {
 #define AMBI_PUSH_BRIGHT 1.25
 vec4 pixel_border() {
     vec3 ambi = texture(ambi_temporal_pass, vOutputCoord + random(noisepower) ).rgb;
-    float l = length(ambi);
-    ambi =  normalize( pow(ambi.rgb + vec3(eps), vec3(AMBI_PUSH_SAT)))*l * AMBI_PUSH_BRIGHT  ;
-    ambi*=AMBI_PUSH_BRIGHT;
+  //  float l = length(ambi);
+  //  ambi =  normalize( pow(ambi.rgb + vec3(eps), vec3(AMBI_PUSH_SAT)))*l * AMBI_PUSH_BRIGHT  ;
+  //  ambi*=AMBI_PUSH_BRIGHT;
     return vec4(ambi,0.0);
 }
 

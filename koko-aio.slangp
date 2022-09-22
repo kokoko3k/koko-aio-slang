@@ -188,6 +188,7 @@ float_framebuffer3 = true
            scale_type7 = source
                 scale7 = 1.0
             wrap_mode7 = "mirrored_repeat"
+//FIXME: mipmap_input here is probably useless
          mipmap_input7 = true
          
                shader8 = shaders/reflection_blur_v.slang
@@ -239,9 +240,10 @@ float_framebuffer3 = true
         //...repeat left and right borders
                shader13 = shaders/ambi_displace.slang
                 alias13 = "ambi_displace_pass"
-        filter_linear13 = true
-           scale_type13 = source
-               scale_13  = 1.0
+           scale_type13 = absolute
+              scale_x13 = 320
+              scale_y13 = 320
+            wrap_mode13 = "mirrored_repeat"
          mipmap_input13 = false
 
         //...then just downscale via mipmapping here:
@@ -249,9 +251,11 @@ float_framebuffer3 = true
                 alias14 = "ambi_pre_pass1"
         filter_linear14 = true
            scale_type14 = absolute
-              scale_x14 = 32
-              scale_y14 = 32
+              scale_x14 = 320
+              scale_y14 = 320
          mipmap_input14 = true
+            wrap_mode14 = "clamp_to_border"
+
 
                shader15 = shaders/ambi_temporal_pass.slang
                 alias15 = "ambi_temporal_pass"

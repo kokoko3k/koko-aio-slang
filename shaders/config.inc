@@ -1,7 +1,7 @@
 #define GLOW_SHARP_MAX 15 		    //This has to be the same as the max used for in_glow_wh
 #define MIN_LINES_INTERLACED 300	//Consider content interlaced if lines are more than this
 #define noisepower ((params.OutputSize.w + params.OutputSize.z)*1.5)         //Sort of dithering
-#define scene_change_threshold 0.1  // 0.0-1.0: sensitivity to scene change (ambilike stuff)
+#define scene_change_threshold 0.07  // 0.0-1.0: sensitivity to scene change (ambilike stuff), 0.0 changes more
 #define BLOOM_THRESHOLD 0.5
 
 layout(push_constant) uniform Push
@@ -262,7 +262,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 //Ambilight effect
 #pragma parameter DO_AMBILIGHT	 "Ambient led lights (needs Retroarch aspect ratio set to full!)"	1.0  0.0  1.0     1.0
-#pragma parameter ambi_steps	 "        Slowness"							60.0 1.0  1000.0  5.0
+#pragma parameter ambi_steps	 "        Slowness"							60.0 5.0  1000.0  5.0
 #pragma parameter label_aspect_presets "Aspect ratio presets list:" 0.0 0.0 0.0 1.0
 #pragma parameter label_aspect_preset1 "    (-1 = NTSC)" 0.0 0.0 0.0 1.0
 #pragma parameter label_aspect_preset2 "    (-2 = PAL)" 0.0 0.0 0.0 1.0

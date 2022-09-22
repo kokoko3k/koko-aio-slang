@@ -121,6 +121,7 @@ float random(float power) {
 			The OutputSize of a pass that scales to viewport will have different aspect from the real final viewport.
 			We exploit this to understand when a game is rotated.
 			-->> This function only works if the calling pass scales to viewport.
+			This will fail for very particular cases, eg: when output window is extremely tall 
 		*/
 		return (abs((params.OutputSize.x/params.OutputSize.y) - (global.FinalViewportSize.x/global.FinalViewportSize.y)) > tolerance);
 	}
@@ -140,7 +141,7 @@ float random(float power) {
 	}
 
 
-	vec2 get_scaled_coords(vec2 pTexCoord, vec4 destsize){
+	vec2 get_scaled_coords_old(vec2 pTexCoord, vec4 destsize, bool is_rotated){
 		if (!border_needed()) return pTexCoord;
 			//else
 		float scale_x = 1.0;
@@ -148,11 +149,13 @@ float random(float power) {
 		float offset_x = 0.0 ;
 		float offset_y = 0.0 ;
 		float in_aspect = get_in_aspect();
-		if (is_rotated()) {
+		if (is_rotated) {
 			//scale_y = params.OutputSize.y/(params.OutputSize.x / in_aspect );
 			//scale_y = global.FinalViewportSize.y/(global.FinalViewportSize.x / in_aspect );
 			scale_y = destsize.y/(destsize.x / in_aspect );
 			offset_y = (0.5 * scale_y ) - 0.5 ;
+			
+			
 		} else {
 			//scale_x = params.OutputSize.x/(params.OutputSize.y * in_aspect);
 			//scale_x = global.FinalViewportSize.x/(global.FinalViewportSize.y * in_aspect);
@@ -165,6 +168,34 @@ float random(float power) {
 	}
 
 
+	vec2 get_scaled_coords(vec2 pTexCoord, vec4 destsize, bool is_rotated){
+		if (!border_needed()) return pTexCoord;
+			//else
+		float scale_x = 1.0;
+		float scale_y = 1.0;
+		float offset_x = 0.0 ;
+		float offset_y = 0.0 ;
+		float in_aspect = get_in_aspect();
+		if (is_rotated) {
+			//I'm doing ping pong between th the following 2:
+			//FIXME: verify if it depends on destsize being outputsize or finalviewportsize!!
+			//scale_y = destsize.y/(destsize.x / in_aspect );
+			scale_y = destsize.x/(destsize.y / in_aspect );
+			
+			offset_y = (0.5 * scale_y ) - 0.5 ;
+			
+			
+		} else {
+			//scale_x = params.OutputSize.x/(params.OutputSize.y * in_aspect);
+			//scale_x = global.FinalViewportSize.x/(global.FinalViewportSize.y * in_aspect);
+			scale_x = destsize.x/(destsize.y * in_aspect);
+			offset_x = (0.5 * scale_x ) - 0.5 ;
+		}
+
+		vec2 scale_coord=vec2(pTexCoord.x*scale_x - offset_x , pTexCoord.y*scale_y - offset_y);
+		return scale_coord;
+	}
+	
 /*
 float content_x_scale(){
     return params.OutputSize.x/(in_aspect * params.OutputSize.y);
