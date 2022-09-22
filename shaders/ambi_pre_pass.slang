@@ -31,9 +31,9 @@ layout(set = 0, binding = 4) uniform sampler2D ambi_pre_pass1Feedback;
 
 
 
-vec3 circle_smooth(vec2 coords, vec2 middle, float radius, float light_falloff,float led_power, float lod) {
+vec3 circle_smooth(vec2 coords, vec2 middle, float radius, float FALLOFF,float POWER, float lod) {
     float distanza=distance(middle,vec2(coords.x,coords.y));
-    float circle = (1-smoothstep(radius-light_falloff,radius+light_falloff,distanza))*led_power;
+    float circle = (1-smoothstep(radius-FALLOFF,radius+FALLOFF,distanza))*POWER;
     vec3 circle_color = textureLod(Source,middle,lod).rgb * circle;
     //circle_color = vec3(circle);
     return circle_color;
@@ -43,14 +43,18 @@ vec3 circle_smooth(vec2 coords, vec2 middle, float radius, float light_falloff,f
 
 /*
 #define leds_per_strip 8
-#define light_falloff 0.7  //As a general rule, light_falloff+led_power < 1.0+internalness
-#define led_power 0.5   
+#define AMBI_FALLOFF 0.7  //As a general rule, AMBI_FALLOFF+AMBI_POWER < 1.0+internalness
+#define AMBI_POWER 0.5   
 #define internalness 0.07
 */
 
+/*#define leds_per_strip 8
+#define AMBI_FALLOFF 0.3
+#define AMBI_POWER 1.7
+#define internalness 0.07
+*/ 
+
 #define leds_per_strip 8
-#define light_falloff 0.25
-#define led_power 1.7
 #define internalness 0.07
 
 /*
@@ -129,7 +133,7 @@ void main() {
                (middle_x-tolleranza_bordo < bordo_min) || (middle_y-tolleranza_bordo < bordo_min)) {
                     vec2 middle=vec2(middle_x,middle_y);
                     float distanza=distance(middle,coords);
-                    float circle = (1-smoothstep(radius-light_falloff,radius+light_falloff,distanza))*led_power;
+                    float circle = (1-smoothstep(radius-AMBI_FALLOFF,radius+AMBI_FALLOFF,distanza))*AMBI_POWER;
                     circle_color = textureLod(Source,middle,lod).rgb * circle;
                     pixel_out += circle_color;
                     //passi+=1;
@@ -143,20 +147,20 @@ void main() {
     
     middle_x=bordo_min;
     for (middle_y=bordo_min ; middle_y <= bordo_max+eps ; middle_y=middle_y + passo ) {
-        pixel_out +=circle_smooth(coords, vec2(middle_x,middle_y), radius, light_falloff, led_power, lod);
+        pixel_out +=circle_smooth(coords, vec2(middle_x,middle_y), radius, AMBI_FALLOFF, AMBI_POWER, lod);
     }
     middle_x=bordo_max;
     for (middle_y=bordo_min ; middle_y <=  bordo_max+eps ; middle_y=middle_y + passo ) {
-        pixel_out +=circle_smooth(coords, vec2(middle_x,middle_y), radius, light_falloff, led_power, lod);
+        pixel_out +=circle_smooth(coords, vec2(middle_x,middle_y), radius, AMBI_FALLOFF, AMBI_POWER, lod);
     }    
 
     middle_y=bordo_min;
     for (middle_x=bordo_min+passo ; middle_x <= bordo_max-passo+eps ; middle_x=middle_x + passo ) {
-        pixel_out +=circle_smooth(coords, vec2(middle_x,middle_y), radius, light_falloff, led_power, lod);
+        pixel_out +=circle_smooth(coords, vec2(middle_x,middle_y), radius, AMBI_FALLOFF, AMBI_POWER, lod);
     }
     middle_y=bordo_max;
     for (middle_x=bordo_min+passo ; middle_x <= bordo_max-passo+eps ; middle_x=middle_x + passo ) {
-        pixel_out +=circle_smooth(coords, vec2(middle_x,middle_y), radius, light_falloff, led_power, lod);
+        pixel_out +=circle_smooth(coords, vec2(middle_x,middle_y), radius, AMBI_FALLOFF, AMBI_POWER, lod);
     }    
 
     FragColor = vec4(pixel_out,1.0);

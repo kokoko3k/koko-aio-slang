@@ -12,22 +12,22 @@ haswell igp: i5-4590 CPU @ 3.30GHz
 Ouutput on aspect: full, 1080p, 16:9, 60fps
 input: mame, dynamite dux:
                     GPU%        Delta% vs Basal:
-         no shader: 11          -23.6
-             basal: 34.6        0.0
-              FXAA: 37.5        2.9
-         scanlines: 36.5        1.9
+         no shader: 11          -23.6               
+             basal: 34.6        0.0                31.2
+              FXAA: 37.5        2.9                35
+         scanlines: 36.5        1.9                32.3
      ...flickering: 36.2        1.6
-input glow gamma 3: 40          5.4
-          rgb mask: 35.7        1.1
+input glow gamma 3: 40          5.4                36.5
+          rgb mask: 35.7        1.1                
           slotmask: 36.5        1.9
       halo gamma 3: 40.0        5.4
-          bloom,hq: 38-43       3.4-8.4
+          bloom,hq: 38-43       3.4-8.4            35-40
  color corrections: 35          0.4
-    curvature warp: 39.2        4.6
-     vignette+spot: 35.2        0.6
-     ambient light: 38          3.4
+    curvature warp: 39.2        4.6               33.5
+     vignette+spot: 35.2        0.6               32.9  ++
+     ambient light: 38          3.4               33.5
 -----------------------------------------------
-Total basal + all the features: 72.2
+Total basal + all the features: 72.2            67.70
     
 */
 

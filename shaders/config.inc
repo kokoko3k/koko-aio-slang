@@ -95,6 +95,8 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float v_bypass;
 	
 	float DO_AMBILIGHT;
+	float AMBI_FALLOFF;
+	float AMBI_POWER;
 	float aspect_x;
 	float aspect_y;
 	float ambi_steps;
@@ -263,6 +265,8 @@ layout(std140, set = 0, binding = 0) uniform UBO
 //Ambilight effect
 #pragma parameter DO_AMBILIGHT	 "Ambient led lights (needs Retroarch aspect ratio set to full!)"	1.0  0.0  1.0     1.0
 #pragma parameter ambi_steps	 "        Slowness"							60.0 5.0  1000.0  5.0
+#pragma parameter AMBI_FALLOFF   "        Light Falloff"						0.7  0.1  3.0     0.01
+#pragma parameter AMBI_POWER     "        Led power"							0.5  0.1  3.0     0.05
 #pragma parameter label_aspect_presets "Aspect ratio presets list:" 0.0 0.0 0.0 1.0
 #pragma parameter label_aspect_preset1 "    (-1 = NTSC)" 0.0 0.0 0.0 1.0
 #pragma parameter label_aspect_preset2 "    (-2 = PAL)" 0.0 0.0 0.0 1.0
@@ -369,5 +373,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 #define DO_AMBILIGHT global.DO_AMBILIGHT
 #define ambi_steps   global.ambi_steps
+#define AMBI_FALLOFF global.AMBI_FALLOFF
+#define AMBI_POWER   global.AMBI_POWER
 #define aspect_x	global.aspect_x
 #define aspect_y	global.aspect_y
