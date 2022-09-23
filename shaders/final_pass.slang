@@ -130,7 +130,8 @@ vec3 compose_bezel_over(vec3 full_viewport) {
 
     //This is the reflection to be composed over the bezel);
     vec3 pixel_mirrored = texture(reflected_blurred_pass2,
-                          coords_for_mirror + displace( (global.FinalViewportSize.z+global.FinalViewportSize.w)*0.5 ) ).rgb;
+                          coords_for_mirror + displace( global.FinalViewportSize.w ) ).rgb;
+
 
     //Draw a black border around the frame to allow a bit underscanning
         vec3 full_viewport_bordered = full_viewport;
