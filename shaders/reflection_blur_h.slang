@@ -60,11 +60,6 @@ void main() {
          return;
       }
          
-         /*if (is_outer_frame(texture(main_pass,vTexCoord))) {
-               FragColor = mark_useless(vec3(0.0));
-               return;
-         }*/
-
          vec2 res = vec2(params.SourceSize.x, params.SourceSize.y);
          vec2 dir = vec2(1.0,0.0);
          FragColor = blur9(main_pass, vTexCoord,res,dir);
