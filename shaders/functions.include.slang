@@ -23,6 +23,11 @@ bool is_interlaced() {
 	return (params.OriginalSize.y > MIN_LINES_INTERLACED);
 }
 
+
+#define RND_A 12.9898
+#define RND_B 78.233
+#define RND_C 43758.5453
+
 float random(float power) {
     // www.stackoverflow.com/questions/5149544/can-i-generate-a-random-number-inside-a-pixel-shader/
     /*vec2 seed = vTexCoord * params.FrameCount;
@@ -35,13 +40,10 @@ float random(float power) {
     //Copyright (c) 2016, Viacheslav Slavinsky
     //All rights reserved.
     vec2 co = vTexCoord * params.FrameCount;
-    float a  = 12.9898;
-    float b  = 78.233;
-    float c  = 43758.5453;
-    float dt = dot(co.xy, vec2(a, b));
+    float dt = dot(co.xy, vec2(RND_A, RND_B));
     float sn = mod(dt,3.14);
 
-    float noise_out = fract(sin(sn) * c) - 0.5;
+    float noise_out = fract(sin(sn) * RND_C) - 0.5;
     noise_out = clamp(noise_out, -power, power);
     return noise_out ; 
     
@@ -102,7 +104,7 @@ float random(float power) {
 	
 	#define mark_useless(x) mark_outer_frame(x)	
 	vec4 mark_outer_frame(vec3 pixel) {
-		return vec4(pixel.r,pixel.g,pixel.b,0.0) ;
+		return vec4(pixel.rgb,0.0) ;
 		//For my mental sanity, I use a specific alpha channel value to mark a frame as a border
 		return vec4(pixel.r,pixel.g,pixel.b,alpha_mark) ;
 	}
@@ -116,7 +118,7 @@ float random(float power) {
 		return  abs(pixel.a - alpha_mark) < 0.05; //<-- 0.05 allow about 20 alpha levels (1*0.05)
 	}
 
-	#define tolerance 0.1 //To compensate when comparing different A/R 
+	#define ar_tolerance 0.1 //To compensate when comparing different A/R 
 	bool is_rotated() {
 		/*
 			For some reason, probably retroarch rotates the view only on final viewport stage, transparent to the shader passes,
@@ -125,7 +127,7 @@ float random(float power) {
 			-->> This function only works if the calling pass scales to viewport.
 			This will fail for very particular cases, eg: when output window is extremely tall 
 		*/
-		return (abs((params.OutputSize.x/params.OutputSize.y) - (global.FinalViewportSize.x/global.FinalViewportSize.y)) > tolerance);
+		return (abs((params.OutputSize.x/params.OutputSize.y) - (global.FinalViewportSize.x/global.FinalViewportSize.y)) > ar_tolerance);
 	}
 
 	float get_in_aspect() {
@@ -143,7 +145,7 @@ float random(float power) {
 	}
 
 
-	vec2 get_scaled_coords_old(vec2 pTexCoord, vec4 destsize, bool is_rotated){
+	/*vec2 get_scaled_coords_old(vec2 pTexCoord, vec4 destsize, bool is_rotated){
 		if (!border_needed()) return pTexCoord;
 			//else
 		float scale_x = 1.0;
@@ -167,7 +169,7 @@ float random(float power) {
 
 		vec2 scale_coord=vec2(pTexCoord.x*scale_x - offset_x , pTexCoord.y*scale_y - offset_y);
 		return scale_coord;
-	}
+	}*/
 
 
 	vec2 get_scaled_coords(vec2 pTexCoord, vec4 destsize, bool is_rotated){
