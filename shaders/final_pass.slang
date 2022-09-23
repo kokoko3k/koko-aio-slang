@@ -45,8 +45,11 @@ float displace(float power) {
 
 #define AMBI_PUSH_SAT 1.25
 #define AMBI_PUSH_BRIGHT 1.25
+
+float global_noise;
+
 vec4 pixel_border() {
-    vec3 ambi = texture(ambi_temporal_pass, vOutputCoord + random(noisepower) ).rgb;
+    vec3 ambi = texture(ambi_temporal_pass, vOutputCoord + global_noise ).rgb;
   //  float l = length(ambi);
   //  ambi =  normalize( pow(ambi.rgb + vec3(eps), vec3(AMBI_PUSH_SAT)))*l * AMBI_PUSH_BRIGHT  ;
   //  ambi*=AMBI_PUSH_BRIGHT;
@@ -89,7 +92,6 @@ vec3 bezel_color(float lum)  {
 }
 
 vec2 coords_curved = vTexCoord ; //FIXME how bad is this global variable?
-
 
 float quad_smoothstep(vec2 co, float smooth_end, float smooth_start) {
     float mysmoothstep = 1.0;
@@ -193,13 +195,12 @@ vec4 pixel_inner_frame() {
 
     //vignette and spot
         if (DO_VIGNETTE + DO_SPOT >0.0) {
-            float rnoise = random(noisepower);
             float in_aspect = get_in_aspect();
             
             if (DO_VIGNETTE == 1.0) {
                 float vignette;
                 float dist = length(vec2((coords_curved.x-0.5)*in_aspect,coords_curved.y-0.5)); //dist = length(vec2(coords_curved.x*in_aspect-(in_aspect*0.5),coords_curved.y-0.5));
-                vignette = smoothstep(v_size,0.0,dist)*v_power+rnoise;
+                vignette = smoothstep(v_size,0.0,dist)*v_power+global_noise;
                 if (v_bypass < 1.0) pixel_out = vignette * pixel_out;
                     else
                 pixel_out = vec3(vignette);
@@ -209,7 +210,7 @@ vec4 pixel_inner_frame() {
             float spot;
             vec2 s_offset = vec2(-s_center_x,-s_center_y);
             float dist = length(vec2((coords_curved.x-0.5)*in_aspect,coords_curved.y-0.5)+s_offset); //dist = length(vec2(coords_curved.x*in_aspect-in_aspect*0.5),coords_curved.y-0.5));
-            spot = smoothstep(s_size,0.0,dist)*s_power+rnoise;
+            spot = smoothstep(s_size,0.0,dist)*s_power+global_noise;
             if (s_bypass < 1.0) pixel_out = spot + pixel_out;
                 else
             pixel_out = vec3(spot);
@@ -231,7 +232,7 @@ vec4 pixel_inner_frame() {
 
 vec4 main_wrap(){
     /* Handle inner border and outer border, not bezel */
-    
+    if (DO_VIGNETTE + DO_SPOT + DO_AMBILIGHT >0.0) global_noise = random(noisepower);
     //Just do pixel_inner_frame() and exit when there is no need to paint border.
     if (!border_needed()) return pixel_inner_frame();
 
