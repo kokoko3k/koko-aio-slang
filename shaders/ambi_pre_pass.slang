@@ -2,23 +2,45 @@
 #include "config.inc"
 #define eps 1e-5
 
+#define internalness 0.07
+#define leds_per_strip 8
+#define radius 0.001
+
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
+layout(location = 1) out float bordo_min;
+layout(location = 2) out float bordo_max;
+layout(location = 3) out float passo;
+layout(location = 4) out float lod;
 
 void main()
 {
    gl_Position = global.MVP * Position;
    vTexCoord = TexCoord;
+   
+   bordo_min=internalness ;
+   bordo_max=1.0-internalness ;
+   passo = (bordo_max - bordo_min)  / (leds_per_strip-1);
+   //Prendo una texture precisa led_strip x led_strip, ne calcolo il lod:
+   lod = log2(params.SourceSize.y / leds_per_strip);
 }
 
 #pragma stage fragment
 layout(location = 0) in vec2 vTexCoord;
+layout(location = 1) in float bordo_min;
+layout(location = 2) in float bordo_max;
+layout(location = 3) in float passo;
+layout(location = 4) in float lod;
+
 layout(location = 0) out vec4 FragColor;
+
+
 layout(set = 0, binding = 2) uniform sampler2D Source;
 layout(set = 0, binding = 3) uniform sampler2D isrotated_pass;
 layout(set = 0, binding = 4) uniform sampler2D ambi_pre_pass1Feedback;
+
 
 #define SourceTexture Source
 #define SourceTextureSize params.SourceSize
@@ -31,10 +53,10 @@ layout(set = 0, binding = 4) uniform sampler2D ambi_pre_pass1Feedback;
 
 
 
-vec3 circle_smooth(vec2 coords, vec2 middle, float radius, float FALLOFF,float POWER, float lod) {
+vec3 circle_smooth(vec2 coords, vec2 middle, float f_radius, float FALLOFF,float POWER, float f_lod) {
     float distanza=distance(middle,vec2(coords.x,coords.y));
-    float circle = (1-smoothstep(radius-FALLOFF,radius+FALLOFF,distanza))*POWER;
-    vec3 circle_color = textureLod(Source,middle,lod).rgb * circle;
+    float circle = (1-smoothstep(f_radius-FALLOFF,f_radius+FALLOFF,distanza))*POWER;
+    vec3 circle_color = textureLod(Source,middle,f_lod).rgb * circle;
     //circle_color = vec3(circle);
     return circle_color;
 }
@@ -54,8 +76,8 @@ vec3 circle_smooth(vec2 coords, vec2 middle, float radius, float FALLOFF,float P
 #define internalness 0.07
 */ 
 
-#define leds_per_strip 8
-#define internalness 0.07
+
+
 
 /*
    To spare gpu cycles, completely skip the pass 
@@ -110,16 +132,7 @@ void main() {
     }
 
     vec3 pixel_out = vec3(0.0);
-    float radius=0.001;
 
-    float bordo_min=internalness ;
-    float bordo_max=1.0-internalness ;
- 
-    float passo = (bordo_max - bordo_min)  / (leds_per_strip-1);
-    
-    //Prendo una texture precisa led_strip x led_strip, ne calcolo il lod:
-    float lod = log2(params.SourceSize.y / leds_per_strip);
-    
    /* 
     float passi = 1.0;
     float tolleranza_bordo = passo;
