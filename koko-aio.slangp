@@ -189,7 +189,7 @@ float_framebuffer3 = true
                 scale7 = 1.0
             wrap_mode7 = "mirrored_repeat"
 //FIXME: mipmap_input here is probably useless
-         mipmap_input7 = true
+         mipmap_input7 = false
          
                shader8 = shaders/reflection_blur_v.slang
                 alias8 = "reflected_blurred_pass2"

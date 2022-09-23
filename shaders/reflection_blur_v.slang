@@ -19,9 +19,12 @@ layout(set = 0, binding = 2) uniform sampler2D Source;
 
 
 #include "blurs.include.slang"
+#include "functions.include.slang"
+
 void main() {
    if (DO_BEZEL == 1.0) {
-      //FragColor = texture(Source, vTexCoord);
+      if (is_useless(texture(Source, vTexCoord))) return;
+      
       vec2 res = vec2(params.SourceSize.x, params.SourceSize.y);
       vec2 dir = vec2(0.0,1.0);
       FragColor = blur9(Source, vTexCoord,res,dir);

@@ -99,12 +99,14 @@ float random(float power) {
 		return (DO_AMBILIGHT == 1.0);
 	}
 
+	
+	#define mark_useless(x) mark_outer_frame(x)	
 	vec4 mark_outer_frame(vec3 pixel) {
 		return vec4(pixel.r,pixel.g,pixel.b,0.0) ;
 		//For my mental sanity, I use a specific alpha channel value to mark a frame as a border
 		return vec4(pixel.r,pixel.g,pixel.b,alpha_mark) ;
 	}
-
+	#define is_useless(x) is_outer_frame(x)
 	bool is_outer_frame(vec4 pixel) {
 		return pixel.a == 0.0;
 		/*Check if a pixel is marked as border by comparing the value of its alpha channel
