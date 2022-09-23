@@ -1,24 +1,28 @@
 #version 450
 #include "config.inc"
 
+//16 pixel wide for the mipmap.
+#define min_w 16 
+
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
-
+layout(location = 1) out float lod;
 void main()
 {
    gl_Position = global.MVP * Position;
    vTexCoord = TexCoord;
+   lod = log2(params.SourceSize.y / min_w);
 }
 
 #pragma stage fragment
 layout(location = 0) in vec2 vTexCoord;
+layout(location = 1) in float lod;
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D Source;
 
-//16 pixel wide for the mipmap.
-#define min_w 16 
+
 
 void main() {
     /*Grab a mipmap from the previous pass.
@@ -35,7 +39,6 @@ void main() {
         }
         if (DO_BEZEL == 1.0) {
             //Create a small mipmap to be used to light the bezel corners.
-            float lod = log2(params.SourceSize.y / min_w);
             pixel_out.rgb = textureLod(Source, vTexCoord,lod).rgb;
         }
         FragColor = pixel_out;
