@@ -30,29 +30,24 @@ layout(set = 0, binding = 7) uniform sampler2D monitor_body;
 
 #include "functions.include.slang"
 
+#define NOISE_A 12.9898
+#define NOISE_B 78.233
+#define NOISE_C 43758.5453
+
 float displace(float power) {
     vec2 co = vTexCoord ;
-    float a  = 12.9898;
-    float b  = 78.233;
-    float c  = 43758.5453;
-    float dt = dot(co.xy, vec2(a, b));
+    float dt = dot(co.xy, vec2(NOISE_A, NOISE_B));
     float sn = mod(dt,3.14);
 
-    float noise_out = fract(sin(sn) * c) - 0.5;
+    float noise_out = fract(sin(sn) * NOISE_C) - 0.5;
     noise_out = clamp(noise_out, -power, power);
     return noise_out ; 
 }
-
-#define AMBI_PUSH_SAT 1.25
-#define AMBI_PUSH_BRIGHT 1.25
 
 float global_noise;
 
 vec4 pixel_border() {
     vec3 ambi = texture(ambi_temporal_pass, vOutputCoord + global_noise ).rgb;
-  //  float l = length(ambi);
-  //  ambi =  normalize( pow(ambi.rgb + vec3(eps), vec3(AMBI_PUSH_SAT)))*l * AMBI_PUSH_BRIGHT  ;
-  //  ambi*=AMBI_PUSH_BRIGHT;
     return vec4(ambi,0.0);
 }
 
@@ -94,7 +89,7 @@ vec3 bezel_color(float lum)  {
 vec2 coords_curved = vTexCoord ; //FIXME how bad is this global variable?
 
 float quad_smoothstep(vec2 co, float smooth_end, float smooth_start) {
-    float mysmoothstep = 1.0;
+    float mysmoothstep;
     mysmoothstep =              smoothstep(smooth_start, smooth_end, co.x);
     //return mysmoothstep;
     mysmoothstep = min( mysmoothstep, smoothstep(1.0-smooth_start,1.0-smooth_end , co.x) );
@@ -111,6 +106,7 @@ float borderframe(vec2 co, float thickness) {
     return borderout-borderin;
 }
 
+#define BEZEL_INNER_BORDER_SIZE 0.05
 vec3 compose_bezel_over(vec3 full_viewport) {
 
     vec2 coords_for_bezel = vTexCoord;
@@ -132,13 +128,12 @@ vec3 compose_bezel_over(vec3 full_viewport) {
 
     //This is the reflection to be composed over the bezel);
     vec3 pixel_mirrored = texture(reflected_blurred_pass2,
-                          coords_for_mirror + displace( global.FinalViewportSize.w ) ).rgb;
+                          coords_for_mirror + displace( global.FinalViewportSize.z ) ).rgb;
 
 
     //Draw a black border around the frame to allow a bit underscanning
         vec3 full_viewport_bordered = full_viewport;
-        float border_size = 0.05;
-        float fborderframe = borderframe(zoom(coords_curved,1+border_size),border_size);
+        float fborderframe = borderframe(zoom(coords_curved,1+BEZEL_INNER_BORDER_SIZE),BEZEL_INNER_BORDER_SIZE);
         full_viewport_bordered = full_viewport_bordered*(1-fborderframe);
 
     //Generate the reflection area and mix it over the bezel:    
