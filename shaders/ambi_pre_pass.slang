@@ -90,19 +90,16 @@ void main() {
     FragColor = vec4(0.0);
 
     
-    
-    
-    
     bool skip_pass = false;
-    //Salta coordinate entro il rettangolo "sotto al monitor"
-        //Considera le coordinate curve prima:
+    //Skip coords in the rect "under the monitor"
+        //First consider curved coords
         vec2 coords_curved = coords; 
         if (DO_CURVATURE == 1.0) {
             if ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0))
                 coords_curved = Warp(coords_curved,GEOM_WARP_X,GEOM_WARP_Y);
                 skip_pass =    ( (coords_curved.x > 0.0 + tol && coords_curved.x < 1.0 -tol ) && (coords_curved.y > 0.0 +tol && coords_curved.y < 1.0 - tol) );
         }    
-    //...e quelle dritte dopo (necessarie anche quando si fa la curvatura, perchè ritorna valori particolari negli angoli.
+    //...next, the straight ones (needed even when curvature is due, because it returns particular values in the corners)
     skip_pass = skip_pass && !( (coords.x < 0.0 -tol || coords.x > 1.0 +tol) ||  (coords.y < 0.0 -tol || coords.y > 1.0 +tol) );
 
 

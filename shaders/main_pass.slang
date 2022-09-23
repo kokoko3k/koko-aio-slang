@@ -140,8 +140,6 @@ vec3 pixel_scanline_static(vec3 color, vec2 coords) {
    /* Code modified from scanlines-sine-abs.glsl by RiskyJumps
       license: public domain
    */
-    float offset = 0.0;
-    float lines_black = SCANLINE_DARK;
     int period = (params.OriginalSize.y > MIN_LINES_INTERLACED ) ? 2 : 1 ;
     float angle = coords.y * omega * period * params.OriginalSize.y ;
     float lines = abs(sin(angle));
@@ -151,8 +149,6 @@ vec3 pixel_scanline_static(vec3 color, vec2 coords) {
     if (SCANLINE_DARK >= 0.0) {
         lines = lines * (ps_lines_white - SCANLINE_DARK) + SCANLINE_DARK;
     } else {        
-        //float deepness = -SCANLINE_DARK;
-        //lines = lines * ((1+deepness) ) - deepness ;
         float deepness = -SCANLINE_DARK;
         lines = lines * ((1-SCANLINE_DARK) ) + SCANLINE_DARK ;
     }
