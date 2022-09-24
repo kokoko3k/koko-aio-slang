@@ -108,7 +108,7 @@ float borderframe(vec2 co, float thickness) {
     return borderout-borderin;
 }
 
-#define BEZEL_INNER_BORDER_SIZE 0.05
+#define BEZEL_INNER_BORDER_SIZE 0.03
 vec3 compose_bezel_over(vec3 full_viewport) {
 
     vec2 coords_for_bezel = vTexCoord;
