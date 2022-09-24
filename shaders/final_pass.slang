@@ -99,8 +99,12 @@ float quad_smoothstep(vec2 co, float smooth_end, float smooth_start) {
 }
 
 float borderframe(vec2 co, float thickness) {
-    float borderout = border(co);
+    //float borderout = border(co);
     float borderin = border(zoom(co,1-thickness));
+
+    vec2 br = step(vec2(0.0), co );       // bottom-right
+    vec2 tl = step(vec2(0.0), 1.0 - co ); // top-left
+    float borderout = tl.x * tl.y * br.x * br.y ;
     return borderout-borderin;
 }
 
