@@ -38,7 +38,7 @@ layout(set = 0, binding = 2) uniform sampler2D Original;
 layout(set = 0, binding = 3) uniform sampler2D FXAA_pass;
 layout(set = 0, binding = 4) uniform sampler2D in_glow_and_scanline_flickering_pass;
 layout(set = 0, binding = 5) uniform sampler2D halo_pass;
-layout(set = 0, binding = 6) uniform sampler2D doublesize_pass;
+layout(set = 0, binding = 6) uniform sampler2D first_pass;
 
 
 
@@ -176,7 +176,7 @@ vec4 main_wrap(vec2 co) {
             else if (DO_FXAA == 1.0) 
         pixel_in = texture(FXAA_pass,co).rgb ;
             else
-        pixel_in = texture(doublesize_pass,co).rgb ;
+        pixel_in = texture(first_pass,co).rgb ;
         
     vec3 pixel_out = pixel_in;
 

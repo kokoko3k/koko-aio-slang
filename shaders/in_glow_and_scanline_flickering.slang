@@ -21,7 +21,7 @@ void main()
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 3) uniform sampler2D FXAA_pass;
-layout(set = 0, binding = 4) uniform sampler2D doublesize_pass;
+layout(set = 0, binding = 4) uniform sampler2D first_pass;
 
 
 // Blur sizes must not depend on input resolution
@@ -108,14 +108,14 @@ void main() {
    if (DO_FXAA == 1.0)
       pixel_out = texture(FXAA_pass, vTexCoord).rgb;
          else
-      pixel_out = texture(doublesize_pass, vTexCoord).rgb;
+      pixel_out = texture(first_pass, vTexCoord).rgb;
 
    if (DO_IN_GLOW == 1.0) {
       vec3 pixel_glowed;
       if (DO_FXAA == 1.0)
          pixel_glowed = pixel_glow(FXAA_pass, in_glow_wh,in_glow_wh,in_glow_power,in_glow_gamma,vTexCoord, global.FXAA_passSize, global.FXAA_passSize).rgb;
             else
-         pixel_glowed = pixel_glow(doublesize_pass, in_glow_wh,in_glow_wh,in_glow_power,in_glow_gamma,vTexCoord, global.FXAA_passSize, global.FXAA_passSize).rgb;
+         pixel_glowed = pixel_glow(first_pass, in_glow_wh,in_glow_wh,in_glow_power,in_glow_gamma,vTexCoord, global.FXAA_passSize, global.FXAA_passSize).rgb;
          
          if (IN_GLOW_ADD>0.0) pixel_glowed = mix(pixel_glowed,pixel_out+pixel_glowed,IN_GLOW_ADD);
          pixel_out = pixel_glowed;

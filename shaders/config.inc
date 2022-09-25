@@ -34,7 +34,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	vec4 FXAA_passSize;
 	vec4 main_passSize;
 	vec4 monitor_bodySize;
-	vec4 doublesize_passSize;
+	vec4 first_passSize;
 	float DO_SCANLINES;
 	float DO_IN_GLOW;
 	float DO_RGB_MASK ;

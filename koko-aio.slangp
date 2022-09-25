@@ -106,8 +106,8 @@ shaders = 17
 
 
 
-           shader0 = shaders/passthrough.slang
-            alias0 = "doublesize_pass"
+           shader0 = shaders/first_pass.slang
+            alias0 = "first_pass"
     filter_linear0 = false
        scale_type0 = source
           scale_x0 = 2.0

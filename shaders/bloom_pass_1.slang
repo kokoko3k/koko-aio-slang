@@ -15,11 +15,10 @@ void main()
 #pragma stage fragment
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 0) out vec4 FragColor;
-layout(set = 0, binding = 1) uniform sampler2D Original;
-layout(set = 0, binding = 2) uniform sampler2D doublesize_pass;
+layout(set = 0, binding = 2) uniform sampler2D first_pass;
 
-#define SourceTexture doublesize_pass
-#define SourceTextureSize global.doublesize_passSize
+#define SourceTexture first_pass
+#define SourceTextureSize global.first_passSize
 
 
 // What follows is an ugly optimization with a lot of code copied and pasted repeated multiple times,
