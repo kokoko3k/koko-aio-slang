@@ -17,9 +17,19 @@ layout(location = 0) in vec2 vTexCoord;
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D Source;
 
+#include "functions.include.slang"
 
 void main() {
-   FragColor = texture(Source, vTexCoord);
+   vec2 coords = vTexCoord;
+   if (DO_BEZEL == 1.0) {
+      coords = zoom(vTexCoord,1-BEZEL_IMAGE_BORDER);
+      if (coords.x < 0.0 || coords.y < 0.0 || coords.y > 1.0 || coords.x > 1.0) {
+         FragColor = vec4(0.0);
+         return;
+      }
+   }
+   vec3 pixel_in = texture(Source, coords).rgb;
+   FragColor = vec4(pixel_in.rgb,1.0);
 }
  
   

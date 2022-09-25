@@ -98,7 +98,7 @@ float quad_smoothstep(vec2 co, float smooth_end, float smooth_start) {
     return mysmoothstep;
 }
 
-float borderframe(vec2 co, float thickness) {
+/*float borderframe(vec2 co, float thickness) {
     //float borderout = border(co);
     float borderin = border(zoom(co,1-thickness));
 
@@ -106,7 +106,7 @@ float borderframe(vec2 co, float thickness) {
     vec2 tl = step(vec2(0.0), 1.0 - co ); // top-left
     float borderout = tl.x * tl.y * br.x * br.y ;
     return borderout-borderin;
-}
+}*/
 
 #define BEZEL_INNER_BORDER_SIZE 0.03
 vec3 compose_bezel_over(vec3 full_viewport) {
@@ -122,13 +122,8 @@ vec3 compose_bezel_over(vec3 full_viewport) {
     //Main lut:
     vec4 bezel = texture(monitor_body,coords_for_bezel);
 
-    //Draw a black border around the frame to allow a bit underscanning
-        vec3 full_viewport_bordered = full_viewport;
-        float fborderframe = borderframe(zoom(coords_curved,1+BEZEL_INNER_BORDER_SIZE),BEZEL_INNER_BORDER_SIZE);
-        full_viewport_bordered = full_viewport_bordered*(1-fborderframe);
-
     //No need to draw anything on full alpha:
-    if (bezel.a == 0.0) return full_viewport_bordered;
+    if (bezel.a == 0.0) return full_viewport;
 
     //We use the red component of the bezel to express its luminance (define bezel_luminance bezel.r)
     vec3 bezel_colored = bezel_color(bezel_luminance);
@@ -157,7 +152,7 @@ vec3 compose_bezel_over(vec3 full_viewport) {
             bezel_out = bezel_out + ( pixel_avglum.rgb * lut_hardness/3.5);
         }
          
-    return mix(full_viewport_bordered, bezel_out, bezel.a);
+    return mix(full_viewport, bezel_out, bezel.a);
 }
 
 vec4 pixel_inner_frame() {
