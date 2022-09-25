@@ -63,10 +63,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float saturation ; //1
 	
 	float DO_CURVATURE;
-	//float SHARPNESS_H;
-	//float SHARPNESS_V;
-	float GEOM_BORDER_WX;
-	float GEOM_BORDER_WY;
+
 	float GEOM_WARP_X;
 	float GEOM_WARP_Y;
 	float GEOM_CORNER_SIZE;
@@ -229,22 +226,19 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter DO_CURVATURE	     "Emulate curvature:"			0.0   0.0 1.0 1.0
 #pragma parameter GEOM_WARP_X        "        Warp X"				0.02  0.0 0.1 0.01
 #pragma parameter GEOM_WARP_Y        "        Warp Y"				0.0   0.0 0.1 0.01
-#pragma parameter GEOM_BORDER_WX     "        Border Curve X (neg=use Warp X)"	0.02  -0.01 0.1 0.01
-#pragma parameter GEOM_BORDER_WY     "        Border Curve Y (neg=use Warp Y)"	0.02  -0.01 0.1 0.01
 #pragma parameter GEOM_CORNER_SIZE   "        Corner Size"			0.01  0.005 0.1 0.005
 #pragma parameter GEOM_CORNER_SMOOTH "        Corner sharpness"			350.0 50.0 1000.0 25.0
-//#pragma parameter GEOM_ZOOMOUT       "        Monitor zoom out"			0.0   0.0 0.3 0.01
-//#pragma parameter GEOM_GAP_SIZE      "        Monitor Gap"			0.0   0.0 0.3 0.005
+
 
 //Bezel related
 #pragma parameter DO_BEZEL	     "Emulate bezel"				0.0   0.0 1.0 1.0
-#pragma parameter BEZEL_R            "        Bezel color: Red"			0.0   -0.5 0.5  0.01
-#pragma parameter BEZEL_G            "        Bezel color: Green"		0.0   -0.5 0.5  0.01
-#pragma parameter BEZEL_B            "        Bezel color: Blue"		0.0   -0.5 0.5  0.01
-#pragma parameter BEZEL_CON          "        Bezel Contrast"			1.0   0.0  10.0 0.01
-#pragma parameter BEZEL_REF_START    "        Reflection area start"		0.75   0.5  1.0  0.005
-#pragma parameter BEZEL_REF_END      "        Reflection area end"		0.90   0.5  1.0  0.005
-#pragma parameter BEZEL_INNER_ZOOM   "        Image zoom"			0.0   -0.5 0.5 0.01
+#pragma parameter BEZEL_R            "        Bezel color: Red"			-0.3   -0.5 0.5  0.01
+#pragma parameter BEZEL_G            "        Bezel color: Green"		-0.3   -0.5 0.5  0.01
+#pragma parameter BEZEL_B            "        Bezel color: Blue"		-0.3   -0.5 0.5  0.01
+#pragma parameter BEZEL_CON          "        Bezel Contrast"			1.3   0.0  10.0 0.01
+#pragma parameter BEZEL_REF_START    "        Reflection area start"	0.89   0.5  1.0  0.005
+#pragma parameter BEZEL_REF_END      "        Reflection area end"		1.0   0.5  1.0  0.005
+#pragma parameter BEZEL_INNER_ZOOM   "        Image zoom"			-0.18   -0.5 0.5 0.01
 #pragma parameter BEZEL_FRAME_ZOOM   "        Frame zoom"			0.0   -0.5 0.5 0.01
 
 //Vignette and spot
@@ -337,16 +331,11 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 
 #define DO_CURVATURE       global.DO_CURVATURE
-//#define SHARPNESS_H        global.SHARPNESS_H
-//#define SHARPNESS_V        global.SHARPNESS_V
 #define GEOM_WARP_X        global.GEOM_WARP_X
 #define GEOM_WARP_Y        global.GEOM_WARP_Y
-#define GEOM_BORDER_WX     global.GEOM_BORDER_WX
-#define GEOM_BORDER_WY     global.GEOM_BORDER_WY
 #define GEOM_CORNER_SIZE   global.GEOM_CORNER_SIZE
 #define GEOM_CORNER_SMOOTH global.GEOM_CORNER_SMOOTH
-//#define GEOM_ZOOMOUT       global.GEOM_ZOOMOUT	
-//#define GEOM_GAP_SIZE      global.GEOM_GAP_SIZE
+
 
 #define DO_BEZEL           global.DO_BEZEL
 #define BEZEL_R            global.BEZEL_R
