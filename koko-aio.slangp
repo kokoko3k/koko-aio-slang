@@ -110,7 +110,7 @@ shaders = 17
             alias0 = "doublesize_pass"
     filter_linear0 = false
        scale_type0 = source
-          scale_x0 = 1.0
+          scale_x0 = 2.0
           scale_y0 = 2.0
         wrap_mode0 = "clamp_to_edge"
 /* Nvidia fxaa pass:
@@ -246,7 +246,7 @@ float_framebuffer3 = true
          mipmap_input13 = false
 
         //...then just downscale via mipmapping here:
-               shader14 = shaders/ambi_pre_pass.slang 
+               shader14 = shaders/ambi_pre_pass.slang
                 alias14 = "ambi_pre_pass1"
         filter_linear14 = true
            scale_type14 = absolute
