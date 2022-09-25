@@ -110,7 +110,7 @@ shaders = 17
             alias0 = "doublesize_pass"
     filter_linear0 = false
        scale_type0 = source
-          scale_x0 = 2.0
+          scale_x0 = 1.0
           scale_y0 = 2.0
         wrap_mode0 = "clamp_to_edge"
 /* Nvidia fxaa pass:
@@ -237,6 +237,8 @@ float_framebuffer3 = true
         //...repeat left and right borders
                shader13 = shaders/passthrough_original.slang
                 alias13 = "ambi_displace_pass"
+            //WHY ON EARTH I NEED TO SET **THIS** TO true TO HAVE THE PREVIOUS PASS linearly filtered!?!?!?
+        filter_linear13 = true
            scale_type13 = absolute
               scale_x13 = 320
               scale_y13 = 320
