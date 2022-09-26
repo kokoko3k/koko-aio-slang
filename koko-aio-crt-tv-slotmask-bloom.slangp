@@ -1,17 +1,16 @@
 #reference "koko-aio.slangp"
 prefer_std_pow = "0.0"
 
-DO_FXAA = "0.0"
+DO_FXAA = "1.0"
 
 DO_SCANLINES = "0.0" 
 	SCANLINE_DARK = "0.0"
 	scanline_flickering = 2.0
 
 
-
 DO_IN_GLOW = "1.0"
 	in_glow_power = "1.00"
-	in_glow_wh = "1.0"	
+	in_glow_wh = "2.75"	
 	in_glow_gamma = "2.0" 
 	IN_GLOW_ADD = "0.0"
 
@@ -27,22 +26,39 @@ DO_DARKLINES = "1.0"
 
 DO_HALO = "1.0"
 	halo_power = "0.50" 
-	halo_w = "1.25"
-	halo_h = "1.25"
+	halo_w = "2.0"
+	halo_h = "2.0"
 	halo_gamma = "5.0" 
 
-DO_BLOOM = "0.0"
-	BLOOM_MIX = "0.2"
-	bloom_size = "2"
+DO_BLOOM = "1.0"
+	BLOOM_MIX = "0.10"
+	bloom_size = "3"
 	bloom_quality = "2.0"
-	bloom_gamma = 4.0"
+	bloom_gamma = "4.0"
 	bloom_power = "4.0"
-	bloom_output_gamma = "1"
-	bloom_on_dark_only = 1.0
+	bloom_output_gamma = "1.5"
 
 DO_CCORRECTION = "1.0"
-	GAMMA_OUT = "0.500000"
+	GAMMA_OUT = "0.400000"
 	saturation = "1.00"
 
 DO_ALT_BLANK = 0.0
 	ALT_BLANK_STRENGTH = 0.0
+
+DO_CURVATURE = "1.0"
+	GEOM_WARP_X = "0.00"
+	GEOM_WARP_Y = "0.00"
+	GEOM_CORNER_SIZE = "0.01"
+	GEOM_CORNER_SMOOTH = "100.0"
+
+DO_ALT_BLANK = 0.0
+	ALT_BLANK_STRENGTH = 0.0
+
+DO_AMBILIGHT = "1.0"
+	AMBI_FALLOFF = "0.5"
+	AMBI_POWER = "0.6"
+	ambi_steps = "60.0"
+	
+DO_VIGNETTE = "1.0"
+	v_size = "2.5"
+	v_power = "1.1"

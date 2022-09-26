@@ -250,7 +250,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 #pragma parameter DO_VIGNETTE	"★ Vignette"			0.0  0.0  1.0  1.0
 #pragma parameter v_bypass	"        bypass "	        	0.0  0.0  1.0  1.0
-#pragma parameter v_size	"        size"			1.7  0.0  2.0  0.05
+#pragma parameter v_size	"        size"			1.7  0.0  3.0  0.05
 #pragma parameter v_power	"        power"			1.1  0.05 2.0  0.05
 
 #pragma parameter DO_SPOT	"★ Spot"			0.0   0.0   1.0 1.0
@@ -261,7 +261,8 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter s_power	"        power" 		0.15  0.05  2.0 0.05
 
 
-//Ambilight effect
+//Back leds
+//Emulates leds under the monitor frame that slowly reacts to image contents
 #pragma parameter DO_AMBILIGHT	 "★ Back leds (needs Retroarch aspect ratio set to full!)"	1.0  0.0  1.0     1.0
 #pragma parameter ambi_steps	 "        Slowness"							60.0 5.0  1000.0  5.0
 #pragma parameter AMBI_FALLOFF   "        Light Falloff"						0.7  0.1  3.0     0.01
