@@ -1,20 +1,21 @@
 #reference "koko-aio.slangp"
 prefer_std_pow = "1.0"
 
-DO_FXAA = "0.0"
+DO_FXAA = "1.0"
 
-DO_SCANLINES = "0.0"
+DO_SCANLINES = "1.0"
 SCANLINE_DARK = "0.0"
 scanline_flickering = 0.0
 
 DO_IN_GLOW = "1.0"
 	in_glow_power = "1.0"
-	in_glow_wh = "1.5"	
-	in_glow_gamma = "1.0" 
+	in_glow_wh = "15.0"	
+	in_glow_gamma = "2.0" 
 	IN_GLOW_ADD = "0.0"
+	GLOW_OVER_DARK_SCANLINES = "1.0"
 
-DO_RGB_MASK = "0.0"
-	RGB_MASK_STRENGTH = "1.0"
+DO_RGB_MASK = "1.0"
+	RGB_MASK_STRENGTH = "0.45"
 	VMASK_OVERWHITE = "1.0"
 
 DO_DARKLINES = "0.0"
@@ -30,17 +31,38 @@ DO_HALO = "0.0"
 	halo_gamma = "4.0" 
 
 DO_BLOOM = "1.0"
-	BLOOM_MIX = "0.20"
-	bloom_size = "7.0"
+	BLOOM_MIX = "0.30"
+	bloom_size = "5.0"
 	bloom_quality = "4.0"
-	bloom_gamma = "2.0"
-	bloom_power = "3.0"
-	bloom_gamma_out = "2"
-	bloom_on_dark_only = "0.0"
+	bloom_gamma = "10.0"
+	bloom_power = "10.0"
+	bloom_gamma_out = "4"
 
 DO_CCORRECTION = "1.0"
-	GAMMA_OUT = "0.83"	
+	GAMMA_OUT = "0.5"	
 	saturation = "1.0"
+
+DO_CURVATURE = "1.0"
+	GEOM_WARP_X = "0.05"
+	GEOM_WARP_Y = "0.05"
+	GEOM_CORNER_SIZE = "0.04"
+	GEOM_CORNER_SMOOTH = "100.0"
 
 DO_ALT_BLANK = 0.0
 	ALT_BLANK_STRENGTH = 0.0
+
+DO_AMBILIGHT = "1.0"
+	AMBI_FALLOFF = "0.32"
+	AMBI_POWER = "1.45"
+	ambi_steps = "60.0"
+	
+DO_VIGNETTE = "1.0"
+	v_size = "2.0"
+	v_power = "1.2"
+
+DO_SPOT = "1.0"
+	s_center_x = "0.65"
+	s_center_y = "-0.5"
+	s_size = "0.4"
+	s_power = "0.2"
+
