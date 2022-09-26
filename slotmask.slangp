@@ -1,14 +1,48 @@
-#reference "~/koko-aio-slang/puae.slangp"
-DO_FXAA = "0.000000"
-SCANLINE_DARK = "0.000000"
-in_glow_wh = "1.000000"
-in_glow_gamma = "2.000000"
-IN_GLOW_ADD = "0.000000"
-DARKLINES_STRENGTH = "0.600000"
-halo_power = "0.500000"
-halo_w = "1.250000"
-halo_h = "1.250000"
-halo_gamma = "5.000000"
-DO_BLOOM = "0.000000"
-GAMMA_OUT = "0.500000"
-aspect_x = "-4.000000"
+#reference "koko-aio.slangp"
+prefer_std_pow = "0.0"
+
+DO_FXAA = "0.0"
+
+DO_SCANLINES = "0.0" 
+	SCANLINE_DARK = "0.0"
+	scanline_flickering = 2.0
+
+
+
+DO_IN_GLOW = "1.0"
+	in_glow_power = "1.00"
+	in_glow_wh = "1.0"	
+	in_glow_gamma = "2.0" 
+	IN_GLOW_ADD = "0.0"
+
+DO_RGB_MASK = "1.0"
+	RGB_MASK_STRENGTH = "1.0"
+	VMASK_OVERWHITE = "1.0"
+
+DO_DARKLINES = "1.0"
+	DARKLINES_STRENGTH = "0.6"
+	DO_DARKLINES_VOFFSET = "1.0"
+	DARKLINES_PERIOD = "4.0" 	
+	DRKLN_OVERWHITE = "1.0"
+
+DO_HALO = "1.0"
+	halo_power = "0.50" 
+	halo_w = "1.25"
+	halo_h = "1.25"
+	halo_gamma = "5.0" 
+
+DO_BLOOM = "0.0"
+	BLOOM_MIX = "0.2"
+	bloom_size = "2"
+	bloom_quality = "2.0"
+	bloom_gamma = 4.0"
+	bloom_power = "4.0"
+	bloom_output_gamma = "1"
+	bloom_on_dark_only = 1.0
+
+DO_CCORRECTION = "1.0"
+	GAMMA_OUT = "0.500000"
+	saturation = "1.00"
+
+DO_ALT_BLANK = 0.0
+	ALT_BLANK_STRENGTH = 0.0

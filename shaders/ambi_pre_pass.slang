@@ -76,9 +76,6 @@ vec3 circle_smooth(vec2 coords, vec2 middle, float f_radius, float FALLOFF,float
 #define internalness 0.07
 */ 
 
-
-
-
 /*
    To spare gpu cycles, completely skip the pass 
    by the following factor and return instead the previous 

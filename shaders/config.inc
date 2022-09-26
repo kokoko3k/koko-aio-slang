@@ -118,14 +118,14 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 // FXAA
 // Apply an antialiasing filter via FXAA from Nvidia.
-#pragma parameter DO_FXAA "FXAA:"	1.0 	0.0 1.0 1.0
+#pragma parameter DO_FXAA "★ FXAA:"	1.0 	0.0 1.0 1.0
 
 
 // Scanlines
 // Blank even source lines, the value from 0.0 to 1.0 expresses the darkness of the blanked lines
 // 1.0 means no blank at all.
 
-#pragma parameter DO_SCANLINES	"Scanlines:"									1.0 	0.0  1.0 1.0
+#pragma parameter DO_SCANLINES	"★ Scanlines:"									1.0 	0.0  1.0 1.0
 #pragma parameter SCANLINE_DARK "        Scanlines gap brightness"			  			0.0 	-1.0 1.0 0.05
 
 // Alternate the drawing of the scanlines between frames. this will produce a flickering typical of
@@ -145,7 +145,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // "IN_GLOW_ADD" allows to modulate from interpolation(*) to a sum, wihch may (or not) produce better effects.
 // With "IN_GLOW_ADD=0" input glowing does not alter the RGB mask
 // or slot mask applied to the image.
-#pragma parameter DO_IN_GLOW               "Input power/glowing:"	 					1.0	0.0 1.0 1.0
+#pragma parameter DO_IN_GLOW               "★ Input power/glowing:"	 					1.0	0.0 1.0 1.0
 #pragma parameter in_glow_power            "        Input signal glow strength"					0.45 	0.0 5.0 0.05
 #pragma parameter in_glow_wh               "        Sharpness"							2.5	0.2 15.0 0.05
 #pragma parameter in_glow_gamma            "        Gamma, the higher, the less the glow on dark colors"	1.0 	1.0 10.0 0.1
@@ -161,7 +161,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // "VMASK_OVERWHITE" modulates the strenght of the effect depending on the source pixel brightness,
 // This is handy  if you want to keep a good image contrast/brightness, but keep in mind that other
 // parameters like haloing and bloom.
-#pragma parameter DO_RGB_MASK        "RGB Mask:"         				1.0 	0.0 1.0 1.0
+#pragma parameter DO_RGB_MASK        "★  RGB Mask:"         				1.0 	0.0 1.0 1.0
 #pragma parameter RGB_MASK_STRENGTH  "        Strength (0.0=off)"			0.75  	0.0 1.0 0.05
 #pragma parameter VMASK_OVERWHITE    "        How much to affect bright colors"	1.0 	0.0 1.0 0.05
 
@@ -175,7 +175,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // "DARKLINES_PERIOD" expresses every how many lines draw a black one.
 // "DO_DARKLINES_VOFFSET" lets you to vertically offset by ""DARKLINES_PERIOD/2" the lines every 3 screen pixels,
 // allowing, in conjunction with RGB mask, to emulate slot mask
-#pragma parameter DO_DARKLINES          "Slotmask/Aperture grille"		0.0 	0.0 1.0 1.0
+#pragma parameter DO_DARKLINES          "★ Slotmask/Aperture grille"		0.0 	0.0 1.0 1.0
 #pragma parameter DARKLINES_STRENGTH    "        Strength"				0.3 	0.0 1.0 0.05
 #pragma parameter DO_DARKLINES_VOFFSET  "        Offset by triads"		1.0 	0.0 1.0 1.0
 #pragma parameter DARKLINES_PERIOD      "        Period"				4.0 	-8.0 8.0 2.0
@@ -189,7 +189,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // multiplying the resulting picture by the source one, it is added.
 // this means that haloing will produce solid colors,
 // lessening afromentioned effects on bright colors.
-#pragma parameter DO_HALO       "Halo:" 							1.0	0.0 1.0 1.0
+#pragma parameter DO_HALO       "★ Halo:" 							1.0	0.0 1.0 1.0
 #pragma parameter halo_power    "        Strength (neg=off)"			0.9 	0.0  5.0 0.05
 #pragma parameter halo_w        "        Horizontal sharpness"			1.75	0.2  15.0 0.05
 #pragma parameter halo_h        "        Vertical sharpness"			1.75	0.2  15.0 0.05
@@ -206,7 +206,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // "bloom_power" is the additional gain applied to the bloom
 // "bloom_bypass" will show only the bloomed component
 // the original image.
-#pragma parameter DO_BLOOM           "Bloom:" 				                0.0  0.0  1.0  1.0
+#pragma parameter DO_BLOOM           "★ Bloom:" 				                0.0  0.0  1.0  1.0
 #pragma parameter BLOOM_MIX          "        Final mix, (0.0=off)"			0.2 0.0 1.0  0.01
 #pragma parameter bloom_size         "        Radius"					2.0  0.5 30.0 0.5
 #pragma parameter bloom_quality      "        Quality: more is better but slower"	2.0  2.0 32.0 1.0
@@ -220,13 +220,13 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // Gamma and saturation correction
 // Correct the final gamma of the image
 // To have more or less saturated colors use "saturation" > 1 or "saturation" < 1
-#pragma parameter DO_CCORRECTION "Color corrections:" 			0.0 0.0 1.0 1.0
+#pragma parameter DO_CCORRECTION "★ Color corrections:" 			0.0 0.0 1.0 1.0
 #pragma parameter GAMMA_OUT      "        Gamma output"			0.69	0.1 9.0  0.025
 #pragma parameter saturation     "        Saturation modifier (1.0=off)"	1.0	0.0 10.0 0.025
 
 
 //Curvature parameters:
-#pragma parameter DO_CURVATURE	     "Emulate curvature:"			0.0   0.0 1.0 1.0
+#pragma parameter DO_CURVATURE	     "★ Curvature:"			0.0   0.0 1.0 1.0
 #pragma parameter GEOM_WARP_X        "        Warp X"				0.02  0.0 0.1 0.01
 #pragma parameter GEOM_WARP_Y        "        Warp Y"				0.0   0.0 0.1 0.01
 #pragma parameter GEOM_CORNER_SIZE   "        Corner Size"			0.01  0.005 0.1 0.005
@@ -234,7 +234,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 
 //Bezel related
-#pragma parameter DO_BEZEL	     "Emulate bezel"				0.0   0.0 1.0 1.0
+#pragma parameter DO_BEZEL	     "★ Bezel"				0.0   0.0 1.0 1.0
 #pragma parameter BEZEL_R            "        Bezel color: Red"			-0.3   -0.5 0.5  0.01
 #pragma parameter BEZEL_G            "        Bezel color: Green"		-0.3   -0.5 0.5  0.01
 #pragma parameter BEZEL_B            "        Bezel color: Blue"		-0.3   -0.5 0.5  0.01
@@ -248,41 +248,41 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 //Vignette and spot
 
-#pragma parameter DO_VIGNETTE	"Emulate vignette effect:"	0.0  0.0  1.0  1.0
-#pragma parameter v_bypass	"    bypass "	        	0.0  0.0  1.0  1.0
+#pragma parameter DO_VIGNETTE	"★ Vignette"			0.0  0.0  1.0  1.0
+#pragma parameter v_bypass	"        bypass "	        	0.0  0.0  1.0  1.0
 #pragma parameter v_size	"        size"			1.7  0.0  2.0  0.05
 #pragma parameter v_power	"        power"			1.1  0.05 2.0  0.05
 
-#pragma parameter DO_SPOT	"Emulate spot effect:"	0.0   0.0   1.0 1.0
-#pragma parameter s_bypass	"    bypass"	        0.0   0.0   1.0 1.0
-#pragma parameter s_center_x 	"    x position"	0.65  -1.5  1.5 0.05
-#pragma parameter s_center_y	"    y postion "	-0.5  -1.5  1.5 0.05
-#pragma parameter s_size	"    size"		0.1   0.0  1.0 0.01
-#pragma parameter s_power	"    power" 		0.15  0.05  2.0 0.05
+#pragma parameter DO_SPOT	"★ Spot"			0.0   0.0   1.0 1.0
+#pragma parameter s_bypass	"        bypass"	        0.0   0.0   1.0 1.0
+#pragma parameter s_center_x 	"        x position"	0.65  -1.5  1.5 0.05
+#pragma parameter s_center_y	"        y postion "	-0.5  -1.5  1.5 0.05
+#pragma parameter s_size	"        size"		0.1   0.0  1.0 0.01
+#pragma parameter s_power	"        power" 		0.15  0.05  2.0 0.05
 
 
 //Ambilight effect
-#pragma parameter DO_AMBILIGHT	 "Ambient led lights (needs Retroarch aspect ratio set to full!)"	1.0  0.0  1.0     1.0
+#pragma parameter DO_AMBILIGHT	 "★ Back leds (needs Retroarch aspect ratio set to full!)"	1.0  0.0  1.0     1.0
 #pragma parameter ambi_steps	 "        Slowness"							60.0 5.0  1000.0  5.0
 #pragma parameter AMBI_FALLOFF   "        Light Falloff"						0.7  0.1  3.0     0.01
 #pragma parameter AMBI_POWER     "        Led power"							0.5  0.1  3.0     0.05
-#pragma parameter label_aspect_presets "Aspect ratio presets list:" 0.0 0.0 0.0 1.0
-#pragma parameter label_aspect_preset1 "    (-1 = NTSC)" 0.0 0.0 0.0 1.0
-#pragma parameter label_aspect_preset2 "    (-2 = PAL)" 0.0 0.0 0.0 1.0
-#pragma parameter label_aspect_preset3 "    (-3 = Snes 8/7)" 0.0 0.0 0.0 1.0
-#pragma parameter label_aspect_preset4 "    (-4 = Megadrive) 10/7" 0.0 0.0 0.0 1.0
-#pragma parameter label_aspect_preset5 "    (-5 = Uncorrected)" 0.0 0.0 0.0 1.0
-#pragma parameter aspect_x "    Aspect Ratio Numerator (0 for mame, -x for presets above)"   0.0  -5.0 256. 1.0
-#pragma parameter aspect_y "    Aspect Ratio Denominator"	  				3.0   0.0 256. 1.0
-
+#pragma parameter aspect_x       "        Aspect Ratio Numerator (-x for a preset below)"   0.0  -5.0 256. 1.0
+#pragma parameter aspect_y       "        Aspect Ratio Denominator"	  				3.0   0.0 256. 1.0
+#pragma parameter label_aspect_presets "        Presets reference list:" 0.0 0.0 0.0 1.0
+#pragma parameter label_aspect_preset0 "          (0 =  MAME 1.33)" 0.0 0.0 0.0 1.0
+#pragma parameter label_aspect_preset1 "          (-1 = NTSC 1.5)" 0.0 0.0 0.0 1.0
+#pragma parameter label_aspect_preset2 "          (-2 = PAL 1.25)" 0.0 0.0 0.0 1.0
+#pragma parameter label_aspect_preset3 "          (-3 = Snes 8/7)" 0.0 0.0 0.0 1.0
+#pragma parameter label_aspect_preset4 "          (-4 = Megadrive 10/7)" 0.0 0.0 0.0 1.0
+#pragma parameter label_aspect_preset5 "          (-5 = Uncorrected)" 0.0 0.0 0.0 1.0
 
 // Alternative blanking.
 // Emulates the low pixel persistance of CRT monitors and reduces the motion blur,
 // typical of LCD displays, by blanking even/odd screen lines on even/odd frames.
 // ALT_BLANK_STRENGTH expresses the strength of the "blank".
-#pragma parameter DO_ALT_BLANK       "Alternate line blanking: " 					0.0 0.0 1.0 1.0
+#pragma parameter DO_ALT_BLANK       "★ Alternate line blanking: " 					0.0 0.0 1.0 1.0
 #pragma parameter ALT_BLANK_STRENGTH "        Alternate black frame insertion strength" 	0.0 0.0 1.0 0.1
-#pragma parameter ALT_BLANK_PERIOD "        Dark lines period" 	2.0 0.0 20.0 1.0
+#pragma parameter ALT_BLANK_PERIOD   "        Dark lines period" 	2.0 0.0 20.0 1.0
 
 
 #define DO_FXAA        global.DO_FXAA

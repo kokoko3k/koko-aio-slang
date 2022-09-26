@@ -10,24 +10,28 @@
 Performances:
 haswell igp: i5-4590 CPU @ 3.30GHz
 Ouutput on aspect: full, 1080p, 16:9, 60fps
-input: mame, dynamite dux:
+All measurements made with aspect=full, so as long as ambient light is not used, the whole screen is filled by the shader.
+This means that all the measurements, but ambient light itself are likely higher than real use.
+
+input: mame, dynamite dux:                          26/09/2022
                     GPU%        Delta% vs Basal:
-         no shader: 11          -23.6               
-             basal: 34.6        0.0                31.2
-              FXAA: 37.5        2.9                35
-         scanlines: 36.5        1.9                32.3
-     ...flickering: 36.2        1.6
-input glow gamma 3: 40          5.4                36.5
-          rgb mask: 35.7        1.1                
-          slotmask: 36.5        1.9
-      halo gamma 3: 40.0        5.4
-          bloom,hq: 38-43       3.4-8.4            35-40
- color corrections: 35          0.4
-    curvature warp: 39.2        4.6               33.5
-     vignette+spot: 35.2        0.6               32.9  ++
-     ambient light: 38          3.4               33.5
+         no shader: 11          -23.6               11
+             basal: 34.6        0.0                 31.5
+              FXAA: 37.5        2.9                 34.15
+         scanlines: 36.5        1.9                 32.3
+     ...flickering: 36.2        1.6                 32.4
+input glow gamma 3: 40          5.4                 36.75
+          rgb mask: 35.7        1.1                 32.60
+          slotmask: 36.5        1.9                 33.6
+      halo gamma 3: 40.0        5.4                 36.9
+  bloom(q2),hq(q4): 38-43       3.4-8.4             35.8,40.0
+ color corrections: 35          0.4                 31.6
+    curvature warp: 39.2        4.6                 33.5
+     vignette+spot: 35.2        0.6                 33.2
+     ambient light: 38          3.4                 32.1
+             Bezel:                                 37.5
 -----------------------------------------------
-Total basal + all the features: 72.2            67.70
+Total basal + all the features: 72.2                65.3 .. 69.9(bloom hq)
     
 */
 
@@ -52,7 +56,7 @@ Total basal + all the features: 72.2            67.70
 
 
 
-* Pipeline *
+* Pipeline (outdated) *
 ------------
 
 → → Original image from emulator
@@ -104,8 +108,10 @@ shaders = 17
   For other emulators/systems, probably it is best and safe to doulbe x0 too.
 */
 
-
-
+/* In the first pass we draw an optional black border around the image for bezel purposes
+   and scale the image to something better usable by FXAA
+   Scaling y to 2x is needed by flickering scanlines pass.
+*/
            shader0 = shaders/first_pass.slang
             alias0 = "first_pass"
     filter_linear0 = false
@@ -113,6 +119,7 @@ shaders = 17
           scale_x0 = 2.0
           scale_y0 = 2.0
         wrap_mode0 = "clamp_to_edge"
+
 /* Nvidia fxaa pass:
    works good for "SD" resolutions
 */
@@ -123,7 +130,12 @@ shaders = 17
             scale1 = 1.0
         wrap_mode1 = "mirrored_repeat"
         
-    //Put in_glow in its own pass so that we can use lower resolution
+/* Blur and glow the image as requested 
+   This pass aims to simulate the signal input power.
+   Glowing will be used to weighting the scanlines.
+   In this pass we also generate flickering scanlines by blindly blanking
+   alternate lines at #frame interval
+*/
            shader2 = shaders/in_glow_and_scanline_flickering.slang
             alias2 = "in_glow_and_scanline_flickering_pass"
     filter_linear2 = true
@@ -133,7 +145,9 @@ float_framebuffer2 = true
         wrap_mode2 = "mirrored_repeat"
             
           
-    //Put halo in its own pass so that we can use lower resolution
+/* This essentially is the same as glowing by a code point of view.
+   But this pass will be added later on instead of mixed
+*/
            shader3 = shaders/halo.slang
             alias3 = "halo_pass"
     filter_linear3 = true
@@ -142,9 +156,10 @@ float_framebuffer2 = true
 float_framebuffer3 = true
         wrap_mode3 = "mirrored_repeat"
 
-   //In this pass we gather information about the rotated state of the source
-   //This information can only be taken when a pass scales to viewport
-   //Use a low output resolution to keep things as light as possible.
+/* In this pass we gather information about the rotated state of the source
+   This information can only be taken when a pass scales to viewport
+   So use a low output resolution to keep things as light as possible.
+*/
            shader4 = shaders/isrotated.slang
             alias4 = "isrotated_pass"
     filter_linear4 = true
@@ -154,6 +169,8 @@ float_framebuffer3 = true
         
 /* In this pass we emulate scanlines, glowing,
    RGB vertical mask, slot mask,haloing and color corrections
+   This pass will also be mirrored_repeat so that it can be used
+   to cheaply emulate bezel reflections.
 */
            shader5 = shaders/main_pass.slang
             alias5 = "main_pass"
@@ -162,17 +179,17 @@ float_framebuffer3 = true
        scale_type5 = viewport
         wrap_mode5 = "mirrored_repeat"
      
-     
-     
-/*      Get the average luminance needed by ambilight here, because:
-        * mipmap_input only works on "Source" texture
-        * the following pass does not use the previous one 
-        * the previous pass represents scene changes.
+    
+/* Get the average luminance needed by ambilight here, because:
+   * mipmap_input only works on "Source" texture
+   * the following pass does not use the previous one 
+   * the previous pass represents scene changes.
+
+   The rgb channels of the following pass contains luminance info
+   Used by the bezel code to light up the bezel corners.
+   The alpha channel contains the sum/3.0 of rgb channels
+   used to detect scene changes.
 */
-         //The rgb channels of the following pass contains luminance info
-         //Used by the bezel code to light up the bezel corners.
-         //The alpha channel contains the sum/3.0 of rgb channels
-         //used to detect scene changes.
                shader6 = shaders/avglum_pass.slang
                 alias6 = "avglum_pass"
         filter_linear6 = true
@@ -182,6 +199,9 @@ float_framebuffer3 = true
             wrap_mode6 = "mirrored_repeat"
          mipmap_input6 = true
          
+/* The following 2 passes will blur the mirrored part of main pass
+   to emulate bezel reflections.
+*/
                shader7 = shaders/reflection_blur_h.slang
                 alias7 = "reflected_blurred_pass1"
         filter_linear7 = true
@@ -197,19 +217,18 @@ float_framebuffer3 = true
             wrap_mode8 = "mirrored_repeat"
             
 
-/* In the subsequent passes we do first a fast blOOm by first
+/* In the subsequent passes we do first a fast bloom  by first
    sampling the original texture and scale it down to keep
-   it fast, next we do subsequent blURs of the bloomed
+   it fast, next we do subsequent blurd of the bloomed
    pass.
 */
-        
                shader9 = shaders/bloom_pass_1.slang
                 alias9 = "bloom_pass_1"
         filter_linear9 = true
            scale_type9 = absolute
               scale_x9 = 320
               scale_y9 = 240
-            //WHY ON EARTH I NEED TO SET **THIS** TO MIRRORED REPEAT TO HAVE THE PREVIOUS PASS MIRRORED REPEAT!?!?!?
+            //I NEED TO SET **THIS** TO mirrored_repeat TO HAVE THE PREVIOUS PASS mirrored_repeated (!?)
             wrap_mode9 = "mirrored_repeat" 
         
                shader10 = shaders/bloom_pass_2.slang
@@ -233,11 +252,14 @@ float_framebuffer3 = true
                 scale12 = 1
             wrap_mode12 = "mirrored_repeat"
         
-/* Create the ambilight magic: */
-        //...repeat left and right borders
+/* Back led lights: */
+/* Since the next pass will need mipmaps of the original image, and is only possible to get mipmaps
+   from the very previous pass, the next one will just passthrough the original image
+*/
+
                shader13 = shaders/passthrough_original.slang
                 alias13 = "ambi_displace_pass"
-            //WHY ON EARTH I NEED TO SET **THIS** TO true TO HAVE THE PREVIOUS PASS linearly filtered!?!?!?
+         //I NEED TO SET **THIS** TO true TO HAVE THE PREVIOUS PASS linearly filtered (!?)
         filter_linear13 = true
            scale_type13 = absolute
               scale_x13 = 320
@@ -245,7 +267,7 @@ float_framebuffer3 = true
             wrap_mode13 = "mirrored_repeat"
          mipmap_input13 = false
 
-        //...then just downscale via mipmapping here:
+// Gather mipmaps from prevous pass and use them to light virtual leds under the virtual monitor 
                shader14 = shaders/ambi_pre_pass.slang
                 alias14 = "ambi_pre_pass1"
         filter_linear14 = true
@@ -255,7 +277,7 @@ float_framebuffer3 = true
          mipmap_input14 = true
             wrap_mode14 = "clamp_to_border"
 
-
+// Temporally smooth led lights.
                shader15 = shaders/ambi_temporal_pass.slang
                 alias15 = "ambi_temporal_pass"
         filter_linear15 = true
@@ -264,7 +286,8 @@ float_framebuffer3 = true
 
     
 /* This pass pass will do the composition of the previous passes
-   with the bloomed image, vignette and spot light,  and black frame insertions.
+   with the bloomed image, vignette and spot light,  black frame insertions
+   and Bezel emulation
 */
            shader16 = shaders/final_pass.slang
             alias16 = "final_pass"
