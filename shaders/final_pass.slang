@@ -108,11 +108,11 @@ float quad_smoothstep(vec2 co, float smooth_end, float smooth_start) {
     return borderout-borderin;
 }*/
 
-#define BEZEL_INNER_BORDER_SIZE 0.03
 vec3 compose_bezel_over(vec3 full_viewport) {
 
     vec2 coords_for_bezel = vTexCoord;
     vec2 coords_for_mirror = vOutputCoord;
+    //vec2 coords_for_mirror =zoom(vOutputCoord,0.99);
     if (BEZEL_FRAME_ZOOM != 0.0)
         coords_for_bezel = zoomout_coords(vTexCoord,-BEZEL_FRAME_ZOOM,1.0);
 
@@ -243,8 +243,17 @@ vec4 main_wrap(){
             vec4 vPixel_inner_frame = pixel_inner_frame();
             if (DO_AMBILIGHT == 1) {
                 //mix ambilight in the inner frame too, as curvature could shrink into the inner frame.
-                return vec4(mix(ambi_noised().rgb,vPixel_inner_frame.rgb,min(vPixel_inner_frame.a*1.5,1.0)),vPixel_inner_frame.a);
+                bool draw_leds = true;
+                //Not painting ambilights here is the best way to cheaply draw a border around the frame
+                if (DO_BEZEL == 1.0) {
+                    float border_start = 1-BEZEL_IMAGE_BORDER;
+                    draw_leds = coords_curved.x < border_start || coords_curved.x > BEZEL_IMAGE_BORDER || 
+                                coords_curved.y < border_start || coords_curved.y > BEZEL_IMAGE_BORDER ;
+                }
                 
+                if (draw_leds) 
+                    return vec4(mix(ambi_noised().rgb,vPixel_inner_frame.rgb,min(vPixel_inner_frame.a*1.5,1.0)),vPixel_inner_frame.a);
+                //return vec4(1.0,0.0,0.0,1.0);
             }
 
             //Last case, inner border without ambilight:

@@ -243,7 +243,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter BEZEL_REF_END      "        Reflection area end"		1.0   0.5  1.0  0.005
 #pragma parameter BEZEL_INNER_ZOOM   "        Image zoom"			-0.18   -0.5 0.5 0.01
 #pragma parameter BEZEL_FRAME_ZOOM   "        Frame zoom"			0.0   -0.5 0.5 0.01
-#pragma parameter BEZEL_IMAGE_BORDER "        Image border"			0.00   0.0 0.1 0.01
+#pragma parameter BEZEL_IMAGE_BORDER "        Image border"			1.01   1.0 1.2 0.01
 
 
 //Vignette and spot

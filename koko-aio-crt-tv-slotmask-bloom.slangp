@@ -25,9 +25,9 @@ DO_DARKLINES = "1.0"
 	DRKLN_OVERWHITE = "1.0"
 
 DO_HALO = "1.0"
-	halo_power = "0.50" 
-	halo_w = "2.0"
-	halo_h = "2.0"
+	halo_power = "0.60" 
+	halo_w = "2.25"
+	halo_h = "2.25"
 	halo_gamma = "5.0" 
 
 DO_BLOOM = "1.0"
@@ -39,7 +39,7 @@ DO_BLOOM = "1.0"
 	bloom_output_gamma = "1.5"
 
 DO_CCORRECTION = "1.0"
-	GAMMA_OUT = "0.400000"
+	GAMMA_OUT = "0.350000"
 	saturation = "1.00"
 
 DO_ALT_BLANK = 0.0

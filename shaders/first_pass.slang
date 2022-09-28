@@ -20,16 +20,7 @@ layout(set = 0, binding = 2) uniform sampler2D Source;
 #include "functions.include.slang"
 
 void main() {
-   vec2 coords = vTexCoord;
-   if (DO_BEZEL == 1.0) {
-      coords = zoom(vTexCoord,1-BEZEL_IMAGE_BORDER);
-      if (coords.x < 0.0 || coords.y < 0.0 || coords.y > 1.0 || coords.x > 1.0) {
-         FragColor = vec4(0.0);
-         return;
-      }
-   }
-   vec3 pixel_in = texture(Source, coords).rgb;
-   FragColor = vec4(pixel_in.rgb,1.0);
+   FragColor = texture(Source, vTexCoord);
 }
  
   

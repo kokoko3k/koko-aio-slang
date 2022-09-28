@@ -96,9 +96,10 @@ void main() {
 
    vec3 pixel_out;
    //Use to debug:
-      //pixel_out=vec4(abs(sin(params.FrameCount/3.14/20))); //white fade
-      //pixel_out=vec4(abs(sin(params.FrameCount/3.14/20)),0.0,0.0,0.0); //red fade
-      //pixel_out=vec4(0.2);
+      //FragColor=vec4(abs(sin(params.FrameCount/3.14/20))); //white fade
+      //FragColor=vec4(abs(sin(params.FrameCount/3.14/20)),0.0,0.0,0.0); //red fade
+      //FragColor=vec4(0.8);
+      //return;
 
    bool is_interlaced = (params.OriginalSize.y > MIN_LINES_INTERLACED) ? true : false ;
    bool exec_scanline_code = flickering_scanline_needed(is_interlaced);
