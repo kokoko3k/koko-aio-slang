@@ -33,7 +33,7 @@ Several presets are included.<br>
         
 # Examples
 
-![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/Screenshots_2.0/ffight.png.png?raw=true)
+![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/Screenshots_2.0/ffight.png?raw=true)
 
 ![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/Screenshots_2.0/jim.png?raw=true)
 
