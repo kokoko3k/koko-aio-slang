@@ -1,0 +1,17 @@
+#reference "koko-aio-crt-monitor-slotmask.slangp"
+DO_SCANLINES = "0.0"
+
+DO_FXAA = "1.000000"
+
+in_glow_power = "0.900000"
+in_glow_wh = "3.000000"
+in_glow_gamma = "1.000000"
+
+DARKLINES_STRENGTH = "0.600000"
+
+halo_power = "1.000000"
+halo_w = "1.000000"
+halo_h = "1.000000"
+
+GAMMA_OUT = "0.650000"
+

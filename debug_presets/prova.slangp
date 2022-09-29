@@ -1,0 +1,67 @@
+#reference "../koko-aio.slangp"
+prefer_std_pow = "1.0"
+
+DO_FXAA = "0.0"
+
+DO_SCANLINES = "1.0"
+	SCANLINE_DARK = "0.0"
+	scanline_flickering = 1.0
+
+DO_IN_GLOW = "1.0"
+	in_glow_power = "1.0"
+	in_glow_wh = "15.0"	
+	in_glow_gamma = "2.0" 
+	IN_GLOW_ADD = "0.0"
+
+DO_RGB_MASK = "0.0"
+	RGB_MASK_STRENGTH = "1.0"
+	VMASK_OVERWHITE = "0.5"
+
+DO_DARKLINES = "0.0"
+	DARKLINES_STRENGTH = "0.7"
+	DO_DARKLINES_VOFFSET = "1.0"
+	DARKLINES_PERIOD = "4.0" 	
+	DRKLN_OVERWHITE = "1.0"
+
+DO_HALO = "0.0"
+	halo_power = "0.6" 
+	halo_w = "15.0"
+	halo_h = "15.0"
+	halo_gamma = "2.0" 
+
+DO_BLOOM = "1.0"
+	BLOOM_MIX = "0.2"
+	bloom_size = "2.0"
+	bloom_quality = "2.0"
+	bloom_gamma = "4.0"
+	bloom_power = "8.0"
+	bloom_gamma_out = "1.5"
+	bloom_on_dark_only = "0.0"
+
+DO_CCORRECTION = "0.0"
+	GAMMA_OUT = "0.59"	
+	saturation = "1.20"
+
+DO_ALT_BLANK = 0.0
+	ALT_BLANK_STRENGTH = 0.0
+
+DO_AMBILIGHT = "1.000000"
+
+DO_BEZEL = "1.0"
+	BEZEL_R = "0.2"
+	BEZEL_G = "-0.2"
+	BEZEL_B = "0.2"
+	BEZEL_CON = "1.0"
+
+
+DO_CURVATURE = 1.0
+	GEOM_BORDER_WX = 0.0
+	GEOM_BORDER_WY = 0.0
+	GEOM_WARP_X = 0.05
+	GEOM_WARP_Y = 0.05
+	GEOM_CORNER_SIZE = 0.01
+	GEOM_CORNER_SMOOTH = 775
+	GEOM_ZOOMOUT = 0.18
+	GEOM_GAP_SIZE = 0.15
+
+	

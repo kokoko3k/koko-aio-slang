@@ -1,0 +1,10 @@
+#reference "koko-aio-crt-monitor-slotmask-bloom-bezel.slangp"
+
+GEOM_WARP_X = 0.03
+GEOM_WARP_Y = 0.03
+
+BEZEL_FRAME_ZOOM = "0.139"
+BEZEL_INNER_ZOOM = "-0.005"
+BEZEL_IMAGE_BORDER = "1.02"
+
+

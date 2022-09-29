@@ -282,8 +282,8 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // typical of LCD displays, by blanking even/odd screen lines on even/odd frames.
 // ALT_BLANK_STRENGTH expresses the strength of the "blank".
 #pragma parameter DO_ALT_BLANK       "★ Alternate line blanking: " 					0.0 0.0 1.0 1.0
-#pragma parameter ALT_BLANK_STRENGTH "        Alternate black frame insertion strength" 	0.0 0.0 1.0 0.1
-#pragma parameter ALT_BLANK_PERIOD   "        Dark lines period" 	2.0 0.0 20.0 1.0
+#pragma parameter ALT_BLANK_STRENGTH "        Alternate black frame insertion strength" 	0.5 0.0 1.0 0.1
+#pragma parameter ALT_BLANK_PERIOD   "        Dark lines period" 	4.0 0.0 20.0 1.0
 
 
 #define DO_FXAA        global.DO_FXAA

@@ -1,0 +1,2 @@
+#reference "koko-aio-crt-monitor-slotmask-bloom.slangp"
+DO_DARKLINES = "0.0"

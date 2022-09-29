@@ -32,7 +32,7 @@ layout(location = 1) in vec2 vOutputCoord;
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D FXAA_pass;
 layout(set = 0, binding = 3) uniform sampler2D first_pass;
-
+layout(set = 0, binding = 4) uniform sampler2D in_glow_and_scanline_flickering_pass;
 // What follows is an ugly optimization with a lot of code copied and pasted repeated multiple times,
 // shamlessly hidden into an include:
 #include "pixel_glows.include.slang"    
@@ -43,9 +43,11 @@ vec4 main_wrap(void) {
     vec3 pixel_haloed;
     vec2 halo_coords = vTexCoord;
 
-    if (DO_FXAA == 1.0)
+    if (DO_IN_GLOW == 1.0)
+        pixel_haloed = pixel_glow(in_glow_and_scanline_flickering_pass, halo_w,halo_h,halo_power,halo_gamma,halo_coords, global.FXAA_passSize, global.FXAA_passSize).rgb;
+    else if (DO_FXAA == 1.0)
         pixel_haloed = pixel_glow(FXAA_pass, halo_w,halo_h,halo_power,halo_gamma,halo_coords, global.FXAA_passSize, global.FXAA_passSize).rgb;
-            else
+    else
         pixel_haloed = pixel_glow(first_pass, halo_w,halo_h,halo_power,halo_gamma,halo_coords, global.FXAA_passSize, global.FXAA_passSize).rgb;
         
     return vec4(pixel_haloed.rgb,1.0);

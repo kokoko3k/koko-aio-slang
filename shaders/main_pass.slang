@@ -192,6 +192,7 @@ vec4 main_wrap(vec2 co) {
             //Mix scanline and glow pixel; depending on whiteness.
             if (DO_IN_GLOW == 1) {
                 float in_luminance = (pixel_glowed.r+pixel_glowed.g+pixel_glowed.b)/3;
+                //in_luminance *=in_luminance;
                 //float in_luminance = max(max(pixel_glowed.r,pixel_glowed.g),pixel_glowed.b);
                 in_luminance = min(in_luminance  * GLOW_OVER_DARK_SCANLINES, 1.0) ;
                 pixel_out = mix(pixel_scanlined,pixel_glowed,in_luminance) ;
