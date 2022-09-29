@@ -1,4 +1,4 @@
-#reference "koko-aio-crt-tv-slotmask-bloom.bezel.slangp"
+#reference "koko-aio-crt-tv-slotmask-bloom-bezel.slangp"
 
 DARKLINES_STRENGTH = "0.8"
 DO_DARKLINES_VOFFSET = "0.0"

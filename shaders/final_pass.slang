@@ -246,11 +246,12 @@ vec4 main_wrap(){
                 bool draw_leds = true;
                 //Not painting ambilights here is the best way to cheaply draw a border around the frame
                 if (DO_BEZEL == 1.0) {
+                    vec2 vTexCoord_zoomout = zoomout_coords(vTexCoord, -BEZEL_INNER_ZOOM , 1.0);
                     float border_start = 1-BEZEL_IMAGE_BORDER;
-                    draw_leds = coords_curved.x < border_start || coords_curved.x > BEZEL_IMAGE_BORDER || 
-                                coords_curved.y < border_start || coords_curved.y > BEZEL_IMAGE_BORDER ;
+                    //Not using coords_curved here because crazy things would happen with vertical games
+                    draw_leds = vTexCoord_zoomout.x < border_start || vTexCoord_zoomout.x > BEZEL_IMAGE_BORDER || 
+                                vTexCoord_zoomout.y < border_start || vTexCoord_zoomout.y > BEZEL_IMAGE_BORDER ;
                 }
-                
                 if (draw_leds) 
                     return vec4(mix(ambi_noised().rgb,vPixel_inner_frame.rgb,min(vPixel_inner_frame.a*1.5,1.0)),vPixel_inner_frame.a);
                 //return vec4(1.0,0.0,0.0,1.0);

@@ -1,11 +1,10 @@
 /*TODO:
     Guess more aspect ratios: edit. nope: Guessing is impossible..
-    Update presets with new switchable functions
     Update pipeline graph
 
     Investigate the possible use of mipmapping in bloom function too.
     Try to move flickering scanlines into main, maybe by faking them with screenlines?
-    Halo should take in_glow if available (?)
+
     
 Performances:
 haswell igp: i5-4590 CPU @ 3.30GHz
