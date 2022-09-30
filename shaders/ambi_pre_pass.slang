@@ -53,9 +53,9 @@ layout(set = 0, binding = 4) uniform sampler2D ambi_pre_pass1Feedback;
 
 
 
-vec3 circle_smooth(vec2 coords, vec2 middle, float f_radius, float FALLOFF,float POWER, float f_lod) {
+vec3 circle_smooth(vec2 coords, vec2 middle, float f_radius, float FALLOFF, float f_lod) {
     float distanza=distance(middle,vec2(coords.x,coords.y));
-    float circle = (1-smoothstep(f_radius-FALLOFF,f_radius+FALLOFF,distanza))*POWER;
+    float circle = (1-smoothstep(f_radius-FALLOFF,f_radius+FALLOFF,distanza));
     vec3 circle_color = textureLod(Source,middle,f_lod).rgb * circle;
     //circle_color = vec3(circle);
     return circle_color;
@@ -154,22 +154,23 @@ void main() {
     
     middle_x=bordo_min;
     for (middle_y=bordo_min ; middle_y <= bordo_max+eps ; middle_y=middle_y + passo ) {
-        pixel_out +=circle_smooth(coords, vec2(middle_x,middle_y), radius, AMBI_FALLOFF, AMBI_POWER, lod);
+        pixel_out +=circle_smooth(coords, vec2(middle_x,middle_y), radius, AMBI_FALLOFF, lod);
     }
     middle_x=bordo_max;
     for (middle_y=bordo_min ; middle_y <=  bordo_max+eps ; middle_y=middle_y + passo ) {
-        pixel_out +=circle_smooth(coords, vec2(middle_x,middle_y), radius, AMBI_FALLOFF, AMBI_POWER, lod);
+        pixel_out +=circle_smooth(coords, vec2(middle_x,middle_y), radius, AMBI_FALLOFF, lod);
     }    
 
     middle_y=bordo_min;
     for (middle_x=bordo_min+passo ; middle_x <= bordo_max-passo+eps ; middle_x=middle_x + passo ) {
-        pixel_out +=circle_smooth(coords, vec2(middle_x,middle_y), radius, AMBI_FALLOFF, AMBI_POWER, lod);
+        pixel_out +=circle_smooth(coords, vec2(middle_x,middle_y), radius, AMBI_FALLOFF, lod);
     }
     middle_y=bordo_max;
     for (middle_x=bordo_min+passo ; middle_x <= bordo_max-passo+eps ; middle_x=middle_x + passo ) {
-        pixel_out +=circle_smooth(coords, vec2(middle_x,middle_y), radius, AMBI_FALLOFF, AMBI_POWER, lod);
+        pixel_out +=circle_smooth(coords, vec2(middle_x,middle_y), radius, AMBI_FALLOFF, lod);
     }    
 
+ 
     FragColor = vec4(pixel_out,1.0);
     return;
 

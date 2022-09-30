@@ -256,8 +256,8 @@ float_framebuffer3 = true
    from the very previous pass, the next one will just passthrough the original image
 */
 
-               shader13 = shaders/passthrough_original.slang
-                alias13 = "ambi_displace_pass"
+               shader13 = shaders/ambi_push_pass.slang
+                alias13 = "ambi_push_pass"
          //I NEED TO SET **THIS** TO true TO HAVE THE PREVIOUS PASS linearly filtered (!?)
         filter_linear13 = true
            scale_type13 = absolute
@@ -265,6 +265,7 @@ float_framebuffer3 = true
               scale_y13 = 320
             wrap_mode13 = "mirrored_repeat"
          mipmap_input13 = false
+    float_framebuffer13 = true
 
 // Gather mipmaps from prevous pass and use them to light virtual leds under the virtual monitor 
                shader14 = shaders/ambi_pre_pass.slang
@@ -275,6 +276,7 @@ float_framebuffer3 = true
               scale_y14 = 320
          mipmap_input14 = true
             wrap_mode14 = "clamp_to_border"
+    float_framebuffer14 = false
 
 // Temporally smooth led lights.
                shader15 = shaders/ambi_temporal_pass.slang
