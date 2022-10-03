@@ -8,7 +8,7 @@ DO_SCANLINES = "1.0"
 
 DO_IN_GLOW = "1.0"
 	in_glow_power = "1.900000"
-	in_glow_wh = "15.00000"
+	in_glow_wh = "6.00000"
 	in_glow_gamma = "2.0"
 	IN_GLOW_ADD = "0.0"
 	GLOW_OVER_DARK_SCANLINES = "0.0"

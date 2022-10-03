@@ -1,4 +1,4 @@
-#define GLOW_SHARP_MAX 15 		    //This has to be the same as the max used for in_glow_wh
+#define GLOW_SHARP_MAX 6	        //This has to be the same as the max used for in_glow_wh
 #define MIN_LINES_INTERLACED 300	//Consider content interlaced if lines are more than this
 #define noisepower ((params.OutputSize.w + params.OutputSize.z)*1.5)         //Sort of dithering
 #define scene_change_threshold 0.07  // 0.0-1.0: sensitivity to scene change (ambilike stuff), 0.0 changes more
@@ -104,17 +104,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 
 
-// PARAMETERS AND MEANING
-
-
-
-//Misc
-//Depending on the compiler and exponent size, one may prefer to use the standard pow or the
-//integer optimized one. The optimize version will use only integer values.
-//#pragma parameter str_1          "Optimizations: see which is faster" 								0.0 	0.0 0.0 1.0
-//#pragma parameter prefer_std_pow "       Use pow (choose fractional gamma too for halo and glow)"				0.0 	0.0 1.0 1.0
-
-                                                                                        
+// PARAMETERS AND MEANING                                                    
 
 // FXAA
 // Apply an antialiasing filter via FXAA from Nvidia.
@@ -147,7 +137,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // or slot mask applied to the image.
 #pragma parameter DO_IN_GLOW               "★ Input power/glowing:"	 					1.0	0.0 1.0 1.0
 #pragma parameter in_glow_power            "        Input signal glow strength"					0.45 	0.0 5.0 0.05
-#pragma parameter in_glow_wh               "        Sharpness"							2.5	0.2 15.0 0.05
+#pragma parameter in_glow_wh               "        Sharpness"							2.5	0.2 6.0 0.05
 #pragma parameter in_glow_gamma            "        Gamma, the higher, the less the glow on dark colors"	1.0 	1.0 10.0 0.1
 #pragma parameter IN_GLOW_ADD              "        Post gain (0.0 to disable)"					0.0 	0.0 1.0 0.05
 #pragma parameter GLOW_OVER_DARK_SCANLINES "        Scanlines bleeding"						1.0 	0.0 3.0 0.1
@@ -176,10 +166,10 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // "DO_DARKLINES_VOFFSET" lets you to vertically offset by ""DARKLINES_PERIOD/2" the lines every 3 screen pixels,
 // allowing, in conjunction with RGB mask, to emulate slot mask
 #pragma parameter DO_DARKLINES          "★ Slotmask/Aperture grille"		0.0 	0.0 1.0 1.0
-#pragma parameter DARKLINES_STRENGTH    "        Strength"				0.3 	0.0 1.0 0.05
+#pragma parameter DARKLINES_STRENGTH    "        Strength"				0.3 0.0 1.0 0.05
 #pragma parameter DO_DARKLINES_VOFFSET  "        Offset by triads"		1.0 	0.0 1.0 1.0
-#pragma parameter DARKLINES_PERIOD      "        Period"				4.0 	-8.0 8.0 2.0
-#pragma parameter DRKLN_OVERWHITE       "        How much to affect bright colors"	1.0 	0.0 1.0 0.05
+#pragma parameter DARKLINES_PERIOD      "        Period"				4.0 -8.0 8.0 2.0
+#pragma parameter DRKLN_OVERWHITE       "        How much to affect bright colors"	1.0 0.0 1.0 0.05
 
 
 
@@ -190,9 +180,9 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // this means that haloing will produce solid colors,
 // lessening afromentioned effects on bright colors.
 #pragma parameter DO_HALO       "★ Halo:" 							1.0	0.0 1.0 1.0
-#pragma parameter halo_power    "        Strength (neg=off)"			0.9 	0.0  5.0 0.05
-#pragma parameter halo_w        "        Horizontal sharpness"			1.75	0.2  15.0 0.05
-#pragma parameter halo_h        "        Vertical sharpness"			1.75	0.2  15.0 0.05
+#pragma parameter halo_power    "        Strength (neg=off)"					0.9 	0.0  5.0 0.05
+#pragma parameter halo_w        "        Horizontal sharpness"					1.75	0.2  6.0 0.05
+#pragma parameter halo_h        "        Vertical sharpness"					1.75	0.2  6.0 0.05
 #pragma parameter halo_gamma    "        Gamma, the higher, the less the halo on dark colors"	2.0 	1.0  10.0 0.1
 
 
@@ -206,7 +196,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // "bloom_power" is the additional gain applied to the bloom
 // "bloom_bypass" will show only the bloomed component
 // the original image.
-#pragma parameter DO_BLOOM           "★ Bloom:" 				                0.0  0.0  1.0  1.0
+#pragma parameter DO_BLOOM           "★ Bloom:" 				        0.0  0.0  1.0  1.0
 #pragma parameter BLOOM_MIX          "        Final mix, (0.0=off)"			0.2 0.0 1.0  0.01
 #pragma parameter bloom_size         "        Radius"					2.0  0.5 30.0 0.5
 #pragma parameter bloom_quality      "        Quality: more is better but slower"	2.0  2.0 32.0 1.0
