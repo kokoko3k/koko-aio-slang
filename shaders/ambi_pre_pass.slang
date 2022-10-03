@@ -45,13 +45,7 @@ layout(set = 0, binding = 4) uniform sampler2D ambi_pre_pass1Feedback;
 #define SourceTexture Source
 #define SourceTextureSize params.SourceSize
 
-// What follows is an ugly optimization with a lot of code copied and pasted repeated multiple times,
-// shamlessly hidden into an include:
-#include "blooms.include.slang" 
-
 #include "functions.include.slang"
-
-
 
 vec3 circle_smooth(vec2 coords, vec2 middle, float f_radius, float FALLOFF, float f_lod) {
     float distanza=distance(middle,vec2(coords.x,coords.y));

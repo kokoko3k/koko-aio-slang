@@ -18,7 +18,6 @@ layout(location = 0) out vec2 vTexCoord;
 layout(location = 1) out vec2 vOutputCoord;
 
 
-#include "functions.include.slang"
 void main() {
    gl_Position = global.MVP * Position;
    //vTexCoord = get_scaled_coords(TexCoord);
@@ -33,6 +32,7 @@ layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D FXAA_pass;
 layout(set = 0, binding = 3) uniform sampler2D first_pass;
 layout(set = 0, binding = 4) uniform sampler2D in_glow_and_scanline_flickering_pass;
+
 // What follows is an ugly optimization with a lot of code copied and pasted repeated multiple times,
 // shamlessly hidden into an include:
 #include "pixel_glows.include.slang"    
