@@ -39,7 +39,7 @@ void main() {
         }
         if (DO_BEZEL == 1.0) {
             //Create a small mipmap to be used to light the bezel corners.
-            pixel_out.rgb = textureLod(Source, vTexCoord,lod).rgb;
+            pixel_out.rgb = textureLod(Source, vTexCoord,lod).rgb + (pixel_out.a*0.5);
         }
         FragColor = pixel_out;
         
