@@ -135,21 +135,20 @@ vec3 compose_bezel_over(vec3 full_viewport) {
     //Generate the reflection area and mix it over the bezel:    
         float reflection = quad_smoothstep( zoomout_coords(vTexCoord, -BEZEL_FRAME_ZOOM, 1.0) , BEZEL_REF_START,BEZEL_REF_END );
 
-        //Take the reflection modifier from the texture blue component into account; it is/may be used to lower the reflection in the corners.
-            reflection = (reflection * 1.4 -  0.4)  * bezel.b ;
-            reflection = clamp (reflection, 0.0, 1.0);
+    //Take the reflection modifier from the texture blue component into account; it is/may be used to lower the reflection in the corners.
+        reflection = (reflection * 1.4 -  0.4)  * bezel.b ;
+        reflection = clamp (reflection, 0.0, 1.0);
         vec3 bezel_out = bezel_colored + (pixel_mirrored *reflection) ;
 
     //Mix a bit of ambient light over the bezel
         vec4 pixel_avglum = texture(avglum_pass,vOutputCoord);
         bezel_out = bezel_out + (pixel_avglum.rgb * 0.05);
-//bezel_out = vec3(0.1);
-//bezel_out = bezel_colored;
+
     //We use the green component to express Hardness/Specularity; there the reflection will be completely diffused.
     //For the task, we use a mipmap whit adeguate precision.
         float lut_hardness = bezel.g;
         if (lut_hardness > 0.0) {
-            bezel_out = bezel_out + ( pixel_avglum.rgb * lut_hardness/3.5);
+            bezel_out = bezel_out + ( ( pixel_avglum.rgb + pixel_avglum.a*0.5)       * lut_hardness/3.5);
         } 
          
     return mix(full_viewport, bezel_out, bezel.a);

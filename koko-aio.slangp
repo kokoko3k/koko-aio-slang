@@ -93,6 +93,7 @@ Total basal + all the features: 72.2                65.3 .. 69.9(bloom hq)
             monitor_body = "textures/f1.png"
      monitor_body_linear = "true"
   monitor_body_wrap_mode = "clamp_to_edge" //Does this work?
+  monitor_body_mipmap = "true"
 
 
 
