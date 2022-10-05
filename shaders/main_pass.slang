@@ -262,25 +262,25 @@ void main() {
     
    //FIXME: bezel may need a wider border when zoomed in.
             //But for performance reasons we can wide the border in relation to the desidered reflection area.
-            //by now, just wide it to the screen content.
+            //by now, just wide by BEZEL_REFLECTION_AREA_SIZE defined in config.inc
 
     bool is_border = false;
     
     if (border_needed()) {
-        float WIDEN = 0.0;
-        if (DO_BEZEL == 1.0) WIDEN = BEZEL_REF_END - BEZEL_REF_START;
-   
+
+        float WIDEN = DO_BEZEL * BEZEL_REFLECTION_AREA_SIZE;
         bool b_is_rotated = is_rotated();
         bool is_outside_x = ((coords.x > 1.0+WIDEN ) || (coords.x < 0.0 - WIDEN) );
         bool is_outside_y = ((coords.y > 1.0+WIDEN ) || (coords.y < 0.0 - WIDEN) );
         is_border = (b_is_rotated && is_outside_y) || (!b_is_rotated && is_outside_x);
-
    }
    
    if (is_border)
        FragColor = mark_outer_frame(vec3(0.0));
    else
        FragColor = main_wrap(coords_curved);
+
+       
 }
 
 

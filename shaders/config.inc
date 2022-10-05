@@ -2,7 +2,9 @@
 #define MIN_LINES_INTERLACED 300	//Consider content interlaced if lines are more than this
 #define noisepower ((params.OutputSize.w + params.OutputSize.z)*1.5)         //Sort of dithering
 #define scene_change_threshold 0.07  // 0.0-1.0: sensitivity to scene change (ambilike stuff), 0.0 changes more
-#define BLOOM_THRESHOLD 0.5
+
+#define BEZEL_REFLECTION_AREA_SIZE 0.1;  //Bezel reflection area size in relation to the game frame
+
 
 layout(push_constant) uniform Push
 {

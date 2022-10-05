@@ -5,21 +5,28 @@
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
+
 layout(location = 0) out vec2 vTexCoord;
 layout(location = 1) out vec2 vOutputCoord;
+layout(location = 2) out float bezel_frame_lod;
 
 #include "functions.include.slang"
+
+
 void main() {
     gl_Position = global.MVP * Position;
     vTexCoord = get_scaled_coords(TexCoord,global.FinalViewportSize, is_rotated());
     vOutputCoord = TexCoord;
+    bezel_frame_lod = log2(global.monitor_bodySize.y * (BEZEL_FRAME_ZOOM+1.0) /global.FinalViewportSize.y);
 }
 
 
 #pragma stage fragment
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in vec2 vOutputCoord;
+layout(location = 2) in float bezel_frame_lod;
 layout(location = 0) out vec4 FragColor;
+
 layout(set = 0, binding = 2) uniform sampler2D main_pass;
 layout(set = 0, binding = 3) uniform sampler2D bloom_pass_final;
 layout(set = 0, binding = 4) uniform sampler2D reflected_blurred_pass2;
@@ -86,28 +93,6 @@ vec3 bezel_color(float lum)  {
 
 vec2 coords_curved = vTexCoord ; //FIXME how bad is this global variable?
 
-float quad_smoothstep(vec2 co, float smooth_end, float smooth_start) {
-    float mysmoothstep;
-    mysmoothstep =              smoothstep(smooth_start, smooth_end, co.x);
-    //return mysmoothstep;
-    mysmoothstep = min( mysmoothstep, smoothstep(1.0-smooth_start,1.0-smooth_end , co.x) );
-    //return mysmoothstep;
-    mysmoothstep = min( mysmoothstep, smoothstep(smooth_start, smooth_end, co.y) );
-    //return mysmoothstep;
-    mysmoothstep = min( mysmoothstep, smoothstep(1.0-smooth_start  , 1.0-smooth_end, co.y) );
-    return mysmoothstep;
-}
-
-/*float borderframe(vec2 co, float thickness) {
-    //float borderout = border(co);
-    float borderin = border(zoom(co,1-thickness));
-
-    vec2 br = step(vec2(0.0), co );       // bottom-right
-    vec2 tl = step(vec2(0.0), 1.0 - co ); // top-left
-    float borderout = tl.x * tl.y * br.x * br.y ;
-    return borderout-borderin;
-}*/
-
 vec3 compose_bezel_over(vec3 full_viewport) {
 
     vec2 coords_for_bezel = vTexCoord;
@@ -120,7 +105,7 @@ vec3 compose_bezel_over(vec3 full_viewport) {
     if (coords_for_bezel.x < 0  || coords_for_bezel.y < 0 || coords_for_bezel.x > 1.0 || coords_for_bezel.y > 1.0) return full_viewport;
 
     //Main lut:
-    vec4 bezel = texture(monitor_body,coords_for_bezel);
+    vec4 bezel = textureLod(monitor_body,coords_for_bezel,bezel_frame_lod);
 
     //No need to draw anything on full alpha:
     if (bezel.a == 0.0) return full_viewport;
@@ -132,13 +117,12 @@ vec3 compose_bezel_over(vec3 full_viewport) {
     vec3 pixel_mirrored = texture(reflected_blurred_pass2,
                           coords_for_mirror + displace( global.FinalViewportSize.z ) ).rgb;
 
-    //Generate the reflection area and mix it over the bezel:    
-        float reflection = quad_smoothstep( zoomout_coords(vTexCoord, -BEZEL_FRAME_ZOOM, 1.0) , BEZEL_REF_START,BEZEL_REF_END );
-
     //Take the reflection modifier from the texture blue component into account; it is/may be used to lower the reflection in the corners.
-        reflection = (reflection * 1.4 -  0.4)  * bezel.b ;
-        reflection = clamp (reflection, 0.0, 1.0);
-        vec3 bezel_out = bezel_colored + (pixel_mirrored *reflection) ;
+        //float reflection = (reflection_shade * 1.4 -  0.4)  * bezel.b ;
+        //reflection = clamp (reflection, 0.0, 1.0);
+        float reflection = bezel.b;
+
+        vec3 bezel_out = bezel_colored + (pixel_mirrored * reflection * 0.5) ;
 
     //Mix a bit of ambient light over the bezel
         vec4 pixel_avglum = texture(avglum_pass,vOutputCoord);
