@@ -24,6 +24,7 @@ layout(set = 0, binding = 4) uniform sampler2D avglum_pass;
 layout(set = 0, binding = 5) uniform sampler2D avglum_passFeedback;
 
 #define max_steps ambi_steps
+#define fast_step 0.2
 
 float ambi_step(float start, float end, float mystep) {
     float diff = start-end;
@@ -43,26 +44,37 @@ vec3 ambi_step_rgb(vec3 s,vec3 d, vec3 mystep){
 }
 
 
-vec3 pixel_ambilight() {
+vec4 pixel_ambilight() {
+    vec3 mystep;
+    //stiamo cambiando scena?
+    vec4 previous_pixel_vec4 = texture(PreviousSampler, vTexCoord);
+    vec3 current_pixel =  texture(CurrentSampler, vTexCoord).rgb;
+    vec3 previous_pixel = previous_pixel_vec4.rgb;
+    
+    float scene_change_remaining = previous_pixel_vec4.a;
+    
     float prev_avg_lum = texture(avglum_passFeedback,vec2(0.5,0.5)).a;
     float curr_avg_lum = texture(avglum_pass        ,vec2(0.5,0.5)).a;
     float diff_avg_lum = abs(prev_avg_lum - curr_avg_lum);
 
-    vec3 previous_pixel = texture(PreviousSampler, vTexCoord).rgb;
-    vec3 current_pixel =  texture(CurrentSampler, vTexCoord).rgb;
-
-    vec3 mystep = vec3(1.0);
-    if (diff_avg_lum <= scene_change_threshold )
+    if (diff_avg_lum >= scene_change_threshold) {
+        scene_change_remaining = 1.0;
+    }
+    
+    if (scene_change_remaining > 0.0) {
+        mystep = vec3(fast_step);
+        scene_change_remaining -=  fast_step;
+            } else {
         mystep = abs((previous_pixel-current_pixel) / max_steps);
-        
-    vec3 outmix=ambi_step_rgb(previous_pixel,current_pixel,mystep);
-    return outmix;
+    }
+    return vec4(ambi_step_rgb(previous_pixel,current_pixel,mystep),scene_change_remaining);
+
 }
 
 
 #include "functions.include.slang"
 void main() {
     if (DO_AMBILIGHT != 1.0) return;
-    FragColor = vec4(pixel_ambilight(),0.0);
+    FragColor = pixel_ambilight();
 
 }

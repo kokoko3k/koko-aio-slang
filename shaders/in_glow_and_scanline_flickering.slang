@@ -99,6 +99,7 @@ void main() {
       //FragColor=vec4(abs(sin(params.FrameCount/3.14/20))); //white fade
       //FragColor=vec4(abs(sin(params.FrameCount/3.14/20)),0.0,0.0,0.0); //red fade
       //FragColor=vec4(0.8);
+      //if  (mod(params.FrameCount,10) == 0) FragColor=vec4(0.0) ; else FragColor=vec4(1.0);
       //return;
 
    bool is_interlaced = (params.OriginalSize.y > MIN_LINES_INTERLACED) ? true : false ;

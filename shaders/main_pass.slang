@@ -34,7 +34,6 @@ void main() {
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in vec2 vOutputCoord;
 layout(location = 0) out vec4 FragColor;
-layout(set = 0, binding = 2) uniform sampler2D Original;
 layout(set = 0, binding = 3) uniform sampler2D FXAA_pass;
 layout(set = 0, binding = 4) uniform sampler2D in_glow_and_scanline_flickering_pass;
 layout(set = 0, binding = 5) uniform sampler2D halo_pass;
