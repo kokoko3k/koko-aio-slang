@@ -2,9 +2,7 @@
 #define MIN_LINES_INTERLACED 300	//Consider content interlaced if lines are more than this
 #define noisepower ((params.OutputSize.w + params.OutputSize.z)*1.5)         //Sort of dithering
 #define scene_change_threshold 0.07  // 0.0-1.0: sensitivity to scene change (ambilike stuff), 0.0 changes more
-
 #define BEZEL_REFLECTION_AREA_SIZE 0.1;  //Bezel reflection area size in relation to the game frame
-
 
 layout(push_constant) uniform Push
 {
@@ -78,8 +76,6 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float BEZEL_G;
 	float BEZEL_B;
 	float BEZEL_CON;
-	float BEZEL_REF_START;
-	float BEZEL_REF_END;
 	float BEZEL_INNER_ZOOM;
 	float BEZEL_IMAGE_BORDER;
 	float BEZEL_FRAME_ZOOM;
@@ -95,6 +91,9 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float v_size;
 	float v_power;
 	float v_bypass;
+
+	float DO_DYNZOOM;
+	float DYNZOOM_FACTOR;
 	
 	float DO_AMBILIGHT;
 	float AMBI_FALLOFF;
@@ -208,7 +207,6 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter bloom_bypass       "        Bypass"					0.0  0.0 1.0  1.0
 
 
-
 // Gamma and saturation correction
 // Correct the final gamma of the image
 // To have more or less saturated colors use "saturation" > 1 or "saturation" < 1
@@ -231,27 +229,14 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter BEZEL_G            "        Bezel color: Green"		-0.3   -0.5 0.5  0.01
 #pragma parameter BEZEL_B            "        Bezel color: Blue"		-0.3   -0.5 0.5  0.01
 #pragma parameter BEZEL_CON          "        Bezel Contrast"			1.3   0.0  10.0 0.01
-#pragma parameter BEZEL_REF_START    "        Reflection area start"	0.89   0.5  1.0  0.005
-#pragma parameter BEZEL_REF_END      "        Reflection area end"		1.0   0.5  1.0  0.005
 #pragma parameter BEZEL_INNER_ZOOM   "        Image zoom"			-0.18   -0.5 0.5 0.01
 #pragma parameter BEZEL_FRAME_ZOOM   "        Frame zoom"			0.0   -0.5 0.5 0.01
 #pragma parameter BEZEL_IMAGE_BORDER "        Image border"			1.01   1.0 1.2 0.01
 
 
-//Vignette and spot
-
-#pragma parameter DO_VIGNETTE	"★ Vignette"			0.0  0.0  1.0  1.0
-#pragma parameter v_bypass	"        bypass "	        	0.0  0.0  1.0  1.0
-#pragma parameter v_size	"        size"			1.7  0.0  3.0  0.05
-#pragma parameter v_power	"        power"			1.1  0.05 2.0  0.05
-
-#pragma parameter DO_SPOT	"★ Spot"			0.0   0.0   1.0 1.0
-#pragma parameter s_bypass	"        bypass"	        0.0   0.0   1.0 1.0
-#pragma parameter s_center_x 	"        x position"	0.65  -1.5  1.5 0.05
-#pragma parameter s_center_y	"        y postion "	-0.5  -1.5  1.5 0.05
-#pragma parameter s_size	"        size"		0.1   0.0  1.0 0.01
-#pragma parameter s_power	"        power" 		0.15  0.05  2.0 0.05
-
+//Full screen glowing
+#pragma parameter DO_DYNZOOM	     "★ Luminosity dependant zoom"			1.0   0.0   1.0  1.0
+#pragma parameter DYNZOOM_FACTOR     "        narrowness"				55.0  30.0  99.0 1.0
 
 //Back leds
 //Emulates leds under the monitor frame that slowly reacts to image contents
@@ -268,6 +253,21 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter label_aspect_preset3 "          (-3 = Snes 8/7)" 0.0 0.0 0.0 1.0
 #pragma parameter label_aspect_preset4 "          (-4 = Megadrive 10/7)" 0.0 0.0 0.0 1.0
 #pragma parameter label_aspect_preset5 "          (-5 = Uncorrected)" 0.0 0.0 0.0 1.0
+
+//Vignette and spot
+
+#pragma parameter DO_VIGNETTE	"★ Vignette"			0.0  0.0  1.0  1.0
+#pragma parameter v_bypass	"        bypass "	        	0.0  0.0  1.0  1.0
+#pragma parameter v_size	"        size"			1.7  0.0  3.0  0.05
+#pragma parameter v_power	"        power"			1.1  0.05 2.0  0.05
+
+#pragma parameter DO_SPOT	"★ Spot"			0.0   0.0   1.0 1.0
+#pragma parameter s_bypass	"        bypass"	        0.0   0.0   1.0 1.0
+#pragma parameter s_center_x 	"        x position"	0.65  -1.5  1.5 0.05
+#pragma parameter s_center_y	"        y postion "	-0.5  -1.5  1.5 0.05
+#pragma parameter s_size	"        size"		0.1   0.0  1.0 0.01
+#pragma parameter s_power	"        power" 		0.15  0.05  2.0 0.05
+
 
 // Alternative blanking.
 // Emulates the low pixel persistance of CRT monitors and reduces the motion blur,
@@ -340,8 +340,6 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #define BEZEL_G            global.BEZEL_G
 #define BEZEL_B            global.BEZEL_B
 #define BEZEL_CON          global.BEZEL_CON
-#define BEZEL_REF_START    global.BEZEL_REF_START
-#define BEZEL_REF_END      global.BEZEL_REF_END
 #define BEZEL_INNER_ZOOM   global.BEZEL_INNER_ZOOM
 #define BEZEL_FRAME_ZOOM   global.BEZEL_FRAME_ZOOM
 #define BEZEL_IMAGE_BORDER global.BEZEL_IMAGE_BORDER
@@ -353,6 +351,8 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #define s_size     global.s_size
 #define s_power    global.s_power
 
+#define DO_DYNZOOM      global.DO_DYNZOOM
+#define DYNZOOM_FACTOR  global.DYNZOOM_FACTOR
 
 #define DO_VIGNETTE  global.DO_VIGNETTE
 #define v_bypass     global.v_bypass

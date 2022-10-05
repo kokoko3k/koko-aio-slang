@@ -39,6 +39,7 @@ layout(set = 0, binding = 3) uniform sampler2D FXAA_pass;
 layout(set = 0, binding = 4) uniform sampler2D in_glow_and_scanline_flickering_pass;
 layout(set = 0, binding = 5) uniform sampler2D halo_pass;
 layout(set = 0, binding = 6) uniform sampler2D first_pass;
+layout(set = 0, binding = 7) uniform sampler2D avglum_passFeedback;
 
 
 
@@ -248,7 +249,14 @@ vec4 main_wrap(vec2 co) {
 
 void main() {
     vec2 coords = vTexCoord;
-    vec2 coords_curved = vTexCoord;
+    
+    if (DO_DYNZOOM == 1.0) {
+        float zoomin = 1.0 + (texture(avglum_passFeedback,vTexCoord).a/ DYNZOOM_FACTOR);
+        coords = zoom(vTexCoord, zoomin);
+    }
+    
+    vec2 coords_curved = coords;
+
     //Curvature: set coords_curved coordinate: (global var)
         if (DO_CURVATURE == 1.0) {
             if ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0))
