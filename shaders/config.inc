@@ -1,8 +1,28 @@
 #define GLOW_SHARP_MAX 6	        //This has to be the same as the max used for in_glow_wh
 #define MIN_LINES_INTERLACED 300	//Consider content interlaced if lines are more than this
-#define noisepower ((params.OutputSize.w + params.OutputSize.z)*1.5)         //Sort of dithering
-#define scene_change_threshold 0.07  // 0.0-1.0: sensitivity to scene change (ambilike stuff), 0.0 changes more
-#define BEZEL_REFLECTION_AREA_SIZE 0.1;  //Bezel reflection area size in relation to the game frame
+
+//Sort of dithering used in vignette, spot, backlight leds
+	#define NOISEPOWER ((params.OutputSize.z)*3)
+
+	//Bezel reflection area size in relation to the game frame
+	//Use the lowest possible value for best performance
+#define BEZEL_REFLECTION_AREA_SIZE 0.1;
+
+	// 0.0-1.0: sensitivity to scene change (ambilike stuff), 0.0 changes more
+#define AMBI_SCENE_CHG_THRSHLD 0.07  
+	
+	// The following will allow to sample at reduced interval
+	// The scene change detection logic will take advantage of it
+	// So that quick fades will still be treated as scene changes
+#define AMBI_AVGLUM_DIVIDER 4
+
+	// The following defines the speed of the color fades 
+	// when changing scene. (range 0..1)
+	// It is wise to correlate it with avglum_divider
+	// try between (1/avglum_divider) and (1/avglum_divider)/3
+#define AMBI_FAST_STEP 0.125 
+
+
 
 layout(push_constant) uniform Push
 {

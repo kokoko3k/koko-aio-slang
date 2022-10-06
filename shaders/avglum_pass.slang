@@ -21,27 +21,52 @@ layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in float lod;
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D Source;
+layout(set = 0, binding = 3) uniform sampler2D avglum_passFeedback;
 
+/* The following will allow to sample at reduced interval
+   The scene change detection logic will take advantage of it
+   So that quick fades will still be treated as scene changes
+*/
+// #define avglum_divider 4  <-- in config.inc
 
+float get_avg_lum_from_mip() {
+    vec4 mip = textureLod(Source, vec2(0.5,0.5),20.0);
+    return (mip.r+mip.g+mip.b)/3.0;
+}
+
+float get_avglum() {
+    bool coordinate_for_scene_detection = 
+            vTexCoord.x > 0.24 && vTexCoord.x < 0.26 &&
+            vTexCoord.y > 0.24 && vTexCoord.y < 0.26 ;
+            
+    bool reduced_sample_time_is_now = (mod(params.FrameCount,AMBI_AVGLUM_DIVIDER) == 0);
+
+    if (!coordinate_for_scene_detection) return get_avg_lum_from_mip();
+    if (reduced_sample_time_is_now)      return get_avg_lum_from_mip();
+    if (coordinate_for_scene_detection && reduced_sample_time_is_now) return get_avg_lum_from_mip();
+    //else siamo nella zona coordinate in un tempo che non è di sample
+    return texture(avglum_passFeedback,vTexCoord).a;
+}
 
 void main() {
     /*Grab a mipmap from the previous pass.
       Calculate the average luminance from the smallest mipmap and put into the alpha channel
-      So that can be used by the scene detection logic.
+      So that can be used:
+      1 - continuously at coordinate 0.5,0.5
+      2 - sampled less often for scene detection logic at coordinate 0.25,0.25
       Put another small mipmap into the rgb channel to be used by the reflection code.
     */
-    vec4 pixel_out;
+   vec4 pixel_out;
     if (DO_AMBILIGHT == 1.0 || DO_BEZEL == 1.0) {
         if (DO_AMBILIGHT == 1.0)  {
-            //pixel_out.rgb = textureLod(Source, vec2(0.5,0.5),20.0).rgb;
-            vec4 mip = textureLod(Source, vec2(0.5,0.5),20.0);
-            pixel_out.a = (mip.r+mip.g+mip.b)/3.0;
+          pixel_out.a = get_avglum();
         }
         if (DO_BEZEL == 1.0) {
             //Create a small mipmap to be used to light the bezel corners.
             pixel_out.rgb = textureLod(Source, vTexCoord,lod).rgb;
         }
         FragColor = pixel_out;
-        
+     
     }
+     
 }

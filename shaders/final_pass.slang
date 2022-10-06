@@ -206,7 +206,7 @@ vec4 pixel_inner_frame() {
 
 vec4 main_wrap(){
     /* Handle inner border and outer border, not bezel */
-    if (DO_VIGNETTE + DO_SPOT + DO_AMBILIGHT >0.0) global_noise = random(noisepower);
+    if (DO_VIGNETTE + DO_SPOT + DO_AMBILIGHT >0.0) global_noise = random(NOISEPOWER);
     //Just do pixel_inner_frame() and exit when there is no need to paint border.
     if (!border_needed()) return pixel_inner_frame();
 

@@ -24,7 +24,7 @@ layout(set = 0, binding = 4) uniform sampler2D avglum_pass;
 layout(set = 0, binding = 5) uniform sampler2D avglum_passFeedback;
 
 #define max_steps ambi_steps
-#define fast_step 0.2
+
 
 float ambi_step(float start, float end, float mystep) {
     float diff = start-end;
@@ -53,19 +53,20 @@ vec4 pixel_ambilight() {
     
     float scene_change_remaining = previous_pixel_vec4.a;
     
-    float prev_avg_lum = texture(avglum_passFeedback,vec2(0.5,0.5)).a;
-    float curr_avg_lum = texture(avglum_pass        ,vec2(0.5,0.5)).a;
+    float prev_avg_lum = texture(avglum_passFeedback,vec2(0.25,0.25)).a;
+    float curr_avg_lum = texture(avglum_pass        ,vec2(0.25,0.25)).a;
     float diff_avg_lum = abs(prev_avg_lum - curr_avg_lum);
 
-    if (diff_avg_lum >= scene_change_threshold) {
+    if (diff_avg_lum >= AMBI_SCENE_CHG_THRSHLD) {
         scene_change_remaining = 1.0;
     }
     
     if (scene_change_remaining > 0.0) {
-        mystep = vec3(fast_step);
-        scene_change_remaining -=  fast_step;
+        mystep = vec3(max(1.0/max_steps, AMBI_FAST_STEP)); // <- Never slow down fades due to fast step when changing scene
+        scene_change_remaining -=  AMBI_FAST_STEP;
             } else {
         mystep = abs((previous_pixel-current_pixel) / max_steps);
+        
     }
     return vec4(ambi_step_rgb(previous_pixel,current_pixel,mystep),scene_change_remaining);
 
