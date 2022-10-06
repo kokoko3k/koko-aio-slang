@@ -44,11 +44,11 @@ vec4 main_wrap(void) {
     vec2 halo_coords = vTexCoord;
 
     if (DO_IN_GLOW == 1.0)
-        pixel_haloed = pixel_glow(in_glow_and_scanline_flickering_pass, halo_w,halo_h,halo_power,halo_gamma,halo_coords, global.FXAA_passSize, global.FXAA_passSize).rgb;
+        pixel_haloed = pixel_glow(in_glow_and_scanline_flickering_pass, HALO_W,HALO_H,HALO_POWER,HALO_GAMMA,halo_coords, global.FXAA_passSize, global.FXAA_passSize).rgb;
     else if (DO_FXAA == 1.0)
-        pixel_haloed = pixel_glow(FXAA_pass, halo_w,halo_h,halo_power,halo_gamma,halo_coords, global.FXAA_passSize, global.FXAA_passSize).rgb;
+        pixel_haloed = pixel_glow(FXAA_pass, HALO_W,HALO_H,HALO_POWER,HALO_GAMMA,halo_coords, global.FXAA_passSize, global.FXAA_passSize).rgb;
     else
-        pixel_haloed = pixel_glow(first_pass, halo_w,halo_h,halo_power,halo_gamma,halo_coords, global.FXAA_passSize, global.FXAA_passSize).rgb;
+        pixel_haloed = pixel_glow(first_pass, HALO_W,HALO_H,HALO_POWER,HALO_GAMMA,halo_coords, global.FXAA_passSize, global.FXAA_passSize).rgb;
         
     return vec4(pixel_haloed.rgb,1.0);
 }

@@ -2,8 +2,8 @@
 
 DO_BLOOM = "1.0"
 	BLOOM_MIX = "0.20"
-	bloom_size = "3.5"
-	bloom_quality = "2.0"
-	bloom_gamma = "4.0"
-	bloom_power = "3.4"
-	bloom_gamma_out = "10.0"
+	BLOOM_SIZE = "3.5"
+	BLOOM_QUALITY = "2.0"
+	BLOOM_GAMMA = "4.0"
+	BLOOM_POWER = "3.4"
+	BLOOM_GAMMA_out = "10.0"

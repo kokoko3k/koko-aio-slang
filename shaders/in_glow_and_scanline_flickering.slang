@@ -35,9 +35,9 @@ layout(set = 0, binding = 4) uniform sampler2D first_pass;
 
 bool flickering_scanline_needed(bool is_interlaced){
    if (DO_SCANLINES == 1.0) {
-      if (scanline_flickering != 0.0) {
+      if (SCANLINE_FLICKERING != 0.0) {
          if ( scanline_have_to_flicker(is_interlaced) ) {
-            if  (! ( is_interlaced && (scanline_disable_on_interlace == 1.0))  ) {
+            if  (! ( is_interlaced && (SCANLINE_DISABLE_ON_INTERLACE == 1.0))  ) {
                return true;
             }
          }
@@ -80,7 +80,7 @@ vec3 flickering_scanline(vec3 pixel_in, bool is_interlaced, vec2 vTexCoord) {
    
    //Do flickering based on user prefs.
    //(blank odd lines on odd frames and even lines on even frames)
-   if ((scanline_flickering == 1.0) || ((scanline_flickering==2.0) && is_interlaced )) {
+   if ((SCANLINE_FLICKERING == 1.0) || ((SCANLINE_FLICKERING==2.0) && is_interlaced )) {
          if  (int(mod(float(params.FrameCount),2  )) <  1.0 ) {
                if (mymod >= scanline_period_half) { return get_scanline_mixed(pixel_in) ; }
          } else {
@@ -115,9 +115,9 @@ void main() {
    if (DO_IN_GLOW == 1.0) {
       vec3 pixel_glowed;
       if (DO_FXAA == 1.0)
-         pixel_glowed = pixel_glow(FXAA_pass, in_glow_wh,in_glow_wh,in_glow_power,in_glow_gamma,vTexCoord, global.FXAA_passSize, global.FXAA_passSize).rgb;
+         pixel_glowed = pixel_glow(FXAA_pass, IN_GLOW_WH,IN_GLOW_WH,IN_GLOW_POWER,IN_GLOW_GAMMA,vTexCoord, global.FXAA_passSize, global.FXAA_passSize).rgb;
             else
-         pixel_glowed = pixel_glow(first_pass, in_glow_wh,in_glow_wh,in_glow_power,in_glow_gamma,vTexCoord, global.FXAA_passSize, global.FXAA_passSize).rgb;
+         pixel_glowed = pixel_glow(first_pass, IN_GLOW_WH,IN_GLOW_WH,IN_GLOW_POWER,IN_GLOW_GAMMA,vTexCoord, global.FXAA_passSize, global.FXAA_passSize).rgb;
          
          if (IN_GLOW_ADD>0.0) pixel_glowed = mix(pixel_glowed,pixel_out+pixel_glowed,IN_GLOW_ADD);
          pixel_out = pixel_glowed;

@@ -23,7 +23,7 @@ layout(set = 0, binding = 3) uniform sampler2D PreviousSampler;
 layout(set = 0, binding = 4) uniform sampler2D avglum_pass;
 layout(set = 0, binding = 5) uniform sampler2D avglum_passFeedback;
 
-#define max_steps ambi_steps
+#define max_steps AMBI_STEPS
 
 
 float ambi_step(float start, float end, float mystep) {

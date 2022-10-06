@@ -156,7 +156,7 @@ vec4 pixel_inner_frame() {
     //Mix bloom texture
         if (DO_BLOOM == 1.0 ) {
             bloomed=texture(bloom_pass_final, coords_curved).rgb ;
-            if (bloom_bypass == 1.0)
+            if (BLOOM_BYPASS == 1.0)
                 pixel_out = bloomed;
             else
                 pixel_out = pixel_out + (bloomed * BLOOM_MIX );
@@ -174,18 +174,18 @@ vec4 pixel_inner_frame() {
             if (DO_VIGNETTE == 1.0) {
                 float vignette;
                 float dist = length(vec2((coords_curved.x-0.5)*in_aspect,coords_curved.y-0.5)); //dist = length(vec2(coords_curved.x*in_aspect-(in_aspect*0.5),coords_curved.y-0.5));
-                vignette = smoothstep(v_size,0.0,dist)*v_power+global_noise;
-                if (v_bypass < 1.0) pixel_out = vignette * pixel_out;
+                vignette = smoothstep(V_SIZE,0.0,dist)*V_POWER+global_noise;
+                if (V_BYPASS < 1.0) pixel_out = vignette * pixel_out;
                     else
                 pixel_out = vec3(vignette);
             }
 
             if (DO_SPOT == 1.0) {
             float spot;
-            vec2 s_offset = vec2(-s_center_x,-s_center_y);
+            vec2 s_offset = vec2(-S_CENTER_X,-S_CENTER_Y);
             float dist = length(vec2((coords_curved.x-0.5)*in_aspect,coords_curved.y-0.5)+s_offset); //dist = length(vec2(coords_curved.x*in_aspect-in_aspect*0.5),coords_curved.y-0.5));
-            spot = smoothstep(s_size,0.0,dist)*s_power+global_noise;
-            if (s_bypass < 1.0) pixel_out = spot + pixel_out;
+            spot = smoothstep(S_SIZE,0.0,dist)*S_POWER+global_noise;
+            if (S_BYPASS < 1.0) pixel_out = spot + pixel_out;
                 else
             pixel_out = vec3(spot);
             }

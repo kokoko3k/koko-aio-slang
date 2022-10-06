@@ -45,7 +45,7 @@ Total basal + all the features: 72.2                65.3 .. 69.9(bloom hq)
 
     Actually it provides emulation for:
         scanlines, screenlines, RGB vertical masks, horizontal slot masks,
-        glowing, haloing, blooming, gamma and saturation correction,pixel_outi
+        glowing, haloing, blooming, gamma and SATURATION correction,pixel_outi
         
         black frame insertions, interlace emulation, antialiasing.
 

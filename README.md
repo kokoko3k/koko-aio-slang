@@ -16,7 +16,7 @@ Several presets are included.<br>
 * Input signal glowing
 * Output signal glowing
 * Blooming
-* Gamma and saturation correction,
+* Gamma and SATURATION correction,
 * Black frame insertions through alternate blanking
 * Interlace forcing and emulation
 * Antialiasing

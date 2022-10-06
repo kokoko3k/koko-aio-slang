@@ -184,7 +184,7 @@ vec4 main_wrap(vec2 co) {
     // Non flickering scanlines
     if ( DO_SCANLINES == 1.0 )  {
         if  (!flickering_scanlines) {  //flickering scanlines are handled in previous pass
-            if  (! ( isinterlaced  && (scanline_disable_on_interlace == 1.0))  ) {
+            if  (! ( isinterlaced  && (SCANLINE_DISABLE_ON_INTERLACE == 1.0))  ) {
                 pixel_scanlined = pixel_scanline_static(pixel_out,co);
                 pixel_scanlined = min(vec3(1.0),pixel_scanlined);
                 pixel_out = min(vec3(1.0),pixel_out);
@@ -236,9 +236,9 @@ vec4 main_wrap(vec2 co) {
     }
 
     //Saturation modifier
-    if (!(saturation == 1.0)) {
+    if (!(SATURATION == 1.0)) {
         float l = length(pixel_out);
-        pixel_out =  normalize( pow(pixel_out.rgb + vec3(eps), vec3(saturation)))*l  ;
+        pixel_out =  normalize( pow(pixel_out.rgb + vec3(eps), vec3(SATURATION)))*l  ;
     }
 
     

@@ -28,9 +28,9 @@ layout(set = 0, binding = 2) uniform sampler2D first_pass;
 void main() {
 
     if (DO_BLOOM == 1.0 ) {
-        vec3 bloomed = bloom(bloom_directions,bloom_quality,bloom_size,bloom_gamma) * bloom_power;
-        //vec3 bloomed = bloom_new(SourceTexture, vTexCoord, bloom_size, bloom_quality, BLOOM_THRESHOLD) * bloom_power;
-        FragColor = vec4(pow(bloomed,vec3(bloom_gamma_out)),1.0);
+        vec3 bloomed = bloom(bloom_directions,BLOOM_QUALITY,BLOOM_SIZE,BLOOM_GAMMA) * BLOOM_POWER;
+        //vec3 bloomed = bloom_new(SourceTexture, vTexCoord, BLOOM_SIZE, BLOOM_QUALITY, BLOOM_THRESHOLD) * BLOOM_POWER;
+        FragColor = vec4(pow(bloomed,vec3(BLOOM_GAMMA_out)),1.0);
     } else {
         return ;
     }

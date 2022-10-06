@@ -1,5 +1,11 @@
-#define GLOW_SHARP_MAX 6	        //This has to be the same as the max used for in_glow_wh
-#define MIN_LINES_INTERLACED 300	//Consider content interlaced if lines are more than this
+	//Setting the glow/halo sharpness parameter to this
+	//will skip the blurring phase and lowers the gpu use
+	//Set this to the same value as used for the maximum
+	//of IN_GLOW_WH, HALO_W and HALO_H
+#define GLOW_SHARP_MAX 6	        
+
+	//Consider content interlaced if lines are more than this
+#define MIN_LINES_INTERLACED 300
 
 //Sort of dithering used in vignette, spot, backlight leds
 	#define NOISEPOWER ((params.OutputSize.z)*3)
@@ -37,24 +43,26 @@ layout(push_constant) uniform Push
 	float DRKLN_OVERWHITE ;
 	float DO_DARKLINES_VOFFSET ;
 	float DARKLINES_PERIOD ;
-	float halo_w ;
-	float halo_h ;
-	float halo_power ;
-	float halo_gamma ;
+	float HALO_W ;
+	float HALO_H ;
+	float HALO_POWER ;
+	float HALO_GAMMA ;
 	float DO_BLOOM ; //4
- 	float bloom_quality ; //1
-	//float prefer_std_pow; 
+ 	float BLOOM_QUALITY ; //1
+
 } params;
 
 layout(std140, set = 0, binding = 0) uniform UBO
 {
 	mat4 MVP;
+	
 	vec4 FinalViewportSize;
 	vec4 in_glow_and_scanline_flickering_passSize;
 	vec4 FXAA_passSize;
 	vec4 main_passSize;
 	vec4 monitor_bodySize;
 	vec4 first_passSize;
+	
 	float DO_SCANLINES;
 	float DO_IN_GLOW;
 	float DO_RGB_MASK ;
@@ -64,24 +72,24 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float DO_ALT_BLANK;
 	float IN_GLOW_ADD ;
 	float GLOW_OVER_DARK_SCANLINES ;
-	float in_glow_wh ;
-	float in_glow_power ;
-	float in_glow_gamma ;
+	float IN_GLOW_WH ;
+	float IN_GLOW_POWER ;
+	float IN_GLOW_GAMMA ;
 	float BLOOM_MIX;
- 	float bloom_size ; //1
-	float bloom_gamma; //1
-	float bloom_bypass; //1
-	float bloom_power; //1
-  	float bloom_gamma_out; 
+ 	float BLOOM_SIZE ; //1
+	float BLOOM_GAMMA; //1
+	float BLOOM_BYPASS; //1
+	float BLOOM_POWER; //1
+  	float BLOOM_GAMMA_out; 
   	float ALT_BLANK_STRENGTH ; //2 FIXME to 1
   	float ALT_BLANK_PERIOD ;
 	float DO_FXAA ; //1
-	float scanline_flickering ; //2
-	float scanline_disable_on_interlace;
+	float SCANLINE_FLICKERING ; //2
+	float SCANLINE_DISABLE_ON_INTERLACE;
 	float RGB_MASK_STRENGTH;
 	float DARKLINES_STRENGTH;
 	float GAMMA_OUT ; //1
-	float saturation ; //1
+	float SATURATION ; //1
 	
 	float DO_CURVATURE;
 
@@ -89,8 +97,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float GEOM_WARP_Y;
 	float GEOM_CORNER_SIZE;
 	float GEOM_CORNER_SMOOTH;
-	//float GEOM_ZOOMOUT;
-	//float GEOM_GAP_SIZE;
+
 	float DO_BEZEL;
 	float BEZEL_R;
 	float BEZEL_G;
@@ -101,16 +108,16 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float BEZEL_FRAME_ZOOM;
 
 	float DO_SPOT;
-	float s_center_x;
-	float s_center_y; 
-	float s_size;
-	float s_power;
-	float s_bypass;
+	float S_CENTER_X;
+	float S_CENTER_Y; 
+	float S_SIZE;
+	float S_POWER;
+	float S_BYPASS;
 
 	float DO_VIGNETTE;
-	float v_size;
-	float v_power;
-	float v_bypass;
+	float V_SIZE;
+	float V_POWER;
+	float V_BYPASS;
 
 	float DO_DYNZOOM;
 	float DYNZOOM_FACTOR;
@@ -118,9 +125,9 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float DO_AMBILIGHT;
 	float AMBI_FALLOFF;
 	float AMBI_POWER;
-	float aspect_x;
-	float aspect_y;
-	float ambi_steps;
+	float ASPECT_X;
+	float ASPECT_Y;
+	float AMBI_STEPS;
 } global;
 
 
@@ -142,24 +149,24 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // Alternate the drawing of the scanlines between frames. this will produce a flickering typical of
 // interlaced screens; 0 disable the effect, 1 always enables it, 2 enables it only when
 // the shader detects an interlaced signal, which actually means that the vertical resoution is "high enough"
-#pragma parameter scanline_flickering "        Interlace Flicker (0=off,1=on,2=if interlaced)"		  	2.0 	0.0 2.0 1.0
+#pragma parameter SCANLINE_FLICKERING "        Interlace Flicker (0=off,1=on,2=if interlaced)"		  	2.0 	0.0 2.0 1.0
 
-#pragma parameter scanline_disable_on_interlace "        Disable on interlaced screen"			  	0.0 	0.0 1.0 1.0
+#pragma parameter SCANLINE_DISABLE_ON_INTERLACE "        Disable on interlaced screen"			  	0.0 	0.0 1.0 1.0
 
 
 
 // Input glowing
-// Emulates the glowing of the input signal by blurring it with "in_glow_wh" sharpness.
+// Emulates the glowing of the input signal by blurring it with "IN_GLOW_WH" sharpness.
 // The blur always affects horizontal sharpness, vertical sharpness is affected only if Dark scanline brightness is < 1.0.
-// Apply a gamma filter "in_glow_gamma" to "light" it, multiplying the result by "in_glow_power" and
+// Apply a gamma filter "IN_GLOW_GAMMA" to "light" it, multiplying the result by "IN_GLOW_POWER" and
 // finally interpolating(*) it with the source image.
 // "IN_GLOW_ADD" allows to modulate from interpolation(*) to a sum, wihch may (or not) produce better effects.
 // With "IN_GLOW_ADD=0" input glowing does not alter the RGB mask
 // or slot mask applied to the image.
 #pragma parameter DO_IN_GLOW               "★ Input power/glowing:"	 					1.0	0.0 1.0 1.0
-#pragma parameter in_glow_power            "        Input signal glow strength"					0.45 	0.0 5.0 0.05
-#pragma parameter in_glow_wh               "        Sharpness"							2.5	0.2 6.0 0.05
-#pragma parameter in_glow_gamma            "        Gamma, the higher, the less the glow on dark colors"	1.0 	1.0 10.0 0.1
+#pragma parameter IN_GLOW_POWER            "        Input signal glow strength"					0.45 	0.0 5.0 0.05
+#pragma parameter IN_GLOW_WH               "        Sharpness"							2.5	0.2 6.0 0.05
+#pragma parameter IN_GLOW_GAMMA            "        Gamma, the higher, the less the glow on dark colors"	1.0 	1.0 10.0 0.1
 #pragma parameter IN_GLOW_ADD              "        Post gain (0.0 to disable)"					0.0 	0.0 1.0 0.05
 #pragma parameter GLOW_OVER_DARK_SCANLINES "        Scanlines bleeding"						1.0 	0.0 3.0 0.1
 
@@ -201,38 +208,38 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // this means that haloing will produce solid colors,
 // lessening afromentioned effects on bright colors.
 #pragma parameter DO_HALO       "★ Halo:" 							1.0	0.0 1.0 1.0
-#pragma parameter halo_power    "        Strength (neg=off)"					0.9 	0.0  5.0 0.05
-#pragma parameter halo_w        "        Horizontal sharpness"					1.75	0.2  6.0 0.05
-#pragma parameter halo_h        "        Vertical sharpness"					1.75	0.2  6.0 0.05
-#pragma parameter halo_gamma    "        Gamma, the higher, the less the halo on dark colors"	2.0 	1.0  10.0 0.1
+#pragma parameter HALO_POWER    "        Strength"						0.9 	0.0  5.0 0.05
+#pragma parameter HALO_W        "        Horizontal sharpness"					1.75	0.2  6.0 0.05
+#pragma parameter HALO_H        "        Vertical sharpness"					1.75	0.2  6.0 0.05
+#pragma parameter HALO_GAMMA    "        Gamma, the higher, the less the halo on dark colors"	2.0 	1.0  10.0 0.1
 
 
 
 // Bloom
 // The image is downsampled, bloomed and mixed back with the original image.
 // "BLOOM_MIX" is the final mix strength
-// "bloom_size" is the radius of the blurred image
-// "bloom_quality" express a tradeoff between quality and effect speed.
-// "bloom_gamma" allows to apply more bloom on the bright colors of the source image
-// "bloom_power" is the additional gain applied to the bloom
-// "bloom_bypass" will show only the bloomed component
+// "BLOOM_SIZE" is the radius of the blurred image
+// "BLOOM_QUALITY" express a tradeoff between quality and effect speed.
+// "BLOOM_GAMMA" allows to apply more bloom on the bright colors of the source image
+// "BLOOM_POWER" is the additional gain applied to the bloom
+// "BLOOM_BYPASS" will show only the bloomed component
 // the original image.
 #pragma parameter DO_BLOOM           "★ Bloom:" 				        0.0  0.0  1.0  1.0
 #pragma parameter BLOOM_MIX          "        Final mix, (0.0=off)"			0.2 0.0 1.0  0.01
-#pragma parameter bloom_size         "        Radius"					2.0  0.5 30.0 0.5
-#pragma parameter bloom_quality      "        Quality: more is better but slower"	2.0  2.0 32.0 1.0
-#pragma parameter bloom_gamma        "        Input Gamma"				4.0  1.0 10.0 1.0
-#pragma parameter bloom_power        "        Power multiplier"				8.0  1.0 10.0 0.1
-#pragma parameter bloom_gamma_out    "        Output Gamma"				1.5  0.1 10.0 0.05
-#pragma parameter bloom_bypass       "        Bypass"					0.0  0.0 1.0  1.0
+#pragma parameter BLOOM_SIZE         "        Radius"					2.0  0.5 30.0 0.5
+#pragma parameter BLOOM_QUALITY      "        Quality: more is better but slower"	2.0  2.0 32.0 1.0
+#pragma parameter BLOOM_GAMMA        "        Input Gamma"				4.0  1.0 10.0 1.0
+#pragma parameter BLOOM_POWER        "        Power multiplier"				8.0  1.0 10.0 0.1
+#pragma parameter BLOOM_GAMMA_out    "        Output Gamma"				1.5  0.1 10.0 0.05
+#pragma parameter BLOOM_BYPASS       "        Bypass"					0.0  0.0 1.0  1.0
 
 
-// Gamma and saturation correction
+// Gamma and SATURATION correction
 // Correct the final gamma of the image
-// To have more or less saturated colors use "saturation" > 1 or "saturation" < 1
+// To have more or less saturated colors use "SATURATION" > 1 or "SATURATION" < 1
 #pragma parameter DO_CCORRECTION "★ Color corrections:" 			0.0 0.0 1.0 1.0
 #pragma parameter GAMMA_OUT      "        Gamma output"			0.69	0.1 9.0  0.025
-#pragma parameter saturation     "        Saturation modifier (1.0=off)"	1.0	0.0 10.0 0.025
+#pragma parameter SATURATION     "        Saturation modifier (1.0=off)"	1.0	0.0 10.0 0.025
 
 
 //Curvature parameters:
@@ -255,17 +262,19 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 
 //Full screen glowing
+//Modulate the image zooming depending on the image luminosity.
+//You can lower the effect power through the DYNZOOM_FACTOR parameter.
 #pragma parameter DO_DYNZOOM	     "★ Luminosity dependant zoom"			1.0   0.0   1.0  1.0
 #pragma parameter DYNZOOM_FACTOR     "        narrowness"				55.0  30.0  99.0 1.0
 
 //Back leds
 //Emulates leds under the monitor frame that slowly reacts to image contents
 #pragma parameter DO_AMBILIGHT	 "★ Leds (needs Retroarch aspect ratio set to full!)"	1.0  0.0  1.0     1.0
-#pragma parameter ambi_steps	 "        Slowness"							60.0 5.0  1000.0  5.0
+#pragma parameter AMBI_STEPS	 "        Slowness"							60.0 5.0  1000.0  5.0
 #pragma parameter AMBI_FALLOFF   "        Light Falloff"						0.7  0.1  3.0     0.01
 #pragma parameter AMBI_POWER     "        Led power"							0.5  0.1  5.0     0.05
-#pragma parameter aspect_x       "        Aspect Ratio Numerator (-x for a preset below)"   0.0  -5.0 256. 1.0
-#pragma parameter aspect_y       "        Aspect Ratio Denominator"	  				3.0   0.0 256. 1.0
+#pragma parameter ASPECT_X       "        Aspect Ratio Numerator (-x for a preset below)"   0.0  -5.0 256. 1.0
+#pragma parameter ASPECT_Y       "        Aspect Ratio Denominator"	  				3.0   0.0 256. 1.0
 #pragma parameter label_aspect_presets "        Presets reference list:" 0.0 0.0 0.0 1.0
 #pragma parameter label_aspect_preset0 "          (0 =  MAME 1.33)" 0.0 0.0 0.0 1.0
 #pragma parameter label_aspect_preset1 "          (-1 = NTSC 1.5)" 0.0 0.0 0.0 1.0
@@ -275,18 +284,18 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter label_aspect_preset5 "          (-5 = Uncorrected)" 0.0 0.0 0.0 1.0
 
 //Vignette and spot
-
+//Emulates the vignette effect and/or a light reflection.
 #pragma parameter DO_VIGNETTE	"★ Vignette"			0.0  0.0  1.0  1.0
-#pragma parameter v_bypass	"        bypass "	        	0.0  0.0  1.0  1.0
-#pragma parameter v_size	"        size"			1.7  0.0  3.0  0.05
-#pragma parameter v_power	"        power"			1.1  0.05 2.0  0.05
+#pragma parameter V_BYPASS	"        bypass "	        	0.0  0.0  1.0  1.0
+#pragma parameter V_SIZE	"        size"			1.7  0.0  3.0  0.05
+#pragma parameter V_POWER	"        power"			1.1  0.05 2.0  0.05
 
 #pragma parameter DO_SPOT	"★ Spot"			0.0   0.0   1.0 1.0
-#pragma parameter s_bypass	"        bypass"	        0.0   0.0   1.0 1.0
-#pragma parameter s_center_x 	"        x position"	0.65  -1.5  1.5 0.05
-#pragma parameter s_center_y	"        y postion "	-0.5  -1.5  1.5 0.05
-#pragma parameter s_size	"        size"		0.1   0.0  1.0 0.01
-#pragma parameter s_power	"        power" 		0.15  0.05  2.0 0.05
+#pragma parameter S_BYPASS	"        bypass"	        0.0   0.0   1.0 1.0
+#pragma parameter S_CENTER_X 	"        x position"	0.65  -1.5  1.5 0.05
+#pragma parameter S_CENTER_Y	"        y postion "	-0.5  -1.5  1.5 0.05
+#pragma parameter S_SIZE	"        size"		0.1   0.0  1.0 0.01
+#pragma parameter S_POWER	"        power" 		0.15  0.05  2.0 0.05
 
 
 // Alternative blanking.
@@ -304,15 +313,15 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #define DO_SCANLINES                  global.DO_SCANLINES
 #define SCANLINE_DARK                 params.SCANLINE_DARK
 #define SCANLINE_OVERWHITE            global.SCANLINE_OVERWHITE
-#define scanline_flickering           global.scanline_flickering
-#define scanline_disable_on_interlace global.scanline_disable_on_interlace
+#define SCANLINE_FLICKERING           global.SCANLINE_FLICKERING
+#define SCANLINE_DISABLE_ON_INTERLACE global.SCANLINE_DISABLE_ON_INTERLACE
 
 #define DO_IN_GLOW               global.DO_IN_GLOW
 #define IN_GLOW_ADD              global.IN_GLOW_ADD
 #define GLOW_OVER_DARK_SCANLINES global.GLOW_OVER_DARK_SCANLINES
-#define in_glow_wh               global.in_glow_wh
-#define in_glow_power            global.in_glow_power
-#define in_glow_gamma            global.in_glow_gamma
+#define IN_GLOW_WH               global.IN_GLOW_WH
+#define IN_GLOW_POWER            global.IN_GLOW_POWER
+#define IN_GLOW_GAMMA            global.IN_GLOW_GAMMA
 
 #define DO_RGB_MASK       global.DO_RGB_MASK
 #define RGB_MASK_STRENGTH global.RGB_MASK_STRENGTH
@@ -325,23 +334,23 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #define DARKLINES_PERIOD     params.DARKLINES_PERIOD
 
 #define DO_HALO    global.DO_HALO
-#define halo_w     params.halo_w
-#define halo_h     params.halo_h
-#define halo_power params.halo_power
-#define halo_gamma params.halo_gamma
+#define HALO_W     params.HALO_W
+#define HALO_H     params.HALO_H
+#define HALO_POWER params.HALO_POWER
+#define HALO_GAMMA params.HALO_GAMMA
 
 #define DO_BLOOM           params.DO_BLOOM
 #define BLOOM_MIX          global.BLOOM_MIX
-#define bloom_quality      params.bloom_quality
-#define bloom_size         global.bloom_size
-#define bloom_gamma        global.bloom_gamma
-#define bloom_power        global.bloom_power
-#define bloom_gamma_out    global.bloom_gamma_out
-#define bloom_bypass       global.bloom_bypass
+#define BLOOM_QUALITY      params.BLOOM_QUALITY
+#define BLOOM_SIZE         global.BLOOM_SIZE
+#define BLOOM_GAMMA        global.BLOOM_GAMMA
+#define BLOOM_POWER        global.BLOOM_POWER
+#define BLOOM_GAMMA_out    global.BLOOM_GAMMA_out
+#define BLOOM_BYPASS       global.BLOOM_BYPASS
 
 #define DO_CCORRECTION global.DO_CCORRECTION
 #define GAMMA_OUT      global.GAMMA_OUT
-#define saturation     global.saturation
+#define SATURATION     global.SATURATION
 
 #define DO_ALT_BLANK       global.DO_ALT_BLANK
 #define ALT_BLANK_STRENGTH global.ALT_BLANK_STRENGTH
@@ -365,23 +374,23 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #define BEZEL_IMAGE_BORDER global.BEZEL_IMAGE_BORDER
 
 #define DO_SPOT    global.DO_SPOT
-#define s_bypass   global.s_bypass
-#define s_center_x global.s_center_x
-#define s_center_y global.s_center_y
-#define s_size     global.s_size
-#define s_power    global.s_power
+#define S_BYPASS   global.S_BYPASS
+#define S_CENTER_X global.S_CENTER_X
+#define S_CENTER_Y global.S_CENTER_Y
+#define S_SIZE     global.S_SIZE
+#define S_POWER    global.S_POWER
 
 #define DO_DYNZOOM      global.DO_DYNZOOM
 #define DYNZOOM_FACTOR  global.DYNZOOM_FACTOR
 
 #define DO_VIGNETTE  global.DO_VIGNETTE
-#define v_bypass     global.v_bypass
-#define v_size       global.v_size
-#define v_power      global.v_power
+#define V_BYPASS     global.V_BYPASS
+#define V_SIZE       global.V_SIZE
+#define V_POWER      global.V_POWER
 
 #define DO_AMBILIGHT global.DO_AMBILIGHT
-#define ambi_steps   global.ambi_steps
+#define AMBI_STEPS   global.AMBI_STEPS
 #define AMBI_FALLOFF global.AMBI_FALLOFF
 #define AMBI_POWER   global.AMBI_POWER
-#define aspect_x	global.aspect_x
-#define aspect_y	global.aspect_y
+#define ASPECT_X	global.ASPECT_X
+#define ASPECT_Y	global.ASPECT_Y

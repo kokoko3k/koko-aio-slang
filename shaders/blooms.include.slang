@@ -16,18 +16,18 @@
 }
 */
 
-vec3 radial_bloom_std_pow(float Quality, float Directions, float Size, float fbloom_gamma) {
+vec3 radial_bloom_std_pow(float Quality, float Directions, float Size, float fBLOOM_GAMMA) {
     vec4 iResolution = SourceTextureSize;
     vec2 Radius = Size/iResolution.xy ;
 
     vec3 color  = vec3(0.0,0.0,0.0);
     vec3 lookup = vec3(0.0,0.0,0.0);
     float steps=0.0;
-    vec3 fbloom_gamma_vec3=vec3(fbloom_gamma);
+    vec3 fBLOOM_GAMMA_vec3=vec3(fBLOOM_GAMMA);
     for( float d=0.0; d<Pi; d+=Pi/Directions) {
         for(float i=1.0/Quality; i<=1.0; i+=1.0/Quality) {
             lookup = texture( SourceTexture, vTexCoord + vec2(cos(d)  + b_offset_x , sin(d))*Radius*i  ).rgb ;
-            color +=pow(lookup.rgb,fbloom_gamma_vec3);
+            color +=pow(lookup.rgb,fBLOOM_GAMMA_vec3);
             steps+=1.0;
         }
     }
@@ -36,7 +36,7 @@ vec3 radial_bloom_std_pow(float Quality, float Directions, float Size, float fbl
 }
 
 
-vec3 radial_bloom_gamma_1(float Quality, float Directions, float Size) {
+vec3 radial_BLOOM_GAMMA_1(float Quality, float Directions, float Size) {
     vec4 iResolution = SourceTextureSize;
     vec2 Radius = Size/iResolution.xy ;
 
@@ -53,7 +53,7 @@ vec3 radial_bloom_gamma_1(float Quality, float Directions, float Size) {
     color /= (steps-1);
     return color;
 }
-vec3 radial_bloom_gamma_2(float Quality, float Directions, float Size) {
+vec3 radial_BLOOM_GAMMA_2(float Quality, float Directions, float Size) {
     vec4 iResolution = SourceTextureSize;
     vec2 Radius = Size/iResolution.xy ;
 
@@ -70,7 +70,7 @@ vec3 radial_bloom_gamma_2(float Quality, float Directions, float Size) {
     color /= (steps-1);
     return color;
 }
-vec3 radial_bloom_gamma_3(float Quality, float Directions, float Size) {
+vec3 radial_BLOOM_GAMMA_3(float Quality, float Directions, float Size) {
     vec4 iResolution = SourceTextureSize;
     vec2 Radius = Size/iResolution.xy ;
 
@@ -87,7 +87,7 @@ vec3 radial_bloom_gamma_3(float Quality, float Directions, float Size) {
     color /= (steps-1);
     return color;
 }
-vec3 radial_bloom_gamma_4(float Quality, float Directions, float Size) {
+vec3 radial_BLOOM_GAMMA_4(float Quality, float Directions, float Size) {
     vec4 iResolution = SourceTextureSize;
     vec2 Radius = Size/iResolution.xy ;
 
@@ -104,7 +104,7 @@ vec3 radial_bloom_gamma_4(float Quality, float Directions, float Size) {
     color /= (steps-1);
     return color;
 }
-vec3 radial_bloom_gamma_5(float Quality, float Directions, float Size) {
+vec3 radial_BLOOM_GAMMA_5(float Quality, float Directions, float Size) {
     vec4 iResolution = SourceTextureSize;
     vec2 Radius = Size/iResolution.xy ;
 
@@ -121,7 +121,7 @@ vec3 radial_bloom_gamma_5(float Quality, float Directions, float Size) {
     color /= (steps-1);
     return color;
 }
-vec3 radial_bloom_gamma_6(float Quality, float Directions, float Size) {
+vec3 radial_BLOOM_GAMMA_6(float Quality, float Directions, float Size) {
     vec4 iResolution = SourceTextureSize;
     vec2 Radius = Size/iResolution.xy ;
 
@@ -138,7 +138,7 @@ vec3 radial_bloom_gamma_6(float Quality, float Directions, float Size) {
     color /= (steps-1);
     return color;
 }
-vec3 radial_bloom_gamma_7(float Quality, float Directions, float Size) {
+vec3 radial_BLOOM_GAMMA_7(float Quality, float Directions, float Size) {
     vec4 iResolution = SourceTextureSize;
     vec2 Radius = Size/iResolution.xy ;
 
@@ -155,7 +155,7 @@ vec3 radial_bloom_gamma_7(float Quality, float Directions, float Size) {
     color /= (steps-1);
     return color;
 }
-vec3 radial_bloom_gamma_8(float Quality, float Directions, float Size) {
+vec3 radial_BLOOM_GAMMA_8(float Quality, float Directions, float Size) {
     vec4 iResolution = SourceTextureSize;
     vec2 Radius = Size/iResolution.xy ;
 
@@ -172,7 +172,7 @@ vec3 radial_bloom_gamma_8(float Quality, float Directions, float Size) {
     color /= (steps-1);
     return color;
 }
-vec3 radial_bloom_gamma_9(float Quality, float Directions, float Size) {
+vec3 radial_BLOOM_GAMMA_9(float Quality, float Directions, float Size) {
     vec4 iResolution = SourceTextureSize;
     vec2 Radius = Size/iResolution.xy ;
 
@@ -189,7 +189,7 @@ vec3 radial_bloom_gamma_9(float Quality, float Directions, float Size) {
     color /= (steps-1);
     return color;
 }
-vec3 radial_bloom_gamma_10(float Quality, float Directions, float Size) {
+vec3 radial_BLOOM_GAMMA_10(float Quality, float Directions, float Size) {
     vec4 iResolution = SourceTextureSize;
     vec2 Radius = Size/iResolution.xy ;
 
@@ -208,16 +208,16 @@ vec3 radial_bloom_gamma_10(float Quality, float Directions, float Size) {
 }
 
 
-vec3 bloom(float Directions, float Quality, float Size, float fbloom_gamma)  {
-        if (fbloom_gamma == 1) return radial_bloom_gamma_1(Quality, Directions, Size);
-        if (fbloom_gamma == 2) return radial_bloom_gamma_2(Quality, Directions, Size);
-        if (fbloom_gamma == 3) return radial_bloom_gamma_3(Quality, Directions, Size);
-        if (fbloom_gamma == 4) return radial_bloom_gamma_4(Quality, Directions, Size);
-        if (fbloom_gamma == 5) return radial_bloom_gamma_5(Quality, Directions, Size);
-        if (fbloom_gamma == 6) return radial_bloom_gamma_6(Quality, Directions, Size);
-        if (fbloom_gamma == 7) return radial_bloom_gamma_7(Quality, Directions, Size);
-        if (fbloom_gamma == 8) return radial_bloom_gamma_8(Quality, Directions, Size);
-        if (fbloom_gamma == 9) return radial_bloom_gamma_9(Quality, Directions, Size);
-        if (fbloom_gamma == 10) return radial_bloom_gamma_10(Quality, Directions, Size);
-        return radial_bloom_std_pow(Quality, Directions, Size, fbloom_gamma);
+vec3 bloom(float Directions, float Quality, float Size, float fBLOOM_GAMMA)  {
+        if (fBLOOM_GAMMA == 1) return radial_BLOOM_GAMMA_1(Quality, Directions, Size);
+        if (fBLOOM_GAMMA == 2) return radial_BLOOM_GAMMA_2(Quality, Directions, Size);
+        if (fBLOOM_GAMMA == 3) return radial_BLOOM_GAMMA_3(Quality, Directions, Size);
+        if (fBLOOM_GAMMA == 4) return radial_BLOOM_GAMMA_4(Quality, Directions, Size);
+        if (fBLOOM_GAMMA == 5) return radial_BLOOM_GAMMA_5(Quality, Directions, Size);
+        if (fBLOOM_GAMMA == 6) return radial_BLOOM_GAMMA_6(Quality, Directions, Size);
+        if (fBLOOM_GAMMA == 7) return radial_BLOOM_GAMMA_7(Quality, Directions, Size);
+        if (fBLOOM_GAMMA == 8) return radial_BLOOM_GAMMA_8(Quality, Directions, Size);
+        if (fBLOOM_GAMMA == 9) return radial_BLOOM_GAMMA_9(Quality, Directions, Size);
+        if (fBLOOM_GAMMA == 10) return radial_BLOOM_GAMMA_10(Quality, Directions, Size);
+        return radial_bloom_std_pow(Quality, Directions, Size, fBLOOM_GAMMA);
 }

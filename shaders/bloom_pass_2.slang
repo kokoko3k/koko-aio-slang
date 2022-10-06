@@ -28,8 +28,8 @@ layout(set = 0, binding = 2) uniform sampler2D Source;
 void main() {
 
     if (DO_BLOOM == 1.0 ) {
-        vec3 bloomed = (bloom(bloom_directions,bloom_quality,bloom_size,1));
-        //vec3 bloomed = bloom_new(SourceTexture, vTexCoord, bloom_size, bloom_quality, BLOOM_THRESHOLD) * bloom_power;
+        vec3 bloomed = (bloom(bloom_directions,BLOOM_QUALITY,BLOOM_SIZE,1));
+        //vec3 bloomed = bloom_new(SourceTexture, vTexCoord, BLOOM_SIZE, BLOOM_QUALITY, BLOOM_THRESHOLD) * BLOOM_POWER;
         FragColor = vec4(bloomed,1.0);
     } else {
         return;

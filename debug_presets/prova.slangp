@@ -19,13 +19,13 @@ DO_CURVATURE = 1.0
 	GEOM_CORNER_SMOOTH = 700
 
 DO_VIGNETTE = "1.0"
-	v_size = "2.5"
-	v_power = "1.1"
+	V_SIZE = "2.5"
+	V_POWER = "1.1"
 
 DO_SPOT = "1.0"
-	s_center_x = "0.65"
-	s_center_y = "-0.5"
-	s_size = "0.4"
-	s_power = "0.1"
+	S_CENTER_X = "0.65"
+	S_CENTER_Y = "-0.5"
+	S_SIZE = "0.4"
+	S_POWER = "0.1"
 
 DO_BLOOM = "0.0"

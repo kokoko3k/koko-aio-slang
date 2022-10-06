@@ -30,7 +30,7 @@ void main() {
       float push =  AMBI_POWER * (1.0 - avglum)  + 1.0;
       pixel_out = pixel_out * push;
 
-      //Compensate for the loss of saturation
+      //Compensate for the loss of SATURATION
       float extrasat = min(push,2.0); //not more than 2X
       float l = length(pixel_out);
       pixel_out =  normalize( pow(pixel_out.rgb + vec3(eps), vec3(extrasat)))*l  ;

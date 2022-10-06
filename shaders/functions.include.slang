@@ -16,7 +16,7 @@ vec2 zoomout_coords(vec2 in_coords, float zoom_out, float aspect) {
 }
 
 bool scanline_have_to_flicker(bool is_interlaced) {
-    return ((scanline_flickering == 1.0) || ((scanline_flickering==2.0) && is_interlaced ));
+    return ((SCANLINE_FLICKERING == 1.0) || ((SCANLINE_FLICKERING==2.0) && is_interlaced ));
 }
 
 bool is_interlaced() {
@@ -131,17 +131,17 @@ float random(float power) {
 	}
 
 	float get_in_aspect() {
-			if (aspect_x ==  -1) return 1.5;   // ntsc
-			if (aspect_x ==  -2) return 1.25;  // pal
-			if (aspect_x ==  -3) return 1.143; // 8/7 snes
-			if (aspect_x ==  -4) return 1.428; // 10/7 megadrive
-			if (aspect_x ==  -5) return params.OriginalSize.x/params.OriginalSize.y; //uncorrected
+			if (ASPECT_X ==  -1) return 1.5;   // ntsc
+			if (ASPECT_X ==  -2) return 1.25;  // pal
+			if (ASPECT_X ==  -3) return 1.143; // 8/7 snes
+			if (ASPECT_X ==  -4) return 1.428; // 10/7 megadrive
+			if (ASPECT_X ==  -5) return params.OriginalSize.x/params.OriginalSize.y; //uncorrected
 
-			if (aspect_x == 0) {
+			if (ASPECT_X == 0) {
 				return 1.3333333333333; //all mame games, not rotated
 			}
 
-			return aspect_x / aspect_y ;
+			return ASPECT_X / ASPECT_Y ;
 	}
 
 
@@ -397,7 +397,7 @@ aggiungi opzioni negative per:
 
 
 
-    if ( aspect_x == 0 ) {
+    if ( ASPECT_X == 0 ) {
         /*AMIGA - PUAE
         Cropping res (PAL):
         720x288
