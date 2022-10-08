@@ -30,7 +30,7 @@ void main() {
     if (DO_BLOOM == 1.0 ) {
         vec3 bloomed = bloom(bloom_directions,BLOOM_QUALITY,BLOOM_SIZE,BLOOM_GAMMA) * BLOOM_POWER;
         //vec3 bloomed = bloom_new(SourceTexture, vTexCoord, BLOOM_SIZE, BLOOM_QUALITY, BLOOM_THRESHOLD) * BLOOM_POWER;
-        FragColor = vec4(pow(bloomed,vec3(BLOOM_GAMMA_out)),1.0);
+        FragColor = vec4(pow(bloomed,vec3(BLOOM_GAMMA_OUT)),1.0);
     } else {
         return ;
     }
