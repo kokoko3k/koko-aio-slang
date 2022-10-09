@@ -51,8 +51,9 @@ vec3 pixel_vmask(vec3 source, vec3 lm1,vec3 lm2,vec3 lm3,
     int col = int( vOutputCoord.x * params.OutputSize.x );
     vec3 pixel_out;
     vec3 vmasked;
-    if (mod(col, 3) < 1) vmasked = lm1*source;
-    else if (mod(col, 3) < 2) vmasked = lm2*source;
+    vec3 vec_mod=vec3(3,1,2) * VMASK_SCALE ;
+    if (mod(col, vec_mod.x) < vec_mod.y) vmasked = lm1*source;
+    else if (mod(col, vec_mod.x) < vec_mod.z) vmasked = lm2*source;
     else vmasked = lm3*source;
 
     if (over_white == 1.0) pixel_out = vmasked;
@@ -67,12 +68,11 @@ vec3 pixel_vmask(vec3 source, vec3 lm1,vec3 lm2,vec3 lm3,
 
 }
 
-//(3 pixels unless changing m1,m2,m3 datatype)
-#define Darkline_part_w 3 
-#define Darkline_part_w_x2 6
 vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
                      float do_offset, vec3 white_reference,float over_white) {
 
+    float Darkline_part_w = 3.0 * VMASK_SCALE;
+    float Darkline_part_w_x2 = 6.0 * VMASK_SCALE;
     //vec3 pixel_out=source;
     float col_2 =  vOutputCoord.x * params.OutputSize.x;
     float line_2 = vOutputCoord.y * params.OutputSize.y;
@@ -85,7 +85,7 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
     }
 
     if (do_offset == 1.0) {
-        int hmask_shape_offset = int (darkline_every/2.0) + 1 ;
+        int hmask_shape_offset = int (darkline_every*0.5) + 1 ;
         if  (int(mod(line_2, darkline_every)) == 1) {
             if (int(mod(col_2, Darkline_part_w_x2)) < Darkline_part_w) {
                 return source * darkline_trans;
