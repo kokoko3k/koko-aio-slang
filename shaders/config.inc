@@ -41,6 +41,7 @@ layout(push_constant) uniform Push
 	float SCANLINE_DARK;
 	float VMASK_OVERWHITE ;
 	float VMASK_SCALE;
+	float VMASK_GAP;
 	float DRKLN_OVERWHITE ;
 	float DO_DARKLINES_VOFFSET ;
 	float DARKLINES_PERIOD ;
@@ -63,7 +64,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	vec4 main_passSize;
 	vec4 monitor_bodySize;
 	vec4 first_passSize;
-	
+
 	float DO_SCANLINES;
 	float DO_IN_GLOW;
 	float DO_RGB_MASK ;
@@ -178,13 +179,15 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // This is done by multiplying the source image pixels, in turn, by red green or blue.
 // The strenght of the multiplication, and so of the final effect is affected by "RGB_MASK_STRENGTH" value.
 // A Value of 0 completely disable the effect.
-// "VMASK_SCALE" Is the width of the mask, use if you have hidpi monitors.
+// "VMASK_SCALE" Is the width of the mask, for HiDPI monitors.
+// "VMASK_GAP" Will draw an horizontal gap between triads, for HiDPI monitors.
 // "VMASK_OVERWHITE" modulates the strenght of the effect depending on the source pixel brightness,
 // This is handy  if you want to keep a good image contrast/brightness, but keep in mind that other
 // parameters like haloing and bloom.
 #pragma parameter DO_RGB_MASK        "★  RGB Mask:"         				1.0 	0.0 1.0 1.0
 #pragma parameter RGB_MASK_STRENGTH  "        Strength (0.0=off)"			0.75  	0.0 1.0 0.05
-#pragma parameter VMASK_SCALE       "        Vmask size multiplier (for HiDPI)"			1.0  	1.0 4.0 1.0
+#pragma parameter VMASK_SCALE       "        (HiDPI) Vmask size multiplier (for HiDPI)"			1.0  	1.0 4.0 1.0
+#pragma parameter VMASK_GAP          "        (HiDPI) Horizontal Gap between triads"			0.0  	0.0 1.0 1.0
 #pragma parameter VMASK_OVERWHITE    "        How much to affect bright colors"	1.0 	0.0 1.0 0.05
 
 
@@ -332,6 +335,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #define RGB_MASK_STRENGTH global.RGB_MASK_STRENGTH
 #define VMASK_OVERWHITE   params.VMASK_OVERWHITE
 #define VMASK_SCALE       params.VMASK_SCALE
+#define VMASK_GAP         params.VMASK_GAP
 
 #define DO_DARKLINES         global.DO_DARKLINES
 #define DARKLINES_STRENGTH   global.DARKLINES_STRENGTH

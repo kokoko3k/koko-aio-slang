@@ -41,7 +41,6 @@ layout(set = 0, binding = 6) uniform sampler2D first_pass;
 layout(set = 0, binding = 7) uniform sampler2D avglum_passFeedback;
 
 
-
 // What follows is an ugly optimization with a lot of code copied and pasted repeated multiple times,
 // shamlessly hidden into an include:
 #include "pixel_glows.include.slang"    
@@ -51,10 +50,11 @@ vec3 pixel_vmask(vec3 source, vec3 lm1,vec3 lm2,vec3 lm3,
     int col = int( vOutputCoord.x * params.OutputSize.x );
     vec3 pixel_out;
     vec3 vmasked;
-    vec3 vec_mod=vec3(3,1,2) * VMASK_SCALE ;
+    vec4 vec_mod=(vec4(3,1,2,3) + vec4(VMASK_GAP,0.0,0.0,0.0))* VMASK_SCALE ;
     if (mod(col, vec_mod.x) < vec_mod.y) vmasked = lm1*source;
-    else if (mod(col, vec_mod.x) < vec_mod.z) vmasked = lm2*source;
-    else vmasked = lm3*source;
+        else if (mod(col, vec_mod.x) < vec_mod.z) vmasked = lm2*source;
+        else if (mod(col, vec_mod.x) < vec_mod.w) vmasked = lm3*source;
+    else vmasked = vec3(0.0);
 
     if (over_white == 1.0) pixel_out = vmasked;
         else {
@@ -71,8 +71,8 @@ vec3 pixel_vmask(vec3 source, vec3 lm1,vec3 lm2,vec3 lm3,
 vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
                      float do_offset, vec3 white_reference,float over_white) {
 
-    float Darkline_part_w = 3.0 * VMASK_SCALE;
-    float Darkline_part_w_x2 = 6.0 * VMASK_SCALE;
+    float Darkline_part_w = (3.0+VMASK_GAP) * VMASK_SCALE;
+    float Darkline_part_w_x2 = Darkline_part_w*2;
     //vec3 pixel_out=source;
     float col_2 =  vOutputCoord.x * params.OutputSize.x;
     float line_2 = vOutputCoord.y * params.OutputSize.y;
