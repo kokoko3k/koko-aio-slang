@@ -57,16 +57,15 @@ void main() {
       Put another small mipmap into the rgb channel to be used by the reflection code.
     */
    vec4 pixel_out;
-    if (DO_AMBILIGHT == 1.0 || DO_BEZEL == 1.0) {
-        if (DO_AMBILIGHT == 1.0)  {
-          pixel_out.a = get_avglum();
-        }
+    //FIXME: see which is faster:
+    //if (DO_AMBILIGHT == 1.0 || DO_BEZEL == 1.0 || DO_DYNZOOM == 1.0) {
+    if ( !(DO_AMBILIGHT + DO_BEZEL + DO_DYNZOOM == 0) ) {
+        pixel_out.a = get_avglum();
         if (DO_BEZEL == 1.0) {
             //Create a small mipmap to be used to light the bezel corners.
             pixel_out.rgb = textureLod(Source, vTexCoord,lod).rgb;
         }
         FragColor = pixel_out;
-     
     }
      
 }

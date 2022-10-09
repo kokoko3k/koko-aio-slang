@@ -250,7 +250,7 @@ void main() {
     vec2 coords = vTexCoord;
     
     if (DO_DYNZOOM == 1.0) {
-        float zoomin = 1.0 + (texture(avglum_passFeedback,vTexCoord).a/ DYNZOOM_FACTOR);
+        float zoomin = 1.0 + (texture(avglum_passFeedback, vec2(0.5,0.5)    ).a/ DYNZOOM_FACTOR);
         coords = zoom(vTexCoord, zoomin);
     }
     
