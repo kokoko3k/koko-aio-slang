@@ -164,10 +164,10 @@ vec4 pixel_inner_frame() {
                         float b_brightness = max(pixel_out.b,max(pixel_out.r,pixel_out.g));
 
                         b_brightness *= 1-BLOOM_OVER_WHITE;
-                        over_white_correction = 1.0 - b_brightness;
+                        over_white_correction =1- b_brightness;
 
                 }
-                pixel_out = pixel_out - (bloomed * BLOOM_MIX * over_white_correction);
+                pixel_out = pixel_out + (bloomed * BLOOM_MIX * over_white_correction);
             }
         }
 
