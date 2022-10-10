@@ -184,11 +184,11 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // "VMASK_OVERWHITE" modulates the strenght of the effect depending on the source pixel brightness,
 // This is handy  if you want to keep a good image contrast/brightness, but keep in mind that other
 // parameters like haloing and bloom.
-#pragma parameter DO_RGB_MASK        "★  RGB Mask:"         				1.0 	0.0 1.0 1.0
-#pragma parameter RGB_MASK_STRENGTH  "        Strength (0.0=off)"			0.75  	0.0 1.0 0.05
-#pragma parameter VMASK_SCALE       "        (HiDPI) Vmask size multiplier (for HiDPI)"			1.0  	1.0 4.0 1.0
-#pragma parameter VMASK_GAP          "        (HiDPI) Horizontal Gap between triads"			0.0  	0.0 1.0 1.0
-#pragma parameter VMASK_OVERWHITE    "        How much to affect bright colors"	1.0 	0.0 1.0 0.05
+#pragma parameter DO_RGB_MASK        "★  RGB Mask:"         					1.0 	0.0 1.0 1.0
+#pragma parameter RGB_MASK_STRENGTH  "        Strength (0.0=off)"				0.75  	0.0 1.0 0.05
+#pragma parameter VMASK_SCALE       "        (HiDPI) Vmask size multiplier (for HiDPI)"		1.0  	1.0 4.0 1.0
+#pragma parameter VMASK_GAP          "        (HiDPI) Horizontal Gap between triads"		0.0  	0.0 1.0 1.0
+#pragma parameter VMASK_OVERWHITE    "        How much to affect bright colors"	1.0 		0.0 	1.0 0.05
 
 
 
@@ -197,14 +197,14 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // on final viewport coordinates.
 // "DARKLINES_STRENGTH" expresses the final strenght of the effect.
 // if "DO_DARKLINES_VOFFSET" is 0, straight horizontal black lines will be painted that emulates an aperture grille.
-// "DARKLINES_PERIOD" expresses every how many lines draw a black one.
+// "DARKLINES_PERIOD" expresses every how many lines draw a black one (or the height ov the RGB triads)
 // "DO_DARKLINES_VOFFSET" lets you to vertically offset by ""DARKLINES_PERIOD/2" the lines every 3 screen pixels,
 // allowing, in conjunction with RGB mask, to emulate slot mask
-#pragma parameter DO_DARKLINES          "★ Slotmask/Aperture grille"		0.0 	0.0 1.0 1.0
-#pragma parameter DARKLINES_STRENGTH    "        Strength"				0.3 0.0 1.0 0.05
-#pragma parameter DO_DARKLINES_VOFFSET  "        Offset by triads"		1.0 	0.0 1.0 1.0
-#pragma parameter DARKLINES_PERIOD      "        Period"				4.0 -16.0 16.0 2.0
-#pragma parameter DRKLN_OVERWHITE       "        How much to affect bright colors"	1.0 0.0 1.0 0.05
+#pragma parameter DO_DARKLINES          "★ Slotmask/Aperture grille"			0.0 	0.0 1.0 1.0
+#pragma parameter DARKLINES_STRENGTH    "        Strength"				0.3 	0.0 1.0 0.05
+#pragma parameter DO_DARKLINES_VOFFSET  "        Offset by triads"			1.0 	0.0 1.0 1.0
+#pragma parameter DARKLINES_PERIOD      "        Period (triad height)"			4.0 	-16.0 16.0 2.0
+#pragma parameter DRKLN_OVERWHITE       "        How much to affect bright colors"	1.0 	0.0 1.0 0.05
 
 
 
@@ -238,20 +238,20 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter BLOOM_GAMMA        "        Input Gamma"				4.0  1.0 10.0 0.1
 #pragma parameter BLOOM_POWER        "        Power multiplier"				8.0  1.0 10.0 0.5
 #pragma parameter BLOOM_GAMMA_OUT    "        Output Gamma"				1.5  0.1 10.0 0.1
-#pragma parameter BLOOM_OVER_WHITE   "        Strength on bright areas (0 = aura)"					1.0  0.0 1.0  0.1
+#pragma parameter BLOOM_OVER_WHITE   "        Strength on bright areas (0 = aura)"	1.0  0.0 1.0  0.1
 #pragma parameter BLOOM_BYPASS       "        Bypass"					0.0  0.0 1.0  1.0
 
 
 // Gamma and SATURATION correction
 // Correct the final gamma of the image
 // To have more or less saturated colors use "SATURATION" > 1 or "SATURATION" < 1
-#pragma parameter DO_CCORRECTION "★ Color corrections:" 			0.0 0.0 1.0 1.0
-#pragma parameter GAMMA_OUT      "        Gamma output"			0.69	0.1 9.0  0.025
+#pragma parameter DO_CCORRECTION "★ Color corrections:" 			0.0 	0.0 1.0 1.0
+#pragma parameter GAMMA_OUT      "        Gamma output"			0.69	0.1 	9.0  0.025
 #pragma parameter SATURATION     "        Saturation modifier (1.0=off)"	1.0	0.0 10.0 0.025
 
 
 //Curvature parameters:
-#pragma parameter DO_CURVATURE	     "★ Curvature:"			0.0   0.0 1.0 1.0
+#pragma parameter DO_CURVATURE	     "★ Curvature:"				0.0   0.0 1.0 1.0
 #pragma parameter GEOM_WARP_X        "        Warp X"				0.02  0.0 0.1 0.01
 #pragma parameter GEOM_WARP_Y        "        Warp Y"				0.0   0.0 0.1 0.01
 #pragma parameter GEOM_CORNER_SIZE   "        Corner Size"			0.01  0.005 0.1 0.005
@@ -259,7 +259,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 
 //Bezel related
-#pragma parameter DO_BEZEL	     "★ Bezel"				0.0   0.0 1.0 1.0
+#pragma parameter DO_BEZEL	     "★ Bezel"					0.0   0.0 1.0 1.0
 #pragma parameter BEZEL_R            "        Bezel color: Red"			-0.3   -0.5 0.5  0.01
 #pragma parameter BEZEL_G            "        Bezel color: Green"		-0.3   -0.5 0.5  0.01
 #pragma parameter BEZEL_B            "        Bezel color: Blue"		-0.3   -0.5 0.5  0.01
@@ -277,11 +277,11 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 //Back leds
 //Emulates leds under the monitor frame that slowly reacts to image contents
-#pragma parameter DO_AMBILIGHT	 "★ Leds (needs Retroarch aspect ratio set to full!)"	1.0  0.0  1.0     1.0
+#pragma parameter DO_AMBILIGHT	 "★ Leds (needs Retroarch aspect ratio set to full!)"	1		.0  0.0  1.0     1.0
 #pragma parameter AMBI_STEPS	 "        Slowness"							60.0 5.0  1000.0  5.0
 #pragma parameter AMBI_FALLOFF   "        Light Falloff"						0.7  0.1  3.0     0.01
 #pragma parameter AMBI_POWER     "        Led power"							0.5  0.1  5.0     0.05
-#pragma parameter ASPECT_X       "        Aspect Ratio Numerator (-x for a preset below)"   0.0  -5.0 256. 1.0
+#pragma parameter ASPECT_X       "        Aspect Ratio Numerator (-x for a preset below)"   		0.0  -5.0 256. 1.0
 #pragma parameter ASPECT_Y       "        Aspect Ratio Denominator"	  				3.0   0.0 256. 1.0
 #pragma parameter label_aspect_presets "        Presets reference list:" 0.0 0.0 0.0 1.0
 #pragma parameter label_aspect_preset0 "          (0 =  MAME 1.33)" 0.0 0.0 0.0 1.0
@@ -294,15 +294,15 @@ layout(std140, set = 0, binding = 0) uniform UBO
 //Vignette and spot
 //Emulates the vignette effect and/or a light reflection.
 #pragma parameter DO_VIGNETTE	"★ Vignette"			0.0  0.0  1.0  1.0
-#pragma parameter V_BYPASS	"        bypass "	        	0.0  0.0  1.0  1.0
+#pragma parameter V_BYPASS	"        bypass "	        0.0  0.0  1.0  1.0
 #pragma parameter V_SIZE	"        size"			1.7  0.0  3.0  0.05
 #pragma parameter V_POWER	"        power"			1.1  0.05 2.0  0.05
 
 #pragma parameter DO_SPOT	"★ Spot"			0.0   0.0   1.0 1.0
 #pragma parameter S_BYPASS	"        bypass"	        0.0   0.0   1.0 1.0
-#pragma parameter S_CENTER_X 	"        x position"	0.65  -1.5  1.5 0.05
-#pragma parameter S_CENTER_Y	"        y postion "	-0.5  -1.5  1.5 0.05
-#pragma parameter S_SIZE	"        size"		0.1   0.0  1.0 0.01
+#pragma parameter S_CENTER_X 	"        x position"		0.65  -1.5  1.5 0.05
+#pragma parameter S_CENTER_Y	"        y postion "		-0.5  -1.5  1.5 0.05
+#pragma parameter S_SIZE	"        size"			0.1   0.0  1.0 0.01
 #pragma parameter S_POWER	"        power" 		0.15  0.05  2.0 0.05
 
 
@@ -310,9 +310,9 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // Emulates the low pixel persistance of CRT monitors and reduces the motion blur,
 // typical of LCD displays, by blanking even/odd screen lines on even/odd frames.
 // ALT_BLANK_STRENGTH expresses the strength of the "blank".
-#pragma parameter DO_ALT_BLANK       "★ Alternate line blanking: " 					0.0 0.0 1.0 1.0
+#pragma parameter DO_ALT_BLANK       "★ Alternate line blanking: " 				0.0 0.0 1.0 1.0
 #pragma parameter ALT_BLANK_STRENGTH "        Alternate black frame insertion strength" 	0.5 0.0 1.0 0.1
-#pragma parameter ALT_BLANK_PERIOD   "        Dark lines period" 	4.0 0.0 20.0 1.0
+#pragma parameter ALT_BLANK_PERIOD   "        Dark lines period" 				4.0 0.0 20.0 1.0
 
 
 #define DO_FXAA        global.DO_FXAA
