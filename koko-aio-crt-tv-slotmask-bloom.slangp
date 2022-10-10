@@ -1,6 +1,6 @@
 #reference "koko-aio-crt-tv-slotmask.slangp"
 
-GAMMA_OUT = "0.375"
+GAMMA_OUT = "0.35"
 
 DO_BLOOM = "1.0"
 	BLOOM_MIX = "0.20"
