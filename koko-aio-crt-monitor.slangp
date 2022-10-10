@@ -70,12 +70,12 @@ DO_CURVATURE = 0.0
 
 DO_VIGNETTE = "0.0"
 	V_SIZE = "2.5"
-	V_POWER = "1.1"
+	V_POWER = "1.0"
 
 DO_SPOT = "0.0"
 	S_CENTER_X = "0.65"
 	S_CENTER_Y = "-0.5"
 	S_SIZE = "0.4"
-	S_POWER = "0.2"
+	S_POWER = "0.1"
 
 
