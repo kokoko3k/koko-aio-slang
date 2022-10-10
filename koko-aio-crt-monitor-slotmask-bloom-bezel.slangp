@@ -26,3 +26,6 @@ DO_SPOT = "1.0"
 	S_CENTER_Y = "-0.5"
 	S_SIZE = "0.4"
 	S_POWER = "0.1"
+
+	AMBI_FALLOFF = "0.45"
+	AMBI_POWER = "1.2"
