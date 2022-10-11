@@ -33,14 +33,14 @@ Several presets are included.<br>
         
 # Examples
 
-![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots_2.0/ffight.png?raw=true)
+![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots.2.0/ffight.png?raw=true)
 
-![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots_2.0/jim.png?raw=true)
+![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots.2.0/jim.png?raw=true)
 
-![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots_2.0/mvc.png?raw=true)
+![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots.2.0/mvc.png?raw=true)
 
-![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots_2.0/sonic.png?raw=true)
+![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots.2.0/sonic.png?raw=true)
 
-![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots_2.0/spft.png?raw=true)
+![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots.2.0/spft.png?raw=true)
 
 
