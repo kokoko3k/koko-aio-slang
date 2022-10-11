@@ -23,7 +23,8 @@ void main() {
    //Use one of the following to debug:
       //FragColor=vec4(abs(sin(params.FrameCount/3.14/2))); //white fade
       //FragColor=vec4(abs(sin(params.FrameCount/3.14/20)),0.0,0.0,0.0); //red fade
-      //FragColor=vec4(0.8);
+      //FragColor=vec4(1.0);
+      //FragColor=vec4(vTexCoord.x);
       //if  (mod(params.FrameCount,100) < 50) FragColor=vec4(0.0) ; else FragColor=vec4(1.0);      
 }
  

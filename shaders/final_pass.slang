@@ -33,6 +33,7 @@ layout(set = 0, binding = 4) uniform sampler2D reflected_blurred_pass2;
 layout(set = 0, binding = 5) uniform sampler2D ambi_temporal_pass;
 layout(set = 0, binding = 6) uniform sampler2D avglum_pass;
 layout(set = 0, binding = 7) uniform sampler2D monitor_body;
+layout(set = 0, binding = 8) uniform sampler2D first_pass;
 
 
 #include "functions.include.slang"
@@ -258,6 +259,10 @@ void main() {
     //"Just" handle inner and outer frame here:
     vec4 pixel_out = main_wrap();
     
+    //split screen (debug)
+    //if ( (vTexCoord.x < 0.5  && vTexCoord.y > 0.5) || (vTexCoord.x > 0.5  && vTexCoord.y < 0.5)         ) pixel_out = texture(first_pass,vTexCoord);
+    
+    
     //Bezel
     if (DO_BEZEL == 1.0) {
         pixel_out = vec4(compose_bezel_over(pixel_out.rgb),1.0);
@@ -265,6 +270,7 @@ void main() {
 
     FragColor = pixel_out ;
                       
-    //FragColor = texture(reflected_blurred_pass2, vOutputCoord);
+    //Use to debug:
+
     
 }

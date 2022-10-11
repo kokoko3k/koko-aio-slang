@@ -42,6 +42,7 @@ layout(push_constant) uniform Push
 	float VMASK_OVERWHITE ;
 	float VMASK_SCALE;
 	float VMASK_GAP;
+	float VMASK_USE_GM;
 	float DRKLN_OVERWHITE ;
 	float DO_DARKLINES_VOFFSET ;
 	float DARKLINES_PERIOD ;
@@ -181,14 +182,16 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // A Value of 0 completely disable the effect.
 // "VMASK_SCALE" Is the width of the mask, for HiDPI monitors.
 // "VMASK_GAP" Will draw an horizontal gap between triads, for HiDPI monitors.
+// "VMASK_USE_GM" exploit the rgb subpixel layout of the real monitor to higher the apparent RGB vmask resolution
 // "VMASK_OVERWHITE" modulates the strenght of the effect depending on the source pixel brightness,
 // This is handy  if you want to keep a good image contrast/brightness, but keep in mind that other
 // parameters like haloing and bloom.
-#pragma parameter DO_RGB_MASK        "★  RGB Mask:"         					1.0 	0.0 1.0 1.0
-#pragma parameter RGB_MASK_STRENGTH  "        Strength (0.0=off)"				0.75  	0.0 1.0 0.05
-#pragma parameter VMASK_SCALE       "        (HiDPI) Vmask size multiplier (for HiDPI)"		1.0  	1.0 4.0 1.0
-#pragma parameter VMASK_GAP          "        (HiDPI) Horizontal Gap between triads"		0.0  	0.0 1.0 1.0
-#pragma parameter VMASK_OVERWHITE    "        How much to affect bright colors"	1.0 		0.0 	1.0 0.05
+#pragma parameter DO_RGB_MASK        "★  RGB Mask:"         						1.0 	0.0 1.0 1.0
+#pragma parameter RGB_MASK_STRENGTH  "        Strength (0.0=off)"					0.75  	0.0 1.0 0.05
+#pragma parameter VMASK_SCALE        "        (HiDPI) Vmask size multiplier (for HiDPI)"		1.0  	1.0 4.0 1.0
+#pragma parameter VMASK_USE_GM       "        (LoDPI, RGB subpixel), use Green,Magenta, not RGB" 	0.0  	0.0 1.0 1.0
+#pragma parameter VMASK_GAP          "        Horizontal Gap between triads"				0.0  	0.0 1.0 1.0
+#pragma parameter VMASK_OVERWHITE    "        How much to affect bright colors"	1.0 			0.0 	1.0 0.05
 
 
 
@@ -336,6 +339,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #define VMASK_OVERWHITE   params.VMASK_OVERWHITE
 #define VMASK_SCALE       params.VMASK_SCALE
 #define VMASK_GAP         params.VMASK_GAP
+#define VMASK_USE_GM      params.VMASK_USE_GM
 
 #define DO_DARKLINES         global.DO_DARKLINES
 #define DARKLINES_STRENGTH   global.DARKLINES_STRENGTH

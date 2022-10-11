@@ -11,6 +11,12 @@
  #define m2 vec3 ( 0.0 , 1.0 , 0.0 )    //col 2
  #define m3 vec3 ( 0.0 , 0.0 , 1.0  )   //col 3
 
+// RGB mask low dpi (green-magenta, exploiting native rgb subpixels)
+ #define m1gm vec3 ( 0.0 , 1.0 , 0.0 )    //col 1
+ #define m2gm vec3 ( 1.0 , 0.0 , 1.0 )    //col 2
+
+ 
+ 
 // Blur sizes must not depend on input resolution
 #define scalemod_x (global.in_glow_and_scanline_flickering_passSize.x/360.0)
 #define scalemod_y (global.in_glow_and_scanline_flickering_passSize.y/270.0)
@@ -68,10 +74,32 @@ vec3 pixel_vmask(vec3 source, vec3 lm1,vec3 lm2,vec3 lm3,
 
 }
 
+vec3 pixel_vmask_gm(vec3 source, vec3 lm1,vec3 lm2,
+                 vec3 white_reference, float over_white,bool is_scanlined) {
+    int col = int( vOutputCoord.x * params.OutputSize.x );
+    vec3 pixel_out;
+    vec3 vmasked;
+    vec3 vec_mod=(vec3(2,1,2) + vec3(VMASK_GAP,0.0,0.0))* VMASK_SCALE ;
+    if (mod(col, vec_mod.x) < vec_mod.y) vmasked = lm1*source;
+        else if (mod(col, vec_mod.x) < vec_mod.z) vmasked = lm2*source;
+    else vmasked = vec3(0.0);
+
+    if (over_white == 1.0) pixel_out = vmasked;
+        else {
+            float whiteness=(white_reference.r+white_reference.g+white_reference.b)/3.0;
+            whiteness-= over_white;
+            whiteness=  clamp(whiteness,0.0,1.0);
+            pixel_out=  mix(vmasked,source,whiteness);
+        }
+    
+   return pixel_out;
+
+}
+
 vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
                      float do_offset, vec3 white_reference,float over_white) {
 
-    float Darkline_part_w = (3.0+VMASK_GAP) * VMASK_SCALE;
+    float Darkline_part_w = (3.0 - VMASK_USE_GM + VMASK_GAP) * VMASK_SCALE;
     float Darkline_part_w_x2 = Darkline_part_w*2;
     //vec3 pixel_out=source;
     float col_2 =  vOutputCoord.x * params.OutputSize.x;
@@ -204,13 +232,22 @@ vec4 main_wrap(vec2 co) {
     
     //Vertical RGB Mask
     if (DO_RGB_MASK == 1.0 ) {
-        vec3 m1f = m1 + 1.0 - RGB_MASK_STRENGTH ;
-        vec3 m2f = m2 + 1.0 - RGB_MASK_STRENGTH ;
-        vec3 m3f = m3 + 1.0 - RGB_MASK_STRENGTH ;
-        m1f = min(vec3(1.0),m1f) ;
-        m2f = min(vec3(1.0),m2f) ;
-        m3f = min(vec3(1.0),m3f) ;
-        pixel_out = pixel_vmask(pixel_out,m1f,m2f,m3f,pixel_in,VMASK_OVERWHITE,(DO_SCANLINES == 1));
+        //Use RGB pattern or exploit RGB layout with green and magenta?
+        if (VMASK_USE_GM < 1.0) {
+            vec3 m1f = m1 + 1.0 - RGB_MASK_STRENGTH ;
+            vec3 m2f = m2 + 1.0 - RGB_MASK_STRENGTH ;
+            vec3 m3f = m3 + 1.0 - RGB_MASK_STRENGTH ;
+            m1f = min(vec3(1.0),m1f) ;
+            m2f = min(vec3(1.0),m2f) ;
+            m3f = min(vec3(1.0),m3f) ;
+            pixel_out = pixel_vmask(pixel_out,m1f,m2f,m3f,pixel_in,VMASK_OVERWHITE,(DO_SCANLINES == 1));
+        } else {           
+            vec3 m1f = m1gm + 1.0 - RGB_MASK_STRENGTH ;
+            vec3 m2f = m2gm + 1.0 - RGB_MASK_STRENGTH ;
+            m1f = min(vec3(1.0),m1f) ;
+            m2f = min(vec3(1.0),m2f) ;
+            pixel_out = pixel_vmask_gm(pixel_out,m1f,m2f,pixel_in,VMASK_OVERWHITE,(DO_SCANLINES == 1));
+        }
     }
 
     //Horizontal screen lines
