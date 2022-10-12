@@ -49,8 +49,8 @@ bool flickering_scanline_needed(bool is_interlaced){
 
 vec3 get_scanline_mixed(vec3 pixel_in) {
 
-   float in_luminance = ((pixel_in.r+pixel_in.g+pixel_in.b)/3) * DO_IN_GLOW;
-   in_luminance = min(in_luminance  * GLOW_OVER_DARK_SCANLINES, 1.0) ;
+   float in_luminance = max(max(pixel_in.r,pixel_in.g), pixel_in.b) * DO_IN_GLOW;
+   in_luminance = min(in_luminance  * SCANLINES_BLEEDING, 1.0) ;
    vec3 pixel_scanlined = pixel_in * SCANLINE_DARK;
    return mix(pixel_scanlined, pixel_in, in_luminance);
    return vec3(1.0);

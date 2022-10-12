@@ -1,5 +1,7 @@
 #reference "koko-aio-crt-tv-slotmask.slangp"
 
+IN_GLOW_POWER = "0.80"
+
 DARKLINES_STRENGTH = "0.8"
 DO_DARKLINES_VOFFSET = "0.0"
 DARKLINES_PERIOD = "2.0" 	

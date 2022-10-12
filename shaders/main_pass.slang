@@ -208,9 +208,9 @@ vec4 main_wrap(vec2 co) {
         
     vec3 pixel_out = pixel_in;
 
-
+    
     // Non flickering scanlines
-    if ( DO_SCANLINES == 1.0 )  {
+    /*if ( DO_SCANLINES == 1.0 )  {
         if  (!flickering_scanlines) {  //flickering scanlines are handled in previous pass
             if  (! ( isinterlaced  && (SCANLINE_DISABLE_ON_INTERLACE == 1.0))  ) {
                 pixel_scanlined = pixel_scanline_static(pixel_out,co);
@@ -222,13 +222,14 @@ vec4 main_wrap(vec2 co) {
                 float in_luminance = (pixel_glowed.r+pixel_glowed.g+pixel_glowed.b)/3;
                 //in_luminance *=in_luminance;
                 //float in_luminance = max(max(pixel_glowed.r,pixel_glowed.g),pixel_glowed.b);
-                in_luminance = min(in_luminance  * GLOW_OVER_DARK_SCANLINES, 1.0) ;
+                in_luminance = min(in_luminance  * SCANLINES_BLEEDING, 1.0) ;
                 pixel_out = mix(pixel_scanlined,pixel_glowed,in_luminance) ;
                 } else {
                 pixel_out = pixel_scanlined;
             }   
         }
-    }     
+    }*/
+    
     
     //Vertical RGB Mask
     if (DO_RGB_MASK == 1.0 ) {
@@ -240,6 +241,7 @@ vec4 main_wrap(vec2 co) {
             m1f = min(vec3(1.0),m1f) ;
             m2f = min(vec3(1.0),m2f) ;
             m3f = min(vec3(1.0),m3f) ;
+                       
             pixel_out = pixel_vmask(pixel_out,m1f,m2f,m3f,pixel_in,VMASK_OVERWHITE,(DO_SCANLINES == 1));
         } else {           
             vec3 m1f = m1gm + 1.0 - RGB_MASK_STRENGTH ;
@@ -249,6 +251,7 @@ vec4 main_wrap(vec2 co) {
             pixel_out = pixel_vmask_gm(pixel_out,m1f,m2f,pixel_in,VMASK_OVERWHITE,(DO_SCANLINES == 1));
         }
     }
+    
 
     //Horizontal screen lines
     if (DO_DARKLINES == 1.0 ) {
@@ -257,11 +260,42 @@ vec4 main_wrap(vec2 co) {
     }
 
     //Halo
+    vec3 pixel_haloed;
     if (DO_HALO == 1.0 ) {
-        vec3 pixel_haloed = texture(halo_pass,co).rgb;
+        pixel_haloed = texture(halo_pass,co).rgb;
         pixel_out += pixel_haloed;
     }
 
+
+    // Non flickering scanlines
+    if ( DO_SCANLINES == 1.0 )  {
+        if  (!flickering_scanlines) {  //flickering scanlines are handled in previous pass
+            if  (! ( isinterlaced  && (SCANLINE_DISABLE_ON_INTERLACE == 1.0))  ) {
+                pixel_scanlined = pixel_scanline_static(pixel_out,co);
+                pixel_scanlined = min(vec3(1.0),pixel_scanlined);
+                pixel_out = min(vec3(1.0),pixel_out);
+            }
+            //If Halo, mix halo over scanlines, else mix glow
+            if (DO_IN_GLOW + DO_HALO > 0.0) {
+                vec3 pixel_bleed;
+                if (DO_HALO == 1.0)
+                    pixel_bleed = pixel_haloed;
+                else if (DO_IN_GLOW == 1.0)
+                    pixel_bleed = pixel_glowed;
+            
+            
+                float in_luminance = max(max(pixel_bleed.r,pixel_bleed.g), pixel_bleed.b);
+
+                //in_luminance *=in_luminance;
+                //float in_luminance = max(max(pixel_glowed.r,pixel_glowed.g),pixel_glowed.b);
+                in_luminance = min(in_luminance  * SCANLINES_BLEEDING, 1.0) ;
+                pixel_out = mix(pixel_scanlined,pixel_bleed,in_luminance) ;
+                    } else {
+                pixel_out = pixel_scanlined;
+            }   
+        }
+    }
+    
     
     if (DO_CCORRECTION == 1.0) {
         //Gamma correction
@@ -282,6 +316,43 @@ vec4 main_wrap(vec2 co) {
     //Out
     return vec4(pixel_out,1.0) ; //* border(border_coords);
 }
+
+/* 
+//Test masks to be used with pixel_vmask_test()
+// Actually slower than pixel_vmask(), but handy for quick test
+    //first element of the array is the useful size.
+    const vec3 oo = vec3(0); //padding
+    const vec3 mask_RGB[10] = vec3[]( vec3(3), vec3(1,0,0), vec3(0,1,0), vec3(0,0,1), oo, oo, oo, oo, oo, oo);
+    const vec3 mask_GM[10] =  vec3[]( vec3(2), vec3(0,1,0), vec3(1,0,1), oo,          oo, oo, oo, oo, oo, oo);
+
+
+vec3 pixel_vmask_test(vec3 color_in, vec3[10] vmask, int multiplier, float gap, vec3 white_reference, float over_white) {
+    int col = int( vOutputCoord.x * params.OutputSize.x );
+    vec3 vmasked;
+      
+    float size = (vmask[0].x + gap) * multiplier;
+    
+    for (int i = multiplier ; i <= size * multiplier ; i+=multiplier) {
+        if (mod(col, size) < i) {
+            vmasked = min (vmask[i/multiplier] + 1.0 - RGB_MASK_STRENGTH, vec3(1.0)) * color_in;
+            break;
+        }
+    }
+    
+    if (over_white == 1.0) return vmasked;
+        else {
+            float whiteness=(white_reference.r+white_reference.g+white_reference.b)/3.0;
+            whiteness-= over_white;
+            whiteness=  clamp(whiteness,0.0,1.0);
+            return  mix(vmasked, color_in, whiteness);
+        }
+
+}
+*/
+
+
+
+
 
 void main() {
     vec2 coords = vTexCoord;

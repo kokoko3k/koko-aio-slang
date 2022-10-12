@@ -74,7 +74,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float DO_CCORRECTION;
 	float DO_ALT_BLANK;
 	float IN_GLOW_ADD ;
-	float GLOW_OVER_DARK_SCANLINES ;
+	float SCANLINES_BLEEDING ;
 	float IN_GLOW_WH ;
 	float IN_GLOW_POWER ;
 	float IN_GLOW_GAMMA ;
@@ -149,6 +149,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 #pragma parameter DO_SCANLINES	"★ Scanlines:"									1.0 	0.0  1.0 1.0
 #pragma parameter SCANLINE_DARK "        Scanlines gap brightness"			  			0.0 	-1.0 1.0 0.05
+#pragma parameter SCANLINES_BLEEDING "        Scanlines bleeding"						0.0 	0.0 3.0 0.05
 
 // Alternate the drawing of the scanlines between frames. this will produce a flickering typical of
 // interlaced screens; 0 disable the effect, 1 always enables it, 2 enables it only when
@@ -172,7 +173,6 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter IN_GLOW_WH               "        Sharpness"							2.5	0.2 6.0 0.05
 #pragma parameter IN_GLOW_GAMMA            "        Gamma, the higher, the less the glow on dark colors"	1.0 	1.0 10.0 0.1
 #pragma parameter IN_GLOW_ADD              "        Post gain (0.0 to disable)"					0.0 	0.0 1.0 0.05
-#pragma parameter GLOW_OVER_DARK_SCANLINES "        Scanlines bleeding"						1.0 	0.0 3.0 0.1
 
 
 // RGB Mask
@@ -189,7 +189,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter DO_RGB_MASK        "★  RGB Mask:"         						1.0 	0.0 1.0 1.0
 #pragma parameter RGB_MASK_STRENGTH  "        Strength (0.0=off)"					0.75  	0.0 1.0 0.05
 #pragma parameter VMASK_SCALE        "        (HiDPI) Vmask size multiplier (for HiDPI)"		1.0  	1.0 4.0 1.0
-#pragma parameter VMASK_USE_GM       "        (LoDPI, RGB subpixel), use Green,Magenta, not RGB" 	0.0  	0.0 1.0 1.0
+#pragma parameter VMASK_USE_GM       "        (LoDPI) Green,Magenta -> BGR"		 		0.0  	0.0 1.0 1.0
 #pragma parameter VMASK_GAP          "        Horizontal Gap between triads"				0.0  	0.0 1.0 1.0
 #pragma parameter VMASK_OVERWHITE    "        How much to affect bright colors"	1.0 			0.0 	1.0 0.05
 
@@ -241,7 +241,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter BLOOM_GAMMA        "        Input Gamma"				4.0  1.0 10.0 0.1
 #pragma parameter BLOOM_POWER        "        Power multiplier"				8.0  1.0 10.0 0.5
 #pragma parameter BLOOM_GAMMA_OUT    "        Output Gamma"				1.5  0.1 10.0 0.1
-#pragma parameter BLOOM_OVER_WHITE   "        Strength on bright areas (0 = aura)"	1.0  0.0 1.0  0.1
+#pragma parameter BLOOM_OVER_WHITE   "        Strength on bright areas (0 = aura)"	1.0  0.0 1.0  0.05
 #pragma parameter BLOOM_BYPASS       "        Bypass"					0.0  0.0 1.0  1.0
 
 
@@ -280,7 +280,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 //Back leds
 //Emulates leds under the monitor frame that slowly reacts to image contents
-#pragma parameter DO_AMBILIGHT	 "★ Leds (needs Retroarch aspect ratio set to full!)"	1		.0  0.0  1.0     1.0
+#pragma parameter DO_AMBILIGHT	 "★ Leds (needs Retroarch aspect ratio set to full!)"			1.0  0.0  1.0     1.0
 #pragma parameter AMBI_STEPS	 "        Slowness"							60.0 5.0  1000.0  5.0
 #pragma parameter AMBI_FALLOFF   "        Light Falloff"						0.7  0.1  3.0     0.01
 #pragma parameter AMBI_POWER     "        Led power"							0.5  0.1  5.0     0.05
@@ -329,7 +329,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 #define DO_IN_GLOW               global.DO_IN_GLOW
 #define IN_GLOW_ADD              global.IN_GLOW_ADD
-#define GLOW_OVER_DARK_SCANLINES global.GLOW_OVER_DARK_SCANLINES
+#define SCANLINES_BLEEDING       global.SCANLINES_BLEEDING
 #define IN_GLOW_WH               global.IN_GLOW_WH
 #define IN_GLOW_POWER            global.IN_GLOW_POWER
 #define IN_GLOW_GAMMA            global.IN_GLOW_GAMMA
