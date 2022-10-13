@@ -184,6 +184,28 @@ float scanline_shape_static(vec2 coords) {
     return lines;
 }
 
+float scanline_shape_static_in_lum(vec2 coords, float in_luminance) {
+   /* Code modified from scanlines-sine-abs.glsl by RiskyJumps
+      license: public domain
+   */
+    int period = (params.OriginalSize.y > MIN_LINES_INTERLACED ) ? 2 : 1 ;
+    float angle = coords.y * omega * period * params.OriginalSize.y ;
+    float lines = abs(sin(angle));
+  
+    lines = (lines*lines);
+  
+    in_luminance = clamp((in_luminance + SCANLINE_DARK),0.0,1.0);
+    if (in_luminance >= 0.0) {
+        lines = lines * (ps_lines_white - in_luminance) + in_luminance;
+    } else {        
+        float deepness = -SCANLINE_DARK;
+        lines = lines * ((1-SCANLINE_DARK) ) + SCANLINE_DARK ;
+    }
+    
+    return lines;
+}
+
+
 vec4 main_wrap(vec2 co) {
     bool isinterlaced = is_interlaced();
     bool flickering_scanlines = (DO_SCANLINES == 1.0) && scanline_have_to_flicker(isinterlaced) ;
@@ -191,12 +213,11 @@ vec4 main_wrap(vec2 co) {
 
     vec3 pixel_in;
     vec3 pixel_glowed;
-    float scanline_shape;
     
     //Get the first available pixel_in:
     if  ((DO_IN_GLOW == 1.0) || flickering_scanlines) {
-            pixel_in = texture(in_glow_and_scanline_flickering_pass,co).rgb;
-            pixel_glowed = pixel_in;
+            pixel_glowed = texture(in_glow_and_scanline_flickering_pass,co).rgb;
+            pixel_in = pixel_glowed;
         }
             else if (DO_FXAA == 1.0) 
         pixel_in = texture(FXAA_pass,co).rgb ;
@@ -261,37 +282,25 @@ vec4 main_wrap(vec2 co) {
     if (DO_HALO == 1.0 ) {
         pixel_haloed = texture(halo_pass,co).rgb;
         pixel_out += pixel_haloed;
-        pixel_out = clamp(pixel_out,0.0,HALO_CLAMP);
+        pixel_out = clamp(pixel_out,0.0,1.25);
     }
 
-    
-
-    
     // Non flickering scanlines
     if ( DO_SCANLINES == 1.0 )  {
+        vec3 pixel_bleed ; 
         if  (!flickering_scanlines) {  //flickering scanlines are handled in previous pass
             if  (! ( isinterlaced  && (SCANLINE_DISABLE_ON_INTERLACE == 1.0))  ) {
-                scanline_shape = scanline_shape_static(co);                
+                
+                if (DO_IN_GLOW + DO_HALO > 0.0) {
+                    if (DO_HALO == 1.0) pixel_bleed = pixel_haloed;
+                    else if (DO_IN_GLOW == 1.0) pixel_bleed = pixel_glowed;
+                    else pixel_bleed = pixel_in;
+                }
             }
+            float scanline_shape =  scanline_shape_static(co) ;
             vec3 pixel_scanlined = scanline_shape * pixel_out;
-            //If Halo, mix halo over scanlines, else mix glow
-            if (DO_IN_GLOW + DO_HALO > 0.0) {
-                vec3 pixel_bleed;
-                if (DO_HALO == 1.0)
-                    pixel_bleed = pixel_haloed;
-                else if (DO_IN_GLOW == 1.0)
-                    pixel_bleed = pixel_glowed;
-
-                float in_luminance = max(max(pixel_bleed.r,pixel_bleed.g), pixel_bleed.b);
-                //float in_luminance = (pixel_glowed.r+pixel_glowed.g+pixel_glowed.b)/3.0;
-                
-                
-                
-                in_luminance = min(in_luminance  * SCANLINES_BLEEDING, 1.0) ;
-                pixel_out = mix(pixel_scanlined,pixel_bleed,in_luminance) ;
-                    } else {
-                pixel_out = pixel_out * scanline_shape;
-            }   
+            float in_luminance = max(max(pixel_bleed.r,pixel_bleed.g),pixel_bleed.b) * SCANLINES_BLEEDING;
+            pixel_out = mix(pixel_scanlined,pixel_bleed,in_luminance) ;
         }
     }
 

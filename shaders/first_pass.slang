@@ -25,7 +25,7 @@ void main() {
       //FragColor=vec4(abs(sin(params.FrameCount/3.14/20)),0.0,0.0,0.0); //red fade
       //FragColor=vec4(1.0);
       //FragColor=vec4(0.38,0.0,1.0,1.0);
-      //FragColor=vec4(1.0,0.0,1.0,1.0)*vTexCoord.x;
+      //FragColor=vec4(0.38,0.0,1.0,1.0)*vTexCoord.x;
       //FragColor=vec4(vTexCoord.x); //H bw gradient
       //if  (mod(params.FrameCount,100) < 50) FragColor=vec4(0.0) ; else FragColor=vec4(1.0);      
 }

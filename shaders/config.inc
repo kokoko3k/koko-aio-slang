@@ -31,7 +31,7 @@
 	// Since halo is added, we may want to clamp it to 1.0 to avoid visual artifacts
 	// when doing scanlines; however the effect is nice when not clamped
 	// se put the following as higher as possible to trade the things.
-#define HALO_CLAMP 1.4
+#define HALO_CLAMP 1.25
 
 layout(push_constant) uniform Push
 {
