@@ -1,5 +1,12 @@
 #reference "koko-aio-crt-tv-slotmask-bloom-bezelwider.slangp"
 
 DO_SCANLINES = "1.0"
+	SCANLINES_BLEEDING = "0.60"
+
+IN_GLOW_POWER = "1.10"
 
 DARKLINES_PERIOD = "4.0" 
+
+HALO_POWER = "1.25"
+
+GAMMA_OUT = "0.50"
