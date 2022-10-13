@@ -216,29 +216,7 @@ vec4 main_wrap(vec2 co) {
         
     vec3 pixel_out = pixel_in;
 
-    
-    // Non flickering scanlines
-    /*if ( DO_SCANLINES == 1.0 )  {
-        if  (!flickering_scanlines) {  //flickering scanlines are handled in previous pass
-            if  (! ( isinterlaced  && (SCANLINE_DISABLE_ON_INTERLACE == 1.0))  ) {
-                pixel_scanlined = pixel_scanline_static(pixel_out,co);
-                pixel_scanlined = min(vec3(1.0),pixel_scanlined);
-                pixel_out = min(vec3(1.0),pixel_out);
-            }
-            //Mix scanline and glow pixel; depending on whiteness.
-            if (DO_IN_GLOW == 1) {
-                float in_luminance = (pixel_glowed.r+pixel_glowed.g+pixel_glowed.b)/3;
-                //in_luminance *=in_luminance;
-                //float in_luminance = max(max(pixel_glowed.r,pixel_glowed.g),pixel_glowed.b);
-                in_luminance = min(in_luminance  * SCANLINES_BLEEDING, 1.0) ;
-                pixel_out = mix(pixel_scanlined,pixel_glowed,in_luminance) ;
-                } else {
-                pixel_out = pixel_scanlined;
-            }   
-        }
-    }*/
-    
-    
+   
     //Vertical RGB Mask
     if (DO_RGB_MASK == 1.0 ) {
         //Use RGB pattern or exploit RGB layout with green and magenta?
@@ -250,13 +228,14 @@ vec4 main_wrap(vec2 co) {
             m2f = min(vec3(1.0),m2f) ;
             m3f = min(vec3(1.0),m3f) ;
                        
-            pixel_out = pixel_vmask(pixel_out,m1f,m2f,m3f,pixel_in,VMASK_OVERWHITE,(DO_SCANLINES == 1));
+            pixel_out = pixel_vmask(pixel_out,m1f,m2f,m3f,pixel_out,VMASK_OVERWHITE,(DO_SCANLINES == 1));
         } else {           
             vec3 m1f = m1gm + 1.0 - RGB_MASK_STRENGTH ;
             vec3 m2f = m2gm + 1.0 - RGB_MASK_STRENGTH ;
             m1f = min(vec3(1.0),m1f) ;
             m2f = min(vec3(1.0),m2f) ;
-            pixel_out = pixel_vmask_gm(pixel_out,m1f,m2f,pixel_in,VMASK_OVERWHITE,(DO_SCANLINES == 1));
+            //pixel_out = pixel_vmask_gm(pixel_out,m1f,m2f,pixel_in,VMASK_OVERWHITE,(DO_SCANLINES == 1));
+            pixel_out = pixel_vmask_gm(pixel_out,m1f,m2f,texture(first_pass,co).rgb,VMASK_OVERWHITE,(DO_SCANLINES == 1));
         }
     }
     
@@ -289,7 +268,7 @@ vec4 main_wrap(vec2 co) {
             float scanline_shape =  scanline_shape_static(co) ;
             vec3 pixel_scanlined = scanline_shape * pixel_out;
             float in_luminance = max(max(pixel_bleed.r,pixel_bleed.g),pixel_bleed.b) * SCANLINES_BLEEDING;
-            pixel_out = mix(pixel_scanlined,pixel_bleed,in_luminance) ;
+            pixel_out = mix(pixel_scanlined,pixel_bleed,  in_luminance *  (1-scanline_shape) ) ;
         }
     }
 
