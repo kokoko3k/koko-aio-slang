@@ -164,6 +164,18 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
 #define omega 3.14159265358979
 #define ps_lines_white 1.0000
 
+float scanline_shape_static_in_lum(vec2 coords, float in_luminance) {
+   /* Modulate scanline weight via in_luminance */
+    float period = (params.OriginalSize.y > MIN_LINES_INTERLACED ) ? 2 : 1 ;
+    float angle = coords.y * omega * period * params.OriginalSize.y ;
+    float lines = abs(sin(angle));
+    lines=clamp(lines, SCANLINE_DARK,1.0);
+    lines = (lines*lines);
+    float w = (SCANLINES_BLEEDING * 9.0 * in_luminance +1 ); // + SCANLINES_BLEEDING;
+    lines = pow(lines,1.0/ w );
+    return lines;
+}
+
 float scanline_shape_static(vec2 coords) {
    /* Code modified from scanlines-sine-abs.glsl by RiskyJumps
       license: public domain
@@ -183,28 +195,6 @@ float scanline_shape_static(vec2 coords) {
     
     return lines;
 }
-
-float scanline_shape_static_in_lum(vec2 coords, float in_luminance) {
-   /* Code modified from scanlines-sine-abs.glsl by RiskyJumps
-      license: public domain
-   */
-    int period = (params.OriginalSize.y > MIN_LINES_INTERLACED ) ? 2 : 1 ;
-    float angle = coords.y * omega * period * params.OriginalSize.y ;
-    float lines = abs(sin(angle));
-  
-    lines = (lines*lines);
-  
-    in_luminance = clamp((in_luminance + SCANLINE_DARK),0.0,1.0);
-    if (in_luminance >= 0.0) {
-        lines = lines * (ps_lines_white - in_luminance) + in_luminance;
-    } else {        
-        float deepness = -SCANLINE_DARK;
-        lines = lines * ((1-SCANLINE_DARK) ) + SCANLINE_DARK ;
-    }
-    
-    return lines;
-}
-
 
 vec4 main_wrap(vec2 co) {
     bool isinterlaced = is_interlaced();
@@ -282,7 +272,7 @@ vec4 main_wrap(vec2 co) {
     if (DO_HALO == 1.0 ) {
         pixel_haloed = texture(halo_pass,co).rgb;
         pixel_out += pixel_haloed;
-        pixel_out = clamp(pixel_out,0.0,1.25);
+        pixel_out = clamp(pixel_out,0.0,HALO_CLAMP);
     }
 
     // Non flickering scanlines
@@ -290,7 +280,6 @@ vec4 main_wrap(vec2 co) {
         vec3 pixel_bleed ; 
         if  (!flickering_scanlines) {  //flickering scanlines are handled in previous pass
             if  (! ( isinterlaced  && (SCANLINE_DISABLE_ON_INTERLACE == 1.0))  ) {
-                
                 if (DO_IN_GLOW + DO_HALO > 0.0) {
                     if (DO_HALO == 1.0) pixel_bleed = pixel_haloed;
                     else if (DO_IN_GLOW == 1.0) pixel_bleed = pixel_glowed;
