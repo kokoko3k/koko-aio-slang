@@ -260,7 +260,7 @@ void main() {
     vec4 pixel_out = main_wrap();
     
     //split screen (debug)
-    //if ( (vTexCoord.x < 0.5  && vTexCoord.y > 0.5) || (vTexCoord.x > 0.5  && vTexCoord.y < 0.5)         ) pixel_out = texture(first_pass,vTexCoord);
+//     //if ( (vTexCoord.x < 0.5  && vTexCoord.y > 0.5) || (vTexCoord.x > 0.5  && vTexCoord.y < 0.5)         ) pixel_out = texture(first_pass,vTexCoord);
     
     
     //Bezel

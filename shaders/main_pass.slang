@@ -164,7 +164,7 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
 #define omega 3.14159265358979
 #define ps_lines_white 1.0000
 
-vec3 pixel_scanline_static(vec3 color, vec2 coords) {
+float scanline_shape_static(vec2 coords) {
    /* Code modified from scanlines-sine-abs.glsl by RiskyJumps
       license: public domain
    */
@@ -180,10 +180,8 @@ vec3 pixel_scanline_static(vec3 color, vec2 coords) {
         float deepness = -SCANLINE_DARK;
         lines = lines * ((1-SCANLINE_DARK) ) + SCANLINE_DARK ;
     }
-
-    color *= min(lines,1.0); // <-- not clamping here may produce scanline dephasing.
     
-    return color;
+    return lines;
 }
 
 vec4 main_wrap(vec2 co) {
@@ -193,13 +191,12 @@ vec4 main_wrap(vec2 co) {
 
     vec3 pixel_in;
     vec3 pixel_glowed;
-    vec3 pixel_scanlined;
+    float scanline_shape;
     
     //Get the first available pixel_in:
     if  ((DO_IN_GLOW == 1.0) || flickering_scanlines) {
             pixel_in = texture(in_glow_and_scanline_flickering_pass,co).rgb;
             pixel_glowed = pixel_in;
-            pixel_scanlined = pixel_in;
         }
             else if (DO_FXAA == 1.0) 
         pixel_in = texture(FXAA_pass,co).rgb ;
@@ -264,17 +261,19 @@ vec4 main_wrap(vec2 co) {
     if (DO_HALO == 1.0 ) {
         pixel_haloed = texture(halo_pass,co).rgb;
         pixel_out += pixel_haloed;
+        pixel_out = clamp(pixel_out,0.0,HALO_CLAMP);
     }
 
+    
 
+    
     // Non flickering scanlines
     if ( DO_SCANLINES == 1.0 )  {
         if  (!flickering_scanlines) {  //flickering scanlines are handled in previous pass
             if  (! ( isinterlaced  && (SCANLINE_DISABLE_ON_INTERLACE == 1.0))  ) {
-                pixel_scanlined = pixel_scanline_static(pixel_out,co);
-                pixel_scanlined = min(vec3(1.0),pixel_scanlined);
-                pixel_out = min(vec3(1.0),pixel_out);
+                scanline_shape = scanline_shape_static(co);                
             }
+            vec3 pixel_scanlined = scanline_shape * pixel_out;
             //If Halo, mix halo over scanlines, else mix glow
             if (DO_IN_GLOW + DO_HALO > 0.0) {
                 vec3 pixel_bleed;
@@ -282,20 +281,20 @@ vec4 main_wrap(vec2 co) {
                     pixel_bleed = pixel_haloed;
                 else if (DO_IN_GLOW == 1.0)
                     pixel_bleed = pixel_glowed;
-            
-            
-                float in_luminance = max(max(pixel_bleed.r,pixel_bleed.g), pixel_bleed.b);
 
-                //in_luminance *=in_luminance;
-                //float in_luminance = max(max(pixel_glowed.r,pixel_glowed.g),pixel_glowed.b);
+                float in_luminance = max(max(pixel_bleed.r,pixel_bleed.g), pixel_bleed.b);
+                //float in_luminance = (pixel_glowed.r+pixel_glowed.g+pixel_glowed.b)/3.0;
+                
+                
+                
                 in_luminance = min(in_luminance  * SCANLINES_BLEEDING, 1.0) ;
                 pixel_out = mix(pixel_scanlined,pixel_bleed,in_luminance) ;
                     } else {
-                pixel_out = pixel_scanlined;
+                pixel_out = pixel_out * scanline_shape;
             }   
         }
     }
-    
+
     
     if (DO_CCORRECTION == 1.0) {
         //Gamma correction
