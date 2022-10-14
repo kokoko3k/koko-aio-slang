@@ -279,9 +279,9 @@ vec4 main_wrap(vec2 co) {
                 float in_luminance = max(max(pixel_bleed.r,pixel_bleed.g),pixel_bleed.b) * SCANLINES_BLEEDING;
                 pixel_out = mix(pixel_scanlined,pixel_bleed,  in_luminance *  (1-scanline_shape) ) ;
             } else {
-                pixel_scanlined = clamp(pixel_scanlined,0.0,1.0);
-                pixel_out = scale_to_ranpixel_scanlined;
+                pixel_out = pixel_scanlined;
             }
+
         }
     }
 
