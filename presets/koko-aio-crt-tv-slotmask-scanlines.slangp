@@ -1,10 +1,6 @@
-#reference "koko-aio-crt-tv-slotmask.slangp"
+#reference "koko-aio-crt-monitor-slotmask.slangp"
 
-DO_SCANLINES = "1.0"
-	SCANLINES_BLEEDING = "0.60"
+DO_FXAA = "1.000000"
 
-IN_GLOW_POWER = "1.10"
-
-HALO_POWER = "1.25"
-
-GAMMA_OUT = "0.50"
+HALO_W = "6.000000"
+HALO_H = "6.000000"

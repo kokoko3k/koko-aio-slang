@@ -1,5 +1,9 @@
-#reference "koko-aio-crt-tv-slotmask-bloom-bezelwider.slangp"
+#reference "koko-aio-crt-tv-aperturegrille-bloom-bezel.slangp"
 
-DARKLINES_STRENGTH = "0.8"
-DO_DARKLINES_VOFFSET = "0.0"
-DARKLINES_PERIOD = "2.0" 	
+GEOM_WARP_X = 0.03
+GEOM_WARP_Y = 0.03
+
+BEZEL_FRAME_ZOOM = "0.139"
+BEZEL_INNER_ZOOM = "-0.005"
+BEZEL_IMAGE_BORDER = "1.02"
+
