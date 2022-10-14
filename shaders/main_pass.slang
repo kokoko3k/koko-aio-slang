@@ -182,21 +182,19 @@ float scanline_shape(vec2 coords, bool do_flicker) {
    */
    
     bool alternate = false;
-    if (do_flicker)
+    float period = 1.0;
+    if (do_flicker) {
         if  (int(mod(float(params.FrameCount),2.0  )) == 1) alternate = true;
-
-
-    int period = (params.OriginalSize.y > MIN_LINES_INTERLACED ) ? 2 : 1 ;
-    
+        if (params.OriginalSize.y > MIN_LINES_INTERLACED )  period = 0.5;
+    }
     float angle = coords.y * omega * period * params.OriginalSize.y;
 
     float lines;
-    if (alternate )
+    if (alternate)
         lines = abs(cos(angle));
             else
         lines = abs(sin(angle));
         
-   
     lines = (lines*lines);
   
     if (SCANLINE_DARK >= 0.0) {
