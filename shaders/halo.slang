@@ -7,8 +7,8 @@
 
 
 // Blur sizes must not depend on input resolution
-#define scalemod_x (global.in_glow_and_scanline_flickering_passSize.x/360.0)
-#define scalemod_y (global.in_glow_and_scanline_flickering_passSize.y/270.0)
+#define scalemod_x (global.in_glow_passSize.x/360.0)
+#define scalemod_y (global.in_glow_passSize.y/270.0)
 
 
 #pragma stage vertex
@@ -31,7 +31,7 @@ layout(location = 1) in vec2 vOutputCoord;
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D FXAA_pass;
 layout(set = 0, binding = 3) uniform sampler2D first_pass;
-layout(set = 0, binding = 4) uniform sampler2D in_glow_and_scanline_flickering_pass;
+layout(set = 0, binding = 4) uniform sampler2D in_glow_pass;
 
 // What follows is an ugly optimization with a lot of code copied and pasted repeated multiple times,
 // shamlessly hidden into an include:
@@ -44,7 +44,7 @@ vec4 main_wrap(void) {
     vec2 halo_coords = vTexCoord;
 
     if (DO_IN_GLOW == 1.0)
-        pixel_haloed = pixel_glow(in_glow_and_scanline_flickering_pass, HALO_W,HALO_H,HALO_POWER,HALO_GAMMA,halo_coords, global.FXAA_passSize, global.FXAA_passSize).rgb;
+        pixel_haloed = pixel_glow(in_glow_pass, HALO_W,HALO_H,HALO_POWER,HALO_GAMMA,halo_coords, global.FXAA_passSize, global.FXAA_passSize).rgb;
     else if (DO_FXAA == 1.0)
         pixel_haloed = pixel_glow(FXAA_pass, HALO_W,HALO_H,HALO_POWER,HALO_GAMMA,halo_coords, global.FXAA_passSize, global.FXAA_passSize).rgb;
     else

@@ -136,8 +136,8 @@ shaders = 17
    In this pass we also generate flickering scanlines by blindly blanking
    alternate lines at #frame interval
 */
-           shader2 = shaders/in_glow_and_scanline_flickering.slang
-            alias2 = "in_glow_and_scanline_flickering_pass"
+           shader2 = shaders/in_glow.slang
+            alias2 = "in_glow_pass"
     filter_linear2 = true
             scale2 = 1
        scale_type2 = source    

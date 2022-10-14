@@ -156,7 +156,7 @@ vec4 pixel_inner_frame() {
     
     //Mix bloom texture
         if (DO_BLOOM == 1.0 ) {
-            bloomed=texture(bloom_pass_final, coords_curved).rgb ;
+            bloomed=texture(bloom_pass_final, vOutputCoord).rgb ;
             if (BLOOM_BYPASS == 1.0)
                 pixel_out = bloomed;
             else {

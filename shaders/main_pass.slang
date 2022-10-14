@@ -18,8 +18,8 @@
  
  
 // Blur sizes must not depend on input resolution
-#define scalemod_x (global.in_glow_and_scanline_flickering_passSize.x/360.0)
-#define scalemod_y (global.in_glow_and_scanline_flickering_passSize.y/270.0)
+#define scalemod_x (global.in_glow_passSize.x/360.0)
+#define scalemod_y (global.in_glow_passSize.y/270.0)
 
 
 #pragma stage vertex
@@ -41,7 +41,7 @@ layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in vec2 vOutputCoord;
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 3) uniform sampler2D FXAA_pass;
-layout(set = 0, binding = 4) uniform sampler2D in_glow_and_scanline_flickering_pass;
+layout(set = 0, binding = 4) uniform sampler2D in_glow_pass;
 layout(set = 0, binding = 5) uniform sampler2D halo_pass;
 layout(set = 0, binding = 6) uniform sampler2D first_pass;
 layout(set = 0, binding = 7) uniform sampler2D avglum_passFeedback;
@@ -176,14 +176,27 @@ float scanline_shape_static_in_lum(vec2 coords, float in_luminance) {
     return lines;
 }
 
-float scanline_shape_static(vec2 coords) {
+float scanline_shape(vec2 coords, bool do_flicker) {
    /* Code modified from scanlines-sine-abs.glsl by RiskyJumps
       license: public domain
    */
+   
+    bool alternate = false;
+    if (do_flicker)
+        if  (int(mod(float(params.FrameCount),2.0  )) == 1) alternate = true;
+
+
     int period = (params.OriginalSize.y > MIN_LINES_INTERLACED ) ? 2 : 1 ;
-    float angle = coords.y * omega * period * params.OriginalSize.y ;
-    float lines = abs(sin(angle));
-  
+    
+    float angle = coords.y * omega * period * params.OriginalSize.y;
+
+    float lines;
+    if (alternate )
+        lines = abs(cos(angle));
+            else
+        lines = abs(sin(angle));
+        
+   
     lines = (lines*lines);
   
     if (SCANLINE_DARK >= 0.0) {
@@ -205,8 +218,8 @@ vec4 main_wrap(vec2 co) {
     vec3 pixel_glowed;
     
     //Get the first available pixel_in:
-    if  ((DO_IN_GLOW == 1.0) || flickering_scanlines) {
-            pixel_glowed = texture(in_glow_and_scanline_flickering_pass,co).rgb;
+    if  (DO_IN_GLOW == 1.0) {
+            pixel_glowed = texture(in_glow_pass,co).rgb;
             pixel_in = pixel_glowed;
         }
             else if (DO_FXAA == 1.0) 
@@ -257,15 +270,14 @@ vec4 main_wrap(vec2 co) {
     // Non flickering scanlines
     if ( DO_SCANLINES == 1.0 )  {
         vec3 pixel_bleed ; 
-        if  (!flickering_scanlines) {  //flickering scanlines are handled in previous pass
-            if  (! ( isinterlaced  && (SCANLINE_DISABLE_ON_INTERLACE == 1.0))  ) {
-                if (DO_IN_GLOW + DO_HALO > 0.0) {
-                    if (DO_HALO == 1.0) pixel_bleed = pixel_haloed;
-                    else if (DO_IN_GLOW == 1.0) pixel_bleed = pixel_glowed;
-                    else pixel_bleed = pixel_in;
-                }
+        if  (! ( isinterlaced  && (SCANLINE_DISABLE_ON_INTERLACE == 1.0))  ) {
+            if (DO_IN_GLOW + DO_HALO > 0.0) {
+                if (DO_HALO == 1.0) pixel_bleed = pixel_haloed;
+                else if (DO_IN_GLOW == 1.0) pixel_bleed = pixel_glowed;
+                else pixel_bleed = pixel_in;
             }
-            float scanline_shape =  scanline_shape_static(co) ;
+        
+            float scanline_shape =  scanline_shape(co, flickering_scanlines ) ;
             vec3 pixel_scanlined = scanline_shape * pixel_out;
             float in_luminance = max(max(pixel_bleed.r,pixel_bleed.g),pixel_bleed.b) * SCANLINES_BLEEDING;
             pixel_out = mix(pixel_scanlined,pixel_bleed,  in_luminance *  (1-scanline_shape) ) ;
