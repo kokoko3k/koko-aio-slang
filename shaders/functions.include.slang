@@ -23,6 +23,15 @@ bool is_interlaced() {
 	return (params.OriginalSize.y > MIN_LINES_INTERLACED);
 }
 
+float scale_to_range(float x, float dmin, float dmax) {
+    //Scales 0..1 range to a..b range
+    return ( (dmax-dmin) * x ) + dmin;
+}
+
+vec3 scale_to_range_vec3(vec3 x, float dmin, float dmax) {
+    //Scales 0..1 range to a..b range
+    return ( (dmax-dmin) * x ) + dmin;
+}
 
 #define RND_A 12.9898
 #define RND_B 78.233

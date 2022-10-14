@@ -158,16 +158,10 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
     return pixel_out;
 }
 
-/* freq = 0.500000
-   omega = pi x 2 * freq --> omega = pi x 2 x 0.5 = pi. (is the Angular frequency)
-*/
-#define omega 3.14159265358979
-#define ps_lines_white 1.0000
-
 float scanline_shape_static_in_lum(vec2 coords, float in_luminance) {
    /* Modulate scanline weight via in_luminance */
     float period = (params.OriginalSize.y > MIN_LINES_INTERLACED ) ? 2 : 1 ;
-    float angle = coords.y * omega * period * params.OriginalSize.y ;
+    float angle = coords.y * pi * period * params.OriginalSize.y ;
     float lines = abs(sin(angle));
     lines=clamp(lines, SCANLINE_DARK,1.0);
     lines = (lines*lines);
@@ -177,17 +171,13 @@ float scanline_shape_static_in_lum(vec2 coords, float in_luminance) {
 }
 
 float scanline_shape(vec2 coords, bool do_flicker) {
-   /* Code modified from scanlines-sine-abs.glsl by RiskyJumps
-      license: public domain
-   */
-   
     bool alternate = false;
     float period = 1.0;
     if (do_flicker) {
         if  (int(mod(float(params.FrameCount),2.0  )) == 1) alternate = true;
         if (params.OriginalSize.y > MIN_LINES_INTERLACED )  period = 0.5;
     }
-    float angle = coords.y * omega * period * params.OriginalSize.y;
+    float angle = coords.y * pi * period * params.OriginalSize.y;
 
     float lines;
     if (alternate)
@@ -198,13 +188,21 @@ float scanline_shape(vec2 coords, bool do_flicker) {
     lines = (lines*lines);
   
     if (SCANLINE_DARK >= 0.0) {
-        lines = lines * (ps_lines_white - SCANLINE_DARK) + SCANLINE_DARK;
+        lines = lines * (1.0 - SCANLINE_DARK) + SCANLINE_DARK;
     } else {        
         float deepness = -SCANLINE_DARK;
         lines = lines * ((1-SCANLINE_DARK) ) + SCANLINE_DARK ;
     }
     
     return lines;
+}
+
+float scanline_shape_dumb(vec2 coords, bool do_flicker) {
+    float source_dy =  global.first_passSize.w ;
+    if ( mod(coords.y, source_dy*2) < source_dy ) {
+        return 1.0;
+    }
+    return 0.0;
 }
 
 vec4 main_wrap(vec2 co) {
@@ -277,8 +275,13 @@ vec4 main_wrap(vec2 co) {
         
             float scanline_shape =  scanline_shape(co, flickering_scanlines ) ;
             vec3 pixel_scanlined = scanline_shape * pixel_out;
-            float in_luminance = max(max(pixel_bleed.r,pixel_bleed.g),pixel_bleed.b) * SCANLINES_BLEEDING;
-            pixel_out = mix(pixel_scanlined,pixel_bleed,  in_luminance *  (1-scanline_shape) ) ;
+            if (!flickering_scanlines) {
+                float in_luminance = max(max(pixel_bleed.r,pixel_bleed.g),pixel_bleed.b) * SCANLINES_BLEEDING;
+                pixel_out = mix(pixel_scanlined,pixel_bleed,  in_luminance *  (1-scanline_shape) ) ;
+            } else {
+                pixel_scanlined = clamp(pixel_scanlined,0.0,1.0);
+                pixel_out = scale_to_ranpixel_scanlined;
+            }
         }
     }
 

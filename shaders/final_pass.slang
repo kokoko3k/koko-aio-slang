@@ -76,11 +76,6 @@ vec3 pixel_alternate(vec3 source, float whiteness) {
 }
 
 
-float scale_to_range(float x, float dmin, float dmax) {
-    //Scales 0..1 range to a..b range
-    return ( (dmax-dmin) * x ) + dmin;
-}
-
 #define bezel_luminance bezel.r
 vec3 bezel_color(float lum)  {
     vec3 col = vec3(BEZEL_R,BEZEL_G,BEZEL_B) + lum;
