@@ -17,8 +17,32 @@ layout(location = 0) in vec2 vTexCoord;
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D Source;
 
+
+
+
+
 void main() {
-   FragColor = texture(Source, vTexCoord);
+   
+   if (DO_OFFSET == 1.0) {
+      vec2 offset_r = vec2(floor(OFFSET_R), fract(OFFSET_R)*10)-vec2(10,0.10);
+      vec2 offset_g = vec2(floor(OFFSET_G), fract(OFFSET_G)*10)-vec2(10,0.10);
+      vec2 offset_b = vec2(floor(OFFSET_B), fract(OFFSET_B)*10)-vec2(10,0.10);
+   
+      vec2 d = -vec2(global.FinalViewportSize.z,global.FinalViewportSize.w);
+      vec3 pixel_offset;
+      pixel_offset.r=texture(Source,vTexCoord + offset_r * d).r;
+      pixel_offset.g=texture(Source,vTexCoord + offset_g * d).g;
+      pixel_offset.b=texture(Source,vTexCoord + offset_b * d).b;
+
+      vec3 pixel_out = texture(Source, vTexCoord).rgb;
+      pixel_out = mix(pixel_out,pixel_offset,OFFSET_STRENGTH);
+      FragColor = vec4(pixel_out,1.0);
+      
+   } else {
+      
+      FragColor = texture(Source, vTexCoord);
+      
+   }
    
    //Use one of the following to debug:
       //FragColor=vec4(abs(sin(params.FrameCount/3.14/4))); //white fade
