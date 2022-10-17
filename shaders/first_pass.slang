@@ -18,19 +18,7 @@ layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D Source;
 
 void main() {
-
-   vec2 dr = vec2(0,0);
-   vec2 dg = vec2(0,0);
-   vec2 db = vec2(0,0);
-
-   vec3 pixel_out;
-   pixel_out.r=texture(source,vTexCoord+dr).r;
-   pixel_out.g=texture(source,vTexCoord+dg).g;
-   pixel_out.b=texture(source,vTexCoord+db).b;
-
-   FragColor vec4(pixel_out,1.0);
-   
-   //FragColor = texture(Source, vTexCoord);
+   FragColor = texture(Source, vTexCoord);
    
    //Use one of the following to debug:
       //FragColor=vec4(abs(sin(params.FrameCount/3.14/4))); //white fade
