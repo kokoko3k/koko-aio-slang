@@ -255,6 +255,8 @@ vec4 main_wrap(vec2 co) {
         pixel_out = pixel_darklines(pixel_out,DARKLINES_PERIOD,MYDARKLINES_TRANSPARENCY,DO_DARKLINES_VOFFSET,pixel_in,DRKLN_OVERWHITE);
     }
 
+
+
     //Halo
     vec3 pixel_haloed;
     if (DO_HALO == 1.0 ) {
@@ -262,7 +264,7 @@ vec4 main_wrap(vec2 co) {
         pixel_out += pixel_haloed;
         pixel_out = clamp(pixel_out,0.0,HALO_CLAMP);
     }
-
+    
     // Non flickering scanlines
     if ( DO_SCANLINES == 1.0 )  {
         vec3 pixel_bleed ; 
@@ -276,14 +278,24 @@ vec4 main_wrap(vec2 co) {
             float scanline_shape =  scanline_shape(co, flickering_scanlines ) ;
             vec3 pixel_scanlined = scanline_shape * pixel_out;
             if (!flickering_scanlines) {
-                float in_luminance = max(max(pixel_bleed.r,pixel_bleed.g),pixel_bleed.b) * SCANLINES_BLEEDING;
-                pixel_out = mix(pixel_scanlined,pixel_bleed,  in_luminance *  (1-scanline_shape) ) ;
+                                            
+            /*
+            //float in_luminance = max(max(pixel_bleed.r,pixel_bleed.g),pixel_bleed.b);
+            float in_luminance = (pixel_bleed.r+pixel_bleed.g+pixel_bleed.b) * SCANLINES_BLEEDING * 0.333 ;
+            in_luminance*=in_luminance; 
+            pixel_out = pixel_scanlined + (pixel_out * in_luminance *  SCANLINES_BLEEDING * (1-scanline_shape));
+            */                            
+                                            
+            pixel_out = pixel_scanlined + (pixel_out * pixel_bleed *  SCANLINES_BLEEDING * (1-scanline_shape));
+                
             } else {
                 pixel_out = pixel_scanlined;
             }
 
         }
     }
+
+
 
     
     if (DO_CCORRECTION == 1.0) {

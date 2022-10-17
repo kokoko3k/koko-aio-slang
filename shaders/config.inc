@@ -221,7 +221,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // this means that haloing will produce solid colors,
 // lessening afromentioned effects on bright colors.
 #pragma parameter DO_HALO       "★ Halo:" 							1.0	0.0 1.0 1.0
-#pragma parameter HALO_POWER    "        Strength"						0.9 	0.0  5.0 0.05
+#pragma parameter HALO_POWER    "        Strength"						0.9 	0.0  5.0 0.025
 #pragma parameter HALO_W        "        Horizontal sharpness"					1.75	0.2  6.0 0.05
 #pragma parameter HALO_H        "        Vertical sharpness"					1.75	0.2  6.0 0.05
 #pragma parameter HALO_GAMMA    "        Gamma, the higher, the less the halo on dark colors"	2.0 	1.0  10.0 0.1
