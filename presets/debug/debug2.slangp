@@ -1,4 +1,5 @@
-#reference "../koko-aio.slangp"
+#reference "../../koko-aio.slangp"
+
 prefer_std_pow = "1.0"
 
 DO_FXAA = "0.0"
