@@ -144,20 +144,26 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	
 } global;
 
-
+//Offset RGB
+// Allow to shift Red, Green, Blue components along x and y axis
+#pragma parameter DO_OFFSET       "★ Offset RGB enable? ==>"	 		0.0	0.0 1.0 1.0
+#pragma parameter OFFSET_R        "        Red offset"			0.0 	0.0 1000.0 1
+#pragma parameter OFFSET_G        "        Green offset"		0.0 	0.0 1000.0 1
+#pragma parameter OFFSET_B        "        Blue offset"			0.0 	0.0 100.0 1
+#pragma parameter OFFSET_STRENGTH "        Strength"			0.5 	0.0 1.0 0.1
 
 // PARAMETERS AND MEANING                                                    
 
 // FXAA
 // Apply an antialiasing filter via FXAA from Nvidia.
-#pragma parameter DO_FXAA "★ FXAA:"	1.0 	0.0 1.0 1.0
+#pragma parameter DO_FXAA "★ FXAA enable? ==>"	1.0 	0.0 1.0 1.0
 
 
 // Scanlines
 // Blank even source lines, the value from 0.0 to 1.0 expresses the darkness of the blanked lines
 // 1.0 means no blank at all.
 
-#pragma parameter DO_SCANLINES	"★ Scanlines:"									1.0 	0.0  1.0 1.0
+#pragma parameter DO_SCANLINES	"★ Scanlines enable? ==>"									1.0 	0.0  1.0 1.0
 #pragma parameter SCANLINE_DARK "        Scanlines gap brightness"			  			0.0 	-1.0 1.0 0.05
 #pragma parameter SCANLINES_BLEEDING "        Scanlines bleeding"						0.0 	0.0 3.0 0.05
 
@@ -168,7 +174,6 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 #pragma parameter SCANLINE_DISABLE_ON_INTERLACE "        Disable on interlaced screen"			  	0.0 	0.0 1.0 1.0
 
-
 // Input glowing
 // Emulates the glowing of the input signal by blurring it with "IN_GLOW_WH" sharpness.
 // The blur always affects horizontal sharpness, vertical sharpness is affected only if Dark scanline brightness is < 1.0.
@@ -177,20 +182,13 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // "IN_GLOW_ADD" allows to modulate from interpolation(*) to a sum, wihch may (or not) produce better effects.
 // With "IN_GLOW_ADD=0" input glowing does not alter the RGB mask
 // or slot mask applied to the image.
-#pragma parameter DO_IN_GLOW               "★ Input power/glowing:"	 					1.0	0.0 1.0 1.0
+#pragma parameter DO_IN_GLOW               "★ Input power/glowing enable? ==>" 					1.0	0.0 1.0 1.0
 #pragma parameter IN_GLOW_POWER            "        Input signal glow strength"					0.45 	0.0 5.0 0.05
 #pragma parameter IN_GLOW_WH               "        Sharpness"							2.5	0.2 6.0 0.05
 #pragma parameter IN_GLOW_GAMMA            "        Gamma, the higher, the less the glow on dark colors"	1.0 	1.0 10.0 0.1
 #pragma parameter IN_GLOW_ADD              "        Post gain (0.0 to disable)"					0.0 	0.0 1.0 0.05
 
 
-//Offset RGB
-// Allow to shift Red, Green, Blue components along x and y axis
-#pragma parameter DO_OFFSET       "★ Offset RGB:"	 		0.0	0.0 1.0 1.0
-#pragma parameter OFFSET_R        "        Red offset"			0.0 	0.0 1000.0 1
-#pragma parameter OFFSET_G        "        Green offset"		0.0 	0.0 1000.0 1
-#pragma parameter OFFSET_B        "        Blue offset"			0.0 	0.0 1000.0 1
-#pragma parameter OFFSET_STRENGTH "        Strength"			0.5 	0.0 1.0 0.1
 
 // RGB Mask
 // Emulates CRT RGB phosphors.
@@ -203,7 +201,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // "VMASK_OVERWHITE" modulates the strenght of the effect depending on the source pixel brightness,
 // This is handy  if you want to keep a good image contrast/brightness, but keep in mind that other
 // parameters like haloing and bloom.
-#pragma parameter DO_RGB_MASK        "★  RGB Mask:"         						1.0 	0.0 1.0 1.0
+#pragma parameter DO_RGB_MASK        "★  RGB Mask enable? ==>"         					1.0 	0.0 1.0 1.0
 #pragma parameter RGB_MASK_STRENGTH  "        Strength (0.0=off)"					0.75  	0.0 1.0 0.05
 #pragma parameter VMASK_SCALE        "        (HiDPI) Vmask size multiplier (for HiDPI)"		1.0  	1.0 4.0 1.0
 #pragma parameter VMASK_USE_GM       "        (LoDPI) Green,Magenta -> BGR"		 		0.0  	0.0 1.0 1.0
@@ -220,7 +218,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // "DARKLINES_PERIOD" expresses every how many lines draw a black one (or the height ov the RGB triads)
 // "DO_DARKLINES_VOFFSET" lets you to vertically offset by ""DARKLINES_PERIOD/2" the lines every 3 screen pixels,
 // allowing, in conjunction with RGB mask, to emulate slot mask
-#pragma parameter DO_DARKLINES          "★ Slotmask/Aperture grille"			0.0 	0.0 1.0 1.0
+#pragma parameter DO_DARKLINES          "★ Slotmask/Aperture grille enable? ==>"		0.0 	0.0 1.0 1.0
 #pragma parameter DARKLINES_STRENGTH    "        Strength"				0.3 	0.0 1.0 0.05
 #pragma parameter DO_DARKLINES_VOFFSET  "        Offset by triads"			1.0 	0.0 1.0 1.0
 #pragma parameter DARKLINES_PERIOD      "        Period (triad height)"			4.0 	-16.0 16.0 2.0
@@ -234,7 +232,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // multiplying the resulting picture by the source one, it is added.
 // this means that haloing will produce solid colors,
 // lessening afromentioned effects on bright colors.
-#pragma parameter DO_HALO       "★ Halo:" 							1.0	0.0 1.0 1.0
+#pragma parameter DO_HALO       "★ Halo enable? ==>" 						1.0	0.0 1.0 1.0
 #pragma parameter HALO_POWER    "        Strength"						0.9 	0.0  5.0 0.025
 #pragma parameter HALO_W        "        Horizontal sharpness"					1.75	0.2  6.0 0.05
 #pragma parameter HALO_H        "        Vertical sharpness"					1.75	0.2  6.0 0.05
@@ -251,7 +249,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // "BLOOM_POWER" is the additional gain applied to the bloom
 // "BLOOM_BYPASS" will show only the bloomed component
 // the original image.
-#pragma parameter DO_BLOOM           "★ Bloom:" 				        0.0  0.0  1.0  1.0
+#pragma parameter DO_BLOOM           "★ Bloom enable? ==>" 				        0.0  0.0  1.0  1.0
 #pragma parameter BLOOM_MIX          "        Final mix, (0.0=off)"			0.2 0.0 1.0  0.01
 #pragma parameter BLOOM_SIZE         "        Radius"					2.0  0.5 30.0 0.5
 #pragma parameter BLOOM_QUALITY      "        Quality: more is better but slower"	2.0  2.0 32.0 1.0
@@ -265,13 +263,13 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // Gamma and SATURATION correction
 // Correct the final gamma of the image
 // To have more or less saturated colors use "SATURATION" > 1 or "SATURATION" < 1
-#pragma parameter DO_CCORRECTION "★ Color corrections:" 			0.0 	0.0 1.0 1.0
+#pragma parameter DO_CCORRECTION "★ Color corrections enable? ==>" 			0.0 	0.0 1.0 1.0
 #pragma parameter GAMMA_OUT      "        Gamma output"			0.69	0.1 	9.0  0.025
 #pragma parameter SATURATION     "        Saturation modifier (1.0=off)"	1.0	0.0 10.0 0.025
 
 
 //Curvature parameters:
-#pragma parameter DO_CURVATURE	     "★ Curvature:"				0.0   0.0 1.0 1.0
+#pragma parameter DO_CURVATURE	     "★ Curvature enable? ==>"				0.0   0.0 1.0 1.0
 #pragma parameter GEOM_WARP_X        "        Warp X"				0.02  0.0 0.1 0.01
 #pragma parameter GEOM_WARP_Y        "        Warp Y"				0.0   0.0 0.1 0.01
 #pragma parameter GEOM_CORNER_SIZE   "        Corner Size"			0.01  0.01 0.1 0.005
@@ -279,7 +277,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 
 //Bezel related
-#pragma parameter DO_BEZEL	     "★ Bezel"					0.0   0.0 1.0 1.0
+#pragma parameter DO_BEZEL	     "★ Bezel enable? ==>"				0.0   0.0 1.0 1.0
 #pragma parameter BEZEL_R            "        Bezel color: Red"			-0.3   -0.5 0.5  0.01
 #pragma parameter BEZEL_G            "        Bezel color: Green"		-0.3   -0.5 0.5  0.01
 #pragma parameter BEZEL_B            "        Bezel color: Blue"		-0.3   -0.5 0.5  0.01
@@ -292,12 +290,12 @@ layout(std140, set = 0, binding = 0) uniform UBO
 //Full screen glowing
 //Modulate the image zooming depending on the image luminosity.
 //You can lower the effect power through the DYNZOOM_FACTOR parameter.
-#pragma parameter DO_DYNZOOM	     "★ Luminosity dependant zoom"			1.0   0.0   1.0  1.0
+#pragma parameter DO_DYNZOOM	     "★ Luminosity dependant zoom enable? ==>"		1.0   0.0   1.0  1.0
 #pragma parameter DYNZOOM_FACTOR     "        narrowness"				55.0  30.0  99.0 1.0
 
 //Back leds
 //Emulates leds under the monitor frame that slowly reacts to image contents
-#pragma parameter DO_AMBILIGHT	 "★ Leds (needs Retroarch aspect ratio set to full!)"			1.0  0.0  1.0     1.0
+#pragma parameter DO_AMBILIGHT	 "★ Leds (set RetroArch aspect ratio to full!): ==>"			1.0  0.0  1.0     1.0
 #pragma parameter AMBI_STEPS	 "        Slowness"							60.0 5.0  1000.0  5.0
 #pragma parameter AMBI_FALLOFF   "        Light Falloff"						0.7  0.1  3.0     0.01
 #pragma parameter AMBI_POWER     "        Led power"							0.5  0.1  5.0     0.05
@@ -313,12 +311,12 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 //Vignette and spot
 //Emulates the vignette effect and/or a light reflection.
-#pragma parameter DO_VIGNETTE	"★ Vignette"			0.0  0.0  1.0  1.0
+#pragma parameter DO_VIGNETTE	"★ Vignette enable? ==>"		0.0  0.0  1.0  1.0
 #pragma parameter V_BYPASS	"        bypass "	        0.0  0.0  1.0  1.0
 #pragma parameter V_SIZE	"        size"			1.7  0.0  3.0  0.05
 #pragma parameter V_POWER	"        power"			1.1  0.05 2.0  0.05
 
-#pragma parameter DO_SPOT	"★ Spot"			0.0   0.0   1.0 1.0
+#pragma parameter DO_SPOT	"★ Spot enable? ==>"		0.0   0.0   1.0 1.0
 #pragma parameter S_BYPASS	"        bypass"	        0.0   0.0   1.0 1.0
 #pragma parameter S_CENTER_X 	"        x position"		0.65  -1.5  1.5 0.05
 #pragma parameter S_CENTER_Y	"        y postion "		-0.5  -1.5  1.5 0.05
@@ -330,7 +328,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // Emulates the low pixel persistance of CRT monitors and reduces the motion blur,
 // typical of LCD displays, by blanking even/odd screen lines on even/odd frames.
 // ALT_BLANK_STRENGTH expresses the strength of the "blank".
-#pragma parameter DO_ALT_BLANK       "★ Alternate line blanking: " 				0.0 0.0 1.0 1.0
+#pragma parameter DO_ALT_BLANK       "★ Alternate line blanking enable? ==>"			0.0 0.0 1.0 1.0
 #pragma parameter ALT_BLANK_STRENGTH "        Alternate black frame insertion strength" 	0.5 0.0 1.0 0.1
 #pragma parameter ALT_BLANK_PERIOD   "        Dark lines period" 				4.0 0.0 20.0 1.0
 

@@ -13,8 +13,7 @@ layout(location = 3) out vec2 b_offset;
 
 #define OFFSET_DIRECTIONS 8
 
-void main()
-{
+void main() {
    gl_Position = global.MVP * Position;
    vTexCoord = TexCoord;
    if (DO_OFFSET == 1.0) {
