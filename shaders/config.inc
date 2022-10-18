@@ -186,11 +186,11 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 //Offset RGB
 // Allow to shift Red, Green, Blue components along x and y axis
-#pragma parameter DO_OFFSET       "★ Offset RGB:"	 			0.0	0.0 1.0 1.0
-#pragma parameter OFFSET_R        "        R Shift (10.10 = no shift)"		10.10 	0.0 20.20 0.1
-#pragma parameter OFFSET_G        "        G Shift (10.10 = no shift)"		10.10 	0.0 20.20 0.1
-#pragma parameter OFFSET_B        "        B (10.10 = no shift)"		10.10 	0.0 20.20 0.1
-#pragma parameter OFFSET_STRENGTH "        Strength"				0.5 	0.0 1.0 0.1
+#pragma parameter DO_OFFSET       "★ Offset RGB:"	 		0.0	0.0 1.0 1.0
+#pragma parameter OFFSET_R        "        Red offset"			0.0 	0.0 1000.0 1
+#pragma parameter OFFSET_G        "        Green offset"		0.0 	0.0 1000.0 1
+#pragma parameter OFFSET_B        "        Blue offset"			0.0 	0.0 1000.0 1
+#pragma parameter OFFSET_STRENGTH "        Strength"			0.5 	0.0 1.0 0.1
 
 // RGB Mask
 // Emulates CRT RGB phosphors.

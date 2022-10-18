@@ -5,7 +5,6 @@
 #define eps 1e-8
 #define pi 3.141592654
 
-
 // RGB mask:       R     G     B
  #define m1 vec3 ( 1.0 , 0.0 , 0.0 )    //col 1
  #define m2 vec3 ( 0.0 , 1.0 , 0.0 )    //col 2

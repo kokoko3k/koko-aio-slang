@@ -1,4 +1,29 @@
 #define alpha_mark 0.1
+#define pi 3.141592654
+
+
+vec2 circles(float param, float c_radius, float aspect, float directions) {
+   //given a 1d input param return full circles increasing radius.
+   param = param*(pi/directions);
+   float m = 1 + (c_radius * floor(param/pi)) * 100;
+   return vec2(m * sin(param) * aspect, m * cos(param)) * vec2(aspect,1.0);
+}
+
+vec2 spiral(float param,float spr_radius,vec2 spr_offset, vec2 spr_scale) {
+   //given a 1d input param returns a spiral
+   float m = spr_radius * param;
+   return vec2(m * sin(param), m * cos(param)) * spr_scale + spr_offset;
+}
+
+bool similar(float a, float b, float threshold) {
+   return abs(a-b) < threshold;
+}
+
+bool vec2_similar(vec2 a, vec2 b, float threshold) {
+   return abs(a.x-b.x) < threshold  && abs(a.y-b.y) < threshold;
+}
+
+
 vec2 zoom(vec2 in_coords, float zoom_factor) {
    float off = 1.0/(zoom_factor*2.0) - 0.5;
    return (in_coords/zoom_factor)-off;

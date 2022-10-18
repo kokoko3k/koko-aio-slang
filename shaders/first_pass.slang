@@ -5,34 +5,45 @@
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
+layout(location = 1) out vec2 r_offset;
+layout(location = 2) out vec2 g_offset;
+layout(location = 3) out vec2 b_offset;
+
+#include "functions.include.slang"
+
+#define OFFSET_DIRECTIONS 8
 
 void main()
 {
    gl_Position = global.MVP * Position;
    vTexCoord = TexCoord;
+   if (DO_OFFSET == 1.0) {
+      float in_aspect = get_in_aspect();
+      vec2 spr_scale = 10 * vec2(get_in_aspect(),1.0);
+      float spr_radius = min(params.SourceSize.z, params.SourceSize.w);
+      r_offset = circles(OFFSET_R, spr_radius, in_aspect, OFFSET_DIRECTIONS);
+      g_offset = circles(OFFSET_G, spr_radius, in_aspect, OFFSET_DIRECTIONS);
+      b_offset = circles(OFFSET_B, spr_radius, in_aspect, OFFSET_DIRECTIONS);
+   }
 }
 
 #pragma stage fragment
 layout(location = 0) in vec2 vTexCoord;
+layout(location = 1) in vec2 r_offset;
+layout(location = 2) in vec2 g_offset;
+layout(location = 3) in vec2 b_offset;
 layout(location = 0) out vec4 FragColor;
+
 layout(set = 0, binding = 2) uniform sampler2D Source;
 
 
-
-
-
-void main() {
-   
-   if (DO_OFFSET == 1.0) {
-      vec2 offset_r = vec2(floor(OFFSET_R), fract(OFFSET_R)*10)-vec2(10,0.10);
-      vec2 offset_g = vec2(floor(OFFSET_G), fract(OFFSET_G)*10)-vec2(10,0.10);
-      vec2 offset_b = vec2(floor(OFFSET_B), fract(OFFSET_B)*10)-vec2(10,0.10);
-   
+void main() { 
+   if (DO_OFFSET == 1.0) {   
       vec2 d = -vec2(global.FinalViewportSize.z,global.FinalViewportSize.w);
       vec3 pixel_offset;
-      pixel_offset.r=texture(Source,vTexCoord + offset_r * d).r;
-      pixel_offset.g=texture(Source,vTexCoord + offset_g * d).g;
-      pixel_offset.b=texture(Source,vTexCoord + offset_b * d).b;
+      pixel_offset.r=texture(Source,vTexCoord + r_offset * d).r;
+      pixel_offset.g=texture(Source,vTexCoord + g_offset * d).g;
+      pixel_offset.b=texture(Source,vTexCoord + b_offset * d).b;
 
       vec3 pixel_out = texture(Source, vTexCoord).rgb;
       pixel_out = mix(pixel_out,pixel_offset,OFFSET_STRENGTH);
