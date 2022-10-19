@@ -258,7 +258,7 @@ void main() {
     //if ( (vTexCoord.x < 0.5  && vTexCoord.y > 0.5) || (vTexCoord.x > 0.5  && vTexCoord.y < 0.5)         ) pixel_out = texture(first_pass,vTexCoord);
     
     //split screen (debug)
-    if (vTexCoord.y < 0.5) pixel_out = texture(first_pass,vTexCoord);
+    //if (vTexCoord.y < 0.5) pixel_out = texture(first_pass,vTexCoord);
     
     //Bezel
     if (DO_BEZEL == 1.0) {
