@@ -219,26 +219,26 @@ vec4 main_wrap(vec2 co) {
         pixel_in = texture(FXAA_pass,co).rgb ;
             else
         pixel_in = texture(first_pass,co).rgb ;
-        
-    vec3 pixel_out = pixel_in;
 
-   
+    
+    vec3 pixel_out = pixel_in;
+    vec3 pixel_in_clamped = min(pixel_in,vec3(1.0)); //Clamp here for moth vmask and darklines.
+    
+    
     //Vertical RGB Mask
     if (DO_RGB_MASK == 1.0 ) {
-        pixel_out = min(pixel_out,vec3(1.0));
         //Use RGB pattern or exploit RGB layout with green and magenta?
         if (VMASK_USE_GM < 1.0) {
-            pixel_out = pixel_vmask(pixel_out, pixel_out, VMASK_OVERWHITE);
+            pixel_out = pixel_vmask(pixel_in, pixel_in_clamped, VMASK_OVERWHITE);
         } else {           
-            pixel_out = pixel_vmask_gm(pixel_out, pixel_out, VMASK_OVERWHITE);
+            pixel_out = pixel_vmask_gm(pixel_in, pixel_in_clamped, VMASK_OVERWHITE);
         }
     }
     
-
     //Horizontal screen lines
     if (DO_DARKLINES == 1.0 ) {
         float MYDARKLINES_TRANSPARENCY = 1.0 - DARKLINES_STRENGTH;
-        pixel_out = pixel_darklines(pixel_out,DARKLINES_PERIOD,MYDARKLINES_TRANSPARENCY,DO_DARKLINES_VOFFSET,pixel_in,DRKLN_OVERWHITE);
+        pixel_out = pixel_darklines(pixel_out,DARKLINES_PERIOD,MYDARKLINES_TRANSPARENCY,DO_DARKLINES_VOFFSET,pixel_in_clamped,DRKLN_OVERWHITE);
     }
 
 
@@ -291,13 +291,18 @@ vec4 main_wrap(vec2 co) {
             cc=vec3(GAMMA_OUT);
             pixel_out = pow(pixel_out,cc);
         }
+        //Saturation modifier
+        if (!(SATURATION == 1.0)) {
+            float l = length(pixel_out);
+            pixel_out =  normalize( pow(pixel_out.rgb + vec3(eps), vec3(SATURATION)))*l  ;
+        }
+        
+        if (CONTRAST != 0.0 || BRIGHTNESS != 0.0)
+            pixel_out = scale_to_range_vec3(pixel_out, -CONTRAST, 1+CONTRAST) + BRIGHTNESS;
     }
 
-    //Saturation modifier
-    if (!(SATURATION == 1.0)) {
-        float l = length(pixel_out);
-        pixel_out =  normalize( pow(pixel_out.rgb + vec3(eps), vec3(SATURATION)))*l  ;
-    }
+
+    
 
     
     //Out

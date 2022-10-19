@@ -97,6 +97,8 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float DARKLINES_STRENGTH;
 	float GAMMA_OUT ; //1
 	float SATURATION ; //1
+	float CONTRAST;
+	float BRIGHTNESS;
 	
 	float DO_CURVATURE;
 
@@ -260,13 +262,12 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter BLOOM_BYPASS       "        Bypass"					0.0  0.0 1.0  1.0
 
 
-// Gamma and SATURATION correction
-// Correct the final gamma of the image
-// To have more or less saturated colors use "SATURATION" > 1 or "SATURATION" < 1
+// Color correction
 #pragma parameter DO_CCORRECTION "★ Color corrections enable? ==>" 			0.0 	0.0 1.0 1.0
 #pragma parameter GAMMA_OUT      "        Gamma output"			0.69	0.1 	9.0  0.025
-#pragma parameter SATURATION     "        Saturation modifier (1.0=off)"	1.0	0.0 10.0 0.025
-
+#pragma parameter SATURATION     "        Saturation  (1.0=off)"		1.0	0.0 10.0 0.025
+#pragma parameter CONTRAST       "        Contrast    (0.0=off)"		0.0	-1.0 1.0 0.01
+#pragma parameter BRIGHTNESS     "        Brightness  (0.0=off)"		0.0	-1.0 1.0 0.01
 
 //Curvature parameters:
 #pragma parameter DO_CURVATURE	     "★ Curvature enable? ==>"				0.0   0.0 1.0 1.0
@@ -382,6 +383,8 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #define DO_CCORRECTION global.DO_CCORRECTION
 #define GAMMA_OUT      global.GAMMA_OUT
 #define SATURATION     global.SATURATION
+#define CONTRAST       global.CONTRAST
+#define BRIGHTNESS     global.BRIGHTNESS
 
 #define DO_ALT_BLANK       global.DO_ALT_BLANK
 #define ALT_BLANK_STRENGTH global.ALT_BLANK_STRENGTH
