@@ -50,7 +50,7 @@ layout(set = 0, binding = 7) uniform sampler2D avglum_passFeedback;
 #include "pixel_glows.include.slang"    
 #include "functions.include.slang"
 vec3 pixel_vmask(vec3 source, vec3 lm1,vec3 lm2,vec3 lm3,
-                 vec3 white_reference, float over_white,bool is_scanlined) {
+                 vec3 white_reference, float over_white) {
     int col = int( vOutputCoord.x * params.OutputSize.x );
     vec3 pixel_out;
     vec3 vmasked;
@@ -73,7 +73,7 @@ vec3 pixel_vmask(vec3 source, vec3 lm1,vec3 lm2,vec3 lm3,
 }
 
 vec3 pixel_vmask_gm(vec3 source, vec3 lm1,vec3 lm2,
-                 vec3 white_reference, float over_white,bool is_scanlined) {
+                 vec3 white_reference, float over_white) {
     int col = int( vOutputCoord.x * params.OutputSize.x );
     vec3 pixel_out;
     vec3 vmasked;
@@ -234,15 +234,13 @@ vec4 main_wrap(vec2 co) {
             m1f = min(vec3(1.0),m1f) ;
             m2f = min(vec3(1.0),m2f) ;
             m3f = min(vec3(1.0),m3f) ;
-                       
-            pixel_out = pixel_vmask(pixel_out,m1f,m2f,m3f,pixel_out,VMASK_OVERWHITE,(DO_SCANLINES == 1));
+            pixel_out = pixel_vmask(pixel_out,m1f,m2f,m3f,pixel_out,VMASK_OVERWHITE);
         } else {           
             vec3 m1f = m1gm + 1.0 - RGB_MASK_STRENGTH ;
             vec3 m2f = m2gm + 1.0 - RGB_MASK_STRENGTH ;
             m1f = min(vec3(1.0),m1f) ;
             m2f = min(vec3(1.0),m2f) ;
-            //pixel_out = pixel_vmask_gm(pixel_out,m1f,m2f,pixel_in,VMASK_OVERWHITE,(DO_SCANLINES == 1));
-            pixel_out = pixel_vmask_gm(pixel_out,m1f,m2f,texture(first_pass,co).rgb,VMASK_OVERWHITE,(DO_SCANLINES == 1));
+            pixel_out = pixel_vmask_gm(pixel_out,m1f,m2f,texture(first_pass,co).rgb,VMASK_OVERWHITE);
         }
     }
     
