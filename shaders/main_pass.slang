@@ -49,16 +49,16 @@ layout(set = 0, binding = 7) uniform sampler2D avglum_passFeedback;
 // shamlessly hidden into an include:
 #include "pixel_glows.include.slang"    
 #include "functions.include.slang"
-vec3 pixel_vmask(vec3 source, vec3 lm1,vec3 lm2,vec3 lm3,
-                 vec3 white_reference, float over_white) {
+vec3 pixel_vmask(vec3 source, vec3 white_reference, float over_white) {
     int col = int( vOutputCoord.x * params.OutputSize.x );
     vec3 pixel_out;
     vec3 vmasked;
     vec4 vec_mod=(vec4(3,1,2,3) + vec4(VMASK_GAP,0.0,0.0,0.0))* VMASK_SCALE ;
-    if (mod(col, vec_mod.x) < vec_mod.y) vmasked = lm1*source;
-        else if (mod(col, vec_mod.x) < vec_mod.z) vmasked = lm2*source;
-        else if (mod(col, vec_mod.x) < vec_mod.w) vmasked = lm3*source;
-    else vmasked = vec3(0.0);
+    float mask_lightness = 1.0 - RGB_MASK_STRENGTH;
+    if (mod(col, vec_mod.x) < vec_mod.y)          vmasked = min(m1 + mask_lightness,vec3(1.0)) * source;
+        else if (mod(col, vec_mod.x) < vec_mod.z) vmasked = min(m2 + mask_lightness,vec3(1.0)) * source;
+        else if (mod(col, vec_mod.x) < vec_mod.w) vmasked = min(m3 + mask_lightness,vec3(1.0)) * source;
+    else vmasked = min(vec3(0.0) + mask_lightness,vec3(1.0)) * source;
 
     if (over_white == 1.0) pixel_out = vmasked;
         else {
@@ -67,20 +67,19 @@ vec3 pixel_vmask(vec3 source, vec3 lm1,vec3 lm2,vec3 lm3,
             whiteness=  clamp(whiteness,0.0,1.0);
             pixel_out=  mix(vmasked,source,whiteness);
         }
-    
    return pixel_out;
-
 }
 
-vec3 pixel_vmask_gm(vec3 source, vec3 lm1,vec3 lm2,
-                 vec3 white_reference, float over_white) {
+vec3 pixel_vmask_gm(vec3 source, vec3 white_reference, float over_white) {
     int col = int( vOutputCoord.x * params.OutputSize.x );
     vec3 pixel_out;
     vec3 vmasked;
     vec3 vec_mod=(vec3(2,1,2) + vec3(VMASK_GAP,0.0,0.0))* VMASK_SCALE ;
-    if (mod(col, vec_mod.x) < vec_mod.y) vmasked = lm1*source;
-        else if (mod(col, vec_mod.x) < vec_mod.z) vmasked = lm2*source;
-    else vmasked = vec3(0.0);
+    
+    float mask_lightness = 1.0 - RGB_MASK_STRENGTH;
+    if (mod(col, vec_mod.x) < vec_mod.y)          vmasked = min(m1gm + mask_lightness,vec3(1.0)) * source;
+        else if (mod(col, vec_mod.x) < vec_mod.z) vmasked = min(m2gm + mask_lightness,vec3(1.0)) * source;
+    else vmasked = min(vec3(0.0) + mask_lightness,vec3(1.0)) * source;
 
     if (over_white == 1.0) pixel_out = vmasked;
         else {
@@ -226,21 +225,12 @@ vec4 main_wrap(vec2 co) {
    
     //Vertical RGB Mask
     if (DO_RGB_MASK == 1.0 ) {
+        //pixel_out = min(pixel_out,vec3(1.0));
         //Use RGB pattern or exploit RGB layout with green and magenta?
         if (VMASK_USE_GM < 1.0) {
-            vec3 m1f = m1 + 1.0 - RGB_MASK_STRENGTH ;
-            vec3 m2f = m2 + 1.0 - RGB_MASK_STRENGTH ;
-            vec3 m3f = m3 + 1.0 - RGB_MASK_STRENGTH ;
-            m1f = min(vec3(1.0),m1f) ;
-            m2f = min(vec3(1.0),m2f) ;
-            m3f = min(vec3(1.0),m3f) ;
-            pixel_out = pixel_vmask(pixel_out,m1f,m2f,m3f,pixel_out,VMASK_OVERWHITE);
+            pixel_out = pixel_vmask(pixel_out, pixel_out, VMASK_OVERWHITE);
         } else {           
-            vec3 m1f = m1gm + 1.0 - RGB_MASK_STRENGTH ;
-            vec3 m2f = m2gm + 1.0 - RGB_MASK_STRENGTH ;
-            m1f = min(vec3(1.0),m1f) ;
-            m2f = min(vec3(1.0),m2f) ;
-            pixel_out = pixel_vmask_gm(pixel_out,m1f,m2f,texture(first_pass,co).rgb,VMASK_OVERWHITE);
+            pixel_out = pixel_vmask_gm(pixel_out, pixel_out, VMASK_OVERWHITE);
         }
     }
     
