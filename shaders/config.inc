@@ -146,11 +146,11 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 //Offset RGB
 // Allow to shift Red, Green, Blue components along x and y axis
-#pragma parameter DO_OFFSET       "★ Offset RGB enable? ==>"	 		0.0	0.0 1.0 1.0
-#pragma parameter OFFSET_R        "        Red offset"			0.0 	0.0 1000.0 1
-#pragma parameter OFFSET_G        "        Green offset"		0.0 	0.0 1000.0 1
-#pragma parameter OFFSET_B        "        Blue offset"			0.0 	0.0 100.0 1
-#pragma parameter OFFSET_STRENGTH "        Strength"			0.5 	0.0 1.0 0.1
+#pragma parameter DO_OFFSET       "★ Offset RGB enable? ==>"	 	0.0	0.0 1.0 1.0
+#pragma parameter OFFSET_R        "        Red offset"			32.0 	0.0 400.0 1
+#pragma parameter OFFSET_G        "        Green offset"		20.0 	0.0 400.0 1
+#pragma parameter OFFSET_B        "        Blue offset"			24.0 	0.0 400.0 1
+#pragma parameter OFFSET_STRENGTH "        Strength"			0.8 	0.0 1.0 0.1
 
 // PARAMETERS AND MEANING                                                    
 
@@ -163,7 +163,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // Blank even source lines, the value from 0.0 to 1.0 expresses the darkness of the blanked lines
 // 1.0 means no blank at all.
 
-#pragma parameter DO_SCANLINES	"★ Scanlines enable? ==>"									1.0 	0.0  1.0 1.0
+#pragma parameter DO_SCANLINES	"★ Scanlines enable? ==>"							1.0 	0.0  1.0 1.0
 #pragma parameter SCANLINE_DARK "        Scanlines gap brightness"			  			0.0 	-1.0 1.0 0.05
 #pragma parameter SCANLINES_BLEEDING "        Scanlines bleeding"						0.0 	0.0 3.0 0.05
 
@@ -291,7 +291,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 //Modulate the image zooming depending on the image luminosity.
 //You can lower the effect power through the DYNZOOM_FACTOR parameter.
 #pragma parameter DO_DYNZOOM	     "★ Luminosity dependant zoom enable? ==>"		1.0   0.0   1.0  1.0
-#pragma parameter DYNZOOM_FACTOR     "        narrowness"				55.0  30.0  99.0 1.0
+#pragma parameter DYNZOOM_FACTOR     "        narrowness"				80.0  30.0  120.0 1.0
 
 //Back leds
 //Emulates leds under the monitor frame that slowly reacts to image contents

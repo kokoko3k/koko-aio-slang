@@ -70,7 +70,7 @@
 vec2 circles(float param, float c_radius, float aspect, float directions) {
    //given a 1d input param return full circles increasing radius.
    param = param*(pi/directions);
-   float m = 1 + (c_radius * floor(param/pi)) * 100;
+   float m = (c_radius * floor(param/pi)) * 100;
    return vec2(m * sin(param) * aspect, m * cos(param)) * vec2(aspect,1.0);
 }
 

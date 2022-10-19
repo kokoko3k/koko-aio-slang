@@ -17,8 +17,7 @@ void main() {
    gl_Position = global.MVP * Position;
    vTexCoord = TexCoord;
    if (DO_OFFSET == 1.0) {
-      float in_aspect = get_in_aspect();
-      vec2 spr_scale = 10 * vec2(get_in_aspect(),1.0);
+      float in_aspect = 1.0;//get_in_aspect();
       float spr_radius = min(params.SourceSize.z, params.SourceSize.w);
       r_offset = circles(OFFSET_R, spr_radius, in_aspect, OFFSET_DIRECTIONS);
       g_offset = circles(OFFSET_G, spr_radius, in_aspect, OFFSET_DIRECTIONS);
@@ -38,7 +37,8 @@ layout(set = 0, binding = 2) uniform sampler2D Source;
 
 void main() { 
    if (DO_OFFSET == 1.0) {   
-      vec2 d = -vec2(global.FinalViewportSize.z,global.FinalViewportSize.w);
+      //vec2 d = -vec2(global.FinalViewportSize.z,global.FinalViewportSize.w);
+      vec2 d = -vec2(params.SourceSize.z, params.SourceSize.w)*0.5;
       vec3 pixel_offset;
       pixel_offset.r=texture(Source,vTexCoord + r_offset * d).r;
       pixel_offset.g=texture(Source,vTexCoord + g_offset * d).g;
