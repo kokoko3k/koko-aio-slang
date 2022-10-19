@@ -225,7 +225,7 @@ vec4 main_wrap(vec2 co) {
    
     //Vertical RGB Mask
     if (DO_RGB_MASK == 1.0 ) {
-        //pixel_out = min(pixel_out,vec3(1.0));
+        pixel_out = min(pixel_out,vec3(1.0));
         //Use RGB pattern or exploit RGB layout with green and magenta?
         if (VMASK_USE_GM < 1.0) {
             pixel_out = pixel_vmask(pixel_out, pixel_out, VMASK_OVERWHITE);
