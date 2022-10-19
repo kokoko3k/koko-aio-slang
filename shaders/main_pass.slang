@@ -15,7 +15,6 @@
  #define m2gm vec3 ( 1.0 , 0.0 , 1.0 )    //col 2
 
  
- 
 // Blur sizes must not depend on input resolution
 #define scalemod_x (global.in_glow_passSize.x/360.0)
 #define scalemod_y (global.in_glow_passSize.y/270.0)

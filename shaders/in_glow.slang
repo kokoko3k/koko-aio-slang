@@ -1,7 +1,5 @@
 #version 450
-
 #include "config.inc"
-
 
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
@@ -44,7 +42,6 @@ void main() {
       //if  (mod(params.FrameCount,10) == 0) FragColor=vec4(0.0) ; else FragColor=vec4(1.0);
       //return;
 
-   
    if (DO_IN_GLOW == 0.0) return;
    
    if (DO_FXAA == 1.0)
