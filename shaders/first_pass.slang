@@ -34,25 +34,57 @@ layout(location = 0) out vec4 FragColor;
 
 layout(set = 0, binding = 2) uniform sampler2D Source;
 
+#include "functions.include.slang"
 
-void main() { 
-   if (DO_OFFSET == 1.0) {   
-      //vec2 d = -vec2(global.FinalViewportSize.z,global.FinalViewportSize.w);
+vec3 pixel_flickering(vec3 pixel_cur) {
+   vec4 pixel_out;
+   float mymod = params.FrameCount % 3;
+   
+   if (mymod == 0.0) return pixel_cur;
+   
+   vec3 flickline;
+   if (mymod == 1.0 )
+      flickline = texture(Source,vTexCoord + vec2(0.0,params.OriginalSize.w/2.0)).rgb;
+   else if (mymod == 2.0) 
+      flickline = texture(Source,vTexCoord - vec2(0.0,params.OriginalSize.w/2.0)).rgb;
+
+   float lumdiff = (flickline.r+flickline.g+flickline.b)/3.0 -
+                   (pixel_cur.r+pixel_cur.g+pixel_cur.b)/3.0;
+   
+   if (lumdiff > 0.0) {
+      lumdiff = scale_to_range(lumdiff,0.2,0.7);
+      return mix(pixel_cur,flickline,lumdiff);
+   } else {
+      return pixel_cur;
+   }
+
+}
+
+
+vec3 pixel_offset(vec3 pixel_cur) {
       vec2 d = -vec2(params.SourceSize.z, params.SourceSize.w)*0.5;
       vec3 pixel_offset;
       pixel_offset.r=texture(Source,vTexCoord + r_offset * d).r;
       pixel_offset.g=texture(Source,vTexCoord + g_offset * d).g;
       pixel_offset.b=texture(Source,vTexCoord + b_offset * d).b;
+      return mix(pixel_cur,pixel_offset,OFFSET_STRENGTH);
+}
 
-      vec3 pixel_out = texture(Source, vTexCoord).rgb;
-      pixel_out = mix(pixel_out,pixel_offset,OFFSET_STRENGTH);
-      FragColor = vec4(pixel_out,1.0);
-      
-   } else {
-      
-      FragColor = texture(Source, vTexCoord);
-      
+
+
+
+
+void main() { 
+
+   vec4 pixel_out = texture(Source,vTexCoord);
+   if (DO_OFFSET == 1.0) pixel_out = vec4(pixel_offset(pixel_out.rgb), 1.0);
+
+   if (DO_SCANLINES == 1.0) {
+      if (scanline_have_to_flicker(is_interlaced())) pixel_out = vec4(pixel_flickering(pixel_out.rgb),1.0);
    }
+   
+   FragColor = pixel_out;
+   
    
    //Use one of the following to debug:
       //FragColor=vec4(abs(sin(params.FrameCount/3.14/4))); //white fade

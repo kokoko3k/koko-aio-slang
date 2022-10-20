@@ -171,21 +171,24 @@ float scanline_shape_static_in_lum(vec2 coords, float in_luminance) {
 float scanline_shape(vec2 coords, bool do_flicker) {
     bool alternate = false;
     float period = 1.0;
+    
+    int slow = 1;
+    
     if (do_flicker) {
-        if  (int(mod(float(params.FrameCount),4.0  )) < 2) alternate = true;
+        if (params.FrameCount/slow % 2 == 0.0) alternate = true;
         if (params.OriginalSize.y > MIN_LINES_INTERLACED )  period = 0.5;
     }
 
-    float angle = coords.y * pi * period * params.OriginalSize.y;
+    float angle = coords.y * pi * params.OriginalSize.y * period;
 
     float lines;
     if (alternate)
         lines = -sin(angle+half_pi); //lines = abs(cos(angle));
-            else
+             else
         lines = sin(angle);
-    lines = (lines*lines);
+    //lines = (lines*lines);
+    lines = abs(lines);
   
-    
     if (SCANLINE_DARK >= 0.0) {
         lines = lines * (1.0 - SCANLINE_DARK) + SCANLINE_DARK;
     } else {        
@@ -265,20 +268,11 @@ vec4 main_wrap(vec2 co) {
         
             float scanline_shape =  scanline_shape(co, flickering_scanlines ) ;
             vec3 pixel_scanlined = scanline_shape * pixel_out;
-            if (!flickering_scanlines) {
-                                            
-            /*
-            //float in_luminance = max(max(pixel_bleed.r,pixel_bleed.g),pixel_bleed.b);
-            float in_luminance = (pixel_bleed.r+pixel_bleed.g+pixel_bleed.b) * SCANLINES_BLEEDING * 0.333 ;
-            in_luminance*=in_luminance; 
-            pixel_out = pixel_scanlined + (pixel_out * in_luminance *  SCANLINES_BLEEDING * (1-scanline_shape));
-            */                            
+
                                             
             pixel_out = pixel_scanlined + (pixel_out * pixel_bleed *  SCANLINES_BLEEDING * (1-scanline_shape));
                 
-            } else {
-                pixel_out = pixel_scanlined;
-            }
+
 
         }
     }
