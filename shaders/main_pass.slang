@@ -4,6 +4,7 @@
 
 #define eps 1e-8
 #define pi 3.141592654
+#define half_pi 1.5707963267949
 
 // RGB mask:       R     G     B
  #define m1 vec3 ( 1.0 , 0.0 , 0.0 )    //col 1
@@ -171,19 +172,20 @@ float scanline_shape(vec2 coords, bool do_flicker) {
     bool alternate = false;
     float period = 1.0;
     if (do_flicker) {
-        if  (int(mod(float(params.FrameCount),2.0  )) == 1) alternate = true;
+        if  (int(mod(float(params.FrameCount),4.0  )) < 2) alternate = true;
         if (params.OriginalSize.y > MIN_LINES_INTERLACED )  period = 0.5;
     }
+
     float angle = coords.y * pi * period * params.OriginalSize.y;
 
     float lines;
     if (alternate)
-        lines = abs(cos(angle));
+        lines = -sin(angle+half_pi); //lines = abs(cos(angle));
             else
-        lines = abs(sin(angle));
-        
+        lines = sin(angle);
     lines = (lines*lines);
   
+    
     if (SCANLINE_DARK >= 0.0) {
         lines = lines * (1.0 - SCANLINE_DARK) + SCANLINE_DARK;
     } else {        
