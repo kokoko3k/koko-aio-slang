@@ -137,20 +137,20 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float ASPECT_Y;
 	float AMBI_STEPS;
 	
-	float DO_OFFSET;
-	float OFFSET_R;
-	float OFFSET_G;
-	float OFFSET_B;
+	float DO_SHIFT_RGB;
+	float SHIFT_R;
+	float SHIFT_G;
+	float SHIFT_B;
 	float OFFSET_STRENGTH;
 	
 } global;
 
 //Offset RGB
 // Allow to shift Red, Green, Blue components along x and y axis
-#pragma parameter DO_OFFSET       "★ Shift RGB components enable? ==>"	0.0	 0.0 1.0 1.0
-#pragma parameter OFFSET_R        "        Red offset"			20.0 	-210.0 189.0 1
-#pragma parameter OFFSET_G        "        Green offset"		-1.0 	-210.0 189.0 1
-#pragma parameter OFFSET_B        "        Blue offset"			1.0 	-210.0 189.0 1
+#pragma parameter DO_SHIFT_RGB       "★ Shift RGB components enable? ==>"	0.0	 0.0 1.0 1.0
+#pragma parameter SHIFT_R        "        Red offset"			20.0 	-210.0 189.0 1
+#pragma parameter SHIFT_G        "        Green offset"		-1.0 	-210.0 189.0 1
+#pragma parameter SHIFT_B        "        Blue offset"			1.0 	-210.0 189.0 1
 #pragma parameter OFFSET_STRENGTH "        Strength"			0.5 	 0.0 1.0 0.1
 
 // PARAMETERS AND MEANING                                                    
@@ -311,7 +311,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 //Vignette and spot
 //Emulates the vignette effect and/or a light reflection.
-#pragma parameter DO_VIGNETTE	"★ Vignette enable? ==>"		0.0  0.0  1.0  1.0
+#pragma parameter DO_VIGNETTE	"★ Vignette enable? ==>"	0.0  0.0  1.0  1.0
 #pragma parameter V_BYPASS	"        bypass "	        0.0  0.0  1.0  1.0
 #pragma parameter V_SIZE	"        size"			1.7  0.0  3.0  0.05
 #pragma parameter V_POWER	"        power"			1.1  0.05 2.0  0.05
@@ -426,8 +426,8 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #define ASPECT_X     global.ASPECT_X
 #define ASPECT_Y     global.ASPECT_Y
 
-#define DO_OFFSET         global.DO_OFFSET
-#define OFFSET_R          global.OFFSET_R
-#define OFFSET_G          global.OFFSET_G
-#define OFFSET_B          global.OFFSET_B
+#define DO_SHIFT_RGB         global.DO_SHIFT_RGB
+#define SHIFT_R          global.SHIFT_R
+#define SHIFT_G          global.SHIFT_G
+#define SHIFT_B          global.SHIFT_B
 #define OFFSET_STRENGTH   global.OFFSET_STRENGTH

@@ -1,5 +1,7 @@
 #reference "koko-aio-crt-monitor-slotmask.slangp"
 
+DO_SHIFT_RGB = "1.0" 
+
 DO_FXAA = "1.000000"
 
 HALO_W = "6.000000"

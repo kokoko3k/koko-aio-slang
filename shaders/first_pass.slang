@@ -16,12 +16,12 @@ layout(location = 3) out vec2 b_offset;
 void main() {
    gl_Position = global.MVP * Position;
    vTexCoord = TexCoord;
-   if (DO_OFFSET == 1.0) {
+   if (DO_SHIFT_RGB == 1.0) {
       float in_aspect = 1.0;//get_in_aspect();
       float spr_radius = min(params.SourceSize.z, params.SourceSize.w);
-      r_offset=offsets_from_float(OFFSET_R+210.0,RGB_SHIFT_RANGE);
-      g_offset=offsets_from_float(OFFSET_G+210.0,RGB_SHIFT_RANGE);
-      b_offset=offsets_from_float(OFFSET_B+210.0,RGB_SHIFT_RANGE);
+      r_offset=offsets_from_float(SHIFT_R+210.0,RGB_SHIFT_RANGE);
+      g_offset=offsets_from_float(SHIFT_G+210.0,RGB_SHIFT_RANGE);
+      b_offset=offsets_from_float(SHIFT_B+210.0,RGB_SHIFT_RANGE);
    }
 }
 
@@ -72,7 +72,7 @@ vec3 pixel_offset(vec3 pixel_cur) {
 void main() { 
 
    vec4 pixel_out = texture(Source,vTexCoord);
-   if (DO_OFFSET == 1.0) pixel_out = vec4(pixel_offset(pixel_out.rgb), 1.0);
+   if (DO_SHIFT_RGB == 1.0) pixel_out = vec4(pixel_offset(pixel_out.rgb), 1.0);
 
    if (DO_SCANLINES == 1.0) {
       if (scanline_have_to_flicker(is_interlaced())) pixel_out = vec4(pixel_flickering(pixel_out.rgb),1.0);

@@ -6,5 +6,4 @@ DO_FXAA = "1.000000"
 
 IN_GLOW_POWER = "1.5" 
 
-
-
+DO_SHIFT_RGB = "1.0" 
