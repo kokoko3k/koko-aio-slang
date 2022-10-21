@@ -156,12 +156,13 @@ vec4 pixel_inner_frame() {
     
     //Mix bloom texture
         if (DO_BLOOM == 1.0 ) {
-            bloomed=texture(bloom_pass_final, vOutputCoord).rgb ;
+            bloomed=texture(bloom_pass_final, coords_curved).rgb ;
             if (BLOOM_BYPASS == 1.0)
                 pixel_out = bloomed;
             else {
                 float over_white_correction = 1.0;
                 if (BLOOM_OVER_WHITE < 1.0) {
+                        
                         float b_brightness = max(pixel_out.b,max(pixel_out.r,pixel_out.g));
 
                         b_brightness *= 1-BLOOM_OVER_WHITE;

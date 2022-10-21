@@ -178,8 +178,7 @@ float scanline_shape(vec2 coords, bool do_flicker) {
         lines = -sin(angle+half_pi); //lines = abs(cos(angle));
              else
         lines = sin(angle);
-    //lines = (lines*lines);
-    lines = abs(lines);
+    lines = (lines*lines);
   
     if (SCANLINE_DARK >= 0.0) {
         lines = lines * (1.0 - SCANLINE_DARK) + SCANLINE_DARK;

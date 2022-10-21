@@ -67,6 +67,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	vec4 FXAA_passSize;
 	vec4 main_passSize;
 	vec4 monitor_bodySize;
+	vec4 avglum_passSize;
 	vec4 first_passSize;
 
 	float DO_SCANLINES;
@@ -254,10 +255,10 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter BLOOM_MIX          "        Final mix, (0.0=off)"			0.2 0.0 1.0  0.01
 #pragma parameter BLOOM_SIZE         "        Radius"					2.0  0.5 30.0 0.5
 #pragma parameter BLOOM_QUALITY      "        Quality: more is better but slower"	2.0  2.0 32.0 1.0
-#pragma parameter BLOOM_GAMMA        "        Input Gamma"				4.0  1.0 10.0 0.1
-#pragma parameter BLOOM_POWER        "        Power multiplier"				8.0  1.0 10.0 0.5
-#pragma parameter BLOOM_GAMMA_OUT    "        Output Gamma"				1.5  0.1 10.0 0.1
-#pragma parameter BLOOM_OVER_WHITE   "        Strength on bright areas (0 = aura)"	1.0  0.0 1.0  0.05
+#pragma parameter BLOOM_GAMMA        "        Input Gamma"				10.0  1.0 10.0 0.1
+#pragma parameter BLOOM_POWER        "        Power multiplier"				10.0  1.0 10.0 0.5
+#pragma parameter BLOOM_GAMMA_OUT    "        Output Gamma"				10.0  0.1 10.0 0.1
+#pragma parameter BLOOM_OVER_WHITE   "        Strength on bright areas (0 = aura)"	0.5  0.0 1.0  0.05
 #pragma parameter BLOOM_BYPASS       "        Bypass"					0.0  0.0 1.0  1.0
 
 
