@@ -1,5 +1,6 @@
 #version 450
 #include "config.inc"
+#define eps 1e-8
 
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
@@ -72,8 +73,20 @@ vec3 pixel_offset(vec3 pixel_cur) {
 void main() { 
 
    vec4 pixel_out = texture(Source,vTexCoord);
+      
    if (DO_SHIFT_RGB == 1.0) pixel_out = vec4(pixel_offset(pixel_out.rgb), 1.0);
 
+    if (DO_CCORRECTION == 1.0) {
+        //Saturation modifier
+        if (!(SATURATION == 1.0)) {
+            float l = length(pixel_out.rgb);
+            pixel_out =  vec4(normalize( pow(pixel_out.rgb + vec3(eps), vec3(SATURATION)))*l,1.0)  ;
+        }
+        
+        if (CONTRAST != 0.0 || BRIGHTNESS != 0.0)
+            pixel_out = vec4(scale_to_range_vec3(pixel_out.rgb, -CONTRAST, 1+CONTRAST) + BRIGHTNESS, 1.0);
+    }
+   
    if (DO_SCANLINES == 1.0) {
       if (scanline_have_to_flicker(is_interlaced())) pixel_out = vec4(pixel_flickering(pixel_out.rgb),1.0);
    }

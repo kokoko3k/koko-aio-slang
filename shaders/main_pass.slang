@@ -1,9 +1,5 @@
 #version 450
 #include "config.inc"
-
-
-#define eps 1e-8
-#define pi 3.141592654
 #define half_pi 1.5707963267949
 
 // RGB mask:       R     G     B
@@ -238,7 +234,6 @@ vec4 main_wrap(vec2 co) {
     }
 
 
-
     //Halo
     vec3 pixel_haloed;
     if (DO_HALO == 1.0 ) {
@@ -260,38 +255,12 @@ vec4 main_wrap(vec2 co) {
             float scanline_shape =  scanline_shape(co, flickering_scanlines ) ;
             vec3 pixel_scanlined = scanline_shape * pixel_out;
 
-                                            
             pixel_out = pixel_scanlined + (pixel_out * pixel_bleed *  SCANLINES_BLEEDING * (1-scanline_shape));
-                
-
-
         }
     }
+  
+    if (DO_CCORRECTION == 1.0) pixel_out = pow(pixel_out,vec3(GAMMA_OUT));
 
-
-
-    
-    if (DO_CCORRECTION == 1.0) {
-        //Gamma correction
-        vec3 cc = vec3(1.0);
-        if  (GAMMA_OUT != 1.0) {
-            cc=vec3(GAMMA_OUT);
-            pixel_out = pow(pixel_out,cc);
-        }
-        //Saturation modifier
-        if (!(SATURATION == 1.0)) {
-            float l = length(pixel_out);
-            pixel_out =  normalize( pow(pixel_out.rgb + vec3(eps), vec3(SATURATION)))*l  ;
-        }
-        
-        if (CONTRAST != 0.0 || BRIGHTNESS != 0.0)
-            pixel_out = scale_to_range_vec3(pixel_out, -CONTRAST, 1+CONTRAST) + BRIGHTNESS;
-    }
-
-
-    
-
-    
     //Out
     return vec4(pixel_out,1.0) ; //* border(border_coords);
 }

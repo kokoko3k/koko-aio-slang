@@ -1,10 +1,7 @@
 #version 450
 #include "config.inc"
-
-
 #define eps 1e-8
 #define pi 3.141592654
-
 
 // Blur sizes must not depend on input resolution
 #define scalemod_x (global.in_glow_passSize.x/360.0)

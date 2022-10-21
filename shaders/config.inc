@@ -149,10 +149,19 @@ layout(std140, set = 0, binding = 0) uniform UBO
 //Offset RGB
 // Allow to shift Red, Green, Blue components along x and y axis
 #pragma parameter DO_SHIFT_RGB       "★ Shift RGB components enable? ==>"	0.0	 0.0 1.0 1.0
-#pragma parameter SHIFT_R        "        Red offset"			20.0 	-210.0 189.0 1
-#pragma parameter SHIFT_G        "        Green offset"		-1.0 	-210.0 189.0 1
-#pragma parameter SHIFT_B        "        Blue offset"			1.0 	-210.0 189.0 1
+#pragma parameter SHIFT_R         "        Red offset"			20.0 	-210.0 189.0 1
+#pragma parameter SHIFT_G         "        Green offset"		-1.0 	-210.0 189.0 1
+#pragma parameter SHIFT_B         "        Blue offset"			1.0 	-210.0 189.0 1
 #pragma parameter OFFSET_STRENGTH "        Strength"			0.5 	 0.0 1.0 0.1
+
+
+// Color correction
+#pragma parameter DO_CCORRECTION "★ Color corrections enable? ==>" 			0.0 	0.0 1.0 1.0
+#pragma parameter GAMMA_OUT      "        Gamma out"			0.69	0.1 	9.0  0.025
+#pragma parameter SATURATION     "        Saturation in  (1.0=off)"		1.0	0.0 10.0 0.025
+#pragma parameter CONTRAST       "        Contrast in    (0.0=off)"		0.0	-1.0 1.0 0.01
+#pragma parameter BRIGHTNESS     "        Brightness in  (0.0=off)"		0.0	-1.0 1.0 0.01
+
 
 // PARAMETERS AND MEANING                                                    
 
@@ -261,13 +270,6 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter BLOOM_OVER_WHITE   "        Strength on bright areas (0 = aura)"	0.5  0.0 1.0  0.05
 #pragma parameter BLOOM_BYPASS       "        Bypass"					0.0  0.0 1.0  1.0
 
-
-// Color correction
-#pragma parameter DO_CCORRECTION "★ Color corrections enable? ==>" 			0.0 	0.0 1.0 1.0
-#pragma parameter GAMMA_OUT      "        Gamma output"			0.69	0.1 	9.0  0.025
-#pragma parameter SATURATION     "        Saturation  (1.0=off)"		1.0	0.0 10.0 0.025
-#pragma parameter CONTRAST       "        Contrast    (0.0=off)"		0.0	-1.0 1.0 0.01
-#pragma parameter BRIGHTNESS     "        Brightness  (0.0=off)"		0.0	-1.0 1.0 0.01
 
 //Curvature parameters:
 #pragma parameter DO_CURVATURE	     "★ Curvature enable? ==>"				0.0   0.0 1.0 1.0

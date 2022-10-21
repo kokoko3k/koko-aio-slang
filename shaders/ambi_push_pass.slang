@@ -1,7 +1,6 @@
 #version 450
 #include "config.inc"
-#define eps 1e-8
-   
+#define eps 1e-5
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;

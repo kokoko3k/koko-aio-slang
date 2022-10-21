@@ -1,5 +1,5 @@
 #include "pows.include.slang"
-#define Pi  (3.14159265358979*2)
+#define Pi2  (3.14159265358979*2)
 #define bloom_directions 8
 
 #define b_offset_x -0.05 //Why is this needed by bloom?
@@ -24,7 +24,7 @@ vec3 radial_bloom_std_pow(float Quality, float Directions, float Size, float fBL
     vec3 lookup = vec3(0.0,0.0,0.0);
     float steps=0.0;
     vec3 fBLOOM_GAMMA_vec3=vec3(fBLOOM_GAMMA);
-    for( float d=0.0; d<Pi; d+=Pi/Directions) {
+    for( float d=0.0; d<Pi2; d+=Pi2/Directions) {
         for(float i=1.0/Quality; i<=1.0; i+=1.0/Quality) {
             lookup = texture( SourceTexture, vTexCoord + vec2(cos(d)  + b_offset_x , sin(d))*Radius*i  ).rgb ;
             color +=pow(lookup.rgb,fBLOOM_GAMMA_vec3);
@@ -43,7 +43,7 @@ vec3 radial_BLOOM_GAMMA_1(float Quality, float Directions, float Size) {
     vec3 color  = vec3(0.0,0.0,0.0);
     vec3 lookup = vec3(0.0,0.0,0.0);
     float steps=0.0;
-    for( float d=0.0; d<Pi; d+=Pi/Directions) {
+    for( float d=0.0; d<Pi2; d+=Pi2/Directions) {
         for(float i=1.0/Quality; i<=1.0; i+=1.0/Quality) {
             lookup = texture( SourceTexture, vTexCoord + vec2(cos(d)  + b_offset_x , sin(d))*Radius*i  ).rgb ;
             color += lookup.rgb;
@@ -60,7 +60,7 @@ vec3 radial_BLOOM_GAMMA_2(float Quality, float Directions, float Size) {
     vec3 color  = vec3(0.0,0.0,0.0);
     vec3 lookup = vec3(0.0,0.0,0.0);
     float steps=0.0;
-    for( float d=0.0; d<Pi; d+=Pi/Directions) {
+    for( float d=0.0; d<Pi2; d+=Pi2/Directions) {
         for(float i=1.0/Quality; i<=1.0; i+=1.0/Quality) {
             lookup = texture( SourceTexture, vTexCoord + vec2(cos(d)  + b_offset_x , sin(d))*Radius*i  ).rgb ;
             color += (lookup.rgb*lookup.rgb);
@@ -77,7 +77,7 @@ vec3 radial_BLOOM_GAMMA_3(float Quality, float Directions, float Size) {
     vec3 color  = vec3(0.0,0.0,0.0);
     vec3 lookup = vec3(0.0,0.0,0.0);
     float steps=0.0;
-    for( float d=0.0; d<Pi; d+=Pi/Directions) {
+    for( float d=0.0; d<Pi2; d+=Pi2/Directions) {
         for(float i=1.0/Quality; i<=1.0; i+=1.0/Quality) {
             lookup = texture( SourceTexture, vTexCoord + vec2(cos(d)  + b_offset_x , sin(d))*Radius*i  ).rgb ;
             color +=pow_3(lookup.rgb);
@@ -94,7 +94,7 @@ vec3 radial_BLOOM_GAMMA_4(float Quality, float Directions, float Size) {
     vec3 color  = vec3(0.0,0.0,0.0);
     vec3 lookup = vec3(0.0,0.0,0.0);
     float steps=0.0;
-    for( float d=0.0; d<Pi; d+=Pi/Directions) {
+    for( float d=0.0; d<Pi2; d+=Pi2/Directions) {
         for(float i=1.0/Quality; i<=1.0; i+=1.0/Quality) {
             lookup = texture( SourceTexture, vTexCoord + vec2(cos(d)  + b_offset_x , sin(d))*Radius*i  ).rgb ;
             color +=pow_4(lookup.rgb);
@@ -111,7 +111,7 @@ vec3 radial_BLOOM_GAMMA_5(float Quality, float Directions, float Size) {
     vec3 color  = vec3(0.0,0.0,0.0);
     vec3 lookup = vec3(0.0,0.0,0.0);
     float steps=0.0;
-    for( float d=0.0; d<Pi; d+=Pi/Directions) {
+    for( float d=0.0; d<Pi2; d+=Pi2/Directions) {
         for(float i=1.0/Quality; i<=1.0; i+=1.0/Quality) {
             lookup = texture( SourceTexture, vTexCoord + vec2(cos(d)  + b_offset_x , sin(d))*Radius*i  ).rgb ;
             color +=pow_5(lookup.rgb);
@@ -128,7 +128,7 @@ vec3 radial_BLOOM_GAMMA_6(float Quality, float Directions, float Size) {
     vec3 color  = vec3(0.0,0.0,0.0);
     vec3 lookup = vec3(0.0,0.0,0.0);
     float steps=0.0;
-    for( float d=0.0; d<Pi; d+=Pi/Directions) {
+    for( float d=0.0; d<Pi2; d+=Pi2/Directions) {
         for(float i=1.0/Quality; i<=1.0; i+=1.0/Quality) {
             lookup = texture( SourceTexture, vTexCoord + vec2(cos(d)  + b_offset_x , sin(d))*Radius*i  ).rgb ;
             color +=pow_6(lookup.rgb);
@@ -145,7 +145,7 @@ vec3 radial_BLOOM_GAMMA_7(float Quality, float Directions, float Size) {
     vec3 color  = vec3(0.0,0.0,0.0);
     vec3 lookup = vec3(0.0,0.0,0.0);
     float steps=0.0;
-    for( float d=0.0; d<Pi; d+=Pi/Directions) {
+    for( float d=0.0; d<Pi2; d+=Pi2/Directions) {
         for(float i=1.0/Quality; i<=1.0; i+=1.0/Quality) {
             lookup = texture( SourceTexture, vTexCoord + vec2(cos(d)  + b_offset_x , sin(d))*Radius*i  ).rgb ;
             color +=pow_7(lookup.rgb);
@@ -162,7 +162,7 @@ vec3 radial_BLOOM_GAMMA_8(float Quality, float Directions, float Size) {
     vec3 color  = vec3(0.0,0.0,0.0);
     vec3 lookup = vec3(0.0,0.0,0.0);
     float steps=0.0;
-    for( float d=0.0; d<Pi; d+=Pi/Directions) {
+    for( float d=0.0; d<Pi2; d+=Pi2/Directions) {
         for(float i=1.0/Quality; i<=1.0; i+=1.0/Quality) {
             lookup = texture( SourceTexture, vTexCoord + vec2(cos(d)  + b_offset_x , sin(d))*Radius*i  ).rgb ;
             color +=pow_8(lookup.rgb);
@@ -179,7 +179,7 @@ vec3 radial_BLOOM_GAMMA_9(float Quality, float Directions, float Size) {
     vec3 color  = vec3(0.0,0.0,0.0);
     vec3 lookup = vec3(0.0,0.0,0.0);
     float steps=0.0;
-    for( float d=0.0; d<Pi; d+=Pi/Directions) {
+    for( float d=0.0; d<Pi2; d+=Pi2/Directions) {
         for(float i=1.0/Quality; i<=1.0; i+=1.0/Quality) {
             lookup = texture( SourceTexture, vTexCoord + vec2(cos(d)  + b_offset_x , sin(d))*Radius*i  ).rgb ;
             color +=pow_9(lookup.rgb);
@@ -196,7 +196,7 @@ vec3 radial_BLOOM_GAMMA_10(float Quality, float Directions, float Size) {
     vec3 color  = vec3(0.0,0.0,0.0);
     vec3 lookup = vec3(0.0,0.0,0.0);
     float steps=0.0;
-    for( float d=0.0; d<Pi; d+=Pi/Directions) {
+    for( float d=0.0; d<Pi2; d+=Pi2/Directions) {
         for(float i=1.0/Quality; i<=1.0; i+=1.0/Quality) {
             lookup = texture( SourceTexture, vTexCoord + vec2(cos(d)  + b_offset_x , sin(d))*Radius*i  ).rgb ;
             color +=pow_10(lookup.rgb);
