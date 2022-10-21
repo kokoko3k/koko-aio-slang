@@ -9,6 +9,7 @@ layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
 layout(location = 1) out vec2 vOutputCoord;
 layout(location = 2) out float bezel_frame_lod;
+layout(location = 3) out vec2 spot_offset;
 
 #include "functions.include.slang"
 
@@ -18,6 +19,8 @@ void main() {
     vTexCoord = get_scaled_coords(TexCoord,global.FinalViewportSize, is_rotated());
     vOutputCoord = TexCoord;
     bezel_frame_lod = log2(global.monitor_bodySize.y * (BEZEL_FRAME_ZOOM+1.0) /global.FinalViewportSize.y);
+    spot_offset = offsets_from_float(S_POSITION+420.0,40);
+    spot_offset = spot_offset / 10.0 + vec2(0.0,1.0);
 }
 
 
@@ -25,7 +28,9 @@ void main() {
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in vec2 vOutputCoord;
 layout(location = 2) in float bezel_frame_lod;
+layout(location = 3) in vec2 spot_offset;
 layout(location = 0) out vec4 FragColor;
+
 
 layout(set = 0, binding = 2) uniform sampler2D main_pass;
 layout(set = 0, binding = 3) uniform sampler2D bloom_pass_final;
@@ -187,8 +192,7 @@ vec4 pixel_inner_frame() {
 
             if (DO_SPOT == 1.0) {
             float spot;
-            vec2 s_offset = vec2(-S_CENTER_X,-S_CENTER_Y);
-            float dist = length(vec2((coords_curved.x-0.5)*in_aspect,coords_curved.y-0.5)+s_offset); //dist = length(vec2(coords_curved.x*in_aspect-in_aspect*0.5),coords_curved.y-0.5));
+            float dist = length(vec2((coords_curved.x-0.5)*in_aspect,coords_curved.y-0.5)+spot_offset); //dist = length(vec2(coords_curved.x*in_aspect-in_aspect*0.5),coords_curved.y-0.5));
             spot = smoothstep(S_SIZE,0.0,dist)*S_POWER+global_noise;
             if (S_BYPASS < 1.0) pixel_out = spot + pixel_out;
                 else

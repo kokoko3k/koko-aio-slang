@@ -1,6 +1,16 @@
 #define alpha_mark 0.1
 #define pi 3.141592654
 
+
+vec2 offsets_from_float(float in_param, int range){
+    return vec2(  
+                  (int(in_param) % range) - range*0.5,
+                  floor(in_param / range) - range*0.5 
+	        );
+}
+
+
+
 /* pack_2to1_f and unpack_1to2_float 
  * Take 2 floats and pack them into one
  * #pragma format R32G32B32A32_SFLOAT needed
@@ -67,7 +77,7 @@
 	}
 
 
-vec2 circles(float param, float c_radius, float aspect, float directions) {
+/*vec2 circles(float param, float c_radius, float aspect, float directions) {
    //given a 1d input param return full circles increasing radius.
    param = param*(pi/directions);
    float m = (c_radius * floor(param/pi)) * 100;
@@ -79,7 +89,7 @@ vec2 spiral(float param,float spr_radius,vec2 spr_offset, vec2 spr_scale) {
    float m = spr_radius * param;
    return vec2(m * sin(param), m * cos(param)) * spr_scale + spr_offset;
 }
-
+*/
 bool similar(float a, float b, float threshold) {
    return abs(a-b) < threshold;
 }
@@ -119,6 +129,11 @@ float scale_to_range(float x, float dmin, float dmax) {
 }
 
 vec3 scale_to_range_vec3(vec3 x, float dmin, float dmax) {
+    //Scales 0..1 range to a..b range
+    return ( (dmax-dmin) * x ) + dmin;
+}
+
+vec2 scale_to_range_vec2(vec2 x, float dmin, float dmax) {
     //Scales 0..1 range to a..b range
     return ( (dmax-dmin) * x ) + dmin;
 }

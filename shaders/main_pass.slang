@@ -56,7 +56,7 @@ vec3 pixel_vmask(vec3 source, vec3 white_reference, float over_white) {
     vec3 vmasked;
     vec4 vec_mod=(vec4(3,1,2,3) + vec4(VMASK_GAP,0.0,0.0,0.0))* VMASK_SCALE ;
     float mask_lightness = 1.0 - RGB_MASK_STRENGTH;
-    if (mod(col, vec_mod.x) < vec_mod.y)          vmasked = min(m1 + mask_lightness,vec3(1.0)) * source;
+    if ( mod(col, vec_mod.x) < vec_mod.y)          vmasked = min(m1 + mask_lightness,vec3(1.0)) * source;
         else if (mod(col, vec_mod.x) < vec_mod.z) vmasked = min(m2 + mask_lightness,vec3(1.0)) * source;
         else if (mod(col, vec_mod.x) < vec_mod.w) vmasked = min(m3 + mask_lightness,vec3(1.0)) * source;
     else vmasked = min(vec3(0.0) + mask_lightness,vec3(1.0)) * source;
@@ -113,29 +113,21 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
     if (do_offset == 1.0) {
         int hmask_shape_offset = int (darkline_every*0.5) + 1 ;
         if  (int(mod(line_2, darkline_every)) == 1) {
-            if (int(mod(col_2, Darkline_part_w_x2)) < Darkline_part_w) {
-                return source * darkline_trans;
-            }
+            if (int(mod(col_2, Darkline_part_w_x2)) < Darkline_part_w) return source * darkline_trans;
+
         } else if  (int(mod(line_2, darkline_every)) == hmask_shape_offset ) {
             // DRAW WITH OFFSET:
             col_2+=Darkline_part_w;
-            if ((int(mod(col_2, Darkline_part_w_x2))) < Darkline_part_w) {
+            if ((int(mod(col_2, Darkline_part_w_x2))) < Darkline_part_w)
                 return source * darkline_trans;
-            }
         }
     } else {
 
-        if ( darkline_every >= 0.0) {
-            if  (int(mod(line_2, darkline_every)) == 1) {
-                return source * darkline_trans;
-            }
-        }
+        if ( darkline_every >= 0.0) 
+            if (int(mod(line_2, darkline_every)) == 1) return source * darkline_trans;
 
-        if ( darkline_every < 0.0) {
-            if  (int(mod(line_2, abs(darkline_every) )) != 1) {
-                return source * darkline_trans;
-            }
-        }
+        if ( darkline_every < 0.0)
+            if  (int(mod(line_2, abs(darkline_every) )) != 1) return source * darkline_trans;
     }
 
     return source;

@@ -117,8 +117,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float BEZEL_FRAME_ZOOM;
 
 	float DO_SPOT;
-	float S_CENTER_X;
-	float S_CENTER_Y; 
+	float S_POSITION; 
 	float S_SIZE;
 	float S_POWER;
 	float S_BYPASS;
@@ -148,11 +147,11 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 //Offset RGB
 // Allow to shift Red, Green, Blue components along x and y axis
-#pragma parameter DO_OFFSET       "★ Offset RGB enable? ==>"	 	0.0	0.0 1.0 1.0
-#pragma parameter OFFSET_R        "        Red offset"			32.0 	0.0 400.0 1
-#pragma parameter OFFSET_G        "        Green offset"		20.0 	0.0 400.0 1
-#pragma parameter OFFSET_B        "        Blue offset"			24.0 	0.0 400.0 1
-#pragma parameter OFFSET_STRENGTH "        Strength"			0.8 	0.0 1.0 0.1
+#pragma parameter DO_OFFSET       "★ Shift RGB components enable? ==>"	0.0	 0.0 1.0 1.0
+#pragma parameter OFFSET_R        "        Red offset"			20.0 	-210.0 189.0 1
+#pragma parameter OFFSET_G        "        Green offset"		-1.0 	-210.0 189.0 1
+#pragma parameter OFFSET_B        "        Blue offset"			1.0 	-210.0 189.0 1
+#pragma parameter OFFSET_STRENGTH "        Strength"			0.5 	 0.0 1.0 0.1
 
 // PARAMETERS AND MEANING                                                    
 
@@ -203,7 +202,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // "VMASK_OVERWHITE" modulates the strenght of the effect depending on the source pixel brightness,
 // This is handy  if you want to keep a good image contrast/brightness, but keep in mind that other
 // parameters like haloing and bloom.
-#pragma parameter DO_RGB_MASK        "★  RGB Mask enable? ==>"         					1.0 	0.0 1.0 1.0
+#pragma parameter DO_RGB_MASK        "★  Mask RGB enable? ==>"         					1.0 	0.0 1.0 1.0
 #pragma parameter RGB_MASK_STRENGTH  "        Strength (0.0=off)"					0.75  	0.0 1.0 0.05
 #pragma parameter VMASK_SCALE        "        (HiDPI) Vmask size multiplier (for HiDPI)"		1.0  	1.0 4.0 1.0
 #pragma parameter VMASK_USE_GM       "        (LoDPI) Green,Magenta -> BGR"		 		0.0  	0.0 1.0 1.0
@@ -319,10 +318,9 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 #pragma parameter DO_SPOT	"★ Spot enable? ==>"		0.0   0.0   1.0 1.0
 #pragma parameter S_BYPASS	"        bypass"	        0.0   0.0   1.0 1.0
-#pragma parameter S_CENTER_X 	"        x position"		0.65  -1.5  1.5 0.05
-#pragma parameter S_CENTER_Y	"        y postion "		-0.5  -1.5  1.5 0.05
-#pragma parameter S_SIZE	"        size"			0.1   0.0  1.0 0.01
-#pragma parameter S_POWER	"        power" 		0.15  0.05  2.0 0.05
+#pragma parameter S_POSITION 	"        Position"		0.0   -420.0 378.0 1
+#pragma parameter S_SIZE	"        size"			0.4   0.0  1.0 0.01
+#pragma parameter S_POWER	"        power" 		0.1  0.05  2.0 0.05
 
 
 // Alternative blanking.
@@ -409,8 +407,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 #define DO_SPOT    global.DO_SPOT
 #define S_BYPASS   global.S_BYPASS
-#define S_CENTER_X global.S_CENTER_X
-#define S_CENTER_Y global.S_CENTER_Y
+#define S_POSITION global.S_POSITION
 #define S_SIZE     global.S_SIZE
 #define S_POWER    global.S_POWER
 

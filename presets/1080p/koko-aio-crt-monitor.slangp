@@ -3,10 +3,10 @@
 DO_FXAA = "0.0"
 
 DO_OFFSET = "0.0"
-	OFFSET_R = "32.0"        
-	OFFSET_G = "20.0"        
-	OFFSET_B = "24.0        
-	OFFSET_STRENGTH = "0.8"
+	OFFSET_R = "20.0"        
+	OFFSET_G = "-1.0"        
+	OFFSET_B = "1.0        
+	OFFSET_STRENGTH = "0.5"
 
 DO_SCANLINES = "1.0"
 	SCANLINE_DARK = "0.5"
@@ -82,8 +82,7 @@ DO_VIGNETTE = "0.0"
 	V_POWER = "1.0"
 
 DO_SPOT = "0.0"
-	S_CENTER_X = "0.65"
-	S_CENTER_Y = "-0.5"
+	S_POSITION = "194.0"
 	S_SIZE = "0.4"
 	S_POWER = "0.1"
 

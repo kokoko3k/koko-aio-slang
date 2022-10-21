@@ -1,5 +1,6 @@
 #reference "../../koko-aio.slangp"
 
+DO_OFFSET  = "1.0"
 
 DO_FXAA = "0.0"
 
@@ -68,3 +69,6 @@ DO_CURVATURE = 0.0
 	GEOM_CORNER_SMOOTH = 775
 	GEOM_ZOOMOUT = 0.18
 	GEOM_GAP_SIZE = 0.15
+
+DO_SPOT = "1.0"
+

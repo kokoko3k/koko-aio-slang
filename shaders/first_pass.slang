@@ -11,7 +11,7 @@ layout(location = 3) out vec2 b_offset;
 
 #include "functions.include.slang"
 
-#define OFFSET_DIRECTIONS 8
+#define RGB_SHIFT_RANGE 20
 
 void main() {
    gl_Position = global.MVP * Position;
@@ -19,9 +19,9 @@ void main() {
    if (DO_OFFSET == 1.0) {
       float in_aspect = 1.0;//get_in_aspect();
       float spr_radius = min(params.SourceSize.z, params.SourceSize.w);
-      r_offset = circles(OFFSET_R, spr_radius, in_aspect, OFFSET_DIRECTIONS);
-      g_offset = circles(OFFSET_G, spr_radius, in_aspect, OFFSET_DIRECTIONS);
-      b_offset = circles(OFFSET_B, spr_radius, in_aspect, OFFSET_DIRECTIONS);
+      r_offset=offsets_from_float(OFFSET_R+210.0,RGB_SHIFT_RANGE);
+      g_offset=offsets_from_float(OFFSET_G+210.0,RGB_SHIFT_RANGE);
+      b_offset=offsets_from_float(OFFSET_B+210.0,RGB_SHIFT_RANGE);
    }
 }
 
@@ -60,7 +60,6 @@ vec3 pixel_flickering(vec3 pixel_cur) {
 
 }
 
-
 vec3 pixel_offset(vec3 pixel_cur) {
       vec2 d = -vec2(params.SourceSize.z, params.SourceSize.w)*0.5;
       vec3 pixel_offset;
@@ -69,10 +68,6 @@ vec3 pixel_offset(vec3 pixel_cur) {
       pixel_offset.b=texture(Source,vTexCoord + b_offset * d).b;
       return mix(pixel_cur,pixel_offset,OFFSET_STRENGTH);
 }
-
-
-
-
 
 void main() { 
 
@@ -84,7 +79,6 @@ void main() {
    }
    
    FragColor = pixel_out;
-   
    
    //Use one of the following to debug:
       //FragColor=vec4(abs(sin(params.FrameCount/3.14/4))); //white fade
