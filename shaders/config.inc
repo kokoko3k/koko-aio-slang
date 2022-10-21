@@ -100,6 +100,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float SATURATION ; //1
 	float CONTRAST;
 	float BRIGHTNESS;
+	float TEMPERATURE;
 	
 	float DO_CURVATURE;
 
@@ -158,9 +159,10 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // Color correction
 #pragma parameter DO_CCORRECTION "★ Color corrections enable? ==>" 			0.0 	0.0 1.0 1.0
 #pragma parameter GAMMA_OUT      "        Gamma out"			0.69	0.1 	9.0  0.025
-#pragma parameter SATURATION     "        Saturation in  (1.0=off)"		1.0	0.0 10.0 0.025
+#pragma parameter SATURATION     "        Saturation in  (1.0=off)"		1.0	0.0  2.0 0.01
 #pragma parameter CONTRAST       "        Contrast in    (0.0=off)"		0.0	-1.0 1.0 0.01
 #pragma parameter BRIGHTNESS     "        Brightness in  (0.0=off)"		0.0	-1.0 1.0 0.01
+#pragma parameter TEMPERATURE    "        Temperature in (6500=off)"		6500.0	3000 10000.0 50.0
 
 
 // PARAMETERS AND MEANING                                                    
@@ -386,6 +388,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #define SATURATION     global.SATURATION
 #define CONTRAST       global.CONTRAST
 #define BRIGHTNESS     global.BRIGHTNESS
+#define TEMPERATURE    global.TEMPERATURE
 
 #define DO_ALT_BLANK       global.DO_ALT_BLANK
 #define ALT_BLANK_STRENGTH global.ALT_BLANK_STRENGTH

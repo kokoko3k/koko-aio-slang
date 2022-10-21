@@ -70,25 +70,60 @@ vec3 pixel_offset(vec3 pixel_cur) {
       return mix(pixel_cur,pixel_offset,OFFSET_STRENGTH);
 }
 
+
+vec3 kelvin2rgb(float k) {
+   k = clamp(k,1000,40000);
+   k=k/100.0;
+   float tmpCalc;
+    vec3 pixel_out;
+   if (k<=66) {
+      pixel_out.r = 255;
+      pixel_out.g = 99.4708025861 * log(k) - 161.1195681661;
+   } else {
+      pixel_out.r = 329.698727446 * pow(k - 60 ,-0.1332047592);   
+      pixel_out.g = 288.1221695283 * pow(k-60, -0.0755148492);      
+   }
+   
+   if (k >= 66)
+      pixel_out.b = 255;
+   else if (k<=19) 
+      pixel_out.b = 0;
+   else
+      pixel_out.b = 138.5177312231 * log(k - 10) - 305.0447927307;
+   
+   return pixel_out/255.0;
+}
+
 void main() { 
 
    vec4 pixel_out = texture(Source,vTexCoord);
-      
+   
    if (DO_SHIFT_RGB == 1.0) pixel_out = vec4(pixel_offset(pixel_out.rgb), 1.0);
 
+   
+   
     if (DO_CCORRECTION == 1.0) {
         //Saturation modifier
         if (!(SATURATION == 1.0)) {
-            float l = length(pixel_out.rgb);
-            pixel_out =  vec4(normalize( pow(pixel_out.rgb + vec3(eps), vec3(SATURATION)))*l,1.0)  ;
+         //pixel_out *=vec4(pixel_out.rgb,1.0);
+         const vec3 W = vec3(0.2125, 0.7154, 0.0721);
+         vec3 intensity = vec3(dot(pixel_out.rgb, W));
+         pixel_out.rgb = mix(intensity, pixel_out.rgb, SATURATION);
+         //pixel_out = pow(pixel_out,vec4(0.5));  
+         //float l = length(pixel_out.rgb);
+         //pixel_out =  vec4(normalize( pow(pixel_out.rgb + vec3(eps), vec3(SATURATION)))*l,1.0)  ;
         }
         
         if (CONTRAST != 0.0 || BRIGHTNESS != 0.0)
-            pixel_out = vec4(scale_to_range_vec3(pixel_out.rgb, -CONTRAST, 1+CONTRAST) + BRIGHTNESS, 1.0);
+            pixel_out.rgb = scale_to_range_vec3(pixel_out.rgb, -CONTRAST, 1+CONTRAST) + BRIGHTNESS;
+       
+       if (TEMPERATURE != 6500.0)
+            pixel_out.rgb = pixel_out.rgb*kelvin2rgb(TEMPERATURE);
+
     }
    
    if (DO_SCANLINES == 1.0) {
-      if (scanline_have_to_flicker(is_interlaced())) pixel_out = vec4(pixel_flickering(pixel_out.rgb),1.0);
+      if (scanline_have_to_flicker(is_interlaced())) pixel_out.rgb = pixel_flickering(pixel_out.rgb);
    }
    
    FragColor = pixel_out;
