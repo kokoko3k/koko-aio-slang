@@ -122,10 +122,7 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
     } else {
 
         if ( darkline_every >= 0.0)
-            if (int(mod(line_2, darkline_every)) == 1) return source * darkline_trans;
-
-        if ( darkline_every < 0.0)
-            if  (int(mod(line_2, abs(darkline_every) )) != 1) return source * darkline_trans;
+            if (int(mod(line_2, darkline_every)) < DARKLINE_SCALE) return source * darkline_trans;
     }
 
     return source;
