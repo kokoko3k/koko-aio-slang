@@ -234,7 +234,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter DO_DARKLINES          "★ Slotmask/Aperture grille enable? ==>"		0.0 	0.0 1.0 1.0
 #pragma parameter DARKLINES_STRENGTH    "        Strength"				0.3 	0.0 1.0 0.05
 #pragma parameter DO_DARKLINES_VOFFSET  "        Offset by triads"			1.0 	0.0 1.0 1.0
-#pragma parameter DARKLINES_PERIOD      "        Period (triad height)"			4.0 	-16.0 16.0 2.0
+#pragma parameter DARKLINES_PERIOD      "        Period (triad height)"		4.0 	2.0 16.0 1.0
 #pragma parameter DRKLN_OVERWHITE       "        How much to affect bright colors"	1.0 	0.0 1.0 0.05
 
 
