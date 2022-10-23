@@ -9,10 +9,35 @@ layout(location = 0) out vec2 vTexCoord;
 layout(location = 1) out vec2 r_offset;
 layout(location = 2) out vec2 g_offset;
 layout(location = 3) out vec2 b_offset;
+layout(location = 4) out vec3 temperature_rgb;
 
 #include "functions.include.slang"
 
 #define RGB_SHIFT_RANGE 20
+
+vec3 kelvin2rgb(float k) {
+   k = clamp(k,1000,40000);
+   k=k/100.0;
+   float tmpCalc;
+    vec3 pixel_out;
+   if (k<=66) {
+      pixel_out.r = 255;
+      pixel_out.g = 99.4708025861 * log(k) - 161.1195681661;
+   } else {
+      pixel_out.r = 329.698727446 * pow(k - 60 ,-0.1332047592);
+      pixel_out.g = 288.1221695283 * pow(k-60, -0.0755148492);
+   }
+
+   if (k >= 66)
+      pixel_out.b = 255;
+   else if (k<=19)
+      pixel_out.b = 0;
+   else
+      pixel_out.b = 138.5177312231 * log(k - 10) - 305.0447927307;
+
+   return pixel_out/255.0;
+}
+
 
 void main() {
    gl_Position = global.MVP * Position;
@@ -24,6 +49,9 @@ void main() {
       g_offset=offsets_from_float(SHIFT_G+210.0,RGB_SHIFT_RANGE);
       b_offset=offsets_from_float(SHIFT_B+210.0,RGB_SHIFT_RANGE);
    }
+   if (TEMPERATURE != 6500)
+      temperature_rgb = kelvin2rgb(TEMPERATURE);
+
 }
 
 #pragma stage fragment
@@ -31,6 +59,7 @@ layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in vec2 r_offset;
 layout(location = 2) in vec2 g_offset;
 layout(location = 3) in vec2 b_offset;
+layout(location = 4) in vec3 temperature_rgb;
 layout(location = 0) out vec4 FragColor;
 
 layout(set = 0, binding = 2) uniform sampler2D Source;
@@ -71,28 +100,6 @@ vec3 pixel_offset(vec3 pixel_cur) {
 }
 
 
-vec3 kelvin2rgb(float k) {
-   k = clamp(k,1000,40000);
-   k=k/100.0;
-   float tmpCalc;
-    vec3 pixel_out;
-   if (k<=66) {
-      pixel_out.r = 255;
-      pixel_out.g = 99.4708025861 * log(k) - 161.1195681661;
-   } else {
-      pixel_out.r = 329.698727446 * pow(k - 60 ,-0.1332047592);   
-      pixel_out.g = 288.1221695283 * pow(k-60, -0.0755148492);      
-   }
-   
-   if (k >= 66)
-      pixel_out.b = 255;
-   else if (k<=19) 
-      pixel_out.b = 0;
-   else
-      pixel_out.b = 138.5177312231 * log(k - 10) - 305.0447927307;
-   
-   return pixel_out/255.0;
-}
 
 void main() { 
 
@@ -117,9 +124,7 @@ void main() {
         if (CONTRAST != 0.0 || BRIGHTNESS != 0.0)
             pixel_out.rgb = scale_to_range_vec3(pixel_out.rgb, -CONTRAST, 1+CONTRAST) + BRIGHTNESS;
        
-       if (TEMPERATURE != 6500.0)
-            pixel_out.rgb = pixel_out.rgb*kelvin2rgb(TEMPERATURE);
-
+        if (TEMPERATURE != 6500.0) pixel_out.rgb = pixel_out.rgb * temperature_rgb;
     }
    
    if (DO_SCANLINES == 1.0) {
