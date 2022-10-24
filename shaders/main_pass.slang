@@ -50,7 +50,7 @@ vec3 pixel_vmask(vec3 source, vec3 white_reference, float over_white) {
     int col = int( vOutputCoord.x * params.OutputSize.x );
     vec3 pixel_out;
     vec3 vmasked;
-    vec4 vec_mod=(vec4(3,1,2,3) + vec4(VMASK_GAP,0.0,0.0,0.0))* VMASK_SCALE ;
+    vec4 vec_mod=(vec4(3,1,2,3) + vec4(VMASK_GAP,0.0,0.0,0.0))* VMASK_DARKLINE_SCALE ;
     float mask_lightness = 1.0 - RGB_MASK_STRENGTH;
     if ( mod(col, vec_mod.x) < vec_mod.y)          vmasked = min(m1 + mask_lightness,vec3(1.0)) * source;
         else if (mod(col, vec_mod.x) < vec_mod.z) vmasked = min(m2 + mask_lightness,vec3(1.0)) * source;
@@ -71,7 +71,7 @@ vec3 pixel_vmask_gm(vec3 source, vec3 white_reference, float over_white) {
     int col = int( vOutputCoord.x * params.OutputSize.x );
     vec3 pixel_out;
     vec3 vmasked;
-    vec3 vec_mod=(vec3(2,1,2) + vec3(VMASK_GAP,0.0,0.0))* VMASK_SCALE ;
+    vec3 vec_mod=(vec3(2,1,2) + vec3(VMASK_GAP,0.0,0.0))* VMASK_DARKLINE_SCALE ;
     
     float mask_lightness = 1.0 - RGB_MASK_STRENGTH;
     if (mod(col, vec_mod.x) < vec_mod.y)          vmasked = min(m1gm + mask_lightness,vec3(1.0)) * source;
@@ -87,21 +87,18 @@ vec3 pixel_vmask_gm(vec3 source, vec3 white_reference, float over_white) {
         }
     
    return pixel_out;
-
 }
-
-#define DARKLINE_SCALE 1.0
 
 vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
                      float do_offset, vec3 white_reference,float over_white) {
 
-    float Darkline_part_w = (3.0 - VMASK_USE_GM + VMASK_GAP) * VMASK_SCALE;
+    float Darkline_part_w = (3.0 - VMASK_USE_GM + VMASK_GAP) * VMASK_DARKLINE_SCALE;
     float Darkline_part_w_x2 = Darkline_part_w*2;
     //vec3 pixel_out=source;
     float col_2 =  vOutputCoord.x * params.OutputSize.x;
     float line_2 = vOutputCoord.y * params.OutputSize.y;
 
-    darkline_every *= DARKLINE_SCALE;
+    darkline_every *= VMASK_DARKLINE_SCALE;
 
     if (over_white != 1.0) {
         //less effect on bright colors.
@@ -111,9 +108,9 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
     }
 
     if (do_offset == 1.0) {
-        if  (int(mod(line_2, darkline_every)) < DARKLINE_SCALE) {
+        if  (int(mod(line_2, darkline_every)) < VMASK_DARKLINE_SCALE) {
             if (int(mod(col_2, Darkline_part_w_x2)) < Darkline_part_w) return source * darkline_trans;
-        } else if  (int(mod(line_2+(darkline_every/2), darkline_every)) < DARKLINE_SCALE ) {
+        } else if  (int(mod(line_2+(darkline_every/2), darkline_every)) < VMASK_DARKLINE_SCALE ) {
             // DRAW WITH OFFSET:
             col_2+=Darkline_part_w;
             if ((int(mod(col_2, Darkline_part_w_x2))) < Darkline_part_w)
@@ -122,9 +119,8 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
     } else {
 
         if ( darkline_every >= 0.0)
-            if (int(mod(line_2, darkline_every)) < DARKLINE_SCALE) return source * darkline_trans;
+            if (int(mod(line_2, darkline_every)) < VMASK_DARKLINE_SCALE) return source * darkline_trans;
     }
-
     return source;
 }
 

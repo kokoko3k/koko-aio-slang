@@ -43,7 +43,7 @@ layout(push_constant) uniform Push
 
 	float SCANLINE_DARK;
 	float VMASK_OVERWHITE ;
-	float VMASK_SCALE;
+	float VMASK_DARKLINE_SCALE;
 	float VMASK_GAP;
 	float VMASK_USE_GM;
 	float DRKLN_OVERWHITE ;
@@ -207,7 +207,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // This is done by multiplying the source image pixels, in turn, by red green or blue.
 // The strenght of the multiplication, and so of the final effect is affected by "RGB_MASK_STRENGTH" value.
 // A Value of 0 completely disable the effect.
-// "VMASK_SCALE" Is the width of the mask, for HiDPI monitors.
+// "VMASK_DARKLINE_SCALE" Scales the gaps, the width the mask, and the height of the rgm bask and darklines (for HiDPI).
 // "VMASK_GAP" Will draw an horizontal gap between triads, for HiDPI monitors.
 // "VMASK_USE_GM" exploit the rgb subpixel layout of the real monitor to higher the apparent RGB vmask resolution
 // "VMASK_OVERWHITE" modulates the strenght of the effect depending on the source pixel brightness,
@@ -224,15 +224,16 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // allowing, in conjunction with RGB mask, to emulate slot mask
 
 #pragma parameter DO_VMASK_AND_DARKLINES "★  Mask RGB and/or Darklines enable? ==>"         	1.0 	0.0 1.0 1.0
-#pragma parameter RGB_MASK_STRENGTH  "        Vmask Strength (0.0 to disable)"			0.75  	0.0 1.0 0.05
-#pragma parameter VMASK_SCALE        "        (HiDPI) Vmask size multiplier (for HiDPI)"	1.0  	1.0 4.0 1.0
-#pragma parameter VMASK_USE_GM       "        RGB Mask: (LoDPI) Green,Magenta -> BGR"	 	0.0  	0.0 1.0 1.0
-#pragma parameter VMASK_GAP          "        RGB Mask: Horizontal Gap between triads"		0.0  	0.0 1.0 1.0
-#pragma parameter VMASK_OVERWHITE    "        RGB Mask: affect bright colors"			1.0 	0.0 1.0 0.05
-#pragma parameter DARKLINES_STRENGTH    "     Darklines: strength (0.0 to disable)"		0.3 	0.0 1.0 0.05
-#pragma parameter DO_DARKLINES_VOFFSET  "     Darklines: offset by triads"			1.0 	0.0 1.0 1.0
-#pragma parameter DARKLINES_PERIOD      "     Darklines: period (triad height)"			4.0 	2.0 16.0 2.0
-#pragma parameter DRKLN_OVERWHITE       "     Darklines: affect bright colors"			1.0 	0.0 1.0 0.05
+#pragma parameter VMASK_DARKLINE_SCALE   "        (HiDPI) Vmask and Darklines multiplier"	1.0  	1.0 4.0 1.0
+#pragma parameter RGB_MASK_STRENGTH      "        Vmask Strength (0.0 to disable)"		0.75  	0.0 1.0 0.05
+#pragma parameter VMASK_USE_GM           "        RGB Mask: (LoDPI) Green,Magenta -> BGR"	0.0  	0.0 1.0 1.0
+#pragma parameter VMASK_GAP              "        RGB Mask: Horizontal Gap between triads"	0.0  	0.0 1.0 1.0
+#pragma parameter VMASK_OVERWHITE        "        RGB Mask: affect bright colors"		1.0 	0.0 1.0 0.05
+
+#pragma parameter DARKLINES_STRENGTH     "     Darklines: strength (0.0 to disable)"		0.3 	0.0 1.0 0.05
+#pragma parameter DO_DARKLINES_VOFFSET   "     Darklines: offset by triads"			1.0 	0.0 1.0 1.0
+#pragma parameter DARKLINES_PERIOD       "     Darklines: period (triad height)"		4.0 	2.0 16.0 2.0
+#pragma parameter DRKLN_OVERWHITE        "     Darklines: affect bright colors"			1.0 	0.0 1.0 0.05
 
 
 
@@ -350,12 +351,12 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #define IN_GLOW_POWER            global.IN_GLOW_POWER
 #define IN_GLOW_GAMMA            global.IN_GLOW_GAMMA
 
-#define DO_VMASK_AND_DARKLINES       global.DO_VMASK_AND_DARKLINES
-#define RGB_MASK_STRENGTH global.RGB_MASK_STRENGTH
-#define VMASK_OVERWHITE   params.VMASK_OVERWHITE
-#define VMASK_SCALE       params.VMASK_SCALE
-#define VMASK_GAP         params.VMASK_GAP
-#define VMASK_USE_GM      params.VMASK_USE_GM
+#define DO_VMASK_AND_DARKLINES  global.DO_VMASK_AND_DARKLINES
+#define RGB_MASK_STRENGTH       global.RGB_MASK_STRENGTH
+#define VMASK_OVERWHITE         params.VMASK_OVERWHITE
+#define VMASK_DARKLINE_SCALE    params.VMASK_DARKLINE_SCALE
+#define VMASK_GAP               params.VMASK_GAP
+#define VMASK_USE_GM            params.VMASK_USE_GM
 
 #define DARKLINES_STRENGTH   global.DARKLINES_STRENGTH
 #define DRKLN_OVERWHITE      params.DRKLN_OVERWHITE
