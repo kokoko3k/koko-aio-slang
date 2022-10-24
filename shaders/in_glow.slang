@@ -28,8 +28,7 @@ layout(set = 0, binding = 4) uniform sampler2D first_pass;
 
 // What follows is an ugly optimization with a lot of code copied and pasted repeated multiple times,
 // shamlessly hidden into an include:
-#include "pixel_glows.include.slang" 
-#include "functions.include.slang"
+#include "includes/pixel_glows.include.slang" 
 
 void main() { 
    //FIXME: flickering scanlines does not curve, and think they will never do due to moiree, not a big deal since they are barely visible.

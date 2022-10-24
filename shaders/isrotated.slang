@@ -7,7 +7,7 @@ layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
 layout(location = 1) out float mark_color_rotated;
 
-#include "functions.include.slang"
+#include "includes/functions.include.slang"
 void main()
 {
    gl_Position = global.MVP * Position;

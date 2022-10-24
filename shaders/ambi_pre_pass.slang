@@ -9,9 +9,9 @@
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
-layout(location = 1) out float bordo_min;
-layout(location = 2) out float bordo_max;
-layout(location = 3) out float passo;
+layout(location = 1) out float border_min;
+layout(location = 2) out float border_max;
+layout(location = 3) out float fstep;
 layout(location = 4) out float lod;
 
 void main()
@@ -19,10 +19,10 @@ void main()
    gl_Position = global.MVP * Position;
    vTexCoord = TexCoord;
    
-   bordo_min=internalness ;
-   bordo_max=1.0-internalness ;
-   passo = (bordo_max - bordo_min)  / (leds_per_strip-1);
-   //Prendo una texture precisa led_strip x led_strip, ne calcolo il lod:
+   border_min=internalness ;
+   border_max=1.0-internalness ;
+   fstep = (border_max - border_min)  / (leds_per_strip-1);
+   //Calc a lod for a texture sized led_strip x led_strip
    lod = log2(params.SourceSize.y / leds_per_strip);
 }
 
@@ -30,7 +30,7 @@ void main()
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in float bordo_min;
 layout(location = 2) in float bordo_max;
-layout(location = 3) in float passo;
+layout(location = 3) in float fstep;
 layout(location = 4) in float lod;
 
 layout(location = 0) out vec4 FragColor;
@@ -44,7 +44,7 @@ layout(set = 0, binding = 4) uniform sampler2D ambi_pre_pass1Feedback;
 #define SourceTexture Source
 #define SourceTextureSize params.SourceSize
 
-#include "functions.include.slang"
+#include "includes/functions.include.slang"
 
 vec3 circle_smooth(vec2 coords, vec2 middle, float f_radius, float FALLOFF, float f_lod) {
     float distanza=distance(middle,vec2(coords.x,coords.y));
@@ -94,7 +94,7 @@ void main() {
         return;
     }
     
-    //Scalo al rapporto d'aspetto originale.
+    //Scale to the original aspect
     vec2 coords = get_scaled_coords(vTexCoord,global.FinalViewportSize,is_rotated);
     if (DO_BEZEL==1.0) coords = zoomout_coords(coords, -BEZEL_INNER_ZOOM , 1.0);
     
@@ -146,20 +146,20 @@ void main() {
     float middle_x; float middle_y ;
     
     middle_x=bordo_min;
-    for (middle_y=bordo_min ; middle_y <= bordo_max+eps ; middle_y=middle_y + passo ) {
+    for (middle_y=bordo_min ; middle_y <= bordo_max+eps ; middle_y=middle_y + fstep ) {
         pixel_out +=circle_smooth(coords, vec2(middle_x,middle_y), radius, AMBI_FALLOFF, lod);
     }
     middle_x=bordo_max;
-    for (middle_y=bordo_min ; middle_y <=  bordo_max+eps ; middle_y=middle_y + passo ) {
+    for (middle_y=bordo_min ; middle_y <=  bordo_max+eps ; middle_y=middle_y + fstep ) {
         pixel_out +=circle_smooth(coords, vec2(middle_x,middle_y), radius, AMBI_FALLOFF, lod);
     }    
 
     middle_y=bordo_min;
-    for (middle_x=bordo_min+passo ; middle_x <= bordo_max-passo+eps ; middle_x=middle_x + passo ) {
+    for (middle_x=bordo_min+fstep ; middle_x <= bordo_max-fstep+eps ; middle_x=middle_x + fstep ) {
         pixel_out +=circle_smooth(coords, vec2(middle_x,middle_y), radius, AMBI_FALLOFF, lod);
     }
     middle_y=bordo_max;
-    for (middle_x=bordo_min+passo ; middle_x <= bordo_max-passo+eps ; middle_x=middle_x + passo ) {
+    for (middle_x=bordo_min+fstep ; middle_x <= bordo_max-fstep+eps ; middle_x=middle_x + fstep ) {
         pixel_out +=circle_smooth(coords, vec2(middle_x,middle_y), radius, AMBI_FALLOFF, lod);
     }    
 

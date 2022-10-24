@@ -11,8 +11,7 @@ layout(location = 1) out vec2 vOutputCoord;
 layout(location = 2) out float bezel_frame_lod;
 layout(location = 3) out vec2 spot_offset;
 
-#include "functions.include.slang"
-
+#include "includes/functions.include.slang"
 
 void main() {
     gl_Position = global.MVP * Position;
@@ -41,7 +40,7 @@ layout(set = 0, binding = 7) uniform sampler2D monitor_body;
 layout(set = 0, binding = 8) uniform sampler2D first_pass;
 
 
-#include "functions.include.slang"
+#include "includes/functions.include.slang"
 
 #define NOISE_A 12.9898
 #define NOISE_B 78.233

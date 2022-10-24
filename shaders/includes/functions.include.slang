@@ -1,15 +1,12 @@
 #define alpha_mark 0.1
 #define pi 3.141592654
 
-
 vec2 offsets_from_float(float in_param, int range){
     return vec2(  
                   (int(in_param) % range) - range*0.5,
                   floor(in_param / range) - range*0.5 
 	        );
 }
-
-
 
 /* pack_2to1_f and unpack_1to2_float 
  * Take 2 floats and pack them into one

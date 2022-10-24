@@ -26,7 +26,7 @@ layout(set = 0, binding = 2) uniform sampler2D SourceTexture;
 
 // What follows is an ugly optimization with a lot of code copied and pasted repeated multiple times,
 // shamlessly hidden into an include:
-#include "blooms.include.slang" 
+#include "includes/blooms.include.slang" 
 
 void main() {
 

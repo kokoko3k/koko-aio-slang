@@ -32,7 +32,7 @@ layout(set = 0, binding = 4) uniform sampler2D in_glow_pass;
 
 // What follows is an ugly optimization with a lot of code copied and pasted repeated multiple times,
 // shamlessly hidden into an include:
-#include "pixel_glows.include.slang"    
+#include "includes/pixel_glows.include.slang"    
 
 
 vec4 main_wrap(void) {

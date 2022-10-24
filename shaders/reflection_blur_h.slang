@@ -20,8 +20,8 @@ layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 1) uniform sampler2D main_pass;
 layout(set = 0, binding = 2) uniform sampler2D isrotated_pass;
 
-#include "blurs.include.slang"
-#include "functions.include.slang"
+#include "includes/blurs.include.slang"
+#include "includes/functions.include.slang"
 
 #define c_tolerance 0.1
 

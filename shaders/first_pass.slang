@@ -11,7 +11,7 @@ layout(location = 2) out vec2 g_offset;
 layout(location = 3) out vec2 b_offset;
 layout(location = 4) out vec3 temperature_rgb;
 
-#include "functions.include.slang"
+#include "includes/functions.include.slang"
 
 #define RGB_SHIFT_RANGE 20
 
@@ -64,7 +64,7 @@ layout(location = 0) out vec4 FragColor;
 
 layout(set = 0, binding = 2) uniform sampler2D Source;
 
-#include "functions.include.slang"
+#include "includes/functions.include.slang"
 
 
 vec3 pixel_offset(vec3 pixel_cur,vec2 coord) {

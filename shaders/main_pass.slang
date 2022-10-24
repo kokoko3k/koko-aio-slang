@@ -21,7 +21,7 @@ layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
 layout(location = 1) out vec2 vOutputCoord;
 
-#include "functions.include.slang"
+#include "includes/functions.include.slang"
 void main() {
    gl_Position = global.MVP * Position;
    vTexCoord = get_scaled_coords(TexCoord,global.FinalViewportSize, is_rotated());
@@ -39,7 +39,7 @@ layout(set = 0, binding = 6) uniform sampler2D first_pass;
 layout(set = 0, binding = 7) uniform sampler2D avglum_passFeedback;
 
 
-#include "functions.include.slang"
+#include "includes/functions.include.slang"
 vec3 pixel_vmask(vec3 source, vec3 white_reference, float over_white) {
     int col = int( vOutputCoord.x * params.OutputSize.x );
     vec3 pixel_out;
