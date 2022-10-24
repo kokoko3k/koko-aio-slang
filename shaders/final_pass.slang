@@ -9,15 +9,17 @@ layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
 layout(location = 1) out vec2 vOutputCoord;
 layout(location = 2) out float bezel_frame_lod;
-layout(location = 3) out vec2 spot_offset;
+layout(location = 3) out float bg_lod;
+layout(location = 4) out vec2 spot_offset;
 
 #include "includes/functions.include.slang"
 
 void main() {
     gl_Position = global.MVP * Position;
     vTexCoord = get_scaled_coords(TexCoord,global.FinalViewportSize, is_rotated());
-    vOutputCoord = TexCoord;
+    vOutputCoord = TexCoord;;
     bezel_frame_lod = log2(global.monitor_bodySize.y * (BEZEL_FRAME_ZOOM+1.0) /global.FinalViewportSize.y);
+    bg_lod = log2(global.bgSize.y /global.FinalViewportSize.y);
     spot_offset = offsets_from_float(S_POSITION+420.0,40);
     spot_offset = spot_offset / 10.0 + vec2(0.0,1.0);
 }
@@ -27,7 +29,8 @@ void main() {
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in vec2 vOutputCoord;
 layout(location = 2) in float bezel_frame_lod;
-layout(location = 3) in vec2 spot_offset;
+layout(location = 3) in float bg_lod;
+layout(location = 4) in vec2 spot_offset;
 layout(location = 0) out vec4 FragColor;
 
 
@@ -37,7 +40,8 @@ layout(set = 0, binding = 4) uniform sampler2D reflected_blurred_pass2;
 layout(set = 0, binding = 5) uniform sampler2D ambi_temporal_pass;
 layout(set = 0, binding = 6) uniform sampler2D avglum_pass;
 layout(set = 0, binding = 7) uniform sampler2D monitor_body;
-layout(set = 0, binding = 8) uniform sampler2D first_pass;
+layout(set = 0, binding = 8) uniform sampler2D bg;
+layout(set = 0, binding = 9) uniform sampler2D first_pass;
 
 
 #include "includes/functions.include.slang"
@@ -58,14 +62,30 @@ float displace(float power) {
 
 float global_noise;
 
-vec4 pixel_border() {
-    vec3 ambi = texture(ambi_temporal_pass, vOutputCoord + global_noise ).rgb;
-    return vec4(ambi,0.0);
+vec3 pixel_background_image(){
+    
+    vec2 tex_size = textureSize(bg, 0);
+   //Background:
+    vec2 back_coords =  get_scaled_coords_aspect(vTexCoord,global.FinalViewportSize, global.FinalViewportSize.x/global.FinalViewportSize.y, is_rotated());
+    back_coords =  get_scaled_coords_aspect(vOutputCoord,global.FinalViewportSize, tex_size.x/tex_size.y, is_rotated());
+    back_coords=zoom(back_coords,1.0);
+    return textureLod(bg,back_coords,bg_lod).rgb;
 }
 
 vec3 ambi_noised() {
-    return pixel_border().rgb;
+    return texture(ambi_temporal_pass, vOutputCoord + global_noise ).rgb;
 }
+
+
+vec3 pixel_border() {
+    vec3 pixel_out = vec3(0.0);
+    if (DO_AMBILIGHT == 1.0)
+        pixel_out = ambi_noised();
+    if (DO_BG_IMAGE == 1.0)
+        pixel_out += pixel_background_image();
+    return pixel_out;
+}
+
 
 vec3 pixel_alternate(vec3 source, float whiteness) {
     float line = vTexCoord.y * params.OutputSize.y;
@@ -224,8 +244,10 @@ vec4 main_wrap(){
         
         //Handle outer frame cases
             //if we want ambilights in the outer frame, draw it and return
-            if ((bIs_outer_frame) && (DO_AMBILIGHT == 1))
-                return vec4(ambi_noised(),1.0);
+            if (bIs_outer_frame)              
+                if (border_needed())
+                    return vec4(pixel_border(),1.0);
+                            
             
             //But if it is just outer frame, just make it black.
             if (bIs_outer_frame) return vec4(0.0);
@@ -233,19 +255,19 @@ vec4 main_wrap(){
         
         //Handle inner frame cases
             vec4 vPixel_inner_frame = pixel_inner_frame();
-            if (DO_AMBILIGHT == 1) {
+            if (border_needed()) {
                 //mix ambilight in the inner frame too, as curvature could shrink into the inner frame.
-                bool draw_leds = true;
+                bool draw_border = true;
                 //Not painting ambilights here is the best way to cheaply draw a border around the frame
                 if (DO_BEZEL == 1.0) {
                     vec2 vTexCoord_zoomout = zoomout_coords(vTexCoord, -BEZEL_INNER_ZOOM , 1.0);
                     float border_start = 1-BEZEL_IMAGE_BORDER;
                     //Not using coords_curved here because crazy things would happen with vertical games
-                    draw_leds = vTexCoord_zoomout.x < border_start || vTexCoord_zoomout.x > BEZEL_IMAGE_BORDER || 
+                    draw_border = vTexCoord_zoomout.x < border_start || vTexCoord_zoomout.x > BEZEL_IMAGE_BORDER || 
                                 vTexCoord_zoomout.y < border_start || vTexCoord_zoomout.y > BEZEL_IMAGE_BORDER ;
                 }
-                if (draw_leds) 
-                    return vec4(mix(ambi_noised().rgb,vPixel_inner_frame.rgb,min(vPixel_inner_frame.a*1.5,1.0)),vPixel_inner_frame.a);
+                if (draw_border) 
+                    return vec4(mix(pixel_border().rgb,vPixel_inner_frame.rgb,min(vPixel_inner_frame.a*1.5,1.0)),vPixel_inner_frame.a);
                 //return vec4(1.0,0.0,0.0,1.0);
             }
 
@@ -269,7 +291,5 @@ void main() {
         pixel_out = vec4(compose_bezel_over(pixel_out.rgb),1.0);
     }
 
-    FragColor = pixel_out ;
-
-    
+    FragColor = pixel_out;
 }

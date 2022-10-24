@@ -35,6 +35,11 @@ vec2 zoom(vec2 in_coords, float zoom_factor) {
    return (in_coords/zoom_factor)-off;
 }
 
+vec2 zoomxy(vec2 in_coords, vec2 zoom_factor) {
+   vec2 off = 1.0/(zoom_factor*2.0) - 0.5;
+   return (in_coords/zoom_factor)-off;
+}
+
 vec2 zoomout_coords(vec2 in_coords, float zoom_out, float aspect) {
    vec2 zoom   = vec2( 1 + zoom_out, 
                        1 + (zoom_out * aspect) 
@@ -143,7 +148,7 @@ float random(float power) {
 //AMBILIGHT RELATED
 	bool border_needed() {
 		//returns if we need to draw on the border
-		return (DO_AMBILIGHT == 1.0);
+		return (DO_AMBILIGHT + DO_BG_IMAGE > 0.0);
 	}
 
 	
@@ -189,6 +194,25 @@ float random(float power) {
 			return ASPECT_X / ASPECT_Y ;
 	}
 
+	vec2 get_scaled_coords_aspect(vec2 pTexCoord, vec4 destsize, float in_aspect , bool is_rotated){
+		if (!border_needed()) return pTexCoord;
+			//else
+		float scale_x = 1.0;
+		float scale_y = 1.0;
+		float offset_x = 0.0 ;
+		float offset_y = 0.0 ;
+		if (is_rotated) {
+			scale_y = destsize.x/(destsize.y / in_aspect );
+			offset_y = (0.5 * scale_y ) - 0.5 ;
+		} else {
+			scale_x = destsize.x/(destsize.y * in_aspect);
+			offset_x = (0.5 * scale_x ) - 0.5 ;
+		}
+
+		vec2 scale_coord=vec2(pTexCoord.x*scale_x - offset_x , pTexCoord.y*scale_y - offset_y);
+		return scale_coord;
+	}
+	
 	vec2 get_scaled_coords(vec2 pTexCoord, vec4 destsize, bool is_rotated){
 		if (!border_needed()) return pTexCoord;
 			//else

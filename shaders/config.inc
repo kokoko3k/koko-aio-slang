@@ -67,6 +67,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	vec4 FXAA_passSize;
 	vec4 main_passSize;
 	vec4 monitor_bodySize;
+	vec4 bgSize;
 	vec4 avglum_passSize;
 	vec4 first_passSize;
 
@@ -138,6 +139,8 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float ASPECT_Y;
 	float AMBI_STEPS;
 	
+	float DO_BG_IMAGE;
+	
 	float DO_SHIFT_RGB;
 	float SHIFT_R;
 	float SHIFT_G;
@@ -149,9 +152,9 @@ layout(std140, set = 0, binding = 0) uniform UBO
 //Offset RGB
 // Allow to shift Red, Green, Blue components along x and y axis
 #pragma parameter DO_SHIFT_RGB       "★ Shift RGB components enable? ==>"	0.0	 0.0 1.0 1.0
-#pragma parameter SHIFT_R         "        Red offset"			20.0 	-210.0 189.0 1
-#pragma parameter SHIFT_G         "        Green offset"		-1.0 	-210.0 189.0 1
-#pragma parameter SHIFT_B         "        Blue offset"			1.0 	-210.0 189.0 1
+#pragma parameter SHIFT_R         "        Red offset"			-20.0 	-210.0 189.0 1
+#pragma parameter SHIFT_G         "        Green offset"		1.0 	-210.0 189.0 1
+#pragma parameter SHIFT_B         "        Blue offset"			20.0 	-210.0 189.0 1
 #pragma parameter OFFSET_STRENGTH "        Strength"			0.5 	 0.0 1.0 0.1
 
 
@@ -302,6 +305,9 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter AMBI_STEPS	 "        Slowness"							60.0 5.0  1000.0  5.0
 #pragma parameter AMBI_FALLOFF   "        Light Falloff"						0.7  0.1  3.0     0.01
 #pragma parameter AMBI_POWER     "        Led power"							0.5  0.1  5.0     0.05
+
+#pragma parameter DO_BG_IMAGE	 "★ Background image from textures/bg.png enable: ==> "			0.0  0.0  1.0     1.0
+
 #pragma parameter ASPECT_X       "        Aspect Ratio Numerator (-x for a preset below)"   		0.0  -5.0 256. 1.0
 #pragma parameter ASPECT_Y       "        Aspect Ratio Denominator"	  				3.0   0.0 256. 1.0
 #pragma parameter label_aspect_presets "        Presets reference list:" 0.0 0.0 0.0 1.0
@@ -311,6 +317,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter label_aspect_preset3 "          (-3 = Snes 8/7)" 0.0 0.0 0.0 1.0
 #pragma parameter label_aspect_preset4 "          (-4 = Megadrive 10/7)" 0.0 0.0 0.0 1.0
 #pragma parameter label_aspect_preset5 "          (-5 = Uncorrected)" 0.0 0.0 0.0 1.0
+
 
 //Vignette and spot
 //Emulates the vignette effect and/or a light reflection.
@@ -428,6 +435,8 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #define AMBI_POWER   global.AMBI_POWER
 #define ASPECT_X     global.ASPECT_X
 #define ASPECT_Y     global.ASPECT_Y
+
+#define DO_BG_IMAGE global.DO_BG_IMAGE
 
 #define DO_SHIFT_RGB         global.DO_SHIFT_RGB
 #define SHIFT_R          global.SHIFT_R

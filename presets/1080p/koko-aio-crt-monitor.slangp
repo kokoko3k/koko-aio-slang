@@ -3,9 +3,9 @@
 DO_FXAA = "0.0"
 
 DO_OFFSET = "0.0"
-	OFFSET_R = "20.0"        
-	OFFSET_G = "-1.0"        
-	OFFSET_B = "1.0        
+	OFFSET_R = "-20.0"        
+	OFFSET_G = "1.0"        
+	OFFSET_B = "20.0"
 	OFFSET_STRENGTH = "0.5"
 
 DO_SCANLINES = "1.0"
