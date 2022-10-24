@@ -71,18 +71,19 @@ vec3 pixel_flickering(vec3 pixel_cur) {
    float mymod = params.FrameCount % 3;
    
    if (mymod == 0.0) return pixel_cur;
-   
+   float line_tick = (params.OriginalSize.y > MIN_LINES_INTERLACED ) ? 1 : 2 ;
+
    vec3 flickline;
    if (mymod == 1.0 )
-      flickline = texture(Source,vTexCoord + vec2(0.0,params.OriginalSize.w/2.0)).rgb;
+      flickline = texture(Source,vTexCoord + vec2(0.0,params.OriginalSize.w/line_tick)).rgb;
    else if (mymod == 2.0) 
-      flickline = texture(Source,vTexCoord - vec2(0.0,params.OriginalSize.w/2.0)).rgb;
+      flickline = texture(Source,vTexCoord - vec2(0.0,params.OriginalSize.w/line_tick)).rgb;
 
    float lumdiff = (flickline.r+flickline.g+flickline.b)/3.0 -
                    (pixel_cur.r+pixel_cur.g+pixel_cur.b)/3.0;
    
    if (lumdiff > 0.0) {
-      lumdiff = scale_to_range(lumdiff,0.2,0.7);
+      lumdiff = scale_to_range(lumdiff,0.0,1.5);
       return mix(pixel_cur,flickline,lumdiff);
    } else {
       return pixel_cur;
@@ -107,8 +108,6 @@ void main() {
    
    if (DO_SHIFT_RGB == 1.0) pixel_out = vec4(pixel_offset(pixel_out.rgb), 1.0);
 
-   
-   
     if (DO_CCORRECTION == 1.0) {
         //Saturation modifier
         if (!(SATURATION == 1.0)) {
