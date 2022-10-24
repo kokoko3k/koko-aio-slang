@@ -72,8 +72,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 	float DO_SCANLINES;
 	float DO_IN_GLOW;
-	float DO_RGB_MASK ;
-	float DO_DARKLINES ;
+	float DO_VMASK_AND_DARKLINES ;
 	float DO_HALO ;
 	float DO_CCORRECTION;
 	float DO_ALT_BLANK;
@@ -214,16 +213,8 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // "VMASK_OVERWHITE" modulates the strenght of the effect depending on the source pixel brightness,
 // This is handy  if you want to keep a good image contrast/brightness, but keep in mind that other
 // parameters like haloing and bloom.
-#pragma parameter DO_RGB_MASK        "★  Mask RGB enable? ==>"         					1.0 	0.0 1.0 1.0
-#pragma parameter RGB_MASK_STRENGTH  "        Strength (0.0=off)"					0.75  	0.0 1.0 0.05
-#pragma parameter VMASK_SCALE        "        (HiDPI) Vmask size multiplier (for HiDPI)"		1.0  	1.0 4.0 1.0
-#pragma parameter VMASK_USE_GM       "        (LoDPI) Green,Magenta -> BGR"		 		0.0  	0.0 1.0 1.0
-#pragma parameter VMASK_GAP          "        Horizontal Gap between triads"				0.0  	0.0 1.0 1.0
-#pragma parameter VMASK_OVERWHITE    "        How much to affect bright colors"	1.0 			0.0 	1.0 0.05
 
-
-
-// Aperture grille/slot mask (shadow mask not implemented)
+// Aperture grille/slot mask (shadow mask not implemented) are handled via *DARKLINES*
 // Draw darklines on screen coordinates, by mixing black pixels with the source image
 // on final viewport coordinates.
 // "DARKLINES_STRENGTH" expresses the final strenght of the effect.
@@ -231,11 +222,17 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // "DARKLINES_PERIOD" expresses every how many lines draw a black one (or the height ov the RGB triads)
 // "DO_DARKLINES_VOFFSET" lets you to vertically offset by ""DARKLINES_PERIOD/2" the lines every 3 screen pixels,
 // allowing, in conjunction with RGB mask, to emulate slot mask
-#pragma parameter DO_DARKLINES          "★ Slotmask/Aperture grille enable? ==>"		0.0 	0.0 1.0 1.0
-#pragma parameter DARKLINES_STRENGTH    "        Strength"				0.3 	0.0 1.0 0.05
-#pragma parameter DO_DARKLINES_VOFFSET  "        Offset by triads"			1.0 	0.0 1.0 1.0
-#pragma parameter DARKLINES_PERIOD      "        Period (triad height)"			4.0 	2.0 16.0 2.0
-#pragma parameter DRKLN_OVERWHITE       "        How much to affect bright colors"	1.0 	0.0 1.0 0.05
+
+#pragma parameter DO_VMASK_AND_DARKLINES "★  Mask RGB and/or Darklines enable? ==>"         	1.0 	0.0 1.0 1.0
+#pragma parameter RGB_MASK_STRENGTH  "        Vmask Strength (0.0 to disable)"			0.75  	0.0 1.0 0.05
+#pragma parameter VMASK_SCALE        "        (HiDPI) Vmask size multiplier (for HiDPI)"	1.0  	1.0 4.0 1.0
+#pragma parameter VMASK_USE_GM       "        RGB Mask: (LoDPI) Green,Magenta -> BGR"	 	0.0  	0.0 1.0 1.0
+#pragma parameter VMASK_GAP          "        RGB Mask: Horizontal Gap between triads"		0.0  	0.0 1.0 1.0
+#pragma parameter VMASK_OVERWHITE    "        RGB Mask: affect bright colors"			1.0 	0.0 1.0 0.05
+#pragma parameter DARKLINES_STRENGTH    "     Darklines: strength (0.0 to disable)"		0.3 	0.0 1.0 0.05
+#pragma parameter DO_DARKLINES_VOFFSET  "     Darklines: offset by triads"			1.0 	0.0 1.0 1.0
+#pragma parameter DARKLINES_PERIOD      "     Darklines: period (triad height)"			4.0 	2.0 16.0 2.0
+#pragma parameter DRKLN_OVERWHITE       "     Darklines: affect bright colors"			1.0 	0.0 1.0 0.05
 
 
 
@@ -353,14 +350,13 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #define IN_GLOW_POWER            global.IN_GLOW_POWER
 #define IN_GLOW_GAMMA            global.IN_GLOW_GAMMA
 
-#define DO_RGB_MASK       global.DO_RGB_MASK
+#define DO_VMASK_AND_DARKLINES       global.DO_VMASK_AND_DARKLINES
 #define RGB_MASK_STRENGTH global.RGB_MASK_STRENGTH
 #define VMASK_OVERWHITE   params.VMASK_OVERWHITE
 #define VMASK_SCALE       params.VMASK_SCALE
 #define VMASK_GAP         params.VMASK_GAP
 #define VMASK_USE_GM      params.VMASK_USE_GM
 
-#define DO_DARKLINES         global.DO_DARKLINES
 #define DARKLINES_STRENGTH   global.DARKLINES_STRENGTH
 #define DRKLN_OVERWHITE      params.DRKLN_OVERWHITE
 #define DO_DARKLINES_VOFFSET params.DO_DARKLINES_VOFFSET

@@ -216,21 +216,24 @@ vec4 main_wrap(vec2 co) {
     vec3 pixel_in_clamped = min(pixel_in,vec3(1.0)); //Clamp here for moth vmask and darklines.
     
     
-    //Vertical RGB Mask
-    if (DO_RGB_MASK == 1.0 ) {
-        //Use RGB pattern or exploit RGB layout with green and magenta?
-        if (VMASK_USE_GM < 1.0) {
-            pixel_out = pixel_vmask(pixel_in, pixel_in_clamped, VMASK_OVERWHITE);
-        } else {           
-            pixel_out = pixel_vmask_gm(pixel_in, pixel_in_clamped, VMASK_OVERWHITE);
+    //Mask and darklines:
+    if (DO_VMASK_AND_DARKLINES == 1.0 ) {
+        if (RGB_MASK_STRENGTH > 0.0) {
+            //Use RGB pattern or exploit RGB layout with green and magenta?
+            if (VMASK_USE_GM < 1.0) {
+                pixel_out = pixel_vmask(pixel_in, pixel_in_clamped, VMASK_OVERWHITE);
+            } else {           
+                pixel_out = pixel_vmask_gm(pixel_in, pixel_in_clamped, VMASK_OVERWHITE);
+            }
         }
+        //Screen lines
+        if (DARKLINES_STRENGTH > 0.0 ) {
+            float MYDARKLINES_TRANSPARENCY = 1.0 - DARKLINES_STRENGTH;
+            pixel_out = pixel_darklines(pixel_out,DARKLINES_PERIOD,MYDARKLINES_TRANSPARENCY,DO_DARKLINES_VOFFSET,pixel_in_clamped,DRKLN_OVERWHITE);
+        }
+
     }
     
-    //Horizontal screen lines
-    if (DO_DARKLINES == 1.0 ) {
-        float MYDARKLINES_TRANSPARENCY = 1.0 - DARKLINES_STRENGTH;
-        pixel_out = pixel_darklines(pixel_out,DARKLINES_PERIOD,MYDARKLINES_TRANSPARENCY,DO_DARKLINES_VOFFSET,pixel_in_clamped,DRKLN_OVERWHITE);
-    }
 
 
     //Halo
