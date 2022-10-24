@@ -66,8 +66,38 @@ layout(set = 0, binding = 2) uniform sampler2D Source;
 
 #include "functions.include.slang"
 
-vec3 pixel_flickering(vec3 pixel_cur) {
-   vec4 pixel_out;
+
+vec3 pixel_offset(vec3 pixel_cur,vec2 coord) {
+      vec2 d = -vec2(params.SourceSize.z, params.SourceSize.w)*0.5;
+      vec3 pixel_offset;
+      pixel_offset.r=texture(Source,coord + r_offset * d).r;
+      pixel_offset.g=texture(Source,coord + g_offset * d).g;
+      pixel_offset.b=texture(Source,coord + b_offset * d).b;
+      return mix(pixel_cur,pixel_offset,OFFSET_STRENGTH);
+}
+
+vec3 pixel_no_flicker(vec2 coord){
+   vec3 pixel_out = texture(Source,coord).rgb;
+   if (DO_SHIFT_RGB == 1.0) pixel_out = pixel_offset(pixel_out.rgb, coord);
+   if (DO_CCORRECTION == 1.0) {
+       //Saturation modifier
+       if (!(SATURATION == 1.0)) {
+        //pixel_out *=vec4(pixel_out.rgb,1.0);
+        const vec3 W = vec3(0.2125, 0.7154, 0.0721);
+        vec3 intensity = vec3(dot(pixel_out.rgb, W));
+        pixel_out.rgb = mix(intensity, pixel_out.rgb, SATURATION);
+       }
+       
+       if (CONTRAST != 0.0 || BRIGHTNESS != 0.0)
+           pixel_out.rgb = scale_to_range_vec3(pixel_out.rgb, -CONTRAST, 1+CONTRAST) + BRIGHTNESS;
+      
+       if (TEMPERATURE != 6500.0) pixel_out.rgb = pixel_out.rgb * temperature_rgb;
+   }
+   return pixel_out.rgb;
+}
+
+vec3 pixel_flickering() {
+   vec3 pixel_cur = pixel_no_flicker(vTexCoord);
    float mymod = params.FrameCount % 3;
    
    if (mymod == 0.0) return pixel_cur;
@@ -75,9 +105,9 @@ vec3 pixel_flickering(vec3 pixel_cur) {
 
    vec3 flickline;
    if (mymod == 1.0 )
-      flickline = texture(Source,vTexCoord + vec2(0.0,params.OriginalSize.w/line_tick)).rgb;
+      flickline = pixel_no_flicker(vTexCoord + vec2(0.0,params.OriginalSize.w/line_tick));
    else if (mymod == 2.0) 
-      flickline = texture(Source,vTexCoord - vec2(0.0,params.OriginalSize.w/line_tick)).rgb;
+      flickline = pixel_no_flicker(vTexCoord - vec2(0.0,params.OriginalSize.w/line_tick));
 
    float lumdiff = (flickline.r+flickline.g+flickline.b)/3.0 -
                    (pixel_cur.r+pixel_cur.g+pixel_cur.b)/3.0;
@@ -88,49 +118,32 @@ vec3 pixel_flickering(vec3 pixel_cur) {
    } else {
       return pixel_cur;
    }
-
 }
-
-vec3 pixel_offset(vec3 pixel_cur) {
-      vec2 d = -vec2(params.SourceSize.z, params.SourceSize.w)*0.5;
-      vec3 pixel_offset;
-      pixel_offset.r=texture(Source,vTexCoord + r_offset * d).r;
-      pixel_offset.g=texture(Source,vTexCoord + g_offset * d).g;
-      pixel_offset.b=texture(Source,vTexCoord + b_offset * d).b;
-      return mix(pixel_cur,pixel_offset,OFFSET_STRENGTH);
-}
-
-
 
 void main() { 
 
-   vec4 pixel_out = texture(Source,vTexCoord);
+   /* since flickering code needs
+      luminosity difference between 2 vertical lines
+      both have to be processed through color corrections and rgb pixel offsets.
+      before flickering code can operate. (pixel_no_flicker)
+      Therefore we call pixel_no_flicker inside it when we want flickering scanlines
+      and outside id when we dont.
+   */
    
-   if (DO_SHIFT_RGB == 1.0) pixel_out = vec4(pixel_offset(pixel_out.rgb), 1.0);
-
-    if (DO_CCORRECTION == 1.0) {
-        //Saturation modifier
-        if (!(SATURATION == 1.0)) {
-         //pixel_out *=vec4(pixel_out.rgb,1.0);
-         const vec3 W = vec3(0.2125, 0.7154, 0.0721);
-         vec3 intensity = vec3(dot(pixel_out.rgb, W));
-         pixel_out.rgb = mix(intensity, pixel_out.rgb, SATURATION);
-         //pixel_out = pow(pixel_out,vec4(0.5));  
-         //float l = length(pixel_out.rgb);
-         //pixel_out =  vec4(normalize( pow(pixel_out.rgb + vec3(eps), vec3(SATURATION)))*l,1.0)  ;
-        }
-        
-        if (CONTRAST != 0.0 || BRIGHTNESS != 0.0)
-            pixel_out.rgb = scale_to_range_vec3(pixel_out.rgb, -CONTRAST, 1+CONTRAST) + BRIGHTNESS;
-       
-        if (TEMPERATURE != 6500.0) pixel_out.rgb = pixel_out.rgb * temperature_rgb;
-    }
-   
-   if (DO_SCANLINES == 1.0) {
-      if (scanline_have_to_flicker(is_interlaced())) pixel_out.rgb = pixel_flickering(pixel_out.rgb);
+   if (DO_SCANLINES == 0.0) {
+      FragColor.rgb = pixel_no_flicker(vTexCoord);
+      return;
    }
-   
-   FragColor = pixel_out;
+
+   //Implicit else: DO_SCANLINES == 1.0
+   if (scanline_have_to_flicker(is_interlaced())) {
+      FragColor.rgb = pixel_flickering();
+      return;
+   }
+      
+   //Implicit else: DO_SCANLINES == 1.0 but no flickering needed.
+   FragColor.rgb = pixel_no_flicker(vTexCoord);
+      
    
    //Use one of the following to debug:
       //FragColor=vec4(abs(sin(params.FrameCount/3.14/4))); //white fade
