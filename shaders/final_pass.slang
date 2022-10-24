@@ -259,11 +259,11 @@ void main() {
     //"Just" handle inner and outer frame here:
     vec4 pixel_out = main_wrap();
     
-    //quad split screen (debug)
-    //if ( (vTexCoord.x < 0.5  && vTexCoord.y > 0.5) || (vTexCoord.x > 0.5  && vTexCoord.y < 0.5)         ) pixel_out = texture(first_pass,vTexCoord);
-    
-    //split screen (debug)
-    //if (vTexCoord.y < 0.5) pixel_out = texture(first_pass,vTexCoord);
+    //DEBUG:
+        //quad split screen
+        //if ( (vTexCoord.x < 0.5  && vTexCoord.y > 0.5) || (vTexCoord.x > 0.5  && vTexCoord.y < 0.5)         ) pixel_out = texture(first_pass,vTexCoord);
+        //split screen (debug)
+        //if (vTexCoord.y < 0.5) pixel_out = texture(first_pass,vTexCoord);
     
     //Bezel
     if (DO_BEZEL == 1.0) {
