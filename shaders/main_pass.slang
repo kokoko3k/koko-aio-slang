@@ -39,9 +39,6 @@ layout(set = 0, binding = 6) uniform sampler2D first_pass;
 layout(set = 0, binding = 7) uniform sampler2D avglum_passFeedback;
 
 
-// What follows is an ugly optimization with a lot of code copied and pasted repeated multiple times,
-// shamlessly hidden into an include:
-#include "pixel_glows.include.slang"    
 #include "functions.include.slang"
 vec3 pixel_vmask(vec3 source, vec3 white_reference, float over_white) {
     int col = int( vOutputCoord.x * params.OutputSize.x );
@@ -49,7 +46,7 @@ vec3 pixel_vmask(vec3 source, vec3 white_reference, float over_white) {
     vec3 vmasked;
     vec4 vec_mod=(vec4(3,1,2,3) + vec4(VMASK_GAP,0.0,0.0,0.0))* VMASK_DARKLINE_SCALE ;
     float mask_lightness = 1.0 - RGB_MASK_STRENGTH;
-    if ( mod(col, vec_mod.x) < vec_mod.y)          vmasked = min(m1 + mask_lightness,vec3(1.0)) * source;
+    if ( mod(col, vec_mod.x) < vec_mod.y)         vmasked = min(m1 + mask_lightness,vec3(1.0)) * source;
         else if (mod(col, vec_mod.x) < vec_mod.z) vmasked = min(m2 + mask_lightness,vec3(1.0)) * source;
         else if (mod(col, vec_mod.x) < vec_mod.w) vmasked = min(m3 + mask_lightness,vec3(1.0)) * source;
     else vmasked = min(vec3(0.0) + mask_lightness,vec3(1.0)) * source;
