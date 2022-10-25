@@ -307,9 +307,10 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter AMBI_FALLOFF   "        Light Falloff"						0.7  0.1  3.0     0.01
 #pragma parameter AMBI_POWER     "        Led power"							0.5  0.1  5.0     0.05
 
-#pragma parameter DO_BG_IMAGE	 "★ Background image from textures/bg.png enable: ==> "			0.0  0.0  1.0     1.0
+#pragma parameter DO_BG_IMAGE	 "★ Back image (set RetroArch aspect ratio to full!): ==> "		0.0  0.0  1.0     1.0
 #pragma parameter BG_IMAGE_OVER	 "        Image over content (alpha channel driven)?"			0.0  0.0  1.0     1.0
 
+#pragma parameter label_ar	 "★ Aspect Ratio "							0.0  0.0  1.0     1.0
 #pragma parameter ASPECT_X       "        Aspect Ratio Numerator (-x for a preset below)"   		0.0  -5.0 256. 1.0
 #pragma parameter ASPECT_Y       "        Aspect Ratio Denominator"	  				3.0   0.0 256. 1.0
 #pragma parameter label_aspect_presets "        Presets reference list:" 0.0 0.0 0.0 1.0
