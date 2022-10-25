@@ -2,5 +2,5 @@
 //#reference "koko-aio-crt-monitor-more-darklines.slangp"
 
 
-DO_DARKLINES = "1.0"
+DARKLINES_STRENGTH = "1.0"
 
