@@ -159,7 +159,7 @@ float_framebuffer2 = true
             scale3 = 1.0
        scale_type3 = source
 float_framebuffer3 = true
-     mipmap_input3 = true
+     mipmap_input3 = false
         wrap_mode3 = "mirrored_repeat"
 
 /* In this pass we gather information about the rotated state of the source

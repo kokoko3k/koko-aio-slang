@@ -1,26 +1,30 @@
 #version 450
 #include "config.inc"
+#define eps 1e-8
+#define pi 3.141592654
+
+// Blur sizes must not depend on input resolution
+#define scalemod_x (global.in_glow_passSize.x/360.0)
+#define scalemod_y (global.in_glow_passSize.y/270.0)
+
 
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
-layout(location = 1) out vec2 inglow_wh_vec2;
+layout(location = 1) out vec2 vOutputCoord;
 
-void main()
-{
+
+void main() {
    gl_Position = global.MVP * Position;
-   vTexCoord = TexCoord ;
-   // Blur radius must not depend on input resolution
-   inglow_wh_vec2 = vec2(IN_GLOW_WH * (320.0/params.OutputSize.x), IN_GLOW_WH * (224.0/params.OutputSize.x));
-   inglow_wh_vec2 = vec2(0.0,0.0);
+   //vTexCoord = get_scaled_coords(TexCoord);
+   vTexCoord = TexCoord;
+   vOutputCoord = TexCoord;
 }
 
-
 #pragma stage fragment
-
 layout(location = 0) in vec2 vTexCoord;
-layout(location = 1) in vec2 inglow_wh_vec2;
+layout(location = 1) in vec2 vOutputCoord;
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D FXAA_pass;
 layout(set = 0, binding = 3) uniform sampler2D first_pass;
@@ -37,11 +41,11 @@ vec4 main_wrap(void) {
     vec2 halo_coords = vTexCoord;
 
     if (DO_IN_GLOW == 1.0)
-        pixel_haloed = pixel_glow(in_glow_pass, HALO_W,HALO_H,HALO_POWER,HALO_GAMMA,halo_coords, params.OutputSize, params.OutputSize).rgb;
+        pixel_haloed = pixel_glow(in_glow_pass, HALO_W,HALO_H,HALO_POWER,HALO_GAMMA,halo_coords, global.FXAA_passSize, global.FXAA_passSize).rgb;
     else if (DO_FXAA == 1.0)
-        pixel_haloed = pixel_glow(FXAA_pass, HALO_W,HALO_H,HALO_POWER,HALO_GAMMA,halo_coords, params.OutputSize, params.OutputSize).rgb;
+        pixel_haloed = pixel_glow(FXAA_pass, HALO_W,HALO_H,HALO_POWER,HALO_GAMMA,halo_coords, global.FXAA_passSize, global.FXAA_passSize).rgb;
     else
-        pixel_haloed = pixel_glow(first_pass, HALO_W,HALO_H,HALO_POWER,HALO_GAMMA,halo_coords, params.OutputSize, params.OutputSize).rgb;
+        pixel_haloed = pixel_glow(first_pass, HALO_W,HALO_H,HALO_POWER,HALO_GAMMA,halo_coords, global.FXAA_passSize, global.FXAA_passSize).rgb;
         
     return vec4(pixel_haloed.rgb,1.0);
 }

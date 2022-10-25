@@ -19,7 +19,6 @@ void main() {
     
     spot_offset = offsets_from_float(S_POSITION+420.0,40);
     spot_offset = spot_offset / 10.0 + vec2(0.0,1.0);
-    
 }
 
 
