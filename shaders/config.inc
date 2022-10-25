@@ -140,6 +140,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float AMBI_STEPS;
 	
 	float DO_BG_IMAGE;
+	float BG_IMAGE_OVER;
 	
 	float DO_SHIFT_RGB;
 	float SHIFT_R;
@@ -307,6 +308,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter AMBI_POWER     "        Led power"							0.5  0.1  5.0     0.05
 
 #pragma parameter DO_BG_IMAGE	 "★ Background image from textures/bg.png enable: ==> "			0.0  0.0  1.0     1.0
+#pragma parameter BG_IMAGE_OVER	 "        Image over content (alpha channel driven)?"			0.0  0.0  1.0     1.0
 
 #pragma parameter ASPECT_X       "        Aspect Ratio Numerator (-x for a preset below)"   		0.0  -5.0 256. 1.0
 #pragma parameter ASPECT_Y       "        Aspect Ratio Denominator"	  				3.0   0.0 256. 1.0
@@ -436,7 +438,8 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #define ASPECT_X     global.ASPECT_X
 #define ASPECT_Y     global.ASPECT_Y
 
-#define DO_BG_IMAGE global.DO_BG_IMAGE
+#define DO_BG_IMAGE    global.DO_BG_IMAGE
+#define BG_IMAGE_OVER  global.BG_IMAGE_OVER
 
 #define DO_SHIFT_RGB         global.DO_SHIFT_RGB
 #define SHIFT_R          global.SHIFT_R

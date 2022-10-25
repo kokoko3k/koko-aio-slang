@@ -62,14 +62,13 @@ float displace(float power) {
 
 float global_noise;
 
-vec3 pixel_background_image(){
-    
+vec4 pixel_background_image(){
     vec2 tex_size = textureSize(bg, 0);
    //Background:
     vec2 back_coords =  get_scaled_coords_aspect(vTexCoord,global.FinalViewportSize, global.FinalViewportSize.x/global.FinalViewportSize.y, is_rotated());
     back_coords =  get_scaled_coords_aspect(vOutputCoord,global.FinalViewportSize, tex_size.x/tex_size.y, is_rotated());
     back_coords=zoom(back_coords,1.0);
-    return textureLod(bg,back_coords,bg_lod).rgb;
+    return textureLod(bg,back_coords,bg_lod);
 }
 
 vec3 ambi_noised() {
@@ -77,12 +76,12 @@ vec3 ambi_noised() {
 }
 
 
-vec3 pixel_border() {
+vec3 pixel_border(bool image_over) {
     vec3 pixel_out = vec3(0.0);
     if (DO_AMBILIGHT == 1.0)
         pixel_out = ambi_noised();
-    if (DO_BG_IMAGE == 1.0)
-        pixel_out += pixel_background_image();
+    if (DO_BG_IMAGE == 1.0 && !image_over)
+        pixel_out += pixel_background_image().rgb;
     return pixel_out;
 }
 
@@ -221,7 +220,7 @@ vec4 pixel_inner_frame() {
             
         }
 
-    //Border
+    //Border (edge)
         float border_inner_frame = 1.0;
         if (DO_BEZEL==1.0 || DO_CURVATURE == 1.0)
             border_inner_frame = border(coords_curved);
@@ -246,7 +245,7 @@ vec4 main_wrap(){
             //if we want ambilights in the outer frame, draw it and return
             if (bIs_outer_frame)              
                 if (border_needed())
-                    return vec4(pixel_border(),1.0);
+                    return vec4(pixel_border(BG_IMAGE_OVER == 1.0),1.0);
                             
             
             //But if it is just outer frame, just make it black.
@@ -267,7 +266,7 @@ vec4 main_wrap(){
                                 vTexCoord_zoomout.y < border_start || vTexCoord_zoomout.y > BEZEL_IMAGE_BORDER ;
                 }
                 if (draw_border) 
-                    return vec4(mix(pixel_border().rgb,vPixel_inner_frame.rgb,min(vPixel_inner_frame.a*1.5,1.0)),vPixel_inner_frame.a);
+                    return vec4(mix(pixel_border(BG_IMAGE_OVER == 1.0).rgb,vPixel_inner_frame.rgb,min(vPixel_inner_frame.a*1.5,1.0)),vPixel_inner_frame.a);
                 //return vec4(1.0,0.0,0.0,1.0);
             }
 
@@ -289,6 +288,11 @@ void main() {
     //Bezel
     if (DO_BEZEL == 1.0) {
         pixel_out = vec4(compose_bezel_over(pixel_out.rgb),1.0);
+    }
+    
+    if (DO_BG_IMAGE == 1.0 && BG_IMAGE_OVER==1.0) {
+        vec4 bg_image = pixel_background_image();
+        pixel_out = mix(pixel_out,bg_image,bg_image.a);
     }
 
     FragColor = pixel_out;
