@@ -13,7 +13,6 @@ void main()
    vTexCoord = TexCoord ;
    // Blur radius must not depend on input resolution
    inglow_wh_vec2 = vec2(IN_GLOW_WH * (320.0/params.OutputSize.x), IN_GLOW_WH * (224.0/params.OutputSize.x));
-   inglow_wh_vec2 = vec2(0.0,0.0);
 }
 
 
