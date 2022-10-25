@@ -59,8 +59,8 @@ float displace(float power) {
 float global_noise;
 
 vec4 pixel_background_image(){
-    float bg_lod = log2(global.bgSize.y /global.FinalViewportSize.y);
     vec2 tex_size = textureSize(bg, 0);
+    float bg_lod = log2(tex_size.y / global.FinalViewportSize.y);
     vec2 back_coords =  get_scaled_coords_aspect(vOutputCoord,global.FinalViewportSize, tex_size.x/tex_size.y, is_rotated());
     back_coords=zoom(back_coords,1.0);
     return textureLod(bg,back_coords,bg_lod);
@@ -108,7 +108,8 @@ vec3 bezel_color(float lum)  {
 vec2 coords_curved = vTexCoord ; //FIXME how bad is this global variable?
 
 vec3 compose_bezel_over(vec3 full_viewport) {
-    float bezel_frame_lod = log2(global.monitor_bodySize.y * (BEZEL_FRAME_ZOOM+1.0) /global.FinalViewportSize.y);
+    vec2 bezel_lut_size = textureSize(monitor_body,0);
+    float bezel_frame_lod = log2(bezel_lut_size.y * (BEZEL_FRAME_ZOOM+1.0) /global.FinalViewportSize.y);
     vec2 coords_for_bezel = vTexCoord;
     vec2 coords_for_mirror = vOutputCoord;
     //vec2 coords_for_mirror =zoom(vOutputCoord,0.99);
