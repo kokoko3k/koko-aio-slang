@@ -8,8 +8,6 @@ layout(location = 1) in vec2 TexCoord;
 
 layout(location = 0) out vec2 vTexCoord;
 layout(location = 1) out vec2 vOutputCoord;
-layout(location = 2) out float bezel_frame_lod;
-layout(location = 3) out float bg_lod;
 layout(location = 4) out vec2 spot_offset;
 
 #include "includes/functions.include.slang"
@@ -18,18 +16,16 @@ void main() {
     gl_Position = global.MVP * Position;
     vTexCoord = get_scaled_coords(TexCoord,global.FinalViewportSize, is_rotated());
     vOutputCoord = TexCoord;;
-    bezel_frame_lod = log2(global.monitor_bodySize.y * (BEZEL_FRAME_ZOOM+1.0) /global.FinalViewportSize.y);
-    bg_lod = log2(global.bgSize.y /global.FinalViewportSize.y);
+    
     spot_offset = offsets_from_float(S_POSITION+420.0,40);
     spot_offset = spot_offset / 10.0 + vec2(0.0,1.0);
+    
 }
 
 
 #pragma stage fragment
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in vec2 vOutputCoord;
-layout(location = 2) in float bezel_frame_lod;
-layout(location = 3) in float bg_lod;
 layout(location = 4) in vec2 spot_offset;
 layout(location = 0) out vec4 FragColor;
 
@@ -63,10 +59,9 @@ float displace(float power) {
 float global_noise;
 
 vec4 pixel_background_image(){
+    float bg_lod = log2(global.bgSize.y /global.FinalViewportSize.y);
     vec2 tex_size = textureSize(bg, 0);
-   //Background:
-    vec2 back_coords =  get_scaled_coords_aspect(vTexCoord,global.FinalViewportSize, global.FinalViewportSize.x/global.FinalViewportSize.y, is_rotated());
-    back_coords =  get_scaled_coords_aspect(vOutputCoord,global.FinalViewportSize, tex_size.x/tex_size.y, is_rotated());
+    vec2 back_coords =  get_scaled_coords_aspect(vOutputCoord,global.FinalViewportSize, tex_size.x/tex_size.y, is_rotated());
     back_coords=zoom(back_coords,1.0);
     return textureLod(bg,back_coords,bg_lod);
 }
@@ -113,7 +108,7 @@ vec3 bezel_color(float lum)  {
 vec2 coords_curved = vTexCoord ; //FIXME how bad is this global variable?
 
 vec3 compose_bezel_over(vec3 full_viewport) {
-
+    float bezel_frame_lod = log2(global.monitor_bodySize.y * (BEZEL_FRAME_ZOOM+1.0) /global.FinalViewportSize.y);
     vec2 coords_for_bezel = vTexCoord;
     vec2 coords_for_mirror = vOutputCoord;
     //vec2 coords_for_mirror =zoom(vOutputCoord,0.99);
