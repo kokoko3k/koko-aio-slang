@@ -21,8 +21,8 @@ vec4 pixel_glow_gamma_1(sampler2D in_texture, float my_glowpix, float my_glowpix
     vec2 x2 = 2.0*dx; vec2 x3 = 3.0*dx;
     vec2 y2 = 2.0*dy;
 
-    my_glowpix = my_glowpix / scalemod_x * 2 ; // <-- Make it not dependant on the input resolution.
-    my_glowpixy = my_glowpixy / scalemod_y *2 ;
+    
+    
 
     float wl3 = 2.0 + fp.x; wl3*=wl3; wl3 = exp2(-my_glowpix*wl3);
     float wl2 = 1.0 + fp.x; wl2*=wl2; wl2 = exp2(-my_glowpix*wl2);
@@ -101,8 +101,8 @@ vec4 pixel_glow_gamma_2(sampler2D in_texture, float my_glowpix, float my_glowpix
     vec2 x2 = 2.0*dx; vec2 x3 = 3.0*dx;
     vec2 y2 = 2.0*dy;
 
-    my_glowpix = my_glowpix / scalemod_x * 2 ; // <-- Make it not dependant on the input resolution.
-    my_glowpixy = my_glowpixy / scalemod_y *2 ;
+    
+    
 
     float wl3 = 2.0 + fp.x; wl3*=wl3; wl3 = exp2(-my_glowpix*wl3);
     float wl2 = 1.0 + fp.x; wl2*=wl2; wl2 = exp2(-my_glowpix*wl2);
@@ -183,8 +183,8 @@ vec4 pixel_glow_gamma_3(sampler2D in_texture, float my_glowpix, float my_glowpix
     vec2 x2 = 2.0*dx; vec2 x3 = 3.0*dx;
     vec2 y2 = 2.0*dy;
 
-    my_glowpix = my_glowpix / scalemod_x * 2 ; // <-- Make it not dependant on the input resolution.
-    my_glowpixy = my_glowpixy / scalemod_y *2 ;
+    
+    
 
     float wl3 = 2.0 + fp.x; wl3*=wl3; wl3 = exp2(-my_glowpix*wl3);
     float wl2 = 1.0 + fp.x; wl2*=wl2; wl2 = exp2(-my_glowpix*wl2);
@@ -265,8 +265,8 @@ vec4 pixel_glow_gamma_4(sampler2D in_texture, float my_glowpix, float my_glowpix
     vec2 x2 = 2.0*dx; vec2 x3 = 3.0*dx;
     vec2 y2 = 2.0*dy;
 
-    my_glowpix = my_glowpix / scalemod_x * 2 ; // <-- Make it not dependant on the input resolution.
-    my_glowpixy = my_glowpixy / scalemod_y *2 ;
+    
+    
 
     float wl3 = 2.0 + fp.x; wl3*=wl3; wl3 = exp2(-my_glowpix*wl3);
     float wl2 = 1.0 + fp.x; wl2*=wl2; wl2 = exp2(-my_glowpix*wl2);
@@ -347,8 +347,8 @@ vec4 pixel_glow_gamma_5(sampler2D in_texture, float my_glowpix, float my_glowpix
     vec2 x2 = 2.0*dx; vec2 x3 = 3.0*dx;
     vec2 y2 = 2.0*dy;
 
-    my_glowpix = my_glowpix / scalemod_x * 2 ; // <-- Make it not dependant on the input resolution.
-    my_glowpixy = my_glowpixy / scalemod_y *2 ;
+    
+    
 
     float wl3 = 2.0 + fp.x; wl3*=wl3; wl3 = exp2(-my_glowpix*wl3);
     float wl2 = 1.0 + fp.x; wl2*=wl2; wl2 = exp2(-my_glowpix*wl2);
@@ -429,8 +429,8 @@ vec4 pixel_glow_gamma_6(sampler2D in_texture, float my_glowpix, float my_glowpix
     vec2 x2 = 2.0*dx; vec2 x3 = 3.0*dx;
     vec2 y2 = 2.0*dy;
 
-    my_glowpix = my_glowpix / scalemod_x * 2 ; // <-- Make it not dependant on the input resolution.
-    my_glowpixy = my_glowpixy / scalemod_y *2 ;
+    
+    
 
     float wl3 = 2.0 + fp.x; wl3*=wl3; wl3 = exp2(-my_glowpix*wl3);
     float wl2 = 1.0 + fp.x; wl2*=wl2; wl2 = exp2(-my_glowpix*wl2);
@@ -511,8 +511,8 @@ vec4 pixel_glow_gamma_7(sampler2D in_texture, float my_glowpix, float my_glowpix
     vec2 x2 = 2.0*dx; vec2 x3 = 3.0*dx;
     vec2 y2 = 2.0*dy;
 
-    my_glowpix = my_glowpix / scalemod_x * 2 ; // <-- Make it not dependant on the input resolution.
-    my_glowpixy = my_glowpixy / scalemod_y *2 ;
+    
+    
 
     float wl3 = 2.0 + fp.x; wl3*=wl3; wl3 = exp2(-my_glowpix*wl3);
     float wl2 = 1.0 + fp.x; wl2*=wl2; wl2 = exp2(-my_glowpix*wl2);
@@ -593,8 +593,8 @@ vec4 pixel_glow_gamma_8(sampler2D in_texture, float my_glowpix, float my_glowpix
     vec2 x2 = 2.0*dx; vec2 x3 = 3.0*dx;
     vec2 y2 = 2.0*dy;
 
-    my_glowpix = my_glowpix / scalemod_x * 2 ; // <-- Make it not dependant on the input resolution.
-    my_glowpixy = my_glowpixy / scalemod_y *2 ;
+    
+    
 
     float wl3 = 2.0 + fp.x; wl3*=wl3; wl3 = exp2(-my_glowpix*wl3);
     float wl2 = 1.0 + fp.x; wl2*=wl2; wl2 = exp2(-my_glowpix*wl2);
@@ -675,8 +675,8 @@ vec4 pixel_glow_gamma_9(sampler2D in_texture, float my_glowpix, float my_glowpix
     vec2 x2 = 2.0*dx; vec2 x3 = 3.0*dx;
     vec2 y2 = 2.0*dy;
 
-    my_glowpix = my_glowpix / scalemod_x * 2 ; // <-- Make it not dependant on the input resolution.
-    my_glowpixy = my_glowpixy / scalemod_y *2 ;
+    
+    
 
     float wl3 = 2.0 + fp.x; wl3*=wl3; wl3 = exp2(-my_glowpix*wl3);
     float wl2 = 1.0 + fp.x; wl2*=wl2; wl2 = exp2(-my_glowpix*wl2);
@@ -757,8 +757,8 @@ vec4 pixel_glow_gamma_10(sampler2D in_texture, float my_glowpix, float my_glowpi
     vec2 x2 = 2.0*dx; vec2 x3 = 3.0*dx;
     vec2 y2 = 2.0*dy;
 
-    my_glowpix = my_glowpix / scalemod_x * 2 ; // <-- Make it not dependant on the input resolution.
-    my_glowpixy = my_glowpixy / scalemod_y *2 ;
+    
+    
 
     float wl3 = 2.0 + fp.x; wl3*=wl3; wl3 = exp2(-my_glowpix*wl3);
     float wl2 = 1.0 + fp.x; wl2*=wl2; wl2 = exp2(-my_glowpix*wl2);
@@ -838,7 +838,7 @@ vec3 blur_v(sampler2D in_texture, float my_glowpixy, vec2 coords, vec4 SourceSiz
 
     vec2 y2 = 2.0*dy;
     
-    my_glowpixy = my_glowpixy / scalemod_y *2 ;
+    
 
     vec3 t1 = texture(in_texture, pC4     ).rgb;
     vec3 t2 = texture(in_texture, pC4  -dy).rgb;
@@ -876,8 +876,8 @@ vec4 pixel_glow_std_pow(sampler2D in_texture, float my_glowpix, float my_glowpix
 
     vec3 glow_gamma_vec3 = vec3(glow_gamma);
     
-    my_glowpix = my_glowpix / scalemod_x * 2 ; // <-- Make it not dependant on the input resolution.
-    my_glowpixy = my_glowpixy / scalemod_y *2 ;
+    
+    
 
     float wl3 = 2.0 + fp.x; wl3*=wl3; wl3 = exp2(-my_glowpix*wl3);
     float wl2 = 1.0 + fp.x; wl2*=wl2; wl2 = exp2(-my_glowpix*wl2);
