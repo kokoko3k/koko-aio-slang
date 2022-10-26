@@ -180,7 +180,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // 1.0 means no blank at all.
 
 #pragma parameter DO_SCANLINES	"★ Scanlines enable? ==>"							1.0 	0.0  1.0 1.0
-#pragma parameter SCANLINE_DARK "        Scanlines gap brightness"			  			0.0 	-1.0 1.0 0.05
+#pragma parameter SCANLINE_DARK "        Scanlines gap brightness"			  			0.0 	-0.25 1.0 0.05
 #pragma parameter SCANLINES_BLEEDING "        Scanlines bleeding"						0.0 	0.0 3.0 0.05
 
 // Alternate the drawing of the scanlines between frames. this will produce a flickering typical of
