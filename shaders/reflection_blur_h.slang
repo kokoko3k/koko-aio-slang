@@ -20,10 +20,35 @@ layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 1) uniform sampler2D first_pass;
 layout(set = 0, binding = 2) uniform sampler2D isrotated_passFeedback;
 
-#include "includes/blurs.include.slang"
+#define SourceTexture first_pass
+#define SourceTextureSize global.first_passSize
+
 #include "includes/functions.include.slang"
 
 #define c_tolerance 0.051
+
+#define b_offset_x -0.05
+#define Pi2 6.28318530717959
+vec3 blur(float Quality, float Directions, float Size, vec2 co,float lod) {
+    vec4 iResolution = SourceTextureSize;
+    vec2 Radius = Size/iResolution.xy ;
+
+    vec3 color  = vec3(0.0,0.0,0.0);
+    vec3 lookup = vec3(0.0,0.0,0.0);
+    float steps=0.0;
+    for( float d=0.0; d<Pi2; d+=Pi2/Directions) {
+        for(float i=1.0/Quality; i<=1.0; i+=1.0/Quality) {
+            lookup = textureLod( SourceTexture, co + vec2(cos(d)  + b_offset_x , sin(d))*Radius*i  ,lod).rgb ;
+            color +=lookup.rgb;
+            steps+=1.0;
+        }
+    }
+    color /= steps;
+    
+    if ( steps > 4.0) return vec3(1.0);
+    
+    return color;
+}
 
 void main() {
 
@@ -80,7 +105,8 @@ bool skip_condition = (coords_curved.x < 1.0 - c_tolerance && coords_curved.x > 
         
          vec2 res = vec2(global.first_passSize.x, global.first_passSize.y);
          vec2 dir = vec2(1.0,0.0);
-         FragColor = blur9(first_pass, coords_curved,res,dir,2);
+         ///Quality, Directions, Size, coords, lod
+         FragColor = vec4(blur(1,4,2,coords_curved, 2.0),1.0);
    }
 
 }
