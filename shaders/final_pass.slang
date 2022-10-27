@@ -59,8 +59,6 @@ layout(set = 0, binding = 9) uniform sampler2D first_pass;
 #include "includes/functions.include.slang"
 
     
-vec2 coords_curved = vTexCoord ; //FIXME how bad is this global variable?
-    
 vec3 pixel_vmask(vec3 source, vec3 white_reference, float over_white) {
     int col = int( vOutputCoord.x * params.OutputSize.x );
     vec3 pixel_out;
@@ -239,8 +237,7 @@ vec4 main_pass_main_wrap(vec2 co) {
     return vec4(pixel_out,1.0) ; //* border(border_coords);
 }
 
-vec4 pixel_main_pass() {
-    vec2 coords = vTexCoord;
+vec4 pixel_main_pass(vec2 coords) {
     
     if (DO_DYNZOOM == 1.0) {
         float zoomin = 1.0 + (texture(avglum_passFeedback, vec2(0.25,0.25)    ).a/ DYNZOOM_FACTOR);
@@ -269,7 +266,7 @@ vec4 pixel_main_pass() {
    if (is_border)
        return mark_outer_frame(vec3(0.0));
    else
-       return main_pass_main_wrap(coords_curved);
+       return main_pass_main_wrap(coords);
 }
 
 
@@ -417,14 +414,14 @@ vec3 compose_bezel_over(vec3 full_viewport) {
     return mix(full_viewport, bezel_out, bezel.a);
 }
 // 
-vec4 pixel_inner_frame() {
-    vec4 pixel_in = pixel_main_pass();
+vec4 pixel_inner_frame(vec2 coords) {
+    vec4 pixel_in = pixel_main_pass(coords);
     vec3 pixel_out = pixel_in.rgb;
     vec3 bloomed;
   
     //Mix bloom texture
         if (DO_BLOOM == 1.0 ) {
-            bloomed=texture(bloom_pass_final, coords_curved).rgb ;
+            bloomed=texture(bloom_pass_final, coords).rgb ;
             if (BLOOM_BYPASS == 1.0)
                 pixel_out = bloomed;
             else {
@@ -449,7 +446,7 @@ vec4 pixel_inner_frame() {
             
             if (DO_VIGNETTE == 1.0) {
                 float vignette;
-                float dist = length(vec2((coords_curved.x-0.5)*in_aspect,coords_curved.y-0.5)); //dist = length(vec2(coords_curved.x*in_aspect-(in_aspect*0.5),coords_curved.y-0.5));
+                float dist = length(vec2((coords.x-0.5)*in_aspect,coords.y-0.5));
                 vignette = smoothstep(V_SIZE,0.0,dist)*V_POWER+global_noise;
                 if (V_BYPASS < 1.0) pixel_out = vignette * pixel_out;
                     else
@@ -458,7 +455,7 @@ vec4 pixel_inner_frame() {
 
             if (DO_SPOT == 1.0) {
             float spot;
-            float dist = length(vec2((coords_curved.x-0.5)*in_aspect,coords_curved.y-0.5)+spot_offset); //dist = length(vec2(coords_curved.x*in_aspect-in_aspect*0.5),coords_curved.y-0.5));
+            float dist = length(vec2((coords.x-0.5)*in_aspect,coords.y-0.5)+spot_offset);
             spot = smoothstep(S_SIZE,0.0,dist)*S_POWER+global_noise;
             if (S_BYPASS < 1.0) pixel_out = spot + pixel_out;
                 else
@@ -470,7 +467,7 @@ vec4 pixel_inner_frame() {
     //Border (edge)
         float border_inner_frame = 1.0;
         if (DO_BEZEL==1.0 || DO_CURVATURE == 1.0)
-            border_inner_frame = border(coords_curved);
+            border_inner_frame = border(coords);
 
         float pixel_out_alpha = pixel_in.a * border_inner_frame;
         
@@ -479,11 +476,11 @@ vec4 pixel_inner_frame() {
 }
 
 
-vec4 main_wrap(){
+vec4 main_wrap(vec2 coords){
     /* Handle inner border and outer border, not bezel */
     if (DO_VIGNETTE + DO_SPOT + DO_AMBILIGHT >0.0) global_noise = random(NOISEPOWER);
     //Just do pixel_inner_frame() and exit when there is no need to paint border.
-    if (!border_needed()) return pixel_inner_frame();
+    if (!border_needed()) return pixel_inner_frame(coords);
 
     //From now on, we need a border.
         bool bIs_outer_frame = ((vTexCoord.x < 0.0) || (vTexCoord.x > 1.0));
@@ -500,7 +497,7 @@ vec4 main_wrap(){
 
         
         //Handle inner frame cases
-            vec4 vPixel_inner_frame = pixel_inner_frame();
+            vec4 vPixel_inner_frame = pixel_inner_frame(coords);
             if (border_needed()) {
                 //mix ambilight in the inner frame too, as curvature could shrink into the inner frame.
                 bool draw_border = true;
@@ -508,7 +505,7 @@ vec4 main_wrap(){
                 if (DO_BEZEL == 1.0) {
                     vec2 vTexCoord_zoomout = zoomout_coords(vTexCoord, -BEZEL_INNER_ZOOM , 1.0);
                     float border_start = 1-BEZEL_IMAGE_BORDER;
-                    //Not using coords_curved here because crazy things would happen with vertical games
+                    //Not using curved coords here because crazy things would happen with vertical games
                     draw_border = vTexCoord_zoomout.x < border_start || vTexCoord_zoomout.x > BEZEL_IMAGE_BORDER || 
                                 vTexCoord_zoomout.y < border_start || vTexCoord_zoomout.y > BEZEL_IMAGE_BORDER ;
                 }
@@ -529,19 +526,19 @@ void main() {
         //split screen (debug)
         //if (vTexCoord.y < 0.5) pixel_out = texture(first_pass,vTexCoord);
     
-    
+    vec2 coords = vTexCoord;
     //Curvature
     if (DO_CURVATURE == 1.0) {
         if ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0))
-            coords_curved = Warp(coords_curved,GEOM_WARP_X,GEOM_WARP_Y);
+            coords = Warp(coords,GEOM_WARP_X,GEOM_WARP_Y);
     }
 
     if (DO_BEZEL == 1.0) {
-        coords_curved = zoomout_coords(coords_curved, -BEZEL_INNER_ZOOM , 1.0);
+        coords = zoomout_coords(coords, -BEZEL_INNER_ZOOM , 1.0);
     }  
     
     //"Just" handle inner and outer frame here:
-    vec4 pixel_out = main_wrap();
+    vec4 pixel_out = main_wrap(coords);
 
     
     if (DO_BEZEL == 1.0) {
