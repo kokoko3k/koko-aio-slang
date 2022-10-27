@@ -30,7 +30,7 @@ input glow gamma 3: 40          5.4                 36.75               35.2
      ambient light: 38          3.4                 32.1                33.6 ** non blamka dietro?
              Bezel:                                 37.5                33.7
 -----------------------------------------------
-Total basal + all the features: 72.2                65.3                65.3
+Total basal + all the features: 72.2                65.3                65.2
     
 */
 
@@ -214,7 +214,7 @@ float_framebuffer3 = true
                 alias6 = "reflected_blurred_pass2"
         filter_linear6 = true
            scale_type6 = source
-                scale6 = 2.0
+                scale6 = 1.0
             wrap_mode6 = "mirrored_repeat"
             
 
