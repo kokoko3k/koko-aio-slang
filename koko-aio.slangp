@@ -214,7 +214,7 @@ float_framebuffer3 = true
                 alias6 = "reflected_blurred_pass2"
         filter_linear6 = true
            scale_type6 = source
-                scale6 = 1.0
+                scale6 = 2.0
             wrap_mode6 = "mirrored_repeat"
             
 

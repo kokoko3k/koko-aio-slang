@@ -73,15 +73,14 @@ vec2 coords_curved = vTexCoord;
 bool skip_condition = (coords_curved.x < 1.0 - c_tolerance && coords_curved.x > c_tolerance && 
                        coords_curved.y < 1.0 - c_tolerance && coords_curved.y > c_tolerance ) ;
 
-                           
       if (skip_condition) {
          FragColor = mark_useless(vec3(0.0));
          return;
       }
         
-         vec2 res = vec2(global.FinalViewportSize.x/6.0, global.FinalViewportSize.y/6.0);
+         vec2 res = vec2(global.first_passSize.x, global.first_passSize.y);
          vec2 dir = vec2(1.0,0.0);
-         FragColor = blur9(first_pass, coords_curved,res,dir);
+         FragColor = blur9(first_pass, coords_curved,res,dir,2);
    }
 
 }

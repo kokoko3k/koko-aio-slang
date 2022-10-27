@@ -27,7 +27,7 @@ void main() {
       
       vec2 res = vec2(params.SourceSize.x, params.SourceSize.y);
       vec2 dir = vec2(0.0,1.0);
-      FragColor = blur9(Source, vTexCoord,res,dir);
+      FragColor = blur9(Source, vTexCoord,res,dir, 0.0);
    }
 }
  

@@ -248,9 +248,6 @@ vec4 pixel_main_pass(vec2 coords) {
 
 }
 
-
-
-
 #define NOISE_A 12.9898
 #define NOISE_B 78.233
 #define NOISE_C 43758.5453
@@ -271,7 +268,7 @@ vec4 pixel_background_image(){
     vec2 tex_size = textureSize(bg, 0);
     float bg_lod = log2(tex_size.y / global.FinalViewportSize.y);
     vec2 back_coords =  get_scaled_coords_aspect(vOutputCoord,global.FinalViewportSize, tex_size.x/tex_size.y, is_rotated());
-    back_coords=zoom(back_coords,1.0);
+    //back_coords=zoom(back_coords,1.0);
     return textureLod(bg,back_coords,bg_lod);
 }
 
@@ -498,7 +495,7 @@ void main() {
     }
 
     FragColor = pixel_out;
-    
+    //FragColor = texture(reflected_blurred_pass2,coords );
     
     //FragColor = pixel_main_pass(coords);
 }
