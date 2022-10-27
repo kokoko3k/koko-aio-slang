@@ -58,6 +58,9 @@ layout(set = 0, binding = 9) uniform sampler2D first_pass;
 
 #include "includes/functions.include.slang"
 
+    
+vec2 coords_curved = vTexCoord ; //FIXME how bad is this global variable?
+    
 vec3 pixel_vmask(vec3 source, vec3 white_reference, float over_white) {
     int col = int( vOutputCoord.x * params.OutputSize.x );
     vec3 pixel_out;
@@ -244,16 +247,7 @@ vec4 pixel_main_pass() {
         coords = zoom(vTexCoord, zoomin);
     }
     
-    vec2 coords_curved = coords;
-
-    //Curvature: set coords_curved coordinate: (global var)
-        if (DO_CURVATURE == 1.0) {
-            if ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0))
-                coords_curved = Warp(coords_curved,GEOM_WARP_X,GEOM_WARP_Y);
-        }
-        
         if (DO_BEZEL == 1.0) {
-            coords_curved = zoomout_coords(coords_curved, -BEZEL_INNER_ZOOM , 1.0);
             coords = zoomout_coords(coords, -BEZEL_INNER_ZOOM , 1.0);
         }
     
@@ -376,8 +370,6 @@ vec3 bezel_color(float lum)  {
     return clamp(col,0.0,1.0);
 }
 
-vec2 coords_curved = vTexCoord ; //FIXME how bad is this global variable?
-
 vec3 compose_bezel_over(vec3 full_viewport) {
     vec2 bezel_lut_size = textureSize(monitor_body,0);
     float bezel_frame_lod = log2(bezel_lut_size.y * (BEZEL_FRAME_ZOOM+1.0) /global.FinalViewportSize.y);
@@ -429,17 +421,7 @@ vec4 pixel_inner_frame() {
     vec4 pixel_in = pixel_main_pass();
     vec3 pixel_out = pixel_in.rgb;
     vec3 bloomed;
-
-    //Curvature
-        if (DO_CURVATURE == 1.0) {
-            if ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0))
-                coords_curved = Warp(coords_curved,GEOM_WARP_X,GEOM_WARP_Y);
-        }
-        
-        if (DO_BEZEL == 1.0) {
-            coords_curved = zoomout_coords(coords_curved, -BEZEL_INNER_ZOOM , 1.0);
-        }
-    
+  
     //Mix bloom texture
         if (DO_BLOOM == 1.0 ) {
             bloomed=texture(bloom_pass_final, coords_curved).rgb ;
@@ -448,12 +430,9 @@ vec4 pixel_inner_frame() {
             else {
                 float over_white_correction = 1.0;
                 if (BLOOM_OVER_WHITE < 1.0) {
-                        
                         float b_brightness = max(pixel_out.b,max(pixel_out.r,pixel_out.g));
-
                         b_brightness *= 1-BLOOM_OVER_WHITE;
                         over_white_correction =1- b_brightness;
-
                 }
                 pixel_out = pixel_out + (bloomed * BLOOM_MIX * over_white_correction);
             }
@@ -543,18 +522,27 @@ vec4 main_wrap(){
 }
 
 
-
-
-
 void main() {
-    //"Just" handle inner and outer frame here:
-    vec4 pixel_out = main_wrap();
-    
-    //DEBUG:
+    //For debug purposes:
         //quad split screen
         //if ( (vTexCoord.x < 0.5  && vTexCoord.y > 0.5) || (vTexCoord.x > 0.5  && vTexCoord.y < 0.5)         ) pixel_out = texture(first_pass,vTexCoord);
         //split screen (debug)
         //if (vTexCoord.y < 0.5) pixel_out = texture(first_pass,vTexCoord);
+    
+    
+    //Curvature
+    if (DO_CURVATURE == 1.0) {
+        if ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0))
+            coords_curved = Warp(coords_curved,GEOM_WARP_X,GEOM_WARP_Y);
+    }
+
+    if (DO_BEZEL == 1.0) {
+        coords_curved = zoomout_coords(coords_curved, -BEZEL_INNER_ZOOM , 1.0);
+    }  
+    
+    //"Just" handle inner and outer frame here:
+    vec4 pixel_out = main_wrap();
+
     
     if (DO_BEZEL == 1.0) {
         pixel_out = vec4(compose_bezel_over(pixel_out.rgb),1.0);
