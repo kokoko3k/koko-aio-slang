@@ -37,7 +37,7 @@ layout(location = 0) out vec4 FragColor;
 
 
 layout(set = 0, binding = 2) uniform sampler2D Source;
-layout(set = 0, binding = 3) uniform sampler2D isrotated_pass;
+layout(set = 0, binding = 3) uniform sampler2D isrotated_passFeedback;
 layout(set = 0, binding = 4) uniform sampler2D ambi_pre_pass1Feedback;
 
 
@@ -85,7 +85,7 @@ vec3 circle_smooth(vec2 coords, vec2 middle, float f_radius, float FALLOFF, floa
 
 void main() {
 
-    bool is_rotated = texture(isrotated_pass,vec2(0.5,0.5)).r > 0.5;
+    bool is_rotated = texture(isrotated_passFeedback,vec2(0.5,0.5)).r > 0.5;
     if (DO_AMBILIGHT != 1.0) return ; 
     
 

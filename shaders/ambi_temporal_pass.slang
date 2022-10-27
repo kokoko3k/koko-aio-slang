@@ -22,7 +22,7 @@ layout(set = 0, binding = 2) uniform sampler2D CurrentSampler;
 layout(set = 0, binding = 3) uniform sampler2D PreviousSampler;
 layout(set = 0, binding = 4) uniform sampler2D avglum_pass;
 layout(set = 0, binding = 5) uniform sampler2D avglum_passFeedback;
-
+                                                                                    
 #define max_steps AMBI_STEPS
 
 
@@ -75,5 +75,8 @@ vec4 pixel_ambilight() {
 void main() {
     if (DO_AMBILIGHT != 1.0) return;
     FragColor = pixel_ambilight();
-
+    
+                                                                                                                FragColor = texture(CurrentSampler,vTexCoord);
+    
+    
 }

@@ -12,7 +12,8 @@
 
 	//Bezel reflection area size in relation to the game frame
 	//Use the lowest possible value for best performance
-#define BEZEL_REFLECTION_AREA_SIZE 0.1;
+	//It is also used to compute wrap/repeated coordinates.
+#define BEZEL_REFLECTION_AREA_SIZE 0.175
 
 	// 0.0-1.0: sensitivity to scene change (ambilike stuff), 0.0 changes more
 #define AMBI_SCENE_CHG_THRSHLD 0.07  
@@ -65,7 +66,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	vec4 FinalViewportSize;
 	vec4 in_glow_passSize;
 	vec4 FXAA_passSize;
-	vec4 main_passSize;
+	//vec4 main_passSize;
 	//vec4 monitor_bodySize;
 	//vec4 bgSize;
 	vec4 avglum_passSize;

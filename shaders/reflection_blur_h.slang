@@ -17,23 +17,35 @@ void main()
 #pragma stage fragment
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 0) out vec4 FragColor;
-layout(set = 0, binding = 1) uniform sampler2D main_pass;
-layout(set = 0, binding = 2) uniform sampler2D isrotated_pass;
+layout(set = 0, binding = 1) uniform sampler2D first_pass;
+layout(set = 0, binding = 2) uniform sampler2D isrotated_passFeedback;
 
 #include "includes/blurs.include.slang"
 #include "includes/functions.include.slang"
 
-#define c_tolerance 0.1
+#define c_tolerance 0.051
 
 void main() {
 
-   if (DO_BEZEL == 1.0) {
-      bool is_rotated = texture(isrotated_pass,vec2(0.5,0.5)).r > 0.5;
 
+vec2 coords_curved = vTexCoord;
+
+   if (DO_BEZEL == 1.0) {
+   
+      if (DO_CURVATURE == 1.0) {
+         if ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0))
+               coords_curved = Warp(coords_curved,GEOM_WARP_X,GEOM_WARP_Y);
+      }
+      //coords_curved = zoomout_coords(coords_curved, -BEZEL_INNER_ZOOM , 1.0);
+      coords_curved = zoomout_coords(coords_curved, BEZEL_REFLECTION_AREA_SIZE , 1.0);
+      
+      bool is_rotated = texture(isrotated_passFeedback,vec2(0.5,0.5)).r > 0.5;
+
+      
       /* Calculate the internal area (the one which is not mirrored)
          so that we can skip blurring it:
       */
-         vec2 ar_box;
+/*         vec2 ar_box;
          if (!is_rotated) {
             //Width of the aspect corrected box zoomed as requested by the bezel settings:                                  
             ar_box.x = global.FinalViewportSize.z*global.FinalViewportSize.y*get_in_aspect() * (1+BEZEL_INNER_ZOOM-c_tolerance) ; 
@@ -50,22 +62,28 @@ void main() {
 
 
       //Now we can skip the internal area or the black one as already marked by main_pass:
-      bool skip_condition =(vTexCoord.x > start_point.x  && vTexCoord.x < end_point.x &&
-                           vTexCoord.y > start_point.y && vTexCoord.y < end_point.y) ||
-                           is_outer_frame(texture(main_pass,vTexCoord));
+      //bool skip_condition =(vTexCoord.x > start_point.x  && vTexCoord.x < end_point.x &&
+//                           vTexCoord.y > start_point.y && vTexCoord.y < end_point.y) ||
+//                           is_outer_frame(texture(main_pass,vTexCoord));
 
+*/
 
+//FIXME (CHECKME) is the rotation state still important?
+
+bool skip_condition = (coords_curved.x < 1.0 - c_tolerance && coords_curved.x > c_tolerance && 
+                       coords_curved.y < 1.0 - c_tolerance && coords_curved.y > c_tolerance ) ;
+
+                           
       if (skip_condition) {
          FragColor = mark_useless(vec3(0.0));
          return;
       }
-         
-         vec2 res = vec2(params.SourceSize.x, params.SourceSize.y);
+        
+         vec2 res = vec2(global.FinalViewportSize.x/6.0, global.FinalViewportSize.y/6.0);
          vec2 dir = vec2(1.0,0.0);
-         FragColor = blur9(main_pass, vTexCoord,res,dir);
+         FragColor = blur9(first_pass, coords_curved,res,dir);
    }
 
-   
 }
  
  

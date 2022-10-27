@@ -20,7 +20,7 @@ void main()
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in float lod;
 layout(location = 0) out vec4 FragColor;
-layout(set = 0, binding = 2) uniform sampler2D Source;
+layout(set = 0, binding = 2) uniform sampler2D first_pass;
 layout(set = 0, binding = 3) uniform sampler2D avglum_passFeedback;
 
 /* The following will allow to sample at reduced interval
@@ -30,7 +30,7 @@ layout(set = 0, binding = 3) uniform sampler2D avglum_passFeedback;
 // #define avglum_divider 4  <-- in config.inc
 
 float get_avg_lum_from_mip() {
-    vec4 mip = textureLod(Source, vec2(0.5,0.5),20.0);
+    vec4 mip = textureLod(first_pass, vec2(0.5,0.5),20.0);
     return (mip.r+mip.g+mip.b)/3.0;
 }
 
@@ -63,7 +63,7 @@ void main() {
         pixel_out.a = get_avglum();
         if (DO_BEZEL == 1.0) {
             //Create a small mipmap to be used to light the bezel corners.
-            pixel_out.rgb = textureLod(Source, vTexCoord,lod).rgb;
+            pixel_out.rgb = textureLod(first_pass, vTexCoord,lod).rgb;
         }
         FragColor = pixel_out;
     }

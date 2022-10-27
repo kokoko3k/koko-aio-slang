@@ -14,9 +14,8 @@ layout(location = 4) out vec2 spot_offset;
 
 void main() {
     gl_Position = global.MVP * Position;
-    vTexCoord = get_scaled_coords(TexCoord,global.FinalViewportSize, is_rotated());
+    vTexCoord = get_scaled_coords(TexCoord,global.FinalViewportSize, is_rotated())+vec2(0.00001);
     vOutputCoord = TexCoord;;
-    
     spot_offset = offsets_from_float(S_POSITION+420.0,40);
     spot_offset = spot_offset / 10.0 + vec2(0.0,1.0);
 }
@@ -29,7 +28,7 @@ layout(location = 4) in vec2 spot_offset;
 layout(location = 0) out vec4 FragColor;
 
 
-layout(set = 0, binding = 2) uniform sampler2D main_pass;
+//layout(set = 0, binding = 2) uniform sampler2D main_pass;
 layout(set = 0, binding = 3) uniform sampler2D bloom_pass_final;
 layout(set = 0, binding = 4) uniform sampler2D reflected_blurred_pass2;
 layout(set = 0, binding = 5) uniform sampler2D ambi_temporal_pass;
@@ -38,8 +37,281 @@ layout(set = 0, binding = 7) uniform sampler2D monitor_body;
 layout(set = 0, binding = 8) uniform sampler2D bg;
 layout(set = 0, binding = 9) uniform sampler2D first_pass;
 
+//Ex main_pass layouts:
+    layout(set = 0, binding = 10) uniform sampler2D FXAA_pass;
+    layout(set = 0, binding = 11) uniform sampler2D in_glow_pass;
+    layout(set = 0, binding = 12) uniform sampler2D halo_pass;
+    //layout(set = 0, binding = 13) uniform sampler2D first_pass;
+    layout(set = 0, binding = 14) uniform sampler2D avglum_passFeedback;
+
+//Ex main_pass defines:
+    #define half_pi 1.5707963267949
+    
+    // RGB mask:       R     G     B
+    #define m1 vec3 ( 1.0 , 0.0 , 0.0 )    //col 1
+    #define m2 vec3 ( 0.0 , 1.0 , 0.0 )    //col 2
+    #define m3 vec3 ( 0.0 , 0.0 , 1.0  )   //col 3
+
+    // RGB mask low dpi (green-magenta, exploiting native rgb subpixels)
+    #define m1gm vec3 ( 0.0 , 1.0 , 0.0 )    //col 1
+    #define m2gm vec3 ( 1.0 , 0.0 , 1.0 )    //col 2
 
 #include "includes/functions.include.slang"
+
+vec3 pixel_vmask(vec3 source, vec3 white_reference, float over_white) {
+    int col = int( vOutputCoord.x * params.OutputSize.x );
+    vec3 pixel_out;
+    vec3 vmasked;
+    vec4 vec_mod=(vec4(3,1,2,3) + vec4(VMASK_GAP,0.0,0.0,0.0))* VMASK_DARKLINE_SCALE ;
+    float mask_lightness = 1.0 - RGB_MASK_STRENGTH;
+    if ( mod(col, vec_mod.x) < vec_mod.y)         vmasked = min(m1 + mask_lightness,vec3(1.0)) * source;
+        else if (mod(col, vec_mod.x) < vec_mod.z) vmasked = min(m2 + mask_lightness,vec3(1.0)) * source;
+        else if (mod(col, vec_mod.x) < vec_mod.w) vmasked = min(m3 + mask_lightness,vec3(1.0)) * source;
+    else vmasked = min(vec3(0.0) + mask_lightness,vec3(1.0)) * source;
+
+    if (over_white == 1.0) pixel_out = vmasked;
+        else {
+            float whiteness=(white_reference.r+white_reference.g+white_reference.b)/3.0;
+            whiteness-= over_white;
+            whiteness=  clamp(whiteness,0.0,1.0);
+            pixel_out=  mix(vmasked,source,whiteness);
+        }
+   return pixel_out;
+}
+
+vec3 pixel_vmask_gm(vec3 source, vec3 white_reference, float over_white) {
+    int col = int( vOutputCoord.x * params.OutputSize.x );
+    vec3 pixel_out;
+    vec3 vmasked;
+    vec3 vec_mod=(vec3(2,1,2) + vec3(VMASK_GAP,0.0,0.0))* VMASK_DARKLINE_SCALE ;
+    
+    float mask_lightness = 1.0 - RGB_MASK_STRENGTH;
+    if (mod(col, vec_mod.x) < vec_mod.y)          vmasked = min(m1gm + mask_lightness,vec3(1.0)) * source;
+        else if (mod(col, vec_mod.x) < vec_mod.z) vmasked = min(m2gm + mask_lightness,vec3(1.0)) * source;
+    else vmasked = min(vec3(0.0) + mask_lightness,vec3(1.0)) * source;
+
+    if (over_white == 1.0) pixel_out = vmasked;
+        else {
+            float whiteness=(white_reference.r+white_reference.g+white_reference.b)/3.0;
+            whiteness-= over_white;
+            whiteness=  clamp(whiteness,0.0,1.0);
+            pixel_out=  mix(vmasked,source,whiteness);
+        }
+    
+   return pixel_out;
+}
+
+vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
+                     float do_offset, vec3 white_reference,float over_white) {
+
+    float Darkline_part_w = (3.0 - VMASK_USE_GM + VMASK_GAP) * VMASK_DARKLINE_SCALE;
+    float Darkline_part_w_x2 = Darkline_part_w*2;
+    //vec3 pixel_out=source;
+    float col_2 =  vOutputCoord.x * params.OutputSize.x;
+    float line_2 = vOutputCoord.y * params.OutputSize.y;
+
+    darkline_every *= VMASK_DARKLINE_SCALE;
+
+    if (over_white != 1.0) {
+        //less effect on bright colors.
+        float whiteness=(white_reference.r+white_reference.g+white_reference.b)/3.0;
+        darkline_trans+=(whiteness-over_white);
+        darkline_trans=clamp(darkline_trans,0.0,1.0);
+    }
+
+    if (do_offset == 1.0) {
+        if  (int(mod(line_2, darkline_every)) < VMASK_DARKLINE_SCALE) {
+            if (int(mod(col_2, Darkline_part_w_x2)) < Darkline_part_w) return source * darkline_trans;
+        } else if  (int(mod(line_2+(darkline_every/2), darkline_every)) < VMASK_DARKLINE_SCALE ) {
+            // DRAW WITH OFFSET:
+            col_2+=Darkline_part_w;
+            if ((int(mod(col_2, Darkline_part_w_x2))) < Darkline_part_w)
+                return source * darkline_trans;
+        }
+    } else {
+
+        if ( darkline_every >= 0.0)
+            if (int(mod(line_2, darkline_every)) < VMASK_DARKLINE_SCALE) return source * darkline_trans;
+    }
+    return source;
+}
+
+float scanline_shape(vec2 coords, bool do_flicker) {
+    bool alternate = false;
+    float period = 1.0;
+    
+    int slow = 1;
+    
+    if (do_flicker) {
+        if (params.FrameCount/slow % 2 == 0.0) alternate = true;
+        if (params.OriginalSize.y > MIN_LINES_INTERLACED )  period = 0.5;
+    }
+
+    float angle = coords.y * pi * params.OriginalSize.y * period;
+
+    float lines;
+    if (alternate)
+        lines = -sin(angle+half_pi); //lines = abs(cos(angle));
+             else
+        lines = sin(angle);
+    lines = (lines*lines);
+  
+    if (SCANLINE_DARK >= 0.0) {
+        lines = lines * (1.0 - SCANLINE_DARK) + SCANLINE_DARK;
+    } else {        
+        float deepness = -SCANLINE_DARK;
+        lines = lines * ((1-SCANLINE_DARK) ) + SCANLINE_DARK ;
+    }
+    
+    return lines;
+}
+
+vec4 main_pass_main_wrap(vec2 co) {
+    bool isinterlaced = is_interlaced();
+    bool flickering_scanlines = (DO_SCANLINES == 1.0) && scanline_have_to_flicker(isinterlaced) ;
+
+
+    vec3 pixel_in;
+    vec3 pixel_glowed;
+    
+    //Get the first available pixel_in:
+    if  (DO_IN_GLOW == 1.0) {
+            pixel_glowed = texture(in_glow_pass,co).rgb;
+            pixel_in = pixel_glowed;
+        }
+            else if (DO_FXAA == 1.0) 
+        pixel_in = texture(FXAA_pass,co).rgb ;
+            else
+        pixel_in = texture(first_pass,co).rgb ;
+
+    vec3 pixel_out = pixel_in;
+    vec3 pixel_in_clamped = min(pixel_in,vec3(1.0)); //Clamp here for moth vmask and darklines.
+    
+    //Mask and darklines:
+    if (DO_VMASK_AND_DARKLINES == 1.0 ) {
+        if (RGB_MASK_STRENGTH > 0.0) {
+            //Use RGB pattern or exploit RGB layout with green and magenta?
+            if (VMASK_USE_GM < 1.0) {
+                pixel_out = pixel_vmask(pixel_in, pixel_in_clamped, VMASK_OVERWHITE);
+            } else {           
+                pixel_out = pixel_vmask_gm(pixel_in, pixel_in_clamped, VMASK_OVERWHITE);
+            }
+        }
+        //Screen lines
+        if (DARKLINES_STRENGTH > 0.0 ) {
+            float MYDARKLINES_TRANSPARENCY = 1.0 - DARKLINES_STRENGTH;
+            pixel_out = pixel_darklines(pixel_out,DARKLINES_PERIOD,MYDARKLINES_TRANSPARENCY,DO_DARKLINES_VOFFSET,pixel_in_clamped,DRKLN_OVERWHITE);
+        }
+
+    }
+    
+    //Halo
+    vec3 pixel_haloed;
+    if (DO_HALO == 1.0 ) {
+        pixel_haloed = texture(halo_pass,co).rgb;
+        pixel_out += pixel_haloed;
+        pixel_out = clamp(pixel_out,0.0,HALO_CLAMP);
+    }
+    
+    // Non flickering scanlines
+    if ( DO_SCANLINES == 1.0 )  {
+        vec3 pixel_bleed ; 
+        if  (! ( isinterlaced  && (SCANLINE_DISABLE_ON_INTERLACE == 1.0))  ) {
+            if (DO_IN_GLOW + DO_HALO > 0.0) {
+                if (DO_HALO == 1.0) pixel_bleed = pixel_haloed;
+                else if (DO_IN_GLOW == 1.0) pixel_bleed = pixel_glowed;
+                else pixel_bleed = pixel_in;
+            }
+        
+            float scanline_shape =  scanline_shape(co, flickering_scanlines ) ;
+            vec3 pixel_scanlined = scanline_shape * pixel_out;
+
+            pixel_out = pixel_scanlined + (pixel_out * pixel_bleed *  SCANLINES_BLEEDING * (1-scanline_shape));
+        }
+    }
+  
+    if (DO_CCORRECTION == 1.0) pixel_out = pow(pixel_out,vec3(GAMMA_OUT));
+
+    //Out
+    return vec4(pixel_out,1.0) ; //* border(border_coords);
+}
+
+vec4 pixel_main_pass() {
+    vec2 coords = vTexCoord;
+    
+    if (DO_DYNZOOM == 1.0) {
+        float zoomin = 1.0 + (texture(avglum_passFeedback, vec2(0.25,0.25)    ).a/ DYNZOOM_FACTOR);
+        coords = zoom(vTexCoord, zoomin);
+    }
+    
+    vec2 coords_curved = coords;
+
+    //Curvature: set coords_curved coordinate: (global var)
+        if (DO_CURVATURE == 1.0) {
+            if ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0))
+                coords_curved = Warp(coords_curved,GEOM_WARP_X,GEOM_WARP_Y);
+        }
+        
+        if (DO_BEZEL == 1.0) {
+            coords_curved = zoomout_coords(coords_curved, -BEZEL_INNER_ZOOM , 1.0);
+            coords = zoomout_coords(coords, -BEZEL_INNER_ZOOM , 1.0);
+        }
+    
+   //FIXME: bezel may need a wider border when zoomed in.
+            //But for performance reasons we can wide the border in relation to the desidered reflection area.
+            //by now, just wide by BEZEL_REFLECTION_AREA_SIZE defined in config.inc
+
+    bool is_border = false;
+    
+    if (border_needed()) {
+
+        float WIDEN = DO_BEZEL * BEZEL_REFLECTION_AREA_SIZE;
+        bool b_is_rotated = is_rotated();
+        bool is_outside_x = ((coords.x > 1.0+WIDEN ) || (coords.x < 0.0 - WIDEN) );
+        bool is_outside_y = ((coords.y > 1.0+WIDEN ) || (coords.y < 0.0 - WIDEN) );
+        is_border = (b_is_rotated && is_outside_y) || (!b_is_rotated && is_outside_x);
+   }
+   
+   if (is_border)
+       return mark_outer_frame(vec3(0.0));
+   else
+       return main_pass_main_wrap(coords_curved);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #define NOISE_A 12.9898
 #define NOISE_B 78.233
@@ -110,11 +382,12 @@ vec3 compose_bezel_over(vec3 full_viewport) {
     vec2 bezel_lut_size = textureSize(monitor_body,0);
     float bezel_frame_lod = log2(bezel_lut_size.y * (BEZEL_FRAME_ZOOM+1.0) /global.FinalViewportSize.y);
     vec2 coords_for_bezel = vTexCoord;
-    vec2 coords_for_mirror = vOutputCoord;
+    //vec2 coords_for_mirror;
     //vec2 coords_for_mirror =zoom(vOutputCoord,0.99);
     if (BEZEL_FRAME_ZOOM != 0.0)
         coords_for_bezel = zoomout_coords(vTexCoord,-BEZEL_FRAME_ZOOM,1.0);
 
+    vec2 coords_for_mirror = coords_for_bezel;
     //No need to draw anything outside this:
     if (coords_for_bezel.x < 0  || coords_for_bezel.y < 0 || coords_for_bezel.x > 1.0 || coords_for_bezel.y > 1.0) return full_viewport;
 
@@ -129,7 +402,7 @@ vec3 compose_bezel_over(vec3 full_viewport) {
 
     //This is the reflection to be composed over the bezel);
     vec3 pixel_mirrored = texture(reflected_blurred_pass2,
-                          coords_for_mirror + displace( global.FinalViewportSize.z ) ).rgb;
+                          coords_for_mirror + displace( min(global.FinalViewportSize.z,global.FinalViewportSize.w) ) ).rgb;
 
     //Take the reflection modifier from the texture blue component into account; it is/may be used to lower the reflection in the corners.
         //float reflection = (reflection_shade * 1.4 -  0.4)  * bezel.b ;
@@ -153,7 +426,7 @@ vec3 compose_bezel_over(vec3 full_viewport) {
 }
 // 
 vec4 pixel_inner_frame() {
-    vec4 pixel_in = texture(main_pass, vOutputCoord);
+    vec4 pixel_in = pixel_main_pass();
     vec3 pixel_out = pixel_in.rgb;
     vec3 bloomed;
 
@@ -270,6 +543,9 @@ vec4 main_wrap(){
 }
 
 
+
+
+
 void main() {
     //"Just" handle inner and outer frame here:
     vec4 pixel_out = main_wrap();
@@ -289,6 +565,10 @@ void main() {
         vec4 bg_image = pixel_background_image();
         pixel_out = mix(pixel_out,bg_image,bg_image.a);
     }
+
+//     FragColor = texture(reflected_blurred_pass2, vOutputCoord );
+//     return;
+    //pixel_out = texture(ambi_temporal_pass, vOutputCoord + global_noise );
 
     FragColor = pixel_out;
 }

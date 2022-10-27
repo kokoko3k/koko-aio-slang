@@ -131,19 +131,22 @@ void main() {
    */
    
    if (DO_SCANLINES == 0.0) {
-      FragColor.rgb = pixel_no_flicker(vTexCoord);
+      FragColor= vec4(pixel_no_flicker(vTexCoord),1.0);
       return;
    }
 
    //Implicit else: DO_SCANLINES == 1.0
    if (scanline_have_to_flicker(is_interlaced())) {
-      FragColor.rgb = pixel_flickering();
+      FragColor = vec4(pixel_flickering(),1.0);
       return;
    }
       
    //Implicit else: DO_SCANLINES == 1.0 but no flickering needed.
-   FragColor.rgb = pixel_no_flicker(vTexCoord);
+   FragColor = vec4(pixel_no_flicker(vTexCoord),1.0);
       
+   
+   
+   
    
    //Use one of the following to debug:
       //FragColor=vec4(abs(sin(params.FrameCount/3.14/4))); //white fade
