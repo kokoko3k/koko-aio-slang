@@ -241,12 +241,8 @@ vec4 pixel_main_pass(vec2 coords) {
     
     if (DO_DYNZOOM == 1.0) {
         float zoomin = 1.0 + (texture(avglum_passFeedback, vec2(0.25,0.25)    ).a/ DYNZOOM_FACTOR);
-        coords = zoom(vTexCoord, zoomin);
+        coords = zoom(coords, zoomin);
     }
-    
-        if (DO_BEZEL == 1.0) {
-            coords = zoomout_coords(coords, -BEZEL_INNER_ZOOM , 1.0);
-        }
     
    //FIXME: bezel may need a wider border when zoomed in.
             //But for performance reasons we can wide the border in relation to the desidered reflection area.
@@ -255,7 +251,6 @@ vec4 pixel_main_pass(vec2 coords) {
     bool is_border = false;
     
     if (border_needed()) {
-
         float WIDEN = DO_BEZEL * BEZEL_REFLECTION_AREA_SIZE;
         bool b_is_rotated = is_rotated();
         bool is_outside_x = ((coords.x > 1.0+WIDEN ) || (coords.x < 0.0 - WIDEN) );
