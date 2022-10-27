@@ -303,7 +303,9 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 //Back leds
 //Emulates leds under the monitor frame that slowly reacts to image contents
-#pragma parameter DO_AMBILIGHT	 "★ Leds (set RetroArch aspect ratio to full!): ==>"			1.0  0.0  1.0     1.0
+#pragma parameter DO_AMBILIGHT	 "★ Leds:"								1.0  0.0  1.0     1.0
+#pragma parameter LABEL_WARNING1 "    ⚠ RetroArch aspect needs to be set to Full! ⚠"			1.0  1.0  1.0     1.0
+#pragma parameter LABEL_WARNING2 "    ⚠ Resize the window once if you see glitches! ⚠"			1.0  1.0  1.0     1.0
 #pragma parameter AMBI_STEPS	 "        Slowness"							60.0 5.0  1000.0  5.0
 #pragma parameter AMBI_FALLOFF   "        Light Falloff"						0.7  0.1  3.0     0.01
 #pragma parameter AMBI_POWER     "        Led power"							0.5  0.1  5.0     0.05

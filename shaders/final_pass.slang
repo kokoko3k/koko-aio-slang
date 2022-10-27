@@ -556,7 +556,6 @@ void main() {
         //split screen (debug)
         //if (vTexCoord.y < 0.5) pixel_out = texture(first_pass,vTexCoord);
     
-    //Bezel
     if (DO_BEZEL == 1.0) {
         pixel_out = vec4(compose_bezel_over(pixel_out.rgb),1.0);
     }
@@ -565,10 +564,6 @@ void main() {
         vec4 bg_image = pixel_background_image();
         pixel_out = mix(pixel_out,bg_image,bg_image.a);
     }
-
-//     FragColor = texture(reflected_blurred_pass2, vOutputCoord );
-//     return;
-    //pixel_out = texture(ambi_temporal_pass, vOutputCoord + global_noise );
 
     FragColor = pixel_out;
 }

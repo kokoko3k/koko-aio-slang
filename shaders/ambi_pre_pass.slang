@@ -54,8 +54,9 @@ vec3 circle_smooth(vec2 coords, vec2 middle, float f_radius, float FALLOFF, floa
     return circle_color;
 }
 
-#define tol 0.05  //skip tolerance
 
+#define tol_start 0.03 //skip tolerance
+#define tol_end   0.97 //1-tol_start
 /*
 #define leds_per_strip 8
 #define AMBI_FALLOFF 0.7  //As a general rule, AMBI_FALLOFF+AMBI_POWER < 1.0+internalness
@@ -84,43 +85,33 @@ vec3 circle_smooth(vec2 coords, vec2 middle, float f_radius, float FALLOFF, floa
 #define FRAME_DIVIDER 3
 
 void main() {
-
-    bool is_rotated = texture(isrotated_passFeedback,vec2(0.5,0.5)).r > 0.5;
     if (DO_AMBILIGHT != 1.0) return ; 
-    
-
     if ( mod(params.FrameCount,FRAME_DIVIDER) != 0.0) {
         FragColor = texture(ambi_pre_pass1Feedback,vTexCoord);
         return;
     }
     
+    bool is_rotated = texture(isrotated_passFeedback,vec2(0.5,0.5)).r > 0.5;
     //Scale to the original aspect
     vec2 coords = get_scaled_coords(vTexCoord,global.FinalViewportSize,is_rotated);
     if (DO_BEZEL==1.0) coords = zoomout_coords(coords, -BEZEL_INNER_ZOOM , 1.0);
     
-    
-    FragColor = vec4(0.0);
 
-    
-    bool skip_pass = false;
     //Skip coords in the rect "under the monitor"
-        //First consider curved coords
-        vec2 coords_curved = coords; 
-        if (DO_CURVATURE == 1.0) {
-            if ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0))
-                coords_curved = Warp(coords_curved,GEOM_WARP_X,GEOM_WARP_Y);
-                skip_pass =    ( (coords_curved.x > 0.0 + tol && coords_curved.x < 1.0 -tol ) && (coords_curved.y > 0.0 +tol && coords_curved.y < 1.0 - tol) );
-        }    
+    FragColor = vec4(0.0);
+    //First consider to skip the curved coords
+    if (DO_CURVATURE == 1.0) {
+        if ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0)) {
+            vec2 coords_curved = Warp(coords, GEOM_WARP_X, GEOM_WARP_Y);
+            if ( ( (coords_curved.x > tol_start && coords_curved.x < 1.0 - tol_start ) && (coords_curved.y > tol_start && coords_curved.y < 1.0 - tol_start) ) &&
+                !( (coords.x < - tol_start || coords.x > 1.0 + tol_start) ||  (coords.y < - tol_start || coords.y > 1.0 + tol_start) ) )
+                return;
+        }       
+    }    
     //...next, the straight ones (needed even when curvature is due, because it returns particular values in the corners)
-    skip_pass = skip_pass && !( (coords.x < 0.0 -tol || coords.x > 1.0 +tol) ||  (coords.y < 0.0 -tol || coords.y > 1.0 +tol) );
-
-
-    if ( skip_pass ) {
-        //float lod_debug = log2(params.SourceSize.y / leds_per_strip);
-        //FragColor = textureLod(Source,coords,lod_debug);
+    //skip_pass = skip_pass && !( (coords.x < 0.0 -tol || coords.x > 1.0 +tol) ||  (coords.y < 0.0 -tol || coords.y > 1.0 +tol) );
+    if (coords.x > tol_start && coords.x < tol_end && coords.y > tol_start && coords.y < tol_end) 
         return;
-    }
-
     vec3 pixel_out = vec3(0.0);
 
    /* 
