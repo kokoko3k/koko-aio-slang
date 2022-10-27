@@ -167,23 +167,33 @@ float scanline_shape(vec2 coords, bool do_flicker) {
     return lines;
 }
 
-vec4 main_pass_main_wrap(vec2 co) {
+vec4 pixel_main_pass(vec2 coords) {
+    
+    if (DO_DYNZOOM == 1.0) {
+        float zoomin = 1.0 + (texture(avglum_passFeedback, vec2(0.25,0.25)    ).a/ DYNZOOM_FACTOR);
+        coords = zoom(coords, zoomin);
+    }
+
+    bool is_border = false;
+    
+    if (border_needed())
+        if (vTexCoord.x < 0.0 || vTexCoord.x > 1.0 || vTexCoord.y < 0.0 || vTexCoord.y > 1.0) return vec4(0.0);
+   
     bool isinterlaced = is_interlaced();
     bool flickering_scanlines = (DO_SCANLINES == 1.0) && scanline_have_to_flicker(isinterlaced) ;
-
 
     vec3 pixel_in;
     vec3 pixel_glowed;
     
     //Get the first available pixel_in:
     if  (DO_IN_GLOW == 1.0) {
-            pixel_glowed = texture(in_glow_pass,co).rgb;
+            pixel_glowed = texture(in_glow_pass,coords).rgb;
             pixel_in = pixel_glowed;
         }
             else if (DO_FXAA == 1.0) 
-        pixel_in = texture(FXAA_pass,co).rgb ;
+        pixel_in = texture(FXAA_pass,coords).rgb ;
             else
-        pixel_in = texture(first_pass,co).rgb ;
+        pixel_in = texture(first_pass,coords).rgb ;
 
     vec3 pixel_out = pixel_in;
     vec3 pixel_in_clamped = min(pixel_in,vec3(1.0)); //Clamp here for moth vmask and darklines.
@@ -209,7 +219,7 @@ vec4 main_pass_main_wrap(vec2 co) {
     //Halo
     vec3 pixel_haloed;
     if (DO_HALO == 1.0 ) {
-        pixel_haloed = texture(halo_pass,co).rgb;
+        pixel_haloed = texture(halo_pass,coords).rgb;
         pixel_out += pixel_haloed;
         pixel_out = clamp(pixel_out,0.0,HALO_CLAMP);
     }
@@ -224,7 +234,7 @@ vec4 main_pass_main_wrap(vec2 co) {
                 else pixel_bleed = pixel_in;
             }
         
-            float scanline_shape =  scanline_shape(co, flickering_scanlines ) ;
+            float scanline_shape =  scanline_shape(coords, flickering_scanlines ) ;
             vec3 pixel_scanlined = scanline_shape * pixel_out;
 
             pixel_out = pixel_scanlined + (pixel_out * pixel_bleed *  SCANLINES_BLEEDING * (1-scanline_shape));
@@ -235,66 +245,8 @@ vec4 main_pass_main_wrap(vec2 co) {
 
     //Out
     return vec4(pixel_out,1.0) ; //* border(border_coords);
+
 }
-
-vec4 pixel_main_pass(vec2 coords) {
-    
-    if (DO_DYNZOOM == 1.0) {
-        float zoomin = 1.0 + (texture(avglum_passFeedback, vec2(0.25,0.25)    ).a/ DYNZOOM_FACTOR);
-        coords = zoom(coords, zoomin);
-    }
-    
-   //FIXME: bezel may need a wider border when zoomed in.
-            //But for performance reasons we can wide the border in relation to the desidered reflection area.
-            //by now, just wide by BEZEL_REFLECTION_AREA_SIZE defined in config.inc
-
-    bool is_border = false;
-    
-    if (border_needed()) {
-        float WIDEN = DO_BEZEL * BEZEL_REFLECTION_AREA_SIZE;
-        bool b_is_rotated = is_rotated();
-        bool is_outside_x = ((coords.x > 1.0+WIDEN ) || (coords.x < 0.0 - WIDEN) );
-        bool is_outside_y = ((coords.y > 1.0+WIDEN ) || (coords.y < 0.0 - WIDEN) );
-        is_border = (b_is_rotated && is_outside_y) || (!b_is_rotated && is_outside_x);
-   }
-   
-   if (is_border)
-       return mark_outer_frame(vec3(0.0));
-   else
-       return main_pass_main_wrap(coords);
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -546,4 +498,7 @@ void main() {
     }
 
     FragColor = pixel_out;
+    
+    
+    //FragColor = pixel_main_pass(coords);
 }

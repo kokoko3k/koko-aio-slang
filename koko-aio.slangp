@@ -27,10 +27,10 @@ input glow gamma 3: 40          5.4                 36.75               35.2
  color corrections: 35          0.4                 31.6                29.5
     curvature warp: 39.2        4.6                 33.5                34.1 ** troppi check per curvatura?
      vignette+spot: 35.2        0.6                 33.2                34 ** instabile
-     ambient light: 38          3.4                 32.1                33.5 ** non blamka dietro?
+     ambient light: 38          3.4                 32.1                33.6 ** non blamka dietro?
              Bezel:                                 37.5                33.7
 -----------------------------------------------
-Total basal + all the features: 72.2                65.3                64.0
+Total basal + all the features: 72.2                65.3                65.3
     
 */
 
