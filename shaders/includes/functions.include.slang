@@ -1,6 +1,23 @@
 #define alpha_mark 0.1
 #define pi 3.141592654
 
+vec3 apply_fuzzy_main_pass(vec3 color) {
+   if (DO_IN_GLOW == 1.0)
+      color = pow(color,vec3(IN_GLOW_GAMMA))*IN_GLOW_POWER;
+   if (DO_VMASK_AND_DARKLINES == 1.0)
+      color = color *  (1.0 -  ((RGB_MASK_STRENGTH*0.5)+(DARKLINES_STRENGTH*0.2))); //color = color *  ((2.0 - RGB_MASK_STRENGTH + DARKLINES_STRENGTH) + 0.5);
+   if (DO_HALO == 1.0)
+      color += pow(color,vec3(HALO_GAMMA))*HALO_POWER;
+   if (DO_SCANLINES == 1.0)
+      color *= 0.5 + (SCANLINE_DARK*0.5); //color = color *  ((2.0 - RGB_MASK_STRENGTH + DARKLINES_STRENGTH) + 0.5);
+   if (DO_CCORRECTION == 1.0)
+      color = pow(color, vec3(GAMMA_OUT));
+   if (DO_VIGNETTE == 1.0)
+      color *= 0.8 * (V_POWER);
+   return color;
+}
+
+
 vec2 offsets_from_float(float in_param, int range){
     return vec2(  
                   (int(in_param) % range) - range*0.5,

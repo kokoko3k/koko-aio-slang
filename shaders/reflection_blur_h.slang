@@ -29,6 +29,7 @@ layout(set = 0, binding = 2) uniform sampler2D isrotated_passFeedback;
 
 #define b_offset_x -0.05
 #define Pi2 6.28318530717959
+
 vec3 blur(float Quality, float Directions, float Size, vec2 co,float lod) {
     vec4 iResolution = SourceTextureSize;
     vec2 Radius = Size/iResolution.xy ;
@@ -53,7 +54,7 @@ vec3 blur(float Quality, float Directions, float Size, vec2 co,float lod) {
 void main() {
 
 
-vec2 coords_curved = vTexCoord;
+   vec2 coords_curved = vTexCoord;
 
    if (DO_BEZEL == 1.0) {
    
@@ -70,43 +71,45 @@ vec2 coords_curved = vTexCoord;
       /* Calculate the internal area (the one which is not mirrored)
          so that we can skip blurring it:
       */
-/*         vec2 ar_box;
-         if (!is_rotated) {
-            //Width of the aspect corrected box zoomed as requested by the bezel settings:                                  
-            ar_box.x = global.FinalViewportSize.z*global.FinalViewportSize.y*get_in_aspect() * (1+BEZEL_INNER_ZOOM-c_tolerance) ; 
-            //Height zoomed as requested by bezel settings:
-            ar_box.y = 1+BEZEL_INNER_ZOOM-c_tolerance;
-               } else {
-            ar_box.y = global.FinalViewportSize.z*global.FinalViewportSize.y/get_in_aspect() * (1+BEZEL_INNER_ZOOM-c_tolerance) ; 
-            ar_box.x= 1+BEZEL_INNER_ZOOM-c_tolerance;
-         }
-   
-         //start_point is the middle of the screen minut half the content width
-         vec2 start_point = vec2(0.5 - (ar_box.x*0.5), 0.5 - (ar_box.y*0.5));
-         vec2 end_point =   vec2(0.5 + (ar_box.x*0.5), 0.5 + (ar_box.y*0.5));
+      /*       vec2 ar_box;
+               if (!is_rotated) {
+                  //Width of the aspect corrected box zoomed as requested by the bezel settings:                                  
+                  ar_box.x = global.FinalViewportSize.z*global.FinalViewportSize.y*get_in_aspect() * (1+BEZEL_INNER_ZOOM-c_tolerance) ; 
+                  //Height zoomed as requested by bezel settings:
+                  ar_box.y = 1+BEZEL_INNER_ZOOM-c_tolerance;
+                     } else {
+                  ar_box.y = global.FinalViewportSize.z*global.FinalViewportSize.y/get_in_aspect() * (1+BEZEL_INNER_ZOOM-c_tolerance) ; 
+                  ar_box.x= 1+BEZEL_INNER_ZOOM-c_tolerance;
+               }
+         
+               //start_point is the middle of the screen minut half the content width
+               vec2 start_point = vec2(0.5 - (ar_box.x*0.5), 0.5 - (ar_box.y*0.5));
+               vec2 end_point =   vec2(0.5 + (ar_box.x*0.5), 0.5 + (ar_box.y*0.5));
 
 
-      //Now we can skip the internal area or the black one as already marked by main_pass:
-      //bool skip_condition =(vTexCoord.x > start_point.x  && vTexCoord.x < end_point.x &&
-//                           vTexCoord.y > start_point.y && vTexCoord.y < end_point.y) ||
-//                           is_outer_frame(texture(main_pass,vTexCoord));
+            //Now we can skip the internal area or the black one as already marked by main_pass:
+            //bool skip_condition =(vTexCoord.x > start_point.x  && vTexCoord.x < end_point.x &&
+      //                           vTexCoord.y > start_point.y && vTexCoord.y < end_point.y) ||
+      //                           is_outer_frame(texture(main_pass,vTexCoord));
 
-*/
+      */
 
-//FIXME (CHECKME) is the rotation state still important?
+      //FIXME (CHECKME) is the rotation state still important?
 
-bool skip_condition = (coords_curved.x < 1.0 - c_tolerance && coords_curved.x > c_tolerance && 
-                       coords_curved.y < 1.0 - c_tolerance && coords_curved.y > c_tolerance ) ;
+      bool skip_condition = (coords_curved.x < 1.0 - c_tolerance && coords_curved.x > c_tolerance && 
+                           coords_curved.y < 1.0 - c_tolerance && coords_curved.y > c_tolerance ) ;
 
       if (skip_condition) {
          FragColor = mark_useless(vec3(0.0));
          return;
       }
         
-         vec2 res = vec2(global.first_passSize.x, global.first_passSize.y);
-         vec2 dir = vec2(1.0,0.0);
-         ///Quality, Directions, Size, coords, lod
-         FragColor = vec4(blur(1,4,2,coords_curved, 2.0),1.0);
+      vec2 res = vec2(global.first_passSize.x, global.first_passSize.y);
+      vec2 dir = vec2(1.0,0.0);
+      ///Quality, Directions, Size, coords, lod
+      vec3 pixel_blur = blur(1,4,2,coords_curved, 2.0);
+      
+      FragColor = vec4(apply_fuzzy_main_pass(pixel_blur),1.0);
    }
 
 }

@@ -464,11 +464,7 @@ vec4 main_wrap(vec2 coords){
 
 
 void main() {
-    //For debug purposes:
-        //quad split screen
-        //if ( (vTexCoord.x < 0.5  && vTexCoord.y > 0.5) || (vTexCoord.x > 0.5  && vTexCoord.y < 0.5)         ) pixel_out = texture(first_pass,vTexCoord);
-        //split screen (debug)
-        //if (vTexCoord.y < 0.5) pixel_out = texture(first_pass,vTexCoord);
+
     
     vec2 coords = vTexCoord;
     //Curvature
@@ -494,8 +490,16 @@ void main() {
         pixel_out = mix(pixel_out,bg_image,bg_image.a);
     }
 
-    FragColor = pixel_out;
-    //FragColor = texture(reflected_blurred_pass2,coords );
+
+    //if ( (vOutputCoord.x < 0.5  && vOutputCoord.y > 0.5) || (vOutputCoord.x > 0.5  && vOutputCoord.y < 0.5)  ) pixel_out = texture(reflected_blurred_pass2,coords );
     
     //FragColor = pixel_main_pass(coords);
+    
+        //For debug purposes:
+        //quad split screen
+        //if ( (vOutputCoord.x < 0.5  && vOutputCoord.y > 0.5) || (vOutputCoord.x > 0.5  && vOutputCoord.y < 0.5)  ) pixel_out = texture(first_pass,vOutputCoord);
+        //split screen (debug)
+        //if (vTexCoord.y < 0.5) pixel_out = texture(first_pass,vTexCoord);
+
+    FragColor = pixel_out;
 }
