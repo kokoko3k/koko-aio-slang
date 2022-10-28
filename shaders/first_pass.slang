@@ -111,9 +111,9 @@ vec3 pixel_flickering() {
 
    float lumdiff = (flickline.r+flickline.g+flickline.b)/3.0 -
                    (pixel_cur.r+pixel_cur.g+pixel_cur.b)/3.0;
-   
+      
    if (lumdiff > 0.0) {
-      lumdiff = scale_to_range(lumdiff,0.0,1.5);
+      lumdiff = scale_to_range(lumdiff,0.0,SCANLINE_FLICKERING_POWER);
       return mix(pixel_cur,flickline,lumdiff);
    } else {
       return pixel_cur;
