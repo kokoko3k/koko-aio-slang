@@ -13,9 +13,9 @@ vec3 bloom8_std_pow(sampler2D smp, vec2 uv, vec4 smpsize, vec2 dest_size, float 
     vec3 color  = vec3(0.0,0.0,0.0);
 
     vec3 lookup = vec3(0.0,0.0,0.0);
-    //color =  pow(textureLod(smp, uv , lod).rgb, vec3(gamma)) ;
+    float step = 1.0/quality;
 
-    for(float i=1.0/quality; i<=1.0; i+=1.0/quality) {
+    for(float i=step; i<=1.0; i+=step) {
         color += pow( textureLod(smp, uv + ( passo *i* vec2(-1.0,  r_off )), lod ).rgb, vec3(gamma) );
         color += pow( textureLod(smp, uv + ( passo *i* vec2( 1.0, -r_off )), lod ).rgb, vec3(gamma) );
 
@@ -40,9 +40,9 @@ vec3 bloom8_gamma1(sampler2D smp, vec2 uv, vec4 smpsize, vec2 dest_size, float q
     vec3 color  = vec3(0.0,0.0,0.0);
 
     vec3 lookup = vec3(0.0,0.0,0.0);
-    //color =  pow(textureLod(smp, uv , lod).rgb, vec3(gamma)) ;
+    float step = 1.0/quality;
 
-    for(float i=1.0/quality; i<=1.0; i+=1.0/quality) {
+    for(float i=step; i<=1.0; i+=step) {
         color += textureLod(smp, uv + ( passo *i* vec2(-1.0,  r_off )), lod ).rgb;
         color += textureLod(smp, uv + ( passo *i* vec2( 1.0, -r_off )), lod ).rgb;
 
@@ -65,9 +65,9 @@ vec3 bloom8_gamma2(sampler2D smp, vec2 uv, vec4 smpsize, vec2 dest_size, float q
     vec3 color  = vec3(0.0,0.0,0.0);
 
     vec3 lookup = vec3(0.0,0.0,0.0);
-    //color =  pow(textureLod(smp, uv , lod).rgb, vec3(gamma)) ;
+    float step = 1.0/quality;
 
-    for(float i=1.0/quality; i<=1.0; i+=1.0/quality) {
+    for(float i=step; i<=1.0; i+=step) {
         color += pow_2(textureLod(smp, uv + ( passo *i* vec2(-1.0,  r_off )), lod ).rgb);
         color += pow_2(textureLod(smp, uv + ( passo *i* vec2( 1.0, -r_off )), lod ).rgb);
 
@@ -91,9 +91,9 @@ vec3 bloom8_gamma3(sampler2D smp, vec2 uv, vec4 smpsize, vec2 dest_size, float q
     vec3 color  = vec3(0.0,0.0,0.0);
 
     vec3 lookup = vec3(0.0,0.0,0.0);
-    //color =  pow(textureLod(smp, uv , lod).rgb, vec3(gamma)) ;
+    float step = 1.0/quality;
 
-    for(float i=1.0/quality; i<=1.0; i+=1.0/quality) {
+    for(float i=step; i<=1.0; i+=step) {
         color += pow_3(textureLod(smp, uv + ( passo *i* vec2(-1.0,  r_off )), lod ).rgb);
         color += pow_3(textureLod(smp, uv + ( passo *i* vec2( 1.0, -r_off )), lod ).rgb);
 
@@ -117,9 +117,9 @@ vec3 bloom8_gamma4(sampler2D smp, vec2 uv, vec4 smpsize, vec2 dest_size, float q
     vec3 color  = vec3(0.0,0.0,0.0);
 
     vec3 lookup = vec3(0.0,0.0,0.0);
-    //color =  pow(textureLod(smp, uv , lod).rgb, vec3(gamma)) ;
+    float step = 1.0/quality;
 
-    for(float i=1.0/quality; i<=1.0; i+=1.0/quality) {
+    for(float i=step; i<=1.0; i+=step) {
         color += pow_4(textureLod(smp, uv + ( passo *i* vec2(-1.0,  r_off )), lod ).rgb);
         color += pow_4(textureLod(smp, uv + ( passo *i* vec2( 1.0, -r_off )), lod ).rgb);
 
@@ -143,9 +143,9 @@ vec3 bloom8_gamma5(sampler2D smp, vec2 uv, vec4 smpsize, vec2 dest_size, float q
     vec3 color  = vec3(0.0,0.0,0.0);
 
     vec3 lookup = vec3(0.0,0.0,0.0);
-    //color =  pow(textureLod(smp, uv , lod).rgb, vec3(gamma)) ;
+    float step = 1.0/quality;
 
-    for(float i=1.0/quality; i<=1.0; i+=1.0/quality) {
+    for(float i=step; i<=1.0; i+=step) {
         color += pow_5(textureLod(smp, uv + ( passo *i* vec2(-1.0,  r_off )), lod ).rgb);
         color += pow_5(textureLod(smp, uv + ( passo *i* vec2( 1.0, -r_off )), lod ).rgb);
 
@@ -169,9 +169,9 @@ vec3 bloom8_gamma6(sampler2D smp, vec2 uv, vec4 smpsize, vec2 dest_size, float q
     vec3 color  = vec3(0.0,0.0,0.0);
 
     vec3 lookup = vec3(0.0,0.0,0.0);
-    //color =  pow(textureLod(smp, uv , lod).rgb, vec3(gamma)) ;
+    float step = 1.0/quality;
 
-    for(float i=1.0/quality; i<=1.0; i+=1.0/quality) {
+    for(float i=step; i<=1.0; i+=step) {
         color += pow_6(textureLod(smp, uv + ( passo *i* vec2(-1.0,  r_off )), lod ).rgb);
         color += pow_6(textureLod(smp, uv + ( passo *i* vec2( 1.0, -r_off )), lod ).rgb);
 
@@ -195,9 +195,9 @@ vec3 bloom8_gamma7(sampler2D smp, vec2 uv, vec4 smpsize, vec2 dest_size, float q
     vec3 color  = vec3(0.0,0.0,0.0);
 
     vec3 lookup = vec3(0.0,0.0,0.0);
-    //color =  pow(textureLod(smp, uv , lod).rgb, vec3(gamma)) ;
+    float step = 1.0/quality;
 
-    for(float i=1.0/quality; i<=1.0; i+=1.0/quality) {
+    for(float i=step; i<=1.0; i+=step) {
         color += pow_7(textureLod(smp, uv + ( passo *i* vec2(-1.0,  r_off )), lod ).rgb);
         color += pow_7(textureLod(smp, uv + ( passo *i* vec2( 1.0, -r_off )), lod ).rgb);
 
@@ -221,9 +221,9 @@ vec3 bloom8_gamma8(sampler2D smp, vec2 uv, vec4 smpsize, vec2 dest_size, float q
     vec3 color  = vec3(0.0,0.0,0.0);
 
     vec3 lookup = vec3(0.0,0.0,0.0);
-    //color =  pow(textureLod(smp, uv , lod).rgb, vec3(gamma)) ;
+    float step = 1.0/quality;
 
-    for(float i=1.0/quality; i<=1.0; i+=1.0/quality) {
+    for(float i=step; i<=1.0; i+=step) {
         color += pow_8(textureLod(smp, uv + ( passo *i* vec2(-1.0,  r_off )), lod ).rgb);
         color += pow_8(textureLod(smp, uv + ( passo *i* vec2( 1.0, -r_off )), lod ).rgb);
 
@@ -247,9 +247,9 @@ vec3 bloom8_gamma9(sampler2D smp, vec2 uv, vec4 smpsize, vec2 dest_size, float q
     vec3 color  = vec3(0.0,0.0,0.0);
 
     vec3 lookup = vec3(0.0,0.0,0.0);
-    //color =  pow(textureLod(smp, uv , lod).rgb, vec3(gamma)) ;
+    float step = 1.0/quality;
 
-    for(float i=1.0/quality; i<=1.0; i+=1.0/quality) {
+    for(float i=step; i<=1.0; i+=step) {
         color += pow_9(textureLod(smp, uv + ( passo *i* vec2(-1.0,  r_off )), lod ).rgb);
         color += pow_9(textureLod(smp, uv + ( passo *i* vec2( 1.0, -r_off )), lod ).rgb);
 
@@ -273,9 +273,9 @@ vec3 bloom8_gamma10(sampler2D smp, vec2 uv, vec4 smpsize, vec2 dest_size, float 
     vec3 color  = vec3(0.0,0.0,0.0);
 
     vec3 lookup = vec3(0.0,0.0,0.0);
-    //color =  pow(textureLod(smp, uv , lod).rgb, vec3(gamma)) ;
+    float step = 1.0/quality;
 
-    for(float i=1.0/quality; i<=1.0; i+=1.0/quality) {
+    for(float i=step; i<=1.0; i+=step) {
         color += pow_10(textureLod(smp, uv + ( passo *i* vec2(-1.0,  r_off )), lod ).rgb);
         color += pow_10(textureLod(smp, uv + ( passo *i* vec2( 1.0, -r_off )), lod ).rgb);
 
