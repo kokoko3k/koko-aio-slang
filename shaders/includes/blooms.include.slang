@@ -6,218 +6,303 @@
 
 #define bdirections 8
 
-/*vec3 under_threshold(vec3 pin, float threshold){
-    vec3 pout = vec3(0.0);
-    
-    if (pin.r > threshold) pout.r = pin.r;
-    if (pin.r > threshold) pout.g = pin.g;
-    if (pin.r > threshold) pout.b = pin.b;
-    return pout;
-}
-*/
+vec3 bloom8_std_pow(sampler2D smp, vec2 uv, vec4 smpsize, vec2 dest_size, float quality, float gamma, float r_off, float lod) {
 
-vec3 radial_bloom_std_pow(float Quality, float Directions, float Size, float fBLOOM_GAMMA) {
-    vec4 iResolution = SourceTextureSize;
-    vec2 Radius = Size/iResolution.xy ;
+    vec2 passo = dest_size/smpsize.xy ;
 
     vec3 color  = vec3(0.0,0.0,0.0);
+
     vec3 lookup = vec3(0.0,0.0,0.0);
-    float steps=0.0;
-    vec3 fBLOOM_GAMMA_vec3=vec3(fBLOOM_GAMMA);
-    for( float d=0.0; d<Pi2; d+=Pi2/Directions) {
-        for(float i=1.0/Quality; i<=1.0; i+=1.0/Quality) {
-            lookup = texture( SourceTexture, vTexCoord + vec2(cos(d)  + b_offset_x , sin(d))*Radius*i  ).rgb ;
-            color +=pow(lookup.rgb,fBLOOM_GAMMA_vec3);
-            steps+=1.0;
-        }
+    //color =  pow(textureLod(smp, uv , lod).rgb, vec3(gamma)) ;
+
+    for(float i=1.0/quality; i<=1.0; i+=1.0/quality) {
+        color += pow( textureLod(smp, uv + ( passo *i* vec2(-1.0,  r_off )), lod ).rgb, vec3(gamma) );
+        color += pow( textureLod(smp, uv + ( passo *i* vec2( 1.0, -r_off )), lod ).rgb, vec3(gamma) );
+
+        color += pow( textureLod(smp, uv + ( passo *i* vec2( r_off, -1.0)), lod ).rgb, vec3(gamma) );
+        color += pow( textureLod(smp, uv + ( passo *i* vec2(-r_off, 1.0)), lod ).rgb, vec3(gamma) );
+
+        color += pow( textureLod(smp, uv + ( passo *i* vec2( r_off,   1.0)), lod ).rgb, vec3(gamma) );
+        color += pow( textureLod(smp, uv + ( passo *i* vec2(-r_off, -1.0)), lod ).rgb, vec3(gamma) );
+
+        color += pow( textureLod(smp, uv + ( passo *i* vec2(-1.0,  -r_off)), lod ).rgb, vec3(gamma) );
+        color += pow( textureLod(smp, uv + ( passo *i* vec2( 1.0,   r_off)), lod ).rgb, vec3(gamma) );
     }
-    color /= (steps-1);
+    color /= (quality*8);
     return color;
 }
 
 
-vec3 radial_BLOOM_GAMMA_1(float Quality, float Directions, float Size) {
-    vec4 iResolution = SourceTextureSize;
-    vec2 Radius = Size/iResolution.xy ;
+vec3 bloom8_gamma1(sampler2D smp, vec2 uv, vec4 smpsize, vec2 dest_size, float quality, float r_off, float lod) {
+
+    vec2 passo = dest_size/smpsize.xy ;
 
     vec3 color  = vec3(0.0,0.0,0.0);
+
     vec3 lookup = vec3(0.0,0.0,0.0);
-    float steps=0.0;
-    for( float d=0.0; d<Pi2; d+=Pi2/Directions) {
-        for(float i=1.0/Quality; i<=1.0; i+=1.0/Quality) {
-            lookup = texture( SourceTexture, vTexCoord + vec2(cos(d)  + b_offset_x , sin(d))*Radius*i  ).rgb ;
-            color += lookup.rgb;
-            steps+=1.0;
-        }
+    //color =  pow(textureLod(smp, uv , lod).rgb, vec3(gamma)) ;
+
+    for(float i=1.0/quality; i<=1.0; i+=1.0/quality) {
+        color += textureLod(smp, uv + ( passo *i* vec2(-1.0,  r_off )), lod ).rgb;
+        color += textureLod(smp, uv + ( passo *i* vec2( 1.0, -r_off )), lod ).rgb;
+
+        color += textureLod(smp, uv + ( passo *i* vec2( r_off, -1.0)), lod ).rgb;
+        color += textureLod(smp, uv + ( passo *i* vec2(-r_off, 1.0)), lod ).rgb;
+
+        color += textureLod(smp, uv + ( passo *i* vec2( r_off,   1.0)), lod ).rgb;
+        color += textureLod(smp, uv + ( passo *i* vec2(-r_off, -1.0)), lod ).rgb;
+
+        color += textureLod(smp, uv + ( passo *i* vec2(-1.0,  -r_off)), lod ).rgb;
+        color += textureLod(smp, uv + ( passo *i* vec2( 1.0,   r_off)), lod ).rgb;
     }
-    color /= (steps-1);
+    color /= (quality*8);
     return color;
 }
-vec3 radial_BLOOM_GAMMA_2(float Quality, float Directions, float Size) {
-    vec4 iResolution = SourceTextureSize;
-    vec2 Radius = Size/iResolution.xy ;
+vec3 bloom8_gamma2(sampler2D smp, vec2 uv, vec4 smpsize, vec2 dest_size, float quality, float r_off, float lod) {
+
+    vec2 passo = dest_size/smpsize.xy ;
 
     vec3 color  = vec3(0.0,0.0,0.0);
-    vec3 lookup = vec3(0.0,0.0,0.0);
-    float steps=0.0;
-    for( float d=0.0; d<Pi2; d+=Pi2/Directions) {
-        for(float i=1.0/Quality; i<=1.0; i+=1.0/Quality) {
-            lookup = texture( SourceTexture, vTexCoord + vec2(cos(d)  + b_offset_x , sin(d))*Radius*i  ).rgb ;
-            color += (lookup.rgb*lookup.rgb);
-            steps+=1.0;
-        }
-    }
-    color /= (steps-1);
-    return color;
-}
-vec3 radial_BLOOM_GAMMA_3(float Quality, float Directions, float Size) {
-    vec4 iResolution = SourceTextureSize;
-    vec2 Radius = Size/iResolution.xy ;
 
-    vec3 color  = vec3(0.0,0.0,0.0);
     vec3 lookup = vec3(0.0,0.0,0.0);
-    float steps=0.0;
-    for( float d=0.0; d<Pi2; d+=Pi2/Directions) {
-        for(float i=1.0/Quality; i<=1.0; i+=1.0/Quality) {
-            lookup = texture( SourceTexture, vTexCoord + vec2(cos(d)  + b_offset_x , sin(d))*Radius*i  ).rgb ;
-            color +=pow_3(lookup.rgb);
-            steps+=1.0;
-        }
-    }
-    color /= (steps-1);
-    return color;
-}
-vec3 radial_BLOOM_GAMMA_4(float Quality, float Directions, float Size) {
-    vec4 iResolution = SourceTextureSize;
-    vec2 Radius = Size/iResolution.xy ;
+    //color =  pow(textureLod(smp, uv , lod).rgb, vec3(gamma)) ;
 
-    vec3 color  = vec3(0.0,0.0,0.0);
-    vec3 lookup = vec3(0.0,0.0,0.0);
-    float steps=0.0;
-    for( float d=0.0; d<Pi2; d+=Pi2/Directions) {
-        for(float i=1.0/Quality; i<=1.0; i+=1.0/Quality) {
-            lookup = texture( SourceTexture, vTexCoord + vec2(cos(d)  + b_offset_x , sin(d))*Radius*i  ).rgb ;
-            color +=pow_4(lookup.rgb);
-            steps+=1.0;
-        }
-    }
-    color /= (steps-1);
-    return color;
-}
-vec3 radial_BLOOM_GAMMA_5(float Quality, float Directions, float Size) {
-    vec4 iResolution = SourceTextureSize;
-    vec2 Radius = Size/iResolution.xy ;
+    for(float i=1.0/quality; i<=1.0; i+=1.0/quality) {
+        color += pow_2(textureLod(smp, uv + ( passo *i* vec2(-1.0,  r_off )), lod ).rgb);
+        color += pow_2(textureLod(smp, uv + ( passo *i* vec2( 1.0, -r_off )), lod ).rgb);
 
-    vec3 color  = vec3(0.0,0.0,0.0);
-    vec3 lookup = vec3(0.0,0.0,0.0);
-    float steps=0.0;
-    for( float d=0.0; d<Pi2; d+=Pi2/Directions) {
-        for(float i=1.0/Quality; i<=1.0; i+=1.0/Quality) {
-            lookup = texture( SourceTexture, vTexCoord + vec2(cos(d)  + b_offset_x , sin(d))*Radius*i  ).rgb ;
-            color +=pow_5(lookup.rgb);
-            steps+=1.0;
-        }
-    }
-    color /= (steps-1);
-    return color;
-}
-vec3 radial_BLOOM_GAMMA_6(float Quality, float Directions, float Size) {
-    vec4 iResolution = SourceTextureSize;
-    vec2 Radius = Size/iResolution.xy ;
+        color += pow_2(textureLod(smp, uv + ( passo *i* vec2( r_off, -1.0)), lod ).rgb);
+        color += pow_2(textureLod(smp, uv + ( passo *i* vec2(-r_off, 1.0)), lod ).rgb);
 
-    vec3 color  = vec3(0.0,0.0,0.0);
-    vec3 lookup = vec3(0.0,0.0,0.0);
-    float steps=0.0;
-    for( float d=0.0; d<Pi2; d+=Pi2/Directions) {
-        for(float i=1.0/Quality; i<=1.0; i+=1.0/Quality) {
-            lookup = texture( SourceTexture, vTexCoord + vec2(cos(d)  + b_offset_x , sin(d))*Radius*i  ).rgb ;
-            color +=pow_6(lookup.rgb);
-            steps+=1.0;
-        }
-    }
-    color /= (steps-1);
-    return color;
-}
-vec3 radial_BLOOM_GAMMA_7(float Quality, float Directions, float Size) {
-    vec4 iResolution = SourceTextureSize;
-    vec2 Radius = Size/iResolution.xy ;
+        color += pow_2(textureLod(smp, uv + ( passo *i* vec2( r_off,   1.0)), lod ).rgb);
+        color += pow_2(textureLod(smp, uv + ( passo *i* vec2(-r_off, -1.0)), lod ).rgb);
 
-    vec3 color  = vec3(0.0,0.0,0.0);
-    vec3 lookup = vec3(0.0,0.0,0.0);
-    float steps=0.0;
-    for( float d=0.0; d<Pi2; d+=Pi2/Directions) {
-        for(float i=1.0/Quality; i<=1.0; i+=1.0/Quality) {
-            lookup = texture( SourceTexture, vTexCoord + vec2(cos(d)  + b_offset_x , sin(d))*Radius*i  ).rgb ;
-            color +=pow_7(lookup.rgb);
-            steps+=1.0;
-        }
+        color += pow_2(textureLod(smp, uv + ( passo *i* vec2(-1.0,  -r_off)), lod ).rgb);
+        color += pow_2(textureLod(smp, uv + ( passo *i* vec2( 1.0,   r_off)), lod ).rgb);
     }
-    color /= (steps-1);
-    return color;
-}
-vec3 radial_BLOOM_GAMMA_8(float Quality, float Directions, float Size) {
-    vec4 iResolution = SourceTextureSize;
-    vec2 Radius = Size/iResolution.xy ;
-
-    vec3 color  = vec3(0.0,0.0,0.0);
-    vec3 lookup = vec3(0.0,0.0,0.0);
-    float steps=0.0;
-    for( float d=0.0; d<Pi2; d+=Pi2/Directions) {
-        for(float i=1.0/Quality; i<=1.0; i+=1.0/Quality) {
-            lookup = texture( SourceTexture, vTexCoord + vec2(cos(d)  + b_offset_x , sin(d))*Radius*i  ).rgb ;
-            color +=pow_8(lookup.rgb);
-            steps+=1.0;
-        }
-    }
-    color /= (steps-1);
-    return color;
-}
-vec3 radial_BLOOM_GAMMA_9(float Quality, float Directions, float Size) {
-    vec4 iResolution = SourceTextureSize;
-    vec2 Radius = Size/iResolution.xy ;
-
-    vec3 color  = vec3(0.0,0.0,0.0);
-    vec3 lookup = vec3(0.0,0.0,0.0);
-    float steps=0.0;
-    for( float d=0.0; d<Pi2; d+=Pi2/Directions) {
-        for(float i=1.0/Quality; i<=1.0; i+=1.0/Quality) {
-            lookup = texture( SourceTexture, vTexCoord + vec2(cos(d)  + b_offset_x , sin(d))*Radius*i  ).rgb ;
-            color +=pow_9(lookup.rgb);
-            steps+=1.0;
-        }
-    }
-    color /= (steps-1);
-    return color;
-}
-vec3 radial_BLOOM_GAMMA_10(float Quality, float Directions, float Size) {
-    vec4 iResolution = SourceTextureSize;
-    vec2 Radius = Size/iResolution.xy ;
-
-    vec3 color  = vec3(0.0,0.0,0.0);
-    vec3 lookup = vec3(0.0,0.0,0.0);
-    float steps=0.0;
-    for( float d=0.0; d<Pi2; d+=Pi2/Directions) {
-        for(float i=1.0/Quality; i<=1.0; i+=1.0/Quality) {
-            lookup = texture( SourceTexture, vTexCoord + vec2(cos(d)  + b_offset_x , sin(d))*Radius*i  ).rgb ;
-            color +=pow_10(lookup.rgb);
-            steps+=1.0;
-        }
-    }
-    color /= (steps-1);
+    color /= (quality*8);
     return color;
 }
 
+vec3 bloom8_gamma3(sampler2D smp, vec2 uv, vec4 smpsize, vec2 dest_size, float quality, float r_off, float lod) {
 
-vec3 bloom(float Directions, float Quality, float Size, float fBLOOM_GAMMA)  {
-        if (fBLOOM_GAMMA == 1) return radial_BLOOM_GAMMA_1(Quality, Directions, Size);
-        if (fBLOOM_GAMMA == 2) return radial_BLOOM_GAMMA_2(Quality, Directions, Size);
-        if (fBLOOM_GAMMA == 3) return radial_BLOOM_GAMMA_3(Quality, Directions, Size);
-        if (fBLOOM_GAMMA == 4) return radial_BLOOM_GAMMA_4(Quality, Directions, Size);
-        if (fBLOOM_GAMMA == 5) return radial_BLOOM_GAMMA_5(Quality, Directions, Size);
-        if (fBLOOM_GAMMA == 6) return radial_BLOOM_GAMMA_6(Quality, Directions, Size);
-        if (fBLOOM_GAMMA == 7) return radial_BLOOM_GAMMA_7(Quality, Directions, Size);
-        if (fBLOOM_GAMMA == 8) return radial_BLOOM_GAMMA_8(Quality, Directions, Size);
-        if (fBLOOM_GAMMA == 9) return radial_BLOOM_GAMMA_9(Quality, Directions, Size);
-        if (fBLOOM_GAMMA == 10) return radial_BLOOM_GAMMA_10(Quality, Directions, Size);
-        return radial_bloom_std_pow(Quality, Directions, Size, fBLOOM_GAMMA);
+    vec2 passo = dest_size/smpsize.xy ;
+
+    vec3 color  = vec3(0.0,0.0,0.0);
+
+    vec3 lookup = vec3(0.0,0.0,0.0);
+    //color =  pow(textureLod(smp, uv , lod).rgb, vec3(gamma)) ;
+
+    for(float i=1.0/quality; i<=1.0; i+=1.0/quality) {
+        color += pow_3(textureLod(smp, uv + ( passo *i* vec2(-1.0,  r_off )), lod ).rgb);
+        color += pow_3(textureLod(smp, uv + ( passo *i* vec2( 1.0, -r_off )), lod ).rgb);
+
+        color += pow_3(textureLod(smp, uv + ( passo *i* vec2( r_off, -1.0)), lod ).rgb);
+        color += pow_3(textureLod(smp, uv + ( passo *i* vec2(-r_off, 1.0)), lod ).rgb);
+
+        color += pow_3(textureLod(smp, uv + ( passo *i* vec2( r_off,   1.0)), lod ).rgb);
+        color += pow_3(textureLod(smp, uv + ( passo *i* vec2(-r_off, -1.0)), lod ).rgb);
+
+        color += pow_3(textureLod(smp, uv + ( passo *i* vec2(-1.0,  -r_off)), lod ).rgb);
+        color += pow_3(textureLod(smp, uv + ( passo *i* vec2( 1.0,   r_off)), lod ).rgb);
+    }
+    color /= (quality*8);
+    return color;
+}
+
+vec3 bloom8_gamma4(sampler2D smp, vec2 uv, vec4 smpsize, vec2 dest_size, float quality, float r_off, float lod) {
+
+    vec2 passo = dest_size/smpsize.xy ;
+
+    vec3 color  = vec3(0.0,0.0,0.0);
+
+    vec3 lookup = vec3(0.0,0.0,0.0);
+    //color =  pow(textureLod(smp, uv , lod).rgb, vec3(gamma)) ;
+
+    for(float i=1.0/quality; i<=1.0; i+=1.0/quality) {
+        color += pow_4(textureLod(smp, uv + ( passo *i* vec2(-1.0,  r_off )), lod ).rgb);
+        color += pow_4(textureLod(smp, uv + ( passo *i* vec2( 1.0, -r_off )), lod ).rgb);
+
+        color += pow_4(textureLod(smp, uv + ( passo *i* vec2( r_off, -1.0)), lod ).rgb);
+        color += pow_4(textureLod(smp, uv + ( passo *i* vec2(-r_off, 1.0)), lod ).rgb);
+
+        color += pow_4(textureLod(smp, uv + ( passo *i* vec2( r_off,   1.0)), lod ).rgb);
+        color += pow_4(textureLod(smp, uv + ( passo *i* vec2(-r_off, -1.0)), lod ).rgb);
+
+        color += pow_4(textureLod(smp, uv + ( passo *i* vec2(-1.0,  -r_off)), lod ).rgb);
+        color += pow_4(textureLod(smp, uv + ( passo *i* vec2( 1.0,   r_off)), lod ).rgb);
+    }
+    color /= (quality*8);
+    return color;
+}
+
+vec3 bloom8_gamma5(sampler2D smp, vec2 uv, vec4 smpsize, vec2 dest_size, float quality, float r_off, float lod) {
+
+    vec2 passo = dest_size/smpsize.xy ;
+
+    vec3 color  = vec3(0.0,0.0,0.0);
+
+    vec3 lookup = vec3(0.0,0.0,0.0);
+    //color =  pow(textureLod(smp, uv , lod).rgb, vec3(gamma)) ;
+
+    for(float i=1.0/quality; i<=1.0; i+=1.0/quality) {
+        color += pow_5(textureLod(smp, uv + ( passo *i* vec2(-1.0,  r_off )), lod ).rgb);
+        color += pow_5(textureLod(smp, uv + ( passo *i* vec2( 1.0, -r_off )), lod ).rgb);
+
+        color += pow_5(textureLod(smp, uv + ( passo *i* vec2( r_off, -1.0)), lod ).rgb);
+        color += pow_5(textureLod(smp, uv + ( passo *i* vec2(-r_off, 1.0)), lod ).rgb);
+
+        color += pow_5(textureLod(smp, uv + ( passo *i* vec2( r_off,   1.0)), lod ).rgb);
+        color += pow_5(textureLod(smp, uv + ( passo *i* vec2(-r_off, -1.0)), lod ).rgb);
+
+        color += pow_5(textureLod(smp, uv + ( passo *i* vec2(-1.0,  -r_off)), lod ).rgb);
+        color += pow_5(textureLod(smp, uv + ( passo *i* vec2( 1.0,   r_off)), lod ).rgb);
+    }
+    color /= (quality*8);
+    return color;
+}
+
+vec3 bloom8_gamma6(sampler2D smp, vec2 uv, vec4 smpsize, vec2 dest_size, float quality, float r_off, float lod) {
+
+    vec2 passo = dest_size/smpsize.xy ;
+
+    vec3 color  = vec3(0.0,0.0,0.0);
+
+    vec3 lookup = vec3(0.0,0.0,0.0);
+    //color =  pow(textureLod(smp, uv , lod).rgb, vec3(gamma)) ;
+
+    for(float i=1.0/quality; i<=1.0; i+=1.0/quality) {
+        color += pow_6(textureLod(smp, uv + ( passo *i* vec2(-1.0,  r_off )), lod ).rgb);
+        color += pow_6(textureLod(smp, uv + ( passo *i* vec2( 1.0, -r_off )), lod ).rgb);
+
+        color += pow_6(textureLod(smp, uv + ( passo *i* vec2( r_off, -1.0)), lod ).rgb);
+        color += pow_6(textureLod(smp, uv + ( passo *i* vec2(-r_off, 1.0)), lod ).rgb);
+
+        color += pow_6(textureLod(smp, uv + ( passo *i* vec2( r_off,   1.0)), lod ).rgb);
+        color += pow_6(textureLod(smp, uv + ( passo *i* vec2(-r_off, -1.0)), lod ).rgb);
+
+        color += pow_6(textureLod(smp, uv + ( passo *i* vec2(-1.0,  -r_off)), lod ).rgb);
+        color += pow_6(textureLod(smp, uv + ( passo *i* vec2( 1.0,   r_off)), lod ).rgb);
+    }
+    color /= (quality*8);
+    return color;
+}
+
+vec3 bloom8_gamma7(sampler2D smp, vec2 uv, vec4 smpsize, vec2 dest_size, float quality, float r_off, float lod) {
+
+    vec2 passo = dest_size/smpsize.xy ;
+
+    vec3 color  = vec3(0.0,0.0,0.0);
+
+    vec3 lookup = vec3(0.0,0.0,0.0);
+    //color =  pow(textureLod(smp, uv , lod).rgb, vec3(gamma)) ;
+
+    for(float i=1.0/quality; i<=1.0; i+=1.0/quality) {
+        color += pow_7(textureLod(smp, uv + ( passo *i* vec2(-1.0,  r_off )), lod ).rgb);
+        color += pow_7(textureLod(smp, uv + ( passo *i* vec2( 1.0, -r_off )), lod ).rgb);
+
+        color += pow_7(textureLod(smp, uv + ( passo *i* vec2( r_off, -1.0)), lod ).rgb);
+        color += pow_7(textureLod(smp, uv + ( passo *i* vec2(-r_off, 1.0)), lod ).rgb);
+
+        color += pow_7(textureLod(smp, uv + ( passo *i* vec2( r_off,   1.0)), lod ).rgb);
+        color += pow_7(textureLod(smp, uv + ( passo *i* vec2(-r_off, -1.0)), lod ).rgb);
+
+        color += pow_7(textureLod(smp, uv + ( passo *i* vec2(-1.0,  -r_off)), lod ).rgb);
+        color += pow_7(textureLod(smp, uv + ( passo *i* vec2( 1.0,   r_off)), lod ).rgb);
+    }
+    color /= (quality*8);
+    return color;
+}
+
+vec3 bloom8_gamma8(sampler2D smp, vec2 uv, vec4 smpsize, vec2 dest_size, float quality, float r_off, float lod) {
+
+    vec2 passo = dest_size/smpsize.xy ;
+
+    vec3 color  = vec3(0.0,0.0,0.0);
+
+    vec3 lookup = vec3(0.0,0.0,0.0);
+    //color =  pow(textureLod(smp, uv , lod).rgb, vec3(gamma)) ;
+
+    for(float i=1.0/quality; i<=1.0; i+=1.0/quality) {
+        color += pow_8(textureLod(smp, uv + ( passo *i* vec2(-1.0,  r_off )), lod ).rgb);
+        color += pow_8(textureLod(smp, uv + ( passo *i* vec2( 1.0, -r_off )), lod ).rgb);
+
+        color += pow_8(textureLod(smp, uv + ( passo *i* vec2( r_off, -1.0)), lod ).rgb);
+        color += pow_8(textureLod(smp, uv + ( passo *i* vec2(-r_off, 1.0)), lod ).rgb);
+
+        color += pow_8(textureLod(smp, uv + ( passo *i* vec2( r_off,   1.0)), lod ).rgb);
+        color += pow_8(textureLod(smp, uv + ( passo *i* vec2(-r_off, -1.0)), lod ).rgb);
+
+        color += pow_8(textureLod(smp, uv + ( passo *i* vec2(-1.0,  -r_off)), lod ).rgb);
+        color += pow_8(textureLod(smp, uv + ( passo *i* vec2( 1.0,   r_off)), lod ).rgb);
+    }
+    color /= (quality*8);
+    return color;
+}
+
+vec3 bloom8_gamma9(sampler2D smp, vec2 uv, vec4 smpsize, vec2 dest_size, float quality, float r_off, float lod) {
+
+    vec2 passo = dest_size/smpsize.xy ;
+
+    vec3 color  = vec3(0.0,0.0,0.0);
+
+    vec3 lookup = vec3(0.0,0.0,0.0);
+    //color =  pow(textureLod(smp, uv , lod).rgb, vec3(gamma)) ;
+
+    for(float i=1.0/quality; i<=1.0; i+=1.0/quality) {
+        color += pow_9(textureLod(smp, uv + ( passo *i* vec2(-1.0,  r_off )), lod ).rgb);
+        color += pow_9(textureLod(smp, uv + ( passo *i* vec2( 1.0, -r_off )), lod ).rgb);
+
+        color += pow_9(textureLod(smp, uv + ( passo *i* vec2( r_off, -1.0)), lod ).rgb);
+        color += pow_9(textureLod(smp, uv + ( passo *i* vec2(-r_off, 1.0)), lod ).rgb);
+
+        color += pow_9(textureLod(smp, uv + ( passo *i* vec2( r_off,   1.0)), lod ).rgb);
+        color += pow_9(textureLod(smp, uv + ( passo *i* vec2(-r_off, -1.0)), lod ).rgb);
+
+        color += pow_9(textureLod(smp, uv + ( passo *i* vec2(-1.0,  -r_off)), lod ).rgb);
+        color += pow_9(textureLod(smp, uv + ( passo *i* vec2( 1.0,   r_off)), lod ).rgb);
+    }
+    color /= (quality*8);
+    return color;
+}
+
+vec3 bloom8_gamma10(sampler2D smp, vec2 uv, vec4 smpsize, vec2 dest_size, float quality, float r_off, float lod) {
+
+    vec2 passo = dest_size/smpsize.xy ;
+
+    vec3 color  = vec3(0.0,0.0,0.0);
+
+    vec3 lookup = vec3(0.0,0.0,0.0);
+    //color =  pow(textureLod(smp, uv , lod).rgb, vec3(gamma)) ;
+
+    for(float i=1.0/quality; i<=1.0; i+=1.0/quality) {
+        color += pow_10(textureLod(smp, uv + ( passo *i* vec2(-1.0,  r_off )), lod ).rgb);
+        color += pow_10(textureLod(smp, uv + ( passo *i* vec2( 1.0, -r_off )), lod ).rgb);
+
+        color += pow_10(textureLod(smp, uv + ( passo *i* vec2( r_off, -1.0)), lod ).rgb);
+        color += pow_10(textureLod(smp, uv + ( passo *i* vec2(-r_off, 1.0)), lod ).rgb);
+
+        color += pow_10(textureLod(smp, uv + ( passo *i* vec2( r_off,   1.0)), lod ).rgb);
+        color += pow_10(textureLod(smp, uv + ( passo *i* vec2(-r_off, -1.0)), lod ).rgb);
+
+        color += pow_10(textureLod(smp, uv + ( passo *i* vec2(-1.0,  -r_off)), lod ).rgb);
+        color += pow_10(textureLod(smp, uv + ( passo *i* vec2( 1.0,   r_off)), lod ).rgb);
+    }
+    color /= (quality*8);
+    return color;
+}
+
+
+vec3 bloom(sampler2D smp, vec2 uv, vec4 smpsize, vec2 dest_size, float quality, float gamma, float r_off, float lod) {
+        if (gamma == 1) return bloom8_gamma1(smp, uv, smpsize, dest_size, quality, r_off, lod);
+        if (gamma == 2) return bloom8_gamma2(smp, uv, smpsize, dest_size, quality, r_off, lod);
+        if (gamma == 3) return bloom8_gamma3(smp, uv, smpsize, dest_size, quality, r_off, lod);
+        if (gamma == 4) return bloom8_gamma4(smp, uv, smpsize, dest_size, quality, r_off, lod);
+        if (gamma == 5) return bloom8_gamma5(smp, uv, smpsize, dest_size, quality, r_off, lod);
+        if (gamma == 6) return bloom8_gamma6(smp, uv, smpsize, dest_size, quality, r_off, lod);
+        if (gamma == 7) return bloom8_gamma7(smp, uv, smpsize, dest_size, quality, r_off, lod);
+        if (gamma == 8) return bloom8_gamma8(smp, uv, smpsize, dest_size, quality, r_off, lod);
+        if (gamma == 9) return bloom8_gamma9(smp, uv, smpsize, dest_size, quality, r_off, lod);
+        if (gamma == 10) return bloom8_gamma10(smp, uv, smpsize, dest_size, quality, r_off, lod);
+        return bloom8_std_pow(smp, uv, smpsize, dest_size, quality, gamma, r_off, lod);
 }

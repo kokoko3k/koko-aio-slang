@@ -1,3 +1,7 @@
+vec3 pow_2(vec3 v) {
+    return v*v*v;
+}
+
 vec3 pow_3(vec3 v) {
     return v*v*v;
 }
