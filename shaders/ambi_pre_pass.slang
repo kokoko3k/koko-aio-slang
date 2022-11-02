@@ -55,8 +55,8 @@ vec3 circle_smooth(vec2 coords, vec2 middle, float f_radius, float FALLOFF, floa
 }
 
 
-#define tol_start 0.03 //skip tolerance
-#define tol_end   0.97 //1-tol_start
+#define tol_start 0.06 //skip tolerance
+#define tol_end   0.94 //1-tol_start
 /*
 #define leds_per_strip 8
 #define AMBI_FALLOFF 0.7  //As a general rule, AMBI_FALLOFF+AMBI_POWER < 1.0+internalness
