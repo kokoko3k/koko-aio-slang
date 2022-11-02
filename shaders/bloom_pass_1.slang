@@ -22,6 +22,7 @@ layout(set = 0, binding = 2) uniform sampler2D first_pass;
 // shamlessly hidden into an include:
 #include "includes/blooms.include.slang"
 
+#include "includes/functions.include.slang"
 void main() {
 
     if (DO_BLOOM == 1.0) {
@@ -34,8 +35,9 @@ void main() {
             BLOOM_GAMMA,
             0.0,
             0.0
-        ) * BLOOM_POWER;
+        );
 
+        bloomed = apply_fuzzy_main_pass(bloomed) * BLOOM_POWER;
         FragColor = vec4(bloomed, 1.0);
 
     } else {
