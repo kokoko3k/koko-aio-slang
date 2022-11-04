@@ -30,7 +30,7 @@ input glow gamma 3: 40          5.4                 36.75               35.2
      ambient light: 38          3.4                 32.1                33.6
              Bezel:                                 37.5                33.7
 -----------------------------------------------
-Total basal + all the features: 72.2                65.3                65.2           61.00
+Total basal + all the features: 72.2                65.3                65.2           61.2 (bloom q1)
     
 */
 
@@ -55,32 +55,8 @@ Total basal + all the features: 72.2                65.3                65.2    
 
 
 
-* Pipeline (outdated) *
-------------
 
-→ → Original image from emulator
-     ↓
-    Double the input size
-     ↓
-    FXAA antialiasing
-     ↓
-    Emulate scanlines → Input Glow → phosphors → slot mask/aperture grill →  halo →
-                                                                                    ↓
-                                                                                    ↓
-→ → Original image from emulator                                                    ↓
-     ↓                                                                              ↓
-    Bloom                                                                           ↓
-     ↓                                                                              ↓
-    mix  ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ←
-     ↓
-    Color correction → Vignette, spot → Black frame insertion
-                                                ↓
-                                            Viewport
-
-
-*/
-
-
+    
 /* Bezel texture contains the following infomations:
    - The red channel represents the luminance information
    - The green channel represents the highlights

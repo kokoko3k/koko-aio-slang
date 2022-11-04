@@ -32,12 +32,12 @@ void main() {
             vec2(BLOOM_SIZE),
             BLOOM_QUALITY,
             1.0,
-            0.125,
+            0.196349540625,
             0.0
         );
 
         FragColor = vec4(bloomed.rgb, 1.0);
-
+                                                                                            //FragColor = texture(Source,vTexCoord);
     } else {
         return ;
     }
