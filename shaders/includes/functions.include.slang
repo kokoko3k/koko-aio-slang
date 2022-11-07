@@ -130,17 +130,15 @@ float random(float power) {
 	}
 
 
-	vec2 Warp(vec2 texCoord,float wx, float wy){
-		vec2 curvedCoords = texCoord * 2.0 - 1.0;
-		vec2 CRT_Distortion = vec2(wx, wy) * 15.;
-		float curvedCoordsDistance = sqrt(curvedCoords.x*curvedCoords.x+curvedCoords.y*curvedCoords.y);
-
-		curvedCoords = curvedCoords / curvedCoordsDistance;
-		curvedCoords = curvedCoords * (1.0-pow(vec2(1.0-(curvedCoordsDistance/1.4142135623730950488016887242097)),(1.0/(1.0+CRT_Distortion*0.2))));
-		curvedCoords = curvedCoords / (1.0-pow(vec2(0.29289321881345247559915563789515),(1.0/(vec2(1.0)+CRT_Distortion*0.2))));
-		curvedCoords = curvedCoords * 0.5 + 0.5;
-		
-		return curvedCoords;
+	vec2 Warp(vec2 uv,float wx, float wy){
+		uv = uv * 2.0 - 1.0;
+		vec2 CRT_Distortion = vec2(wx, wy);
+		float curvedCoordsDistance = length(uv);
+		uv /= curvedCoordsDistance;
+		uv *= (1.0-pow(vec2(1.0-(curvedCoordsDistance/1.4142135623730950488016887242097)),(1.0/(1.0+CRT_Distortion*0.2))));
+		uv /= (1.0-pow(vec2(0.29289321881345247559915563789515),(1.0/(vec2(1.0)+CRT_Distortion*0.2))));
+		uv = uv* 0.5 + 0.5;
+		return uv;
 	}
 
 
