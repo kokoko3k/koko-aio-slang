@@ -18,7 +18,7 @@ void main()
 
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 0) out vec4 FragColor;
-layout(set = 0, binding = 3) uniform sampler2D FXAA_pass;
+layout(set = 0, binding = 3) uniform sampler2D FXAA_and_chroma_bleed_pass;
 layout(set = 0, binding = 4) uniform sampler2D first_pass;
 
 
@@ -37,8 +37,8 @@ void main() {
    if (DO_IN_GLOW == 0.0) return;
    
    vec3 pixel_glowed;
-   if (DO_FXAA == 1.0)
-      pixel_glowed = pixel_glow(FXAA_pass, IN_GLOW_WH,IN_GLOW_WH,IN_GLOW_POWER,IN_GLOW_GAMMA,vTexCoord, params.OutputSize, params.OutputSize).rgb;
+   if (DO_FXAA + DO_SAT_BLEED > 0.0)
+      pixel_glowed = pixel_glow(FXAA_and_chroma_bleed_pass, IN_GLOW_WH,IN_GLOW_WH,IN_GLOW_POWER,IN_GLOW_GAMMA,vTexCoord, params.OutputSize, params.OutputSize).rgb;
          else
       pixel_glowed = pixel_glow(first_pass, IN_GLOW_WH,IN_GLOW_WH,IN_GLOW_POWER,IN_GLOW_GAMMA,vTexCoord, params.OutputSize, params.OutputSize).rgb;
       

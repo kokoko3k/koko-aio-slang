@@ -104,8 +104,8 @@ shaders = 16
 /* Nvidia fxaa pass:
    works good for "SD" resolutions
 */
-           shader1 = shaders/fxaa.slang
-            alias1 = "FXAA_pass"
+           shader1 = shaders/fxaa_and_chroma_bleed.slang
+            alias1 = "FXAA_and_chroma_bleed_pass"
     filter_linear1 = true
        scale_type1 = source
             scale1 = 1.0

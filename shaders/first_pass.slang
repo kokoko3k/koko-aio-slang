@@ -69,17 +69,6 @@ layout(set = 0, binding = 2) uniform sampler2D Source;
 #include "includes/functions.include.slang"
 
 
-/*vec3 rgb2hsv(vec3 c){
-   vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
-   vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));
-   vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
-
-   float d = q.x - min(q.w, q.y);
-   float e = 1.0e-10;
-   return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
-}*/
-
-
 vec3 pixel_offset(vec3 pixel_cur,vec2 coord) {
       vec2 d = -vec2(params.SourceSize.z, params.SourceSize.w)*0.5;
       vec3 pixel_offset;
@@ -133,34 +122,15 @@ vec3 pixel_flickering() {
    }
 }
 
+
+
+
 void main() { 
-   /*vec3 previous_pixel1 = texture(Source,vTexCoord - vec2(params.SourceSize.z*1.0,0.0)).rgb;
-   float previous_sat1 = rgb2hsv(previous_pixel1).y;
-   vec3 previous_pixel2 = texture(Source,vTexCoord - vec2(params.SourceSize.z*1.5,0.0)).rgb;
-   float previous_sat2 = rgb2hsv(previous_pixel2).y;
-   previous_sat1*=0.75;
-   previous_sat2*=0.25;
-   
-   vec3 next_pixel1 = texture(Source,vTexCoord + vec2(params.SourceSize.z*0.5,0.0)).rgb;
-   float next_sat1 = rgb2hsv(next_pixel1).y;
-   vec3 next_pixel2 = texture(Source,vTexCoord + vec2(params.SourceSize.z*1,0.0)).rgb;
-   float next_sat2 = rgb2hsv(next_pixel2).y;
-   next_sat1*=0.75;
-   next_sat2*=0.25;   
-   
-   vec3 current_pixel = texture(Source,vTexCoord).rgb;
-   
-   vec3 result_pixel = mix(current_pixel,previous_pixel1,previous_sat1);
-   result_pixel = mix(result_pixel,previous_pixel2,previous_sat2);
-   //result_pixel = mix(result_pixel,next_pixel2,next_sat2);
-   //result_pixel = mix(result_pixel,next_pixel2,next_sat2);
-   
-   FragColor = vec4(result_pixel, 0.0);
-   return;
-   */
-   
+
+
    
 
+   
    /* since flickering code needs
       luminosity difference between 2 vertical lines
       both have to be processed through color corrections and rgb pixel offsets.

@@ -1,0 +1,14 @@
+#reference "/koko/koko-aio-slang/presets/1080p/koko-aio-crt-monitor-slotmask.slangp"
+DO_SAT_BLEED = "1.000000"
+
+DO_SHIFT_RGB = "1.000000"
+	SHIFT_R = "2.000000"
+	SHIFT_G = "20.000000"
+	SHIFT_B = "-2.000000"
+
+	SATURATION = "0.850000"
+	CONTRAST = "0.050000"
+	BRIGHTNESS = "0.050000"
+	TEMPERATURE = "7000.000000"
+
+	IN_GLOW_WH = "1.500000"

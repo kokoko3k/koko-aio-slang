@@ -26,7 +26,7 @@ void main() {
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in vec2 vOutputCoord;
 layout(location = 0) out vec4 FragColor;
-layout(set = 0, binding = 2) uniform sampler2D FXAA_pass;
+layout(set = 0, binding = 2) uniform sampler2D FXAA_and_chroma_bleed_pass;
 layout(set = 0, binding = 3) uniform sampler2D first_pass;
 layout(set = 0, binding = 4) uniform sampler2D in_glow_pass;
 
@@ -41,11 +41,11 @@ vec4 main_wrap(void) {
     vec2 halo_coords = vTexCoord;
 
     if (DO_IN_GLOW == 1.0)
-        pixel_haloed = pixel_glow(in_glow_pass, HALO_W,HALO_H,HALO_POWER,HALO_GAMMA,halo_coords, global.FXAA_passSize, global.FXAA_passSize).rgb;
-    else if (DO_FXAA == 1.0)
-        pixel_haloed = pixel_glow(FXAA_pass, HALO_W,HALO_H,HALO_POWER,HALO_GAMMA,halo_coords, global.FXAA_passSize, global.FXAA_passSize).rgb;
+        pixel_haloed = pixel_glow(in_glow_pass, HALO_W,HALO_H,HALO_POWER,HALO_GAMMA,halo_coords, global.FXAA_and_chroma_bleed_passSize, global.FXAA_and_chroma_bleed_passSize).rgb;
+    else if (DO_FXAA + DO_SAT_BLEED > 0.0)
+        pixel_haloed = pixel_glow(FXAA_and_chroma_bleed_pass, HALO_W,HALO_H,HALO_POWER,HALO_GAMMA,halo_coords, global.FXAA_and_chroma_bleed_passSize, global.FXAA_and_chroma_bleed_passSize).rgb;
     else
-        pixel_haloed = pixel_glow(first_pass, HALO_W,HALO_H,HALO_POWER,HALO_GAMMA,halo_coords, global.FXAA_passSize, global.FXAA_passSize).rgb;
+        pixel_haloed = pixel_glow(first_pass, HALO_W,HALO_H,HALO_POWER,HALO_GAMMA,halo_coords, global.FXAA_and_chroma_bleed_passSize, global.FXAA_and_chroma_bleed_passSize).rgb;
         
     return vec4(pixel_haloed.rgb,1.0);
 }

@@ -34,6 +34,10 @@
 	// se put the following as higher as possible to trade the things.
 #define HALO_CLAMP 1.4
 
+
+#define NTSC_XRES 320
+#define NTSC_YRES 224
+
 layout(push_constant) uniform Push
 {
 	vec4 SourceSize;
@@ -65,7 +69,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	
 	vec4 FinalViewportSize;
 	vec4 in_glow_passSize;
-	vec4 FXAA_passSize;
+	vec4 FXAA_and_chroma_bleed_passSize;
 	//vec4 main_passSize;
 	//vec4 monitor_bodySize;
 	//vec4 bgSize;
@@ -93,6 +97,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
   	float ALT_BLANK_STRENGTH ; //2 FIXME to 1
   	float ALT_BLANK_PERIOD ;
 	float DO_FXAA ; //1
+	float DO_SAT_BLEED;
 	float SCANLINE_FLICKERING ; //2
 	float SCANLINE_FLICKERING_POWER;
 	float SCANLINE_DISABLE_ON_INTERLACE;
@@ -160,6 +165,8 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter SHIFT_B         "        Blue offset"			20.0 	-210.0 189.0 1
 #pragma parameter OFFSET_STRENGTH "        Strength"			0.5 	 0.0 1.0 0.1
 
+// Chroma bleeding, (very) poor man's ntsc filter.
+#pragma parameter DO_SAT_BLEED "★ Saturated color bleeding enable? ==>"	0.0 	0.0 1.0 1.0
 
 // Color correction
 #pragma parameter DO_CCORRECTION "★ Color corrections enable? ==>" 			0.0 	0.0 1.0 1.0
@@ -175,7 +182,6 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // FXAA
 // Apply an antialiasing filter via FXAA from Nvidia.
 #pragma parameter DO_FXAA "★ FXAA enable? ==>"	1.0 	0.0 1.0 1.0
-
 
 // Scanlines
 // Blank even source lines, the value from 0.0 to 1.0 expresses the darkness of the blanked lines
@@ -352,6 +358,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 
 #define DO_FXAA        global.DO_FXAA
+#define DO_SAT_BLEED   global.DO_SAT_BLEED
 //#define prefer_std_pow params.prefer_std_pow
 
 #define DO_SCANLINES                  global.DO_SCANLINES

@@ -38,7 +38,7 @@ layout(set = 0, binding = 8) uniform sampler2D bg;
 layout(set = 0, binding = 9) uniform sampler2D first_pass;
 
 //Ex main_pass layouts:
-    layout(set = 0, binding = 10) uniform sampler2D FXAA_pass;
+    layout(set = 0, binding = 10) uniform sampler2D FXAA_and_chroma_bleed_pass;
     layout(set = 0, binding = 11) uniform sampler2D in_glow_pass;
     layout(set = 0, binding = 12) uniform sampler2D halo_pass;
     //layout(set = 0, binding = 13) uniform sampler2D first_pass;
@@ -190,8 +190,8 @@ vec4 pixel_main_pass(vec2 coords) {
             pixel_glowed = texture(in_glow_pass,coords).rgb;
             pixel_in = pixel_glowed;
         }
-            else if (DO_FXAA == 1.0) 
-        pixel_in = texture(FXAA_pass,coords).rgb ;
+            else if (DO_FXAA + DO_SAT_BLEED > 0.0)
+        pixel_in = texture(FXAA_and_chroma_bleed_pass,coords).rgb ;
             else
         pixel_in = texture(first_pass,coords).rgb ;
 
