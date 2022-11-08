@@ -264,11 +264,13 @@ float displace(float power) {
 
 float global_noise;
 
+
 vec4 pixel_background_image(){
-    vec2 tex_size = textureSize(bg, 0);
+    float BG_ZOOM = 1.0;
+    vec2 tex_size = textureSize(bg, 0) * BG_ZOOM;
     float bg_lod = log2(tex_size.y / global.FinalViewportSize.y);
     vec2 back_coords =  get_scaled_coords_aspect(vOutputCoord,global.FinalViewportSize, tex_size.x/tex_size.y, is_rotated());
-    //back_coords=zoom(back_coords,1.0);
+    back_coords=zoom(back_coords, BG_ZOOM);
     return textureLod(bg,back_coords,bg_lod);
 }
 
@@ -278,11 +280,13 @@ vec3 ambi_noised() {
 
 
 vec3 pixel_border(bool image_over) {
-    vec3 pixel_out = vec3(0.0);
+    vec3 pixel_out = vec3(1.0);
     if (DO_AMBILIGHT == 1.0)
         pixel_out = ambi_noised();
-    if (DO_BG_IMAGE == 1.0 && !image_over)
-        pixel_out += pixel_background_image().rgb;
+    if (DO_BG_IMAGE == 1.0 && !image_over) {
+        vec4 bg_image = pixel_background_image();
+        pixel_out = mix(pixel_out,bg_image.rgb,bg_image.a);
+    }
     return pixel_out;
 }
 

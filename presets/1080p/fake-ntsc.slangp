@@ -1,4 +1,4 @@
-#reference "/koko/koko-aio-slang/presets/1080p/koko-aio-crt-monitor-slotmask.slangp"
+#reference "koko-aio-crt-monitor-slotmask.slangp"
 DO_SAT_BLEED = "1.000000"
 
 DO_SHIFT_RGB = "1.000000"
