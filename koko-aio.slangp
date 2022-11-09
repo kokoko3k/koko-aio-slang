@@ -67,16 +67,15 @@ Total basal + all the features: 72.2                65.3                65.2    
 
                 textures = "monitor_body;bg"
                 
-            monitor_body = "textures/f1.png"
+            monitor_body = "textures/monitor_body.png"
      monitor_body_linear = "true"
   monitor_body_wrap_mode = "clamp_to_edge" //Does this work?
      monitor_body_mipmap = "true"
 
-                      bg = "textures/bg.png"
+                      bg = "textures/background.png"
                bg_linear = "true"
             bg_wrap_mode = "mirrored_repeat"
                bg_mipmap = "true"
-
 
 
 shaders = 16

@@ -8,23 +8,29 @@ While it is not meant to simulate the internal behaviour of CRT displays,<br>
 it aims to give users "visual" parameters to make their monitors look similar.<br>
 Several presets are included.<br>
 
+***Additional documentation:***
+* [See here](docs.md)
+
 ***Actually, it provides emulation for:***
 * Scanlines
 * Screenlines
 * RGB phosphors
+* Chroma shifting, bleeding.
 * Aperture grille and slot mask.
 * Input signal glowing
 * Output signal glowing
 * Blooming
-* Gamma and SATURATION correction,
+* Gamma, contrast, saturation color temperature adjustments,
 * Black frame insertions through alternate blanking
-* Interlace forcing and emulation
+* Interlace flickering, forcing and emulation
 * Antialiasing
 * Curvature
 * Ambient lights
 * Vignette and Spotlight
 * Bezel (Thank you HyperspaceMadness for allowing me to rip his automagically generated bezel!)
   https://github.com/HyperspaceMadness/
+* Background images
+* Full screen glowing
 
 ***External code by:***
 * CRT - Guest - Dr.Venom (single pass bloom function)

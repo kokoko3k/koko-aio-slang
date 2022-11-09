@@ -201,7 +201,6 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 // Input glowing
 // Emulates the glowing of the input signal by blurring it with "IN_GLOW_WH" sharpness.
-// The blur always affects horizontal sharpness, vertical sharpness is affected only if Dark scanline brightness is < 1.0.
 // Apply a gamma filter "IN_GLOW_GAMMA" to "light" it, multiplying the result by "IN_GLOW_POWER" and
 // finally interpolating(*) it with the source image.
 // "IN_GLOW_ADD" allows to modulate from interpolation(*) to a sum, wihch may (or not) produce better effects.
@@ -236,7 +235,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // "DO_DARKLINES_VOFFSET" lets you to vertically offset by ""DARKLINES_PERIOD/2" the lines every 3 screen pixels,
 // allowing, in conjunction with RGB mask, to emulate slot mask
 
-#pragma parameter DO_VMASK_AND_DARKLINES "★  Mask RGB and/or Darklines enable? ==>"         	1.0 	0.0 1.0 1.0
+#pragma parameter DO_VMASK_AND_DARKLINES "★  RGB Masks and/or Darklines enable? ==>"         	1.0 	0.0 1.0 1.0
 #pragma parameter VMASK_DARKLINE_SCALE   "        (HiDPI) Vmask and Darklines multiplier"	1.0  	1.0 4.0 1.0
 #pragma parameter RGB_MASK_STRENGTH      "        Vmask Strength (0.0 to disable)"		0.75  	0.0 1.0 0.05
 #pragma parameter VMASK_USE_GM           "        RGB Mask: (LoDPI) Green,Magenta -> BGR"	0.0  	0.0 1.0 1.0
@@ -283,15 +282,12 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter BLOOM_OVER_WHITE   "        Strength on bright areas (0 = aura)"	0.5  0.0 1.0  0.05
 #pragma parameter BLOOM_BYPASS       "        Bypass"					0.0  0.0 1.0  1.0
 
-
-
 //Curvature parameters:
 #pragma parameter DO_CURVATURE	     "★ Curvature enable? ==>"				0.0   0.0 1.0 1.0
 #pragma parameter GEOM_WARP_X        "        Warp X"				0.3  0.0 6.0 0.05
 #pragma parameter GEOM_WARP_Y        "        Warp Y"				0.0   0.0 6.0 0.05
-#pragma parameter GEOM_CORNER_SIZE   "        Corner Size"			0.01  0.01 0.1 0.005
+#pragma parameter GEOM_CORNER_SIZE   "        Corner radius"			0.01  0.01 0.1 0.005
 #pragma parameter GEOM_CORNER_SMOOTH "        Corner sharpness"			350.0 50.0 1000.0 25.0
-
 
 //Bezel related
 #pragma parameter DO_BEZEL	     "★ Bezel enable? ==>"				0.0   0.0 1.0 1.0
@@ -299,28 +295,24 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter BEZEL_G            "        Bezel color: Green"		-0.3   -0.5 0.5  0.01
 #pragma parameter BEZEL_B            "        Bezel color: Blue"		-0.3   -0.5 0.5  0.01
 #pragma parameter BEZEL_CON          "        Bezel Contrast"			1.3   0.0  10.0 0.01
-#pragma parameter BEZEL_INNER_ZOOM   "        Image zoom"			-0.18   -0.5 0.5 0.01
-#pragma parameter BEZEL_FRAME_ZOOM   "        Frame zoom"			0.0   -0.5 0.5 0.01
+#pragma parameter BEZEL_INNER_ZOOM   "        Image zoom"			-0.18   -1.5 0.5 0.01
+#pragma parameter BEZEL_FRAME_ZOOM   "        Frame zoom"			0.0   -1.5 0.5 0.01
 #pragma parameter BEZEL_IMAGE_BORDER "        Image border"			1.01   1.0 1.2 0.01
 
+#pragma parameter DO_BG_IMAGE	 "★ Backgound image enable? ==>"				0.0  0.0  1.0     1.0
+#pragma parameter LABEL_WARNING1 "    ⚠ RetroArch aspect needs to be set to Full! ⚠"	1.0  1.0  1.0     1.0
+#pragma parameter BG_IMAGE_OVER	 "        Image over content (alpha channel driven)?"	0.0  0.0  1.0     1.0
 
-//Full screen glowing
-//Modulate the image zooming depending on the image luminosity.
-//You can lower the effect power through the DYNZOOM_FACTOR parameter.
-#pragma parameter DO_DYNZOOM	     "★ Luminosity dependant zoom enable? ==>"		1.0   0.0   1.0  1.0
-#pragma parameter DYNZOOM_FACTOR     "        narrowness"				80.0  30.0  120.0 1.0
 
 //Back leds
 //Emulates leds under the monitor frame that slowly reacts to image contents
-#pragma parameter DO_AMBILIGHT	 "★ Leds:"								1.0  0.0  1.0     1.0
-#pragma parameter LABEL_WARNING1 "    ⚠ RetroArch aspect needs to be set to Full! ⚠"			1.0  1.0  1.0     1.0
-#pragma parameter LABEL_WARNING2 "    ⚠ Resize the window once if you see glitches! ⚠"			1.0  1.0  1.0     1.0
+#pragma parameter DO_AMBILIGHT	 "★ Ambient light leds enable? ==> "					1.0  0.0  1.0     1.0
+#pragma parameter LABEL_WARNING3 "    ⚠ RetroArch aspect needs to be set to Full! ⚠"			1.0  1.0  1.0     1.0
+#pragma parameter LABEL_WARNING4 "    ⚠ Resize the window once if you see glitches! ⚠"			1.0  1.0  1.0     1.0
 #pragma parameter AMBI_STEPS	 "        Slowness"							60.0 5.0  1000.0  5.0
 #pragma parameter AMBI_FALLOFF   "        Light Falloff"						0.7  0.1  3.0     0.01
 #pragma parameter AMBI_POWER     "        Led power"							0.5  0.1  5.0     0.05
 
-#pragma parameter DO_BG_IMAGE	 "★ Back image (set RetroArch aspect ratio to full!): ==> "		0.0  0.0  1.0     1.0
-#pragma parameter BG_IMAGE_OVER	 "        Image over content (alpha channel driven)?"			0.0  0.0  1.0     1.0
 
 #pragma parameter label_ar	 "★ Aspect Ratio "							0.0  0.0  1.0     1.0
 #pragma parameter ASPECT_X       "        Aspect Ratio Numerator (-x for a preset below)"   		0.0  -5.0 256. 1.0
@@ -332,6 +324,12 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter label_aspect_preset3 "          (-3 = Snes 8/7)" 0.0 0.0 0.0 1.0
 #pragma parameter label_aspect_preset4 "          (-4 = Megadrive 10/7)" 0.0 0.0 0.0 1.0
 #pragma parameter label_aspect_preset5 "          (-5 = Uncorrected)" 0.0 0.0 0.0 1.0
+
+//Full screen glowing
+//Modulate the image zooming depending on the image luminosity.
+//You can lower the effect power through the DYNZOOM_FACTOR parameter.
+#pragma parameter DO_DYNZOOM	     "★ Luminosity dependant zoom enable? ==>"		1.0   0.0   1.0  1.0
+#pragma parameter DYNZOOM_FACTOR     "        Narrowness"				80.0  30.0  120.0 1.0
 
 
 //Vignette and spot
