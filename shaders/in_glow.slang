@@ -42,8 +42,15 @@ void main() {
          else
       pixel_glowed = pixel_glow(first_pass, IN_GLOW_WH,IN_GLOW_WH,IN_GLOW_POWER,IN_GLOW_GAMMA,vTexCoord, params.OutputSize, params.OutputSize).rgb;
       
-      if (IN_GLOW_ADD>0.0) pixel_glowed = mix(pixel_glowed,pixel_out+pixel_glowed,IN_GLOW_ADD);
-      pixel_out = pixel_glowed;
+      if (IN_GLOW_ADD>0.0) { 
+         if (DO_FXAA + DO_SAT_BLEED > 0.0) {
+            pixel_glowed = mix(pixel_glowed,texture(FXAA_and_chroma_bleed_pass, vTexCoord).rgb + pixel_glowed,IN_GLOW_ADD);
+         } else {
+            pixel_glowed = mix(pixel_glowed,texture(first_pass, vTexCoord).rgb + pixel_glowed,IN_GLOW_ADD);
+         }
+      }
+   
+   pixel_out = pixel_glowed;
 
    FragColor = vec4((pixel_out),1.0);
 }

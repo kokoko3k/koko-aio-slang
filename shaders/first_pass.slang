@@ -123,14 +123,24 @@ vec3 pixel_flickering() {
 }
 
 
+void debug() {
+   //Use one of the following to debug:
+      //FragColor=vec4(abs(sin(params.FrameCount/3.14/4))); //white fade
+      //FragColor=vec4(abs(sin(params.FrameCount/3.14/20)),0.0,0.0,0.0); //red fade
+      //FragColor=vec4(1.0);
+      //FragColor=vec4(0.38,0.0,1.0,1.0);
+      //FragColor=vec4(0.38,0.0,1.0,1.0)*vTexCoord.x;
+      FragColor=vec4(vTexCoord.x); //H bw gradient
+      //FragColor=vec4(floor(vTexCoord.x*16)/16); //H bw gradient 16gray
+      //FragColor=vec4(floor(vTexCoord.x*64)/64); //H bw gradient 64gray
+      //if  (mod(params.FrameCount,100) < 50) FragColor=vec4(0.0) ; else FragColor=vec4(1.0);  
+}
 
 
-void main() { 
+void main() {
+   //debug();
+   //return;
 
-
-   
-
-   
    /* since flickering code needs
       luminosity difference between 2 vertical lines
       both have to be processed through color corrections and rgb pixel offsets.
@@ -154,17 +164,7 @@ void main() {
    FragColor = vec4(pixel_no_flicker(vTexCoord),1.0);
       
 
-   
-   //Use one of the following to debug:
-      //FragColor=vec4(abs(sin(params.FrameCount/3.14/4))); //white fade
-      //FragColor=vec4(abs(sin(params.FrameCount/3.14/20)),0.0,0.0,0.0); //red fade
-      //FragColor=vec4(1.0);
-      //FragColor=vec4(0.38,0.0,1.0,1.0);
-      //FragColor=vec4(0.38,0.0,1.0,1.0)*vTexCoord.x;
-      //FragColor=vec4(vTexCoord.x); //H bw gradient
-      //FragColor=vec4(floor(vTexCoord.x*16)/16); //H bw gradient 16gray
-      //FragColor=vec4(floor(vTexCoord.x*64)/64); //H bw gradient 64gray
-      //if  (mod(params.FrameCount,100) < 50) FragColor=vec4(0.0) ; else FragColor=vec4(1.0);      
+    
 }
  
   

@@ -101,6 +101,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float SCANLINE_FLICKERING ; //2
 	float SCANLINE_FLICKERING_POWER;
 	float SCANLINE_DISABLE_ON_INTERLACE;
+	float SCANLINE_COMPENSATION;
 	float RGB_MASK_STRENGTH;
 	float DARKLINES_STRENGTH;
 	float GAMMA_OUT ; //1
@@ -186,9 +187,13 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // Scanlines
 // Blank even source lines, the value from 0.0 to 1.0 expresses the darkness of the blanked lines
 // 1.0 means no blank at all.
+// SCANLINE_DARK controls the gap brightness
+// SCANLINE_COMPENSATION will make scanlines brighter, where possible, to compensate for the loss of brightness
+// SCANLINE_BLEEDING will make the whiter part of the scanline to bright the gap.
 
 #pragma parameter DO_SCANLINES	"★ Scanlines enable? ==>"							1.0 	0.0  1.0 1.0
 #pragma parameter SCANLINE_DARK "        Scanlines gap brightness"			  			0.0 	-0.25 1.0 0.05
+#pragma parameter SCANLINE_COMPENSATION "        Compensate brightness loss"				0.0	0.0 1.0 0.1
 #pragma parameter SCANLINES_BLEEDING "        Scanlines bleeding"						0.0 	0.0 3.0 0.05
 
 // Alternate the drawing of the scanlines between frames. this will produce a flickering typical of
@@ -365,6 +370,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #define SCANLINE_FLICKERING           global.SCANLINE_FLICKERING
 #define SCANLINE_FLICKERING_POWER     global.SCANLINE_FLICKERING_POWER
 #define SCANLINE_DISABLE_ON_INTERLACE global.SCANLINE_DISABLE_ON_INTERLACE
+#define SCANLINE_COMPENSATION         global.SCANLINE_COMPENSATION
 
 #define DO_IN_GLOW               global.DO_IN_GLOW
 #define IN_GLOW_ADD              global.IN_GLOW_ADD

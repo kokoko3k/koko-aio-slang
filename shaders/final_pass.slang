@@ -221,7 +221,7 @@ vec4 pixel_main_pass(vec2 coords) {
     if (DO_HALO == 1.0 ) {
         pixel_haloed = texture(halo_pass,coords).rgb;
         pixel_out += pixel_haloed;
-        pixel_out = clamp(pixel_out,0.0,HALO_CLAMP);
+        //pixel_out = clamp(pixel_out,0.0,HALO_CLAMP);
     }
     
     // Non flickering scanlines
@@ -235,6 +235,15 @@ vec4 pixel_main_pass(vec2 coords) {
             }
         
             float scanline_shape =  scanline_shape(coords, flickering_scanlines ) ;
+
+            if (SCANLINE_COMPENSATION > 0.0) {
+                float pixel_out_whiteness = (pixel_out.r + pixel_out.g + pixel_out.b)/3.0;
+                pixel_out_whiteness = clamp(pixel_out_whiteness,0.0,1.0);
+                //float middleness = 1-abs(0.5-pixel_out_whiteness)*2;
+                pixel_out *= 1+vec3((1-pixel_out_whiteness) * (SCANLINE_COMPENSATION-SCANLINE_DARK) );
+            }
+            
+            
             vec3 pixel_scanlined = scanline_shape * pixel_out;
 
             pixel_out = pixel_scanlined + (pixel_out * pixel_bleed *  SCANLINES_BLEEDING * (1-scanline_shape));
