@@ -1,25 +1,237 @@
-# **koko-aio-slang parameters documentation**
+**koko-aio-slang parameters documentation**
 
----
 
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;'<br />**Shift RGB components:**<br />&nbsp; &nbsp; Shift R,G,B components separately to mimic chroma<br />&nbsp; &nbsp; dephasing and color aberrations.<br />&nbsp; &nbsp; By varying Red, Green and Blue offsets, the relative component will be<br />&nbsp; &nbsp; shifted column by column, row by row.<br />&nbsp; &nbsp;&nbsp;<br />**Saturated color bleeding:**<br />&nbsp; &nbsp; Will cause an horizontal chroma bleed which cheaply mimics the effect of<br />&nbsp; &nbsp; poor composite video signals.<br />&nbsp; &nbsp; It can be used with RGB shifting and image blurring to give the picture<br />&nbsp; &nbsp; an ntsc look without dealing with specific encoding/decoding stuffs.&nbsp;<br />&nbsp; &nbsp;&nbsp;<br />**Color corrections:**<br />&nbsp; &nbsp; Modify saturation, contrast, brightness and color temperature of the<br />&nbsp; &nbsp; "input" signal.<br />&nbsp; &nbsp; Gamma correction is applied to the final processed picture.<br />&nbsp; &nbsp;&nbsp;<br />**FXAA:**<br />&nbsp; &nbsp; Apply the well known antialiasing effect by Nvidia.<br />&nbsp; &nbsp; Use it if you don't want to blur the image and you still don't like<br />&nbsp; &nbsp; jagged or too much pixelated images.<br />&nbsp; &nbsp;&nbsp;<br />**Scanlines:**<br />&nbsp; &nbsp; Emulate CRT scanlines.<br />&nbsp; &nbsp;&nbsp;<br />&nbsp; &nbsp; Scanlines gap brightness:<br />&nbsp; &nbsp; &nbsp; &nbsp; controls how "little" they will look pronunced.<br />&nbsp; &nbsp; &nbsp; &nbsp; You can even use a negative value to make the scanline more evident,<br />&nbsp; &nbsp; &nbsp; &nbsp; but graphical glitches may occour.<br />&nbsp; &nbsp; Scanlines bleeding:<br />&nbsp; &nbsp; &nbsp; &nbsp; will cause the scanline itself to light the scanline gap (dark) part.&nbsp;<br />&nbsp; &nbsp; &nbsp; &nbsp; You may use it to keep a good brightness overrall picture level.<br />&nbsp; &nbsp; Interlace flicker:<br />&nbsp; &nbsp; &nbsp; &nbsp; Emulates the flickerin issues present on crt interlaced screens<br />&nbsp; &nbsp; &nbsp; &nbsp; where the brighter lines flickers wien they are near dark ones.<br />&nbsp; &nbsp; &nbsp; &nbsp; You can choose to produce the flickering: never, always or only<br />&nbsp; &nbsp; &nbsp; &nbsp; when the input picture is considered interlaced.<br />&nbsp; &nbsp; &nbsp; &nbsp; The threshold for that is defined in config.inc&nbsp;<br />&nbsp; &nbsp; &nbsp; &nbsp; with the parameter: MIN\_LINES\_INTERLACED.<br />&nbsp; &nbsp; Disable on interlaced screen:<br />&nbsp; &nbsp; &nbsp; &nbsp; You can choose to completely disable scanline emulation when<br />&nbsp; &nbsp; &nbsp; &nbsp; the input picture is considered interlaced.
+**Shift RGB components:**
+    Shift R,G,B components separately to mimic chroma
+    dephasing and color aberrations.
+    By varying Red, Green and Blue offsets, the relative component will be
+    shifted column by column, row by row.
+    
+**Saturated color bleeding:**
+    Will cause an horizontal chroma bleed which cheaply mimics the effect of
+    poor composite video signals.
+    It can be used with RGB shifting and image blurring to give the picture
+    an ntsc look without dealing with specific encoding/decoding stuffs. 
+    
+**Color corrections:**
+    Modify saturation, contrast, brightness and color temperature of the
+    "input" signal.
+    Gamma correction is applied to the final processed picture.
+    
+**FXAA:**
+    Apply the well known antialiasing effect by Nvidia.
+    Use it if you don't want to blur the image and you still don't like
+    jagged or too much pixelated images.
+    
+**Scanlines:**
+    Emulate CRT scanlines.
+    
+    Scanlines gap brightness:
+        controls how "little" they will look pronunced.
+        You can even use a negative value to make the scanline more evident,
+        but graphical glitches may occour.
+    Scanlines gap brightness:
+        Controls how much the gap between scanlines is dark
+    Compensate brightness loss:
+        Will make scanlines brighter, where possible, to compensate for the loss of brightness
+        gicen by the dark gap between them.
+    Scanlines bleeding:
+        will cause the scanline itself to light the scanline gap (dark) part. 
+        You may use it to keep a good brightness overrall picture level.
+    Interlace flicker:
+        Emulates the flickerin issues present on crt interlaced screens
+        where the brighter lines flickers wien they are near dark ones.
+        You can choose to produce the flickering: never, always or only
+        when the input picture is considered interlaced.
+        The threshold for that is defined in config.inc 
+        with the parameter: MIN\_LINES\_INTERLACED.
+    Disable on interlaced screen:
+        You can choose to completely disable scanline emulation when
+        the input picture is considered interlaced.
 
-**Input power/glowing:**<br />&nbsp; &nbsp; Emulate the CRT glowing "feature", so that the brighter areas of<br />&nbsp; &nbsp; the image will light their surroundings.<br />&nbsp; &nbsp;&nbsp;<br />&nbsp; &nbsp; Input signal glow strength:<br />&nbsp; &nbsp; &nbsp; &nbsp; The input signal gain<br />&nbsp; &nbsp; Sharpness:<br />&nbsp; &nbsp; &nbsp; &nbsp; How much the glow will "spread".<br />&nbsp; &nbsp; &nbsp; &nbsp; When pushed to its maximum value, no blurring will occour.<br />&nbsp; &nbsp; Gamma:<br />&nbsp; &nbsp; &nbsp; &nbsp; Controls how much the signal has to be bright to produce the glow.<br />&nbsp; &nbsp; Post gain:<br />&nbsp; &nbsp; &nbsp; &nbsp; This will cause the glowed image to be added to the input signal.<br />&nbsp; &nbsp; &nbsp; &nbsp; This allows to emulate glow and haloing in a single pass.<br />&nbsp; &nbsp; &nbsp; &nbsp; However the haloing should be applied after the mask emulation.<br />&nbsp; &nbsp; &nbsp; &nbsp; Likely to be removed in a future release.<br />&nbsp; &nbsp;&nbsp;<br />**RGB Masks and/or Darklines:**<br />&nbsp; &nbsp; Emulates CRT RGB phosphors (RGB Mask),<br />&nbsp; &nbsp; slotmasks and aperturegrille (Darklines).<br />&nbsp; &nbsp;&nbsp;<br />&nbsp; &nbsp; (HiDPI) Vmask and Darklines multiplier:<br />&nbsp; &nbsp; &nbsp; &nbsp; This shader is tuned for 1080p, but ff you have an HiDPI display<br />&nbsp; &nbsp; &nbsp; &nbsp; you may want to scale this filter by a factor.<br />&nbsp; &nbsp; Vmask Strength:<br />&nbsp; &nbsp; &nbsp; &nbsp; How much will the RGB mask be visible.<br />&nbsp; &nbsp; RGB Mask: (LoDPI) Green,Magenta -> BGR:<br />&nbsp; &nbsp; &nbsp; &nbsp; By exploiting common monitors RGB subpixel order, this causes<br />&nbsp; &nbsp; &nbsp; &nbsp; the RGB mask, to be emulated by using just 2 pixels instead of 3.<br />&nbsp; &nbsp; &nbsp; &nbsp; Very useful for 1080p (or lower) displays and to keep more brightness.<br />&nbsp; &nbsp; RGB Mask: Horizontal Gap between triads:<br />&nbsp; &nbsp; &nbsp; &nbsp; In real displays rgb triads are separated by a black space.<br />&nbsp; &nbsp; &nbsp; &nbsp; You can emulate it by turning this feature on.<br />&nbsp; &nbsp; RGB Mask: affect bright colors:<br />&nbsp; &nbsp; &nbsp; &nbsp; Emulating RGB masks will lower the resulting image brightness and you<br />&nbsp; &nbsp; &nbsp; &nbsp; just cant push input signal brightness without "burning" the signal.<br />&nbsp; &nbsp; &nbsp; &nbsp; By using this option, the RGB mask will be less evident on brighter<br />&nbsp; &nbsp; &nbsp; &nbsp; colors. However, since this will make the image to look somehow "dull",<br />&nbsp; &nbsp; &nbsp; &nbsp; it is advised to use the "Halo" feature instead (see later).<br />&nbsp; &nbsp; Darklines: strength:<br />&nbsp; &nbsp; &nbsp; &nbsp; How much will the horizontal darklines be visible.<br />&nbsp; &nbsp; Darklines: offset by triads:<br />&nbsp; &nbsp; &nbsp; &nbsp; When drawing "straight" horizontal darklines, you can emulate CRT aperture grille.<br />&nbsp; &nbsp; &nbsp; &nbsp; But if you want slotmasks instead, you need to vertically<br />&nbsp; &nbsp; &nbsp; &nbsp; offset them every RGB triad.<br />&nbsp; &nbsp; Darklines: period (triad height):<br />&nbsp; &nbsp; &nbsp; &nbsp; Basically tells the shader how much a triad has to be high.<br />&nbsp; &nbsp; Darklines: affect bright colors:<br />&nbsp; &nbsp; &nbsp; &nbsp; See "RGB Mask: affect bright colors"
+**Input power/glowing:**
+    Emulate the CRT glowing "feature", so that the brighter areas of
+    the image will light their surroundings.
+    
+    Input signal glow strength:
+        The input signal gain
+    Sharpness:
+        How much the glow will "spread".
+        When pushed to its maximum value, no blurring will occour.
+    Gamma:
+        Controls how much the signal has to be bright to produce the glow.
+    Post gain:
+        This will cause the glowed image to be added to the input signal.
+        This allows to emulate glow and haloing in a single pass.
+        However the haloing should be applied after the mask emulation.
+        Likely to be removed in a future release.
+    
+**RGB Masks and/or Darklines:**
+    Emulates CRT RGB phosphors (RGB Mask),
+    slotmasks and aperturegrille (Darklines).
+    
+    (HiDPI) Vmask and Darklines multiplier:
+        This shader is tuned for 1080p, but ff you have an HiDPI display
+        you may want to scale this filter by a factor.
+    Vmask Strength:
+        How much will the RGB mask be visible.
+    RGB Mask: (LoDPI) Green,Magenta -> BGR:
+        By exploiting common monitors RGB subpixel order, this causes
+        the RGB mask, to be emulated by using just 2 pixels instead of 3.
+        Very useful for 1080p (or lower) displays and to keep more brightness.
+    RGB Mask: Horizontal Gap between triads:
+        In real displays rgb triads are separated by a black space.
+        You can emulate it by turning this feature on.
+    RGB Mask: affect bright colors:
+        Emulating RGB masks will lower the resulting image brightness and you
+        just cant push input signal brightness without "burning" the signal.
+        By using this option, the RGB mask will be less evident on brighter
+        colors. However, since this will make the image to look somehow "dull",
+        it is advised to use the "Halo" feature instead (see later).
+    Darklines: strength:
+        How much will the horizontal darklines be visible.
+    Darklines: offset by triads:
+        When drawing "straight" horizontal darklines, you can emulate CRT aperture grille.
+        But if you want slotmasks instead, you need to vertically
+        offset them every RGB triad.
+    Darklines: period (triad height):
+        Basically tells the shader how much a triad has to be high.
+    Darklines: affect bright colors:
+        See "RGB Mask: affect bright colors"
 
-**Halo:**<br />&nbsp; &nbsp; Emulates the effect of the brighter pixels reflected by the CRT glass<br />&nbsp; &nbsp; that lights nearby zones (a sort of tight bloom).<br />&nbsp; &nbsp; The light is meant to be spreaded in a way that it nulls the effect of the<br />&nbsp; &nbsp; dark scanline parts, darklines and the RGB masks.<br />&nbsp; &nbsp; So you can use this to restore the brightness and color saturation<br />&nbsp; &nbsp; loss when using features like scanlines, darklines or RGB masks.
+**Halo:**
+    Emulates the effect of the brighter pixels reflected by the CRT glass
+    that lights nearby zones (a sort of tight bloom).
+    The light is meant to be spreaded in a way that it nulls the effect of the
+    dark scanline parts, darklines and the RGB masks.
+    So you can use this to restore the brightness and color saturation
+    loss when using features like scanlines, darklines or RGB masks.
 
-**Bloom:**<br />&nbsp; &nbsp; Acts like Halo, but affects a much wider area and is more configurable.<br />&nbsp; &nbsp; By using this effect and playing with its parameters, you can achieve funny<br />&nbsp; &nbsp; or even artistic results.<br />&nbsp; &nbsp;&nbsp;<br />&nbsp; &nbsp; Final mix:<br />&nbsp; &nbsp; &nbsp; &nbsp; Modulates between the original images and the bloomed one.<br />&nbsp; &nbsp; Radius:<br />&nbsp; &nbsp; &nbsp; &nbsp; Controls how much the bloom has to be wide.<br />&nbsp; &nbsp; Quality:<br />&nbsp; &nbsp; &nbsp; &nbsp; How much the shape of the bloomed picture will reflect the original one.<br />&nbsp; &nbsp; Input Gamma:<br />&nbsp; &nbsp; &nbsp; &nbsp; Use this as a threshold to control how much a pixel has to be bright<br />&nbsp; &nbsp; &nbsp; &nbsp; to produce a bloom effect.<br />&nbsp; &nbsp; Power multiplier:<br />&nbsp; &nbsp; &nbsp; &nbsp; Just apply a gain to the final bloom.<br />&nbsp; &nbsp; Output Gamma:<br />&nbsp; &nbsp; &nbsp; &nbsp; Play with it.<br />&nbsp; &nbsp; Strength on bright areas:<br />&nbsp; &nbsp; &nbsp; &nbsp; Since the light produced by the bloom effect is added to the underlying<br />&nbsp; &nbsp; &nbsp; &nbsp; image, it can produce burn effects on the already bright areas.<br />&nbsp; &nbsp; &nbsp; &nbsp; This is actually an hack that will avoid to bloom them.<br />&nbsp; &nbsp; &nbsp; &nbsp; Don't use too low values.<br />&nbsp; &nbsp; Bypass:<br />&nbsp; &nbsp; &nbsp; &nbsp; See how the bloomed image looks alone.
+**Bloom:**
+    Acts like Halo, but affects a much wider area and is more configurable.
+    By using this effect and playing with its parameters, you can achieve funny
+    or even artistic results.
+    
+    Final mix:
+        Modulates between the original images and the bloomed one.
+    Radius:
+        Controls how much the bloom has to be wide.
+    Quality:
+        How much the shape of the bloomed picture will reflect the original one.
+    Input Gamma:
+        Use this as a threshold to control how much a pixel has to be bright
+        to produce a bloom effect.
+    Power multiplier:
+        Just apply a gain to the final bloom.
+    Output Gamma:
+        Play with it.
+    Strength on bright areas:
+        Since the light produced by the bloom effect is added to the underlying
+        image, it can produce burn effects on the already bright areas.
+        This is actually an hack that will avoid to bloom them.
+        Don't use too low values.
+    Bypass:
+        See how the bloomed image looks alone.
 
-**Curvature:**<br />&nbsp; &nbsp; Emulates a curved CRT display.<br />&nbsp; &nbsp;&nbsp;<br />&nbsp; &nbsp; WARP X, WARP Y:<br />&nbsp; &nbsp; &nbsp; &nbsp; control how much the display is curved along its axes.<br />&nbsp; &nbsp; Corner radius, Corner sharpness:<br />&nbsp; &nbsp; &nbsp; &nbsp; Control the "smoothness" of the display corners.<br />&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;<br />**Bezel:**<br />&nbsp; &nbsp; Draws a monitor frame with simulated reflections from the game content.<br />&nbsp; &nbsp; The monitor frame is an image loaded by the shader and is shipped<br />&nbsp; &nbsp; in the "textures" shader subdirectory, named "monitor\_body.png"<br />&nbsp; &nbsp; It has been made with the following rules that may come handy<br />&nbsp; &nbsp; only if you want to edit it; otherwise go on.<br />&nbsp; &nbsp; - The red channel represents the luminance information<br />&nbsp; &nbsp; - The green channel represents the highlights<br />&nbsp; &nbsp; - The alpha channel in the inner frame represents the part of the bezel<br />&nbsp; &nbsp; &nbsp; that will be filled by the game content<br />&nbsp; &nbsp; - The blue channel represents the part of the bezel that will be filled by the game reflection.<br />&nbsp; &nbsp;&nbsp;<br />&nbsp; &nbsp; Bezel color (red,green,blue) and contrast:<br />&nbsp; &nbsp; &nbsp; &nbsp; Allows to choose the color of the monitor frame.<br />&nbsp; &nbsp; Image zoom:<br />&nbsp; &nbsp; &nbsp; &nbsp; Allows to shrink or expand the game content to fit the monitor frame.<br />&nbsp; &nbsp; Frame zoom:<br />&nbsp; &nbsp; &nbsp; &nbsp; Allows to shrink or expand the monitor frame to fit the game content.<br />&nbsp; &nbsp; Image Border:<br />&nbsp; &nbsp; &nbsp; &nbsp; Draws a black border around the game content.<br />&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;<br />**Backgound image:**<br />&nbsp; &nbsp; Draws an image on screen picked from the "textures" shader subdirectory,<br />&nbsp; &nbsp; named: background.png<br />&nbsp; &nbsp; **-> It is needed that you set retroarch aspect to "Full" <-**<br />&nbsp; &nbsp; ( Settings, Video, Scaling, Aspect Ratio = Full )<br />&nbsp; &nbsp; The image is painted "under" the game content and under the monitor frame by<br />&nbsp; &nbsp; default, and his alpha channel will let you see ambient lighs (see next).<br />&nbsp; &nbsp;&nbsp;<br />&nbsp; &nbsp; Image over content (alpha channel driven)?:<br />&nbsp; &nbsp; &nbsp; &nbsp; ...however you can paint the image over the game content and over the<br />&nbsp; &nbsp; &nbsp; &nbsp; monitor frame itself by selecting this option.<br />&nbsp; &nbsp; &nbsp; &nbsp; If you do so, the alpha channel of the background image will be used to<br />&nbsp; &nbsp; &nbsp; &nbsp; let you view the underlying content.
+**Curvature:**
+    Emulates a curved CRT display.
+    
+    WARP X, WARP Y:
+        control how much the display is curved along its axes.
+    Corner radius, Corner sharpness:
+        Control the "smoothness" of the display corners.
+        
+**Bezel:**
+    Draws a monitor frame with simulated reflections from the game content.
+    The monitor frame is an image loaded by the shader and is shipped
+    in the "textures" shader subdirectory, named "monitor\_body.png"
+    It has been made with the following rules that may come handy
+    only if you want to edit it; otherwise go on.
+    - The red channel represents the luminance information
+    - The green channel represents the highlights
+    - The alpha channel in the inner frame represents the part of the bezel
+      that will be filled by the game content
+    - The blue channel represents the part of the bezel that will be filled by the game reflection.
+    
+    Bezel color (red,green,blue) and contrast:
+        Allows to choose the color of the monitor frame.
+    Image zoom:
+        Allows to shrink or expand the game content to fit the monitor frame.
+    Frame zoom:
+        Allows to shrink or expand the monitor frame to fit the game content.
+    Image Border:
+        Draws a black border around the game content.
+        
+**Backgound image:**
+    Draws an image on screen picked from the "textures" shader subdirectory,
+    named: background.png<br>
+    **-> It is needed that you set retroarch aspect to "Full" <-**
+    ( Settings, Video, Scaling, Aspect Ratio = Full )
+    The image is painted "under" the game content and under the monitor frame by
+    default, and his alpha channel will let you see ambient lighs (see next).
+    
+    Image over content (alpha channel driven)?:
+        ...however you can paint the image over the game content and over the
+        monitor frame itself by selecting this option.
+        If you do so, the alpha channel of the background image will be used to
+        let you view the underlying content.
 
-**Ambient light leds:**<br />&nbsp; &nbsp; Emulates the presence of led strips under the monitor that lights the<br />&nbsp; &nbsp; surroundings according to the edges of the game content.<br />&nbsp; &nbsp; -**\> It is needed that you set retroarch aspect to "Full" <-**<br />&nbsp; &nbsp; ( Settings, Video, Scaling, Aspect Ratio = Full )<br />&nbsp; &nbsp;&nbsp;<br />&nbsp; &nbsp; Slowness:&nbsp;<br />&nbsp; &nbsp; &nbsp; &nbsp; How much will the leds will take to reflect the game content.<br />&nbsp; &nbsp; &nbsp; &nbsp; It may sound silly to make them slow, but if they reacts too fast,<br />&nbsp; &nbsp; &nbsp; &nbsp; they may distract you.<br />&nbsp; &nbsp; &nbsp; &nbsp; Keep in mynd that there is a scene detection logic that will make them<br />&nbsp; &nbsp; &nbsp; &nbsp; react as fast as possible when a scene change is detected.<br />&nbsp; &nbsp; Light Falloff:<br />&nbsp; &nbsp; &nbsp; &nbsp; How wide is the area illuminated.<br />&nbsp; &nbsp; Led power:<br />&nbsp; &nbsp; &nbsp; &nbsp; Leds post gain.<br />&nbsp; &nbsp; Note: To avoid burn-in effects, keep Light Falloff + Led power < 1.4
+**Ambient light leds:**
+    Emulates the presence of led strips under the monitor that lights the
+    surroundings according to the edges of the game content.
+    -**\> It is needed that you set retroarch aspect to "Full" <-**
+    ( Settings, Video, Scaling, Aspect Ratio = Full )
+    
+    Slowness: 
+        How much will the leds will take to reflect the game content.
+        It may sound silly to make them slow, but if they reacts too fast,
+        they may distract you.
+        Keep in mynd that there is a scene detection logic that will make them
+        react as fast as possible when a scene change is detected.
+    Light Falloff:
+        How wide is the area illuminated.
+    Led power:
+        Leds post gain.
+    Note: To avoid burn-in effects, keep Light Falloff + Led power < 1.4
 
-<br />**Aspect Ratio:**<br />&nbsp; &nbsp; When using effects that need Retroarch aspect ratio option<br />&nbsp; &nbsp; to be set to "full", you have to provide the source aspect<br />&nbsp; &nbsp; ratio to the shader.<br />&nbsp; &nbsp;&nbsp;<br />&nbsp; &nbsp; Aspect Ratio Numerator:<br />&nbsp; &nbsp; &nbsp; &nbsp; Setting non positive value here will switch to a predefined<br />&nbsp; &nbsp; &nbsp; &nbsp; aspect ratio from the following list:<br />&nbsp; &nbsp; &nbsp; &nbsp; 0 &nbsp;= 1.33 MAME<br />&nbsp; &nbsp; &nbsp; &nbsp; -1 = 1.55 NTSC<br />&nbsp; &nbsp; &nbsp; &nbsp; -2 = 1.25 PAL<br />&nbsp; &nbsp; &nbsp; &nbsp; -3 = 8/7 &nbsp;Snes<br />&nbsp; &nbsp; &nbsp; &nbsp; -4 = 10/7 Megadrive&nbsp;<br />&nbsp; &nbsp; &nbsp; &nbsp; -5 = Uncorrected<br />&nbsp; &nbsp; Aspect Ratio Denominator:<br />&nbsp; &nbsp; &nbsp; &nbsp; As long as Aspect Ratio Numerator is positive, this will<br />&nbsp; &nbsp; &nbsp; &nbsp; be used as the denominator of the fraction.
 
-**Luminosity dependant zoom:**<br />&nbsp; &nbsp; On older CRT monitors, the picture gets bigger when the image was brighter.
+**Aspect Ratio:**
+    When using effects that need Retroarch aspect ratio option
+    to be set to "full", you have to provide the source aspect
+    ratio to the shader.
+    
+    Aspect Ratio Numerator:
+        Setting non positive value here will switch to a predefined
+        aspect ratio from the following list:
+        0  = 1.33 MAME
+        -1 = 1.55 NTSC
+        -2 = 1.25 PAL
+        -3 = 8/7  Snes
+        -4 = 10/7 Megadrive 
+        -5 = Uncorrected
+    Aspect Ratio Denominator:
+        As long as Aspect Ratio Numerator is positive, this will
+        be used as the denominator of the fraction.
 
-**Vignette:**<br />&nbsp; &nbsp; Will cause uneven brightness of the image, more at the center,<br />&nbsp; &nbsp; less at the edges.<br />&nbsp; &nbsp;&nbsp;<br />**Spot:**<br />&nbsp; &nbsp; Simulates external light reflected by the monitor glass.
+**Luminosity dependant zoom:**
+    On older CRT monitors, the picture gets bigger when the image was brighter.
 
-**Alternate line blanking:**<br />&nbsp; &nbsp; CRT monitors \*real\* refresh was amazing, today is just "meh" in most cases.<br />&nbsp; &nbsp; This emmulates the low pixel persistance of CRT monitors&nbsp;<br />&nbsp; &nbsp; and reduces the motion blur, typical of LCD displays, by blanking even/odd<br />&nbsp; &nbsp; screen lines on even/odd frames, by sacrificing image brightness, ofc.<br />&nbsp; &nbsp;&nbsp;<br />&nbsp; &nbsp; Frame insertion strength:<br />&nbsp; &nbsp; &nbsp; &nbsp; How much the line will be blanked.<br />&nbsp; &nbsp; Dark lines period:<br />&nbsp; &nbsp; &nbsp; &nbsp; You can blank single line or a group of them at once.<br />&nbsp; &nbsp; &nbsp; &nbsp; See what performs better on your display.<br />&nbsp; &nbsp;&nbsp;<br />&nbsp; &nbsp;&nbsp;<br />&nbsp; &nbsp;&nbsp;<br />&nbsp; &nbsp;&nbsp;<br />&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;<br />&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
+**Vignette:**
+    Will cause uneven brightness of the image, more at the center,
+    less at the edges.
+    
+**Spot:**
+    Simulates external light reflected by the monitor glass.
 
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;<br />
+**Alternate line blanking:**
+    CRT monitors \*real\* refresh was amazing, today is just "meh" in most cases.
+    This emmulates the low pixel persistance of CRT monitors 
+    and reduces the motion blur, typical of LCD displays, by blanking even/odd
+    screen lines on even/odd frames, by sacrificing image brightness, ofc.
+    
+    Frame insertion strength:
+        How much the line will be blanked.
+    Dark lines period:
+        You can blank single line or a group of them at once.
+        See what performs better on your display.
+
