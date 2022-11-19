@@ -446,17 +446,14 @@ vec4 main_wrap(vec2 coords){
         //Handle outer frame cases
             //if we want ambilights in the outer frame, draw it and return
             if (bIs_outer_frame)              
-                if (border_needed())
-                    return vec4(pixel_border(BG_IMAGE_OVER == 1.0),1.0);
-                            
-            
+                return vec4(pixel_border(BG_IMAGE_OVER == 1.0),1.0);
+
             //But if it is just outer frame, just make it black.
             if (bIs_outer_frame) return vec4(0.0);
 
         
         //Handle inner frame cases
             vec4 vPixel_inner_frame = pixel_inner_frame(coords);
-            if (border_needed()) {
                 //mix ambilight in the inner frame too, as curvature could shrink into the inner frame.
                 bool draw_border = true;
                 //Not painting ambilights here is the best way to cheaply draw a border around the frame
@@ -464,15 +461,14 @@ vec4 main_wrap(vec2 coords){
                     vec2 vTexCoord_zoomout = zoomout_coords(vTexCoord, -BEZEL_INNER_ZOOM , 1.0);
                     float border_start = 1-BEZEL_IMAGE_BORDER;
                     //Not using curved coords here because crazy things would happen with vertical games
-                    draw_border = vTexCoord_zoomout.x < border_start || vTexCoord_zoomout.x > BEZEL_IMAGE_BORDER || 
+                    draw_border = vTexCoord_zoomout.x < border_start || vTexCoord_zoomout.x > BEZEL_IMAGE_BORDER ||
                                 vTexCoord_zoomout.y < border_start || vTexCoord_zoomout.y > BEZEL_IMAGE_BORDER ;
                 }
-                if (draw_border) 
+                if (draw_border)
                     return vec4(mix(pixel_border(BG_IMAGE_OVER == 1.0).rgb,vPixel_inner_frame.rgb,min(vPixel_inner_frame.a*1.5,1.0)),vPixel_inner_frame.a);
                 //return vec4(1.0,0.0,0.0,1.0);
-            }
 
-            //Last case, inner border without ambilight:
+        //Last case, inner border without ambilight:
             return vPixel_inner_frame;
 }
 
