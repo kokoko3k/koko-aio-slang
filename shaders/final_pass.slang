@@ -237,7 +237,8 @@ vec4 pixel_main_pass(vec2 coords) {
             float scanline_shape =  scanline_shape(coords, flickering_scanlines ) ;
 
             if (SCANLINE_COMPENSATION > 0.0) {
-                float pixel_out_whiteness = (pixel_out.r + pixel_out.g + pixel_out.b)/3.0;
+                //float pixel_out_whiteness = (pixel_out.r + pixel_out.g + pixel_out.b)/3.0;
+                float pixel_out_whiteness = max(max(pixel_out.r, pixel_out.g), pixel_out.b);
                 pixel_out_whiteness = clamp(pixel_out_whiteness,0.0,1.0);
                 //float middleness = 1-abs(0.5-pixel_out_whiteness)*2;
                 pixel_out *= 1+vec3((1-pixel_out_whiteness) * (SCANLINE_COMPENSATION-SCANLINE_DARK) );
