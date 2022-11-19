@@ -167,7 +167,7 @@ float scanline_shape(vec2 coords, bool do_flicker) {
     return lines;
 }
 
-vec4 pixel_main_pass(vec2 coords) {
+vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
     
     if (DO_DYNZOOM == 1.0) {
         float zoomin = 1.0 + (texture(avglum_passFeedback, vec2(0.25,0.25)    ).a/ DYNZOOM_FACTOR);
@@ -176,7 +176,7 @@ vec4 pixel_main_pass(vec2 coords) {
 
     bool is_border = false;
     
-    if (border_needed())
+    if (bBorder_needed)
         if (vTexCoord.x < 0.0 || vTexCoord.x > 1.0 || vTexCoord.y < 0.0 || vTexCoord.y > 1.0) return vec4(0.0);
    
     bool isinterlaced = is_interlaced();
@@ -372,8 +372,8 @@ vec3 compose_bezel_over(vec3 full_viewport) {
     return mix(full_viewport, bezel_out, bezel.a);
 }
 // 
-vec4 pixel_inner_frame(vec2 coords) {
-    vec4 pixel_in = pixel_main_pass(coords);
+vec4 pixel_inner_frame(vec2 coords, bool bBorder_needed) {
+    vec4 pixel_in = pixel_main_pass(coords, bBorder_needed);
     vec3 pixel_out = pixel_in.rgb;
     vec3 bloomed;
   
@@ -438,7 +438,7 @@ vec4 main_wrap(vec2 coords){
     /* Handle inner border and outer border, not bezel */
     if (DO_VIGNETTE + DO_SPOT + DO_AMBILIGHT >0.0) global_noise = random(NOISEPOWER);
     //Just do pixel_inner_frame() and exit when there is no need to paint border.
-    if (!border_needed()) return pixel_inner_frame(coords);
+    if (!border_needed()) return pixel_inner_frame(coords, false);
 
     //From now on, we need a border.
         bool bIs_outer_frame = ((vTexCoord.x < 0.0) || (vTexCoord.x > 1.0));
@@ -453,7 +453,7 @@ vec4 main_wrap(vec2 coords){
 
         
         //Handle inner frame cases
-            vec4 vPixel_inner_frame = pixel_inner_frame(coords);
+            vec4 vPixel_inner_frame = pixel_inner_frame(coords, true);
                 //mix ambilight in the inner frame too, as curvature could shrink into the inner frame.
                 bool draw_border = true;
                 //Not painting ambilights here is the best way to cheaply draw a border around the frame
