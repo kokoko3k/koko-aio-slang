@@ -53,7 +53,6 @@ void main() {
    }
    if (TEMPERATURE != 6500)
       temperature_rgb = kelvin2rgb(TEMPERATURE);
-
 }
 
 #pragma stage fragment
@@ -82,18 +81,24 @@ vec3 pixel_no_flicker(vec2 coord){
    vec3 pixel_out = texture(Source,coord).rgb;
    if (DO_SHIFT_RGB == 1.0) pixel_out = pixel_offset(pixel_out.rgb, coord);
    if (DO_CCORRECTION == 1.0) {
-       //Saturation modifier
-       if (!(SATURATION == 1.0)) {
-        //pixel_out *=vec4(pixel_out.rgb,1.0);
+
+      if (LUMINANCE > 0.0) {
+         float pixel_out_whiteness = max(max(pixel_out.r, pixel_out.g), pixel_out.b);
+         pixel_out_whiteness = clamp(pixel_out_whiteness,0.0,1.0);
+         pixel_out *= 1+vec3((1-pixel_out_whiteness) * LUMINANCE );
+      }
+
+      if (!(SATURATION == 1.0)) {
         const vec3 W = vec3(0.2125, 0.7154, 0.0721);
         vec3 intensity = vec3(dot(pixel_out.rgb, W));
         pixel_out.rgb = mix(intensity, pixel_out.rgb, SATURATION);
-       }
-       
-       if (CONTRAST != 0.0 || BRIGHTNESS != 0.0)
-           pixel_out.rgb = scale_to_range_vec3(pixel_out.rgb, -CONTRAST, 1+CONTRAST) + BRIGHTNESS;
+      }
+
+      if (CONTRAST != 0.0 || BRIGHTNESS != 0.0)
+         pixel_out.rgb = scale_to_range_vec3(pixel_out.rgb, -CONTRAST, 1+CONTRAST) + BRIGHTNESS;
       
-       if (TEMPERATURE != 6500.0) pixel_out.rgb = pixel_out.rgb * temperature_rgb;
+      if (TEMPERATURE != 6500.0) pixel_out.rgb = pixel_out.rgb * temperature_rgb;
+
    }
    return pixel_out.rgb;
 }

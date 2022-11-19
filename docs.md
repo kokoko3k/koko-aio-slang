@@ -14,7 +14,7 @@
     an ntsc look without dealing with specific encoding/decoding stuffs. 
     
 **Color corrections:**
-    Modify saturation, contrast, brightness and color temperature of the
+    Modify luminance, saturation, contrast, brightness and color temperature of the
     "input" signal.
     Gamma correction is applied to the final processed picture.
     
