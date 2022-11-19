@@ -82,11 +82,8 @@ vec3 pixel_no_flicker(vec2 coord){
    if (DO_SHIFT_RGB == 1.0) pixel_out = pixel_offset(pixel_out.rgb, coord);
    if (DO_CCORRECTION == 1.0) {
 
-      if (LUMINANCE > 0.0) {
-         float pixel_out_whiteness = max(max(pixel_out.r, pixel_out.g), pixel_out.b);
-         pixel_out_whiteness = clamp(pixel_out_whiteness,0.0,1.0);
-         pixel_out *= 1+vec3((1-pixel_out_whiteness) * LUMINANCE );
-      }
+      if (LUMINANCE > 0.0)
+         pixel_out = pixel_push_luminance(pixel_out,LUMINANCE);
 
       if (!(SATURATION == 1.0)) {
         const vec3 W = vec3(0.2125, 0.7154, 0.0721);
