@@ -195,7 +195,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // SCANLINE_BLEEDING will make the whiter part of the scanline to bright the gap.
 
 #pragma parameter DO_SCANLINES	"★ Scanlines enable? ==>"							1.0 	0.0  1.0 1.0
-#pragma parameter SCANLINE_DARK "        Scanlines gap brightness"			  			0.0 	-0.25 1.0 0.05
+#pragma parameter SCANLINE_DARK "        Scanlines gap brightness"			  			0.0 	-0.5 1.0 0.05
 #pragma parameter SCANLINE_COMPENSATION "        Compensate for brightness loss"				0.0	0.0 1.0 0.1
 #pragma parameter SCANLINES_BLEEDING "        Scanlines bleeding"						0.0 	0.0 3.0 0.05
 
