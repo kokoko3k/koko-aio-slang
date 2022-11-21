@@ -64,6 +64,7 @@ vec3 pixel_vmask(vec3 source, vec3 white_reference, float over_white) {
     vec3 pixel_out;
     vec3 vmasked;
     vec4 vec_mod=(vec4(3,1,2,3) + vec4(VMASK_GAP,0.0,0.0,0.0))* VMASK_DARKLINE_SCALE ;
+    
     float mask_lightness = 1.0 - RGB_MASK_STRENGTH;
     if ( mod(col, vec_mod.x) < vec_mod.y)         vmasked = min(m1 + mask_lightness,vec3(1.0)) * source;
         else if (mod(col, vec_mod.x) < vec_mod.z) vmasked = min(m2 + mask_lightness,vec3(1.0)) * source;
@@ -200,14 +201,20 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
 
     //Mask and darklines:
     if (DO_VMASK_AND_DARKLINES == 1.0 ) {
+        vec3 pixel_in_compensated = pixel_in;
+        
+        pixel_in_compensated = pixel_push_luminance(pixel_in, RGB_MASK_STRENGTH * MASK_COMPENSATION); // if/then check for strength == 0.0 made by the function itself.
+        
         if (RGB_MASK_STRENGTH > 0.0) {
             //Use RGB pattern or exploit RGB layout with green and magenta?
             if (VMASK_USE_GM < 1.0) {
-                pixel_out = pixel_vmask(pixel_in, pixel_in_clamped, VMASK_OVERWHITE);
+                pixel_out = pixel_vmask(pixel_in_compensated, pixel_in_clamped, VMASK_OVERWHITE);
             } else {
-                pixel_out = pixel_vmask_gm(pixel_in, pixel_in_clamped, VMASK_OVERWHITE);
+                pixel_out = pixel_vmask_gm(pixel_in_compensated, pixel_in_clamped, VMASK_OVERWHITE);
             }
         }
+
+        pixel_out = pixel_push_luminance(pixel_out, DARKLINES_STRENGTH * (1.0/DARKLINES_PERIOD) * MASK_COMPENSATION); // if/then check for strength == 0.0 made by the function itself.
         //Screen lines
         if (DARKLINES_STRENGTH > 0.0 ) {
             float MYDARKLINES_TRANSPARENCY = 1.0 - DARKLINES_STRENGTH;

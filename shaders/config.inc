@@ -79,6 +79,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float DO_SCANLINES;
 	float DO_IN_GLOW;
 	float DO_VMASK_AND_DARKLINES ;
+	float MASK_COMPENSATION ;
 	float DO_HALO ;
 	float DO_CCORRECTION;
 	float DO_ALT_BLANK;
@@ -195,7 +196,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 #pragma parameter DO_SCANLINES	"★ Scanlines enable? ==>"							1.0 	0.0  1.0 1.0
 #pragma parameter SCANLINE_DARK "        Scanlines gap brightness"			  			0.0 	-0.25 1.0 0.05
-#pragma parameter SCANLINE_COMPENSATION "        Compensate brightness loss"				0.0	0.0 1.0 0.1
+#pragma parameter SCANLINE_COMPENSATION "        Compensate for brightness loss"				0.0	0.0 1.0 0.1
 #pragma parameter SCANLINES_BLEEDING "        Scanlines bleeding"						0.0 	0.0 3.0 0.05
 
 // Alternate the drawing of the scanlines between frames. this will produce a flickering typical of
@@ -241,8 +242,12 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // "DARKLINES_PERIOD" expresses every how many lines draw a black one (or the height ov the RGB triads)
 // "DO_DARKLINES_VOFFSET" lets you to vertically offset by ""DARKLINES_PERIOD/2" the lines every 3 screen pixels,
 // allowing, in conjunction with RGB mask, to emulate slot mask
+// MASK_COMPENSATION will, where possible, compensate for the loss of brightness by smartly pushing the source luminance
 
 #pragma parameter DO_VMASK_AND_DARKLINES "★  RGB Masks and/or Darklines enable? ==>"         	1.0 	0.0 1.0 1.0
+
+#pragma parameter MASK_COMPENSATION      "        Compensate for brightness loss"		1.0 	0.0 1.0 0.05
+
 #pragma parameter VMASK_DARKLINE_SCALE   "        (HiDPI) Vmask and Darklines multiplier"	1.0  	1.0 4.0 1.0
 #pragma parameter RGB_MASK_STRENGTH      "        Vmask Strength (0.0 to disable)"		0.75  	0.0 1.0 0.05
 #pragma parameter VMASK_USE_GM           "        RGB Mask: (LoDPI) Green,Magenta -> BGR"	0.0  	0.0 1.0 1.0
@@ -252,7 +257,8 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter DARKLINES_STRENGTH     "        Darklines: strength (0.0 to disable)"		0.65 	0.0 1.0 0.05
 #pragma parameter DO_DARKLINES_VOFFSET   "        Darklines: offset by triads"			1.0 	0.0 1.0 1.0
 #pragma parameter DARKLINES_PERIOD       "        Darklines: period (triad height)"		4.0 	2.0 16.0 2.0
-#pragma parameter DRKLN_OVERWHITE        "        Darklines: affect bright colors"			1.0 	0.0 1.0 0.05
+#pragma parameter DRKLN_OVERWHITE        "        Darklines: affect bright colors"		1.0 	0.0 1.0 0.05
+
 
 
 
@@ -382,6 +388,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #define IN_GLOW_GAMMA            global.IN_GLOW_GAMMA
 
 #define DO_VMASK_AND_DARKLINES  global.DO_VMASK_AND_DARKLINES
+#define MASK_COMPENSATION	global.MASK_COMPENSATION
 #define RGB_MASK_STRENGTH       global.RGB_MASK_STRENGTH
 #define VMASK_OVERWHITE         params.VMASK_OVERWHITE
 #define VMASK_DARKLINE_SCALE    params.VMASK_DARKLINE_SCALE

@@ -2,9 +2,10 @@
 #define pi 3.141592654
 
 vec3 pixel_push_luminance(vec3 c, float strength) {
-   float whiteness = max(max(c.r, c.g), c.b);
-   whiteness = clamp(whiteness, 0.0, 1.0);
-   return c * (1+vec3((1-whiteness) * strength));
+	if (strength == 0.0) return c;
+	float whiteness = max(max(c.r, c.g), c.b);
+	whiteness = clamp(whiteness, 0.0, 1.0);
+	return c * (1+vec3((1-whiteness) * strength));
 }
 
 vec3 apply_fuzzy_main_pass(vec3 color) {

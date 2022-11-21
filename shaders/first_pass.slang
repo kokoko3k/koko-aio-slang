@@ -82,8 +82,7 @@ vec3 pixel_no_flicker(vec2 coord){
    if (DO_SHIFT_RGB == 1.0) pixel_out = pixel_offset(pixel_out.rgb, coord);
    if (DO_CCORRECTION == 1.0) {
 
-      if (LUMINANCE > 0.0)
-         pixel_out = pixel_push_luminance(pixel_out,LUMINANCE);
+      pixel_out = pixel_push_luminance(pixel_out,LUMINANCE); // if/then check for LUMINANCE == 0.0 made by function itself.
 
       if (!(SATURATION == 1.0)) {
         const vec3 W = vec3(0.2125, 0.7154, 0.0721);
