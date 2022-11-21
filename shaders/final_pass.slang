@@ -241,9 +241,11 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
                 else pixel_bleed = pixel_in;
             }
 
-            if (SCANLINE_COMPENSATION > 0.0)
-                pixel_out = pixel_push_luminance(pixel_out, SCANLINE_COMPENSATION-SCANLINE_DARK);
-
+            if (SCANLINE_COMPENSATION > 0.0) {
+                float mypow = mix(1.0, (0.33 * SCANLINE_DARK + 0.67), SCANLINE_COMPENSATION);
+                pixel_out = pow(pixel_out,vec3(mypow));
+            }
+            
             float scanline_shape =  scanline_shape(coords, flickering_scanlines ) ;
             vec3 pixel_scanlined = pixel_out * scanline_shape;
 
