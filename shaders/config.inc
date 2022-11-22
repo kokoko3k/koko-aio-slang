@@ -2,7 +2,7 @@
 	//will skip the blurring phase and lowers the gpu use
 	//Set this to the same value as used for the maximum
 	//of IN_GLOW_WH, HALO_W and HALO_H
-#define GLOW_SHARP_MAX 6	        
+#define GLOW_SHARP_MAX 7	        
 
 	//Consider content interlaced if lines are more than this
 #define MIN_LINES_INTERLACED 300
@@ -185,7 +185,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 // FXAA
 // Apply an antialiasing filter via FXAA from Nvidia.
-#pragma parameter DO_FXAA "★ FXAA enable? ==>"	1.0 	0.0 1.0 1.0
+#pragma parameter DO_FXAA "★ FXAA enable? ==>"	0.0 	0.0 1.0 1.0
 
 // Scanlines
 // Blank even source lines, the value from 0.0 to 1.0 expresses the darkness of the blanked lines
@@ -216,7 +216,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // or slot mask applied to the image.
 #pragma parameter DO_IN_GLOW               "★ Input power/glowing enable? ==>" 					1.0	0.0 1.0 1.0
 #pragma parameter IN_GLOW_POWER            "        Input signal glow strength"					0.45 	0.0 5.0 0.05
-#pragma parameter IN_GLOW_WH               "        Sharpness"							2.5	0.2 6.0 0.05
+#pragma parameter IN_GLOW_WH               "        Sharpness"							2.5	0.2 7.0 0.05
 #pragma parameter IN_GLOW_GAMMA            "        Gamma, the higher, the less the glow on dark colors"	1.0 	1.0 10.0 0.1
 #pragma parameter IN_GLOW_ADD              "        Post gain (0.0 to disable)"					0.0 	0.0 1.0 0.05
 
@@ -270,8 +270,8 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // lessening afromentioned effects on bright colors.
 #pragma parameter DO_HALO       "★ Halo enable? ==>" 						1.0	0.0 1.0 1.0
 #pragma parameter HALO_POWER    "        Strength"						0.9 	0.0  5.0 0.025
-#pragma parameter HALO_W        "        Horizontal sharpness"					1.75	0.2  6.0 0.05
-#pragma parameter HALO_H        "        Vertical sharpness"					1.75	0.2  6.0 0.05
+#pragma parameter HALO_W        "        Horizontal sharpness"					1.75	0.2  7.0 0.05
+#pragma parameter HALO_H        "        Vertical sharpness"					1.75	0.2  7.0 0.05
 #pragma parameter HALO_GAMMA    "        Gamma, the higher, the less the halo on dark colors"	2.0 	1.0  10.0 0.1
 
 

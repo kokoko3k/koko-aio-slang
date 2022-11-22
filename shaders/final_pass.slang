@@ -503,10 +503,6 @@ void main() {
     }
 
 
-    //if ( (vOutputCoord.x < 0.5  && vOutputCoord.y > 0.5) || (vOutputCoord.x > 0.5  && vOutputCoord.y < 0.5)  ) pixel_out = texture(reflected_blurred_pass2,coords );
-
-    //FragColor = pixel_main_pass(coords);
-
         //For debug purposes:
         //quad split screen
         //if ( (vOutputCoord.x < 0.5  && vOutputCoord.y > 0.5) || (vOutputCoord.x > 0.5  && vOutputCoord.y < 0.5)  ) pixel_out = texture(first_pass,vOutputCoord);
