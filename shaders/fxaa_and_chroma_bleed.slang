@@ -274,9 +274,9 @@ vec3 rgb2hsv(vec3 c){
    return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
 }
 
-#define off1 2.0
+#define off1 1.0
 #define w1 0.4
-#define off2 -2.0
+#define off2 -1.0
 #define w2  0.4
 
 void main() {
@@ -307,6 +307,7 @@ void main() {
         
         pixel_out = mix(pixel_out,previous_pixel1,previous_sat1);
         pixel_out = mix(pixel_out,previous_pixel2,previous_sat2);
+        
         /*result_pixel = mix(result_pixel,next_pixel2,next_sat2);
         result_pixel = mix(result_pixel,next_pixel2,next_sat2);
     */
