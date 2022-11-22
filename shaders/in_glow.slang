@@ -18,9 +18,9 @@ void main()
 
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 0) out vec4 FragColor;
-layout(set = 0, binding = 3) uniform sampler2D FXAA_and_chroma_bleed_pass;
+layout(set = 0, binding = 3) uniform sampler2D FXAA_pass;
 layout(set = 0, binding = 4) uniform sampler2D first_pass;
-
+layout(set = 0, binding = 5) uniform sampler2D shift_and_bleed_pass;
 
 // Blur sizes must not depend on input resolution
 #define scalemod_x (params.OutputSize.x/360.0)
@@ -37,18 +37,19 @@ void main() {
    if (DO_IN_GLOW == 0.0) return;
    
    vec3 pixel_glowed;
-   if (DO_FXAA + DO_SAT_BLEED > 0.0)
-      pixel_glowed = pixel_glow(FXAA_and_chroma_bleed_pass, IN_GLOW_WH,IN_GLOW_WH,IN_GLOW_POWER,IN_GLOW_GAMMA,vTexCoord, params.OutputSize, params.OutputSize).rgb;
-         else
+   if ( DO_SHIFT_RGB + DO_SAT_BLEED > 0.0)
+      pixel_glowed = pixel_glow(shift_and_bleed_pass, IN_GLOW_WH,IN_GLOW_WH,IN_GLOW_POWER,IN_GLOW_GAMMA,vTexCoord, params.OutputSize, params.OutputSize).rgb;
+   else if (DO_FXAA > 0.0)
+      pixel_glowed = pixel_glow(FXAA_pass, IN_GLOW_WH,IN_GLOW_WH,IN_GLOW_POWER,IN_GLOW_GAMMA,vTexCoord, params.OutputSize, params.OutputSize).rgb;
+   else
       pixel_glowed = pixel_glow(first_pass, IN_GLOW_WH,IN_GLOW_WH,IN_GLOW_POWER,IN_GLOW_GAMMA,vTexCoord, params.OutputSize, params.OutputSize).rgb;
-      
-      if (IN_GLOW_ADD>0.0) { 
+     /* if (IN_GLOW_ADD>0.0) { 
          if (DO_FXAA + DO_SAT_BLEED > 0.0) {
-            pixel_glowed = mix(pixel_glowed,texture(FXAA_and_chroma_bleed_pass, vTexCoord).rgb + pixel_glowed,IN_GLOW_ADD);
+            pixel_glowed = mix(pixel_glowed,texture(FXAA_pass, vTexCoord).rgb + pixel_glowed,IN_GLOW_ADD);
          } else {
             pixel_glowed = mix(pixel_glowed,texture(first_pass, vTexCoord).rgb + pixel_glowed,IN_GLOW_ADD);
          }
-      }
+      }*/
    
    pixel_out = pixel_glowed;
 

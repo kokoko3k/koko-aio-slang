@@ -264,57 +264,10 @@ layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D first_pass;
 
 
-vec3 rgb2hsv(vec3 c){
-   vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
-   vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));
-   vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
-
-   float d = q.x - min(q.w, q.y);
-   float e = 1.0e-10;
-   return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
-}
-
-#define off1 1.0
-#define w1 0.4
-#define off2 -1.0
-#define w2  0.4
 
 void main() {
     vec3 pixel_out;
     
-    if ( DO_FXAA == 1.0 )
-        pixel_out = FxaaPixelShader(vTexCoord, first_pass, vec2(global.first_passSize.z, global.first_passSize.w));
-
-    
-    if (DO_SAT_BLEED == 1.0) {
-        vec3 previous_pixel1 = texture(first_pass,vTexCoord - vec2(global.first_passSize.z*off1,0.0)).rgb;
-        float previous_sat1 = rgb2hsv(previous_pixel1).y;
-        vec3 previous_pixel2 = texture(first_pass,vTexCoord - vec2(global.first_passSize.z*off2,0.0)).rgb;
-        float previous_sat2 = rgb2hsv(previous_pixel2).y;
-        
-        /*vec3 next_pixel1 = texture(first_pass,vTexCoord + vec2(global.first_passSize.z*off1,0.0)).rgb;
-        float next_sat1 = rgb2hsv(next_pixel1).y;
-        vec3 next_pixel2 = texture(first_pass,vTexCoord + vec2(global.first_passSize.z*off2,0.0)).rgb;
-        float next_sat2 = rgb2hsv(next_pixel2).y;
-        */
-        previous_sat1*=w1;
-        previous_sat2*=w2;
-
-        /*next_sat1*=w1;
-        next_sat2*=w2;
-        */
-        if (DO_FXAA != 1.0) pixel_out = texture(first_pass,vTexCoord).rgb;
-        
-        pixel_out = mix(pixel_out,previous_pixel1,previous_sat1);
-        pixel_out = mix(pixel_out,previous_pixel2,previous_sat2);
-        
-        /*result_pixel = mix(result_pixel,next_pixel2,next_sat2);
-        result_pixel = mix(result_pixel,next_pixel2,next_sat2);
-    */
-    }
-    
-
-   if (DO_FXAA + DO_SAT_BLEED > 0.0)
-       FragColor = vec4(pixel_out, 0.0);
-
+    if ( DO_FXAA > 0.0 )
+        FragColor = vec4(FxaaPixelShader(vTexCoord, first_pass, vec2(global.first_passSize.z, global.first_passSize.w)),0.0);
 }

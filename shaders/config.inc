@@ -69,7 +69,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	
 	vec4 FinalViewportSize;
 	vec4 in_glow_passSize;
-	vec4 FXAA_and_chroma_bleed_passSize;
+	vec4 FXAA_passSize;
 	//vec4 main_passSize;
 	//vec4 monitor_bodySize;
 	//vec4 bgSize;
@@ -83,7 +83,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	float DO_HALO ;
 	float DO_CCORRECTION;
 	float DO_ALT_BLANK;
-	float IN_GLOW_ADD ;
+	//float IN_GLOW_ADD ;
 	float SCANLINES_BLEEDING ;
 	float IN_GLOW_WH ;
 	float IN_GLOW_POWER ;
@@ -168,6 +168,10 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter SHIFT_B         "        Blue offset"			20.0 	-210.0 189.0 1
 #pragma parameter OFFSET_STRENGTH "        Strength"			0.5 	 0.0 1.0 0.1
 
+// FXAA
+// Apply an antialiasing filter via FXAA from Nvidia.
+#pragma parameter DO_FXAA "★ FXAA enable? ==>"	0.0 	0.0 1.0 1.0
+
 // Chroma bleeding, (very) poor man's ntsc filter.
 #pragma parameter DO_SAT_BLEED "★ Saturated color bleeding enable? ==>"	0.0 	0.0 1.0 1.0
 
@@ -180,12 +184,6 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter TEMPERATURE    "        Temperature in (6500=off)"		6500.0	3000 10000.0 50.0
 #pragma parameter GAMMA_OUT      "        Gamma out"						0.69	0.1 	9.0  0.025
 
-
-// PARAMETERS AND MEANING                                                    
-
-// FXAA
-// Apply an antialiasing filter via FXAA from Nvidia.
-#pragma parameter DO_FXAA "★ FXAA enable? ==>"	0.0 	0.0 1.0 1.0
 
 // Scanlines
 // Blank even source lines, the value from 0.0 to 1.0 expresses the darkness of the blanked lines
@@ -218,7 +216,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter IN_GLOW_POWER            "        Input signal glow strength"					0.45 	0.0 5.0 0.05
 #pragma parameter IN_GLOW_WH               "        Sharpness"							2.5	0.2 7.0 0.05
 #pragma parameter IN_GLOW_GAMMA            "        Gamma, the higher, the less the glow on dark colors"	1.0 	1.0 10.0 0.1
-#pragma parameter IN_GLOW_ADD              "        Post gain (0.0 to disable)"					0.0 	0.0 1.0 0.05
+//#pragma parameter IN_GLOW_ADD              "        Post gain (0.0 to disable)"					0.0 	0.0 1.0 0.05
 
 
 
@@ -381,7 +379,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #define SCANLINE_COMPENSATION         global.SCANLINE_COMPENSATION
 
 #define DO_IN_GLOW               global.DO_IN_GLOW
-#define IN_GLOW_ADD              global.IN_GLOW_ADD
+//#define IN_GLOW_ADD              global.IN_GLOW_ADD
 #define SCANLINES_BLEEDING       global.SCANLINES_BLEEDING
 #define IN_GLOW_WH               global.IN_GLOW_WH
 #define IN_GLOW_POWER            global.IN_GLOW_POWER

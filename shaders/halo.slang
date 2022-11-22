@@ -26,10 +26,10 @@ void main() {
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in vec2 vOutputCoord;
 layout(location = 0) out vec4 FragColor;
-layout(set = 0, binding = 2) uniform sampler2D FXAA_and_chroma_bleed_pass;
+layout(set = 0, binding = 2) uniform sampler2D FXAA_pass;
 layout(set = 0, binding = 3) uniform sampler2D first_pass;
 layout(set = 0, binding = 4) uniform sampler2D in_glow_pass;
-
+layout(set = 0, binding = 5) uniform sampler2D shift_and_bleed_pass;
 // What follows is an ugly optimization with a lot of code copied and pasted repeated multiple times,
 // shamlessly hidden into an include:
 #include "includes/pixel_glows.include.slang"    
@@ -41,11 +41,13 @@ vec4 main_wrap(void) {
     vec2 halo_coords = vTexCoord;
 
     if (DO_IN_GLOW == 1.0)
-        pixel_haloed = pixel_glow(in_glow_pass, HALO_W,HALO_H,HALO_POWER,HALO_GAMMA,halo_coords, global.FXAA_and_chroma_bleed_passSize, global.FXAA_and_chroma_bleed_passSize).rgb;
-    else if (DO_FXAA + DO_SAT_BLEED > 0.0)
-        pixel_haloed = pixel_glow(FXAA_and_chroma_bleed_pass, HALO_W,HALO_H,HALO_POWER,HALO_GAMMA,halo_coords, global.FXAA_and_chroma_bleed_passSize, global.FXAA_and_chroma_bleed_passSize).rgb;
+        pixel_haloed = pixel_glow(in_glow_pass, HALO_W,HALO_H,HALO_POWER,HALO_GAMMA,halo_coords, global.FXAA_passSize, global.FXAA_passSize).rgb;
+    else if ( DO_SHIFT_RGB + DO_SAT_BLEED > 0.0)
+        pixel_haloed = pixel_glow(shift_and_bleed_pass, IN_GLOW_WH,IN_GLOW_WH,IN_GLOW_POWER,IN_GLOW_GAMMA,vTexCoord, params.OutputSize, params.OutputSize).rgb;
+    else if (DO_FXAA > 0.0)
+        pixel_haloed = pixel_glow(FXAA_pass, HALO_W,HALO_H,HALO_POWER,HALO_GAMMA,halo_coords, global.FXAA_passSize, global.FXAA_passSize).rgb;
     else
-        pixel_haloed = pixel_glow(first_pass, HALO_W,HALO_H,HALO_POWER,HALO_GAMMA,halo_coords, global.FXAA_and_chroma_bleed_passSize, global.FXAA_and_chroma_bleed_passSize).rgb;
+        pixel_haloed = pixel_glow(first_pass, HALO_W,HALO_H,HALO_POWER,HALO_GAMMA,halo_coords, global.FXAA_passSize, global.FXAA_passSize).rgb;
         
     return vec4(pixel_haloed.rgb,1.0);
 }

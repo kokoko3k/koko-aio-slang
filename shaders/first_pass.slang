@@ -6,15 +6,9 @@
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
-layout(location = 1) out vec2 r_offset;
-layout(location = 2) out vec2 g_offset;
-layout(location = 3) out vec2 b_offset;
 layout(location = 4) out vec3 temperature_rgb;
 
 #include "includes/functions.include.slang"
-
-#define RGB_SHIFT_RANGE 20
-
 
 
 vec3 kelvin2rgb(float k) {
@@ -44,22 +38,12 @@ vec3 kelvin2rgb(float k) {
 void main() {
    gl_Position = global.MVP * Position;
    vTexCoord = TexCoord;
-   if (DO_SHIFT_RGB == 1.0) {
-      float in_aspect = 1.0;//get_in_aspect();
-      float spr_radius = min(params.SourceSize.z, params.SourceSize.w);
-      r_offset=offsets_from_float(SHIFT_R+210.0,RGB_SHIFT_RANGE);
-      g_offset=offsets_from_float(SHIFT_G+210.0,RGB_SHIFT_RANGE);
-      b_offset=offsets_from_float(SHIFT_B+210.0,RGB_SHIFT_RANGE);
-   }
    if (TEMPERATURE != 6500)
       temperature_rgb = kelvin2rgb(TEMPERATURE);
 }
 
 #pragma stage fragment
 layout(location = 0) in vec2 vTexCoord;
-layout(location = 1) in vec2 r_offset;
-layout(location = 2) in vec2 g_offset;
-layout(location = 3) in vec2 b_offset;
 layout(location = 4) in vec3 temperature_rgb;
 layout(location = 0) out vec4 FragColor;
 
@@ -67,19 +51,9 @@ layout(set = 0, binding = 2) uniform sampler2D Source;
 
 #include "includes/functions.include.slang"
 
-
-vec3 pixel_offset(vec3 pixel_cur,vec2 coord) {
-      vec2 d = -vec2(params.SourceSize.z, params.SourceSize.w)*0.5;
-      vec3 pixel_offset;
-      pixel_offset.r=texture(Source,coord + r_offset * d).r;
-      pixel_offset.g=texture(Source,coord + g_offset * d).g;
-      pixel_offset.b=texture(Source,coord + b_offset * d).b;
-      return mix(pixel_cur,pixel_offset,OFFSET_STRENGTH);
-}
-
 vec3 pixel_no_flicker(vec2 coord){
    vec3 pixel_out = texture(Source,coord).rgb;
-   if (DO_SHIFT_RGB == 1.0) pixel_out = pixel_offset(pixel_out.rgb, coord);
+   
    if (DO_CCORRECTION == 1.0) {
 
       pixel_out = pixel_push_luminance(pixel_out,LUMINANCE); // if/then check for LUMINANCE == 0.0 made by function itself.

@@ -29,20 +29,21 @@ layout(location = 0) out vec4 FragColor;
 
 
 //layout(set = 0, binding = 2) uniform sampler2D main_pass;
-layout(set = 0, binding = 3) uniform sampler2D bloom_pass_final;
-layout(set = 0, binding = 4) uniform sampler2D reflected_blurred_pass2;
-layout(set = 0, binding = 5) uniform sampler2D ambi_temporal_pass;
-layout(set = 0, binding = 6) uniform sampler2D avglum_pass;
-layout(set = 0, binding = 7) uniform sampler2D monitor_body;
-layout(set = 0, binding = 8) uniform sampler2D bg;
-layout(set = 0, binding = 9) uniform sampler2D first_pass;
+layout(set = 0, binding = 2) uniform sampler2D bloom_pass_final;
+layout(set = 0, binding = 3) uniform sampler2D reflected_blurred_pass2;
+layout(set = 0, binding = 4) uniform sampler2D ambi_temporal_pass;
+layout(set = 0, binding = 5) uniform sampler2D avglum_pass;
+layout(set = 0, binding = 6) uniform sampler2D monitor_body;
+layout(set = 0, binding = 7) uniform sampler2D bg;
+layout(set = 0, binding = 8) uniform sampler2D first_pass;
+layout(set = 0, binding = 9) uniform sampler2D shift_and_bleed_pass;
 
 //Ex main_pass layouts:
-    layout(set = 0, binding = 10) uniform sampler2D FXAA_and_chroma_bleed_pass;
+    layout(set = 0, binding = 10) uniform sampler2D FXAA_pass;
     layout(set = 0, binding = 11) uniform sampler2D in_glow_pass;
     layout(set = 0, binding = 12) uniform sampler2D halo_pass;
     //layout(set = 0, binding = 13) uniform sampler2D first_pass;
-    layout(set = 0, binding = 14) uniform sampler2D avglum_passFeedback;
+    layout(set = 0, binding = 13) uniform sampler2D avglum_passFeedback;
 
 //Ex main_pass defines:
     #define half_pi 1.5707963267949
@@ -191,9 +192,11 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
             pixel_glowed = texture(in_glow_pass,coords).rgb;
             pixel_in = pixel_glowed;
         }
-            else if (DO_FXAA + DO_SAT_BLEED > 0.0)
-        pixel_in = texture(FXAA_and_chroma_bleed_pass,coords).rgb ;
-            else
+    else if ( DO_SHIFT_RGB + DO_SAT_BLEED > 0.0)
+        pixel_in = texture(shift_and_bleed_pass,coords).rgb ;
+    else if (DO_FXAA > 0.0)
+        pixel_in = texture(FXAA_pass,coords).rgb ;
+    else
         pixel_in = texture(first_pass,coords).rgb ;
 
     vec3 pixel_out = pixel_in;
@@ -508,6 +511,5 @@ void main() {
         //if ( (vOutputCoord.x < 0.5  && vOutputCoord.y > 0.5) || (vOutputCoord.x > 0.5  && vOutputCoord.y < 0.5)  ) pixel_out = texture(first_pass,vOutputCoord);
         //split screen (debug)
         //if (vTexCoord.y < 0.5) pixel_out = texture(first_pass,vTexCoord);
-
     FragColor = pixel_out;
 }
