@@ -1,8 +1,13 @@
 #reference "koko-aio-crt-monitor-slotmask.slangp"
 
-DO_SHIFT_RGB = "1.0" 
+
+//DO_SHIFT_RGB has been disabled by now, because fxaa cant deal with it.
+DO_SHIFT_RGB = "0.0" 
 
 DO_FXAA = "1.000000"
 
-HALO_W = "6.000000"
-HALO_H = "6.000000"
+	SCANLINE_DARK = "0.5"
+
+
+HALO_W = "7.000000"
+HALO_H = "7.000000"

@@ -100,6 +100,7 @@ shaders = 16
           scale_x0 = 2.0
           scale_y0 = 2.0
         wrap_mode0 = "mirrored_repeat"
+float_framebuffer0 = true
 
 /* Nvidia fxaa pass:
    works good for "SD" resolutions
@@ -117,7 +118,7 @@ shaders = 16
    //yay.
      mipmap_input1 = true
         wrap_mode1 = "mirrored_repeat"
-        
+float_framebuffer1 = true
 /* Blur and glow the image as requested 
    This pass aims to simulate the signal input power.
    Glowing will be used to weighting the scanlines.
