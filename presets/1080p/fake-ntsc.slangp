@@ -1,4 +1,8 @@
-#reference "koko-aio-crt-monitor-slotmask.slangp"
+#reference "koko-aio-crt-monitor-slotmask-bloom-bezelwider.slangp"
+
+
+	GAMMA_OUT = "0.36"
+
 DO_SAT_BLEED = "1.000000"
 
 DO_SHIFT_RGB = "1.000000"
@@ -11,7 +15,6 @@ DO_SHIFT_RGB = "1.000000"
 	CONTRAST = "0.050000"
 	BRIGHTNESS = "0.050000"
 	TEMPERATURE = "7000.000000"
-
 	
 	SCANLINE_DARK = "0.3"
 	

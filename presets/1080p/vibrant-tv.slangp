@@ -1,13 +1,19 @@
-#reference "/koko/koko-aio-slang/presets/1080p/koko-aio-crt-monitor-slotmask-bloom-bezel.slangp"
+#reference "koko-aio-crt-monitor-slotmask-bloom-bezel.slangp"
+
+
+
+
+
 DO_SHIFT_RGB = "1.000000"
-SHIFT_R = "-40.000000"
-SHIFT_G = "2.000000"
-SHIFT_B = "40.000000"
-SATURATION = "1.200000"
+SHIFT_R = "-60.000000"
+SHIFT_G = "3.000000"
+SHIFT_B = "60.000000"
+SATURATION = "1.100000"
 TEMPERATURE = "7200.000000"
 DO_FXAA = "1.000000"
+SCANLINE_DARK = "0.10"
 SCANLINE_FLICKERING = "1.000000"
-SCANLINE_FLICKERING_POWER = "4.000000"
+SCANLINE_FLICKERING_POWER = "1.00000"
 IN_GLOW_WH = "1.000000"
-BLOOM_MIX = "0.300000"
+BLOOM_MIX = "0.1"
 V_SIZE = "1.900000"

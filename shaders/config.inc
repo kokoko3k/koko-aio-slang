@@ -160,29 +160,31 @@ layout(std140, set = 0, binding = 0) uniform UBO
 	
 } global;
 
-//Offset RGB
-// Allow to shift Red, Green, Blue components along x and y axis
-#pragma parameter DO_SHIFT_RGB       "★ Shift RGB components enable? ==>"	0.0	 0.0 1.0 1.0
-#pragma parameter SHIFT_R         "        Red offset"			-20.0 	-210.0 189.0 1
-#pragma parameter SHIFT_G         "        Green offset"		1.0 	-210.0 189.0 1
-#pragma parameter SHIFT_B         "        Blue offset"			20.0 	-210.0 189.0 1
-#pragma parameter OFFSET_STRENGTH "        Strength"			0.5 	 0.0 1.0 0.1
-
-// FXAA
-// Apply an antialiasing filter via FXAA from Nvidia.
-#pragma parameter DO_FXAA "★ FXAA enable? ==>"	0.0 	0.0 1.0 1.0
-
-// Chroma bleeding, (very) poor man's ntsc filter.
-#pragma parameter DO_SAT_BLEED "★ Saturated color bleeding enable? ==>"	0.0 	0.0 1.0 1.0
-
 // Color correction
-#pragma parameter DO_CCORRECTION "★ Color corrections enable? ==>" 			0.0 	0.0 1.0 1.0
+#pragma parameter DO_CCORRECTION "★ Color corrections enable? ==>" 		0.0 	0.0 1.0 1.0
 #pragma parameter LUMINANCE       "        Luminance push (>1.0=clip)"		0.0	 0.0 3.0 0.05
 #pragma parameter SATURATION     "        Saturation in   (1.0=off)"		1.0	0.0  2.0 0.01
 #pragma parameter CONTRAST       "        Contrast in     (0.0=off)"		0.0	-1.0 1.0 0.01
 #pragma parameter BRIGHTNESS     "        Brightness in   (0.0=off)"		0.0	-1.0 1.0 0.01
 #pragma parameter TEMPERATURE    "        Temperature in (6500=off)"		6500.0	3000 10000.0 50.0
-#pragma parameter GAMMA_OUT      "        Gamma out"						0.69	0.1 	9.0  0.025
+#pragma parameter GAMMA_OUT      "        Gamma out"				0.69	0.1 	9.0  0.025
+
+// FXAA
+// Apply an antialiasing filter via FXAA from Nvidia.
+#pragma parameter DO_FXAA "★ FXAA enable? ==>"	0.0 	0.0 1.0 1.0
+
+//Offset RGB
+// Allow to shift Red, Green, Blue components along x and y axis
+#pragma parameter DO_SHIFT_RGB       "★ Shift RGB components enable? ==>"	0.0	 0.0 1.0 1.0
+#pragma parameter SHIFT_R         "        Red offset"			-40.0 	-210.0 189.0 1
+#pragma parameter SHIFT_G         "        Green offset"		3.0 	-210.0 189.0 1
+#pragma parameter SHIFT_B         "        Blue offset"			40.0 	-210.0 189.0 1
+#pragma parameter OFFSET_STRENGTH "        Strength"			0.4 	 0.0 1.0 0.1
+
+// Chroma bleeding, (very) poor man's ntsc filter.
+#pragma parameter DO_SAT_BLEED "★ Saturated color bleeding enable? ==>"	0.0 	0.0 1.0 1.0
+
+
 
 
 // Scanlines
@@ -201,7 +203,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // interlaced screens; 0 disable the effect, 1 always enables it, 2 enables it only when
 // the shader detects an interlaced signal, which actually means that the vertical resoution is "high enough"
 #pragma parameter SCANLINE_FLICKERING "        Interlace Flicker (0=off,1=on,2=if interlaced)"		  	2.0 	0.0 2.0 1.0
-#pragma parameter SCANLINE_FLICKERING_POWER "        Interlace Flicker power"		  			1.5 	0.0 4.0 0.25
+#pragma parameter SCANLINE_FLICKERING_POWER "        Interlace Flicker power"		  			0.75 	0.0 4.0 0.25
 
 #pragma parameter SCANLINE_DISABLE_ON_INTERLACE "        Disable on interlaced screen"			  	0.0 	0.0 1.0 1.0
 

@@ -506,10 +506,10 @@ void main() {
     }
 
 
-        //For debug purposes:
+    //For debug purposes:
         //quad split screen
         //if ( (vOutputCoord.x < 0.5  && vOutputCoord.y > 0.5) || (vOutputCoord.x > 0.5  && vOutputCoord.y < 0.5)  ) pixel_out = texture(first_pass,vOutputCoord);
-        //split screen (debug)
+        //split screen
         //if (vTexCoord.y < 0.5) pixel_out = texture(first_pass,vTexCoord);
     FragColor = pixel_out;
 }
