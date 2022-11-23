@@ -49,8 +49,6 @@ vec3 rgb2hsv(vec3 c){
 }
 
 
-
-
 vec3 pixel_offset(vec3 pixel_cur,vec2 coord, sampler2D in_texture, vec4 sourcesize2) {
       vec2 d = -vec2(sourcesize2.z, sourcesize2.w)*0.5;
       vec3 pixel_offset;
@@ -61,13 +59,21 @@ vec3 pixel_offset(vec3 pixel_cur,vec2 coord, sampler2D in_texture, vec4 sourcesi
 }
 
 
+vec3 pixel_offset_wrap (vec2 coord) {
+   vec3 pixel_in;
+   if ( DO_FXAA == 1.0)  {
+      pixel_in = texture(FXAA_pass, vTexCoord).rgb;
+      return pixel_offset(pixel_in, vTexCoord, FXAA_pass, global.FXAA_passSize);
+   } else {
+      pixel_in = texture(first_pass, vTexCoord).rgb;
+      return pixel_offset(pixel_in, vTexCoord, first_pass, global.first_passSize);
+   }
+}
+
 #define off1 1.0
 #define w1 0.125
 #define off2 2.0
 #define w2  0.125
-
-
-float avgsat = 0.0;
 
 vec3 pixel_bleed(vec3 pixel_out, vec2 co, sampler2D in_texture, vec4 sourcesize2) {
    vec3 previous_pixel1 = texture(first_pass, co - vec2(sourcesize2.z*off1,0.0)).rgb;
@@ -83,7 +89,6 @@ vec3 pixel_bleed(vec3 pixel_out, vec2 co, sampler2D in_texture, vec4 sourcesize2
    previous_sat1*=w1;
    previous_sat2*=w2;
 
-   avgsat = (previous_sat1+previous_sat2)*5.0;
    /*next_sat1*=w1;
    next_sat2*=w2;
    */
@@ -96,44 +101,46 @@ vec3 pixel_bleed(vec3 pixel_out, vec2 co, sampler2D in_texture, vec4 sourcesize2
    return pixel_out;
 }
 
-void main() { 
-   vec3 pixel_bleeded;
-   vec3 pixel_shifted;
-   
+
+
+
+void main() {
+   //Handle case where both are needed:
+   //First shift the right source, then pass it to bleed function.
+   if (DO_SHIFT_RGB + DO_SAT_BLEED > 1.0) {
+      vec3 pixel_out = pixel_offset_wrap(vTexCoord);
       if (DO_SAT_BLEED > 0.0) {      
          if ( DO_FXAA == 1.0)  {
-            pixel_bleeded = texture(FXAA_pass, vTexCoord).rgb;
-            pixel_bleeded = pixel_bleed(pixel_bleeded, vTexCoord, FXAA_pass, global.FXAA_passSize);
+            pixel_out = pixel_bleed(pixel_out, vTexCoord, FXAA_pass, global.FXAA_passSize);
          } else {
-            pixel_bleeded = texture(first_pass, vTexCoord).rgb;
-            pixel_bleeded = pixel_bleed(pixel_bleeded, vTexCoord, first_pass, global.first_passSize);
+            pixel_out = pixel_bleed(pixel_out, vTexCoord, first_pass, global.first_passSize);
          }
       }
-      
-      if (DO_SHIFT_RGB > 0.0) {      
-         if ( DO_FXAA == 1.0)  {
-            pixel_shifted = texture(FXAA_pass, vTexCoord).rgb;
-            pixel_shifted = pixel_offset(pixel_shifted, vTexCoord, FXAA_pass, global.FXAA_passSize);
-         } else {
-            pixel_shifted = texture(first_pass, vTexCoord).rgb;
-            pixel_shifted = pixel_offset(pixel_shifted, vTexCoord, first_pass, global.first_passSize);
-         }
-      }
-
-      FragColor = vec4(mix(pixel_bleeded,pixel_shifted,0.25),0.0);
-      if (DO_SAT_BLEED + DO_SHIFT_RGB > 1.0) {
-         FragColor = vec4(mix(pixel_shifted,pixel_bleeded,avgsat),0.0);
-         return;
-      }
-      if (DO_SAT_BLEED > 0.0) {
-         FragColor = vec4(pixel_bleeded,0.0);
-         return;
-      }
-      if (DO_SHIFT_RGB > 0.0) {
-         FragColor = vec4(pixel_shifted,0.0);
-         return;
-      }
+      FragColor = vec4(pixel_out,0.0);
+      return;
+   }
    
-   //if (DO_SHIFT_RGB == 1.0) pixel_out = pixel_offset(pixel_out.rgb, coord);
+   //Handle case where only color shifting is requested
+   if (DO_SHIFT_RGB > 0.0) {
+      vec3 pixel_out = pixel_offset_wrap(vTexCoord);
+      FragColor = vec4(pixel_out,0.0);
+      return;
+   }
+   
+   //Handle case where only chroma bleed is requested
+   if (DO_SAT_BLEED > 0.0) {      
+      vec3 pixel_out;
+      if ( DO_FXAA == 1.0)  {
+         pixel_out = texture(FXAA_pass, vTexCoord).rgb;
+         pixel_out = pixel_bleed(pixel_out, vTexCoord, FXAA_pass, global.FXAA_passSize);
+      } else {
+         pixel_out = texture(first_pass, vTexCoord).rgb;
+         pixel_out = pixel_bleed(pixel_out, vTexCoord, first_pass, global.first_passSize);
+      }
+      FragColor = vec4(pixel_out,0.0);
+      return;
+   }
+   
+
 }
 
