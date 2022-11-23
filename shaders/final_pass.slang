@@ -76,7 +76,7 @@ vec3 pixel_vmask(vec3 source, vec3 white_reference, float over_white) {
     vec3 pixel_out;
     vec3 vmasked;
     vec4 vec_mod=(vec4(3,1,2,3) + vec4(VMASK_GAP,0.0,0.0,0.0))* VMASK_DARKLINE_SCALE ;
-    
+
     float mymod = mod(vFragCoord.x, vec_mod.x);
 
     /*
@@ -146,6 +146,7 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
     float Darkline_part_w = (3.0 - VMASK_USE_GM + VMASK_GAP) * VMASK_DARKLINE_SCALE;
     float Darkline_part_w_x2 = Darkline_part_w*2;
 
+    
 
     darkline_every *= VMASK_DARKLINE_SCALE;
 
@@ -156,20 +157,23 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
         darkline_trans=clamp(darkline_trans,0.0,1.0);
     }
 
+    //Slotmask 
     if (do_offset == 1.0) {
-        if  (mod(vFragCoord.y, darkline_every) < VMASK_DARKLINE_SCALE) {
-            if (mod(vFragCoord.x, Darkline_part_w_x2) < Darkline_part_w) return source * darkline_trans;
-        } else if  (mod(vFragCoord.y+(darkline_every/2), darkline_every) < VMASK_DARKLINE_SCALE ) {
-            // DRAW WITH OFFSET:
-            if ((mod(vFragCoord.x + Darkline_part_w , Darkline_part_w_x2)) < Darkline_part_w)
-                return source * darkline_trans;
-        }
-    } else {
-
-        if ( darkline_every >= 0.0)
-            if ((mod(vFragCoord.y, darkline_every)) < VMASK_DARKLINE_SCALE) return source * darkline_trans;
+        bool odd_line_meno_densa = mod(vFragCoord.y, darkline_every) > VMASK_DARKLINE_SCALE ;
+        bool odd_line_piu_densa = !(mod(vFragCoord.y, darkline_every/2) < VMASK_DARKLINE_SCALE && odd_line_meno_densa);
+        bool odd_column = mod(vFragCoord.x + Darkline_part_w  , Darkline_part_w_x2) < Darkline_part_w;
+        bool draw_dark  = odd_line_piu_densa;        
+        bool draw_color = odd_line_piu_densa && !odd_column || odd_column && odd_line_meno_densa;
+        return source * ( float(draw_color) +  float(draw_dark) * darkline_trans);
     }
-    return source;
+    
+    //Straight lines (implicit do_offset = 0.0):
+        bool draw_dark = mod(vFragCoord.y, darkline_every) < VMASK_DARKLINE_SCALE;
+        bool draw_color = !draw_dark;
+        return source * ( float(draw_color) +  float(draw_dark) * darkline_trans );
+
+    
+
 }
 
 float scanline_shape(vec2 coords, bool do_flicker) {
