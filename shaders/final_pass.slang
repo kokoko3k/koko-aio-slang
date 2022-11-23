@@ -48,29 +48,30 @@ layout(set = 0, binding = 9) uniform sampler2D shift_and_bleed_pass;
 //Ex main_pass defines:
     #define half_pi 1.5707963267949
 
-    // RGB mask:       R     G     B
-    #define m1 vec3 ( 1.0 , 0.0 , 0.0 )    //col 1
-    #define m2 vec3 ( 0.0 , 1.0 , 0.0 )    //col 2
-    #define m3 vec3 ( 0.0 , 0.0 , 1.0  )   //col 3
-
-    // RGB mask low dpi (green-magenta, exploiting native rgb subpixels)
-    #define m1gm vec3 ( 0.0 , 1.0 , 0.0 )    //col 1
-    #define m2gm vec3 ( 1.0 , 0.0 , 1.0 )    //col 2
-
 #include "includes/functions.include.slang"
 
 
 vec3 pixel_vmask(vec3 source, vec3 white_reference, float over_white) {
+
+    float ooo = 1.0 - RGB_MASK_STRENGTH;
+    // RGB mask:     R     G     B
+    vec3 m1 =  vec3( 1.0 , ooo , ooo );  //col 1
+    vec3 m2 =  vec3( ooo , 1.0 , ooo );  //col 2
+    vec3 m3 =  vec3( ooo , ooo , 1.0 );  //col 3
+    vec3 gap = vec3( ooo );
+    
     int col = int( vOutputCoord.x * params.OutputSize.x );
     vec3 pixel_out;
     vec3 vmasked;
     vec4 vec_mod=(vec4(3,1,2,3) + vec4(VMASK_GAP,0.0,0.0,0.0))* VMASK_DARKLINE_SCALE ;
     
-    float mask_lightness = 1.0 - RGB_MASK_STRENGTH;
-    if ( mod(col, vec_mod.x) < vec_mod.y)         vmasked = min(m1 + mask_lightness,vec3(1.0)) * source;
-        else if (mod(col, vec_mod.x) < vec_mod.z) vmasked = min(m2 + mask_lightness,vec3(1.0)) * source;
-        else if (mod(col, vec_mod.x) < vec_mod.w) vmasked = min(m3 + mask_lightness,vec3(1.0)) * source;
-    else vmasked = min(vec3(0.0) + mask_lightness,vec3(1.0)) * source;
+    if (mod(col, vec_mod.x) < vec_mod.y)
+        vmasked = m1 * source;
+    else if (mod(col, vec_mod.x) < vec_mod.z) 
+        vmasked = m2 * source;
+    else if (mod(col, vec_mod.x) < vec_mod.w)
+        vmasked = m3 * source;
+    else vmasked = gap * source;
 
     if (over_white == 1.0) pixel_out = vmasked;
         else {
@@ -79,19 +80,29 @@ vec3 pixel_vmask(vec3 source, vec3 white_reference, float over_white) {
             whiteness=  clamp(whiteness,0.0,1.0);
             pixel_out=  mix(vmasked,source,whiteness);
         }
-   return pixel_out;
+   return pixel_out;  
+    
 }
 
 vec3 pixel_vmask_gm(vec3 source, vec3 white_reference, float over_white) {
+    
+    float ooo = 1.0 - RGB_MASK_STRENGTH;
+    // RGB mask:     R     G     B
+    vec3 m1 =  vec3( ooo , 1.0 , ooo );    //col 1
+    vec3 m2 =  vec3( 1.0 , ooo , 1.0 );    //col 2
+    vec3 gap = vec3( ooo );
+    
     int col = int( vOutputCoord.x * params.OutputSize.x );
     vec3 pixel_out;
     vec3 vmasked;
     vec3 vec_mod=(vec3(2,1,2) + vec3(VMASK_GAP,0.0,0.0))* VMASK_DARKLINE_SCALE ;
 
-    float mask_lightness = 1.0 - RGB_MASK_STRENGTH;
-    if (mod(col, vec_mod.x) < vec_mod.y)          vmasked = min(m1gm + mask_lightness,vec3(1.0)) * source;
-        else if (mod(col, vec_mod.x) < vec_mod.z) vmasked = min(m2gm + mask_lightness,vec3(1.0)) * source;
-    else vmasked = min(vec3(0.0) + mask_lightness,vec3(1.0)) * source;
+    if (mod(col, vec_mod.x) < vec_mod.y)
+        vmasked = m1 * source;
+    else if (mod(col, vec_mod.x) < vec_mod.z)
+        vmasked = m2 * source;
+    else 
+        vmasked = gap * source;
 
     if (over_white == 1.0) pixel_out = vmasked;
         else {
@@ -206,14 +217,16 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
     if (DO_VMASK_AND_DARKLINES == 1.0 ) {
         vec3 pixel_in_compensated = pixel_in;
         
-        pixel_in_compensated = pixel_push_luminance(pixel_in, RGB_MASK_STRENGTH * MASK_COMPENSATION); // if/then check for strength == 0.0 made by the function itself.
+        pixel_in_compensated = pixel_push_luminance(pixel_in, RGB_MASK_STRENGTH * MASK_COMPENSATION);
         
         if (RGB_MASK_STRENGTH > 0.0) {
             //Use RGB pattern or exploit RGB layout with green and magenta?
             if (VMASK_USE_GM < 1.0) {
                 pixel_out = pixel_vmask(pixel_in_compensated, pixel_in_clamped, VMASK_OVERWHITE);
+                //pixel_out *= mask_weights(vTexCoord.st * params.OutputSize.xy, 1.0, 3);
             } else {
                 pixel_out = pixel_vmask_gm(pixel_in_compensated, pixel_in_clamped, VMASK_OVERWHITE);
+                //pixel_out *= mask_weights(vTexCoord.st * params.OutputSize.xy, 1.0, 3);
             }
         }
 
@@ -226,6 +239,8 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
 
     }
 
+    
+    
     //Halo
     vec3 pixel_haloed;
     if (DO_HALO == 1.0 ) {
@@ -478,9 +493,40 @@ vec4 main_wrap(vec2 coords){
 }
 
 
+/*
+A collection of CRT mask effects that work with LCD subpixel structures for
+small details
+
+author: hunterk
+license: public domain
+
+How to use it:
+
+Multiply your image by the vec3 output:
+FragColor.rgb *= mask_weights(gl_FragCoord.xy, 1.0, 1);
+
+In the "alpha" version, the alpha channel stores the number of lit subpixels per pixel for use in brightness-loss compensation efforts.
+
+The function needs to be tiled across the screen using the physical pixels, e.g.
+gl_FragCoord (the "vec2 coord" input). In the case of slang shaders, we use
+(vTexCoord.st * OutputSize.xy).
+
+The "mask_intensity" (float value between 0.0 and 1.0) is how strong the mask
+effect should be. Full-strength red, green and blue subpixels on a white pixel
+are the ideal, and are achieved with an intensity of 1.0, though this darkens
+the image significantly and may not always be desirable.
+
+The "phosphor_layout" (int value between 0 and 24) determines which phophor
+layout to apply. 0 is no mask/passthru.
+
+Many of these mask arrays are adapted from cgwg's crt-geom-deluxe LUTs, and
+those have their filenames included for easy identification
+*/
+
+
+
 void main() {
-
-
+    
     vec2 coords = vTexCoord;
     //Curvature
     if (DO_CURVATURE == 1.0) {
@@ -504,7 +550,6 @@ void main() {
         vec4 bg_image = pixel_background_image();
         pixel_out = mix(pixel_out,bg_image,bg_image.a);
     }
-
 
     //For debug purposes:
         //quad split screen
