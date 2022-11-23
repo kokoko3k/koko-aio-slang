@@ -6,25 +6,37 @@
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 
+
 layout(location = 0) out vec2 vTexCoord;
 layout(location = 1) out vec2 vOutputCoord;
-layout(location = 4) out vec2 spot_offset;
+layout(location = 2) out vec2 spot_offset;
+layout(location = 3) out vec2 vFragCoord;
 
 #include "includes/functions.include.slang"
+
+bool between(float x, float mmin, float mmax) {
+    return x>mmin && x<=mmax;
+}
 
 void main() {
     gl_Position = global.MVP * Position;
     vTexCoord = get_scaled_coords(TexCoord,global.FinalViewportSize, is_rotated())+vec2(0.00001);
     vOutputCoord = TexCoord;;
+
     spot_offset = offsets_from_float(S_POSITION+420.0,40);
     spot_offset = spot_offset / 10.0 + vec2(0.0,1.0);
+
+    vFragCoord = vec2( floor(vOutputCoord.x * params.OutputSize.x),
+                       floor(vOutputCoord.y * params.OutputSize.y));
 }
 
 
 #pragma stage fragment
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in vec2 vOutputCoord;
-layout(location = 4) in vec2 spot_offset;
+layout(location = 2) in vec2 spot_offset;
+layout(location = 3) in vec3 vFragCoord;
+
 layout(location = 0) out vec4 FragColor;
 
 
@@ -53,26 +65,33 @@ layout(set = 0, binding = 9) uniform sampler2D shift_and_bleed_pass;
 
 vec3 pixel_vmask(vec3 source, vec3 white_reference, float over_white) {
 
+    
     float ooo = 1.0 - RGB_MASK_STRENGTH;
     // RGB mask:     R     G     B
     vec3 m1 =  vec3( 1.0 , ooo , ooo );  //col 1
     vec3 m2 =  vec3( ooo , 1.0 , ooo );  //col 2
     vec3 m3 =  vec3( ooo , ooo , 1.0 );  //col 3
     vec3 gap = vec3( ooo );
-    
-    int col = int( vOutputCoord.x * params.OutputSize.x );
+
     vec3 pixel_out;
     vec3 vmasked;
     vec4 vec_mod=(vec4(3,1,2,3) + vec4(VMASK_GAP,0.0,0.0,0.0))* VMASK_DARKLINE_SCALE ;
     
-    if (mod(col, vec_mod.x) < vec_mod.y)
-        vmasked = m1 * source;
-    else if (mod(col, vec_mod.x) < vec_mod.z) 
-        vmasked = m2 * source;
-    else if (mod(col, vec_mod.x) < vec_mod.w)
-        vmasked = m3 * source;
-    else vmasked = gap * source;
+    float mymod = mod(vFragCoord.x, vec_mod.x);
 
+    /*
+    if (mymod < vec_mod.y)         vmasked = m1 * source;
+    else if (mymod < vec_mod.z)      vmasked = m2 * source;
+    else if (mymod < vec_mod.w)      vmasked = m3 * source;
+    else                             vmasked = gap * source;
+    */
+ 
+    bool do_m1 = (mymod < vec_mod.y);
+    bool do_m2 = (mymod < vec_mod.z) && !do_m1;
+    bool do_m3 = (mymod < vec_mod.w) && !do_m2 && !do_m1 ;
+    bool do_gap = !do_m3;
+    vmasked = source * (float(do_m1) * m1 + float(do_m2) * m2 + float(do_m3) * m3 + float(do_gap) * gap);
+    
     if (over_white == 1.0) pixel_out = vmasked;
         else {
             float whiteness=max(max(white_reference.r,white_reference.g),white_reference.b);
@@ -81,7 +100,8 @@ vec3 pixel_vmask(vec3 source, vec3 white_reference, float over_white) {
             pixel_out=  mix(vmasked,source,whiteness);
         }
    return pixel_out;  
-    
+
+
 }
 
 vec3 pixel_vmask_gm(vec3 source, vec3 white_reference, float over_white) {
@@ -92,17 +112,22 @@ vec3 pixel_vmask_gm(vec3 source, vec3 white_reference, float over_white) {
     vec3 m2 =  vec3( 1.0 , ooo , 1.0 );    //col 2
     vec3 gap = vec3( ooo );
     
-    int col = int( vOutputCoord.x * params.OutputSize.x );
     vec3 pixel_out;
     vec3 vmasked;
     vec3 vec_mod=(vec3(2,1,2) + vec3(VMASK_GAP,0.0,0.0))* VMASK_DARKLINE_SCALE ;
 
-    if (mod(col, vec_mod.x) < vec_mod.y)
-        vmasked = m1 * source;
-    else if (mod(col, vec_mod.x) < vec_mod.z)
-        vmasked = m2 * source;
-    else 
-        vmasked = gap * source;
+    float mymod = mod(vFragCoord.x, vec_mod.x);
+    
+    /*
+    if (mymod < vec_mod.y)        vmasked = m1  * source;
+    else if (mymod < vec_mod.z)   vmasked = m2  * source;
+    else                          vmasked = gap * source;
+    */
+    
+    bool do_m1 = (mymod < vec_mod.y);
+    bool do_m2 = (mymod < vec_mod.z) && !do_m1;
+    bool do_gap = !do_m2;
+    vmasked = source * (float(do_m1) * m1 + float(do_m2) * m2 + float(do_gap) * gap);
 
     if (over_white == 1.0) pixel_out = vmasked;
         else {
@@ -120,9 +145,7 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
 
     float Darkline_part_w = (3.0 - VMASK_USE_GM + VMASK_GAP) * VMASK_DARKLINE_SCALE;
     float Darkline_part_w_x2 = Darkline_part_w*2;
-    //vec3 pixel_out=source;
-    float col_2 =  vOutputCoord.x * params.OutputSize.x;
-    float line_2 = vOutputCoord.y * params.OutputSize.y;
+
 
     darkline_every *= VMASK_DARKLINE_SCALE;
 
@@ -134,18 +157,17 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
     }
 
     if (do_offset == 1.0) {
-        if  (int(mod(line_2, darkline_every)) < VMASK_DARKLINE_SCALE) {
-            if (int(mod(col_2, Darkline_part_w_x2)) < Darkline_part_w) return source * darkline_trans;
-        } else if  (int(mod(line_2+(darkline_every/2), darkline_every)) < VMASK_DARKLINE_SCALE ) {
+        if  (mod(vFragCoord.y, darkline_every) < VMASK_DARKLINE_SCALE) {
+            if (mod(vFragCoord.x, Darkline_part_w_x2) < Darkline_part_w) return source * darkline_trans;
+        } else if  (mod(vFragCoord.y+(darkline_every/2), darkline_every) < VMASK_DARKLINE_SCALE ) {
             // DRAW WITH OFFSET:
-            col_2+=Darkline_part_w;
-            if ((int(mod(col_2, Darkline_part_w_x2))) < Darkline_part_w)
+            if ((mod(vFragCoord.x + Darkline_part_w , Darkline_part_w_x2)) < Darkline_part_w)
                 return source * darkline_trans;
         }
     } else {
 
         if ( darkline_every >= 0.0)
-            if (int(mod(line_2, darkline_every)) < VMASK_DARKLINE_SCALE) return source * darkline_trans;
+            if ((mod(vFragCoord.y, darkline_every)) < VMASK_DARKLINE_SCALE) return source * darkline_trans;
     }
     return source;
 }
