@@ -1,9 +1,13 @@
-#include "pows.include.slang"
-
-
 //Those functions will sample from source texture (the previous), but with a precision taken from passthrough_passSize.
 //This is needed because the source texture has been scaled up to the dimension of the viewport to allow
 //the scanlines to be linear filtered.
+
+
+/*
+#include "pows.include.slang"
+
+
+
 
 
 vec4 pixel_glow_gamma_1(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, vec2 coords, vec4 SourceSize1, vec4 SourceSize2) {
@@ -860,6 +864,8 @@ return vec3(1.0);
 
 }
 
+*/
+
 vec4 pixel_glow_std_pow(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, float glow_gamma, vec2 coords, vec4 SourceSize1, vec4 SourceSize2) {
 
     // Calculating texel coordinates
@@ -944,6 +950,8 @@ vec4 pixel_glow_std_pow(sampler2D in_texture, float my_glowpix, float my_glowpix
     return vec4(Bloom*my_glow,1.0);
 }
 
+
+
 vec4 dumb_glow(sampler2D in_texture, float my_glow, float glow_gamma, vec2 coords) {
     vec3 pixel_in = texture(in_texture, coords ).rgb;
     pixel_in = pow(pixel_in,vec3(glow_gamma))*my_glow;
@@ -955,11 +963,13 @@ vec4 pixel_glow(sampler2D in_texture, float my_glowpix, float my_glowpixy, float
     if ( (my_glowpix >= GLOW_SHARP_MAX) && (my_glowpixy >= GLOW_SHARP_MAX) ) {
         return dumb_glow(in_texture, my_glow,glow_gamma,coords);
     }
+    
+    return pixel_glow_std_pow(in_texture,my_glowpix,my_glowpixy,my_glow,glow_gamma,coords,SourceSize1, SourceSize2);
+    
+    //return pixel_glow_my_pow(in_texture,my_glowpix,my_glowpixy,my_glow,glow_gamma,coords,SourceSize1, SourceSize2);
+    
 
-    //if (prefer_std_pow != 1.0)
-    //{
-        //glow_gamma = floor(glow_gamma);
-        if (glow_gamma == 1) { return pixel_glow_gamma_1(in_texture, my_glowpix,my_glowpixy,my_glow,coords,SourceSize1, SourceSize2);   }
+/*        if (glow_gamma == 1) { return pixel_glow_gamma_1(in_texture, my_glowpix,my_glowpixy,my_glow,coords,SourceSize1, SourceSize2);   }
         if (glow_gamma == 2) { return pixel_glow_gamma_2(in_texture, my_glowpix,my_glowpixy,my_glow,coords,SourceSize1, SourceSize2);   }
         if (glow_gamma == 3) { return pixel_glow_gamma_3(in_texture,my_glowpix,my_glowpixy,my_glow,coords,SourceSize1, SourceSize2);   }
         if (glow_gamma == 4) { return pixel_glow_gamma_4(in_texture,my_glowpix,my_glowpixy,my_glow,coords,SourceSize1, SourceSize2);   }
@@ -969,8 +979,9 @@ vec4 pixel_glow(sampler2D in_texture, float my_glowpix, float my_glowpixy, float
         if (glow_gamma == 8) { return pixel_glow_gamma_8(in_texture,my_glowpix,my_glowpixy,my_glow,coords,SourceSize1, SourceSize2);   }
         if (glow_gamma == 9) { return pixel_glow_gamma_9(in_texture,my_glowpix,my_glowpixy,my_glow,coords,SourceSize1, SourceSize2);   }
         if (glow_gamma == 10) { return pixel_glow_gamma_10(in_texture,my_glowpix,my_glowpixy,my_glow,coords,SourceSize1, SourceSize2); }
-    //} else {
         return pixel_glow_std_pow(in_texture,my_glowpix,my_glowpixy,my_glow,glow_gamma,coords,SourceSize1, SourceSize2);
-    //}
+*/
+    
+
 }
  
