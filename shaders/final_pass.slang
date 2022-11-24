@@ -222,6 +222,7 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
     else
         pixel_in = texture(first_pass,coords).rgb ;
 
+    
     vec3 pixel_out = pixel_in;
     vec3 pixel_in_clamped = min(pixel_in,vec3(1.0)); //Clamp here for moth vmask and darklines.
 
@@ -265,12 +266,15 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
     if ( DO_SCANLINES == 1.0 )  {
         vec3 pixel_bleed ;
         if  (! ( isinterlaced  && (SCANLINE_DISABLE_ON_INTERLACE == 1.0))  ) {
-            if (DO_IN_GLOW + DO_HALO > 0.0) {
-                if (DO_HALO == 1.0) pixel_bleed = pixel_haloed;
-                else if (DO_IN_GLOW == 1.0) pixel_bleed = pixel_glowed;
-                else pixel_bleed = pixel_in;
-            }
 
+            if (DO_IN_GLOW == 1.0)
+                pixel_bleed = pixel_glowed;
+            else if (DO_HALO == 1.0) 
+                pixel_bleed = pixel_haloed;
+            else 
+                pixel_bleed = pixel_in;
+
+            
             if (SCANLINE_COMPENSATION > 0.0) {
                 float mypow = mix(1.0, (0.33 * SCANLINE_DARK + 0.67), SCANLINE_COMPENSATION);
                 pixel_out = pow(pixel_out,vec3(mypow));
@@ -568,5 +572,7 @@ void main() {
         //if ( (vOutputCoord.x < 0.5  && vOutputCoord.y > 0.5) || (vOutputCoord.x > 0.5  && vOutputCoord.y < 0.5)  ) pixel_out = texture(first_pass,vOutputCoord);
         //split screen
         //if (vTexCoord.y < 0.5) pixel_out = texture(first_pass,vTexCoord);
+        //pixel_out = texture(FXAA_pass,vTexCoord);
+        
     FragColor = pixel_out;
 }
