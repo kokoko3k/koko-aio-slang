@@ -266,8 +266,6 @@ layout(set = 0, binding = 2) uniform sampler2D first_pass;
 
 
 void main() {
-    vec3 pixel_out;
-    
-    if ( DO_FXAA > 0.0 )
-        FragColor = vec4(FxaaPixelShader(vTexCoord, first_pass, vec2(global.first_passSize.z, global.first_passSize.w)),0.0);
+    if ( DO_FXAA == 0.0 ) return;
+    FragColor = vec4(FxaaPixelShader(vTexCoord, first_pass, vec2(global.first_passSize.z, global.first_passSize.w)),0.0);
 }

@@ -56,16 +56,17 @@ void main() {
       2 - sampled less often for scene detection logic at coordinate 0.25,0.25
       Put another small mipmap into the rgb channel to be used by the reflection code.
     */
-   vec4 pixel_out;
     //FIXME: see which is faster:
     //if (DO_AMBILIGHT == 1.0 || DO_BEZEL == 1.0 || DO_DYNZOOM == 1.0) {
-    if ( !(DO_AMBILIGHT + DO_BEZEL + DO_DYNZOOM == 0) ) {
-        pixel_out.a = get_avglum();
-        if (DO_BEZEL == 1.0) {
-            //Create a small mipmap to be used to light the bezel corners.
-            pixel_out.rgb = textureLod(first_pass, vTexCoord,lod).rgb;
-        }
-        FragColor = pixel_out;
+    if ( DO_AMBILIGHT + DO_BEZEL + DO_DYNZOOM == 0 ) return;
+    
+    vec4 pixel_out;
+    pixel_out.a = get_avglum();
+    if (DO_BEZEL == 1.0) {
+        //Create a small mipmap to be used to light the bezel corners.
+        pixel_out.rgb = textureLod(first_pass, vTexCoord,lod).rgb;
     }
+    FragColor = pixel_out;
+
      
 }

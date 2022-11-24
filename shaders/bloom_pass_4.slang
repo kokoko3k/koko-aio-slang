@@ -23,22 +23,19 @@ layout(set = 0, binding = 2) uniform sampler2D Source;
 #include "includes/blooms.include.slang"
 
 void main() {
+    if (DO_BLOOM == 0.0) return;
 
-    if (DO_BLOOM == 1.0) {
-        vec3 bloomed = bloom(
-            Source,
-            vTexCoord,
-            params.SourceSize,
-            vec2(BLOOM_SIZE),
-            BLOOM_QUALITY,
-            1.0,
-            0.589048621875,
-            0.0
-        );
+    vec3 bloomed = bloom(
+        Source,
+        vTexCoord,
+        params.SourceSize,
+        vec2(BLOOM_SIZE),
+        BLOOM_QUALITY,
+        1.0,
+        0.589048621875,
+        0.0
+    );
 
-        FragColor = vec4(pow(bloomed,vec3(BLOOM_GAMMA_OUT)),1.0);
-                                                                                   //FragColor = texture(Source,vTexCoord);
-    } else {
-        return ;
-    }
+    FragColor = vec4(pow(bloomed,vec3(BLOOM_GAMMA_OUT)),1.0);
+
 }

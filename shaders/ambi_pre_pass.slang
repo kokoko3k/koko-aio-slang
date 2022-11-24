@@ -85,7 +85,8 @@ vec3 circle_smooth(vec2 coords, vec2 middle, float f_radius, float FALLOFF, floa
 #define FRAME_DIVIDER 3
 
 void main() {
-    if (DO_AMBILIGHT != 1.0) return ; 
+    if (DO_AMBILIGHT != 1.0) return; 
+    
     if ( mod(params.FrameCount,FRAME_DIVIDER) != 0.0) {
         FragColor = texture(ambi_pre_pass1Feedback,vTexCoord);
         return;

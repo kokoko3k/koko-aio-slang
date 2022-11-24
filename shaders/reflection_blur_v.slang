@@ -42,14 +42,14 @@ vec3 blur(float Quality, float Directions, float Size, vec2 co) {
 }
 
 void main() {
-   if (DO_BEZEL == 1.0) {
-      if (is_useless(texture(Source, vTexCoord))) return;
-      
-      vec2 res = vec2(params.SourceSize.x, params.SourceSize.y);
-      vec2 dir = vec2(0.0,1.0);
-      ///Quality, Directions, Size, coords
-      FragColor = vec4(blur(1,4,2,vTexCoord),1.0);
-   }
+    if (DO_BEZEL == 0.0) return;
+    
+    if (is_useless(texture(Source, vTexCoord))) return;
+
+    vec2 res = vec2(params.SourceSize.x, params.SourceSize.y);
+    vec2 dir = vec2(0.0,1.0);
+    ///Quality, Directions, Size, coords
+    FragColor = vec4(blur(1,4,2,vTexCoord),1.0);
 }
  
  

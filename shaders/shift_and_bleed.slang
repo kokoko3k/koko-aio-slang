@@ -105,6 +105,8 @@ vec3 pixel_bleed(vec3 pixel_out, vec2 co, sampler2D in_texture, vec4 sourcesize2
 
 
 void main() {
+   if (DO_SHIFT_RGB + DO_SAT_BLEED == 0.0) return;
+   
    //Handle case where both are needed:
    //First shift the right source, then pass it to bleed function.
    if (DO_SHIFT_RGB + DO_SAT_BLEED > 1.0) {

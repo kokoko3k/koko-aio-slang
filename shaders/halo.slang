@@ -55,9 +55,7 @@ vec4 main_wrap(void) {
 
 
 void main() {
-    if (DO_HALO == 1.0 ) {
-        FragColor = main_wrap();
-    } else {
-        return;
-    }
+    if (DO_HALO == 0.0 ) return;
+    
+    FragColor = main_wrap();
 }

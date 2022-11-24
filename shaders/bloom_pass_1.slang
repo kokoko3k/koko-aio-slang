@@ -24,23 +24,21 @@ layout(set = 0, binding = 2) uniform sampler2D first_pass;
 
 #include "includes/functions.include.slang"
 void main() {
+    if (DO_BLOOM == 0.0) return;
+    
+    vec3 bloomed = bloom(
+        first_pass,
+        vTexCoord,
+        params.OriginalSize,
+        vec2(BLOOM_SIZE),
+        BLOOM_QUALITY,
+        BLOOM_GAMMA,
+        0.0,
+        0.0
+    );
 
-    if (DO_BLOOM == 1.0) {
-        vec3 bloomed = bloom(
-            first_pass,
-            vTexCoord,
-            params.OriginalSize,
-            vec2(BLOOM_SIZE),
-            BLOOM_QUALITY,
-            BLOOM_GAMMA,
-            0.0,
-            0.0
-        );
+    bloomed = apply_fuzzy_main_pass(bloomed) * BLOOM_POWER;
+    FragColor = vec4(bloomed, 1.0);
 
-        bloomed = apply_fuzzy_main_pass(bloomed) * BLOOM_POWER;
-        FragColor = vec4(bloomed, 1.0);
 
-    } else {
-        return ;
-    }
 }
