@@ -65,7 +65,6 @@ layout(set = 0, binding = 9) uniform sampler2D shift_and_bleed_pass;
 
 vec3 pixel_vmask(vec3 source, vec3 white_reference, float over_white) {
 
-    
     float ooo = 1.0 - RGB_MASK_STRENGTH;
     // RGB mask:     R     G     B
     vec3 m1 =  vec3( 1.0 , ooo , ooo );  //col 1
@@ -88,10 +87,10 @@ vec3 pixel_vmask(vec3 source, vec3 white_reference, float over_white) {
  
     bool do_m1 = (mymod < vec_mod.y);
     bool do_m2 = (mymod < vec_mod.z) && !do_m1;
-    bool do_m3 = (mymod < vec_mod.w) && !do_m2 && !do_m1 ;
-    bool do_gap = !do_m3;
+    bool do_m3 = (mymod < vec_mod.w) && ! (do_m2 || do_m1) ;
+    bool do_gap = ! (do_m3  || do_m2 || do_m1) ;
     vmasked = source * (float(do_m1) * m1 + float(do_m2) * m2 + float(do_m3) * m3 + float(do_gap) * gap);
-    
+
     if (over_white == 1.0) pixel_out = vmasked;
         else {
             float whiteness=max(max(white_reference.r,white_reference.g),white_reference.b);
@@ -126,7 +125,7 @@ vec3 pixel_vmask_gm(vec3 source, vec3 white_reference, float over_white) {
     
     bool do_m1 = (mymod < vec_mod.y);
     bool do_m2 = (mymod < vec_mod.z) && !do_m1;
-    bool do_gap = !do_m2;
+    bool do_gap = !(do_m2 || do_m1);
     vmasked = source * (float(do_m1) * m1 + float(do_m2) * m2 + float(do_gap) * gap);
 
     if (over_white == 1.0) pixel_out = vmasked;
@@ -162,9 +161,8 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
         bool odd_line_meno_densa = mod(vFragCoord.y, darkline_every) > VMASK_DARKLINE_SCALE ;
         bool odd_line_piu_densa = !(mod(vFragCoord.y, darkline_every/2) < VMASK_DARKLINE_SCALE && odd_line_meno_densa);
         bool odd_column = mod(vFragCoord.x + Darkline_part_w  , Darkline_part_w_x2) < Darkline_part_w;
-        bool draw_dark  = odd_line_piu_densa;        
-        bool draw_color = odd_line_piu_densa && !odd_column || odd_column && odd_line_meno_densa;
-        return source * ( float(draw_color) +  float(draw_dark) * darkline_trans);
+        bool draw_mask = odd_line_piu_densa && !odd_column || odd_column && odd_line_meno_densa;
+        return source * clamp(float(draw_mask),darkline_trans,1.0);
     }
     
     //Straight lines (implicit do_offset = 0.0):
