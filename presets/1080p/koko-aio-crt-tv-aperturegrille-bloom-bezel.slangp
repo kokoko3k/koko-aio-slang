@@ -1,5 +1,7 @@
 #reference "koko-aio-crt-tv-aperturegrille-bloom.slangp"
 
+DO_SHIFT_RGB = "1.0"
+
 DO_BEZEL = "1.0"
         BEZEL_R = "-0.3"
         BEZEL_G = "-0.3"

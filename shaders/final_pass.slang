@@ -273,7 +273,6 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
                 pixel_bleed = pixel_haloed;
             else 
                 pixel_bleed = pixel_in;
-
             
             if (SCANLINE_COMPENSATION > 0.0) {
                 float mypow = mix(1.0, (0.33 * SCANLINE_DARK + 0.67), SCANLINE_COMPENSATION);
@@ -442,7 +441,7 @@ vec4 pixel_inner_frame(vec2 coords, bool bBorder_needed) {
                 float vignette;
                 float dist = length(vec2((coords.x-0.5)*in_aspect,coords.y-0.5));
                 vignette = smoothstep(V_SIZE,0.0,dist)*V_POWER+global_noise;
-                if (V_BYPASS < 1.0) pixel_out = vignette * pixel_out;
+                if (V_BYPASS < 1.0) pixel_out = vignette * clamp(pixel_out,0.0,1.0);
                     else
                 pixel_out = vec3(vignette);
             }
@@ -575,4 +574,6 @@ void main() {
         //pixel_out = texture(FXAA_pass,vTexCoord);
         
     FragColor = pixel_out;
+    
+    
 }
