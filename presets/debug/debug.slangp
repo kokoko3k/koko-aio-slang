@@ -2,6 +2,8 @@
 
 DO_FXAA = "0.0"
 
+DO_SAT_BLEED = "1.0"
+
 DO_OFFSET = "0.0"
 	OFFSET_R = "-20.0"        
 	OFFSET_G = "1.0"        
@@ -19,7 +21,7 @@ DO_IN_GLOW = "0.0"
 	IN_GLOW_GAMMA = "2.0"
 	IN_GLOW_ADD = "0.0"
 	
-DO_VMASK_AND_DARKLINES = "1.0"
+DO_VMASK_AND_DARKLINES = "0.0"
 	RGB_MASK_STRENGTH = "1.0"
 	VMASK_USE_GM = "0.0"
 	VMASK_GAP = "1.0"

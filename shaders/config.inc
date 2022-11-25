@@ -99,6 +99,9 @@ layout(std140, set = 0, binding = 0) uniform UBO
   	float ALT_BLANK_PERIOD ;
 	float DO_FXAA ; //1
 	float DO_SAT_BLEED;
+	float SAT_BLEED_SIZE;
+	float SAT_BLEED_FALLOFF;
+	float SAT_BLEED_STRENGTH;
 	float SCANLINE_FLICKERING ; //2
 	float SCANLINE_FLICKERING_POWER;
 	float SCANLINE_DISABLE_ON_INTERLACE;
@@ -176,15 +179,17 @@ layout(std140, set = 0, binding = 0) uniform UBO
 //Offset RGB
 // Allow to shift Red, Green, Blue components along x and y axis
 #pragma parameter DO_SHIFT_RGB       "★ Shift RGB components enable? ==>"	0.0	 0.0 1.0 1.0
+#pragma parameter OFFSET_STRENGTH "        Strength"			0.4 	 0.0 1.0 0.1
 #pragma parameter SHIFT_R         "        Red offset"			-40.0 	-210.0 189.0 1
 #pragma parameter SHIFT_G         "        Green offset"		3.0 	-210.0 189.0 1
 #pragma parameter SHIFT_B         "        Blue offset"			40.0 	-210.0 189.0 1
-#pragma parameter OFFSET_STRENGTH "        Strength"			0.4 	 0.0 1.0 0.1
+
 
 // Chroma bleeding, (very) poor man's ntsc filter.
 #pragma parameter DO_SAT_BLEED "★ Saturated color bleeding enable? ==>"	0.0 	0.0 1.0 1.0
-
-
+#pragma parameter SAT_BLEED_STRENGTH "        Strength"			0.3	 0.0 1.0  0.01
+#pragma parameter SAT_BLEED_SIZE     "        Size"			5.0 	 1.0 20.0 1.0
+#pragma parameter SAT_BLEED_FALLOFF  "        Falloff"			1.4 	 1.0 2.0 0.05
 
 
 // Scanlines
@@ -368,8 +373,12 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter ALT_BLANK_PERIOD   "        Dark lines period" 				4.0 0.0 20.0 1.0
 
 
-#define DO_FXAA        global.DO_FXAA
-#define DO_SAT_BLEED   global.DO_SAT_BLEED
+#define DO_FXAA        	global.DO_FXAA
+
+#define DO_SAT_BLEED       global.DO_SAT_BLEED
+#define SAT_BLEED_SIZE     global.SAT_BLEED_SIZE
+#define SAT_BLEED_FALLOFF  global.SAT_BLEED_FALLOFF
+#define SAT_BLEED_STRENGTH global.SAT_BLEED_STRENGTH
 //#define prefer_std_pow params.prefer_std_pow
 
 #define DO_SCANLINES                  global.DO_SCANLINES

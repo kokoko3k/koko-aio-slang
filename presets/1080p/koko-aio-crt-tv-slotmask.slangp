@@ -1,3 +1,3 @@
 #reference "koko-aio-crt-tv-BASE.slangp"
 
-DARKLINES_STRENGTH = "1.0"
+DARKLINES_STRENGTH = "0.9"

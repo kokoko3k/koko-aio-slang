@@ -74,8 +74,27 @@ vec3 pixel_offset_wrap (vec2 coord) {
 #define w1 0.125
 #define off2 2.0
 #define w2  0.125
+#define off3 3.0
+#define w1 0.125
+#define off4 4.0
+#define w2  0.125
 
 vec3 pixel_bleed(vec3 pixel_out, vec2 co, sampler2D in_texture, vec4 sourcesize2) {
+   
+   float taps=20;
+   vec3 smp;
+   float p_sat;
+   float w = SAT_BLEED_STRENGTH;
+   for ( float i=1.0 ; i <=SAT_BLEED_SIZE ; i++ ){
+      w = w/SAT_BLEED_FALLOFF;
+      smp = texture(first_pass, co - vec2(sourcesize2.z*i,0.0)).rgb;
+      p_sat = rgb2hsv(smp).y;
+      p_sat *= w;
+      pixel_out = mix(pixel_out,smp,p_sat);
+      
+   }
+   return pixel_out;
+   
    vec3 previous_pixel1 = texture(first_pass, co - vec2(sourcesize2.z*off1,0.0)).rgb;
    float previous_sat1 = rgb2hsv(previous_pixel1).y;
    vec3 previous_pixel2 = texture(first_pass, co - vec2(sourcesize2.z*off2,0.0)).rgb;

@@ -1,5 +1,6 @@
 #reference "koko-aio-crt-tv-slotmask.slangp"
 
+DO_SCANLINES = "0.0"
 DO_DARKLINES_VOFFSET = "0.0"
 DARKLINES_PERIOD = "2.0" 	
 
