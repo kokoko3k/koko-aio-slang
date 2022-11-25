@@ -179,10 +179,10 @@ layout(std140, set = 0, binding = 0) uniform UBO
 //Offset RGB
 // Allow to shift Red, Green, Blue components along x and y axis
 #pragma parameter DO_SHIFT_RGB       "★ Shift RGB components enable? ==>"	0.0	 0.0 1.0 1.0
-#pragma parameter OFFSET_STRENGTH "        Strength"			0.4 	 0.0 1.0 0.1
+#pragma parameter OFFSET_STRENGTH "        Strength"			0.5 	 0.0 1.0 0.1
 #pragma parameter SHIFT_R         "        Red offset"			-40.0 	-210.0 189.0 1
-#pragma parameter SHIFT_G         "        Green offset"		3.0 	-210.0 189.0 1
-#pragma parameter SHIFT_B         "        Blue offset"			40.0 	-210.0 189.0 1
+#pragma parameter SHIFT_G         "        Green offset"		40.0 	-210.0 189.0 1
+#pragma parameter SHIFT_B         "        Blue offset"			3.0 	-210.0 189.0 1
 
 
 // Chroma bleeding, (very) poor man's ntsc filter.

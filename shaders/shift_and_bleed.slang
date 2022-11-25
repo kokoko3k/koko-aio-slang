@@ -85,7 +85,7 @@ vec3 pixel_bleed(vec3 pixel_out, vec2 co, sampler2D in_texture, vec4 sourcesize2
    vec3 smp;
    float p_sat;
    float w = SAT_BLEED_STRENGTH;
-   for ( float i=1.0 ; i <=SAT_BLEED_SIZE ; i++ ){
+   for ( float i=1 ; i <=SAT_BLEED_SIZE ; i++ ){
       w = w/SAT_BLEED_FALLOFF;
       smp = texture(first_pass, co - vec2(sourcesize2.z*i,0.0)).rgb;
       p_sat = rgb2hsv(smp).y;
