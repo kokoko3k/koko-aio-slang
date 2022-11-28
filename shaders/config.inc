@@ -99,9 +99,11 @@ layout(std140, set = 0, binding = 0) uniform UBO
   	float ALT_BLANK_PERIOD ;
 	float DO_FXAA ; //1
 	float DO_SAT_BLEED;
-	float SAT_BLEED_SIZE;
+	float SAT_BLEED_SIZE_LEFT;
+	float SAT_BLEED_SIZE_RIGHT;
 	float SAT_BLEED_FALLOFF;
 	float SAT_BLEED_STRENGTH;
+	float SAT_BLEED_PAL;
 	float SCANLINE_FLICKERING ; //2
 	float SCANLINE_FLICKERING_POWER;
 	float SCANLINE_DISABLE_ON_INTERLACE;
@@ -185,11 +187,13 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter SHIFT_B         "        Blue offset"			3.0 	-210.0 189.0 1
 
 
-// Chroma bleeding, (very) poor man's ntsc filter.
-#pragma parameter DO_SAT_BLEED "★ Saturated color bleeding enable? ==>"	0.0 	0.0 1.0 1.0
-#pragma parameter SAT_BLEED_STRENGTH "        Strength"			0.3	 0.0 1.0  0.01
-#pragma parameter SAT_BLEED_SIZE     "        Size"			5.0 	 1.0 20.0 1.0
-#pragma parameter SAT_BLEED_FALLOFF  "        Falloff"			1.4 	 1.0 2.0 0.05
+// YIQ/YUV bandwidth limited chroma bleeding.
+#pragma parameter DO_SAT_BLEED "★ Bandwidth limited chroma bleeding enable? ==>"	0.0 	0.0 1.0 1.0
+#pragma parameter SAT_BLEED_PAL           "        Use PAL colorspace, not NTSC"	0.0 	 0.0 1.0 1.0
+#pragma parameter SAT_BLEED_STRENGTH      "        Strength"				1.0	 0.0 5.0  0.01
+#pragma parameter SAT_BLEED_SIZE_LEFT     "        Size Left"				5.0 	 1.0 40.0  1.0
+#pragma parameter SAT_BLEED_SIZE_RIGHT    "        Size Right"				5.0 	 1.0 40.0  1.0
+#pragma parameter SAT_BLEED_FALLOFF  "        Falloff"			1.8 	 1.0 2.0 0.01
 
 
 // Scanlines
@@ -376,9 +380,11 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #define DO_FXAA        	global.DO_FXAA
 
 #define DO_SAT_BLEED       global.DO_SAT_BLEED
-#define SAT_BLEED_SIZE     global.SAT_BLEED_SIZE
+#define SAT_BLEED_SIZE_LEFT     global.SAT_BLEED_SIZE_LEFT
+#define SAT_BLEED_SIZE_RIGHT    global.SAT_BLEED_SIZE_RIGHT
 #define SAT_BLEED_FALLOFF  global.SAT_BLEED_FALLOFF
 #define SAT_BLEED_STRENGTH global.SAT_BLEED_STRENGTH
+#define SAT_BLEED_PAL      global.SAT_BLEED_PAL
 //#define prefer_std_pow params.prefer_std_pow
 
 #define DO_SCANLINES                  global.DO_SCANLINES
