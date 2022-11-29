@@ -43,7 +43,7 @@ vec4 main_wrap(void) {
     if (DO_IN_GLOW == 1.0)
         pixel_haloed = pixel_glow(in_glow_pass, HALO_W,HALO_H,HALO_POWER,HALO_GAMMA,halo_coords, global.FXAA_passSize, global.FXAA_passSize).rgb;
     else if ( DO_SHIFT_RGB + DO_SAT_BLEED > 0.0)
-        pixel_haloed = pixel_glow(shift_and_bleed_pass, IN_GLOW_WH,IN_GLOW_WH,IN_GLOW_POWER,IN_GLOW_GAMMA,vTexCoord, params.OutputSize, params.OutputSize).rgb;
+        pixel_haloed = pixel_glow(shift_and_bleed_pass, HALO_W,HALO_H,HALO_POWER,HALO_GAMMA,halo_coords, params.OutputSize, params.OutputSize).rgb;
     else if (DO_FXAA > 0.0)
         pixel_haloed = pixel_glow(FXAA_pass, HALO_W,HALO_H,HALO_POWER,HALO_GAMMA,halo_coords, global.FXAA_passSize, global.FXAA_passSize).rgb;
     else
