@@ -267,12 +267,15 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
         vec3 pixel_bleed ;
         if  (! ( isinterlaced  && (SCANLINE_DISABLE_ON_INTERLACE == 1.0))  ) {
 
-            if (DO_IN_GLOW == 1.0)
-                pixel_bleed = pixel_glowed;
-            else if (DO_HALO == 1.0) 
+            if (DO_HALO == 1.0) 
                 pixel_bleed = pixel_haloed;
+            else if (DO_IN_GLOW == 1.0)
+                pixel_bleed = pixel_glowed;
             else 
                 pixel_bleed = pixel_in;
+            
+            
+            
             
             if (SCANLINE_COMPENSATION > 0.0) {
                 float mypow = mix(1.0, (0.33 * SCANLINE_DARK + 0.67), SCANLINE_COMPENSATION);

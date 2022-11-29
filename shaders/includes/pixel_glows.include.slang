@@ -1,3 +1,4 @@
+
 //Those functions will sample from source texture (the previous), but with a precision taken from passthrough_passSize.
 //This is needed because the source texture has been scaled up to the dimension of the viewport to allow
 //the scanlines to be linear filtered.
