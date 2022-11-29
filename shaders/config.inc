@@ -196,26 +196,6 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter SAT_BLEED_FALLOFF  "        Falloff"			1.7 	 1.0 2.0 0.01
 
 
-// Scanlines
-// Blank even source lines, the value from 0.0 to 1.0 expresses the darkness of the blanked lines
-// 1.0 means no blank at all.
-// SCANLINE_DARK controls the gap brightness
-// SCANLINE_COMPENSATION will make scanlines brighter, where possible, to compensate for the loss of brightness
-// SCANLINE_BLEEDING will make the whiter part of the scanline to bright the gap.
-
-#pragma parameter DO_SCANLINES	"★ Scanlines enable? ==>"							1.0 	0.0  1.0 1.0
-#pragma parameter SCANLINE_DARK "        Scanlines gap brightness"			  			0.0 	-0.5 1.0 0.05
-#pragma parameter SCANLINE_COMPENSATION "        Compensate for brightness loss"				0.0	0.0 1.0 0.1
-#pragma parameter SCANLINES_BLEEDING "        Scanlines bleeding"						0.0 	0.0 3.0 0.05
-
-// Alternate the drawing of the scanlines between frames. this will produce a flickering typical of
-// interlaced screens; 0 disable the effect, 1 always enables it, 2 enables it only when
-// the shader detects an interlaced signal, which actually means that the vertical resoution is "high enough"
-#pragma parameter SCANLINE_FLICKERING "        Interlace Flicker (0=off,1=on,2=if interlaced)"		  	2.0 	0.0 2.0 1.0
-#pragma parameter SCANLINE_FLICKERING_POWER "        Interlace Flicker power"		  			0.75 	0.0 4.0 0.25
-
-#pragma parameter SCANLINE_DISABLE_ON_INTERLACE "        Disable on interlaced screen"			  	0.0 	0.0 1.0 1.0
-
 // Input glowing
 // Emulates the glowing of the input signal by blurring it with "IN_GLOW_WH" sharpness.
 // Apply a gamma filter "IN_GLOW_GAMMA" to "light" it, multiplying the result by "IN_GLOW_POWER" and
@@ -228,7 +208,6 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter IN_GLOW_WH               "        Sharpness"							2.5	0.2 7.0 0.05
 #pragma parameter IN_GLOW_GAMMA            "        Gamma, the higher, the less the glow on dark colors"	1.0 	1.0 10.0 0.1
 //#pragma parameter IN_GLOW_ADD              "        Post gain (0.0 to disable)"					0.0 	0.0 1.0 0.05
-
 
 
 // RGB Mask
@@ -269,8 +248,6 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter DRKLN_OVERWHITE        "        Darklines: affect bright colors"		1.0 	0.0 1.0 0.05
 
 
-
-
 // Halo
 // The parameters are the same as input glowing, but this time the effect is applie
 // after emulating the RGB phosphors the aperture grille or the slot masks and, instead of
@@ -283,6 +260,26 @@ layout(std140, set = 0, binding = 0) uniform UBO
 #pragma parameter HALO_H        "        Vertical sharpness"					1.75	0.2  7.0 0.05
 #pragma parameter HALO_GAMMA    "        Gamma, the higher, the less the halo on dark colors"	2.0 	1.0  10.0 0.1
 
+
+// Scanlines
+// Blank even source lines, the value from 0.0 to 1.0 expresses the darkness of the blanked lines
+// 1.0 means no blank at all.
+// SCANLINE_DARK controls the gap brightness
+// SCANLINE_COMPENSATION will make scanlines brighter, where possible, to compensate for the loss of brightness
+// SCANLINE_BLEEDING will make the whiter part of the scanline to bright the gap.
+
+#pragma parameter DO_SCANLINES	"★ Scanlines enable? ==>"							1.0 	0.0  1.0 1.0
+#pragma parameter SCANLINE_DARK "        Scanlines gap brightness"			  			0.0 	-0.5 1.0 0.05
+#pragma parameter SCANLINE_COMPENSATION "        Compensate for brightness loss"				0.0	0.0 1.0 0.1
+#pragma parameter SCANLINES_BLEEDING "        Scanlines bleeding"						0.0 	0.0 3.0 0.05
+
+// Alternate the drawing of the scanlines between frames. this will produce a flickering typical of
+// interlaced screens; 0 disable the effect, 1 always enables it, 2 enables it only when
+// the shader detects an interlaced signal, which actually means that the vertical resoution is "high enough"
+#pragma parameter SCANLINE_FLICKERING "        Interlace Flicker (0=off,1=on,2=if interlaced)"		  	2.0 	0.0 2.0 1.0
+#pragma parameter SCANLINE_FLICKERING_POWER "        Interlace Flicker power"		  			0.75 	0.0 4.0 0.25
+
+#pragma parameter SCANLINE_DISABLE_ON_INTERLACE "        Disable on interlaced screen"			  	0.0 	0.0 1.0 1.0
 
 
 // Bloom

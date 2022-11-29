@@ -511,38 +511,6 @@ vec4 main_wrap(vec2 coords){
 }
 
 
-/*
-A collection of CRT mask effects that work with LCD subpixel structures for
-small details
-
-author: hunterk
-license: public domain
-
-How to use it:
-
-Multiply your image by the vec3 output:
-FragColor.rgb *= mask_weights(gl_FragCoord.xy, 1.0, 1);
-
-In the "alpha" version, the alpha channel stores the number of lit subpixels per pixel for use in brightness-loss compensation efforts.
-
-The function needs to be tiled across the screen using the physical pixels, e.g.
-gl_FragCoord (the "vec2 coord" input). In the case of slang shaders, we use
-(vTexCoord.st * OutputSize.xy).
-
-The "mask_intensity" (float value between 0.0 and 1.0) is how strong the mask
-effect should be. Full-strength red, green and blue subpixels on a white pixel
-are the ideal, and are achieved with an intensity of 1.0, though this darkens
-the image significantly and may not always be desirable.
-
-The "phosphor_layout" (int value between 0 and 24) determines which phophor
-layout to apply. 0 is no mask/passthru.
-
-Many of these mask arrays are adapted from cgwg's crt-geom-deluxe LUTs, and
-those have their filenames included for easy identification
-*/
-
-
-
 void main() {
     
     vec2 coords = vTexCoord;

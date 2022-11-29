@@ -51,11 +51,7 @@ layout(set = 0, binding = 2) uniform sampler2D Source;
 
 #include "includes/functions.include.slang"
 
-vec3 pixel_no_flicker(vec2 coord){
-   vec3 pixel_out = texture(Source,coord).rgb;
-   
-   if (DO_CCORRECTION == 1.0) {
-
+vec3 color_tools(vec3 pixel_out) {
       pixel_out = pixel_push_luminance(pixel_out,LUMINANCE); // if/then check for LUMINANCE == 0.0 made by function itself.
 
       if (!(SATURATION == 1.0)) {
@@ -68,8 +64,15 @@ vec3 pixel_no_flicker(vec2 coord){
          pixel_out.rgb = scale_to_range_vec3(pixel_out.rgb, -CONTRAST, 1+CONTRAST) + BRIGHTNESS;
       
       if (TEMPERATURE != 6500.0) pixel_out.rgb = pixel_out.rgb * temperature_rgb;
+      return pixel_out;
+}
 
-   }
+
+vec3 pixel_no_flicker(vec2 coord){
+   vec3 pixel_out = texture(Source,coord).rgb;
+   if (DO_CCORRECTION == 1.0)
+      pixel_out = color_tools(pixel_out);
+
    return pixel_out.rgb;
 }
 
@@ -99,17 +102,20 @@ vec3 pixel_flickering() {
 
 
 void debug() {
+   vec3 pixel_debug;
    //Use one of the following to debug:
-      //FragColor=vec4(abs(sin(params.FrameCount/3.14/8.0))); //white fade
-      //FragColor=vec4(abs(sin(params.FrameCount/3.14/20)),0.0,0.0,0.0); //red fade
-      //FragColor=vec4(1.0);
-      //FragColor=vec4(0.38,0.0,1.0,1.0);
-      //FragColor=vec4(0.38,0.0,1.0,1.0)*vTexCoord.x;
-       FragColor=vec4(vTexCoord.x); //H bw gradient
-      //FragColor=vec4(floor(vTexCoord.x*16)/16); //H bw gradient 16gray
-      //FragColor=vec4(floor(vTexCoord.x*64)/64); //H bw gradient 64gray
-      //FragColor=vec4(1,0,0,0)*floor(vTexCoord.x*64)/64; //H red gradient 64
-      //if  (mod(params.FrameCount,100) < 50) FragColor=vec4(0.0) ; else FragColor=vec4(1.0);  
+      //pixel_debug=vec3(abs(sin(params.FrameCount/3.14/8.0))); //white fade
+      //pixel_debug=vec3(abs(sin(params.FrameCount/3.14/20)),0.0,0.0,0.0); //red fade
+      //pixel_debug=vec3(1.0);
+      //pixel_debug=vec3(0.38,0.0,1.0,1.0);
+      //pixel_debug=vec3(0.38,0.0,1.0,1.0)*vTexCoord.x;
+       //pixel_debug=vec3(vTexCoord.x); //H bw gradient
+      //pixel_debug=vec3(floor(vTexCoord.x*16)/16); //H bw gradient 16gray
+      //pixel_debug=vec3(floor(vTexCoord.x*64)/64); //H bw gradient 64gray
+      pixel_debug=vec3(floor(vTexCoord.x*128)/128); //H bw gradient 128gray
+      //pixel_debug=vec3(1,0,0,0)*floor(vTexCoord.x*64)/64; //H red gradient 64
+      //if  (mod(params.FrameCount,100) < 50) pixel_debug=vec3(0.0) ; else pixel_debug=vec3(1.0);  
+      FragColor = vec4(color_tools(pixel_debug).rgb,1.0);
 }
 
 
