@@ -275,8 +275,6 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
                 pixel_bleed = pixel_in;
             
             
-            
-            
             if (SCANLINE_COMPENSATION > 0.0) {
                 float mypow = mix(1.0, (0.33 * SCANLINE_DARK + 0.67), SCANLINE_COMPENSATION);
                 pixel_out = pow(pixel_out,vec3(mypow));
@@ -286,6 +284,9 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
             vec3 pixel_scanlined = pixel_out * scanline_shape;
 
             pixel_out = pixel_scanlined + (pixel_out * pixel_bleed *  SCANLINES_BLEEDING * (1-scanline_shape));
+            
+            //pixel_out = pixel_haloed;
+            
         }
     }
 
@@ -541,7 +542,7 @@ void main() {
         //quad split screen
         //if ( (vOutputCoord.x < 0.5  && vOutputCoord.y > 0.5) || (vOutputCoord.x > 0.5  && vOutputCoord.y < 0.5)  ) pixel_out = texture(first_pass,vOutputCoord);
         //split screen
-        //if (vTexCoord.y < 0.5) pixel_out = texture(first_pass,vTexCoord);
+       //if (vTexCoord.y < 0.5) pixel_out = texture(first_pass,vTexCoord);
         //pixel_out = texture(FXAA_pass,vTexCoord);
         
     FragColor = pixel_out;

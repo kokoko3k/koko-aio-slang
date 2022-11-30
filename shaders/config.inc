@@ -167,7 +167,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 // Color correction
 #pragma parameter DO_CCORRECTION "★ Color corrections enable? ==>" 		0.0 	0.0 1.0 1.0
-#pragma parameter LUMINANCE       "        Luminance push (>1.0=clip)"		0.0	 0.0 3.0 0.05
+#pragma parameter LUMINANCE       "        Luminance push (>1.0=clip)"		0.0	 0.0 1.5 0.05
 #pragma parameter SATURATION     "        Saturation in   (1.0=off)"		1.0	0.0  2.0 0.01
 #pragma parameter CONTRAST       "        Contrast in     (0.0=off)"		0.0	-1.0 1.0 0.01
 #pragma parameter BRIGHTNESS     "        Brightness in   (0.0=off)"		0.0	-1.0 1.0 0.01
