@@ -1,3 +1,6 @@
 #reference "koko-aio-crt-monitor-slotmask-bloom-bezelwider.slangp"
 
 DARKLINES_STRENGTH = "0.0"
+
+AMBI_FALLOFF = "0.4"
+AMBI_POWER = "5.0"

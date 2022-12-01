@@ -25,23 +25,6 @@ void main() {
    
    vec3 pixel_out = texture(first_pass, vTexCoord).rgb;
    pixel_out = apply_fuzzy_main_pass(pixel_out);
-   if (AMBI_POWER > 1.0) {
-      float avglum = texture(avglum_pass, vTexCoord).a;
-   
-      //push input brightness but not too much for already brighter images.
-      float push =  AMBI_POWER * (1.0 - avglum)  + 1.0;
-      pixel_out = pixel_out * push;
-
-      //Compensate for the loss of SATURATION
-      float extrasat = min(push,2.0); //not more than 2X
-      float l = length(pixel_out);
-      pixel_out =  normalize( pow(pixel_out.rgb + vec3(eps), vec3(extrasat)))*l  ;
-   } else {
-      pixel_out = pixel_out * AMBI_POWER;
-   }
-   
+   pixel_out = pixel_push_luminance(pixel_out,AMBI_POWER-1);
    FragColor = vec4(pixel_out,1.0);
-   
-   
-   
 }

@@ -90,7 +90,11 @@ vec3 pixel_offset(vec3 pixel_cur,vec2 coord, sampler2D in_texture, vec4 sourcesi
       pixel_offset.r=texture(in_texture,coord + r_offset * d).r;
       pixel_offset.g=texture(in_texture,coord + g_offset * d).g;
       pixel_offset.b=texture(in_texture,coord + b_offset * d).b;
-      return mix(pixel_cur,pixel_offset,OFFSET_STRENGTH);
+      //return mix(pixel_cur,pixel_offset,OFFSET_STRENGTH);
+      vec3 color_difformity = vec3(pixel_offset.r-pixel_cur.r, +pixel_offset.g-pixel_cur.g, pixel_offset.b - pixel_cur.b);
+      vec3 pixel_offset_to_add = pixel_offset * color_difformity;
+      return pixel_cur + (pixel_offset_to_add *OFFSET_STRENGTH);
+      //return pixel_cur + (pixel_offset *OFFSET_STRENGTH*color_difformity);
 }
 
 

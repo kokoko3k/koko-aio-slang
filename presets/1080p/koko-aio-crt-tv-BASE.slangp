@@ -18,7 +18,7 @@ DO_SHIFT_RGB = "1.0"
 	SHIFT_R = "-20.0"        
 	SHIFT_G = "1.0"        
 	SHIFT_B = "20.0"
-	OFFSET_STRENGTH = "0.55"
+	OFFSET_STRENGTH = "1.0"
 
 DO_SCANLINES = "1.0"
 	SCANLINE_DARK = "0.700000"

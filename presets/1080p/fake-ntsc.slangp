@@ -1,8 +1,10 @@
 #reference "koko-aio-crt-monitor-slotmask-bloom-bezelwider.slangp"
 
 
-	GAMMA_OUT = "0.36"
+GAMMA_OUT = "0.56"
 
+HALO_POWER = "0.5"
+	
 DO_SAT_BLEED = "1.000000"
 	SAT_BLEED_PAL = "0.0"
 	SAT_BLEED_STRENGTH   = "1.0"
