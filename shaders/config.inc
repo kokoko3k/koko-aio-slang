@@ -180,7 +180,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 
 //Offset RGB
 // Allow to shift Red, Green, Blue components along x and y axis
-#pragma parameter DO_SHIFT_RGB       "★ Shift RGB components enable? ==>"	0.0	 0.0 1.0 1.0
+#pragma parameter DO_SHIFT_RGB       "★ Shift RGB components enable? (bad with FXAA) ==>"	0.0	 0.0 1.0 1.0
 #pragma parameter OFFSET_STRENGTH "        Strength"			0.5 	 0.0 1.0 0.1
 #pragma parameter SHIFT_R         "        Red offset"			-40.0 	-210.0 189.0 1
 #pragma parameter SHIFT_G         "        Green offset"		40.0 	-210.0 189.0 1
@@ -203,7 +203,7 @@ layout(std140, set = 0, binding = 0) uniform UBO
 // "IN_GLOW_ADD" allows to modulate from interpolation(*) to a sum, wihch may (or not) produce better effects.
 // With "IN_GLOW_ADD=0" input glowing does not alter the RGB mask
 // or slot mask applied to the image.
-#pragma parameter DO_IN_GLOW               "★ Input power/glowing enable? ==>" 					1.0	0.0 1.0 1.0
+#pragma parameter DO_IN_GLOW               "★ Glowing Input/power enable? ==>" 					1.0	0.0 1.0 1.0
 #pragma parameter IN_GLOW_POWER            "        Input signal glow strength"					0.45 	0.0 5.0 0.05
 #pragma parameter IN_GLOW_WH               "        Sharpness"							2.5	0.2 7.0 0.05
 #pragma parameter IN_GLOW_GAMMA            "        Gamma, the higher, the less the glow on dark colors"	1.0 	1.0 10.0 0.1
