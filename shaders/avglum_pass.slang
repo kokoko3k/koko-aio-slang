@@ -29,8 +29,11 @@ layout(set = 0, binding = 3) uniform sampler2D avglum_passFeedback;
 */
 // #define avglum_divider 4  <-- in config.inc
 
+#include "includes/functions.include.slang"
+
 float get_avg_lum_from_mip() {
-    vec4 mip = textureLod(first_pass, vec2(0.5,0.5),20.0);
+    vec3 mip = textureLod(first_pass, vec2(0.5,0.5),20.0).rgb;
+    mip = apply_fuzzy_main_pass(mip);
     return (mip.r+mip.g+mip.b)/3.0;
 }
 

@@ -194,11 +194,6 @@ float scanline_shape(vec2 coords, bool do_flicker) {
 
 vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
 
-    if (DO_DYNZOOM == 1.0) {
-        float zoomin = 1.0 + (texture(avglum_passFeedback, vec2(0.25,0.25)    ).a/ DYNZOOM_FACTOR);
-        coords = zoom(coords, zoomin);
-    }
-
     bool is_border = false;
 
     if (bBorder_needed)
@@ -515,6 +510,11 @@ vec4 main_wrap(vec2 coords){
 void main() {
     
     vec2 coords = vTexCoord;
+    if (DO_DYNZOOM == 1.0) {
+        float zoomin = 1.0 + (texture(avglum_passFeedback, vec2(0.25,0.25)    ).a/ DYNZOOM_FACTOR);
+        coords = zoom(coords, zoomin);
+    }
+    
     //Curvature
     if (DO_CURVATURE == 1.0) {
         if ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0))
