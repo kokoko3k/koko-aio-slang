@@ -295,23 +295,22 @@ float global_noise;
 
 
 vec4 pixel_background_image(){
-    float BG_ZOOM = 1.0;
-    vec2 tex_size = textureSize(bg, 0) * BG_ZOOM;
+    //return the aspect corrected background image:
+    vec2 tex_size = textureSize(bg, 0); // * BG_ZOOM;
     float bg_lod = log2(tex_size.y / global.FinalViewportSize.y);
     vec2 back_coords =  get_scaled_coords_aspect(vOutputCoord,global.FinalViewportSize, tex_size.x/tex_size.y, is_rotated());
-    back_coords=zoom(back_coords, BG_ZOOM);
+    //back_coords=zoom(back_coords, BG_ZOOM);
     return textureLod(bg,back_coords,bg_lod);
 }
 
-vec3 ambi_noised() {
-    return texture(ambi_temporal_pass, vOutputCoord + global_noise ).rgb;
-}
-
-
 vec3 pixel_border(bool image_over) {
+    /* Returns the surrounding of the tube/bezel:
+     * The led light alone
+     * the led light "under" a background image (alpha driven)
+     */
     vec3 pixel_out = vec3(1.0);
     if (DO_AMBILIGHT == 1.0)
-        pixel_out = ambi_noised();
+        pixel_out =  texture(ambi_temporal_pass, vOutputCoord + global_noise ).rgb;
     if (DO_BG_IMAGE == 1.0 && !image_over) {
         vec4 bg_image = pixel_background_image();
         pixel_out = mix(pixel_out,bg_image.rgb,bg_image.a);
@@ -321,6 +320,8 @@ vec3 pixel_border(bool image_over) {
 
 
 vec3 pixel_alternate(vec3 source, float whiteness) {
+    // Emulate the low crt persistance by only drawing odd/even lines
+    // on odd/even frames
     float line = vTexCoord.y * params.OutputSize.y;
     vec3 pixel_out = source;
     float l_period_half = ALT_BLANK_PERIOD / 2;
@@ -335,6 +336,7 @@ vec3 pixel_alternate(vec3 source, float whiteness) {
 
 #define bezel_luminance bezel.r
 vec3 bezel_color(float lum)  {
+    //Colorize bezel frame
     vec3 col = vec3(BEZEL_R,BEZEL_G,BEZEL_B) + lum;
     float con_max =  0.5 * BEZEL_CON + 0.5;
 
@@ -348,8 +350,7 @@ vec3 compose_bezel_over(vec3 full_viewport) {
     vec2 bezel_lut_size = textureSize(monitor_body,0);
     float bezel_frame_lod = log2(bezel_lut_size.y * (BEZEL_FRAME_ZOOM+1.0) /global.FinalViewportSize.y);
     vec2 coords_for_bezel = vTexCoord;
-    //vec2 coords_for_mirror;
-    //vec2 coords_for_mirror =zoom(vOutputCoord,0.99);
+
     if (BEZEL_FRAME_ZOOM != 0.0)
         coords_for_bezel = zoomout_coords(vTexCoord,-BEZEL_FRAME_ZOOM,1.0);
 
@@ -390,27 +391,29 @@ vec3 compose_bezel_over(vec3 full_viewport) {
 
     return mix(full_viewport, bezel_out, bezel.a);
 }
-//
+
 vec4 pixel_inner_frame(vec2 coords, bool bBorder_needed) {
+//This takes care of drawing the main content.
+    
     vec4 pixel_in = pixel_main_pass(coords, bBorder_needed);
     vec3 pixel_out = pixel_in.rgb;
     vec3 bloomed;
 
     //Mix bloom texture
-        if (DO_BLOOM == 1.0 ) {
-            bloomed=texture(bloom_pass_final, coords).rgb ;
-            if (BLOOM_BYPASS == 1.0)
-                pixel_out = bloomed;
-            else {
-                float over_white_correction = 1.0;
-                if (BLOOM_OVER_WHITE < 1.0) {
-                        float b_brightness = max(pixel_out.b,max(pixel_out.r,pixel_out.g));
-                        b_brightness *= 1-BLOOM_OVER_WHITE;
-                        over_white_correction =1- b_brightness;
-                }
-                pixel_out = pixel_out + (bloomed * BLOOM_MIX * over_white_correction);
+    if (DO_BLOOM == 1.0 ) {
+        bloomed=texture(bloom_pass_final, coords).rgb ;
+        if (BLOOM_BYPASS == 1.0)
+            pixel_out = bloomed;
+        else {
+            float over_white_correction = 1.0;
+            if (BLOOM_OVER_WHITE < 1.0) {
+                    float b_brightness = max(pixel_out.b,max(pixel_out.r,pixel_out.g));
+                    b_brightness *= 1-BLOOM_OVER_WHITE;
+                    over_white_correction =1- b_brightness;
             }
+            pixel_out = pixel_out + (bloomed * BLOOM_MIX * over_white_correction);
         }
+    }
 
     //Black frame insertion
         if (DO_ALT_BLANK == 1.0 ) {
@@ -438,10 +441,9 @@ vec4 pixel_inner_frame(vec2 coords, bool bBorder_needed) {
                 else
             pixel_out = vec3(spot);
             }
-
         }
 
-    //Border (edge)
+    //smooth border (edge)
         float border_inner_frame = 1.0;
         if (DO_BEZEL==1.0 || DO_CURVATURE == 1.0)
             border_inner_frame = border(coords);
@@ -456,6 +458,7 @@ vec4 pixel_inner_frame(vec2 coords, bool bBorder_needed) {
 vec4 main_wrap(vec2 coords){
     /* Handle inner border and outer border, not bezel */
     if (DO_VIGNETTE + DO_SPOT + DO_AMBILIGHT >0.0) global_noise = random(NOISEPOWER, vTexCoord * params.FrameCount);
+    
     //Just do pixel_inner_frame() and exit when there is no need to paint border.
     if (!border_needed()) return pixel_inner_frame(coords, false);
 
@@ -495,6 +498,7 @@ vec4 main_wrap(vec2 coords){
 void main() {
     
     vec2 coords = vTexCoord;
+    //Luminosity dependant zoom
     if (DO_DYNZOOM == 1.0) {
         float zoomin = 1.0 + (texture(avglum_passFeedback, vec2(0.25,0.25)    ).a/ DYNZOOM_FACTOR);
         coords = zoom(coords, zoomin);
@@ -506,6 +510,7 @@ void main() {
             coords = Warp(coords,GEOM_WARP_X,GEOM_WARP_Y);
     }
 
+    //Scale coords according to bezel settings?
     if (DO_BEZEL == 1.0) {
         coords = zoomout_coords(coords, -BEZEL_INNER_ZOOM , 1.0);
     }
@@ -513,11 +518,12 @@ void main() {
     //"Just" handle inner and outer frame here:
     vec4 pixel_out = main_wrap(coords);
 
-
+    //Draw bezel
     if (DO_BEZEL == 1.0) {
         pixel_out = vec4(compose_bezel_over(pixel_out.rgb),1.0);
     }
 
+    //Draw an image "Over" the bezel with ano hole inside by the alpha channel
     if (DO_BG_IMAGE == 1.0 && BG_IMAGE_OVER==1.0) {
         vec4 bg_image = pixel_background_image();
         pixel_out = mix(pixel_out,bg_image,bg_image.a);
@@ -531,6 +537,4 @@ void main() {
         //pixel_out = texture(FXAA_pass,vTexCoord);
         
     FragColor = pixel_out;
-    
-    
 }
