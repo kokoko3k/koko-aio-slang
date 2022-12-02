@@ -1,4 +1,4 @@
-#reference "../../koko-aio.slangp"
+#reference "../koko-aio.slangp"
 
 DO_CCORRECTION = "1.000000"
 	GAMMA_OUT = "0.55"
