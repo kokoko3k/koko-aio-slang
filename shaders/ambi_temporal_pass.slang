@@ -9,8 +9,7 @@ layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
 
-void main()
-{
+void main() {
    gl_Position = global.MVP * Position;
    vTexCoord = TexCoord;
 }
@@ -23,8 +22,7 @@ layout(set = 0, binding = 3) uniform sampler2D PreviousSampler;
 layout(set = 0, binding = 4) uniform sampler2D avglum_pass;
 layout(set = 0, binding = 5) uniform sampler2D avglum_passFeedback;
                                                                                     
-#define max_steps AMBI_STEPS
-
+#define MAX_STEPS AMBI_STEPS
 
 float ambi_step(float start, float end, float mystep) {
     float diff = start-end;
@@ -62,10 +60,10 @@ vec4 pixel_ambilight() {
     }
     
     if (scene_change_remaining > 0.0) {
-        mystep = vec3(max(1.0/max_steps, AMBI_FAST_STEP)); // <- Never slow down fades due to fast step when changing scene
+        mystep = vec3(max(1.0/MAX_STEPS, AMBI_FAST_STEP)); // <- Never slow down fades due to fast step when changing scene
         scene_change_remaining -=  AMBI_FAST_STEP;
             } else {
-        mystep = abs((previous_pixel-current_pixel) / max_steps);
+        mystep = abs((previous_pixel-current_pixel) / MAX_STEPS);
         
     }
     return vec4(ambi_step_rgb(previous_pixel,current_pixel,mystep),scene_change_remaining);

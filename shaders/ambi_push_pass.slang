@@ -1,13 +1,12 @@
 #version 450
 #include "config.inc"
-#define eps 1e-5
+
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
 
-void main()
-{
+void main() {
    gl_Position = global.MVP * Position;
    vTexCoord = TexCoord;
 }
@@ -25,6 +24,6 @@ void main() {
    
    vec3 pixel_out = texture(first_pass, vTexCoord).rgb;
    pixel_out = apply_fuzzy_main_pass(pixel_out);
-   pixel_out = pixel_push_luminance(pixel_out,AMBI_POWER-1);
-   FragColor = vec4(pixel_out,1.0);
+   pixel_out = pixel_push_luminance(pixel_out, AMBI_POWER-1);
+   FragColor = vec4(pixel_out, 1.0);
 }

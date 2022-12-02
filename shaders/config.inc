@@ -34,9 +34,7 @@
 	// se put the following as higher as possible to trade the things.
 #define HALO_CLAMP 1.4
 
-
-#define NTSC_XRES 320
-#define NTSC_YRES 224
+#define eps 1e-5
 
 layout(push_constant) uniform Push
 {

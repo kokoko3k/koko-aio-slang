@@ -1,6 +1,5 @@
 #version 450
 #include "config.inc"
-#define eps 1e-8
 
 #pragma stage vertex
 layout(location = 0) in vec4 Position;

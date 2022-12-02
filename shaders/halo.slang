@@ -1,6 +1,5 @@
 #version 450
 #include "config.inc"
-#define eps 1e-8
 #define pi 3.141592654
 
 // Blur sizes must not depend on input resolution

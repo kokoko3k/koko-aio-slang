@@ -1,6 +1,6 @@
 #version 450
 #include "config.inc"
-#define eps 1e-5
+
 #define internalness 0.07
 #define leds_per_strip 8
 #define radius 0.001
