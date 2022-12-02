@@ -291,21 +291,6 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
     return vec4(pixel_out,1.0) ; //* border(border_coords);
 }
 
-#define NOISE_A 12.9898
-#define NOISE_B 78.233
-#define NOISE_C 43758.5453
-
-float displace(float power) {
-// Random noise generator 
-    vec2 co = vTexCoord ;
-    float dt = dot(co.xy, vec2(NOISE_A, NOISE_B));
-    float sn = mod(dt,3.14);
-
-    float noise_out = fract(sin(sn) * NOISE_C) - 0.5;
-    noise_out = clamp(noise_out, -power, power);
-    return noise_out ;
-}
-
 float global_noise;
 
 
@@ -383,7 +368,7 @@ vec3 compose_bezel_over(vec3 full_viewport) {
 
     //This is the reflection to be composed over the bezel);
     vec3 pixel_mirrored = texture(reflected_blurred_pass2,
-                          coords_for_mirror + displace( min(global.FinalViewportSize.z,global.FinalViewportSize.w) ) ).rgb;
+                          coords_for_mirror + random( min(global.FinalViewportSize.z,global.FinalViewportSize.w), vTexCoord ) ).rgb;
 
     //Take the reflection modifier from the texture blue component into account; it is/may be used to lower the reflection in the corners.
         //float reflection = (reflection_shade * 1.4 -  0.4)  * bezel.b ;
@@ -470,7 +455,7 @@ vec4 pixel_inner_frame(vec2 coords, bool bBorder_needed) {
 
 vec4 main_wrap(vec2 coords){
     /* Handle inner border and outer border, not bezel */
-    if (DO_VIGNETTE + DO_SPOT + DO_AMBILIGHT >0.0) global_noise = random(NOISEPOWER);
+    if (DO_VIGNETTE + DO_SPOT + DO_AMBILIGHT >0.0) global_noise = random(NOISEPOWER, vTexCoord * params.FrameCount);
     //Just do pixel_inner_frame() and exit when there is no need to paint border.
     if (!border_needed()) return pixel_inner_frame(coords, false);
 

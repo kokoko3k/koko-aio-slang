@@ -102,25 +102,17 @@ vec2 scale_to_range_vec2(vec2 x, float dmin, float dmax) {
 #define RND_B 78.233
 #define RND_C 43758.5453
 
-float random(float power) {
-    // www.stackoverflow.com/questions/5149544/can-i-generate-a-random-number-inside-a-pixel-shader/
-    /*vec2 seed = vTexCoord * params.FrameCount;
-    vec2 i = vec2(23.140692, 2.6651442);
-    return fract(cos(dot(seed, i)) * 123456.0f);
-    */
-    
+float random(float power, vec2 seed) {
     //From pal-singlepass.slang 
     //https://github.com/svofski/CRT
     //Copyright (c) 2016, Viacheslav Slavinsky
     //All rights reserved.
-    vec2 co = vTexCoord * params.FrameCount;
-    float dt = dot(co.xy, vec2(RND_A, RND_B));
+    float dt = dot(seed.xy, vec2(RND_A, RND_B));
     float sn = mod(dt,3.14);
 
     float noise_out = fract(sin(sn) * RND_C) - 0.5;
     noise_out = clamp(noise_out, -power, power);
-    return noise_out ; 
-    
+    return noise_out ;
 }
 
 
@@ -263,194 +255,5 @@ float random(float power) {
 		return scale_coord;
 	}
 	
-/*
-float content_x_scale(){
-    return params.OutputSize.x/(in_aspect * params.OutputSize.y);
-}
-*/
 
-/*
-float content_y_scale(){
-    return 1.0;
-}
-*/
-
-/*
-float calc_offset_x(float uv_scale_x){
-    return (0.5 * uv_scale_x ) - 0.5 ;
-}
-*/
-
-/*
-vec2 calc_uv() {
-    vec2 uv_scale = vec2( content_x_scale() , content_y_scale() );
-    vec2 uv ;
-    uv.x = vTexCoord.x * uv_scale.x;
-    uv.y = vTexCoord.y * uv_scale.y;
-
-    float offset_x = calc_offset_x(uv_scale.x);
-    uv.x = uv.x - offset_x ;
-
-    return uv;
-}
-*/
-
-/*bool coord_is_inside_frame(vec2 pixelcoord) {
-    vec2 uv=calc_uv();
-    float offset_x = calc_offset_x( content_x_scale() ) ;
-    if (pixelcoord.x > offset_x)
-        if (pixelcoord.x < 1.0-offset_x)
-            return true;
-    return false; //giallo
-
-}
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-/*float HSM_GetScreenAspect(float screen_index, vec2 cropped_size)
-{
-	vec2 atari_lynx_res = 					vec2(160, 102);
-	vec2 atari_2600_res = 					vec2(160, 228);
-	vec2 atari_2600_crop_res = 				vec2(152, 228);
-	vec2 nintendo_gameboy_advance_res = 	vec2(240, 160);
-	vec2 nintendo_gameboy_res = 			vec2(160, 144);
-	vec2 nintendo_ds_res = 					vec2(256, 192);
-	vec2 nintendo_ds_top_bottom_res = 		vec2(256, 384);
-	vec2 nintendo_ds_side_by_side_res = 	vec2(512, 192);
-	vec2 nintendo_3ds_top_res = 			vec2(400, 240);
-	vec2 nintendo_3ds_bottom_res = 			vec2(320, 240);
-	vec2 nintendo_3ds_top_bottom_res = 		vec2(400, 480);
-	vec2 nintendo_3ds_side_by_side_res = 	vec2(720, 240);
-	vec2 sega_saturn_fmv_res = 				vec2(352, 480);
-	vec2 sony_psp = 						vec2(480, 272);
-	vec2 sony_ps_fmv_res = 					vec2(320, 480);
-	vec2 sony_ps_fmv_res_2 = 				vec2(512, 480);
-
-	// This should handle some PS games with weird resolutions like Tekken and Driver
-	float sony_ps_height = 448;
-
-	if (HSM_ASPECT_RATIO_MODE == 0)
-	{
-		// If the vertical res is larger than 580 is is probably a modern square pixel resolution
-		// 576 seems to be PAL vertical resolution used sometimes
- 		if (original_size.y > 580) horizontal_aspect = core_aspect_horizontal;
-		else if (HSM_ResolutionIsEqual(sony_psp, 						original_size)) horizontal_aspect = core_aspect_horizontal;
-		else if (HSM_ResolutionIsEqual(nintendo_gameboy_advance_res, 	original_size)) horizontal_aspect = core_aspect_horizontal;
-		else if (HSM_ResolutionIsEqual(nintendo_gameboy_res, 			original_size)) horizontal_aspect = core_aspect_horizontal;
-		else if (HSM_ResolutionIsEqual(nintendo_ds_res, 				original_size)) horizontal_aspect = core_aspect_horizontal;
-		else if (HSM_ResolutionIsEqual(nintendo_ds_top_bottom_res, 		original_size)) horizontal_aspect = core_aspect_horizontal;
-		else if (HSM_ResolutionIsEqual(nintendo_ds_side_by_side_res, 	original_size)) horizontal_aspect = core_aspect_horizontal;
-		else if (HSM_ResolutionIsEqual(nintendo_3ds_top_res, 			original_size)) horizontal_aspect = core_aspect_horizontal;
-		else if (HSM_ResolutionIsEqual(nintendo_3ds_bottom_res, 		original_size)) horizontal_aspect = core_aspect_horizontal;
-		else if (HSM_ResolutionIsEqual(nintendo_3ds_top_bottom_res, 	original_size)) horizontal_aspect = core_aspect_horizontal;
-		else if (HSM_ResolutionIsEqual(nintendo_3ds_side_by_side_res, 	original_size)) horizontal_aspect = core_aspect_horizontal;
-		else if (HSM_ResolutionIsEqual(atari_lynx_res, 					original_size)) horizontal_aspect = core_aspect_horizontal;
-		else if (HSM_ResolutionIsEqual(atari_2600_res, 					original_size)) horizontal_aspect = 1.333;
-		else if (HSM_ResolutionIsEqual(atari_2600_crop_res, 			original_size)) horizontal_aspect = 1.333;
-		else if (HSM_ResolutionIsEqual(sony_ps_fmv_res, 				original_size)) horizontal_aspect = 1.333;
-		else if (HSM_ResolutionIsEqual(sony_ps_fmv_res_2, 				original_size)) horizontal_aspect = 1.333;
-		else if (original_size.y == sony_ps_height) 									horizontal_aspect = 1.333;
-		// Fall back to the explicit ratio
-		else horizontal_aspect = HSM_ASPECT_RATIO_EXPLICIT;
-	}
-	else
-		if (HSM_ASPECT_RATIO_MODE == 1) horizontal_aspect = HSM_ASPECT_RATIO_EXPLICIT;
-		else if (HSM_ASPECT_RATIO_MODE == 2) horizontal_aspect = 1.3333;
-		else if (HSM_ASPECT_RATIO_MODE == 3) horizontal_aspect = 1.5;
-		else if (HSM_ASPECT_RATIO_MODE == 4) horizontal_aspect = 1.7777;
-		else if (HSM_ASPECT_RATIO_MODE == 5) horizontal_aspect = cropped_size.x / cropped_size.y;
-		else if (HSM_ASPECT_RATIO_MODE == 6) horizontal_aspect = global.FinalViewportSize.x / global.FinalViewportSize.y;
-		else horizontal_aspect = 1.333;
-
-	// Find what the vertical aspect would be, either the current horizontal_aspect (if it's already vertical)
-	// Or changing the horizontal aspect to vertical by taking the reciprocal
-	float vertical_aspect = 1 / horizontal_aspect;
-	float final_orientation = HSM_ASPECT_RATIO_ORIENTATION;
-
-	if (HSM_ASPECT_RATIO_ORIENTATION < 0.5)
-	{
-		// Catch for Atari 2600 - Stella Emulator which would otherwise show up as a vertical aspect ratio
-		if (
-				HSM_ResolutionIsEqual(atari_2600_res, original_size) ||
-		   		HSM_ResolutionIsEqual(atari_2600_crop_res, original_size) ||
-		   		HSM_ResolutionIsEqual(sega_saturn_fmv_res, original_size) ||
-				HSM_ResolutionIsEqual(sony_ps_fmv_res, original_size) ||
-				HSM_ResolutionIsEqual(sony_ps_fmv_res_2, original_size) ||
-				original_size.y == sony_ps_height
-		   )
-		{
-		   final_orientation = 1;
-		}
-		else
-		{
-			final_orientation = (HSM_GetIsCorePreppedSizeVertical(screen_index) > 0.5) ? 2 : 1;
-		}
-	}
-
-	float final_aspect_ratio = (final_orientation < 1.5) ? horizontal_aspect : vertical_aspect;
-
-	return final_aspect_ratio;
-}*/
-
-/*
-
-Amiga: no guess
-320x224 = megadrive = 10/7
-
-Se fallisce il guess, fallback a 4:3 o 3:4
-
-
-aggiungi opzioni negative per:
--1 = ntsc - 1.5
--2 = pal  - 1.25
--3 = 8/7 (snes)
--4 = 10/7 (megadrive)
--5 = uncorrected
-
-
-  PAL = 1.25
-  NTSC = 1.5
-
-  Megadrive ntsc:
-    //picodrive sets 1.43 (256/179) originalsize = 320x224 (pal and ntsc)
-    //genesis plus gx sets 1.3 (256/196) originalsize = 320x224 (pal and ntsc)
-    Aspect: ntsc, pal o 10/7
-
-  SNES:
-    Aspect:
-		Uncorrected 256/224 (8/7), pal o ntsc, preferenza utente.
-    Source resolution per snes9x: 512x448
-    256*224 (crop enabled)
-	256*239 (crop disabled)
-	512*224 (crop enabled)
-	512*239 (crop disabled)
-	512*448 (crop disabled, interlace)
-	512*478 (crop enabled, interlace)
-
-
-
-
-    if ( ASPECT_X == 0 ) {
-        /*AMIGA - PUAE
-        Cropping res (PAL):
-        720x288
-        720x270
-        696x264
-        672x256
-        640x240
-        640x224
-        640x216
-        640x200
-
-*/
 
