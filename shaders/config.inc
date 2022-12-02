@@ -272,7 +272,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 // interlaced screens; 0 disable the effect, 1 always enables it, 2 enables it only when
 // the shader detects an interlaced signal, which actually means that the vertical resoution is "high enough"
 #pragma parameter SCANLINE_FLICKERING "        Interlace Flicker (0=off,1=on,2=if interlaced)"		  	2.0 	0.0 2.0 1.0
-#pragma parameter SCANLINE_FLICKERING_POWER "        Interlace Flicker power"		  			0.75 	0.0 4.0 0.25
+#pragma parameter SCANLINE_FLICKERING_POWER "        Interlace Flicker power"		  			0.75 	0.0 4.0 0.1
 
 #pragma parameter SCANLINE_DISABLE_ON_INTERLACE "        Disable on interlaced screen"			  	0.0 	0.0 1.0 1.0
 
