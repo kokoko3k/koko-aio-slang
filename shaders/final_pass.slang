@@ -41,20 +41,21 @@ layout(location = 3) in vec3 vFragCoord;
 layout(location = 0) out vec4 FragColor;
 
 
-layout(set = 0, binding = 2) uniform sampler2D bloom_pass_final;
-layout(set = 0, binding = 3) uniform sampler2D reflected_blurred_pass2;
-layout(set = 0, binding = 4) uniform sampler2D ambi_temporal_pass;
-layout(set = 0, binding = 5) uniform sampler2D avglum_pass;
-layout(set = 0, binding = 6) uniform sampler2D monitor_body;
-layout(set = 0, binding = 7) uniform sampler2D bg;
-layout(set = 0, binding = 8) uniform sampler2D first_pass;
-layout(set = 0, binding = 9) uniform sampler2D shift_and_bleed_pass;
+layout(set = 0, binding = 2)  uniform sampler2D bloom_pass_final;
+layout(set = 0, binding = 3)  uniform sampler2D reflected_blurred_pass2;
+layout(set = 0, binding = 4)  uniform sampler2D ambi_temporal_pass;
+layout(set = 0, binding = 5)  uniform sampler2D avglum_pass;
+layout(set = 0, binding = 6)  uniform sampler2D monitor_body;
+layout(set = 0, binding = 7)  uniform sampler2D bg_under;
+layout(set = 0, binding = 8)  uniform sampler2D bg_over;
+layout(set = 0, binding = 9)  uniform sampler2D first_pass;
+layout(set = 0, binding = 10) uniform sampler2D shift_and_bleed_pass;
 
 //Ex main_pass layouts:
-    layout(set = 0, binding = 10) uniform sampler2D FXAA_pass;
-    layout(set = 0, binding = 11) uniform sampler2D in_glow_pass;
-    layout(set = 0, binding = 12) uniform sampler2D halo_pass;
-    layout(set = 0, binding = 13) uniform sampler2D avglum_passFeedback;
+    layout(set = 0, binding = 11) uniform sampler2D FXAA_pass;
+    layout(set = 0, binding = 12) uniform sampler2D in_glow_pass;
+    layout(set = 0, binding = 13) uniform sampler2D halo_pass;
+    layout(set = 0, binding = 14) uniform sampler2D avglum_passFeedback;
 
 //Ex main_pass defines:
     #define half_pi 1.5707963267949
@@ -294,13 +295,22 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
 float global_noise;
 
 
-vec4 pixel_background_image(){
+vec4 pixel_background_image(bool over){
     //return the aspect corrected background image:
-    vec2 tex_size = textureSize(bg, 0); // * BG_ZOOM;
-    float bg_lod = log2(tex_size.y / global.FinalViewportSize.y);
-    vec2 back_coords =  get_scaled_coords_aspect(vOutputCoord,global.FinalViewportSize, tex_size.x/tex_size.y, is_rotated());
-    //back_coords=zoom(back_coords, BG_ZOOM);
-    return textureLod(bg,back_coords,bg_lod);
+    vec2 bg_image_offset=vec2(BG_IMAGE_OFFX,BG_IMAGE_OFFY);
+    if (over) {
+        vec2 tex_size = textureSize(bg_over, 0); // * BG_ZOOM;
+        float bg_over_lod = log2(tex_size.y / global.FinalViewportSize.y);
+        vec2 back_coords =  get_scaled_coords_aspect(vOutputCoord+bg_image_offset,global.FinalViewportSize, tex_size.x/tex_size.y, is_rotated());
+        back_coords=zoom(back_coords, BG_IMAGE_ZOOM);
+        return textureLod(bg_over,back_coords,bg_over_lod);
+    }
+    //under
+        vec2 tex_size = textureSize(bg_under, 0); // * BG_ZOOM;
+        float bg_under_lod = log2(tex_size.y / global.FinalViewportSize.y);
+        vec2 back_coords =  get_scaled_coords_aspect(vOutputCoord+bg_image_offset,global.FinalViewportSize, tex_size.x/tex_size.y, is_rotated());
+        back_coords=zoom(back_coords, BG_IMAGE_ZOOM);
+        return textureLod(bg_under,back_coords,bg_under_lod);
 }
 
 vec3 pixel_border(bool image_over) {
@@ -312,7 +322,7 @@ vec3 pixel_border(bool image_over) {
     if (DO_AMBILIGHT == 1.0)
         pixel_out =  texture(ambi_temporal_pass, vOutputCoord + global_noise ).rgb;
     if (DO_BG_IMAGE == 1.0 && !image_over) {
-        vec4 bg_image = pixel_background_image();
+        vec4 bg_image = pixel_background_image(false);
         pixel_out = mix(pixel_out,bg_image.rgb,bg_image.a);
     }
     return pixel_out;
@@ -523,9 +533,9 @@ void main() {
         pixel_out = vec4(compose_bezel_over(pixel_out.rgb),1.0);
     }
 
-    //Draw an image "Over" the bezel with ano hole inside by the alpha channel
+    //Draw an image "Over" the bezel with an hole inside by the alpha channel
     if (DO_BG_IMAGE == 1.0 && BG_IMAGE_OVER==1.0) {
-        vec4 bg_image = pixel_background_image();
+        vec4 bg_image = pixel_background_image(true);
         pixel_out = mix(pixel_out,bg_image,bg_image.a);
     }
 

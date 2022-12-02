@@ -65,18 +65,22 @@ Total basal + all the features: 72.2                65.3                65.2    
    - The blue channel represents the part of the bezel that will be filled by the game reflection.
 */
 
-                textures = "monitor_body;bg"
+                textures = "monitor_body;bg_under;bg_over"
                 
             monitor_body = "textures/monitor_body.png"
      monitor_body_linear = "true"
   monitor_body_wrap_mode = "clamp_to_edge" //Does this work?
      monitor_body_mipmap = "true"
 
-                      bg = "textures/background.png"
-               bg_linear = "true"
-            bg_wrap_mode = "mirrored_repeat"
-               bg_mipmap = "true"
-
+                bg_under = "textures/background_under.png"
+         bg_under_linear = "true"
+      bg_under_wrap_mode = "mirrored_repeat"
+         bg_under_mipmap = "true"
+          
+                 bg_over = "textures/background_over.png"
+          bg_over_linear = "true"
+       bg_over_wrap_mode = "mirrored_repeat"
+          bg_over_mipmap = "true"
 
 shaders = 17
 /*For P-uae defaults, doubling just y0 seems the best option.
