@@ -1,4 +1,10 @@
 #version 450
+
+/* This pass:
+ * Composes the previous passes
+ * Does masks, spot, bezel, vignette, background image (anything else?)
+ */
+
 #include "config.inc"
 
 #pragma stage vertex
@@ -13,14 +19,10 @@ layout(location = 3) out vec2 vFragCoord;
 
 #include "includes/functions.include.slang"
 
-bool between(float x, float mmin, float mmax) {
-    return x>mmin && x<=mmax;
-}
-
 void main() {
     gl_Position = global.MVP * Position;
     vTexCoord = get_scaled_coords(TexCoord,global.FinalViewportSize, is_rotated())+vec2(0.00001);
-    vOutputCoord = TexCoord;;
+    vOutputCoord = TexCoord;
 
     spot_offset = offsets_from_float(S_POSITION+420.0,40);
     spot_offset = spot_offset / 10.0 + vec2(0.0,1.0);
@@ -39,7 +41,6 @@ layout(location = 3) in vec3 vFragCoord;
 layout(location = 0) out vec4 FragColor;
 
 
-//layout(set = 0, binding = 2) uniform sampler2D main_pass;
 layout(set = 0, binding = 2) uniform sampler2D bloom_pass_final;
 layout(set = 0, binding = 3) uniform sampler2D reflected_blurred_pass2;
 layout(set = 0, binding = 4) uniform sampler2D ambi_temporal_pass;
@@ -53,7 +54,6 @@ layout(set = 0, binding = 9) uniform sampler2D shift_and_bleed_pass;
     layout(set = 0, binding = 10) uniform sampler2D FXAA_pass;
     layout(set = 0, binding = 11) uniform sampler2D in_glow_pass;
     layout(set = 0, binding = 12) uniform sampler2D halo_pass;
-    //layout(set = 0, binding = 13) uniform sampler2D first_pass;
     layout(set = 0, binding = 13) uniform sampler2D avglum_passFeedback;
 
 //Ex main_pass defines:
@@ -62,8 +62,9 @@ layout(set = 0, binding = 9) uniform sampler2D shift_and_bleed_pass;
 #include "includes/functions.include.slang"
 
 vec3 pixel_vmask(vec3 source, vec3 white_reference, float over_white) {
-
+// Simple RGB mask emulation with or without horizontal gap
     float ooo = 1.0 - RGB_MASK_STRENGTH;
+    
     // RGB mask:     R     G     B
     vec3 m1 =  vec3( 1.0 , ooo , ooo );  //col 1
     vec3 m2 =  vec3( ooo , 1.0 , ooo );  //col 2
@@ -96,8 +97,9 @@ vec3 pixel_vmask(vec3 source, vec3 white_reference, float over_white) {
     
 
 vec3 pixel_vmask_gm(vec3 source, vec3 white_reference, float over_white) {
-    
+// Simple RGB mask emulation with or without horizontal gap
     float ooo = 1.0 - RGB_MASK_STRENGTH;
+    
     // RGB mask:     R     G     B
     vec3 m1 =  vec3( ooo , 1.0 , ooo );    //col 1
     vec3 m2 =  vec3( 1.0 , ooo , 1.0 );    //col 2
@@ -128,11 +130,12 @@ vec3 pixel_vmask_gm(vec3 source, vec3 white_reference, float over_white) {
 
 vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
                      float do_offset, vec3 white_reference,float over_white) {
+/* "darklines" are vertical gaps that can be used to emulate aperturegrille
+ * or slotmasks
+ */
 
     float Darkline_part_w = (3.0 - VMASK_USE_GM + VMASK_GAP) * VMASK_DARKLINE_SCALE;
     float Darkline_part_w_x2 = Darkline_part_w*2;
-
-    
 
     darkline_every *= VMASK_DARKLINE_SCALE;
 
@@ -143,7 +146,7 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
         darkline_trans=clamp(darkline_trans,0.0,1.0);
     }
 
-    //Slotmask 
+    //Slotmask (darklines are drawn with offset)
     if (do_offset == 1.0) {
         bool odd_line_meno_densa = mod(vFragCoord.y, darkline_every) > VMASK_DARKLINE_SCALE ;
         bool odd_line_piu_densa = !(mod(vFragCoord.y, darkline_every/2) < VMASK_DARKLINE_SCALE && odd_line_meno_densa);
@@ -152,23 +155,24 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
         return source * clamp(float(draw_mask),darkline_trans,1.0);
     }
     
-    //Straight lines (implicit do_offset = 0.0):
+    //Aperture grille (darklines are drawn straight)
         bool draw_dark = mod(vFragCoord.y, darkline_every) < VMASK_DARKLINE_SCALE;
         bool draw_color = !draw_dark;
         return source * ( float(draw_color) +  float(draw_dark) * darkline_trans );
-
-    
-
 }
 
 float scanline_shape(vec2 coords, bool do_flicker) {
+/* Produces a B/W scanline shape to be multiplicated by the source
+ * pixel later on to emulate scanline effect.
+ * scanlines can be drawn on odd and even fields alternating on odd and
+ * even frames to emulate that aspect of interlacing.
+ */
+
     bool alternate = false;
     float period = 1.0;
 
-    int slow = 1;
-
     if (do_flicker) {
-        if (params.FrameCount/slow % 2 == 0.0) alternate = true;
+        if (params.FrameCount % 2 == 0.0) alternate = true;
         if (params.OriginalSize.y > MIN_LINES_INTERLACED )  period = 0.5;
     }
 
@@ -192,9 +196,8 @@ float scanline_shape(vec2 coords, bool do_flicker) {
 }
 
 vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
-
-    bool is_border = false;
-
+    //Exit if we don't need a border (ambient light/background picture)
+    //And we are outside the the border (unsure if this double check is good for performance) //FIXME
     if (bBorder_needed)
         if (vTexCoord.x < 0.0 || vTexCoord.x > 1.0 || vTexCoord.y < 0.0 || vTexCoord.y > 1.0) return vec4(0.0);
 
@@ -207,8 +210,7 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
     //Get the first available pixel_in:
     if  (DO_IN_GLOW == 1.0) {
             pixel_glowed = texture(in_glow_pass,coords).rgb;
-            pixel_in = pixel_glowed;
-        }
+            pixel_in = pixel_glowed; }
     else if ( DO_SHIFT_RGB + DO_SAT_BLEED > 0.0)
         pixel_in = texture(shift_and_bleed_pass,coords).rgb ;
     else if (DO_FXAA > 0.0)
@@ -216,9 +218,9 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
     else
         pixel_in = texture(first_pass,coords).rgb ;
 
-    
+
     vec3 pixel_out = pixel_in;
-    vec3 pixel_in_clamped = min(pixel_in,vec3(1.0)); //Clamp here for moth vmask and darklines.
+    vec3 pixel_in_clamped = min(pixel_in,vec3(1.0)); //Clamp here for both vmask and darklines.
 
     //Mask and darklines:
     if (DO_VMASK_AND_DARKLINES == 1.0 ) {
@@ -228,17 +230,15 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
         
         if (RGB_MASK_STRENGTH > 0.0) {
             //Use RGB pattern or exploit RGB layout with green and magenta?
-            if (VMASK_USE_GM < 1.0) {
+            if (VMASK_USE_GM < 1.0)
                 pixel_out = pixel_vmask(pixel_in_compensated, pixel_in_clamped, VMASK_OVERWHITE);
-                //pixel_out *= mask_weights(vTexCoord.st * params.OutputSize.xy, 1.0, 3);
-            } else {
+            else
                 pixel_out = pixel_vmask_gm(pixel_in_compensated, pixel_in_clamped, VMASK_OVERWHITE);
-                //pixel_out *= mask_weights(vTexCoord.st * params.OutputSize.xy, 1.0, 3);
-            }
         }
 
-        pixel_out = pixel_push_luminance(pixel_out, DARKLINES_STRENGTH * (1.0/DARKLINES_PERIOD) * MASK_COMPENSATION); // if/then check for strength == 0.0 made by the function itself.
-        //Screen lines
+        pixel_out = pixel_push_luminance(pixel_out, DARKLINES_STRENGTH * (1.0/DARKLINES_PERIOD) * MASK_COMPENSATION); 
+        
+        //Screen lines (slotmask aperture grille)
         if (DARKLINES_STRENGTH > 0.0 ) {
             float MYDARKLINES_TRANSPARENCY = 1.0 - DARKLINES_STRENGTH;
             pixel_out = pixel_darklines(pixel_out,DARKLINES_PERIOD,MYDARKLINES_TRANSPARENCY,DO_DARKLINES_VOFFSET,pixel_in_clamped,DRKLN_OVERWHITE);
@@ -246,49 +246,49 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
 
     }
 
-    
-    
     //Halo
     vec3 pixel_haloed;
     if (DO_HALO == 1.0 ) {
         pixel_haloed = texture(halo_pass,coords).rgb;
         pixel_out += pixel_haloed;
-        //pixel_out = clamp(pixel_out,0.0,HALO_CLAMP);
     }
 
-    // Non flickering scanlines
-    if ( DO_SCANLINES == 1.0 )  {
-        vec3 pixel_bleed ;
-        if  (! ( isinterlaced  && (SCANLINE_DISABLE_ON_INTERLACE == 1.0))  ) {
-
-            if (DO_HALO == 1.0) 
-                pixel_bleed = pixel_haloed;
-            else if (DO_IN_GLOW == 1.0)
-                pixel_bleed = pixel_glowed;
-            else 
-                pixel_bleed = pixel_in;
-            
-            
-            if (SCANLINE_COMPENSATION > 0.0) {
-                float mypow = mix(1.0, (0.33 * SCANLINE_DARK + 0.67), SCANLINE_COMPENSATION);
-                pixel_out = pow(pixel_out,vec3(mypow));
-            }
-            
-            float scanline_shape =  scanline_shape(coords, flickering_scanlines ) ;
-            vec3 pixel_scanlined = pixel_out * scanline_shape;
-
-            pixel_out = pixel_scanlined + (pixel_out * pixel_bleed *  SCANLINES_BLEEDING * (1-scanline_shape));
-            
-            //pixel_out = pixel_haloed;
-            
+    /* Non flickering scanlines, Don't do them if
+     * - User doesn't want scanlines
+     * - The screen is interlaced and the user doesn't want scanlines on it.
+     */
+    if  ( DO_SCANLINES == 1.0 && 
+            !( isinterlaced && SCANLINE_DISABLE_ON_INTERLACE == 1.0 )
+        ) {
+        /* pixel_bleed is the color that will bleed over scanline gap.
+         * It is selected by the first available one depending on the shader
+         * features enabled by the user */ 
+        vec3 pixel_bleed;
+        if (DO_HALO == 1.0) 
+            pixel_bleed = pixel_haloed;
+        else if (DO_IN_GLOW == 1.0)
+            pixel_bleed = pixel_glowed;
+        else 
+            pixel_bleed = pixel_in;
+        
+        // Optionally apply a gamma correction to the scanline shape.
+        if (SCANLINE_COMPENSATION > 0.0) {
+            float mypow = mix(1.0, (0.33 * SCANLINE_DARK + 0.67), SCANLINE_COMPENSATION);
+            pixel_out = pow(pixel_out,vec3(mypow));
         }
+        
+        float scanline_shape = scanline_shape(coords, flickering_scanlines);
+        //Obtain the scanlines screen by multiplying the scanline shape by the pixel color.
+        vec3 pixel_scanlined = pixel_out * scanline_shape;
+        //Next, emulate the bleeding of the color over the dark part of the scanlined screen.
+        pixel_out = pixel_scanlined + (pixel_out * pixel_bleed *  SCANLINES_BLEEDING * (1-scanline_shape));
     }
 
+    // Apply color correction (in this pass it is just the final output gamma)
     if (DO_CCORRECTION == 1.0) pixel_out = pow(pixel_out,vec3(GAMMA_OUT));
 
     //Out
     return vec4(pixel_out,1.0) ; //* border(border_coords);
-
 }
 
 #define NOISE_A 12.9898
@@ -296,6 +296,7 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
 #define NOISE_C 43758.5453
 
 float displace(float power) {
+// Random noise generator 
     vec2 co = vTexCoord ;
     float dt = dot(co.xy, vec2(NOISE_A, NOISE_B));
     float sn = mod(dt,3.14);

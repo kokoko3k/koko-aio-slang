@@ -1,4 +1,9 @@
 #version 450
+
+/* This pass apply an pre-gain to the leds on the rear of the virtual screen 
+ * it is intended to produce a mipmap to be used by the next pass */
+
+
 #include "config.inc"
 
 #pragma stage vertex

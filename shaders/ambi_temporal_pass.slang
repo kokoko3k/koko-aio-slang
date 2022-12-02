@@ -1,4 +1,10 @@
 #version 450
+
+/* In this pass the led light is temporally smoothed to give smooth fades.
+ * the slowness is configurable by user parameter.
+ * It also detect when a full scene is changed to produces fast fades, instead
+ */
+
 #include "config.inc"
 
 #define PreviousSampler ambi_temporal_passFeedback
@@ -44,11 +50,11 @@ vec3 ambi_step_rgb(vec3 s,vec3 d, vec3 mystep){
 
 vec4 pixel_ambilight() {
     vec3 mystep;
-    //stiamo cambiando scena?
+
     vec4 previous_pixel_vec4 = texture(PreviousSampler, vTexCoord);
     vec3 current_pixel =  texture(CurrentSampler, vTexCoord).rgb;
     vec3 previous_pixel = previous_pixel_vec4.rgb;
-    
+
     float scene_change_remaining = previous_pixel_vec4.a;
     
     float prev_avg_lum = texture(avglum_passFeedback,vec2(0.25,0.25)).a;
@@ -58,7 +64,8 @@ vec4 pixel_ambilight() {
     if (diff_avg_lum >= AMBI_SCENE_CHG_THRSHLD) {
         scene_change_remaining = 1.0;
     }
-    
+
+    // Are we changing scene?
     if (scene_change_remaining > 0.0) {
         mystep = vec3(max(1.0/MAX_STEPS, AMBI_FAST_STEP)); // <- Never slow down fades due to fast step when changing scene
         scene_change_remaining -=  AMBI_FAST_STEP;
@@ -74,5 +81,4 @@ void main() {
     if (DO_AMBILIGHT != 1.0) return;
     
     FragColor = pixel_ambilight();
-    
 }

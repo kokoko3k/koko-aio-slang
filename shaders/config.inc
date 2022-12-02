@@ -29,15 +29,10 @@
 	// try between (1/avglum_divider) and (1/avglum_divider)/3
 #define AMBI_FAST_STEP 0.125 
 
-	// Since halo is added, we may want to clamp it to 1.0 to avoid visual artifacts
-	// when doing scanlines; however the effect is nice when not clamped
-	// se put the following as higher as possible to trade the things.
-#define HALO_CLAMP 1.4
 
 #define eps 1e-5
 
-layout(push_constant) uniform Push
-{
+layout(push_constant) uniform Push {
 	vec4 SourceSize;
 	vec4 OriginalSize;
 	vec4 OutputSize;
@@ -61,8 +56,7 @@ layout(push_constant) uniform Push
 
 } params;
 
-layout(std140, set = 0, binding = 0) uniform UBO
-{
+layout(std140, set = 0, binding = 0) uniform UBO {
 	mat4 MVP;
 	
 	vec4 FinalViewportSize;

@@ -1,9 +1,13 @@
 #version 450
+
+/* This pass simulates the presence of a led strip placed on the back of the virtual screen */
+
 #include "config.inc"
 
-#define internalness 0.07
-#define leds_per_strip 8
-#define radius 0.001
+#define internalness 0.07  //The distance between the screen border and the led strip
+#define leds_per_strip 8   //How many leds per border
+
+#define radius 0.001       //The base radius of the emitted light (tuned by user parameter later)
 
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
@@ -76,12 +80,14 @@ void main() {
     }
     
     bool is_rotated = texture(isrotated_passFeedback, vec2(0.5, 0.5)).r > 0.5;
+    
     //Scale to the original aspect
     vec2 coords = get_scaled_coords(vTexCoord, global.FinalViewportSize, is_rotated);
     if (DO_BEZEL==1.0) coords = zoomout_coords(coords, -BEZEL_INNER_ZOOM , 1.0);
     
     //Skip coords in the rect "under the monitor"
     FragColor = vec4(0.0);
+    
     //First consider to skip the curved coords
     if (DO_CURVATURE == 1.0) {
         if ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0)) {
@@ -95,6 +101,7 @@ void main() {
     //skip_pass = skip_pass && !( (coords.x < 0.0 -tol || coords.x > 1.0 +tol) ||  (coords.y < 0.0 -tol || coords.y > 1.0 +tol) );
     if (coords.x > tol_start && coords.x < tol_end && coords.y > tol_start && coords.y < tol_end)  return;
     
+    //Finally, emulate leds.
     vec3 pixel_out = vec3(0.0);
     float middle_x; float middle_y ;
     

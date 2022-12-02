@@ -1,7 +1,11 @@
 #version 450
+
+/* In this pass we calculate the average luminance of the scene.
+ * It is cheaply obtained by the use of mipmaps. */
+
 #include "config.inc"
 
-//16 pixel wide for the mipmap.
+//The mipmap wideness needed by the reflection on the bezel.
 #define min_w 16 
 
 #pragma stage vertex
@@ -9,8 +13,8 @@ layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
 layout(location = 1) out float lod;
-void main()
-{
+
+void main() {
    gl_Position = global.MVP * Position;
    vTexCoord = TexCoord;
    lod = log2(params.SourceSize.y / min_w);
@@ -47,7 +51,9 @@ float get_avglum() {
     if (!coordinate_for_scene_detection) return get_avg_lum_from_mip();
     if (reduced_sample_time_is_now)      return get_avg_lum_from_mip();
     if (coordinate_for_scene_detection && reduced_sample_time_is_now) return get_avg_lum_from_mip();
-    //else siamo nella zona coordinate in un tempo che non è di sample
+    
+    /* Implicit else: we are in a coordinate that is not used for scene detection
+     * So just return the feedback of this pass to spare gpu cycles. */
     return texture(avglum_passFeedback,vTexCoord).a;
 }
 
