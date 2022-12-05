@@ -1,0 +1,4 @@
+#reference "monitor-BASE.slangp"
+
+DARKLINES_STRENGTH = "0.7"
+

@@ -1,4 +1,4 @@
-#reference "koko-aio-crt-tv-slotmask.slangp"
+#reference "tv-slotmask.slangp"
 
 DO_SCANLINES = "0.0"
 

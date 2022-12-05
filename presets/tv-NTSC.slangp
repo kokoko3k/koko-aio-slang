@@ -1,4 +1,4 @@
-#reference "koko-aio-crt-monitor-slotmask-bloom-bezelwider.slangp"
+#reference "monitor-slotmask-bloom-bezelwider.slangp"
 
 
 GAMMA_OUT = "0.56"

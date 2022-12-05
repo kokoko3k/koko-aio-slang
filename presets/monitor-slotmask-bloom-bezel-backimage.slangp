@@ -1,4 +1,4 @@
-#reference "koko-aio-crt-monitor-slotmask-bloom-bezel.slangp"
+#reference "monitor-slotmask-bloom-bezel.slangp"
 
 AMBI_STEPS = "5.000000"
 AMBI_FALLOFF = "0.6"

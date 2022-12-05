@@ -188,7 +188,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter SAT_BLEED_STRENGTH      "        Strength"				1.0	 0.0 5.0  0.01
 #pragma parameter SAT_BLEED_SIZE_LEFT     "        Size Left"				5.0 	 1.0 40.0  1.0
 #pragma parameter SAT_BLEED_SIZE_RIGHT    "        Size Right"				5.0 	 1.0 40.0  1.0
-#pragma parameter SAT_BLEED_FALLOFF  "        Falloff"			1.7 	 1.0 2.0 0.01
+#pragma parameter SAT_BLEED_FALLOFF  	  "        Falloff"			1.7 	 1.0 2.0 0.01
 
 
 // Input glowing

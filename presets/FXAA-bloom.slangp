@@ -1,4 +1,4 @@
-#reference "koko-aio-crt-tv-slotmask-bloom-bezelwider.slangp"
+#reference "tv-slotmask-bloom-bezelwider.slangp"
 TEMPERATURE = "6500.000000"
 				DO_FXAA = "1.000000"
 IN_GLOW_WH = "7.000000"

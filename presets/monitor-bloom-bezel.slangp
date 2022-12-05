@@ -1,0 +1,4 @@
+#reference "monitor-slotmask-bloom-bezel.slangp"
+
+DARKLINES_STRENGTH = "0.0"
+DARKLINES_PERIOD = "2.0"

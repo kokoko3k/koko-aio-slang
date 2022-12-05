@@ -1,4 +1,4 @@
-#reference "koko-aio-crt-tv-slotmask-bloom.slangp"
+#reference "tv-aperturegrille-bloom.slangp"
 
 DO_SHIFT_RGB = "1.0"
 
@@ -25,3 +25,4 @@ DO_SPOT = "1.0"
 
 	AMBI_FALLOFF = "0.6"
 	AMBI_POWER = "2.0"
+

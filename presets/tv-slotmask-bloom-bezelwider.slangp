@@ -1,4 +1,4 @@
-#reference "koko-aio-crt-tv-aperturegrille-bloom-bezel.slangp"
+#reference "tv-slotmask-bloom-bezel.slangp"
 
 DO_SHIFT_RGB = "1.0"
 

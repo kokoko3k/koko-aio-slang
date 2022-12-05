@@ -1,4 +1,4 @@
-#reference "koko-aio-crt-monitor-slotmask-bloom.slangp"
+#reference "monitor-slotmask-bloom.slangp"
 
 DO_BEZEL = "1.0"
         BEZEL_R = "-0.3"
@@ -24,3 +24,5 @@ DO_SPOT = "1.0"
 
 	AMBI_FALLOFF = "0.6"
 	AMBI_POWER = "2.0"
+
+        DARKLINES_PERIOD = "2.0"
