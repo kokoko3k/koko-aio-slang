@@ -43,7 +43,7 @@ DO_HALO = "1.0"
 	HALO_POWER = "0.52"
 	HALO_W = "3.0"
 	HALO_H = "3.0"
-	HALO_GAMMA = "1.2"
+	HALO_GAMMA = "1.1"
 
 DO_BLOOM = "0.0"
 	BLOOM_MIX = "0.20"
