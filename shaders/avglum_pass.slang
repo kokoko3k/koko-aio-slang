@@ -67,11 +67,11 @@ void main() {
     */
     //FIXME: see which is faster:
     //if (DO_AMBILIGHT == 1.0 || DO_BEZEL == 1.0 || DO_DYNZOOM == 1.0) {
-    if ( DO_AMBILIGHT + DO_BEZEL + DO_DYNZOOM == 0 ) return;
+    if ( DO_AMBILIGHT + DO_BEZEL + DO_DYNZOOM + DO_BLOOM == 0 ) return;
     
     vec4 pixel_out;
     pixel_out.a = get_avglum();
-    if (DO_BEZEL == 1.0) {
+    if (DO_BEZEL + DO_BLOOM > 0.0) {
         //Create a small mipmap to be used to light the bezel corners.
         pixel_out.rgb = textureLod(first_pass, vTexCoord,lod).rgb;
     }

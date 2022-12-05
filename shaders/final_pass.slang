@@ -419,7 +419,7 @@ vec4 pixel_inner_frame(vec2 coords, bool bBorder_needed) {
             if (BLOOM_OVER_WHITE < 1.0) {
                     //Use mipmap to identify bright areas.
                     vec3 avglum = texture(avglum_pass,coords).rgb;
-                    avglum = apply_fuzzy_main_pass(avglum);
+                    //avglum = apply_fuzzy_main_pass(avglum);
                     float b_brightness = max(avglum.b,max(avglum.r,avglum.g));
                     //b_brightness = max(pixel_out.b,max(pixel_out.r,pixel_out.g));
                     
@@ -550,7 +550,7 @@ void main() {
         //if ( (vOutputCoord.x < 0.5  && vOutputCoord.y > 0.5) || (vOutputCoord.x > 0.5  && vOutputCoord.y < 0.5)  ) pixel_out = texture(first_pass,vOutputCoord);
         //split screen
        //if (vTexCoord.y < 0.5) pixel_out = texture(first_pass,vTexCoord);
-        //pixel_out = texture(FXAA_pass,vTexCoord);
+        //pixel_out = texture(avglum_pass,vTexCoord);
         
     FragColor = pixel_out;
 }
