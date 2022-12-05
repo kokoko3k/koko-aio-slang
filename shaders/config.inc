@@ -198,7 +198,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 // "IN_GLOW_ADD" allows to modulate from interpolation(*) to a sum, wihch may (or not) produce better effects.
 // With "IN_GLOW_ADD=0" input glowing does not alter the RGB mask
 // or slot mask applied to the image.
-#pragma parameter DO_IN_GLOW               "★ Glowing Input/power enable? ==>" 					1.0	0.0 1.0 1.0
+#pragma parameter DO_IN_GLOW               "★ Glowing Input/power enable? ==>" 					0.0	0.0 1.0 1.0
 #pragma parameter IN_GLOW_POWER            "        Input signal glow strength"					0.45 	0.0 5.0 0.05
 #pragma parameter IN_GLOW_WH               "        Sharpness"							2.5	0.2 7.0 0.05
 #pragma parameter IN_GLOW_GAMMA            "        Gamma, the higher, the less the glow on dark colors"	1.0 	1.0 10.0 0.1
@@ -227,7 +227,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 // allowing, in conjunction with RGB mask, to emulate slot mask
 // MASK_COMPENSATION will, where possible, compensate for the loss of brightness by smartly pushing the source luminance
 
-#pragma parameter DO_VMASK_AND_DARKLINES "★  RGB Masks and/or Darklines enable? ==>"         	1.0 	0.0 1.0 1.0
+#pragma parameter DO_VMASK_AND_DARKLINES "★  RGB Masks and/or Darklines enable? ==>"         	0.0 	0.0 1.0 1.0
 
 #pragma parameter MASK_COMPENSATION      "        Compensate for brightness loss"		0.0 	0.0 1.0 0.05
 
@@ -249,7 +249,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 // multiplying the resulting picture by the source one, it is added.
 // this means that haloing will produce solid colors,
 // lessening afromentioned effects on bright colors.
-#pragma parameter DO_HALO       "★ Halo enable? ==>" 						1.0	0.0 1.0 1.0
+#pragma parameter DO_HALO       "★ Halo enable? ==>" 						0.0	0.0 1.0 1.0
 #pragma parameter HALO_POWER    "        Strength"						0.9 	0.0  5.0 0.025
 #pragma parameter HALO_W        "        Horizontal sharpness"					1.75	0.2  7.0 0.05
 #pragma parameter HALO_H        "        Vertical sharpness"					1.75	0.2  7.0 0.05
@@ -263,7 +263,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 // SCANLINE_COMPENSATION will make scanlines brighter, where possible, to compensate for the loss of brightness
 // SCANLINE_BLEEDING will make the whiter part of the scanline to bright the gap.
 
-#pragma parameter DO_SCANLINES	"★ Scanlines enable? ==>"							1.0 	0.0  1.0 1.0
+#pragma parameter DO_SCANLINES	"★ Scanlines enable? ==>"							0.0 	0.0  1.0 1.0
 #pragma parameter SCANLINE_DARK "        Scanlines gap brightness"			  			0.0 	-0.5 1.0 0.05
 #pragma parameter SCANLINE_COMPENSATION "        Compensate for brightness loss"				0.0	0.0 1.0 0.1
 #pragma parameter SCANLINES_BLEEDING "        Scanlines bleeding"						0.0 	0.0 3.0 0.05
@@ -286,7 +286,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 // "BLOOM_POWER" is the additional gain applied to the bloom
 // "BLOOM_BYPASS" will show only the bloomed component
 // the original image.
-#pragma parameter DO_BLOOM           "★ Bloom enable? ==>" 				        0.0  0.0  1.0  1.0
+#pragma parameter DO_BLOOM           "★ Bloom enable? ==>" 				0.0  0.0  1.0  1.0
 #pragma parameter BLOOM_MIX          "        Final mix, (0.0=off)"			0.2 0.0 1.0  0.01
 #pragma parameter BLOOM_SIZE         "        Radius"					2.0  0.25 30.0 0.25
 #pragma parameter BLOOM_QUALITY      "        Quality: more is better but slower"	1.0  1.0 32.0 1.0
@@ -297,14 +297,14 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BLOOM_BYPASS       "        Bypass"					0.0  0.0 1.0  1.0
 
 //Curvature parameters:
-#pragma parameter DO_CURVATURE	     "★ Curvature enable? ==>"				0.0   0.0 1.0 1.0
+#pragma parameter DO_CURVATURE	     "★ Curvature enable? ==>"			0.0   0.0 1.0 1.0
 #pragma parameter GEOM_WARP_X        "        Warp X"				0.3  0.0 6.0 0.05
 #pragma parameter GEOM_WARP_Y        "        Warp Y"				0.0   0.0 6.0 0.05
 #pragma parameter GEOM_CORNER_SIZE   "        Corner radius"			0.01  0.01 0.1 0.005
 #pragma parameter GEOM_CORNER_SMOOTH "        Corner sharpness"			350.0 50.0 1000.0 25.0
 
 //Bezel related
-#pragma parameter DO_BEZEL	     "★ Bezel enable? ==>"				0.0   0.0 1.0 1.0
+#pragma parameter DO_BEZEL	     "★ Bezel enable? ==>"			0.0   0.0 1.0 1.0
 #pragma parameter BEZEL_R            "        Bezel color: Red"			-0.3   -0.5 0.5  0.01
 #pragma parameter BEZEL_G            "        Bezel color: Green"		-0.3   -0.5 0.5  0.01
 #pragma parameter BEZEL_B            "        Bezel color: Blue"		-0.3   -0.5 0.5  0.01
@@ -313,7 +313,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BEZEL_FRAME_ZOOM   "        Frame zoom"			0.0   -1.5 0.5 0.01
 #pragma parameter BEZEL_IMAGE_BORDER "        Image border"			1.01   1.0 1.2 0.01
 
-#pragma parameter DO_BG_IMAGE	 "★ Backgound image enable? ==>"				0.0  0.0  1.0     1.0
+#pragma parameter DO_BG_IMAGE	 "★ Backgound image enable? ==>"			0.0  0.0  1.0     1.0
 #pragma parameter LABEL_WARNING1 "    ⚠ RetroArch aspect needs to be set to Full! ⚠"	1.0  1.0  1.0     1.0
 #pragma parameter BG_IMAGE_OVER	 "        Image over content (alpha channel driven)?"	0.0  0.0  1.0     1.0
 #pragma parameter BG_IMAGE_OFFX	 "        Shift Image over X axis"			0.0  -1.0  1.0    0.001
