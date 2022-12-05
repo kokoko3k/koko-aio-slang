@@ -419,8 +419,10 @@ vec4 pixel_inner_frame(vec2 coords, bool bBorder_needed) {
             if (BLOOM_OVER_WHITE < 1.0) {
                     //Use mipmap to identify bright areas.
                     vec3 avglum = texture(avglum_pass,coords).rgb;
-                    //avglum = apply_fuzzy_main_pass(avglum);
-                    float b_brightness = max(pixel_out.b,max(pixel_out.r,pixel_out.g));
+                    avglum = apply_fuzzy_main_pass(avglum);
+                    float b_brightness = max(avglum.b,max(avglum.r,avglum.g));
+                    //b_brightness = max(pixel_out.b,max(pixel_out.r,pixel_out.g));
+                    
                     b_brightness *= 1-BLOOM_OVER_WHITE;
                     over_white_correction =1- b_brightness;
             }
