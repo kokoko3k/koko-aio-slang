@@ -36,7 +36,7 @@ void main() {
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in vec2 vOutputCoord;
 layout(location = 2) in vec2 spot_offset;
-layout(location = 3) in vec3 vFragCoord;
+layout(location = 3) in vec2 vFragCoord;
 
 layout(location = 0) out vec4 FragColor;
 
