@@ -32,14 +32,16 @@ layout(set = 0, binding = 5) uniform sampler2D shift_and_bleed_pass;
 
 vec3 glow_blur_bias(sampler2D source_tex, vec2 co, vec3 pixel_glowed, float bias) {
    vec3 pixel_source = texture(source_tex, co).rgb;
-   float glowlum = max(max(pixel_glowed.r, pixel_glowed.g), pixel_glowed.b);
-   float orilum =  max(max(pixel_source.r, pixel_source.g), pixel_source.b);
-   glowlum = clamp(glowlum, 0.0, 1.0);
-   orilum =  clamp(orilum, 0.0, 1.0);
-   float g_mix = (glowlum - orilum);
-   g_mix += IN_GLOW_BIAS;
-   g_mix = clamp(g_mix, 0.0, 1.0);
-   return mix(pixel_source, pixel_glowed, g_mix);
+   
+   vec3 pixel_glowed_c = clamp(pixel_glowed, 0.0, 1.0);
+   vec3 pixel_source_c = clamp(pixel_source, 0.0, 1.0);
+   vec3 vmix = vec3( pixel_glowed_c.r - pixel_source_c.r,
+                     pixel_glowed_c.g - pixel_source_c.g,
+                     pixel_glowed_c.b - pixel_source_c.b);
+   
+   //vmix = clamp(vmix, 0.0, 1.0);
+   vmix += IN_GLOW_BIAS;
+   return mix(pixel_source, pixel_glowed, vmix);
 }
 
 
