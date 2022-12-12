@@ -75,7 +75,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float DO_HALO ;
 	float DO_CCORRECTION;
 	float DO_ALT_BLANK;
-	//float IN_GLOW_ADD ;
+	float IN_GLOW_BIAS ;
 	float SCANLINES_BLEEDING ;
 	float IN_GLOW_WH ;
 	float IN_GLOW_POWER ;
@@ -195,14 +195,12 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 // Emulates the glowing of the input signal by blurring it with "IN_GLOW_WH" sharpness.
 // Apply a gamma filter "IN_GLOW_GAMMA" to "light" it, multiplying the result by "IN_GLOW_POWER" and
 // finally interpolating(*) it with the source image.
-// "IN_GLOW_ADD" allows to modulate from interpolation(*) to a sum, wihch may (or not) produce better effects.
-// With "IN_GLOW_ADD=0" input glowing does not alter the RGB mask
-// or slot mask applied to the image.
+// Glow/blur bias allows to modulate from Glow to blur.
 #pragma parameter DO_IN_GLOW               "★ Glowing Input/power enable? ==>" 					0.0	0.0 1.0 1.0
 #pragma parameter IN_GLOW_POWER            "        Input signal glow strength"					0.45 	0.0 5.0 0.05
 #pragma parameter IN_GLOW_WH               "        Sharpness"							2.5	0.2 7.0 0.05
 #pragma parameter IN_GLOW_GAMMA            "        Gamma, the higher, the less the glow on dark colors"	1.0 	1.0 10.0 0.1
-//#pragma parameter IN_GLOW_ADD              "        Post gain (0.0 to disable)"					0.0 	0.0 1.0 0.05
+#pragma parameter IN_GLOW_BIAS             "        Glow to Blur bias"			1.0 	0.0 1.0 0.05
 
 
 // RGB Mask
@@ -391,7 +389,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #define SCANLINE_COMPENSATION         global.SCANLINE_COMPENSATION
 
 #define DO_IN_GLOW               global.DO_IN_GLOW
-//#define IN_GLOW_ADD              global.IN_GLOW_ADD
+#define IN_GLOW_BIAS             global.IN_GLOW_BIAS
 #define SCANLINES_BLEEDING       global.SCANLINES_BLEEDING
 #define IN_GLOW_WH               global.IN_GLOW_WH
 #define IN_GLOW_POWER            global.IN_GLOW_POWER

@@ -30,17 +30,38 @@ layout(set = 0, binding = 5) uniform sampler2D shift_and_bleed_pass;
 // shamlessly hidden into an include:
 #include "includes/pixel_glows.include.slang" 
 
+vec3 glow_blur_bias(sampler2D source_tex, vec2 co, vec3 pixel_glowed, float bias) {
+   vec3 pixel_source = texture(source_tex, co).rgb;
+   float glowlum = max(max(pixel_glowed.r, pixel_glowed.g), pixel_glowed.b);
+   float orilum =  max(max(pixel_source.r, pixel_source.g), pixel_source.b);
+   glowlum = clamp(glowlum, 0.0, 1.0);
+   orilum =  clamp(orilum, 0.0, 1.0);
+   float g_mix = (glowlum - orilum);
+   g_mix += IN_GLOW_BIAS;
+   g_mix = clamp(g_mix, 0.0, 1.0);
+   return mix(pixel_source, pixel_glowed, g_mix);
+}
+
+
 void main() { 
    if (DO_IN_GLOW == 0.0) return;
    
    vec3 pixel_glowed;
-   if ( DO_SHIFT_RGB + DO_SAT_BLEED > 0.0)
+   if ( DO_SHIFT_RGB + DO_SAT_BLEED > 0.0) {
       pixel_glowed = pixel_glow(shift_and_bleed_pass, IN_GLOW_WH,IN_GLOW_WH,IN_GLOW_POWER,IN_GLOW_GAMMA,vTexCoord, params.OutputSize, params.OutputSize).rgb;
-   else if (DO_FXAA > 0.0)
+      if (IN_GLOW_BIAS < 1.0) pixel_glowed = glow_blur_bias(shift_and_bleed_pass, vTexCoord, pixel_glowed, IN_GLOW_BIAS);
+      }
+   else if (DO_FXAA > 0.0) {
       pixel_glowed = pixel_glow(FXAA_pass, IN_GLOW_WH,IN_GLOW_WH,IN_GLOW_POWER,IN_GLOW_GAMMA,vTexCoord, params.OutputSize, params.OutputSize).rgb;
-   else
+      if (IN_GLOW_BIAS < 1.0) pixel_glowed = glow_blur_bias(FXAA_pass, vTexCoord, pixel_glowed, IN_GLOW_BIAS);
+   }
+   else {
       pixel_glowed = pixel_glow(first_pass, IN_GLOW_WH,IN_GLOW_WH,IN_GLOW_POWER,IN_GLOW_GAMMA,vTexCoord, params.OutputSize, params.OutputSize).rgb;
-   
+      if (IN_GLOW_BIAS < 1.0) pixel_glowed = glow_blur_bias(first_pass, vTexCoord, pixel_glowed, IN_GLOW_BIAS);
+   }
+
+
+
    FragColor = vec4((pixel_glowed),1.0);
 }
 
