@@ -100,7 +100,6 @@ vec3 pixel_vmask(vec3 source, vec3 white_reference, float over_white) {
 vec3 pixel_vmask_gm(vec3 source, vec3 white_reference, float over_white) {
 // Simple RGB mask emulation with or without horizontal gap
     float ooo = 1.0 - RGB_MASK_STRENGTH;
-    
     // RGB mask:     R     G     B
     vec3 m1 =  vec3( ooo , 1.0 , ooo );    //col 1
     vec3 m2 =  vec3( 1.0 , ooo , 1.0 );    //col 2
@@ -278,11 +277,21 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
             pixel_out = pow(pixel_out,vec3(mypow));
         }
         
-        float scanline_shape = scanline_shape(coords, flickering_scanlines);
+        //The following should be theoretically more correct, but it produces moiree:
+        /* vec3 vscanline_shape = scanline_shape(coords, flickering_scanlines) + (pixel_bleed * SCANLINES_BLEEDING);
+        vscanline_shape = min(vscanline_shape,1.0);
+        pixel_out = vscanline_shape * pixel_out;
+        */
+        
         //Obtain the scanlines screen by multiplying the scanline shape by the pixel color.
-        vec3 pixel_scanlined = pixel_out * scanline_shape;
-        //Next, emulate the bleeding of the color over the dark part of the scanlined screen.
-        pixel_out = pixel_scanlined + (pixel_out * pixel_bleed *  SCANLINES_BLEEDING * (1-scanline_shape));
+        //and emulate the bleeding of the color over the dark part of the scanlined screen.
+        float scanline_shape = scanline_shape(coords, flickering_scanlines);                     
+            //vec3 pixel_scanlined = pixel_out * scanline_shape;
+            //pixel_out = pixel_scanlined + (pixel_out * pixel_bleed *  SCANLINES_BLEEDING * (1-scanline_shape));*/
+        
+            //the same, but simplified with less muls:
+                pixel_out = pixel_out * ( scanline_shape + ( pixel_bleed * SCANLINES_BLEEDING * ( 1 - scanline_shape ) ));
+        
     }
 
     // Apply color correction (in this pass it is just the final output gamma)
