@@ -5,7 +5,7 @@
 #define GLOW_SHARP_MAX 7	        
 
 	//Consider content interlaced if lines are more than this
-#define MIN_LINES_INTERLACED 100
+#define MIN_LINES_INTERLACED 300
 
 //Sort of dithering used in vignette, spot, backlight leds
 	#define NOISEPOWER ((params.OutputSize.z)*3)
