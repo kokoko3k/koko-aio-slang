@@ -29,8 +29,7 @@ layout(set = 0, binding = 2) uniform sampler2D FXAA_pass;
 layout(set = 0, binding = 3) uniform sampler2D first_pass;
 layout(set = 0, binding = 4) uniform sampler2D in_glow_pass;
 layout(set = 0, binding = 5) uniform sampler2D shift_and_bleed_pass;
-// What follows is an ugly optimization with a lot of code copied and pasted repeated multiple times,
-// shamlessly hidden into an include:
+
 #include "includes/pixel_glows.include.slang"    
 
 

@@ -1,18 +1,5 @@
 **koko-aio-slang parameters documentation**
 
-
-**Shift RGB components:**
-    Shift R,G,B components separately to mimic chroma
-    dephasing and color aberrations.
-    By varying Red, Green and Blue offsets, the relative component will be
-    shifted column by column, row by row.
-    
-**Saturated color bleeding:**
-    Will cause an horizontal chroma bleed which cheaply mimics the effect of
-    poor composite video signals.
-    It can be used with RGB shifting and image blurring to give the picture
-    an ntsc look without dealing with specific encoding/decoding stuffs. 
-    
 **Color corrections:**
     Modify luminance, saturation, contrast, brightness and color temperature of the
     "input" signal.
@@ -22,32 +9,18 @@
     Apply the well known antialiasing effect by Nvidia.
     Use it if you don't want to blur the image and you still don't like
     jagged or too much pixelated images.
-    
-**Scanlines:**
-    Emulate CRT scanlines.
-    
-    Scanlines gap brightness:
-        controls how "little" they will look pronunced.
-        You can even use a negative value to make the scanline more evident,
-        but graphical glitches may occour.
-    Scanlines gap brightness:
-        Controls how much the gap between scanlines is dark
-    Compensate brightness loss:
-        Will make scanlines brighter, where possible, to compensate for the loss of brightness
-        gicen by the dark gap between them.
-    Scanlines bleeding:
-        will cause the scanline itself to light the scanline gap (dark) part. 
-        You may use it to keep a good brightness overrall picture level.
-    Interlace flicker:
-        Emulates the flickerin issues present on crt interlaced screens
-        where the brighter lines flickers wien they are near dark ones.
-        You can choose to produce the flickering: never, always or only
-        when the input picture is considered interlaced.
-        The threshold for that is defined in config.inc 
-        with the parameter: MIN\_LINES\_INTERLACED.
-    Disable on interlaced screen:
-        You can choose to completely disable scanline emulation when
-        the input picture is considered interlaced.
+
+**Shift RGB components:**
+    Shift R,G,B components separately to mimic chroma
+    dephasing and color aberrations.
+    By varying Red, Green and Blue offsets, the relative component will be
+    shifted column by column, row by row.
+
+**YIQ/YUV bandwidth limited chroma bleeding:**
+    Will cause an horizontal chroma bleed which cheaply mimics the effect of
+    poor composite video signals.
+    It can be used with RGB shifting and image blurring to give the picture
+    an ntsc look without dealing with specific encoding/decoding stuffs. 
 
 **Input power/glowing:**
     Emulate the CRT glowing "feature", so that the brighter areas of
@@ -75,14 +48,14 @@
         you may want to scale this filter by a factor.
     Vmask Strength:
         How much will the RGB mask be visible.
-    RGB Mask: (LoDPI) Green,Magenta -> BGR:
+    . (LoDPI) Green,Magenta -> BGR:
         By exploiting common monitors RGB subpixel order, this causes
         the RGB mask, to be emulated by using just 2 pixels instead of 3.
         Very useful for 1080p (or lower) displays and to keep more brightness.
-    RGB Mask: Horizontal Gap between triads:
+    . Horizontal Gap between triads:
         In real displays rgb triads are separated by a black space.
         You can emulate it by turning this feature on.
-    RGB Mask: affect bright colors:
+    . Affect bright colors:
         Emulating RGB masks will lower the resulting image brightness and you
         just cant push input signal brightness without "burning" the signal.
         By using this option, the RGB mask will be less evident on brighter
@@ -90,11 +63,11 @@
         it is advised to use the "Halo" feature instead (see later).
     Darklines: strength:
         How much will the horizontal darklines be visible.
-    Darklines: offset by triads:
+    . Triad offset:
         When drawing "straight" horizontal darklines, you can emulate CRT aperture grille.
         But if you want slotmasks instead, you need to vertically
         offset them every RGB triad.
-    Darklines: period (triad height):
+    . Triad height:
         Basically tells the shader how much a triad has to be high.
     Darklines: affect bright colors:
         See "RGB Mask: affect bright colors"
@@ -107,6 +80,39 @@
     So you can use this to restore the brightness and color saturation
     loss when using features like scanlines, darklines or RGB masks.
 
+**Scanlines:**
+    Emulate CRT scanlines.
+    
+    Scanlines gap brightness:
+        controls how "little" they will look pronunced.
+        You can even use a negative value to make the scanline more evident,
+        but graphical glitches may occour.
+    Scanlines gap brightness:
+        Controls how much the gap between scanlines is dark
+    Compensate brightness loss:
+        Will make scanlines brighter, where possible, to compensate for the loss of brightness
+        gicen by the dark gap between them.
+    Scanlines bleeding:
+        will cause the scanline itself to light the scanline gap (dark) part. 
+        You may use it to keep a good brightness overrall picture level.
+    Interlace flicker:
+        Emulates the flickering issues present on crt interlaced screens
+        where the brighter lines flickers when they are near dark ones.
+        You can choose to produce the flickering: never, always or only
+        when the input picture is considered interlaced.
+        The threshold for that is defined in config.inc 
+        with the parameter: MIN\_LINES\_INTERLACED.
+    Disable on interlaced screen:
+        You can choose to completely disable scanline emulation when
+        the input picture is considered interlaced.
+    Slotmask strength (don't use with darklines!)
+        You may want to draw slotmasks alongside the scanlines to sync their heights
+        and avoid graphical glitches.
+        It is recommended to disable darklines.
+        Darklines will still used when dealing with interlaced or flickering screens.
+    . Offset
+        This is the slotmask offset
+        
 **Bloom:**
     Acts like Halo, but affects a much wider area and is more configurable.
     By using this effect and playing with its parameters, you can achieve funny

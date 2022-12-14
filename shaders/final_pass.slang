@@ -128,12 +128,23 @@ vec3 pixel_vmask_gm(vec3 source, vec3 white_reference, float over_white) {
    return pixel_out;
 }
 
-vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
-                     float do_offset, vec3 white_reference,float over_white) {
-/* "darklines" are vertical gaps that can be used to emulate aperturegrille
- * or slotmasks
- */
 
+
+/*bool drawit( float period, float off, vec2 coords){    
+    coords = vTexCoord; 
+    float first_pass_size_y = global.first_passSize.y * period;   
+    float current_line_int = floor(coords.y * first_pass_size_y) + off ;
+    float screenline_height = first_pass_size_y/params.OutputSize.y;//; params.OutputSize.y/first_pass_size_y;
+    return (coords.y * first_pass_size_y  > current_line_int) &&  
+           (coords.y * first_pass_size_y  < current_line_int+screenline_height) ; 
+}*/
+
+vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
+                     float do_offset, vec3 white_reference,float over_white, vec2 coords) {
+    /* "darklines" are vertical gaps that can be used to emulate aperturegrille
+    * or slotmasks
+    */
+    
     float Darkline_part_w = (3.0 - VMASK_USE_GM + VMASK_GAP) * VMASK_DARKLINE_SCALE;
     float Darkline_part_w_x2 = Darkline_part_w*2;
 
@@ -147,11 +158,19 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
     }
 
     //Slotmask (darklines are drawn with offset)
-    if (do_offset == 1.0) {
+    if (do_offset > 0.0) {
         bool odd_line_meno_densa = mod(vFragCoord.y, darkline_every) > VMASK_DARKLINE_SCALE ;
         bool odd_line_piu_densa = !(mod(vFragCoord.y, darkline_every/2) < VMASK_DARKLINE_SCALE && odd_line_meno_densa);
         bool odd_column = mod(vFragCoord.x + Darkline_part_w  , Darkline_part_w_x2) < Darkline_part_w;
         bool draw_mask = odd_line_piu_densa && !odd_column || odd_column && odd_line_meno_densa;
+        
+        /*
+        //quante scanline è alta la darkline
+        float darkline_height = 1/2.0;      
+        draw_mask = drawit(darkline_height,0.0, coords) && odd_column || drawit(darkline_height,0.5, coords) && !odd_column;
+        return source * float(!draw_mask);
+        */
+        
         return source * clamp(float(draw_mask),darkline_trans,1.0);
     }
     
@@ -161,7 +180,7 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
         return source * ( float(draw_color) +  float(draw_dark) * darkline_trans );
 }
 
-float scanline_shape(vec2 coords, bool do_flicker) {
+float scanline_shape(vec2 coords, bool do_flicker, bool is_interlaced, bool do_slotmask) {
 /* Produces a B/W scanline shape to be multiplicated by the source
  * pixel later on to emulate scanline effect.
  * scanlines can be drawn on odd and even fields alternating on odd and
@@ -170,28 +189,52 @@ float scanline_shape(vec2 coords, bool do_flicker) {
 
     bool alternate = false;
     float period = 1.0;
-
+    
     if (do_flicker) {
         if (params.FrameCount % 2 == 0.0) alternate = true;
         if (params.OriginalSize.y > MIN_LINES_INTERLACED )  period = 0.5;
     }
 
-    float angle = coords.y * pi * params.OriginalSize.y * period;
+    float angle_base = coords.y * pi * params.OriginalSize.y * period;
 
-    float lines;
-    if (alternate)
-        lines = -sin(angle+half_pi); //lines = abs(cos(angle));
-             else
-        lines = sin(angle);
-    lines = (lines*lines);
+    float lines = 1.0;
+    if (!( is_interlaced && SCANLINE_DISABLE_ON_INTERLACE == 1.0 )) {
+        if (alternate)
+            lines = -sin(angle_base + half_pi); //lines = abs(cos(angle))
+                else
+            lines = sin(angle_base);
+        lines = (lines*lines);
+    }
 
+
+    //Draw the slotmask right here if the height is the same as the scanline.
+    if (do_slotmask) {
+        if (do_flicker) {
+            //Fallback to old darklines code to avoid glitches/artifacts.
+            lines = lines * pixel_darklines(vec3(1.0),DARKLINES_PERIOD,1-SCANLINE_SM_STRENGTH,1.0,vec3(0.0),1.0, coords).r;
+
+        } else {
+            float Darkline_part_w = (3.0 - VMASK_USE_GM + VMASK_GAP) * VMASK_DARKLINE_SCALE;
+            float Darkline_part_w_x2 = Darkline_part_w*2;
+            bool odd_column = mod(vFragCoord.x + Darkline_part_w  , Darkline_part_w_x2) < Darkline_part_w;
+            if (odd_column) { 
+                float slotmask_strength = SCANLINE_SM_STRENGTH;
+                float slotmask_stagger = SCANLINE_SM_VOFFSET;
+                float phase = pi + slotmask_stagger*0.01;
+                float angle_slotmask = angle_base + phase;
+                float lines_2 = sin(angle_slotmask);
+                lines_2 = (lines_2*lines_2);
+                lines = mix(lines, lines_2, slotmask_strength);
+            }
+        }
+    }
+    
     if (SCANLINE_DARK >= 0.0) {
         lines = lines * (1.0 - SCANLINE_DARK) + SCANLINE_DARK;
     } else {
         float deepness = -SCANLINE_DARK;
         lines = lines * ((1-SCANLINE_DARK) ) + SCANLINE_DARK ;
     }
-
     return lines;
 }
 
@@ -239,9 +282,9 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
         pixel_out = pixel_push_luminance(pixel_out, DARKLINES_STRENGTH * (1.0/DARKLINES_PERIOD) * MASK_COMPENSATION); 
         
         //Screen lines (slotmask aperture grille)
-        if (DARKLINES_STRENGTH > 0.0 ) {
+        if (   DARKLINES_STRENGTH > 0.0 ) {
             float MYDARKLINES_TRANSPARENCY = 1.0 - DARKLINES_STRENGTH;
-            pixel_out = pixel_darklines(pixel_out,DARKLINES_PERIOD,MYDARKLINES_TRANSPARENCY,DO_DARKLINES_VOFFSET,pixel_in_clamped,DRKLN_OVERWHITE);
+            pixel_out = pixel_darklines(pixel_out,DARKLINES_PERIOD,MYDARKLINES_TRANSPARENCY,DARKLINES_VOFFSET,pixel_in_clamped,DRKLN_OVERWHITE, coords);
         }
 
     }
@@ -257,9 +300,7 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
      * - User doesn't want scanlines
      * - The screen is interlaced and the user doesn't want scanlines on it.
      */
-    if  ( DO_SCANLINES == 1.0 && 
-            !( isinterlaced && SCANLINE_DISABLE_ON_INTERLACE == 1.0 )
-        ) {
+    if  ( DO_SCANLINES == 1.0 ) {
         /* pixel_bleed is the color that will bleed over scanline gap.
          * It is selected by the first available one depending on the shader
          * features enabled by the user */ 
@@ -278,14 +319,14 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
         }
         
         //The following should be theoretically more correct, but it produces moiree:
-        /* vec3 vscanline_shape = scanline_shape(coords, flickering_scanlines) + (pixel_bleed * SCANLINES_BLEEDING);
+        /* vec3 vscanline_shape = scanline_shape(coords, flickering_scanlines, isinterlaced,  DARKLINES_STRENGTH > 0.0 && DARKLINES_VOFFSET > 0.0); + (pixel_bleed * SCANLINES_BLEEDING);
         vscanline_shape = min(vscanline_shape,1.0);
         pixel_out = vscanline_shape * pixel_out;
         */
         
         //Obtain the scanlines screen by multiplying the scanline shape by the pixel color.
         //and emulate the bleeding of the color over the dark part of the scanlined screen.
-        float scanline_shape = scanline_shape(coords, flickering_scanlines);                     
+        float scanline_shape = scanline_shape(coords, flickering_scanlines, isinterlaced,  SCANLINE_SM_STRENGTH > 0.0 && SCANLINE_SM_VOFFSET > 0.0);                     
             //vec3 pixel_scanlined = pixel_out * scanline_shape;
             //pixel_out = pixel_scanlined + (pixel_out * pixel_bleed *  SCANLINES_BLEEDING * (1-scanline_shape));*/
         
