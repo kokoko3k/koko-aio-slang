@@ -203,7 +203,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter IN_GLOW_POWER            "        Input signal glow strength"					0.45 	0.0 5.0 0.05
 #pragma parameter IN_GLOW_WH               "        Sharpness"							2.5	0.2 7.0 0.05
 #pragma parameter IN_GLOW_GAMMA            "        Gamma, the higher, the less the glow on dark colors"	1.0 	1.0 10.0 0.1
-#pragma parameter IN_GLOW_BIAS             "        Glow to Blur bias"			1.0 	0.0 1.0 0.05
+#pragma parameter IN_GLOW_BIAS             "        Glow to blur bias"						100.0 	0.0 100.0 0.05
 
 
 
