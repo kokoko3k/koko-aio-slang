@@ -62,6 +62,7 @@ vec3 glow_blur_bias(sampler2D source_tex, vec2 co, vec3 pixel_glowed, float bias
 
    vmix = clamp(vmix, 0.0, 1.0);
    return mix(pixel_sharp, pixel_glowed, clamp(   (vmix+0.01 * vInGlowBias) , 0.0,1.0)   );
+   //return pixel_sharp + pixel_glowed*clamp(   (vmix+0.01 * vInGlowBias) , 0.0,1.0);
 }
 
 void main() { 
