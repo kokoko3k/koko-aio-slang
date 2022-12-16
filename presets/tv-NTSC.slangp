@@ -27,4 +27,5 @@ DO_SHIFT_RGB = "1.000000"
 	
 	SCANLINE_DARK = "0.3"
 	
-	IN_GLOW_WH = "1.0"
+	IN_GLOW_W = "1.0"
+	IN_GLOW_H = "1.0"

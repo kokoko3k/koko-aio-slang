@@ -1,7 +1,7 @@
 	//Setting the glow/halo sharpness parameter to this
 	//will skip the blurring phase and lowers the gpu use
 	//Set this to the same value as used for the maximum
-	//of IN_GLOW_WH, HALO_W and HALO_H
+	//of IN_GLOW_W/H, HALO_W/H
 #define GLOW_SHARP_MAX 7	        
 
 	//Consider content interlaced if lines are more than this
@@ -77,7 +77,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float DO_ALT_BLANK;
 	float IN_GLOW_BIAS ;
 	float SCANLINES_BLEEDING ;
-	float IN_GLOW_WH ;
+	float IN_GLOW_W;
+	float IN_GLOW_H;
 	float IN_GLOW_POWER ;
 	float IN_GLOW_GAMMA ;
 	float BLOOM_MIX;
@@ -201,7 +202,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 // Input glowing
 #pragma parameter DO_IN_GLOW               "★ Glowing Input/power enable? ==>" 					0.0	0.0 1.0 1.0
 #pragma parameter IN_GLOW_POWER            "        Input signal glow strength"					0.45 	0.0 5.0 0.05
-#pragma parameter IN_GLOW_WH               "        Sharpness"							2.5	0.2 7.0 0.05
+#pragma parameter IN_GLOW_W                "        Sharpness, horizontal"					2.5	0.2 7.0 0.05
+#pragma parameter IN_GLOW_H                "        Sharpness, vertical"					2.5	0.2 7.0 0.05
 #pragma parameter IN_GLOW_GAMMA            "        Gamma, the higher, the less the glow on dark colors"	1.0 	1.0 10.0 0.1
 #pragma parameter IN_GLOW_BIAS             "        Glow to blur bias"						100.0 	0.0 100.0 0.05
 
@@ -226,8 +228,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 // Halo
 #pragma parameter DO_HALO       "★ Halo enable? ==>" 						0.0	0.0 1.0 1.0
 #pragma parameter HALO_POWER    "        Strength"						0.9 	0.0  5.0 0.025
-#pragma parameter HALO_W        "        Horizontal sharpness"					1.75	0.2  7.0 0.05
-#pragma parameter HALO_H        "        Vertical sharpness"					1.75	0.2  7.0 0.05
+#pragma parameter HALO_W        "        Sharpness, horizontal"					1.75	0.2  7.0 0.05
+#pragma parameter HALO_H        "        Sharpness, Vertical"					1.75	0.2  7.0 0.05
 #pragma parameter HALO_GAMMA    "        Gamma, the higher, the less the halo on dark colors"	2.0 	1.0  10.0 0.1
 
 
@@ -368,7 +370,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #define DO_IN_GLOW               global.DO_IN_GLOW
 #define IN_GLOW_BIAS             global.IN_GLOW_BIAS
 #define SCANLINES_BLEEDING       global.SCANLINES_BLEEDING
-#define IN_GLOW_WH               global.IN_GLOW_WH
+#define IN_GLOW_W                global.IN_GLOW_W
+#define IN_GLOW_H                global.IN_GLOW_H
 #define IN_GLOW_POWER            global.IN_GLOW_POWER
 #define IN_GLOW_GAMMA            global.IN_GLOW_GAMMA
 
