@@ -11,7 +11,8 @@ layout(location = 1) out float vInGlowBias;
 void main() {
    gl_Position = global.MVP * Position;
    vTexCoord = TexCoord ;  
-   vInGlowBias = pow(IN_GLOW_BIAS,0.9);
+   //vInGlowBias = pow(IN_GLOW_BIAS,0.9);
+   vInGlowBias = IN_GLOW_BIAS + 1;
 }
 
 
@@ -33,19 +34,6 @@ layout(set = 0, binding = 5) uniform sampler2D shift_and_bleed_pass;
 // shamlessly hidden into an include:
 #include "includes/pixel_glows.include.slang" 
 
-vec3 OLD_glow_blur_bias(sampler2D source_tex, vec2 co, vec3 pixel_glowed, float bias) {
-   vec3 pixel_source = texture(source_tex, co).rgb;
-   
-   vec3 pixel_glowed_c = clamp(pixel_glowed, 0.0, 1.0);
-   vec3 pixel_source_c = clamp(pixel_source, 0.0, 1.0);
-   vec3 vmix = vec3( pixel_glowed_c.r - pixel_source_c.r,
-                     pixel_glowed_c.g - pixel_source_c.g,
-                     pixel_glowed_c.b - pixel_source_c.b);
-   
-   //vmix = clamp(vmix, 0.0, 1.0);
-   vmix += IN_GLOW_BIAS;
-   return mix(pixel_source, pixel_glowed, vmix);
-}
 
 vec3 glow_blur_bias(sampler2D source_tex, vec2 co, vec3 pixel_glowed, float bias) {
    //Modulates the mix of the blurred version over the sharp one
@@ -53,15 +41,16 @@ vec3 glow_blur_bias(sampler2D source_tex, vec2 co, vec3 pixel_glowed, float bias
    vec3 pixel_original = texture(source_tex,vTexCoord).rgb;
    vec3 pixel_sharp  = pow(pixel_original,vec3(IN_GLOW_GAMMA)) * IN_GLOW_POWER;
    
-   vec3 pixel_glowed_c = clamp(pixel_glowed, 0.0, 1.0);
+   vec3 pixel_glowed_c = clamp(pixel_glowed, 0.0, 1.0) + vInGlowBias;
    vec3 pixel_sharp_c = clamp(pixel_sharp, 0.0, 1.0);
    
    vec3 vmix = vec3( pixel_glowed_c.r - pixel_original.r,
                      pixel_glowed_c.g - pixel_original.g,
                      pixel_glowed_c.b - pixel_original.b);
 
-   vmix = clamp(vmix, 0.0, 1.0);
-   return mix(pixel_sharp, pixel_glowed, clamp(   (vmix+0.01 * vInGlowBias) , 0.0,1.0)   );
+   vmix = clamp(vmix , 0.0, 1.0);
+   //return mix(pixel_sharp, pixel_glowed, clamp(   (vmix+0.01 * vInGlowBias) , 0.0,1.0)   );
+   return mix(pixel_sharp, pixel_glowed, vmix  );
    //return pixel_sharp + pixel_glowed*clamp(   (vmix+0.01 * vInGlowBias) , 0.0,1.0);
 }
 
@@ -74,17 +63,17 @@ void main() {
    vec3 pixel_glowed;
    if ( DO_SHIFT_RGB + DO_SAT_BLEED > 0.0) {
       pixel_glowed = pixel_glow(shift_and_bleed_pass, IN_GLOW_W,IN_GLOW_H,IN_GLOW_POWER,IN_GLOW_GAMMA,vTexCoord, params.OutputSize, params.OutputSize).rgb;
-      if (IN_GLOW_BIAS < 100.0 && (IN_GLOW_W < GLOW_SHARP_MAX || IN_GLOW_H < GLOW_SHARP_MAX) )
+      if (IN_GLOW_BIAS < IN_GLOW_BIAS_MAX && (IN_GLOW_W < GLOW_SHARP_MAX || IN_GLOW_H < GLOW_SHARP_MAX) )
          pixel_glowed = glow_blur_bias(shift_and_bleed_pass, vTexCoord, pixel_glowed, IN_GLOW_BIAS);
       }
    else if (DO_FXAA > 0.0) {
       pixel_glowed = pixel_glow(FXAA_pass, IN_GLOW_W,IN_GLOW_H,IN_GLOW_POWER,IN_GLOW_GAMMA,vTexCoord, params.OutputSize, params.OutputSize).rgb;
-      if (IN_GLOW_BIAS < 100.0 &&  (IN_GLOW_W < GLOW_SHARP_MAX || IN_GLOW_H < GLOW_SHARP_MAX) )
+      if (IN_GLOW_BIAS < IN_GLOW_BIAS_MAX &&  (IN_GLOW_W < GLOW_SHARP_MAX || IN_GLOW_H < GLOW_SHARP_MAX) )
          pixel_glowed = glow_blur_bias(FXAA_pass, vTexCoord, pixel_glowed, IN_GLOW_BIAS);
    }
    else {
       pixel_glowed = pixel_glow(first_pass, IN_GLOW_W,IN_GLOW_H,IN_GLOW_POWER,IN_GLOW_GAMMA,vTexCoord, params.OutputSize, params.OutputSize).rgb;
-      if (IN_GLOW_BIAS < 100.0 &&  (IN_GLOW_W < GLOW_SHARP_MAX || IN_GLOW_H < GLOW_SHARP_MAX) )
+      if (IN_GLOW_BIAS < IN_GLOW_BIAS_MAX &&  (IN_GLOW_W < GLOW_SHARP_MAX || IN_GLOW_H < GLOW_SHARP_MAX) )
          pixel_glowed = glow_blur_bias(first_pass, vTexCoord, pixel_glowed, IN_GLOW_BIAS);
    }
 

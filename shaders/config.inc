@@ -1,9 +1,3 @@
-	//Setting the glow/halo sharpness parameter to this
-	//will skip the blurring phase and lowers the gpu use
-	//Set this to the same value as used for the maximum
-	//of IN_GLOW_W/H, HALO_W/H
-#define GLOW_SHARP_MAX 7	        
-
 	//Consider content interlaced if lines are more than this
 #define MIN_LINES_INTERLACED 300
 
@@ -29,6 +23,18 @@
 	// try between (1/avglum_divider) and (1/avglum_divider)/3
 #define AMBI_FAST_STEP 0.125 
 
+	//Setting the glow/halo sharpness parameter to this
+	//will skip the blurring phase and lowers the gpu use
+	//Set this to the same value as used for the maximum
+	//of IN_GLOW_W/H, HALO_W/H
+#define GLOW_SHARP_MAX 7	        
+
+	//Setting glow to blur bias parameter to this
+	//will skip the glow/blur mix codem and just return
+	//the blurred image
+	//Set this to the same value as used for the maximum
+	//of IN_GLOW_BIAS
+#define IN_GLOW_BIAS_MAX 1.0
 
 #define eps 1e-5
 
@@ -205,7 +211,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter IN_GLOW_W                "        Sharpness, horizontal"					2.5	0.2 7.0 0.05
 #pragma parameter IN_GLOW_H                "        Sharpness, vertical"					2.5	0.2 7.0 0.05
 #pragma parameter IN_GLOW_GAMMA            "        Gamma, the higher, the less the glow on dark colors"	1.0 	1.0 10.0 0.1
-#pragma parameter IN_GLOW_BIAS             "        Glow to blur bias"						100.0 	0.0 100.0 0.05
+#pragma parameter IN_GLOW_BIAS             "        Glow to blur bias"						1.0    -1.0 1.0 0.05 
 
 
 

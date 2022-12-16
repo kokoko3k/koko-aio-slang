@@ -965,7 +965,7 @@ vec4 pixel_glow(sampler2D in_texture, float my_glowpix, float my_glowpixy, float
         return dumb_glow(in_texture, my_glow,glow_gamma,coords);
     }
     
-    return pixel_glow_std_pow(in_texture,my_glowpix,my_glowpixy,my_glow,glow_gamma,coords,SourceSize1, SourceSize2);
+   return pixel_glow_std_pow(in_texture,my_glowpix,my_glowpixy,my_glow,glow_gamma,coords,SourceSize1, SourceSize2);
     
     //return pixel_glow_my_pow(in_texture,my_glowpix,my_glowpixy,my_glow,glow_gamma,coords,SourceSize1, SourceSize2);
     
