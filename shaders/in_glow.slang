@@ -62,19 +62,19 @@ void main() {
    
    vec3 pixel_glowed;
    if ( DO_SHIFT_RGB + DO_SAT_BLEED > 0.0) {
-      pixel_glowed = pixel_glow(shift_and_bleed_pass, IN_GLOW_W,IN_GLOW_H,IN_GLOW_POWER,IN_GLOW_GAMMA,vTexCoord, params.OutputSize, params.OutputSize).rgb;
-      if (IN_GLOW_BIAS < IN_GLOW_BIAS_MAX && (IN_GLOW_W < GLOW_SHARP_MAX || IN_GLOW_H < GLOW_SHARP_MAX) )
-         pixel_glowed = glow_blur_bias(shift_and_bleed_pass, vTexCoord, pixel_glowed, IN_GLOW_BIAS);
+      pixel_glowed = pixel_glow(shift_and_bleed_pass, IN_GLOW_W, IN_GLOW_H, IN_GLOW_POWER, IN_GLOW_GAMMA, IN_GLOW_BIAS, vTexCoord, params.OutputSize, params.OutputSize).rgb;
+//       if (IN_GLOW_BIAS < IN_GLOW_BIAS_MAX && (IN_GLOW_W < GLOW_SHARP_MAX || IN_GLOW_H < GLOW_SHARP_MAX) )
+//          pixel_glowed = glow_blur_bias(shift_and_bleed_pass, vTexCoord, pixel_glowed, IN_GLOW_BIAS);
       }
    else if (DO_FXAA > 0.0) {
-      pixel_glowed = pixel_glow(FXAA_pass, IN_GLOW_W,IN_GLOW_H,IN_GLOW_POWER,IN_GLOW_GAMMA,vTexCoord, params.OutputSize, params.OutputSize).rgb;
-      if (IN_GLOW_BIAS < IN_GLOW_BIAS_MAX &&  (IN_GLOW_W < GLOW_SHARP_MAX || IN_GLOW_H < GLOW_SHARP_MAX) )
-         pixel_glowed = glow_blur_bias(FXAA_pass, vTexCoord, pixel_glowed, IN_GLOW_BIAS);
+      pixel_glowed = pixel_glow(FXAA_pass, IN_GLOW_W, IN_GLOW_H, IN_GLOW_POWER, IN_GLOW_GAMMA, IN_GLOW_BIAS, vTexCoord, params.OutputSize, params.OutputSize).rgb;
+//       if (IN_GLOW_BIAS < IN_GLOW_BIAS_MAX &&  (IN_GLOW_W < GLOW_SHARP_MAX || IN_GLOW_H < GLOW_SHARP_MAX) )
+//          pixel_glowed = glow_blur_bias(FXAA_pass, vTexCoord, pixel_glowed, IN_GLOW_BIAS);
    }
    else {
-      pixel_glowed = pixel_glow(first_pass, IN_GLOW_W,IN_GLOW_H,IN_GLOW_POWER,IN_GLOW_GAMMA,vTexCoord, params.OutputSize, params.OutputSize).rgb;
-      if (IN_GLOW_BIAS < IN_GLOW_BIAS_MAX &&  (IN_GLOW_W < GLOW_SHARP_MAX || IN_GLOW_H < GLOW_SHARP_MAX) )
-         pixel_glowed = glow_blur_bias(first_pass, vTexCoord, pixel_glowed, IN_GLOW_BIAS);
+      pixel_glowed = pixel_glow(first_pass, IN_GLOW_W, IN_GLOW_H, IN_GLOW_POWER, IN_GLOW_GAMMA, IN_GLOW_BIAS, vTexCoord, params.OutputSize, params.OutputSize).rgb;
+//       if (IN_GLOW_BIAS < IN_GLOW_BIAS_MAX &&  (IN_GLOW_W < GLOW_SHARP_MAX || IN_GLOW_H < GLOW_SHARP_MAX) )
+//          pixel_glowed = glow_blur_bias(first_pass, vTexCoord, pixel_glowed, IN_GLOW_BIAS);
    }
 
 

@@ -39,13 +39,13 @@ vec4 main_wrap(void) {
     vec2 halo_coords = vTexCoord;
 
     if (DO_IN_GLOW == 1.0)
-        pixel_haloed = pixel_glow(in_glow_pass, HALO_W,HALO_H,HALO_POWER,HALO_GAMMA,halo_coords, global.FXAA_passSize, global.FXAA_passSize).rgb;
+        pixel_haloed = pixel_glow(in_glow_pass, HALO_W, HALO_H, HALO_POWER, HALO_GAMMA, 1.0, halo_coords, global.FXAA_passSize, global.FXAA_passSize).rgb;
     else if ( DO_SHIFT_RGB + DO_SAT_BLEED > 0.0)
-        pixel_haloed = pixel_glow(shift_and_bleed_pass, HALO_W,HALO_H,HALO_POWER,HALO_GAMMA,halo_coords, params.OutputSize, params.OutputSize).rgb;
+        pixel_haloed = pixel_glow(shift_and_bleed_pass, HALO_W, HALO_H, HALO_POWER, HALO_GAMMA, 1.0, halo_coords, global.FXAA_passSize, global.FXAA_passSize).rgb;
     else if (DO_FXAA > 0.0)
-        pixel_haloed = pixel_glow(FXAA_pass, HALO_W,HALO_H,HALO_POWER,HALO_GAMMA,halo_coords, global.FXAA_passSize, global.FXAA_passSize).rgb;
+        pixel_haloed = pixel_glow(FXAA_pass, HALO_W, HALO_H, HALO_POWER, HALO_GAMMA, 1.0, halo_coords, global.FXAA_passSize, global.FXAA_passSize).rgb;
     else
-        pixel_haloed = pixel_glow(first_pass, HALO_W,HALO_H,HALO_POWER,HALO_GAMMA,halo_coords, global.FXAA_passSize, global.FXAA_passSize).rgb;
+        pixel_haloed = pixel_glow(first_pass, HALO_W, HALO_H, HALO_POWER, HALO_GAMMA, 1.0, halo_coords, global.FXAA_passSize, global.FXAA_passSize).rgb;
         
     return vec4(pixel_haloed.rgb,1.0);
 }
