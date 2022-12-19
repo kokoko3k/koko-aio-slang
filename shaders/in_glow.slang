@@ -36,23 +36,20 @@ layout(set = 0, binding = 5) uniform sampler2D shift_and_bleed_pass;
 
 
 vec3 glow_blur_bias(sampler2D source_tex, vec2 co, vec3 pixel_glowed, float bias) {
-   //Modulates the mix of the blurred version over the sharp one
-   //by the luminosity difference of the blurred version and the original
-   vec3 pixel_original = texture(source_tex,vTexCoord).rgb;
-   vec3 pixel_sharp  = pow(pixel_original,vec3(IN_GLOW_GAMMA)) * IN_GLOW_POWER;
+   //from latitude. with pow.
+   vec3 pixel_source = texture(source_tex, co).rgb;
+   pixel_source  = pow(pixel_source,vec3(IN_GLOW_GAMMA)) * IN_GLOW_POWER;
    
-   vec3 pixel_glowed_c = clamp(pixel_glowed, 0.0, 1.0) + vInGlowBias;
-   vec3 pixel_sharp_c = clamp(pixel_sharp, 0.0, 1.0);
-   
-   vec3 vmix = vec3( pixel_glowed_c.r - pixel_original.r,
-                     pixel_glowed_c.g - pixel_original.g,
-                     pixel_glowed_c.b - pixel_original.b);
-
-   vmix = clamp(vmix , 0.0, 1.0);
-   //return mix(pixel_sharp, pixel_glowed, clamp(   (vmix+0.01 * vInGlowBias) , 0.0,1.0)   );
-   return mix(pixel_sharp, pixel_glowed, vmix  );
-   //return pixel_sharp + pixel_glowed*clamp(   (vmix+0.01 * vInGlowBias) , 0.0,1.0);
+   float glowlum = max(max(pixel_glowed.r, pixel_glowed.g), pixel_glowed.b);
+   float orilum =  max(max(pixel_source.r, pixel_source.g), pixel_source.b);
+   glowlum = clamp(glowlum, 0.0, 1.0);
+   orilum =  clamp(orilum, 0.0, 1.0);
+   float g_mix = (glowlum - orilum);
+   g_mix += IN_GLOW_BIAS;
+   g_mix = clamp(g_mix, 0.0, 1.0);
+   return mix(pixel_source, pixel_glowed, g_mix);
 }
+
 
 void main() { 
  
@@ -62,19 +59,22 @@ void main() {
    
    vec3 pixel_glowed;
    if ( DO_SHIFT_RGB + DO_SAT_BLEED > 0.0) {
-      pixel_glowed = pixel_glow(shift_and_bleed_pass, IN_GLOW_W, IN_GLOW_H, IN_GLOW_POWER, IN_GLOW_GAMMA, IN_GLOW_BIAS, vTexCoord, params.OutputSize, params.OutputSize).rgb;
-//       if (IN_GLOW_BIAS < IN_GLOW_BIAS_MAX && (IN_GLOW_W < GLOW_SHARP_MAX || IN_GLOW_H < GLOW_SHARP_MAX) )
-//          pixel_glowed = glow_blur_bias(shift_and_bleed_pass, vTexCoord, pixel_glowed, IN_GLOW_BIAS);
+      pixel_glowed = pixel_glow(shift_and_bleed_pass, IN_GLOW_W, IN_GLOW_H, IN_GLOW_POWER, IN_GLOW_GAMMA, vTexCoord, params.OutputSize, params.OutputSize).rgb;
+       if (IN_GLOW_BIAS < IN_GLOW_BIAS_MAX && (IN_GLOW_W < GLOW_SHARP_MAX || IN_GLOW_H < GLOW_SHARP_MAX) )
+          pixel_glowed = glow_blur_bias(shift_and_bleed_pass, vTexCoord, pixel_glowed, IN_GLOW_BIAS);
+      
       }
    else if (DO_FXAA > 0.0) {
-      pixel_glowed = pixel_glow(FXAA_pass, IN_GLOW_W, IN_GLOW_H, IN_GLOW_POWER, IN_GLOW_GAMMA, IN_GLOW_BIAS, vTexCoord, params.OutputSize, params.OutputSize).rgb;
-//       if (IN_GLOW_BIAS < IN_GLOW_BIAS_MAX &&  (IN_GLOW_W < GLOW_SHARP_MAX || IN_GLOW_H < GLOW_SHARP_MAX) )
-//          pixel_glowed = glow_blur_bias(FXAA_pass, vTexCoord, pixel_glowed, IN_GLOW_BIAS);
+      pixel_glowed = pixel_glow(FXAA_pass, IN_GLOW_W, IN_GLOW_H, IN_GLOW_POWER, IN_GLOW_GAMMA, vTexCoord, params.OutputSize, params.OutputSize).rgb;
+       if (IN_GLOW_BIAS < IN_GLOW_BIAS_MAX &&  (IN_GLOW_W < GLOW_SHARP_MAX || IN_GLOW_H < GLOW_SHARP_MAX) )
+          pixel_glowed = glow_blur_bias(FXAA_pass, vTexCoord, pixel_glowed, IN_GLOW_BIAS);
+      
    }
    else {
-      pixel_glowed = pixel_glow(first_pass, IN_GLOW_W, IN_GLOW_H, IN_GLOW_POWER, IN_GLOW_GAMMA, IN_GLOW_BIAS, vTexCoord, params.OutputSize, params.OutputSize).rgb;
-//       if (IN_GLOW_BIAS < IN_GLOW_BIAS_MAX &&  (IN_GLOW_W < GLOW_SHARP_MAX || IN_GLOW_H < GLOW_SHARP_MAX) )
-//          pixel_glowed = glow_blur_bias(first_pass, vTexCoord, pixel_glowed, IN_GLOW_BIAS);
+      pixel_glowed = pixel_glow(first_pass, IN_GLOW_W, IN_GLOW_H, IN_GLOW_POWER, IN_GLOW_GAMMA, vTexCoord, params.OutputSize, params.OutputSize).rgb;
+      if (IN_GLOW_BIAS < IN_GLOW_BIAS_MAX &&  (IN_GLOW_W < GLOW_SHARP_MAX || IN_GLOW_H < GLOW_SHARP_MAX) )
+          pixel_glowed = glow_blur_bias(first_pass, vTexCoord, pixel_glowed, IN_GLOW_BIAS);
+      
    }
 
 

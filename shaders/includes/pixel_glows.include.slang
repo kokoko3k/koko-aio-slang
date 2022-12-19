@@ -1,21 +1,17 @@
 
+
 vec3 diff_weight(vec3 v1, vec3 ref, float bias) {
-    //tanto più è la differenza, tanto più ritorna v1
-                                                                    //FIXME:  vec3+k == vec3.r+k;vec3.g+k;vec3+b.k?
-                                                                    //FIXME:  clamp, stessa cosa?
-    
-    ref = clamp(ref, 0.0, 1.0);
-    v1 = clamp(v1, 0.0, 1.0);
-    vec3 v1_biased = v1 + bias;
-    
-    vec3 diff = vec3(
-        v1_biased.r  - ref.r,
-        v1_biased.g  - ref.g,
-        v1_biased.b  - ref.b
-    );
-    diff = clamp(diff,0.0, 1.0);
-    return mix(ref, v1, diff);
+   float v1_lum = max(max(v1.r, v1.g), v1.b);
+    float ref_lum = max(max(ref.r, ref.g), ref.b);
+    v1_lum=clamp(v1_lum,0.0,1.0);
+    ref_lum=clamp(ref_lum,0.0,1.0);
+    float g_mix = v1_lum - ref_lum;
+    g_mix += IN_GLOW_BIAS  ;
+    g_mix = clamp(g_mix, 0.0, 1.0);
+    return mix(ref, v1, g_mix);
 }
+
+
 
 
 
@@ -105,127 +101,18 @@ vec4 pixel_glow_std_pow(sampler2D in_texture, float my_glowpix, float my_glowpix
 
 
 
-vec4 pixel_glow_std_pow_bias(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, float glow_gamma, float glow_blur_bias, vec2 coords, vec4 SourceSize1, vec4 SourceSize2) {
-
-    // Calculating texel coordinates
-    vec2 tex = coords.xy * 1.00001;
-
-    vec2 OGL2Pos = tex * SourceSize2.xy - vec2(0.5,0.5); // vec2 OGL2Pos = tex * SourceSize2.xy - vec2(0.5,0.5); // vec2 OGL2Pos = tex * SourceSize1.xy - vec2(0.5,0.5);  
-    vec2 fp = fract(OGL2Pos);
-    vec2 dx = vec2(SourceSize1.z,0.0) ; // vec2 dx = vec2(params.passthrough_and_cc_passSize.z,0.0) ; // 
-    vec2 dy = vec2(0.0,SourceSize1.w) ; // vec2 dy = vec2(0.0,params.passthrough_and_cc_passSize.w);  //
-    vec2 pC4 = (floor(OGL2Pos) + vec2(0.5)) * SourceSize2.zw;
-
-    vec2 x2 = 2.0*dx; vec2 x3 = 3.0*dx;
-    vec2 y2 = 2.0*dy;
-
-    vec3 glow_gamma_vec3 = vec3(glow_gamma);
-    
-    my_glowpix = my_glowpix / scalemod_x * 2 ; // <-- Make it not dependant on the input resolution.
-    my_glowpixy = my_glowpixy / scalemod_y *2 ;
-
-    float wl3 = 2.0 + fp.x; wl3*=wl3; wl3 = exp2(-my_glowpix*wl3);
-    float wl2 = 1.0 + fp.x; wl2*=wl2; wl2 = exp2(-my_glowpix*wl2);
-    float wl1 =       fp.x; wl1*=wl1; wl1 = exp2(-my_glowpix*wl1);
-    float wr1 = 1.0 - fp.x; wr1*=wr1; wr1 = exp2(-my_glowpix*wr1);
-    float wr2 = 2.0 - fp.x; wr2*=wr2; wr2 = exp2(-my_glowpix*wr2);
-    float wr3 = 3.0 - fp.x; wr3*=wr3; wr3 = exp2(-my_glowpix*wr3);
-
-    float wt = 1.0/(wl3+wl2+wl1+wr1+wr2+wr3);
-    
-    vec3 l1 = texture(in_texture, pC4     ).rgb;
-                                                    vec3 ref = pow(l1, glow_gamma_vec3);
-    vec3 l3 = texture(in_texture, pC4 -x2 ).rgb;
-    vec3 l2 = texture(in_texture, pC4 -dx ).rgb;
-    vec3 r1 = texture(in_texture, pC4 +dx ).rgb;
-    vec3 r2 = texture(in_texture, pC4 +x2 ).rgb;
-    vec3 r3 = texture(in_texture, pC4 +x3 ).rgb;
-    
-    l1=pow(l1,glow_gamma_vec3); //NOT HERE :-)
-    l2=pow(l2,glow_gamma_vec3); l2 = diff_weight(l2, ref, glow_blur_bias);
-    l3=pow(l3,glow_gamma_vec3); l3 = diff_weight(l3, ref, glow_blur_bias);
-    r1=pow(r1,glow_gamma_vec3); r1 = diff_weight(r1, ref, glow_blur_bias);
-    r2=pow(r2,glow_gamma_vec3); r2 = diff_weight(r2, ref, glow_blur_bias);
-    r3=pow(r3,glow_gamma_vec3); r3 = diff_weight(r3, ref, glow_blur_bias);
-
-    vec3 t1 = (l3*wl3 + l2*wl2 + l1*wl1 + r1*wr1 + r2*wr2 + r3*wr3)*wt;
-
-    l3 = texture(in_texture, pC4 -x2 -dy).rgb;
-    l2 = texture(in_texture, pC4 -dx -dy).rgb;
-    l1 = texture(in_texture, pC4     -dy).rgb;
-    r1 = texture(in_texture, pC4 +dx -dy).rgb;
-    r2 = texture(in_texture, pC4 +x2 -dy).rgb;
-    r3 = texture(in_texture, pC4 +x3 -dy).rgb;
-
-    l1=pow(l1,glow_gamma_vec3); l1 = diff_weight(l1, ref, glow_blur_bias);
-    l2=pow(l2,glow_gamma_vec3); l2 = diff_weight(l2, ref, glow_blur_bias);
-    l3=pow(l3,glow_gamma_vec3); l3 = diff_weight(l3, ref, glow_blur_bias);
-    r1=pow(r1,glow_gamma_vec3); r1 = diff_weight(r1, ref, glow_blur_bias);
-    r2=pow(r2,glow_gamma_vec3); r2 = diff_weight(r2, ref, glow_blur_bias);
-    r3=pow(r3,glow_gamma_vec3); r3 = diff_weight(r3, ref, glow_blur_bias);
-
-    vec3 t2 = (l3*wl3 + l2*wl2 + l1*wl1 + r1*wr1 + r2*wr2 + r3*wr3)*wt;
-
-    l3 = texture(in_texture, pC4 -x2 +dy).rgb;
-    l2 = texture(in_texture, pC4 -dx +dy).rgb;
-    l1 = texture(in_texture, pC4     +dy).rgb;
-    r1 = texture(in_texture, pC4 +dx +dy).rgb;
-    r2 = texture(in_texture, pC4 +x2 +dy).rgb;
-    r3 = texture(in_texture, pC4 +x3 +dy).rgb;
-   
-    l1=pow(l1,glow_gamma_vec3); l1 = diff_weight(l1, ref, glow_blur_bias);
-    l2=pow(l2,glow_gamma_vec3); l2 = diff_weight(l2, ref, glow_blur_bias);
-    l3=pow(l3,glow_gamma_vec3); l3 = diff_weight(l3, ref, glow_blur_bias);
-    r1=pow(r1,glow_gamma_vec3); r1 = diff_weight(r1, ref, glow_blur_bias);
-    r2=pow(r2,glow_gamma_vec3); r2 = diff_weight(r2, ref, glow_blur_bias);
-    r3=pow(r3,glow_gamma_vec3); r3 = diff_weight(r3, ref, glow_blur_bias);
-
-    vec3 b1 = (l3*wl3 + l2*wl2 + l1*wl1 + r1*wr1 + r2*wr2 + r3*wr3)*wt;
-
-    l3 = texture(in_texture, pC4 -x2 +y2).rgb;
-    l2 = texture(in_texture, pC4 -dx +y2).rgb;
-    l1 = texture(in_texture, pC4     +y2).rgb;
-    r1 = texture(in_texture, pC4 +dx +y2).rgb;
-    r2 = texture(in_texture, pC4 +x2 +y2).rgb;
-    r3 = texture(in_texture, pC4 +x3 +y2).rgb;
-
-    l1=pow(l1,glow_gamma_vec3); l1 = diff_weight(l1, ref, glow_blur_bias);
-    l2=pow(l2,glow_gamma_vec3); l2 = diff_weight(l2, ref, glow_blur_bias);
-    l3=pow(l3,glow_gamma_vec3); l3 = diff_weight(l3, ref, glow_blur_bias);
-    r1=pow(r1,glow_gamma_vec3); r1 = diff_weight(r1, ref, glow_blur_bias);
-    r2=pow(r2,glow_gamma_vec3); r2 = diff_weight(r2, ref, glow_blur_bias);
-    r3=pow(r3,glow_gamma_vec3); r3 = diff_weight(r3, ref, glow_blur_bias);
-
-    vec3 b2 = (l3*wl3 + l2*wl2 + l1*wl1 + r1*wr1 + r2*wr2 + r3*wr3)*wt;
-
-    wl2 = 1.0 + fp.y; wl2*=wl2; wl2 = exp2(-my_glowpixy*wl2);
-    wl1 =       fp.y; wl1*=wl1; wl1 = exp2(-my_glowpixy*wl1);
-    wr1 = 1.0 - fp.y; wr1*=wr1; wr1 = exp2(-my_glowpixy*wr1);
-    wr2 = 2.0 - fp.y; wr2*=wr2; wr2 = exp2(-my_glowpixy*wr2);
-
-    wt = 1.0/(wl2+wl1+wr1+wr2);
-
-    vec3 Bloom = (t2*wl2 + t1*wl1 + b1*wr1 + b2*wr2)*wt;
-
-    return vec4(Bloom*my_glow,1.0);
-}
-
 vec4 dumb_glow(sampler2D in_texture, float my_glow, float glow_gamma, vec2 coords) {
     vec3 pixel_in = texture(in_texture, coords ).rgb;
     pixel_in = pow(pixel_in,vec3(glow_gamma))*my_glow;
     return vec4(pixel_in,0.0);
 }
 
-vec4 pixel_glow(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, float glow_gamma, float glow_blur_bias, vec2 coords, vec4 SourceSize1, vec4 SourceSize2) {
+vec4 pixel_glow(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, float glow_gamma, vec2 coords, vec4 SourceSize1, vec4 SourceSize2) {
 
     if ( (my_glowpix >= GLOW_SHARP_MAX) && (my_glowpixy >= GLOW_SHARP_MAX) ) {
         return dumb_glow(in_texture, my_glow,glow_gamma,coords);
     }
-    
-    if (glow_blur_bias < 1.0) {
-        return pixel_glow_std_pow_bias(in_texture, my_glowpix, my_glowpixy, my_glow,glow_gamma, glow_blur_bias, coords, SourceSize1, SourceSize2); 
-    }
-    
+        
     return pixel_glow_std_pow(in_texture,my_glowpix,my_glowpixy,my_glow,glow_gamma,coords,SourceSize1, SourceSize2);
 
 
