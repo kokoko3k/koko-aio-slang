@@ -1,12 +1,19 @@
 
 vec3 diff_weight(vec3 v1, vec3 ref, float bias) {
     //tanto più è la differenza, tanto più ritorna v1
+                                                                    //FIXME:  vec3+k == vec3.r+k;vec3.g+k;vec3+b.k?
+                                                                    //FIXME:  clamp, stessa cosa?
+    
+    ref = clamp(ref, 0.0, 1.0);
+    v1 = clamp(v1, 0.0, 1.0);
+    vec3 v1_biased = v1 + bias;
+    
     vec3 diff = vec3(
-        abs(ref.r - v1.r)+bias, 
-        abs(ref.g - v1.g)+bias, 
-        abs(ref.b - v1.b)+bias
+        v1_biased.r  - ref.r,
+        v1_biased.g  - ref.g,
+        v1_biased.b  - ref.b
     );
-    diff = min(diff,1.0);
+    diff = clamp(diff,0.0, 1.0);
     return mix(ref, v1, diff);
 }
 

@@ -34,7 +34,7 @@
 	//the blurred image
 	//Set this to the same value as used for the maximum
 	//of IN_GLOW_BIAS
-#define IN_GLOW_BIAS_MAX 1.0
+#define IN_GLOW_BIAS_MAX 2.0
 
 #define eps 1e-5
 
@@ -211,7 +211,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter IN_GLOW_W                "        Sharpness, horizontal"					2.5	0.2 7.0 0.05
 #pragma parameter IN_GLOW_H                "        Sharpness, vertical"					2.5	0.2 7.0 0.05
 #pragma parameter IN_GLOW_GAMMA            "        Gamma, the higher, the less the glow on dark colors"	1.0 	1.0 10.0 0.1
-#pragma parameter IN_GLOW_BIAS             "        Glow to blur bias"						1.0     0.0 1.0 0.05 
+#pragma parameter IN_GLOW_BIAS             "        Glow to blur bias"						2.0     0.0 2.0 0.05 
 
 
 
