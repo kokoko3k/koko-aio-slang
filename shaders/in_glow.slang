@@ -30,12 +30,29 @@ layout(set = 0, binding = 5) uniform sampler2D shift_and_bleed_pass;
 #define scalemod_x (params.OutputSize.x/360.0)
 #define scalemod_y (params.OutputSize.y/270.0)
 
-// What follows is an ugly optimization with a lot of code copied and pasted repeated multiple times,
-// shamlessly hidden into an include:
 #include "includes/pixel_glows.include.slang" 
 
 
-vec3 glow_blur_bias(sampler2D source_tex, vec2 co, vec3 pixel_glowed, float bias) {
+
+vec3 glow_blur_bias_smother_bloomer(sampler2D source_tex, vec2 co, vec3 pixel_glowed, float bias) {
+   //Modulates the mix of the blurred version over the sharp one
+   //by the luminosity difference of the blurred version and the original
+   vec3 pixel_original = texture(source_tex,vTexCoord).rgb;
+   vec3 pixel_sharp  = pow(pixel_original,vec3(IN_GLOW_GAMMA)) * IN_GLOW_POWER;
+   
+   vec3 pixel_glowed_c = clamp(pixel_glowed, 0.0, 1.0);
+   vec3 pixel_sharp_c = clamp(pixel_sharp, 0.0, 1.0);
+   
+   vec3 vmix = vec3( pixel_glowed_c.r - pixel_original.r,
+                     pixel_glowed_c.g - pixel_original.g,
+                     pixel_glowed_c.b - pixel_original.b);
+
+   vmix = clamp(vmix, 0.0, 1.0);
+   return mix(pixel_sharp, pixel_glowed, clamp(   (vmix+0.01 * vInGlowBias) , 0.0,1.0)   );
+   //return pixel_sharp + pixel_glowed*clamp(   (vmix+0.01 * vInGlowBias) , 0.0,1.0);
+}
+
+vec3 glow_blur_bias_sharper_AA(sampler2D source_tex, vec2 co, vec3 pixel_glowed, float bias) {
    //from latitude. with pow.
    vec3 pixel_source = texture(source_tex, co).rgb;
    pixel_source  = pow(pixel_source,vec3(IN_GLOW_GAMMA)) * IN_GLOW_POWER;
@@ -49,6 +66,15 @@ vec3 glow_blur_bias(sampler2D source_tex, vec2 co, vec3 pixel_glowed, float bias
    g_mix = clamp(g_mix, 0.0, 1.0);
    return mix(pixel_source, pixel_glowed, g_mix);
 }
+
+vec3 glow_blur_bias(sampler2D source_tex, vec2 co, vec3 pixel_glowed, float bias){
+   if (IN_GLOW_W < 0.99)
+      return  glow_blur_bias_sharper_AA( source_tex,  co,  pixel_glowed,  bias);
+         else
+      return  glow_blur_bias_smother_bloomer( source_tex,  co,  pixel_glowed,  bias);
+}
+
+
 
 
 void main() { 
