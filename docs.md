@@ -105,13 +105,19 @@
     Disable on interlaced screen:
         You can choose to completely disable scanline emulation when
         the input picture is considered interlaced.
-    Slotmask strength (don't use with darklines!)
+    Slotmask type (don't use with darklines!)
         You may want to draw slotmasks alongside the scanlines to sync their heights
         and avoid graphical glitches.
         It is recommended to disable darklines.
         Darklines will still used when dealing with interlaced or flickering screens.
+        Type 0 allows you to configure strength and stagger
+        Type 1 produces tinner slotmasks, but with fixed stagger
+        Type 3 os fixed and produces heavier and thinner slotmasks without scanlies at all.
+    Slotmask strength
+        The strenght of the slotmask, available only on type 1 and 2
     . Offset
-        This is the slotmask offset
+        This is the slotmask offset/stagger, available only on type 1
+        Keep it around 79 or all the way to 1
         
 **Bloom:**
     Acts like Halo, but affects a much wider area and is more configurable.

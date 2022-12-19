@@ -108,6 +108,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float SCANLINE_DISABLE_ON_INTERLACE;
 	float SCANLINE_COMPENSATION;
 	float SCANLINE_SM_STRENGTH;
+	float SCANLINE_SM_TYPE;
 	float SCANLINE_SM_VOFFSET;
 	float RGB_MASK_STRENGTH;
 	float DARKLINES_STRENGTH;
@@ -248,8 +249,9 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter SCANLINE_FLICKERING    "        Interlace Flicker (0=off,1=on,2=if interlaced)"		2.0 	0.0 2.0 1.0
 #pragma parameter SCANLINE_FLICKERING_POWER     "        Interlace Flicker power"		  		0.75 	0.0 4.0 0.1
 #pragma parameter SCANLINE_DISABLE_ON_INTERLACE "        Disable on interlaced screen"			  	0.0 	0.0 1.0 1.0
-#pragma parameter SCANLINE_SM_STRENGTH     "        Slotmask strength (don't use with darklines!)"				0.0 	0.0 1.0 0.05
-#pragma parameter SCANLINE_SM_VOFFSET      "           . Offset"						45.0 	0.0 158.0 1.0
+#pragma parameter SCANLINE_SM_TYPE         "        Slotmask type (disable (0) with darklines!)"		0.0 	0.0 3.0 1.0
+#pragma parameter SCANLINE_SM_STRENGTH     "           . Slotmask strength (type 1 and 2 only)"			0.0 	0.0 1.0 0.05
+#pragma parameter SCANLINE_SM_VOFFSET      "           . Offset (type 1 only)"					45.0 	0.0 158.0 1.0
 
 
 
@@ -370,6 +372,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #define SCANLINE_FLICKERING_POWER     global.SCANLINE_FLICKERING_POWER
 #define SCANLINE_DISABLE_ON_INTERLACE global.SCANLINE_DISABLE_ON_INTERLACE
 #define SCANLINE_COMPENSATION         global.SCANLINE_COMPENSATION
+#define SCANLINE_SM_TYPE              global.SCANLINE_SM_TYPE
 #define SCANLINE_SM_STRENGTH          global.SCANLINE_SM_STRENGTH
 #define SCANLINE_SM_VOFFSET           global.SCANLINE_SM_VOFFSET 
 

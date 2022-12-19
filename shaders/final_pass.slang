@@ -57,8 +57,9 @@ layout(set = 0, binding = 10) uniform sampler2D shift_and_bleed_pass;
     layout(set = 0, binding = 13) uniform sampler2D halo_pass;
     layout(set = 0, binding = 14) uniform sampler2D avglum_passFeedback;
 
-//Ex main_pass defines:
-    #define half_pi 1.5707963267949
+
+#define HALF_PI 1.5707963267949
+#define QUARTER_PI 0.785398163397448
 
 #include "includes/functions.include.slang"
 
@@ -180,6 +181,8 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
         return source * ( float(draw_color) +  float(draw_dark) * darkline_trans );
 }
 
+
+
 float scanline_shape(vec2 coords, bool do_flicker, bool is_interlaced, bool do_slotmask) {
 /* Produces a B/W scanline shape to be multiplicated by the source
  * pixel later on to emulate scanline effect.
@@ -189,7 +192,6 @@ float scanline_shape(vec2 coords, bool do_flicker, bool is_interlaced, bool do_s
 
     bool alternate = false;
     float period = 1.0;
-    
     if (do_flicker) {
         if (params.FrameCount % 2 == 0.0) alternate = true;
         if (params.OriginalSize.y > MIN_LINES_INTERLACED )  period = 0.5;
@@ -200,7 +202,7 @@ float scanline_shape(vec2 coords, bool do_flicker, bool is_interlaced, bool do_s
     float lines = 1.0;
     if (!( is_interlaced && SCANLINE_DISABLE_ON_INTERLACE == 1.0 )) {
         if (alternate)
-            lines = -sin(angle_base + half_pi); //lines = abs(cos(angle))
+            lines = -sin(angle_base + HALF_PI); //lines = abs(cos(angle))
                 else
             lines = sin(angle_base);
         lines = (lines*lines);
@@ -217,15 +219,55 @@ float scanline_shape(vec2 coords, bool do_flicker, bool is_interlaced, bool do_s
             float Darkline_part_w = (3.0 - VMASK_USE_GM + VMASK_GAP) * VMASK_DARKLINE_SCALE;
             float Darkline_part_w_x2 = Darkline_part_w*2;
             bool odd_column = mod(vFragCoord.x + Darkline_part_w  , Darkline_part_w_x2) < Darkline_part_w;
-            if (odd_column) { 
-                float slotmask_strength = SCANLINE_SM_STRENGTH;
-                float slotmask_stagger = SCANLINE_SM_VOFFSET;
-                float phase = pi + slotmask_stagger*0.01;
-                float angle_slotmask = angle_base + phase;
-                float lines_2 = sin(angle_slotmask);
-                lines_2 = (lines_2*lines_2);
-                lines = mix(lines, lines_2, slotmask_strength);
+            
+                        
+            if (SCANLINE_SM_TYPE == 1.0) {
+                // Slotmask is out oh phase every "odd" triple and mixed with
+                // the straight scanline.
+                // slotmask strength and stagger are configurable.
+                // Acceptable values are with stagger around 79 (pi/4) 
+                if (odd_column) { 
+                    float phase = pi + SCANLINE_SM_VOFFSET*0.01;
+                    float angle_slotmask = angle_base + phase;
+                    float slotmask = sin(angle_slotmask);
+                    slotmask = (slotmask*slotmask); 
+                    lines = mix(lines, slotmask, SCANLINE_SM_STRENGTH);
+                }
             }
+            
+            else if (SCANLINE_SM_TYPE == 2.0) {
+                float phase;
+                //Slotmask is always out of phase by QUARTER_PI
+                //Every "odd triple" column, it is also out of phase of HALF_PI
+                //Slotmask is multiplied by original scanline and thinner.
+                //Only strenght parameter is taken into account.
+                if (odd_column)
+                    phase = period * pi + QUARTER_PI;
+                        else
+                    phase = period * HALF_PI + QUARTER_PI;
+                
+                float angle_slotmask = angle_base + phase;
+                float slotmask = sin(angle_slotmask);
+                slotmask = slotmask*slotmask; slotmask = slotmask*slotmask; // eleva alla 4 per renderla sottile. valori maggiori producono moiree.
+                slotmask = mix(1.0, slotmask, SCANLINE_SM_STRENGTH); // riduci la forza della slotmask
+                lines = lines * slotmask;
+            }
+
+            else if (SCANLINE_SM_TYPE == 3.0) {
+                // Thinner slotmask screen, no scanlines.
+                // No parameter taken into account.
+                lines = lines * lines;
+                if (odd_column) { 
+                    float phase = pi + HALF_PI;
+                    float angle_slotmask = angle_base + phase;
+                    float slotmask = sin(angle_slotmask);
+                    slotmask = (slotmask*slotmask); slotmask = (slotmask*slotmask);
+                    lines = slotmask;
+                }
+            }
+            
+            
+            
         }
     }
     
@@ -319,7 +361,7 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
         }
         
         //The following should be theoretically more correct, but it produces moiree:
-/*         vec3 vscanline_shape = scanline_shape(coords, flickering_scanlines, isinterlaced,  SCANLINE_SM_STRENGTH > 0.0 && SCANLINE_SM_VOFFSET > 0.0) + 
+/*         vec3 vscanline_shape = scanline_shape(coords, flickering_scanlines, isinterlaced,  SCANLINE_SM_TYPE > 0.0 ) + 
                                (pixel_bleed * SCANLINES_BLEEDING);
          vscanline_shape = min(vscanline_shape,1.0);
          pixel_out = vscanline_shape * pixel_out;
@@ -327,7 +369,7 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
         
         //Obtain the scanlines screen by multiplying the scanline shape by the pixel color.
         //and emulate the bleeding of the color over the dark part of the scanlined screen.
-        float scanline_shape = scanline_shape(coords, flickering_scanlines, isinterlaced,  SCANLINE_SM_STRENGTH > 0.0 && SCANLINE_SM_VOFFSET > 0.0);                     
+        float scanline_shape = scanline_shape(coords, flickering_scanlines, isinterlaced,  SCANLINE_SM_TYPE > 0.0 );                     
             //vec3 pixel_scanlined = pixel_out * scanline_shape;
             //pixel_out = pixel_scanlined + (pixel_out * pixel_bleed *  SCANLINES_BLEEDING * (1-scanline_shape));
         
