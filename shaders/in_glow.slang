@@ -5,21 +5,16 @@
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
-layout(location = 1) out float vInGlowBias;
-
 
 void main() {
    gl_Position = global.MVP * Position;
    vTexCoord = TexCoord ;  
-   //vInGlowBias = pow(IN_GLOW_BIAS,0.9);
-   vInGlowBias = IN_GLOW_BIAS + 1;
 }
 
 
 #pragma stage fragment
 
 layout(location = 0) in vec2 vTexCoord;
-layout(location = 1) in float vInGlowBias;
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 3) uniform sampler2D FXAA_pass;
 layout(set = 0, binding = 4) uniform sampler2D first_pass;
