@@ -240,7 +240,7 @@ float scanline_shape(vec2 coords, bool do_flicker, bool is_interlaced, bool do_s
                 //Slotmask is always out of phase by QUARTER_PI
                 //Every "odd triple" column, it is also out of phase of HALF_PI
                 //Slotmask is multiplied by original scanline and thinner.
-                //Only strenght parameter is taken into account.
+                //Only strength parameter is taken into account.
                 if (odd_column)
                     phase = period * pi + QUARTER_PI;
                         else
@@ -369,13 +369,28 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
         
         //Obtain the scanlines screen by multiplying the scanline shape by the pixel color.
         //and emulate the bleeding of the color over the dark part of the scanlined screen.
-        float scanline_shape = scanline_shape(coords, flickering_scanlines, isinterlaced,  SCANLINE_SM_TYPE > 0.0 );                     
+        //float scanline_shape = scanline_shape(coords, flickering_scanlines, isinterlaced,  SCANLINE_SM_TYPE > 0.0 );     
+        
+        float scanline_shape = scanline_shape(coords, flickering_scanlines, isinterlaced,  SCANLINE_SM_TYPE > 0.0 );     
+        
             //vec3 pixel_scanlined = pixel_out * scanline_shape;
             //pixel_out = pixel_scanlined + (pixel_out * pixel_bleed *  SCANLINES_BLEEDING * (1-scanline_shape));
         
             //the same, but simplified with less muls:
                 pixel_out = pixel_out * ( scanline_shape + ( pixel_bleed * SCANLINES_BLEEDING * ( 1 - scanline_shape ) ));
-
+        
+        
+        //New weight code:
+      /*  float source_lum = max(max(pixel_bleed.r, pixel_bleed.g), pixel_bleed.b);
+        source_lum = source_lum * SCANLINES_BLEEDING;
+        float max_exp = 2.0; //the thinner ones. (8)
+        float min_exp = -2.0; //the fatter ones.
+        float exponent = scale_to_range(1-source_lum, min_exp, max_exp);
+        exponent = clamp(exponent, 0.0,max_exp);
+        scanline_shape = mix( pow(abs(scanline_shape),exponent), 1, source_lum);
+        
+        pixel_out *= scanline_shape;
+        pixel_out += pixel_bleed * SCANLINES_BLEEDING * (1-scanline_shape);*/
     }
 
     // Apply color correction (in this pass it is just the final output gamma)
