@@ -83,7 +83,15 @@
     So you can use this to restore the brightness and color saturation
     loss when using features like scanlines, darklines or RGB masks.
     
-    Refer to "Glowing Input/power" for the parameters meaning.
+	Light up scanlines too:
+		Theoretically Halo have to be applied 
+		"over" everything, because that is the way it works in nature.
+		But you can choose to cheat and instead apply scanlines over the halo
+		instead.
+		Do this if you like much more pronunced scanlines, even at the
+		price of some graphical artifacts visible on high contrasted areas. 
+
+    Refer to "Glowing Input/power" for other parameters meaning.
 
 **Scanlines:**
     Emulate CRT scanlines.
