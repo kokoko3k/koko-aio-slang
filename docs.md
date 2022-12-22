@@ -122,7 +122,7 @@
         The strenght of the slotmask (available on type 1 and 2 only)
     . Offset
         This is the slotmask offset/stagger, (available on type 1 only)
-        Keep it around 79 or all the way to 1
+        Keep it around 79 or all the way to max
         
 **Bloom:**
     Acts like Halo, but affects a much wider area and is more configurable.

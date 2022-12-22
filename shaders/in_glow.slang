@@ -44,6 +44,7 @@ vec3 glow_blur_bias_smother_bloomer(sampler2D source_tex, vec2 co, vec3 pixel_gl
 
    vmix += IN_GLOW_BIAS;
    vmix = clamp(vmix, 0.0, 1.0);
+   vmix *= vmix;
    return mix(pixel_sharp, pixel_glowed, vmix );
    //return mix(pixel_sharp, pixel_glowed, clamp(   (vmix+0.01 * vInGlowBias) , 0.0,1.0)   );
    //return pixel_sharp + pixel_glowed*clamp(   (vmix+0.01 * vInGlowBias) , 0.0,1.0);
@@ -61,6 +62,7 @@ vec3 glow_blur_bias_sharper_AA(sampler2D source_tex, vec2 co, vec3 pixel_glowed,
    float g_mix = (glowlum - orilum);
    g_mix += IN_GLOW_BIAS;
    g_mix = clamp(g_mix, 0.0, 1.0);
+   g_mix *= g_mix ;
    return mix(pixel_source, pixel_glowed, g_mix);
 }
 
