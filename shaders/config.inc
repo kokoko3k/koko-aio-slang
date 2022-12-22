@@ -57,6 +57,7 @@ layout(push_constant) uniform Push {
 	float HALO_H ;
 	float HALO_POWER ;
 	float HALO_GAMMA ;
+	float HALO_VS_SCAN ;
 	float DO_BLOOM ; //4
  	float BLOOM_QUALITY ; //1
 
@@ -188,7 +189,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 
 //Offset RGB
-#pragma parameter DO_SHIFT_RGB       "★ Shift RGB components enable? (bad with FXAA) ==>"	0.0	 0.0 1.0 1.0
+#pragma parameter DO_SHIFT_RGB       "★ RGB deconvergence enable? (bad with FXAA) ==>"	0.0	 0.0 1.0 1.0
 #pragma parameter OFFSET_STRENGTH "        Strength"			0.5 	 0.0 1.0 0.1
 #pragma parameter SHIFT_R         "        Red offset"			-40.0 	-210.0 189.0 1
 #pragma parameter SHIFT_G         "        Green offset"		40.0 	-210.0 189.0 1
@@ -197,7 +198,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 
 // YIQ/YUV bandwidth limited chroma bleeding.
-#pragma parameter DO_SAT_BLEED "★ Bandwidth limited chroma bleeding enable? ==>"	0.0 	0.0 1.0 1.0
+#pragma parameter DO_SAT_BLEED "★ Composite/Bandwidth limited chroma enable? ==>"	0.0 	0.0 1.0 1.0
 #pragma parameter SAT_BLEED_PAL           "        Use PAL colorspace, not NTSC"	0.0 	 0.0 1.0 1.0
 #pragma parameter SAT_BLEED_STRENGTH      "        Strength"				1.0	 0.0 5.0  0.01
 #pragma parameter SAT_BLEED_SIZE_LEFT     "        Size Left"				5.0 	 1.0 40.0  1.0
@@ -238,7 +239,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter HALO_W        "        Sharpness, horizontal"					1.75	0.2  7.0 0.05
 #pragma parameter HALO_H        "        Sharpness, Vertical"					1.75	0.2  7.0 0.05
 #pragma parameter HALO_GAMMA    "        Gamma, the higher, the less the halo on dark colors"	2.0 	1.0  10.0 0.1
-
+#pragma parameter HALO_VS_SCAN  "        Light up scanlines too"				0.0	0.0  1.0  0.1
 
 
 // Scanlines
@@ -397,11 +398,12 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #define DARKLINES_VOFFSET    params.DARKLINES_VOFFSET
 #define DARKLINES_PERIOD     params.DARKLINES_PERIOD
 
-#define DO_HALO    global.DO_HALO
-#define HALO_W     params.HALO_W
-#define HALO_H     params.HALO_H
-#define HALO_POWER params.HALO_POWER
-#define HALO_GAMMA params.HALO_GAMMA
+#define DO_HALO       global.DO_HALO
+#define HALO_W        params.HALO_W
+#define HALO_H        params.HALO_H
+#define HALO_POWER    params.HALO_POWER
+#define HALO_GAMMA    params.HALO_GAMMA
+#define HALO_VS_SCAN  params.HALO_VS_SCAN
 
 #define DO_BLOOM           params.DO_BLOOM
 #define BLOOM_MIX          global.BLOOM_MIX

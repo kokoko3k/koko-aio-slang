@@ -2,7 +2,7 @@
 
 **Color corrections:**
     Modify luminance, saturation, contrast, brightness and color temperature of the
-    "input" signal.
+    signal, at "input" stage.
     Gamma correction is applied to the final processed picture.
     
 **FXAA:**
@@ -10,34 +10,31 @@
     Use it if you don't want to blur the image and you still don't like
     jagged or too much pixelated images.
 
-**Shift RGB components:**
-    Shift R,G,B components separately to mimic chroma
-    dephasing and color aberrations.
+**RGB deconvergence:**
+    Shift R,G,B components separately to mimic channel deconvergence.
     By varying Red, Green and Blue offsets, the relative component will be
     shifted column by column, row by row.
 
-**YIQ/YUV bandwidth limited chroma bleeding:**
+**Composite/Bandwidth limited chroma:**
     Will cause an horizontal chroma bleed which cheaply mimics the effect of
     poor composite video signals.
     It can be used with RGB shifting and image blurring to give the picture
     an ntsc look without dealing with specific encoding/decoding stuffs. 
 
-**Input power/glowing:**
+**Glowing Input/power:**
     Emulate the CRT glowing "feature", so that the brighter areas of
     the image will light their surroundings.
     
     Input signal glow strength:
         The input signal gain
-    Sharpness:
+    Sharpness (horizontal, vertical):
         How much the glow will "spread".
         When pushed to its maximum value, no blurring will occour.
     Gamma:
         Controls how much the signal has to be bright to produce the glow.
-    Post gain:
-        This will cause the glowed image to be added to the input signal.
-        This allows to emulate glow and haloing in a single pass.
-        However the haloing should be applied after the mask emulation.
-        Likely to be removed in a future release.
+    Glow to blur bias:
+        Modulates between glow (0.. brighter colors expands over darker ones)
+        versus blur (..1  all the colors are blurred)
     
 **RGB Masks and/or Darklines:**
     Emulates CRT RGB phosphors (RGB Mask),
@@ -52,21 +49,27 @@
         By exploiting common monitors RGB subpixel order, this causes
         the RGB mask, to be emulated by using just 2 pixels instead of 3.
         Very useful for 1080p (or lower) displays and to keep more brightness.
+        If you have reddish tint, please double check that your monitor is
+        running at native resolution and the operating system is not scaling
+        the screen.
     . Horizontal Gap between triads:
-        In real displays rgb triads are separated by a black space.
+        In real displays, rgb triads are separated by a black space.
         You can emulate it by turning this feature on.
     . Affect bright colors:
         Emulating RGB masks will lower the resulting image brightness and you
-        just cant push input signal brightness without "burning" the signal.
+        cant just push input signal brightness without clipping the signal.
         By using this option, the RGB mask will be less evident on brighter
-        colors. However, since this will make the image to look somehow "dull",
-        it is advised to use the "Halo" feature instead (see later).
+        colors.
+        However, it is advised to use the "Halo" feature instead (see later)
+        ft your system can handle it.
     Darklines: strength:
         How much will the horizontal darklines be visible.
     . Triad offset:
         When drawing "straight" horizontal darklines, you can emulate CRT aperture grille.
         But if you want slotmasks instead, you need to vertically
         offset them every RGB triad.
+        However, slotmask emulation can be enabled via a superior implementation
+        if you enable scanlines (see below).
     . Triad height:
         Basically tells the shader how much a triad has to be high.
     Darklines: affect bright colors:
@@ -79,6 +82,8 @@
     dark scanline parts, darklines and the RGB masks.
     So you can use this to restore the brightness and color saturation
     loss when using features like scanlines, darklines or RGB masks.
+    
+    Refer to "Glowing Input/power" for the parameters meaning.
 
 **Scanlines:**
     Emulate CRT scanlines.
@@ -88,13 +93,13 @@
         You can even use a negative value to make the scanline more evident,
         but graphical glitches may occour.
     Scanlines gap brightness:
-        Controls how much the gap between scanlines is dark
+        Controls how much the gap between scanlines is dark.
     Compensate brightness loss:
-        Will make scanlines brighter, where possible, to compensate for the loss of brightness
-        gicen by the dark gap between them.
+        Will make scanlines brighter, where possible, to compensate for the 
+        loss of brightness given by the dark gap between them.
     Scanlines bleeding:
-        will cause the scanline itself to light the scanline gap (dark) part. 
-        You may use it to keep a good brightness overrall picture level.
+        Will cause the scanline itself to light the scanline gap (dark) part. 
+        You may use it to keep a good picture brightness level.
     Interlace flicker:
         Emulates the flickering issues present on crt interlaced screens
         where the brighter lines flickers when they are near dark ones.
@@ -108,15 +113,15 @@
     Slotmask type (don't use with darklines!)
         You may want to draw slotmasks alongside the scanlines to sync their heights
         and avoid graphical glitches.
-        It is recommended to disable darklines.
+        If you enable this feature, it is highly recommended to disable darklines.
         Darklines will still used when dealing with interlaced or flickering screens.
         Type 0 allows you to configure strength and stagger
         Type 1 produces tinner slotmasks, but with fixed stagger
         Type 3 os fixed and produces heavier and thinner slotmasks without scanlies at all.
     Slotmask strength
-        The strenght of the slotmask, available only on type 1 and 2
+        The strenght of the slotmask (available on type 1 and 2 only)
     . Offset
-        This is the slotmask offset/stagger, available only on type 1
+        This is the slotmask offset/stagger, (available on type 1 only)
         Keep it around 79 or all the way to 1
         
 **Bloom:**
@@ -191,7 +196,7 @@
 **Ambient light leds:**
     Emulates the presence of led strips under the monitor that lights the
     surroundings according to the edges of the game content.
-    -**\> It is needed that you set retroarch aspect to "Full" <-**
+    **-> It is needed that you set retroarch aspect to "Full" <-**
     ( Settings, Video, Scaling, Aspect Ratio = Full )
     
     Slowness: 

@@ -331,11 +331,15 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
 
     }
 
+    
+    float lum = clamp(max(max(pixel_out.r,pixel_out.g),pixel_out.b), 0.0,1.0);
+    
     //Halo
     vec3 pixel_haloed;
     if (DO_HALO == 1.0 ) {
         pixel_haloed = texture(halo_pass,coords).rgb;
-        pixel_out += pixel_haloed;
+        pixel_out += pixel_haloed * (1 - HALO_VS_SCAN);
+        //pixel_out += (pixel_haloed * (lum));
     }
 
     /* Non flickering scanlines, Don't do them if
@@ -347,9 +351,9 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
          * It is selected by the first available one depending on the shader
          * features enabled by the user */ 
         vec3 pixel_bleed;
-        if (DO_HALO == 1.0) 
+        /*if (DO_HALO == 1.0) 
             pixel_bleed = pixel_haloed;
-        else if (DO_IN_GLOW == 1.0)
+        else */if (DO_IN_GLOW == 1.0)
             pixel_bleed = pixel_glowed;
         else 
             pixel_bleed = pixel_in;
@@ -372,7 +376,7 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
         //float scanline_shape = scanline_shape(coords, flickering_scanlines, isinterlaced,  SCANLINE_SM_TYPE > 0.0 );     
         
         float scanline_shape = scanline_shape(coords, flickering_scanlines, isinterlaced,  SCANLINE_SM_TYPE > 0.0 );     
-        
+
             //vec3 pixel_scanlined = pixel_out * scanline_shape;
             //pixel_out = pixel_scanlined + (pixel_out * pixel_bleed *  SCANLINES_BLEEDING * (1-scanline_shape));
         
@@ -381,7 +385,7 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
         
         
         //New weight code:
-      /*  float source_lum = max(max(pixel_bleed.r, pixel_bleed.g), pixel_bleed.b);
+        /*float source_lum = max(max(pixel_bleed.r, pixel_bleed.g), pixel_bleed.b);
         source_lum = source_lum * SCANLINES_BLEEDING;
         float max_exp = 2.0; //the thinner ones. (8)
         float min_exp = -2.0; //the fatter ones.
@@ -393,6 +397,10 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
         pixel_out += pixel_bleed * SCANLINES_BLEEDING * (1-scanline_shape);*/
     }
 
+    
+    pixel_out += pixel_haloed * HALO_VS_SCAN;
+    //pixel_out = pixel_out + (pixel_haloed * (1-lum));
+    
     // Apply color correction (in this pass it is just the final output gamma)
     if (DO_CCORRECTION == 1.0) pixel_out = pow(pixel_out,vec3(GAMMA_OUT));
 
