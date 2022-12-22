@@ -375,26 +375,21 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
         //and emulate the bleeding of the color over the dark part of the scanlined screen.
         //float scanline_shape = scanline_shape(coords, flickering_scanlines, isinterlaced,  SCANLINE_SM_TYPE > 0.0 );     
             float scanline_shape = scanline_shape(coords, flickering_scanlines, isinterlaced,  SCANLINE_SM_TYPE > 0.0 );     
+        
+        //Modify scanline weight?
+            //float l = max(max(pixel_bleed.r, pixel_bleed.g), pixel_bleed.b);
+            //scanline_shape = min(pow(scanline_shape, 1/l), 1.0);
+            
             pixel_out = pixel_out * ( scanline_shape + ( pixel_bleed * SCANLINES_BLEEDING * ( 1 - scanline_shape ) ));
+      
+
         
-        
-        //New weight code:
-     /*   float source_lum = max(max(pixel_bleed.r, pixel_bleed.g), pixel_bleed.b);
-        source_lum = source_lum * SCANLINES_BLEEDING;
-        float max_exp = 4.0; //the thinner ones. (8)
-        float min_exp = -2.0; //the fatter ones.
-        float exponent = scale_to_range(1-source_lum, min_exp, max_exp);
-        exponent = clamp(exponent, 0.0,max_exp);
-        scanline_shape = mix( pow(abs(scanline_shape),exponent), 1, source_lum);
-        
-        pixel_out *= scanline_shape;
-        pixel_out += pixel_bleed * SCANLINES_BLEEDING * (1-scanline_shape);*/
     }
 
     
      if (DO_HALO == 1.0 ) {
         pixel_out += pixel_haloed * HALO_VS_SCAN;
-        pixel_out = pixel_out + (pixel_haloed * (1-lum));
+        //pixel_out = pixel_out + (pixel_haloed * (1-lum));
      }
      
     // Apply color correction (in this pass it is just the final output gamma)
