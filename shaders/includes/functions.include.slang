@@ -204,7 +204,6 @@ float random(float power, vec2 seed) {
 			if (ASPECT_X == 0) {
 				return 1.3333333333333; //all mame games, not rotated
 			}
-
 			return ASPECT_X / ASPECT_Y ;
 	}
 
