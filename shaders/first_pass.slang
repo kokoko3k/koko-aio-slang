@@ -131,12 +131,12 @@ void debug() {
 //Just test patterns here
    vec3 pixel_debug;
    //Use one of the following to debug:
-      //pixel_debug=vec3(abs(sin(params.FrameCount/3.14/8.0))); //white fade
+      pixel_debug=vec3(abs(sin(params.FrameCount/3.14/8.0))); //white fade
       //pixel_debug=vec3(abs(sin(params.FrameCount/3.14/20)),0.0,0.0); //red fade
-      //pixel_debug=vec3(0.5);
+      //pixel_debug=vec3(1.0);
       //pixel_debug=vec3(0.0,1.0,0.0);
       //pixel_debug=vec3(0.38,0.0,1.0)*vTexCoord.x;
-      pixel_debug=vec3(vTexCoord.x); //H bw gradient
+      //pixel_debug=vec3(vTexCoord.x); //H bw gradient
       //pixel_debug=vec3(floor(vTexCoord.x*16)/16); //H bw gradient 16gray
       //pixel_debug=vec3(floor(vTexCoord.x*64)/64); //H bw gradient 64gray
       //pixel_debug=vec3(floor(vTexCoord.x*128)/128); //H bw gradient 128gray

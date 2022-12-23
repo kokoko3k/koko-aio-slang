@@ -4,7 +4,7 @@
 
 GAMMA_OUT = "0.56"
 
-IN_GLOW_POWER = "1.5"
+IN_GLOW_POWER = "1.65"
 IN_GLOW_BIAS = "2.0"
 
 HALO_POWER = "0.5"
