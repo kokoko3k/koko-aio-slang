@@ -224,6 +224,7 @@
     When using effects that need Retroarch aspect ratio option
     to be set to "full", you have to provide the source aspect
     ratio to the shader.
+    Use -6 for MAME cores that pre-rotates the game (TATE mode)
     
     Aspect Ratio Numerator:
         Setting non positive value here will switch to a predefined
@@ -234,6 +235,7 @@
         -3 = 8/7  Snes
         -4 = 10/7 Megadrive 
         -5 = Uncorrected
+        -6 = 0.75 MAME rotated 1.33 games in TATE mode
     Aspect Ratio Denominator:
         As long as Aspect Ratio Numerator is positive, this will
         be used as the denominator of the fraction.

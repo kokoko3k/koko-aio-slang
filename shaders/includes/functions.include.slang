@@ -200,7 +200,7 @@ float random(float power, vec2 seed) {
 			if (ASPECT_X ==  -3) return 1.143; // 8/7 snes
 			if (ASPECT_X ==  -4) return 1.428; // 10/7 megadrive
 			if (ASPECT_X ==  -5) return params.OriginalSize.x/params.OriginalSize.y; //uncorrected
-
+			if (ASPECT_X ==  -6) return 0.75;  // 3/4, pre-rotated (TATE) 1.33 games.
 			if (ASPECT_X == 0) {
 				return 1.3333333333333; //all mame games, not rotated
 			}
