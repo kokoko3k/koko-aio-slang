@@ -1,5 +1,4 @@
-#define alpha_mark 0.1
-#define pi 3.141592654
+
 
 vec3 pixel_push_luminance(vec3 c, float strength) {
 	//if (strength == 0.0) return c; //lighter without the check.

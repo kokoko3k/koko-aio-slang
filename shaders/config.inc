@@ -1,8 +1,8 @@
 	//Consider content interlaced if lines are more than this
 #define MIN_LINES_INTERLACED 380
 
-//Sort of dithering used in vignette, spot, backlight leds
-	#define NOISEPOWER ((params.OutputSize.z)*3)
+	//Sort of dithering used in vignette, spot, backlight leds
+#define NOISEPOWER ((params.OutputSize.z)*3)
 
 	//Bezel reflection area size in relation to the game frame
 	//Use the lowest possible value for best performance
@@ -37,6 +37,10 @@
 #define IN_GLOW_BIAS_MAX 2.0
 
 #define eps 1e-5
+#define pi 3.141592654
+#define TAU  6.28318530717958647693
+#define alpha_mark 0.1
+
 
 layout(push_constant) uniform Push {
 	vec4 SourceSize;
@@ -86,24 +90,29 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float SCANLINES_BLEEDING ;
 	float IN_GLOW_W;
 	float IN_GLOW_H;
-	float IN_GLOW_POWER ;
-	float IN_GLOW_GAMMA ;
+	float IN_GLOW_POWER;
+	float IN_GLOW_GAMMA;
 	float BLOOM_MIX;
- 	float BLOOM_SIZE ; //1
-	float BLOOM_GAMMA; //1
-	float BLOOM_BYPASS; //1
-	float BLOOM_POWER; //1
+ 	float BLOOM_SIZE;
+	float BLOOM_GAMMA;
+	float BLOOM_BYPASS;
+	float BLOOM_POWER;
 	float BLOOM_OVER_WHITE;
   	float BLOOM_GAMMA_OUT;
-  	float ALT_BLANK_STRENGTH ; //2 FIXME to 1
-  	float ALT_BLANK_PERIOD ;
-	float DO_FXAA ; //1
+  	float ALT_BLANK_STRENGTH;
+  	float ALT_BLANK_PERIOD;
+	float DO_FXAA;
 	float DO_SAT_BLEED;
 	float SAT_BLEED_SIZE_LEFT;
 	float SAT_BLEED_SIZE_RIGHT;
 	float SAT_BLEED_FALLOFF;
 	float SAT_BLEED_STRENGTH;
 	float SAT_BLEED_PAL;
+	float DO_NTSC_ARTIFACTS;
+	float NTSC_FILTER_WIDTH;
+	float NTSC_FILTER_SCF;
+	float NTSC_FILTER_FC;
+	float NTSC_MIX;
 	float SCANLINE_FLICKERING ; //2
 	float SCANLINE_FLICKERING_POWER;
 	float SCANLINE_DISABLE_ON_INTERLACE;
@@ -186,7 +195,20 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 // Apply an antialiasing filter via FXAA from Nvidia.
 #pragma parameter DO_FXAA "★ FXAA enable? ==>"	0.0 	0.0 1.0 1.0
 
+// NTSC color artifacting
+#pragma parameter DO_NTSC_ARTIFACTS "★ CVBS: NTSC color artifacts enable? ==>"	0.0 	0.0 1.0 1.0
+#pragma parameter NTSC_FILTER_WIDTH "        Filter width"				17.0	5.0 21.0 4.0
+#pragma parameter NTSC_FILTER_SCF   "        Subcarrier Frequency"		5.30	0.0 10.0 0.01
+#pragma parameter NTSC_FILTER_FC    "        Frequency cutoff"			2.5		0.1 10.0 0.1
+#pragma parameter NTSC_MIX          "        Strength"					0.5		0.0 3.0  0.05
 
+// YIQ/YUV bandwidth limited chroma bleeding and NTSC color artifacts.
+#pragma parameter DO_SAT_BLEED "★ CVBS: Bandwidth limited chroma enable? ==>"	0.0 	0.0 1.0 1.0
+#pragma parameter SAT_BLEED_PAL           "        Use PAL colorspace, not NTSC"	0.0 	 0.0 1.0 1.0
+#pragma parameter SAT_BLEED_STRENGTH      "        Strength"				1.0	 0.0 5.0  0.01
+#pragma parameter SAT_BLEED_SIZE_LEFT     "        Size Left"				5.0 	 1.0 40.0  1.0
+#pragma parameter SAT_BLEED_SIZE_RIGHT    "        Size Right"				5.0 	 1.0 40.0  1.0
+#pragma parameter SAT_BLEED_FALLOFF  	  "        Falloff"			1.7 	 1.0 2.0 0.01
 
 //Offset RGB
 #pragma parameter DO_SHIFT_RGB       "★ RGB deconvergence enable? (bad with FXAA) ==>"	0.0	 0.0 1.0 1.0
@@ -194,17 +216,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter SHIFT_R         "        Red offset"			-40.0 	-210.0 189.0 1
 #pragma parameter SHIFT_G         "        Green offset"		40.0 	-210.0 189.0 1
 #pragma parameter SHIFT_B         "        Blue offset"			3.0 	-210.0 189.0 1
-
-
-
-// YIQ/YUV bandwidth limited chroma bleeding.
-#pragma parameter DO_SAT_BLEED "★ Composite/Bandwidth limited chroma enable? ==>"	0.0 	0.0 1.0 1.0
-#pragma parameter SAT_BLEED_PAL           "        Use PAL colorspace, not NTSC"	0.0 	 0.0 1.0 1.0
-#pragma parameter SAT_BLEED_STRENGTH      "        Strength"				1.0	 0.0 5.0  0.01
-#pragma parameter SAT_BLEED_SIZE_LEFT     "        Size Left"				5.0 	 1.0 40.0  1.0
-#pragma parameter SAT_BLEED_SIZE_RIGHT    "        Size Right"				5.0 	 1.0 40.0  1.0
-#pragma parameter SAT_BLEED_FALLOFF  	  "        Falloff"			1.7 	 1.0 2.0 0.01
-
 
 
 // Input glowing
@@ -366,6 +377,11 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #define SAT_BLEED_STRENGTH      global.SAT_BLEED_STRENGTH
 #define SAT_BLEED_PAL           global.SAT_BLEED_PAL
 
+#define DO_NTSC_ARTIFACTS global.DO_NTSC_ARTIFACTS
+#define NTSC_FILTER_WIDTH global.NTSC_FILTER_WIDTH
+#define NTSC_FILTER_SCF   global.NTSC_FILTER_SCF
+#define NTSC_FILTER_FC    global.NTSC_FILTER_FC
+#define NTSC_MIX          global.NTSC_MIX
 
 #define DO_SCANLINES                  global.DO_SCANLINES
 #define SCANLINE_DARK                 params.SCANLINE_DARK
