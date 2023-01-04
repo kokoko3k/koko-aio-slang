@@ -77,7 +77,7 @@ vec3 pixel_vmask(vec3 source, vec3 white_reference, float over_white) {
     vec3 vmasked;
     vec4 vec_mod=(vec4(3,1,2,3) + vec4(VMASK_GAP,0.0,0.0,0.0))* VMASK_DARKLINE_SCALE ;
     
-    float fcol = vOutputCoord.s * params.OutputSize.x;
+    float fcol = vOutputCoord.x * params.OutputSize.x;
     if (mod(fcol, vec_mod.x) < vec_mod.y)
         vmasked = m1 * source;
     else if (mod(fcol, vec_mod.x) < vec_mod.z) 
