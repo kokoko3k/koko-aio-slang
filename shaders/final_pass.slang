@@ -409,27 +409,26 @@ vec4 pixel_background_image(bool over){
     if (over) {
         vec2 tex_size = textureSize(bg_over, 0); // * BG_ZOOM;
         float bg_over_lod = log2(tex_size.y / global.FinalViewportSize.y);
-    if (BG_IMAGE_ROTATION > 0.0) tex_size.xy = tex_size.yx;
+        if (BG_IMAGE_ROTATION > 0.0) tex_size.xy = tex_size.yx;
         vec2 back_coords =  get_scaled_coords_aspect(vOutputCoord+bg_image_offset,global.FinalViewportSize, tex_size.x/tex_size.y, is_rotated());
-    if (BG_IMAGE_ROTATION > 0.0) {
-        back_coords.xy = vec2(back_coords.y, back_coords.x);
-        if (BG_IMAGE_ROTATION == 1.0) back_coords.y = 1 - back_coords.y;
-        if (BG_IMAGE_ROTATION == 2.0) back_coords.x = 1 - back_coords.x;
-        //if (BG_IMAGE_ROTATION == 3.0) back_coords.xy = vec2(1-back_coords.x, 1-back_coords.y);
-    }
-//flip y:
-//back_coords.y = 1 - back_coords.y;
-//flip x:
-//back_coords.x = 1 - back_coords.x;
-
-
+        if (BG_IMAGE_ROTATION > 0.0) {
+            back_coords.xy = vec2(back_coords.y, back_coords.x);
+            if (BG_IMAGE_ROTATION == 1.0) back_coords.y = 1 - back_coords.y;
+            if (BG_IMAGE_ROTATION == 2.0) back_coords.x = 1 - back_coords.x;
+        }
         back_coords=zoom(back_coords, BG_IMAGE_ZOOM);
         return textureLod(bg_over,back_coords,bg_over_lod);
     }
     //under
         vec2 tex_size = textureSize(bg_under, 0); // * BG_ZOOM;
+        if (BG_IMAGE_ROTATION > 0.0) tex_size.xy = tex_size.yx;
         float bg_under_lod = log2(tex_size.y / global.FinalViewportSize.y);
         vec2 back_coords =  get_scaled_coords_aspect(vOutputCoord+bg_image_offset,global.FinalViewportSize, tex_size.x/tex_size.y, is_rotated());
+        if (BG_IMAGE_ROTATION > 0.0) {
+            back_coords.xy = vec2(back_coords.y, back_coords.x);
+            if (BG_IMAGE_ROTATION == 1.0) back_coords.y = 1 - back_coords.y;
+            if (BG_IMAGE_ROTATION == 2.0) back_coords.x = 1 - back_coords.x;
+        }
         back_coords=zoom(back_coords, BG_IMAGE_ZOOM);
         return textureLod(bg_under,back_coords,bg_under_lod);
 }
