@@ -171,6 +171,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float BG_IMAGE_OFFY;
 	float BG_IMAGE_OFFX;
 	float BG_IMAGE_ZOOM;
+	float BG_IMAGE_ROTATION;
 	
 	float DO_SHIFT_RGB;
 	float SHIFT_R;
@@ -307,6 +308,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BG_IMAGE_OFFX	 "        Shift Image over X axis"			0.0  -1.0  1.0    0.001
 #pragma parameter BG_IMAGE_OFFY	 "        Shift Image over Y axis"			0.0  -1.0  1.0    0.001
 #pragma parameter BG_IMAGE_ZOOM	 "        Zoom Image"					1.0  -1.0  3.0    0.001
+#pragma parameter BG_IMAGE_ROTATION "        Rotate image mode"				0.0   0.0  2.0    1.0
 
 
 
@@ -483,11 +485,12 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #define ASPECT_X     global.ASPECT_X
 #define ASPECT_Y     global.ASPECT_Y
 
-#define DO_BG_IMAGE    global.DO_BG_IMAGE
-#define BG_IMAGE_OVER  global.BG_IMAGE_OVER
-#define BG_IMAGE_OFFY  global.BG_IMAGE_OFFY
-#define BG_IMAGE_OFFX  global.BG_IMAGE_OFFX
-#define BG_IMAGE_ZOOM  global.BG_IMAGE_ZOOM
+#define DO_BG_IMAGE        global.DO_BG_IMAGE
+#define BG_IMAGE_OVER      global.BG_IMAGE_OVER
+#define BG_IMAGE_OFFY      global.BG_IMAGE_OFFY
+#define BG_IMAGE_OFFX      global.BG_IMAGE_OFFX
+#define BG_IMAGE_ZOOM      global.BG_IMAGE_ZOOM
+#define BG_IMAGE_ROTATION  global.BG_IMAGE_ROTATION
 
 #define DO_SHIFT_RGB      global.DO_SHIFT_RGB
 #define SHIFT_R           global.SHIFT_R

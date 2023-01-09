@@ -402,13 +402,27 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
 float global_noise;
 
 
+
 vec4 pixel_background_image(bool over){
     //return the aspect corrected background image:
     vec2 bg_image_offset=vec2(BG_IMAGE_OFFX,BG_IMAGE_OFFY);
     if (over) {
         vec2 tex_size = textureSize(bg_over, 0); // * BG_ZOOM;
         float bg_over_lod = log2(tex_size.y / global.FinalViewportSize.y);
+    if (BG_IMAGE_ROTATION > 0.0) tex_size.xy = tex_size.yx;
         vec2 back_coords =  get_scaled_coords_aspect(vOutputCoord+bg_image_offset,global.FinalViewportSize, tex_size.x/tex_size.y, is_rotated());
+    if (BG_IMAGE_ROTATION > 0.0) {
+        back_coords.xy = vec2(back_coords.y, back_coords.x);
+        if (BG_IMAGE_ROTATION == 1.0) back_coords.y = 1 - back_coords.y;
+        if (BG_IMAGE_ROTATION == 2.0) back_coords.x = 1 - back_coords.x;
+        //if (BG_IMAGE_ROTATION == 3.0) back_coords.xy = vec2(1-back_coords.x, 1-back_coords.y);
+    }
+//flip y:
+//back_coords.y = 1 - back_coords.y;
+//flip x:
+//back_coords.x = 1 - back_coords.x;
+
+
         back_coords=zoom(back_coords, BG_IMAGE_ZOOM);
         return textureLod(bg_over,back_coords,bg_over_lod);
     }
