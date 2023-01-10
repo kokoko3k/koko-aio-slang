@@ -1,5 +1,7 @@
 #reference "monitor-slotmask-bloom-bezelwider.slangp"
 
+SCANLINE_SM_TYPE = "0.0"
+
 DARKLINES_STRENGTH = "0.0"
 DARKLINES_PERIOD = "4.0"
 

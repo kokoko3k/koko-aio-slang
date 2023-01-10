@@ -1,6 +1,6 @@
 #reference "monitor-slotmask-bloom-bezelwider.slangp"
 
-
+LUMINANCE = "0.1"
 
 GAMMA_OUT = "0.56"
 
@@ -33,7 +33,7 @@ DO_SHIFT_RGB = "0.000000"
 
 
 	TEMPERATURE = "7500.000000"
-	SATURATION = "1.25"	
+	SATURATION = "1.20"	
 	CONTRAST = "0.050000"
 	BRIGHTNESS = "0.050000"
 	

@@ -194,13 +194,18 @@
     ( Settings, Video, Scaling, Aspect Ratio = Full )
     The image is painted "under" the game content and under the monitor frame by
     default, and his alpha channel will let you see ambient lighs (see next).
-    
+
     Image over content (alpha channel driven)?:
         ...however you can paint the image over the game content and over the
         monitor frame itself by selecting this option.
         If you do so, the alpha channel of the background image will be used to
         let you view the underlying content.
-
+    Shift(Zoom) Image over X(Y) axis:
+        move or zoom the whole background image.
+    Rotate image mode
+        This could be needed when dealing with vertical games.
+        Use -1 to let the shader try to guess if the rotation is needed.
+    
 **Ambient light leds:**
     Emulates the presence of led strips under the monitor that lights the
     surroundings according to the edges of the game content.

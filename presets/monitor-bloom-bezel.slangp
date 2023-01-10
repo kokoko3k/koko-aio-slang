@@ -1,4 +1,6 @@
 #reference "monitor-slotmask-bloom-bezel.slangp"
 
+SCANLINE_SM_TYPE = "0.0"
+
 DARKLINES_STRENGTH = "0.0"
 DARKLINES_PERIOD = "2.0"

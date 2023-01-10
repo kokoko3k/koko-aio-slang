@@ -16,12 +16,14 @@ layout(location = 0) out vec2 vTexCoord;
 layout(location = 1) out vec2 vOutputCoord;
 layout(location = 2) out vec2 spot_offset;
 layout(location = 3) out vec2 vFragCoord;
+layout(location = 4) out float vIsRotated;
 
 #include "includes/functions.include.slang"
 
 void main() {
     gl_Position = global.MVP * Position;
-    vTexCoord = get_scaled_coords(TexCoord,global.FinalViewportSize, is_rotated())+vec2(0.00001);
+    vIsRotated = float(is_rotated());
+    vTexCoord = get_scaled_coords(TexCoord,global.FinalViewportSize, bool(vIsRotated) ) + vec2(0.00001);
     vOutputCoord = TexCoord;
 
     spot_offset = offsets_from_float(S_POSITION+420.0,40);
@@ -37,6 +39,7 @@ layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in vec2 vOutputCoord;
 layout(location = 2) in vec2 spot_offset;
 layout(location = 3) in vec2 vFragCoord;
+layout(location = 4) in float vIsRotated;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -409,9 +412,17 @@ vec4 pixel_background_image(bool over){
     if (over) {
         vec2 tex_size = textureSize(bg_over, 0); // * BG_ZOOM;
         float bg_over_lod = log2(tex_size.y / global.FinalViewportSize.y);
-        if (BG_IMAGE_ROTATION > 0.0) tex_size.xy = tex_size.yx;
-        vec2 back_coords =  get_scaled_coords_aspect(vOutputCoord+bg_image_offset,global.FinalViewportSize, tex_size.x/tex_size.y, is_rotated());
-        if (BG_IMAGE_ROTATION > 0.0) {
+
+        if (BG_IMAGE_ROTATION > 0.0  || ( BG_IMAGE_ROTATION < 0.0 && bool(vIsRotated) )  ) tex_size.xy = tex_size.yx;
+
+        vec2 back_coords =  get_scaled_coords_aspect(vOutputCoord+bg_image_offset,global.FinalViewportSize, tex_size.x/tex_size.y, bool(vIsRotated));
+        
+        if (BG_IMAGE_ROTATION < 0.0 && bool(vIsRotated) ) {
+            //handle automatic rotation of bg image for rotated games
+            back_coords.xy = vec2(back_coords.y, back_coords.x);
+            back_coords.y = 1 - back_coords.y;
+        } else if (BG_IMAGE_ROTATION > 0.0) {
+            //rotate as user prefs
             back_coords.xy = vec2(back_coords.y, back_coords.x);
             if (BG_IMAGE_ROTATION == 1.0) back_coords.y = 1 - back_coords.y;
             if (BG_IMAGE_ROTATION == 2.0) back_coords.x = 1 - back_coords.x;
@@ -423,7 +434,7 @@ vec4 pixel_background_image(bool over){
         vec2 tex_size = textureSize(bg_under, 0); // * BG_ZOOM;
         if (BG_IMAGE_ROTATION > 0.0) tex_size.xy = tex_size.yx;
         float bg_under_lod = log2(tex_size.y / global.FinalViewportSize.y);
-        vec2 back_coords =  get_scaled_coords_aspect(vOutputCoord+bg_image_offset,global.FinalViewportSize, tex_size.x/tex_size.y, is_rotated());
+        vec2 back_coords =  get_scaled_coords_aspect(vOutputCoord+bg_image_offset,global.FinalViewportSize, tex_size.x/tex_size.y, bool(vIsRotated));
         if (BG_IMAGE_ROTATION > 0.0) {
             back_coords.xy = vec2(back_coords.y, back_coords.x);
             if (BG_IMAGE_ROTATION == 1.0) back_coords.y = 1 - back_coords.y;
