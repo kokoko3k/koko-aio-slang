@@ -1,3 +1,5 @@
 #reference "tv-BASE.slangp"
 
-DARKLINES_STRENGTH = "0.9"
+DARKLINES_STRENGTH = "0.5"
+
+
