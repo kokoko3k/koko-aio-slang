@@ -1,0 +1,34 @@
+#reference "monitor-slotmask-bloom-bezelwider.slangp"
+
+
+GAMMA_OUT = "0.56"
+
+IN_GLOW_POWER = "1.75"
+IN_GLOW_BIAS = "2.0"
+
+HALO_POWER = "0.5"
+	
+DO_SAT_BLEED = "1.000000"
+	SAT_BLEED_PAL = "0.0"
+	SAT_BLEED_STRENGTH   = "1.0"
+	SAT_BLEED_SIZE_LEFT  = "5.0"
+	SAT_BLEED_SIZE_RIGHT = "5.0"
+	SAT_BLEED_FALLOFF    = "1.7"
+
+
+
+DO_NTSC_ARTIFACTS = "1.0"
+	NTSC_PHASE_SHIFT = "1.0"
+
+DO_SHIFT_RGB = "0.0"
+
+	SATURATION = "1.00000"
+	CONTRAST = "0.050000"
+	BRIGHTNESS = "0.050000"
+	TEMPERATURE = "7000.000000"
+
+	
+	SCANLINE_DARK = "0.3"
+	
+	IN_GLOW_W = "1.0"
+	IN_GLOW_H = "1.0"

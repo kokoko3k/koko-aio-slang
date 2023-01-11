@@ -113,6 +113,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float NTSC_FILTER_SCF;
 	float NTSC_FILTER_FC;
 	float NTSC_MIX;
+	float NTSC_PHASE_SHIFT;
+	//float NTSC_DOT_CRAWL;
 	float SCANLINE_FLICKERING ; //2
 	float SCANLINE_FLICKERING_POWER;
 	float SCANLINE_DISABLE_ON_INTERLACE;
@@ -198,10 +200,12 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 // NTSC color artifacting
 #pragma parameter DO_NTSC_ARTIFACTS "★ CVBS: NTSC color artifacts enable? ==>"	0.0 	0.0 1.0 1.0
-#pragma parameter NTSC_FILTER_WIDTH "        Filter width"				17.0	5.0 21.0 4.0
+#pragma parameter NTSC_FILTER_WIDTH "        Filter width"			17.0	5.0 21.0 4.0
 #pragma parameter NTSC_FILTER_SCF   "        Subcarrier Frequency"		5.30	0.0 10.0 0.01
-#pragma parameter NTSC_FILTER_FC    "        Frequency cutoff"			2.5		0.1 10.0 0.1
-#pragma parameter NTSC_MIX          "        Strength"					0.5		0.0 3.0  0.05
+#pragma parameter NTSC_FILTER_FC    "        Frequency cutoff"			2.5	0.1 10.0 0.1
+#pragma parameter NTSC_PHASE_SHIFT  "        Phase shift"			0.0	0.0 1.0  1.0
+//#pragma parameter NTSC_DOT_CRAWL    "        Dot Crawl"			1.0	0.0 1.0  1.0
+#pragma parameter NTSC_MIX          "        Strength"				0.5	0.0 3.0  0.05
 
 // YIQ/YUV bandwidth limited chroma bleeding and NTSC color artifacts.
 #pragma parameter DO_SAT_BLEED "★ CVBS: Bandwidth limited chroma enable? ==>"	0.0 	0.0 1.0 1.0
@@ -209,7 +213,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter SAT_BLEED_STRENGTH      "        Strength"				1.0	 0.0 5.0  0.01
 #pragma parameter SAT_BLEED_SIZE_LEFT     "        Size Left"				5.0 	 1.0 40.0  1.0
 #pragma parameter SAT_BLEED_SIZE_RIGHT    "        Size Right"				5.0 	 1.0 40.0  1.0
-#pragma parameter SAT_BLEED_FALLOFF  	  "        Falloff"			1.7 	 1.0 2.0 0.01
+#pragma parameter SAT_BLEED_FALLOFF  	  "        Falloff"				1.7 	 1.0 2.0 0.01
 
 //Offset RGB
 #pragma parameter DO_SHIFT_RGB       "★ RGB deconvergence enable? (bad with FXAA) ==>"	0.0	 0.0 1.0 1.0
@@ -384,6 +388,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #define NTSC_FILTER_SCF   global.NTSC_FILTER_SCF
 #define NTSC_FILTER_FC    global.NTSC_FILTER_FC
 #define NTSC_MIX          global.NTSC_MIX
+#define NTSC_PHASE_SHIFT  global.NTSC_PHASE_SHIFT
+//#define NTSC_DOT_CRAWL    global.NTSC_DOT_CRAWL
 
 #define DO_SCANLINES                  global.DO_SCANLINES
 #define SCANLINE_DARK                 params.SCANLINE_DARK

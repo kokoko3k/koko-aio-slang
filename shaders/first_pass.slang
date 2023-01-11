@@ -122,6 +122,9 @@ float sinc(float x) {
 	return sin(pi*x) / (pi*x);
 }
 
+#define pi10 pi*10
+
+
 vec3 ntscdec(vec2 uv ){
    vec2 size = params.SourceSize.xy;
    //	Sample composite signal and decode to YIQ
@@ -129,7 +132,12 @@ vec3 ntscdec(vec2 uv ){
       int N = int(NTSC_FILTER_WIDTH);
       for (int n=0; n < N; n++) {
          vec2 pos = uv + vec2(float(n-NTSC_FILTER_MIDDLE) / size.x, 0.0);
-         float phase = TAU * (vNTSC_FILTER_SCF * size.x * pos.x);
+         float phase =  TAU * (vNTSC_FILTER_SCF * size.x * pos.x);
+         //phase += ( pos.x * 3.14 * 20) ; // rainbow width
+         if (NTSC_PHASE_SHIFT > 0.5) phase += ( pos.y * -pi10 ) ; // 45 degree
+         //if (NTSC_DOT_CRAWL > 0.5)  phase += (params.FrameCount % 3140) /2.0 ;
+         //float phase =  TAU * (vNTSC_FILTER_SCF * size.x * pos.x) + ( pos.y * -pi10 * NTSC_PHASE_SHIFT) 
+         // ( pos.y * - 31.4);
          //Just sample luminance via yiq:
             vec3 smp = vec3((texture(Source, pos).rgb * RGB2YIQ).x);
             YIQ_processed += vec3(1.0, cos(phase), sin(phase)) * smp * vNTSC_weights[n];
