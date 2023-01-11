@@ -15,7 +15,14 @@
     By varying Red, Green and Blue offsets, the relative component will be
     shifted column by column, row by row.
 
-**Composite/Bandwidth limited chroma:**
+**CVBS: NTSC color artifacts: **
+    Tries to emulate typical NTSC color artifacting without emulating
+    full NTSC coding/decoding pipeline.
+    While it improves the look of NTSC content, don't expect it to be
+    an accurate emulation (yet?)
+    As today, it is enough to emulate rainbowing effects on genesis.
+    
+**CVBS: Bandwidth limited chroma:**
     Will cause an horizontal chroma bleed which cheaply mimics the effect of
     poor composite video signals.
     It can be used with RGB shifting and image blurring to give the picture
@@ -186,6 +193,8 @@
         Allows to shrink or expand the monitor frame to fit the game content.
     Image Border:
         Draws a black border around the game content.
+    Reflections zoom:
+        "Zoom" the reflections if they don't match the content.
         
 **Backgound image:**
     Draws an image on screen picked from the "textures" shader subdirectory,
