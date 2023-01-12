@@ -7,8 +7,8 @@
 
 #include "config.inc"
 
-#define PreviousSampler ambi_temporal_passFeedback
-#define CurrentSampler ambi_pre_pass1
+#define PastSampler ambi_temporal_passFeedback
+#define PresentSampler ambi_pre_pass1
 
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
@@ -23,8 +23,8 @@ void main() {
 #pragma stage fragment
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 0) out vec4 FragColor;
-layout(set = 0, binding = 2) uniform sampler2D CurrentSampler;
-layout(set = 0, binding = 3) uniform sampler2D PreviousSampler;
+layout(set = 0, binding = 2) uniform sampler2D PresentSampler;
+layout(set = 0, binding = 3) uniform sampler2D PastSampler;
 layout(set = 0, binding = 4) uniform sampler2D avglum_pass;
 layout(set = 0, binding = 5) uniform sampler2D avglum_passFeedback;
                                                                                     
@@ -51,8 +51,8 @@ vec3 ambi_step_rgb(vec3 s,vec3 d, vec3 mystep){
 vec4 pixel_ambilight() {
     vec3 mystep;
 
-    vec4 previous_pixel_vec4 = texture(PreviousSampler, vTexCoord);
-    vec3 current_pixel =  texture(CurrentSampler, vTexCoord).rgb;
+    vec4 previous_pixel_vec4 = texture(PastSampler, vTexCoord);
+    vec3 current_pixel =  texture(PresentSampler, vTexCoord).rgb;
     vec3 previous_pixel = previous_pixel_vec4.rgb;
 
     float scene_change_remaining = previous_pixel_vec4.a;
