@@ -78,6 +78,10 @@ vec4 pixel_ambilight() {
 }
 
 void main() {
+    
+    FragColor = texture(PresentSampler,vTexCoord); return;
+    
+    
     if (DO_AMBILIGHT != 1.0) return;
     
     FragColor = pixel_ambilight();
