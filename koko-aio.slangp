@@ -77,7 +77,7 @@
        bg_over_wrap_mode = "mirrored_repeat"
           bg_over_mipmap = "true"
 
-shaders = 16
+shaders = 17
 # For P-uae defaults, doubling just y0 seems the best option.
 #  90% of games are lowres in vertical size and p-uae defaults
 #  to 720 pixels width, which is enough for this preset to work as intended.
@@ -91,22 +91,30 @@ shaders = 16
 #   and scale the image to something better usable by FXAA
 #   Scaling y to 2x is needed by flickering scanlines pass.
 
-           shader0 = shaders/first_pass.slang
-            alias0 = "first_pass"
+           shader0 = shaders/ntsc_pass.slang
+            alias0 = "ntsc_pass"
     filter_linear0 = false
        scale_type0 = source
-          scale_x0 = 2.0
-          scale_y0 = 2.0
+            scale0 = 1.0
         wrap_mode0 = "mirrored_repeat"
 float_framebuffer0 = false
 
+
+           shader1 = shaders/first_pass.slang
+            alias1 = "first_pass"
+    filter_linear1 = false
+       scale_type1 = source
+            scale1 = 2.0
+        wrap_mode1 = "mirrored_repeat"
+float_framebuffer1 = false
+
 # Nvidia fxaa pass:
 #   works good for "SD" resolutions
-           shader1 = shaders/fxaa.slang
-            alias1 = "FXAA_pass"
-    filter_linear1 = true
-       scale_type1 = source
-            scale1 = 1.0
+           shader2 = shaders/fxaa.slang
+            alias2 = "FXAA_pass"
+    filter_linear2 = true
+       scale_type2 = source
+            scale2 = 1.0
             
 #   FXAA don't really need any mipmap, but avglum_pass several passes after it does.
 #   and for the weird way retroarch manages mipmaps, specify that FXAA_pass wants mipmaps
@@ -115,19 +123,19 @@ float_framebuffer0 = false
 #   to textureLod(..,0.0) or it acts weird, don't ask me why.
 #   yay.
 
-     mipmap_input1 = true
-        wrap_mode1 = "mirrored_repeat"
-float_framebuffer1 = false
-
-
-           shader2 = shaders/shift_and_bleed.slang
-            alias2 = "shift_and_bleed_pass"
-    filter_linear2 = true
-            scale2 = 1.0
-       scale_type2 = source
-float_framebuffer2 = false
-     mipmap_input2 = false
+     mipmap_input2 = true
         wrap_mode2 = "mirrored_repeat"
+float_framebuffer2 = false
+
+
+           shader3 = shaders/shift_and_bleed.slang
+            alias3 = "shift_and_bleed_pass"
+    filter_linear3 = true
+            scale3 = 1.0
+       scale_type3 = source
+float_framebuffer3 = false
+     mipmap_input3 = false
+        wrap_mode3 = "mirrored_repeat"
 
 
 
@@ -137,26 +145,26 @@ float_framebuffer2 = false
 #   In this pass we also generate flickering scanlines by blindly blanking
 #   alternate lines at #frame interval
 
-           shader3 = shaders/in_glow.slang
-            alias3 = "in_glow_pass"
-    filter_linear3 = true
-            scale3 = 1.0
-       scale_type3 = source    
-float_framebuffer3 = true
-        wrap_mode3 = "mirrored_repeat"
+           shader4 = shaders/in_glow.slang
+            alias4 = "in_glow_pass"
+    filter_linear4 = true
+            scale4 = 1.0
+       scale_type4 = source    
+float_framebuffer4 = true
+        wrap_mode4 = "mirrored_repeat"
             
           
 # This essentially is the same as glowing by a code point of view.
 #   But this pass will be added later on instead of mixed
 
-           shader4 = shaders/halo.slang
-            alias4 = "halo_pass"
-    filter_linear4 = true
-            scale4 = 1.0
-       scale_type4 = source
-float_framebuffer4 = true
-     mipmap_input4 = false
-        wrap_mode4 = "mirrored_repeat"
+           shader5 = shaders/halo.slang
+            alias5 = "halo_pass"
+    filter_linear5 = true
+            scale5 = 1.0
+       scale_type5 = source
+float_framebuffer5 = true
+     mipmap_input5 = false
+        wrap_mode5 = "mirrored_repeat"
         
 # Get the average luminance needed by ambilight here, because:
 #   * mipmap_input only works on "Source" texture
@@ -168,30 +176,30 @@ float_framebuffer4 = true
 #   The alpha channel contains the sum/3.0 of rgb channels
 #   used to detect scene changes.
 
-               shader5 = shaders/avglum_pass.slang
-                alias5 = "avglum_pass"
-        filter_linear5 = true
-           scale_type5 = source
-                scale5 = 0.5
-            wrap_mode5 = "mirrored_repeat"
-         mipmap_input5 = false
+               shader6 = shaders/avglum_pass.slang
+                alias6 = "avglum_pass"
+        filter_linear6 = true
+           scale_type6 = source
+                scale6 = 0.5
+            wrap_mode6 = "mirrored_repeat"
+         mipmap_input6 = false
          
 # The following 2 passes will blur the mirrored part of main pass
 #   to emulate bezel reflections.
    
-               shader6 = shaders/reflection_blur_h.slang
-                alias6 = "reflected_blurred_pass1"
-        filter_linear6 = true
-           scale_type6 = source
-                scale6 = 1.0
-            wrap_mode6 = "mirrored_repeat"
-         
-               shader7 = shaders/reflection_blur_v.slang
-                alias7 = "reflected_blurred_pass2"
+               shader7 = shaders/reflection_blur_h.slang
+                alias7 = "reflected_blurred_pass1"
         filter_linear7 = true
            scale_type7 = source
                 scale7 = 1.0
             wrap_mode7 = "mirrored_repeat"
+         
+               shader8 = shaders/reflection_blur_v.slang
+                alias8 = "reflected_blurred_pass2"
+        filter_linear8 = true
+           scale_type8 = source
+                scale8 = 1.0
+            wrap_mode8 = "mirrored_repeat"
             
 
 # In the subsequent passes we do first a fast bloom  by first
@@ -199,38 +207,38 @@ float_framebuffer4 = true
 #   it fast, next we do subsequent blurd of the bloomed
 #   pass.
    
-               shader8 = shaders/bloom_pass_1.slang
-                alias8 = "bloom_pass_1"
-        filter_linear8 = true
-           scale_type8 = source
-                scale8 = 1.0
-# I NEED TO SET **THIS** TO mirrored_repeat TO HAVE THE PREVIOUS PASS mirrored_repeated (!?)
-            wrap_mode8 = "mirrored_repeat" 
-    float_framebuffer8 = true
-    
-    
-               shader9 = shaders/bloom_pass_2.slang
-                alias9 = "bloom_pass_2"
+               shader9 = shaders/bloom_pass_1.slang
+                alias9 = "bloom_pass_1"
         filter_linear9 = true
            scale_type9 = source
-                scale9 = 0.5
-            wrap_mode9 = "clamp_to_edge"
-
-            
-               shader10 = shaders/bloom_pass_3.slang
-                alias10 = "bloom_pass_3"
+                scale9 = 1.0
+# I NEED TO SET **THIS** TO mirrored_repeat TO HAVE THE PREVIOUS PASS mirrored_repeated (!?)
+            wrap_mode9 = "mirrored_repeat" 
+    float_framebuffer9 = true
+    
+    
+               shader10 = shaders/bloom_pass_2.slang
+                alias10 = "bloom_pass_2"
         filter_linear10 = true
            scale_type10 = source
-                scale10 = 1.0
+                scale10 = 0.5
             wrap_mode10 = "clamp_to_edge"
 
-        
-               shader11 = shaders/bloom_pass_4.slang
-                alias11 = "bloom_pass_final"
+            
+               shader11 = shaders/bloom_pass_3.slang
+                alias11 = "bloom_pass_3"
         filter_linear11 = true
            scale_type11 = source
                 scale11 = 1.0
-            wrap_mode11 = "mirrored_repeat"
+            wrap_mode11 = "clamp_to_edge"
+
+        
+               shader12 = shaders/bloom_pass_4.slang
+                alias12 = "bloom_pass_final"
+        filter_linear12 = true
+           scale_type12 = source
+                scale12 = 1.0
+            wrap_mode12 = "mirrored_repeat"
 
         
 # Back led lights:
@@ -238,26 +246,26 @@ float_framebuffer4 = true
 # from the very previous pass, the next one will just passthrough the original image
 
 
-               shader12 = shaders/ambi_push_pass.slang
-                alias12 = "ambi_push_pass"
+               shader13 = shaders/ambi_push_pass.slang
+                alias13 = "ambi_push_pass"
 # I NEED TO SET **THIS** TO true TO HAVE THE PREVIOUS PASS linearly filtered
-        filter_linear12 = true
-           scale_type12 = source
-                scale12 = 1.0
-            wrap_mode12 = "mirrored_repeat"
-         mipmap_input12 = false
-    float_framebuffer12 = true
+        filter_linear13 = true
+           scale_type13 = source
+                scale13 = 1.0
+            wrap_mode13 = "mirrored_repeat"
+         mipmap_input13 = false
+    float_framebuffer13 = true
 
 # Gather mipmaps from prevous pass and use them to light virtual leds under the virtual monitor 
 # and Temporally smooth led lights.
-               shader13 = shaders/ambi_pre_pass.slang
-                alias13 = "ambi_temporal_pass"
-        filter_linear13 = true
-           scale_type13 = source
-                scale13 = 0.5
-         mipmap_input13 = true
-            wrap_mode13 = "clamp_to_border"
-    float_framebuffer13 = true
+               shader14 = shaders/ambi_pre_pass.slang
+                alias14 = "ambi_temporal_pass"
+        filter_linear14 = true
+           scale_type14 = source
+                scale14 = 0.5
+         mipmap_input14 = true
+            wrap_mode14 = "clamp_to_border"
+    float_framebuffer14 = true
 
 
 # In this pass we gather information about the rotated state of the source
@@ -266,12 +274,12 @@ float_framebuffer4 = true
 #   The feedback of this pass will be queried by previous ones.
 #   I tried to move this into final_pass, but the gpu consumption was higher.
 
-           shader14 = shaders/isrotated.slang
-            alias14 = "isrotated_pass"
-    filter_linear14 = true
-            scale14 = 0.1
-       scale_type14 = viewport
-        wrap_mode14 = "mirrored_repeat"   
+           shader15 = shaders/isrotated.slang
+            alias15 = "isrotated_pass"
+    filter_linear15 = true
+            scale15 = 0.1
+       scale_type15 = viewport
+        wrap_mode15 = "mirrored_repeat"   
 
 # In this pass we emulate scanlines, glowing,
 #   RGB vertical mask, slot mask,haloing and color corrections
@@ -280,10 +288,10 @@ float_framebuffer4 = true
 #   with the bloomed image, vignette and spot light,  black frame insertions
 #   and Bezel emulation
 
-           shader15 = shaders/final_pass.slang
-            alias15 = "final_pass"
-    filter_linear15 = true
-       scale_type15 = viewport
-            scale15 = 1.0
-        wrap_mode15 = "mirrored_repeat"
+           shader16 = shaders/final_pass.slang
+            alias16 = "final_pass"
+    filter_linear16 = true
+       scale_type16 = viewport
+            scale16 = 1.0
+        wrap_mode16 = "mirrored_repeat"
 
