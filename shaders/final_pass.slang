@@ -186,7 +186,7 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
 
 
 
-float scanline_shape(vec2 coords, bool do_flicker, bool is_interlaced, bool do_slotmask) {
+float scanline_shape(vec2 coords, bool do_flicker, bool is_interlaced, bool do_slotmask, float lum) {
 /* Produces a B/W scanline shape to be multiplicated by the source
  * pixel later on to emulate scanline effect.
  * scanlines can be drawn on odd and even fields alternating on odd and
@@ -280,6 +280,10 @@ float scanline_shape(vec2 coords, bool do_flicker, bool is_interlaced, bool do_s
         float deepness = -SCANLINE_DARK;
         lines = lines * ((1-SCANLINE_DARK) ) + SCANLINE_DARK ;
     }
+
+    lum=scale_to_range(lum,SCANLINE_MIN,1.0);
+    lines = pow(lines,  (   1/(lum+eps)       )          );
+
     return lines;
 }
 
@@ -377,7 +381,8 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
         //Obtain the scanlines screen by multiplying the scanline shape by the pixel color.
         //and emulate the bleeding of the color over the dark part of the scanlined screen.
         //float scanline_shape = scanline_shape(coords, flickering_scanlines, isinterlaced,  SCANLINE_SM_TYPE > 0.0 );     
-            float scanline_shape = scanline_shape(coords, flickering_scanlines, isinterlaced,  SCANLINE_SM_TYPE > 0.0 );     
+            float lum = max(max(pixel_out.r, pixel_out.g), pixel_out.b);
+            float scanline_shape = scanline_shape(coords, flickering_scanlines, isinterlaced,  SCANLINE_SM_TYPE > 0.0, lum );
         
         //Modify scanline weight?
             //float l = max(max(pixel_bleed.r, pixel_bleed.g), pixel_bleed.b);

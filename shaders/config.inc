@@ -122,6 +122,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float SCANLINE_SM_STRENGTH;
 	float SCANLINE_SM_TYPE;
 	float SCANLINE_SM_VOFFSET;
+	float SCANLINE_MIN;
 	float RGB_MASK_STRENGTH;
 	float DARKLINES_STRENGTH;
 	float GAMMA_OUT ; //1
@@ -261,7 +262,9 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 // Scanlines
 #pragma parameter DO_SCANLINES	         "★ Scanlines enable? ==>"						0.0 	0.0  1.0 1.0
-#pragma parameter SCANLINE_DARK          "        Scanlines gap brightness"			  		0.0 	-0.5 1.0 0.05
+#pragma parameter SCANLINE_MIN          "        Minimum height"			  		1.0 	0.05 1.0 0.05
+
+#pragma parameter SCANLINE_DARK          "        Gap brightness"			  		0.0 	-0.5 1.0 0.05
 #pragma parameter SCANLINE_COMPENSATION  "        Compensate for brightness loss"				0.0	0.0 1.0 0.1
 #pragma parameter SCANLINES_BLEEDING     "        Scanlines bleeding"						0.0 	0.0 3.0 0.05
 #pragma parameter SCANLINE_FLICKERING    "        Interlace Flicker (0=off,1=on,2=if interlaced)"		2.0 	0.0 2.0 1.0
@@ -395,6 +398,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 #define DO_SCANLINES                  global.DO_SCANLINES
 #define SCANLINE_DARK                 params.SCANLINE_DARK
+#define SCANLINE_MIN                  global.SCANLINE_MIN
 #define SCANLINE_OVERWHITE            global.SCANLINE_OVERWHITE
 #define SCANLINE_FLICKERING           global.SCANLINE_FLICKERING
 #define SCANLINE_FLICKERING_POWER     global.SCANLINE_FLICKERING_POWER
