@@ -59,6 +59,7 @@
 #   - The alpha channel in the inner frame represents the part of the bezel that will be filled by the game content
 #   - The blue channel represents the part of the bezel that will be filled by the game reflection.
 
+                # textures = "monitor_body_curved;monitor_body_straight;bg_under;bg_over;curvature1xy"
                 textures = "monitor_body_curved;monitor_body_straight;bg_under;bg_over"
                 
             monitor_body_curved = "textures/monitor_body_curved.png"
@@ -82,6 +83,11 @@
           bg_over_linear = "true"
        bg_over_wrap_mode = "mirrored_repeat"
           bg_over_mipmap = "true"
+          
+#                 curvature1xy = "textures/curvature1.xy.png"
+#          curvature1xy_linear = "true"
+#       curvature1xy_wrap_mode = "clamp_to_edge"
+#          curvature1xy_mipmap = "true"
 
 shaders = 17
 # For P-uae defaults, doubling just y0 seems the best option.

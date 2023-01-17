@@ -184,7 +184,8 @@
     - The alpha channel in the inner frame represents the part of the bezel
       that will be filled by the game content
     - The blue channel represents the part of the bezel that will be filled by the game reflection.
-    
+    Straight
+        Use a straight bezel instead of a curved one.
     Bezel color (red,green,blue) and contrast:
         Allows to choose the color of the monitor frame.
     Image zoom:
