@@ -48,17 +48,18 @@ layout(set = 0, binding = 2)  uniform sampler2D bloom_pass_final;
 layout(set = 0, binding = 3)  uniform sampler2D reflected_blurred_pass2;
 layout(set = 0, binding = 4)  uniform sampler2D ambi_temporal_pass;
 layout(set = 0, binding = 5)  uniform sampler2D avglum_pass;
-layout(set = 0, binding = 6)  uniform sampler2D monitor_body;
-layout(set = 0, binding = 7)  uniform sampler2D bg_under;
-layout(set = 0, binding = 8)  uniform sampler2D bg_over;
-layout(set = 0, binding = 9)  uniform sampler2D first_pass;
-layout(set = 0, binding = 10) uniform sampler2D shift_and_bleed_pass;
+layout(set = 0, binding = 6)  uniform sampler2D monitor_body_straight;
+layout(set = 0, binding = 7)  uniform sampler2D monitor_body_curved;
+layout(set = 0, binding = 8)  uniform sampler2D bg_under;
+layout(set = 0, binding = 9)  uniform sampler2D bg_over;
+layout(set = 0, binding = 10)  uniform sampler2D first_pass;
+layout(set = 0, binding = 11) uniform sampler2D shift_and_bleed_pass;
 
 //Ex main_pass layouts:
-    layout(set = 0, binding = 11) uniform sampler2D FXAA_pass;
-    layout(set = 0, binding = 12) uniform sampler2D in_glow_pass;
-    layout(set = 0, binding = 13) uniform sampler2D halo_pass;
-    layout(set = 0, binding = 14) uniform sampler2D avglum_passFeedback;
+    layout(set = 0, binding = 12) uniform sampler2D FXAA_pass;
+    layout(set = 0, binding = 13) uniform sampler2D in_glow_pass;
+    layout(set = 0, binding = 14) uniform sampler2D halo_pass;
+    layout(set = 0, binding = 15) uniform sampler2D avglum_passFeedback;
 
 
 #define HALF_PI 1.5707963267949
@@ -492,21 +493,55 @@ vec3 bezel_color(float lum)  {
     return clamp(col,0.0,1.0);
 }
 
+
+
 vec3 compose_bezel_over(vec3 full_viewport) {
-    vec2 bezel_lut_size = textureSize(monitor_body,0);
+    vec2 bezel_lut_size = textureSize(monitor_body_curved,0); //no need to branch here if we assume straight and curved textures are the same size.
+                                                              //FIXME ?
     float bezel_frame_lod = log2(bezel_lut_size.y * (BEZEL_FRAME_ZOOM+1.0) /global.FinalViewportSize.y);
     vec2 coords_for_bezel = vTexCoord;
-
+    
     if (BEZEL_FRAME_ZOOM != 0.0)
-        coords_for_bezel = zoomout_coords(vTexCoord,-BEZEL_FRAME_ZOOM,1.0);
+        coords_for_bezel = zoomout_coords(coords_for_bezel,-BEZEL_FRAME_ZOOM,1.0);  
+    
+    /* Bezel image is a fixed png file, and is curved.
+     * To have a straight bezel, we can "unwarp" it and then curve it again
+     * Too lame?
+                    float BEZEL_IMG_BORDER_START_X = 120.0/2923.0; //= 0.03; 120
+                    float BEZEL_IMG_BORDER_END_X = 220.0/2923.0 ;//= 0.2;    220
+                    
+                    float BEZEL_IMG_BORDER_START_Y = 75.0/2178.0; //= 0.01;  75
+                    float BEZEL_IMG_BORDER_END_Y = 160.0/2178.0;//= 0.4;    160
+                    
+                    float BEZEL_IMG_CURVATURE_X = 0.6;
+                    float BEZEL_IMG_CURVATURE_Y = 0.6;
+                    
+                    float min_x = min(coords_for_bezel.x, 1-coords_for_bezel.x);
+                    float min_y = min(coords_for_bezel.y, 1-coords_for_bezel.y);
 
+                    
+                    
+                    float kx = smoothstep(BEZEL_IMG_BORDER_START_X, BEZEL_IMG_BORDER_END_X, min(coords_for_bezel.x, 1-coords_for_bezel.x));
+                    float ky = smoothstep(BEZEL_IMG_BORDER_START_Y, BEZEL_IMG_BORDER_END_Y, min(coords_for_bezel.y, 1-coords_for_bezel.y));
+                    coords_for_bezel = Warp(coords_for_bezel,-BEZEL_IMG_CURVATURE_X * kx , -BEZEL_IMG_CURVATURE_Y * ky ); 
+                    coords_for_bezel = Warp(coords_for_bezel,GEOM_WARP_X * kx , GEOM_WARP_Y * ky );
+    */
+
+    
+
+    
     vec2 coords_for_mirror = coords_for_bezel;
     //No need to draw anything outside this:
     if (coords_for_bezel.x < 0  || coords_for_bezel.y < 0 || coords_for_bezel.x > 1.0 || coords_for_bezel.y > 1.0) return full_viewport;
 
     //Main lut:
-    vec4 bezel = textureLod(monitor_body,coords_for_bezel,bezel_frame_lod);
-
+    vec4 bezel;
+    if (BEZEL_USE_STRAIGHT < 0.5)
+        bezel = textureLod(monitor_body_curved,coords_for_bezel,bezel_frame_lod);
+            else
+        bezel = textureLod(monitor_body_straight,coords_for_bezel,bezel_frame_lod);
+    
+//return mix(bezel.rgb, vec3(kx), 0.5);
     //No need to draw anything on full alpha:
     if (bezel.a == 0.0) return full_viewport;
 

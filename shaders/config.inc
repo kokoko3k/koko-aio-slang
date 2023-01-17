@@ -148,6 +148,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float BEZEL_IMAGE_BORDER;
 	float BEZEL_REFL_ZOOM;
 	float BEZEL_FRAME_ZOOM;
+	float BEZEL_USE_STRAIGHT;
 
 	float DO_SPOT;
 	float S_POSITION; 
@@ -299,15 +300,16 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 
 //Bezel related
-#pragma parameter DO_BEZEL	     "★ Bezel enable? ==>"			0.0   0.0 1.0 1.0
-#pragma parameter BEZEL_R            "        Bezel color: Red"			-0.3   -0.5 0.5  0.01
-#pragma parameter BEZEL_G            "        Bezel color: Green"		-0.3   -0.5 0.5  0.01
-#pragma parameter BEZEL_B            "        Bezel color: Blue"		-0.3   -0.5 0.5  0.01
-#pragma parameter BEZEL_CON          "        Bezel Contrast"			1.3   0.0  10.0 0.01
-#pragma parameter BEZEL_INNER_ZOOM   "        Image zoom"			-0.18   -1.5 0.5 0.01
-#pragma parameter BEZEL_FRAME_ZOOM   "        Frame zoom"			0.0   -1.5 0.5 0.01
-#pragma parameter BEZEL_IMAGE_BORDER "        Image border"			1.01   1.0 1.2 0.01
-#pragma parameter BEZEL_REFL_ZOOM    "        Reflections zoom"			0.965   0.0 2.0 0.005
+#pragma parameter DO_BEZEL	     "★ Bezel enable? ==>"		0.0   0.0 1.0 1.0
+#pragma parameter BEZEL_USE_STRAIGHT "        Straight"			0.0	0.0 1.0  1.0 
+#pragma parameter BEZEL_R            "        Color: Red"		-0.3   -0.5 0.5  0.01
+#pragma parameter BEZEL_G            "        Color: Green"		-0.3   -0.5 0.5  0.01
+#pragma parameter BEZEL_B            "        Color: Blue"		-0.3   -0.5 0.5  0.01
+#pragma parameter BEZEL_CON          "        Contrast"			1.3   0.0  10.0 0.01
+#pragma parameter BEZEL_INNER_ZOOM   "        Image zoom"		-0.18   -1.5 0.5 0.01
+#pragma parameter BEZEL_FRAME_ZOOM   "        Frame zoom"		0.0   -1.5 0.5 0.01
+#pragma parameter BEZEL_IMAGE_BORDER "        Image border"		1.01   1.0 1.2 0.01
+#pragma parameter BEZEL_REFL_ZOOM    "        Reflections zoom"		0.965   0.0 2.0 0.005
 
 
 //Background Image
@@ -476,6 +478,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #define BEZEL_FRAME_ZOOM   global.BEZEL_FRAME_ZOOM
 #define BEZEL_IMAGE_BORDER global.BEZEL_IMAGE_BORDER
 #define BEZEL_REFL_ZOOM    global.BEZEL_REFL_ZOOM
+#define BEZEL_USE_STRAIGHT global.BEZEL_USE_STRAIGHT
 
 #define DO_SPOT    global.DO_SPOT
 #define S_BYPASS   global.S_BYPASS

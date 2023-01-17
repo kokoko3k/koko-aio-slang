@@ -59,14 +59,20 @@
 #   - The alpha channel in the inner frame represents the part of the bezel that will be filled by the game content
 #   - The blue channel represents the part of the bezel that will be filled by the game reflection.
 
-                textures = "monitor_body;bg_under;bg_over"
+                textures = "monitor_body_curved;monitor_body_straight;bg_under;bg_over"
                 
-            monitor_body = "textures/monitor_body.png"
-     monitor_body_linear = "true"
-     # Does this work?
-  monitor_body_wrap_mode = "clamp_to_edge"
-     monitor_body_mipmap = "true"
+            monitor_body_curved = "textures/monitor_body_curved.png"
+     monitor_body_curved_linear = "true"
+  # Does this work?
+  monitor_body_curved_wrap_mode = "clamp_to_edge"
+     monitor_body_curved_mipmap = "true"
 
+            monitor_body_straight = "textures/monitor_body_straight.png"
+     monitor_body_straight_linear = "true"
+  # Does this work?
+  monitor_body_straight_wrap_mode = "clamp_to_edge"
+     monitor_body_straight_mipmap = "true"
+     
                 bg_under = "textures/background_under.png"
          bg_under_linear = "true"
       bg_under_wrap_mode = "mirrored_repeat"

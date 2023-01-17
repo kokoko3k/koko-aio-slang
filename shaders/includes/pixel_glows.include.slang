@@ -1,5 +1,8 @@
 
 
+
+
+
 /*
  * This commented version is a blur that blurs only brighter colors.
  * I'm not using it, because a cheaper method is available in in_glow.slang
@@ -135,6 +138,8 @@ vec4 pixel_glow_std_pow_bloom_only(sampler2D in_texture, float my_glowpix, float
 */
 
 
+
+
 vec4 pixel_glow_std_pow(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, float glow_gamma, vec2 coords, vec4 SourceSize1, vec4 SourceSize2) {
 
     // Calculating texel coordinates
@@ -232,10 +237,11 @@ vec4 dumb_glow(sampler2D in_texture, float my_glow, float glow_gamma, vec2 coord
 
 
 
+
+
+
 vec4 pixel_glow(sampler2D in_texture, float my_glowpix, float my_glowpixy, float my_glow, float glow_gamma, vec2 coords, vec4 SourceSize1, vec4 SourceSize2) {
 
-    //return blur(in_texture, SourceSize1, glow_gamma, my_glow);
-    return pixel_glow_std_pow(in_texture,my_glowpix,my_glowpixy,my_glow,glow_gamma,coords,SourceSize1, SourceSize2);
     
     if ( (my_glowpix >= GLOW_SHARP_MAX) && (my_glowpixy >= GLOW_SHARP_MAX) ) {
         return dumb_glow(in_texture, my_glow,glow_gamma,coords);
