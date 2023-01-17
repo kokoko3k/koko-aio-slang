@@ -44,25 +44,22 @@ layout(location = 4) in float vIsRotated;
 layout(location = 0) out vec4 FragColor;
 
 
-layout(set = 0, binding = 1)  uniform sampler2D bloom_pass_final;
-layout(set = 0, binding = 2)  uniform sampler2D reflected_blurred_pass2;
-layout(set = 0, binding = 3)  uniform sampler2D ambi_temporal_pass;
-layout(set = 0, binding = 4)  uniform sampler2D avglum_pass;
-layout(set = 0, binding = 5)  uniform sampler2D monitor_body_straight;
-layout(set = 0, binding = 6)  uniform sampler2D monitor_body_curved;
-layout(set = 0, binding = 7)  uniform sampler2D bg_under;
-layout(set = 0, binding = 8)  uniform sampler2D bg_over;
-layout(set = 0, binding = 9)  uniform sampler2D first_pass;
-layout(set = 0, binding = 10) uniform sampler2D shift_and_bleed_pass;
-
+layout(set = 0, binding = 2)  uniform sampler2D bloom_pass_final;
+layout(set = 0, binding = 3)  uniform sampler2D reflected_blurred_pass2;
+layout(set = 0, binding = 4)  uniform sampler2D ambi_temporal_pass;
+layout(set = 0, binding = 5)  uniform sampler2D avglum_pass;
+layout(set = 0, binding = 6)  uniform sampler2D monitor_body_straight;
+layout(set = 0, binding = 7)  uniform sampler2D monitor_body_curved;
+layout(set = 0, binding = 8)  uniform sampler2D bg_under;
+layout(set = 0, binding = 9)  uniform sampler2D bg_over;
+layout(set = 0, binding = 10)  uniform sampler2D first_pass;
+layout(set = 0, binding = 11) uniform sampler2D shift_and_bleed_pass;
 
 //Ex main_pass layouts:
-    layout(set = 0, binding = 11) uniform sampler2D FXAA_pass;
-    layout(set = 0, binding = 12) uniform sampler2D in_glow_pass;
-    layout(set = 0, binding = 13) uniform sampler2D halo_pass;
-    layout(set = 0, binding = 14) uniform sampler2D avglum_passFeedback;
-
-    //layout(set = 0, binding = 15) uniform sampler2D curvature1xy;
+    layout(set = 0, binding = 12) uniform sampler2D FXAA_pass;
+    layout(set = 0, binding = 13) uniform sampler2D in_glow_pass;
+    layout(set = 0, binding = 14) uniform sampler2D halo_pass;
+    layout(set = 0, binding = 15) uniform sampler2D avglum_passFeedback;
 
 
 #define HALF_PI 1.5707963267949
@@ -725,17 +722,7 @@ void main() {
         //split screen
         //if (vTexCoord.y < 0.5) pixel_out = texture(first_pass,vTexCoord);
         //pixel_out = texture(avglum_pass,vTexCoord);
-        
-    /*vec2 warped = Warp(vOutputCoord,1.0,1.0);
-    FragColor = textureLod(bg_over, warped, 0.0);
-    return;
-    */
-    //warped = mix(vOutputCoord, warped, 1.0);
-    
-    //warped = floor(warped*256)/256;
-    
-    //vec2 warped = texture(curvature1xy, vOutputCoord).xy;
-    //FragColor = textureLod(bg_over, warped, 0.0);
-    
+  
+     
     FragColor = pixel_out;
 }

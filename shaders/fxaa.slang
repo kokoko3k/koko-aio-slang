@@ -252,6 +252,8 @@ layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
 
+
+
 void main()
 {
    gl_Position = global.MVP * Position;
@@ -263,9 +265,7 @@ layout(location = 0) in vec2 vTexCoord;
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D first_pass;
 
-
-
-void main() {
+void main() {  
     if ( DO_FXAA == 0.0 ) return;
     FragColor = vec4(FxaaPixelShader(vTexCoord, first_pass, vec2(global.first_passSize.z, global.first_passSize.w)),0.0);
 }

@@ -128,20 +128,36 @@ float random(float power, vec2 seed) {
 	}
 
 
-	vec2 Warp(vec2 uv,float wx, float wy){
-		// Transform coordinates to range [-1, 1]
+	vec2 Warp_minus_05(vec2 uv){
 		uv = uv * 2.0 - 1.0;
-		vec2 CRT_Distortion = vec2(wx, wy) * 0.2;
 		float curvedCoordsDistance = length(uv);
 		uv /= curvedCoordsDistance;
-		uv *= (1.0-pow(vec2(1.0-(curvedCoordsDistance/1.4142135623730950488016887242097)),(1.0/(1.0+CRT_Distortion))));
-		uv /= (1.0-pow(vec2(0.29289321881345247559915563789515),(1.0/(vec2(1.0)+CRT_Distortion))));
+		float pow_arg = 1.0-(curvedCoordsDistance/1.4142462);
+		uv *= 1.0 - vec2( pow_arg * pow_arg ) ;
+		uv /= 0.914213562373095;
+		uv = uv* 0.5 + 0.5;
+		return uv;
+	}
+	
+	
+	vec2 Warp(vec2 uv,float wx, float wy){
+		
+		//For a bit faster, less precise version; also, parameter scales differently
+		//return mix(Warp_minus_05(uv), uv,  vec2(1 + wx*0.16, 1 + wy* 0.16) ); 
+		
+		
+		// Transform coordinates to range [-1, 1]
+		uv = uv * 2.0 - 1.0;
+		vec2 CRT_Distortion = vec2(wx, wy) * 0.2 ;
+		float curvedCoordsDistance = length(uv);
+		uv /= curvedCoordsDistance;
+		uv *= (1.0-pow(vec2(1.0-(curvedCoordsDistance/1.4142135623730950488016887242097)),(1.0/(1.0+CRT_Distortion ))));
+		uv /= (1.0-pow(vec2(0.29289321881345247559915563789515),(1.0/(vec2(1.0)+CRT_Distortion ))));
 		// Transform coordinates back to [0, 1]
 		uv = uv* 0.5 + 0.5;
 		return uv;
 	}
-
-
+	
 //VIGNETTE - SPOT
 /*	float gauss(float x, float x0, float sx, float size, float power){
 		float arg = x-x0;
