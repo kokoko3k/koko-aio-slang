@@ -34,7 +34,7 @@
 	//the blurred image
 	//Set this to the same value as used for the maximum
 	//of IN_GLOW_BIAS
-#define IN_GLOW_BIAS_MAX 2.0
+#define IN_GLOW_BIAS_MAX 1.0
 
 #define eps 1e-5
 #define pi 3.141592654
@@ -87,6 +87,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float DO_CCORRECTION;
 	float DO_ALT_BLANK;
 	float IN_GLOW_BIAS ;
+	float IN_GLOW_AMOUNT ;
 	float SCANLINES_BLEEDING ;
 	float IN_GLOW_W;
 	float IN_GLOW_H;
@@ -226,13 +227,14 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter SHIFT_B         "        Blue offset"			3.0 	-210.0 189.0 1
 
 
-// Input glowing
-#pragma parameter DO_IN_GLOW               "★ Glowing Input/power enable? ==>" 					0.0	0.0 1.0 1.0
-#pragma parameter IN_GLOW_POWER            "        Input signal glow strength"					0.45 	0.0 5.0 0.05
+// Input Blur / light glowing
+#pragma parameter DO_IN_GLOW               "★ Glow/Blur enable? ==>"	 					0.0	0.0 1.0 1.0
+#pragma parameter IN_GLOW_POWER            "        Input signal strength"					0.45 	0.0 5.0 0.05
 #pragma parameter IN_GLOW_W                "        Sharpness, horizontal"					2.5	0.2 7.0 0.05
 #pragma parameter IN_GLOW_H                "        Sharpness, vertical"					2.5	0.2 7.0 0.05
 #pragma parameter IN_GLOW_GAMMA            "        Gamma, the higher, the less the glow on dark colors"	1.0 	1.0 10.0 0.1
-#pragma parameter IN_GLOW_BIAS             "        Glow to blur bias"					    	1.0    -2.0 1.0 0.05 
+#pragma parameter IN_GLOW_AMOUNT           "        Light spread amount"					0.6 	0.0 2.0 0.05
+#pragma parameter IN_GLOW_BIAS             "        Glow to blur bias"					    	1.0     0.0 1.0 0.05 
 
 
 
@@ -412,6 +414,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 #define DO_IN_GLOW               global.DO_IN_GLOW
 #define IN_GLOW_BIAS             global.IN_GLOW_BIAS
+#define IN_GLOW_AMOUNT           global.IN_GLOW_AMOUNT
 #define SCANLINES_BLEEDING       global.SCANLINES_BLEEDING
 #define IN_GLOW_W                global.IN_GLOW_W
 #define IN_GLOW_H                global.IN_GLOW_H

@@ -28,11 +28,12 @@
     It can be used with RGB shifting and image blurring to give the picture
     an ntsc look without dealing with specific encoding/decoding stuffs. 
 
-**Glowing Input/power:**
+**Glow/Blur:**
     Emulate the CRT glowing "feature", so that the brighter areas of
-    the image will light their surroundings.
+    the image will light their surroundings,
+    with options to switch to classic blur.
     
-    Input signal glow strength:
+    Input signal strength:
         The input signal gain
     Sharpness (horizontal, vertical):
         How much the glow will "spread".
