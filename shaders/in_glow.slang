@@ -67,17 +67,30 @@ vec3 glow_blur_bias_sharper_AA(sampler2D source_tex, vec2 co, vec3 pixel_glowed,
 }
 
 vec3 glow_blur_bias(sampler2D source_tex, vec2 co, vec3 pixel_glowed, float bias){
-   if (IN_GLOW_W < 0.99)
+   
+   float w1 = max(-bias, 0.0); // only add abs(bias) if bias < 0.0;
+
+   vec3 pixel_source = texture(source_tex, co).rgb;
+   pixel_source  = pow(pixel_source,vec3(IN_GLOW_GAMMA)) * IN_GLOW_POWER;
+   vec3 glow_light = clamp((pixel_glowed - pixel_source) * w1, 0.0,1.0);
+   vec3 proper_glow = glow_light + pixel_source;
+   return mix(proper_glow, pixel_glowed, max(0.0, bias));   
+   
+   
+   /*if (IN_GLOW_W < 0.99)
       return  glow_blur_bias_sharper_AA( source_tex,  co,  pixel_glowed,  bias);
          else
       return  glow_blur_bias_smother_bloomer( source_tex,  co,  pixel_glowed,  bias);
+   */
 }
 
 
 
 
 void main() { 
-
+ 
+   
+   
    if (DO_IN_GLOW == 0.0) return;
    
    vec3 pixel_glowed;

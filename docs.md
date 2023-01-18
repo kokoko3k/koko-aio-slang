@@ -39,9 +39,11 @@
         When pushed to its maximum value, no blurring will occour.
     Gamma:
         Controls how much the signal has to be bright to produce the glow.
-    Glow to blur bias:
-        Modulates between glow (0.. brighter colors expands over darker ones)
-        versus blur (..1  all the colors are blurred)
+    Glow / blur bias:
+        Higher negative values -> more glow : brighter colors expands over darker ones.
+        Higher positive values -> means blur: all the colors are blurred.
+        0.0 means no blur, no glow.
+        
     
 **RGB Masks and/or Darklines:**
     Emulates CRT RGB phosphors (RGB Mask),
