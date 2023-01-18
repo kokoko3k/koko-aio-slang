@@ -67,8 +67,7 @@ layout(set = 0, binding = 11) uniform sampler2D shift_and_bleed_pass;
 //Ex main_pass layouts:
     layout(set = 0, binding = 12) uniform sampler2D FXAA_pass;
     layout(set = 0, binding = 13) uniform sampler2D in_glow_pass;
-    layout(set = 0, binding = 14) uniform sampler2D halo_pass;
-    layout(set = 0, binding = 15) uniform sampler2D avglum_passFeedback;
+
 
 
 #define HALF_PI 1.5707963267949
@@ -696,7 +695,7 @@ void main() {
     vec2 coords = vTexCoord;
     //Luminosity dependant zoom
     if (DO_DYNZOOM == 1.0) {
-        float zoomin = 1.0 + (texture(avglum_passFeedback, vec2(0.25,0.25)    ).a/ DYNZOOM_FACTOR);
+        float zoomin = 1.0 + (texture(avglum_pass, vec2(0.25,0.25)    ).a/ DYNZOOM_FACTOR);
         coords = zoom(coords, zoomin);
     }
     
