@@ -77,9 +77,7 @@ vec3 glow_blur_bias(sampler2D source_tex, vec2 co, vec3 pixel_glowed, float bias
 
 
 void main() { 
- 
-   
-   
+
    if (DO_IN_GLOW == 0.0) return;
    
    vec3 pixel_glowed;

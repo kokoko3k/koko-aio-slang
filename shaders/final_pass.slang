@@ -67,6 +67,7 @@ layout(set = 0, binding = 11) uniform sampler2D shift_and_bleed_pass;
 //Ex main_pass layouts:
     layout(set = 0, binding = 12) uniform sampler2D FXAA_pass;
     layout(set = 0, binding = 13) uniform sampler2D in_glow_pass;
+    layout(set = 0, binding = 14) uniform sampler2D halo_pass;
 
 
 
