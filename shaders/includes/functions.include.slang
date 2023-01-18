@@ -117,8 +117,7 @@ float random(float power, vec2 seed) {
 
 //CURVATURE
 	#define corner_aspect vec2(1.0,  0.75)
-	float border(vec2 coord)
-	{
+	float border(vec2 coord) {
 		coord = (coord - vec2(0.5)) + vec2(0.5, 0.5);
 		coord = min(coord, vec2(1.0) - coord) * corner_aspect;
 		vec2 cdist = vec2(GEOM_CORNER_SIZE);
@@ -126,37 +125,46 @@ float random(float power, vec2 seed) {
 		float dist = sqrt(dot(coord, coord));
 		return clamp((cdist.x - dist)*GEOM_CORNER_SMOOTH, 0.0, 1.0);
 	}
-
-
-	vec2 Warp_minus_05(vec2 uv){
+	
+	vec2 Warp_06(vec2 uv) {
+		//Pre-calc version for curvature = 0.6,0.6
 		uv = uv * 2.0 - 1.0;
 		float curvedCoordsDistance = length(uv);
 		uv /= curvedCoordsDistance;
-		float pow_arg = 1.0-(curvedCoordsDistance/1.4142462);
-		uv *= 1.0 - vec2( pow_arg * pow_arg ) ;
-		uv /= 0.914213562373095;
+		uv *= 1.0-pow(vec2(1.0-(curvedCoordsDistance/1.4142)), vec2(0.8928) );
+		uv /= 0.6659;
 		uv = uv* 0.5 + 0.5;
 		return uv;
 	}
 	
-	
+	//warp full new
 	vec2 Warp(vec2 uv,float wx, float wy){
-		
-		//For a bit faster, less precise version; also, parameter scales differently
-		//return mix(Warp_minus_05(uv), uv,  vec2(1 + wx*0.16, 1 + wy* 0.16) ); 
-		
-		
 		// Transform coordinates to range [-1, 1]
 		uv = uv * 2.0 - 1.0;
-		vec2 CRT_Distortion = vec2(wx, wy) * 0.2 ;
+		vec2 pow_exp = 1.0/(1.0+vec2(wx, wy) * 0.2 ) ;
 		float curvedCoordsDistance = length(uv);
 		uv /= curvedCoordsDistance;
-		uv *= (1.0-pow(vec2(1.0-(curvedCoordsDistance/1.4142135623730950488016887242097)),(1.0/(1.0+CRT_Distortion ))));
-		uv /= (1.0-pow(vec2(0.29289321881345247559915563789515),(1.0/(vec2(1.0)+CRT_Distortion ))));
+		uv *= (1.0-pow(vec2(1.0-(curvedCoordsDistance/1.4142135623730950488016887242097)),  pow_exp ));
+		uv /= (1.0-pow(vec2(0.29289321881345247559915563789515),  pow_exp ));
 		// Transform coordinates back to [0, 1]
-		uv = uv* 0.5 + 0.5;
-		return uv;
+		return uv* 0.5 + 0.5;
 	}
+	
+	vec2 Warp_fast(vec2 uv, vec2 v_exp, vec2 arg2) {
+		/*This version is exact and faster than the other implementation,
+		 * Just because it needs precalculed arguments that can live in
+		 * vertex shader
+		 */
+		// Transform coordinates to range [-1, 1]
+		uv = uv * 2.0 - 1.0;
+		float curvedCoordsDistance = length(uv);
+		uv /= curvedCoordsDistance;
+		uv *= 1.0-pow(vec2(1.0-(curvedCoordsDistance/1.4142)), v_exp );
+		uv /= arg2;
+		// Transform coordinates back to [0, 1]
+		return uv * 0.5 + 0.5;
+	}
+	
 	
 //VIGNETTE - SPOT
 /*	float gauss(float x, float x0, float sx, float size, float power){

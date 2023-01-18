@@ -6,18 +6,28 @@ layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 
 layout(location = 0) out vec2 vTexCoord;
+layout(location = 1) out vec2 vWarp_vexp;
+layout(location = 2) out vec2 vWarp_arg2;
 
 #include "includes/functions.include.slang"
 void main() {
    gl_Position = global.MVP * Position;
    vTexCoord = TexCoord;
    if (DO_BEZEL > 0.5)
-    vTexCoord = zoom(vTexCoord, BEZEL_REFL_ZOOM);
+      vTexCoord = zoom(vTexCoord, BEZEL_REFL_ZOOM);
+
+   //Precalc some Curvature/Warp values:
+      vWarp_vexp = 1.0/ (1 + (vec2(GEOM_WARP_X, GEOM_WARP_Y) * 0.2)) ;
+      vWarp_arg2 = 1.0 - pow(vec2(0.29289321881345247559915563789515), vWarp_vexp );
 }
 
 #pragma stage fragment
 layout(location = 0) in vec2 vTexCoord;
+
 layout(location = 0) out vec4 FragColor;
+layout(location = 1) in vec2 vWarp_vexp;
+layout(location = 2) in vec2 vWarp_arg2;
+
 layout(set = 0, binding = 1) uniform sampler2D first_pass;
 layout(set = 0, binding = 2) uniform sampler2D isrotated_passFeedback;
 
@@ -58,7 +68,7 @@ void main() {
    vec2 coords_curved = vTexCoord;
    if (DO_CURVATURE == 1.0) {
       if ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0))
-            coords_curved = Warp(coords_curved,GEOM_WARP_X,GEOM_WARP_Y);
+            coords_curved = Warp_fast(coords_curved, vWarp_vexp, vWarp_arg2); //coords_curved = Warp(coords_curved,GEOM_WARP_X,GEOM_WARP_Y);
    }
    //coords_curved = zoomout_coords(coords_curved, -BEZEL_INNER_ZOOM , 1.0);
    coords_curved = zoomout_coords(coords_curved, BEZEL_REFLECTION_AREA_SIZE , 1.0);

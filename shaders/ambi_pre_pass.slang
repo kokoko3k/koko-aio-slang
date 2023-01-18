@@ -18,16 +18,23 @@ layout(location = 1) out float border_min;
 layout(location = 2) out float border_max;
 layout(location = 3) out float fstep;
 layout(location = 4) out float lod;
+layout(location = 5) out vec2 vWarp_vexp;
+layout(location = 6) out vec2 vWarp_arg2;
 
 void main() {
-   gl_Position = global.MVP * Position;
-   vTexCoord = TexCoord;
-   
-   border_min=internalness ;
-   border_max=1.0-internalness ;
-   fstep = (border_max - border_min)  / (leds_per_strip-1);
-   //Calc a lod for a texture sized led_strip x led_strip
-   lod = log2(params.SourceSize.y / leds_per_strip);
+    gl_Position = global.MVP * Position;
+    vTexCoord = TexCoord;
+
+    border_min=internalness ;
+    border_max=1.0-internalness ;
+    fstep = (border_max - border_min)  / (leds_per_strip-1);
+    
+    //Calc a lod for a texture sized led_strip x led_strip
+        lod = log2(params.SourceSize.y / leds_per_strip);
+    
+    //Precalc some Curvature/Warp values:
+        vWarp_vexp = 1.0/ (1 + (vec2(GEOM_WARP_X, GEOM_WARP_Y) * 0.2)) ;
+        vWarp_arg2 = 1.0 - pow(vec2(0.29289321881345247559915563789515), vWarp_vexp );
 }
 
 #pragma stage fragment
@@ -36,6 +43,8 @@ layout(location = 1) in float border_min;
 layout(location = 2) in float border_max;
 layout(location = 3) in float fstep;
 layout(location = 4) in float lod;
+layout(location = 5) in vec2 vWarp_vexp;
+layout(location = 6) in vec2 vWarp_arg2;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -71,7 +80,7 @@ vec3 ambi_pre_pass() {
     //First consider to skip the curved coords
     if (DO_CURVATURE == 1.0) {
         if ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0)) {
-            vec2 coords_curved = Warp(coords, GEOM_WARP_X, GEOM_WARP_Y);
+            vec2 coords_curved = Warp_fast(coords, vWarp_vexp, vWarp_arg2); // vec2 coords_curved = Warp(coords, GEOM_WARP_X, GEOM_WARP_Y);
             if ( ( (coords_curved.x > tol_start && coords_curved.x < 1.0 - tol_start ) && (coords_curved.y > tol_start && coords_curved.y < 1.0 - tol_start) ) &&
                 !( (coords.x < - tol_start || coords.x > 1.0 + tol_start) ||  (coords.y < - tol_start || coords.y > 1.0 + tol_start) ) )
                 return vec3(0.0);                               

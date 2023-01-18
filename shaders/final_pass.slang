@@ -17,6 +17,9 @@ layout(location = 1) out vec2 vOutputCoord;
 layout(location = 2) out vec2 spot_offset;
 layout(location = 3) out vec2 vFragCoord;
 layout(location = 4) out float vIsRotated;
+layout(location = 5) out vec2 vWarp_vexp;
+layout(location = 6) out vec2 vWarp_arg2;
+
 
 #include "includes/functions.include.slang"
 
@@ -31,6 +34,10 @@ void main() {
 
     vFragCoord = vec2( floor(vOutputCoord.x * params.OutputSize.x),
                        floor(vOutputCoord.y * params.OutputSize.y));
+
+    //Precalc some Curvature/Warp values:
+        vWarp_vexp = 1.0/ (1 + (vec2(GEOM_WARP_X, GEOM_WARP_Y) * 0.2)) ;
+        vWarp_arg2 = 1.0 - pow(vec2(0.29289321881345247559915563789515), vWarp_vexp );
 }
 
 
@@ -40,6 +47,8 @@ layout(location = 1) in vec2 vOutputCoord;
 layout(location = 2) in vec2 spot_offset;
 layout(location = 3) in vec2 vFragCoord;
 layout(location = 4) in float vIsRotated;
+layout(location = 5) in vec2 vWarp_vexp;
+layout(location = 6) in vec2 vWarp_arg2;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -694,7 +703,7 @@ void main() {
     //Curvature
     if (DO_CURVATURE == 1.0) {
         if ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0))
-            coords = Warp(coords,GEOM_WARP_X,GEOM_WARP_Y);
+            coords = Warp_fast(coords, vWarp_vexp, vWarp_arg2);
     }
 
     //Scale coords according to bezel settings?
@@ -723,6 +732,5 @@ void main() {
         //if (vTexCoord.y < 0.5) pixel_out = texture(first_pass,vTexCoord);
         //pixel_out = texture(avglum_pass,vTexCoord);
   
-     
     FragColor = pixel_out;
 }
