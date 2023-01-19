@@ -199,6 +199,9 @@
         Draws a black border around the game content.
     Reflections zoom:
         "Zoom" the reflections if they don't match the content.
+
+**Global shift/zoom image:**
+    Zoom and shift everything on screen, but background pixtures.
         
 **Backgound image:**
     Draws an image on screen picked from the "textures" shader subdirectory,
