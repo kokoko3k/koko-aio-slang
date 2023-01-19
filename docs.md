@@ -201,7 +201,7 @@
         "Zoom" the reflections if they don't match the content.
 
 **Global shift/zoom image:**
-    Zoom and shift everything on screen, but background pixtures.
+    Zoom and shift everything on screen, but background pictures.
         
 **Backgound image:**
     Draws an image on screen picked from the "textures" shader subdirectory,

@@ -118,6 +118,14 @@ float random(float power, vec2 seed) {
 //CURVATURE
 	#define corner_aspect vec2(1.0,  0.75)
 	float border(vec2 coord) {
+		//if (GEOM_CORNER_SIZE < 0.02) {
+			/*float fout = float(coord.x > 0.0 &&
+					    coord.y > 0.0 &&
+					    coord.x < 1.0 &&
+					    coord.y < 1.0
+				);
+			return fout;
+		//}*/
 		coord = (coord - vec2(0.5)) + vec2(0.5, 0.5);
 		coord = min(coord, vec2(1.0) - coord) * corner_aspect;
 		vec2 cdist = vec2(GEOM_CORNER_SIZE);

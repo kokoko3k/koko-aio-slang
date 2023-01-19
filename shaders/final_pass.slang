@@ -735,9 +735,6 @@ void main() {
         //split screen
         //if (vTexCoord.y < 0.5) pixel_out = texture(first_pass,vTexCoord);
         //pixel_out = texture(avglum_pass,vTexCoord);
-  
-  //FragColor = mix(texture(ambi_temporal_pass,vOutputCoord), pixel_out, 0.5);
-  
-  
+      
     FragColor = pixel_out;
 }
