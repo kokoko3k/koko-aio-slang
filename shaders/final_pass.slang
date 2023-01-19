@@ -26,7 +26,8 @@ layout(location = 6) out vec2 vWarp_arg2;
 void main() {
     gl_Position = global.MVP * Position;
     vIsRotated = float(is_rotated());
-    vTexCoord = get_scaled_coords(TexCoord,global.FinalViewportSize, bool(vIsRotated) ) + vec2(0.00001);
+    vTexCoord = get_scaled_coords(TexCoord,global.FinalViewportSize, bool(vIsRotated) ) + vec2(0.00001) + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY);
+    vTexCoord = zoom(vTexCoord, GLOBAL_ZOOM);
     vOutputCoord = TexCoord;
 
     spot_offset = offsets_from_float(S_POSITION+420.0,40);
@@ -731,6 +732,9 @@ void main() {
         //split screen
         //if (vTexCoord.y < 0.5) pixel_out = texture(first_pass,vTexCoord);
         //pixel_out = texture(avglum_pass,vTexCoord);
+  
+  //FragColor = mix(texture(ambi_temporal_pass,vOutputCoord), pixel_out, 0.5);
+  
   
     FragColor = pixel_out;
 }

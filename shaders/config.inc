@@ -185,6 +185,10 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float SHIFT_B;
 	float OFFSET_STRENGTH;
 	
+	float GLOBAL_ZOOM;
+	float GLOBAL_OFFX;
+	float GLOBAL_OFFY;
+	
 } global;
 
 // Color correction
@@ -313,6 +317,11 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BEZEL_IMAGE_BORDER "        Image border"		1.01   1.0 1.2 0.01
 #pragma parameter BEZEL_REFL_ZOOM    "        Reflections zoom"		0.965   0.0 2.0 0.005
 
+//Global Zoom/Offset
+#pragma parameter label_global	 "★ Global shift/zoom"				0.0   0.0 1.0 1.0
+#pragma parameter GLOBAL_OFFX	 "        X axis shift "			0.0  -1.0  1.0    0.0005
+#pragma parameter GLOBAL_OFFY	 "        Y axis shift "			0.0  -1.0  1.0    0.0005
+#pragma parameter GLOBAL_ZOOM	 "        Zoom"					1.0  -1.0  3.0    0.0005
 
 //Background Image
 #pragma parameter DO_BG_IMAGE	 "★ Backgound image enable? ==>"			0.0  0.0  1.0     1.0
@@ -516,3 +525,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #define SHIFT_G           global.SHIFT_G
 #define SHIFT_B           global.SHIFT_B
 #define OFFSET_STRENGTH   global.OFFSET_STRENGTH
+
+#define GLOBAL_ZOOM      global.GLOBAL_ZOOM
+#define GLOBAL_OFFX      global.GLOBAL_OFFX
+#define GLOBAL_OFFY      global.GLOBAL_OFFY

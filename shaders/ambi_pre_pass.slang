@@ -6,7 +6,7 @@
 
 #define PastSampler ambi_temporal_passFeedback
 
-#define internalness 0.07  //The distance between the screen border and the led strip
+#define internalness 0.07 //The distance between the screen border and the led strip
 #define leds_per_strip 8   //How many leds per border
 #define radius 0.001       //The base radius of the emitted light (tuned by user parameter later)
 
@@ -60,6 +60,7 @@ vec3 circle_smooth(vec2 coords, vec2 middle, float f_radius, float FALLOFF, floa
     float fdistance=distance(middle, vec2(coords.x, coords.y));
     float circle = (1-smoothstep(f_radius-FALLOFF, f_radius+FALLOFF, fdistance));
     vec3 circle_color = textureLod(Source, middle, f_lod).rgb * circle;
+    //return pow(circle_color, vec3(2.0));
     return circle_color;
 }
 
@@ -72,6 +73,7 @@ vec3 ambi_pre_pass() {
     
     //Scale to the original aspect
     vec2 coords = get_scaled_coords(vTexCoord, global.FinalViewportSize, is_rotated);
+    coords = zoom(coords + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM );
     if (DO_BEZEL==1.0) coords = zoomout_coords(coords, -BEZEL_INNER_ZOOM , 1.0);
     
     //Skip coords in the rect "under the monitor"
@@ -86,14 +88,14 @@ vec3 ambi_pre_pass() {
                 return vec3(0.0);                               
         }       
     }    
+
     //...next, the straight ones (needed even when curvature is due, because it returns particular values in the corners)
     //skip_pass = skip_pass && !( (coords.x < 0.0 -tol || coords.x > 1.0 +tol) ||  (coords.y < 0.0 -tol || coords.y > 1.0 +tol) );
-    if (coords.x > tol_start && coords.x < tol_end && coords.y > tol_start && coords.y < tol_end)  return vec3(0.0);
-    
+if (coords.x > tol_start && coords.x < tol_end && coords.y > tol_start && coords.y < tol_end)  return vec3(0.0);
+   
     //Finally, emulate leds.
     vec3 pixel_out = vec3(0.0);
     float middle_x; float middle_y ;
-    
     middle_x=border_min;
     for (middle_y=border_min ; middle_y <= border_max+eps ; middle_y=middle_y + fstep ) {
         pixel_out +=circle_smooth(coords, vec2(middle_x,middle_y), radius, AMBI_FALLOFF, lod);
