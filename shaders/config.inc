@@ -188,6 +188,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float GLOBAL_ZOOM;
 	float GLOBAL_OFFX;
 	float GLOBAL_OFFY;
+	float GLOBAL_SHZO;
 	
 } global;
 
@@ -318,10 +319,10 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BEZEL_REFL_ZOOM    "        Reflections zoom"		0.965   0.0 2.0 0.005
 
 //Global Zoom/Offset
-#pragma parameter label_global	 "★ Global shift/zoom"				0.0   0.0 1.0 1.0
+#pragma parameter GLOBAL_SHZO	 "★ Global shift/zoom"				0.0   0.0  1.0 	  1.0
 #pragma parameter GLOBAL_OFFX	 "        X axis shift "			0.0  -1.0  1.0    0.0005
 #pragma parameter GLOBAL_OFFY	 "        Y axis shift "			0.0  -1.0  1.0    0.0005
-#pragma parameter GLOBAL_ZOOM	 "        Zoom"					1.0  -1.0  3.0    0.0005
+#pragma parameter GLOBAL_ZOOM	 "        Zoom"					1.0   0.0  3.0    0.0005
 
 //Background Image
 #pragma parameter DO_BG_IMAGE	 "★ Backgound image enable? ==>"			0.0  0.0  1.0     1.0
@@ -529,3 +530,4 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #define GLOBAL_ZOOM      global.GLOBAL_ZOOM
 #define GLOBAL_OFFX      global.GLOBAL_OFFX
 #define GLOBAL_OFFY      global.GLOBAL_OFFY
+#define GLOBAL_SHZO      global.GLOBAL_SHZO
