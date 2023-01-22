@@ -70,7 +70,15 @@ vec3 glow_blur_bias(sampler2D source_tex, vec2 co, vec3 pixel_glowed, float bias
    vec3 pixel_source = texture(source_tex, co).rgb;
    pixel_source  = pow(pixel_source,vec3(IN_GLOW_GAMMA)) * IN_GLOW_POWER;
    vec3 glow_light = clamp((pixel_glowed - pixel_source) * IN_GLOW_AMOUNT, 0.0, 1.0);
-   vec3 proper_glow = glow_light*glow_light + pixel_source;
+
+   /* powering glow_light is fine when not dealing with scanline minimum thickness,
+    * but then the scanline shape gets smaller, it kinda produces a visive
+    * pow(x,2) by its own; in that case powering glow_light make things worse.
+    * It makes sense, because we are emulating the light spread twice.
+    * FIXME: How to deal with this?
+    */
+
+   vec3 proper_glow = glow_light * glow_light + pixel_source;
 
    return mix(proper_glow, pixel_glowed, max(0.0, bias));   
    
