@@ -270,7 +270,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 // Scanlines
 #pragma parameter DO_SCANLINES	         "★ Scanlines enable? ==>"						0.0 	0.0  1.0 1.0
-#pragma parameter SCANLINE_MIN          "        Minimum height"			  		1.0 	0.05 1.0 0.05
+#pragma parameter SCANLINE_MIN          "        Minimum height"			  		1.0 	0.00 1.0 0.05
 
 #pragma parameter SCANLINE_DARK          "        Gap brightness"			  		0.0 	-0.5 1.0 0.05
 #pragma parameter SCANLINE_COMPENSATION  "        Compensate for brightness loss"				0.0	0.0 1.0 0.1

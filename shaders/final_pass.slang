@@ -288,6 +288,10 @@ float scanline_shape(vec2 coords, bool do_flicker, bool is_interlaced, bool do_s
         }
     }
     
+
+
+
+
     if (SCANLINE_DARK >= 0.0) {
         lines = lines * (1.0 - SCANLINE_DARK) + SCANLINE_DARK;
     } else {
@@ -295,17 +299,20 @@ float scanline_shape(vec2 coords, bool do_flicker, bool is_interlaced, bool do_s
         lines = lines * ((1-SCANLINE_DARK) ) + SCANLINE_DARK ;
     }
 
-    //Min  thickness
-    lum=scale_to_range(lum,SCANLINE_MIN,1.0);
-    lines = pow(lines,  (   1/(lum+eps)       )          );
 
+    //Thickness (min):
+        lum=scale_to_range(lum,SCANLINE_MIN+eps,1.0);
+        //lines = pow(lines,  (   1/(lum+eps)       )          );
+        lines = pow(lines,  (   1/(sqrt(lum)    )       )          );
 
-    //Scale to full range?
-    /*lum=scale_to_range(lum,SCANLINE_MIN,1.0);
-    lines = pow(abs(lines), 1/(10*lum*lum));
-    float clamp_start=0.2;
-    if (lum>clamp_start) lines = clamp(lines,(lum-clamp_start)/(1-clamp_start) ,1.0); //FIXME use step?
-    */
+    //Thickness (max):
+        /*
+            lum=scale_to_range(lum,SCANLINE_MIN,1.0);
+            lines = pow(abs(lines), 1/(10*lum*lum));
+            float clamp_start=0.2;
+            if (lum>clamp_start) lines = clamp(lines,(lum-clamp_start)/(1-clamp_start) ,1.0); //FIXME use step?
+        */
+
     return lines;
 }
 
