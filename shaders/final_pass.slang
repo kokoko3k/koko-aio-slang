@@ -207,6 +207,9 @@ float scanline_shape(vec2 coords, bool do_flicker, bool is_interlaced, bool do_s
  * even frames to emulate that aspect of interlacing.
  */
 
+    //...to scale scanline tickness:
+        float lum_scaled = scale_to_range(lum,SCANLINE_MIN+eps,1.0);
+
     bool alternate = false;
     float period = 1.0;
     if (do_flicker) {
@@ -236,22 +239,22 @@ float scanline_shape(vec2 coords, bool do_flicker, bool is_interlaced, bool do_s
             float Darkline_part_w = (3.0 - VMASK_USE_GM + VMASK_GAP) * VMASK_DARKLINE_SCALE;
             float Darkline_part_w_x2 = Darkline_part_w*2;
             bool odd_column = mod(vFragCoord.x + Darkline_part_w  , Darkline_part_w_x2) < Darkline_part_w;
-            
-                        
+
+
             if (SCANLINE_SM_TYPE == 1.0) {
                 // Slotmask is out oh phase every "odd" triple and mixed with
                 // the straight scanline.
                 // slotmask strength and stagger are configurable.
-                // Acceptable values are with stagger around 79 (pi/4) 
-                if (odd_column) { 
-                    float phase = pi + SCANLINE_SM_VOFFSET*0.01;
+                // Acceptable values are with stagger around 79 (pi/4)
+                if (odd_column) {
+                    float phase = pi + SCANLINE_SM_VOFFSET*0.01 * lum_scaled;
                     float angle_slotmask = angle_base + phase;
                     float slotmask = sin(angle_slotmask);
-                    slotmask = (slotmask*slotmask); 
+                    slotmask = (slotmask*slotmask);
                     lines = mix(lines, slotmask, SCANLINE_SM_STRENGTH);
                 }
             }
-            
+
             else if (SCANLINE_SM_TYPE == 2.0) {
                 float phase;
                 //Slotmask is always out of phase by QUARTER_PI
@@ -259,10 +262,11 @@ float scanline_shape(vec2 coords, bool do_flicker, bool is_interlaced, bool do_s
                 //Slotmask is multiplied by original scanline and thinner.
                 //Only strength parameter is taken into account.
                 if (odd_column)
-                    phase = period * pi + QUARTER_PI;
+                    phase = period * pi + QUARTER_PI * lum_scaled;
                         else
                     phase = period * HALF_PI + QUARTER_PI;
-                
+
+
                 float angle_slotmask = angle_base + phase;
                 float slotmask = sin(angle_slotmask);
                 slotmask = slotmask*slotmask; slotmask = slotmask*slotmask; // eleva alla 4 per renderla sottile. valori maggiori producono moiree.
@@ -273,8 +277,7 @@ float scanline_shape(vec2 coords, bool do_flicker, bool is_interlaced, bool do_s
             else if (SCANLINE_SM_TYPE == 3.0) {
                 // Thinner slotmask screen, no scanlines.
                 // No parameter taken into account.
-                lines = lines * lines;
-                if (odd_column) { 
+                if (odd_column) {
                     float phase = pi + HALF_PI;
                     float angle_slotmask = angle_base + phase;
                     float slotmask = sin(angle_slotmask);
@@ -282,12 +285,12 @@ float scanline_shape(vec2 coords, bool do_flicker, bool is_interlaced, bool do_s
                     lines = slotmask;
                 }
             }
-            
-            
-            
+
+
+
         }
     }
-    
+
 
 
 
@@ -301,16 +304,14 @@ float scanline_shape(vec2 coords, bool do_flicker, bool is_interlaced, bool do_s
 
 
     //Thickness (min):
-        lum=scale_to_range(lum,SCANLINE_MIN+eps,1.0);
-        //lines = pow(lines,  (   1/(lum+eps)       )          );
-        lines = pow(lines,  (   1/(sqrt(lum)    )       )          );
+        //lines = pow(lines,  (   1/(lum_scaled+eps)       )          );
+        lines = pow(lines,  (   1/(sqrt(lum_scaled)    )       )          );
 
     //Thickness (max):
         /*
-            lum=scale_to_range(lum,SCANLINE_MIN,1.0);
-            lines = pow(abs(lines), 1/(10*lum*lum));
+            lines = pow(abs(lines), 1/(10*lum_scaled*lum_scaled));
             float clamp_start=0.2;
-            if (lum>clamp_start) lines = clamp(lines,(lum-clamp_start)/(1-clamp_start) ,1.0); //FIXME use step?
+            if (lum_scaled>clamp_start) lines = clamp(lines,(lum_scaled-clamp_start)/(1-clamp_start) ,1.0); //FIXME use step?
         */
 
     return lines;
