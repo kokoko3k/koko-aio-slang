@@ -133,9 +133,11 @@
         and avoid graphical glitches.
         If you enable this feature, it is highly recommended to disable darklines.
         Darklines will still used when dealing with interlaced or flickering screens.
-        Type 0 allows you to configure strength and stagger
-        Type 1 produces tinner slotmasks, but with fixed stagger
-        Type 3 os fixed and produces heavier and thinner slotmasks without scanlies at all.
+        Type 0 allows you to configure strength and stagger.
+               The stagger height will be modulated by the scanline height.
+        Type 1 produces tinner slotmasks, but with fixed stagger.
+               The stagger height will be modulated by the scanline height.
+        Type 3 is fixed and produces heavier and thinner slotmasks without visible scanlines.
     Slotmask strength
         The strenght of the slotmask (available on type 1 and 2 only)
     . Offset
