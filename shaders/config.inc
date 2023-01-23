@@ -1,5 +1,5 @@
 	//Consider content interlaced if lines are more than this
-#define MIN_LINES_INTERLACED 38
+#define MIN_LINES_INTERLACED 80
 
 	//Sort of dithering used in vignette, spot, backlight leds
 #define NOISEPOWER ((params.OutputSize.z)*3)

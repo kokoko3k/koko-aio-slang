@@ -59,6 +59,7 @@ void main() {
             
             //Scanline period:
             vScanlinePeriod = 1.0;
+            vScanlinesAlternate = 0.0;
             if (bIs_Interlaced) {
                 if (params.FrameCount % 2 == 0.0) vScanlinesAlternate = 1.0;
                 if (params.OriginalSize.y > MIN_LINES_INTERLACED )  vScanlinePeriod = 0.5;
@@ -238,15 +239,15 @@ float scanline_shape(vec2 coords, bool do_slotmask, float lum) {
     
     if (!( is_interlaced && SCANLINE_DISABLE_ON_INTERLACE == 1.0 )) {
         
-        
+
         
         /*if (alternate)
-            lines = -sin(angle_base + HALF_PI); //lines = abs(cos(angle))
+            lines = -sin(angle_base + HALF_PI); 
                 else
             lines = sin(angle_base);
         */
         //Unbranched the previous if/then/else:
-            lines = vScanlinesAlternate * sin(angle_base + (vScanlinesAlternate * HALF_PI)) ;
+            lines = (2*vScanlinesAlternate -1) * sin(angle_base + (vScanlinesAlternate * HALF_PI)) ;
          
         lines = (lines*lines);
     }
@@ -284,11 +285,13 @@ float scanline_shape(vec2 coords, bool do_slotmask, float lum) {
                 //Every "odd triple" column, it is also out of phase of HALF_PI
                 //Slotmask is multiplied by original scanline and thinner.
                 //Only strength parameter is taken into account.
-                if (odd_column)
+               if (odd_column)
                     phase = period * pi + QUARTER_PI * lum_scaled;
                         else
                     phase = period * HALF_PI + QUARTER_PI;
 
+                
+//                phase = period * mix(HALF_PI + QUARTER_PI, pi + QUARTER_PI * lum_scaled, float(odd_column));
 
                 float angle_slotmask = angle_base + phase;
                 float slotmask = sin(angle_slotmask);
