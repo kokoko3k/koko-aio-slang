@@ -152,6 +152,20 @@ void debug() {
 
 
 void main() {
+   
+  /*    vec4 pixel_debug=texture(Source,vTexCoord);
+      float mymod =  int(mod(vTexCoord.y * params.OutputSize.y , 2.0 )) ;
+      if (mymod != 0.0)
+         pixel_debug *= 1.0;
+            else
+         pixel_debug *= 0.0;
+   
+   
+      FragColor = pixel_debug;
+      return;
+   */
+   
+   
    //debug(); return;
 
    /* since flickering code needs
@@ -162,6 +176,9 @@ void main() {
       and outside id when we dont.
    */
 
+   
+   
+   
    if (DO_SCANLINES == 0.0) {
       FragColor= vec4(pixel_no_flicker(vTexCoord),1.0);
       return;

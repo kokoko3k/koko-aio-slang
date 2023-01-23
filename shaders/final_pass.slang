@@ -17,8 +17,16 @@ layout(location = 1) out vec2 vOutputCoord;
 layout(location = 2) out vec2 spot_offset;
 layout(location = 3) out vec2 vFragCoord;
 layout(location = 4) out float vIsRotated;
-layout(location = 5) out vec2 vWarp_vexp;
-layout(location = 6) out vec2 vWarp_arg2;
+
+//Curvature:
+    layout(location = 5) out vec2 vWarp_vexp;
+    layout(location = 6) out vec2 vWarp_arg2;
+
+//Scanlines:
+    layout(location = 7) out float vIsInterlaced;
+    layout(location = 8) out float vFlickeringScanlines;
+    layout(location = 9) out float vScanlinePeriod;
+    layout(location = 10) out float vScanlinesAlternate;
 
 
 #include "includes/functions.include.slang"
@@ -42,6 +50,21 @@ void main() {
     //Precalc some Curvature/Warp values:
         vWarp_vexp = 1.0/ (1 + (vec2(GEOM_WARP_X, GEOM_WARP_Y) * 0.2)) ;
         vWarp_arg2 = 1.0 - pow(vec2(0.29289321881345247559915563789515), vWarp_vexp );
+        
+    //Help scanline code too:
+        if (DO_SCANLINES > 0.5) {
+            bool bIs_Interlaced = is_interlaced();
+            vIsInterlaced = float(bIs_Interlaced);
+            vFlickeringScanlines = float((DO_SCANLINES == 1.0) && scanline_have_to_flicker(bIs_Interlaced)) ;
+            
+            //Scanline period:
+            vScanlinePeriod = 1.0;
+            if (bIs_Interlaced) {
+                if (params.FrameCount % 2 == 0.0) vScanlinesAlternate = 1.0;
+                if (params.OriginalSize.y > MIN_LINES_INTERLACED )  vScanlinePeriod = 0.5;
+            }
+        }
+
 }
 
 
@@ -53,6 +76,10 @@ layout(location = 3) in vec2 vFragCoord;
 layout(location = 4) in float vIsRotated;
 layout(location = 5) in vec2 vWarp_vexp;
 layout(location = 6) in vec2 vWarp_arg2;
+layout(location = 7) in float vIsInterlaced;
+layout(location = 8) in float vFlickeringScanlines;
+layout(location = 9) in float vScanlinePeriod;
+layout(location = 10) in float vScanlinesAlternate;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -200,22 +227,21 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
 
 
 
-float scanline_shape(vec2 coords, bool do_flicker, bool is_interlaced, bool do_slotmask, float lum) {
+float scanline_shape(vec2 coords, bool do_slotmask, float lum) {
 /* Produces a B/W scanline shape to be multiplicated by the source
  * pixel later on to emulate scanline effect.
  * scanlines can be drawn on odd and even fields alternating on odd and
  * even frames to emulate that aspect of interlacing.
  */
 
+    float period = vScanlinePeriod;
+    bool is_interlaced = bool(vIsInterlaced);
+    bool alternate = bool(vScanlinesAlternate);
+    bool do_flicker = bool(vFlickeringScanlines);
+
     //...to scale scanline tickness:
         float lum_scaled = scale_to_range(lum,SCANLINE_MIN+eps,1.0);
 
-    bool alternate = false;
-    float period = 1.0;
-    if (do_flicker) {
-        if (params.FrameCount % 2 == 0.0) alternate = true;
-        if (params.OriginalSize.y > MIN_LINES_INTERLACED )  period = 0.5;
-    }
 
     float angle_base = coords.y * pi * params.OriginalSize.y * period;
 
@@ -286,13 +312,8 @@ float scanline_shape(vec2 coords, bool do_flicker, bool is_interlaced, bool do_s
                 }
             }
 
-
-
         }
     }
-
-
-
 
 
     if (SCANLINE_DARK >= 0.0) {
@@ -304,8 +325,8 @@ float scanline_shape(vec2 coords, bool do_flicker, bool is_interlaced, bool do_s
 
 
     //Thickness (min):
-        //lines = pow(lines,  (   1/(lum_scaled+eps)       )          );
-        lines = pow(lines,  (   1/(sqrt(lum_scaled)    )       )          );
+        //lines = pow(lines, 1/(lum_scaled+eps) );
+        lines = pow(lines, 1/(sqrt(lum_scaled) ) );
 
     //Thickness (max):
         /*
@@ -323,13 +344,13 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
     if (bBorder_needed)
         if (vTexCoord.x < 0.0 || vTexCoord.x > 1.0 || vTexCoord.y < 0.0 || vTexCoord.y > 1.0) return vec4(0.0);
 
-    bool isinterlaced = is_interlaced();
-    bool flickering_scanlines = (DO_SCANLINES == 1.0) && scanline_have_to_flicker(isinterlaced) ;
-
     vec3 pixel_in;
     vec3 pixel_glowed;
 
     //Get the first available pixel_in:
+    //vec2 off=vec2(0.0,+ global.first_passSize.w*0.5); needed
+    //To be added to the following coords and to halo coords (FIXME: WHY?)
+    //if drawing scanlines on first pass too)
     if  (DO_IN_GLOW == 1.0) {
             pixel_glowed = texture(in_glow_pass,coords).rgb;
             pixel_in = pixel_glowed; }
@@ -401,27 +422,15 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
             pixel_out = pow(pixel_out,vec3(mypow));
         }
         
-        //The following should be theoretically more correct, but it produces moiree:
-/*         vec3 vscanline_shape = scanline_shape(coords, flickering_scanlines, isinterlaced,  SCANLINE_SM_TYPE > 0.0 ) + 
-                               (pixel_bleed * SCANLINES_BLEEDING);
-         vscanline_shape = min(vscanline_shape,1.0);
-         pixel_out = vscanline_shape * pixel_out;
-*/        
-        
         //Obtain the scanlines screen by multiplying the scanline shape by the pixel color.
         //and emulate the bleeding of the color over the dark part of the scanlined screen.
-        //float scanline_shape = scanline_shape(coords, flickering_scanlines, isinterlaced,  SCANLINE_SM_TYPE > 0.0 );     
+        //float scanline_shape = scanline_shape(coords, SCANLINE_SM_TYPE > 0.0 );     
             float lum = max(max(pixel_out.r, pixel_out.g), pixel_out.b);
-            float scanline_shape = scanline_shape(coords, flickering_scanlines, isinterlaced,  SCANLINE_SM_TYPE > 0.0, lum );
-        
-        //Modify scanline weight?
-            //float l = max(max(pixel_bleed.r, pixel_bleed.g), pixel_bleed.b);
-            //scanline_shape = min(pow(scanline_shape, 1/l), 1.0);
+            float scanline_shape = scanline_shape(coords, SCANLINE_SM_TYPE > 0.0, lum );
+            
             
             pixel_out = pixel_out * ( scanline_shape + ( pixel_bleed * SCANLINES_BLEEDING * ( 1 - scanline_shape ) ));
-      
 
-        
     }
 
     
