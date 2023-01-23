@@ -173,17 +173,6 @@ vec3 pixel_vmask_gm(vec3 source, vec3 white_reference, float over_white) {
    return pixel_out;
 }
 
-
-
-/*bool drawit( float period, float off, vec2 coords){    
-    coords = vTexCoord; 
-    float first_pass_size_y = global.first_passSize.y * period;   
-    float current_line_int = floor(coords.y * first_pass_size_y) + off ;
-    float screenline_height = first_pass_size_y/params.OutputSize.y;//; params.OutputSize.y/first_pass_size_y;
-    return (coords.y * first_pass_size_y  > current_line_int) &&  
-           (coords.y * first_pass_size_y  < current_line_int+screenline_height) ; 
-}*/
-
 vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
                      float do_offset, vec3 white_reference,float over_white, vec2 coords) {
     /* "darklines" are vertical gaps that can be used to emulate aperturegrille
@@ -246,12 +235,20 @@ float scanline_shape(vec2 coords, bool do_slotmask, float lum) {
     float angle_base = coords.y * pi * params.OriginalSize.y * period;
 
     float lines = 1.0;
+    
     if (!( is_interlaced && SCANLINE_DISABLE_ON_INTERLACE == 1.0 )) {
-        if (alternate)
+        
+        
+        
+        /*if (alternate)
             lines = -sin(angle_base + HALF_PI); //lines = abs(cos(angle))
                 else
             lines = sin(angle_base);
-            lines = (lines*lines);
+        */
+        //Unbranched the previous if/then/else:
+            lines = vScanlinesAlternate * sin(angle_base + (vScanlinesAlternate * HALF_PI)) ;
+         
+        lines = (lines*lines);
     }
 
 
