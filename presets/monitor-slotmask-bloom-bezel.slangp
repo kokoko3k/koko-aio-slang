@@ -26,5 +26,3 @@ DO_SPOT = "1.0"
 
 	AMBI_FALLOFF = "0.6"
 	AMBI_POWER = "2.0"
-
-        DARKLINES_PERIOD = "2.0"
