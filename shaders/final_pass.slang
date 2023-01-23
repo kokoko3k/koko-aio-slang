@@ -232,14 +232,11 @@ float scanline_shape(vec2 coords, bool do_slotmask, float lum) {
     //...to scale scanline tickness:
         float lum_scaled = scale_to_range(lum,SCANLINE_MIN+eps,1.0);
 
-
     float angle_base = coords.y * pi * params.OriginalSize.y * period;
 
     float lines = 1.0;
     
     if (!( is_interlaced && SCANLINE_DISABLE_ON_INTERLACE == 1.0 )) {
-        
-
         
         /*if (alternate)
             lines = -sin(angle_base + HALF_PI); 
@@ -247,7 +244,7 @@ float scanline_shape(vec2 coords, bool do_slotmask, float lum) {
             lines = sin(angle_base);
         */
         //Unbranched the previous if/then/else:
-            lines = (2*vScanlinesAlternate -1) * sin(angle_base + (vScanlinesAlternate * HALF_PI)) ;
+        lines = (2*vScanlinesAlternate -1) * sin(angle_base + (vScanlinesAlternate * HALF_PI)) ;
          
         lines = (lines*lines);
     }
@@ -308,19 +305,10 @@ float scanline_shape(vec2 coords, bool do_slotmask, float lum) {
                     lines = slotmask;
                 }
             }
-
         }
     }
 
-
-    if (SCANLINE_DARK >= 0.0) {
-        lines = lines * (1.0 - SCANLINE_DARK) + SCANLINE_DARK;
-    } else {
-        float deepness = -SCANLINE_DARK;
-        lines = lines * ((1-SCANLINE_DARK) ) + SCANLINE_DARK ;
-    }
-
-
+ 
     //Thickness (min):
         //lines = pow(lines, 1/(lum_scaled+eps) );
         lines = pow(lines, 1/(sqrt(lum_scaled) ) );
@@ -331,7 +319,8 @@ float scanline_shape(vec2 coords, bool do_slotmask, float lum) {
             float clamp_start=0.2;
             if (lum_scaled>clamp_start) lines = clamp(lines,(lum_scaled-clamp_start)/(1-clamp_start) ,1.0); //FIXME use step?
         */
-
+        
+    lines = lines * ((1-SCANLINE_DARK) ) + SCANLINE_DARK ;
     return lines;
 }
 
