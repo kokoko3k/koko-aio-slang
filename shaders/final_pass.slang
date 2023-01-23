@@ -290,9 +290,6 @@ float scanline_shape(vec2 coords, bool do_slotmask, float lum) {
                         else
                     phase = period * HALF_PI + QUARTER_PI;
 
-                
-//                phase = period * mix(HALF_PI + QUARTER_PI, pi + QUARTER_PI * lum_scaled, float(odd_column));
-
                 float angle_slotmask = angle_base + phase;
                 float slotmask = sin(angle_slotmask);
                 slotmask = slotmask*slotmask; slotmask = slotmask*slotmask; // eleva alla 4 per renderla sottile. valori maggiori producono moiree.
