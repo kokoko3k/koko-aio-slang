@@ -287,5 +287,39 @@ float random(float power, vec2 seed) {
 		return scale_coord;
 	}
 	
+//Blur/Glow
+	vec3 glow_dumb(sampler2D in_texture, float glow_power, float gamma, vec2 coords) {
+		return pow( texture(in_texture, coords).rgb, vec3(gamma) ) * glow_power;
+	}
 
+	vec3 glow9_x(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_x, float glow_power) {
+	//sharpness_x = sharpness_x * 6 / scalemod_xy; // <-- Make it not dependant on the input resolution.
+	sharpness_x /= new_scalemod_x;
 
+	vec2 resolution = sourcesize * sharpness_x;
+	vec3 color = vec3(0.0);
+	vec2 off1 = vec2(1.3846153846, 0.0) ;
+	vec2 off2 = vec2(3.2307692308, 0.0) ;
+	color += texture(image, uv).rgb                       * 0.2270270270;
+	color += texture(image, uv + (off1 / resolution)).rgb * 0.3162162162;
+	color += texture(image, uv - (off1 / resolution)).rgb * 0.3162162162;
+	color += texture(image, uv + (off2 / resolution)).rgb * 0.0702702703;
+	color += texture(image, uv - (off2 / resolution)).rgb * 0.0702702703;
+	return color * glow_power;
+	}
+
+	vec3 glow9_y(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_y, float glow_power) {
+	//sharpness_y = sharpness_y * 6 / scalemod_xy ;// <-- Make it not dependant on the input resolution.
+	sharpness_y /= new_scalemod_y;
+
+	vec2 resolution = sourcesize * sharpness_y;
+	vec3 color = vec3(0.0);
+	vec2 off1 = vec2(0.0, 1.3846153846) ;
+	vec2 off2 = vec2(0.0, 3.2307692308) ;
+	color += texture(image, uv).rgb                       * 0.2270270270;
+	color += texture(image, uv + (off1 / resolution)).rgb * 0.3162162162;
+	color += texture(image, uv - (off1 / resolution)).rgb * 0.3162162162;
+	color += texture(image, uv + (off2 / resolution)).rgb * 0.0702702703;
+	color += texture(image, uv - (off2 / resolution)).rgb * 0.0702702703;
+	return color * glow_power;
+	}

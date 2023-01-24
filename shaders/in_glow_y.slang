@@ -19,13 +19,11 @@ layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 3) uniform sampler2D FXAA_pass;
 layout(set = 0, binding = 4) uniform sampler2D first_pass;
 layout(set = 0, binding = 5) uniform sampler2D shift_and_bleed_pass;
+layout(set = 0, binding = 6) uniform sampler2D Source;
 
 
-// Blur sizes must not depend on input resolution
-#define scalemod_x (params.OutputSize.x/360.0)
-#define scalemod_y (params.OutputSize.y/270.0)
 
-#include "includes/pixel_glows.include.slang" 
+#include "includes/functions.include.slang" 
 
 
 
@@ -78,6 +76,8 @@ vec3 glow_blur_bias(sampler2D source_tex, vec2 co, vec3 pixel_glowed, float bias
     * FIXME: How to deal with this?
     */
 
+   //return vec3(glow_light);
+   
    vec3 proper_glow = glow_light * glow_light + pixel_source;
 
    return mix(proper_glow, pixel_glowed, max(0.0, bias));   
@@ -94,33 +94,26 @@ vec3 glow_blur_bias(sampler2D source_tex, vec2 co, vec3 pixel_glowed, float bias
 
 
 void main() { 
- 
-   
-   
    if (DO_IN_GLOW == 0.0) return;
    
-   vec3 pixel_glowed;
-   if ( DO_SHIFT_RGB + DO_SAT_BLEED > 0.0) {
-      pixel_glowed = pixel_glow(shift_and_bleed_pass, IN_GLOW_W, IN_GLOW_H, IN_GLOW_POWER, IN_GLOW_GAMMA, vTexCoord, params.OutputSize, params.OutputSize).rgb;
-       if (IN_GLOW_BIAS < IN_GLOW_BIAS_MAX && (IN_GLOW_W < GLOW_SHARP_MAX || IN_GLOW_H < GLOW_SHARP_MAX) )
-          pixel_glowed = glow_blur_bias(shift_and_bleed_pass, vTexCoord, pixel_glowed, IN_GLOW_BIAS);
-      
-      }
-   else if (DO_FXAA > 0.0) {
-      pixel_glowed = pixel_glow(FXAA_pass, IN_GLOW_W, IN_GLOW_H, IN_GLOW_POWER, IN_GLOW_GAMMA, vTexCoord, params.OutputSize, params.OutputSize).rgb;
-       if (IN_GLOW_BIAS < IN_GLOW_BIAS_MAX &&  (IN_GLOW_W < GLOW_SHARP_MAX || IN_GLOW_H < GLOW_SHARP_MAX) )
-          pixel_glowed = glow_blur_bias(FXAA_pass, vTexCoord, pixel_glowed, IN_GLOW_BIAS);
-      
-   }
-   else {
-      pixel_glowed = pixel_glow(first_pass, IN_GLOW_W, IN_GLOW_H, IN_GLOW_POWER, IN_GLOW_GAMMA, vTexCoord, params.OutputSize, params.OutputSize).rgb;
-      if (IN_GLOW_BIAS < IN_GLOW_BIAS_MAX &&  (IN_GLOW_W < GLOW_SHARP_MAX || IN_GLOW_H < GLOW_SHARP_MAX) )
-          pixel_glowed = glow_blur_bias(first_pass, vTexCoord, pixel_glowed, IN_GLOW_BIAS);
-      
+   //apply just gamma and power for tighter blurs and exit:
+   if (IN_GLOW_W >= GLOW_SHARP_MAX && IN_GLOW_H >= GLOW_SHARP_MAX) {
+      FragColor = vec4( glow_dumb(Source, IN_GLOW_POWER, IN_GLOW_GAMMA, vTexCoord), 1.0);
+      return;
    }
 
+   vec3 pixel_glowed = texture(Source, vTexCoord).rgb;
+   pixel_glowed = glow9_y(Source, vTexCoord, params.SourceSize.xy, IN_GLOW_H, IN_GLOW_POWER);
+      
+   if (IN_GLOW_BIAS < IN_GLOW_BIAS_MAX && (IN_GLOW_W < GLOW_SHARP_MAX || IN_GLOW_H < GLOW_SHARP_MAX) ) {
+      if ( DO_SHIFT_RGB + DO_SAT_BLEED > 0.0)
+         pixel_glowed = glow_blur_bias(shift_and_bleed_pass, vTexCoord, pixel_glowed, IN_GLOW_BIAS);
+      else if (DO_FXAA > 0.0)
+         pixel_glowed = glow_blur_bias(FXAA_pass, vTexCoord, pixel_glowed, IN_GLOW_BIAS);
+      else
+         pixel_glowed = glow_blur_bias(first_pass, vTexCoord, pixel_glowed, IN_GLOW_BIAS);
+   }
 
-
-   FragColor = vec4((pixel_glowed),1.0);
+   FragColor = vec4(pixel_glowed,1.0);
 }
 

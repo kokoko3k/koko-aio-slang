@@ -36,6 +36,10 @@
 	//of IN_GLOW_BIAS
 #define IN_GLOW_BIAS_MAX 1.0
 
+	//Try to keep blur sizes consistent across input resolutions
+#define new_scalemod_x params.OriginalSize.x/360.0 / 2.2
+#define new_scalemod_y params.OriginalSize.y/270.0 / 2.2
+
 #define eps 1e-5
 #define pi 3.141592654
 #define TAU  6.28318530717958647693
