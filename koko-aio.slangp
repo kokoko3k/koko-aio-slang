@@ -215,14 +215,14 @@ float_framebuffer7 = true
 # The following 2 passes will blur the mirrored part of main pass
 #   to emulate bezel reflections.
    
-               shader9 = shaders/reflection_blur_h.slang
+               shader9 = shaders/reflection_blur_x.slang
                 alias9 = "reflected_blurred_pass1"
         filter_linear9 = true
            scale_type9 = source
                 scale9 = 1.0
             wrap_mode9 = "mirrored_repeat"
          
-               shader10 = shaders/reflection_blur_v.slang
+               shader10 = shaders/reflection_blur_y.slang
                 alias10 = "reflected_blurred_pass2"
         filter_linear10 = true
            scale_type10 = source

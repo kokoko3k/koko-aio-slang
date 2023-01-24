@@ -292,8 +292,7 @@ float random(float power, vec2 seed) {
 		return pow( texture(in_texture, coords).rgb, vec3(gamma) ) * glow_power;
 	}
 
-	vec3 glow9_x(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_x, float glow_power) {
-	//sharpness_x = sharpness_x * 6 / scalemod_xy; // <-- Make it not dependant on the input resolution.
+	vec3 blur9_x(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_x) {
 	sharpness_x /= new_scalemod_x;
 
 	vec2 resolution = sourcesize * sharpness_x;
@@ -305,11 +304,10 @@ float random(float power, vec2 seed) {
 	color += texture(image, uv - (off1 / resolution)).rgb * 0.3162162162;
 	color += texture(image, uv + (off2 / resolution)).rgb * 0.0702702703;
 	color += texture(image, uv - (off2 / resolution)).rgb * 0.0702702703;
-	return color * glow_power;
+	return color;
 	}
 
-	vec3 glow9_y(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_y, float glow_power) {
-	//sharpness_y = sharpness_y * 6 / scalemod_xy ;// <-- Make it not dependant on the input resolution.
+	vec3 blur9_y(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_y) {
 	sharpness_y /= new_scalemod_y;
 
 	vec2 resolution = sourcesize * sharpness_y;
@@ -321,5 +319,32 @@ float random(float power, vec2 seed) {
 	color += texture(image, uv - (off1 / resolution)).rgb * 0.3162162162;
 	color += texture(image, uv + (off2 / resolution)).rgb * 0.0702702703;
 	color += texture(image, uv - (off2 / resolution)).rgb * 0.0702702703;
-	return color * glow_power;
+	return color;
 	}
+
+	vec3 blur5_x(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_x, float lod) {
+	sharpness_x /= new_scalemod_x;
+
+	vec2 resolution = sourcesize * sharpness_x;
+	vec3 color = vec3(0.0);
+	vec2 off1 = vec2(1.333333333333, 0.0) ;
+	color += textureLod(image, uv, lod).rgb   * 0.29411764705882354;
+	color += textureLod(image, uv + (off1 / resolution), lod).rgb   * 0.35294117647058826;
+	color += textureLod(image, uv - (off1 / resolution), lod).rgb   * 0.35294117647058826;
+	return color;
+	}
+	
+	vec3 blur5_y(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_y, float lod) {
+	sharpness_y /= new_scalemod_y;
+
+	vec2 resolution = sourcesize * sharpness_y;
+	vec3 color = vec3(0.0);
+	vec2 off1 = vec2(0.0, 1.333333333333) ;
+	color += textureLod(image, uv, lod).rgb   * 0.29411764705882354;
+	color += textureLod(image, uv + (off1 / resolution), lod).rgb   * 0.35294117647058826;
+	color += textureLod(image, uv - (off1 / resolution), lod).rgb   * 0.35294117647058826;
+	return color;
+	}
+	
+	
+	

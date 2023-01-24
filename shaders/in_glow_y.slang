@@ -103,7 +103,7 @@ void main() {
    }
 
    vec3 pixel_glowed = texture(Source, vTexCoord).rgb;
-   pixel_glowed = glow9_y(Source, vTexCoord, params.SourceSize.xy, IN_GLOW_H, IN_GLOW_POWER);
+   pixel_glowed = blur9_y(Source, vTexCoord, params.SourceSize.xy, IN_GLOW_H) * IN_GLOW_POWER;
       
    if (IN_GLOW_BIAS < IN_GLOW_BIAS_MAX && (IN_GLOW_W < GLOW_SHARP_MAX || IN_GLOW_H < GLOW_SHARP_MAX) ) {
       if ( DO_SHIFT_RGB + DO_SAT_BLEED > 0.0)

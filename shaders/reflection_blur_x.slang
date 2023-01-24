@@ -56,10 +56,19 @@ vec3 blur(float Quality, float Directions, float Size, vec2 co,float lod) {
         }
     }
     color /= steps;
-    
     if ( steps > 4.0) return vec3(1.0);
-    
     return color;
+}
+
+
+vec3 blur_unroll(float Size, vec2 co,float lod) {  
+    vec3 color;
+    vec2 d = SourceTextureSize.zw * Size;
+    color =  textureLod( SourceTexture, co + d * vec2(-1.0,  1.0 )  ,lod).rgb ;
+    color += textureLod( SourceTexture, co + d * vec2( 1.0,  1.0 )  ,lod).rgb ;
+    color += textureLod( SourceTexture, co + d * vec2(-1.0,  -1.0 ) ,lod).rgb ;
+    color += textureLod( SourceTexture, co + d * vec2( 1.0,  -1.0 ) ,lod).rgb ;
+    return color / 4.0;
 }
 
 void main() {
@@ -73,12 +82,13 @@ void main() {
    //coords_curved = zoomout_coords(coords_curved, -BEZEL_INNER_ZOOM , 1.0);
    coords_curved = zoomout_coords(coords_curved, BEZEL_REFLECTION_AREA_SIZE , 1.0);
    
-   bool is_rotated = texture(isrotated_passFeedback,vec2(0.5,0.5)).r > 0.5;
+   
 
    
    /* Calculate the internal area (the one which is not mirrored)
       so that we can skip blurring it:
    */
+   //bool is_rotated = texture(isrotated_passFeedback,vec2(0.5,0.5)).r > 0.5;
    /*       vec2 ar_box;
             if (!is_rotated) {
                //Width of the aspect corrected box zoomed as requested by the bezel settings:                                  
@@ -99,13 +109,13 @@ void main() {
          //bool skip_condition =(vTexCoord.x > start_point.x  && vTexCoord.x < end_point.x &&
    //                           vTexCoord.y > start_point.y && vTexCoord.y < end_point.y) ||
    //                           is_outer_frame(texture(main_pass,vTexCoord));
-
+   //FIXME (CHECKME) is the rotation state still important?
    */
 
-   //FIXME (CHECKME) is the rotation state still important?
+
 
    bool skip_condition = (coords_curved.x < 1.0 - c_tolerance && coords_curved.x > c_tolerance && 
-                        coords_curved.y < 1.0 - c_tolerance && coords_curved.y > c_tolerance ) ;
+                          coords_curved.y < 1.0 - c_tolerance && coords_curved.y > c_tolerance ) ;
 
    if (skip_condition) {
       FragColor = mark_useless(vec3(0.0));
@@ -115,7 +125,10 @@ void main() {
    vec2 res = vec2(global.first_passSize.x, global.first_passSize.y);
    vec2 dir = vec2(1.0,0.0);
    ///Quality, Directions, Size, coords, lod
-   vec3 pixel_blur = blur(1,4,2,coords_curved, 2.0);
+   
+   vec3 pixel_blur;
+   pixel_blur = blur(1,4,2,coords_curved, 2.0);
+   //pixel_blur = blur_unroll(1.5,coords_curved, 2.0);
    
    FragColor = vec4(apply_fuzzy_main_pass(pixel_blur),1.0);
 
