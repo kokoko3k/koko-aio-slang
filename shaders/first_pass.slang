@@ -166,7 +166,7 @@ void main() {
    
    
       FragColor = pixel_debug;
-      return;/*
+      return;*/
    
    
    
@@ -182,21 +182,21 @@ void main() {
 
    
    
+   vec3 pixel_out;
+   if (DO_SCANLINES == 0.0)
+      pixel_out = pixel_no_flicker(vTexCoord);
    
-   if (DO_SCANLINES == 0.0) {
-      FragColor= vec4(pixel_no_flicker(vTexCoord),1.0);
-      return;
-   }
-
-   //Implicit else: DO_SCANLINES == 1.0
-   if (scanline_have_to_flicker(is_interlaced())) {
-      FragColor = vec4(pixel_flickering(),1.0);
-      return;
-   }
-
+   else if (scanline_have_to_flicker(is_interlaced()))
+      pixel_out = pixel_flickering();
+   else
    //Implicit else: DO_SCANLINES == 1.0 but no flickering needed.
-   FragColor = vec4(pixel_no_flicker(vTexCoord),1.0);
+   pixel_out = pixel_no_flicker(vTexCoord);
 
+   
+   //vec3 noise = vec3(random(1.0, vTexCoord * params.FrameCount));
+   //pixel_out += noise * 0.21;
+   
+   FragColor = vec4(pixel_out, 1.0);
 }
 
 

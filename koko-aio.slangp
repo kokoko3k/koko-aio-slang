@@ -1,8 +1,12 @@
 # TODO:
 #    Guess more aspect ratios: edit. nope: Guessing is impossible..
 #    Update pipeline graph
-
-
+#       Use gauss blur for composite color bleeding?
+#       Vignette and spot could be done earlier at lower res?
+#       rf noise
+#       check branching conditions in first_pass.slang
+#       random/noise function power: clamp or mul?
+#       Provide extra artwork on a separate repo
 
     
 # Performances:
