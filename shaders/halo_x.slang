@@ -16,8 +16,6 @@ void main() {
 #pragma stage fragment
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 0) out vec4 FragColor;
-layout(set = 0, binding = 2) uniform sampler2D FXAA_pass;
-layout(set = 0, binding = 3) uniform sampler2D first_pass;
 layout(set = 0, binding = 4) uniform sampler2D in_glow_pass;
 layout(set = 0, binding = 5) uniform sampler2D shift_and_bleed_pass;
 
@@ -26,24 +24,23 @@ layout(set = 0, binding = 5) uniform sampler2D shift_and_bleed_pass;
 void main() {
     if (DO_HALO == 0.0 ) return;
 
+   //Pass the right texture unchanged for tighter blurs:
+   if (HALO_W >= GLOW_SHARP_MAX && HALO_H >= GLOW_SHARP_MAX) {
+        if (DO_IN_GLOW == 1.0)
+                FragColor = texture(in_glow_pass, vTexCoord);
+            else
+                FragColor = texture(shift_and_bleed_pass, vTexCoord);
+
+      return;
+   }
+    
     vec3 pixel_haloed;
-    //float pixel_in_alpha ;
     if (DO_IN_GLOW == 1.0) {
         pixel_haloed = blur9_x(in_glow_pass, vTexCoord, global.FXAA_passSize.xy, HALO_W);
-        //pixel_in_alpha = texture(in_glow_pass, vTexCoord).a;
-    }
-    else if ( DO_SHIFT_RGB + DO_SAT_BLEED > 0.0) {
-        pixel_haloed = blur9_x(shift_and_bleed_pass, vTexCoord, global.FXAA_passSize.xy, HALO_W);
-        //pixel_in_alpha = texture(shift_and_bleed_pass, vTexCoord).a;
-    }
-    else if (DO_FXAA > 0.0) {
-        pixel_haloed = blur9_x(FXAA_pass, vTexCoord, global.FXAA_passSize.xy, HALO_W);
-        //pixel_in_alpha = texture(FXAA_pass, vTexCoord).a;
     }
     else {
-        pixel_haloed = blur9_x(first_pass, vTexCoord, global.FXAA_passSize.xy, HALO_W);
-        //pixel_in_alpha = texture(first_pass, vTexCoord).a;
+        pixel_haloed = blur9_x(shift_and_bleed_pass, vTexCoord, global.FXAA_passSize.xy, HALO_W);
     }
-        
+    
     FragColor = vec4(pixel_haloed.rgb, 1.0);
 }

@@ -27,7 +27,7 @@ void main() {
    if (DO_IN_GLOW == 0.0) return;
    
    //Pass the right texture unchanged for tighter blurs:
-   if (IN_GLOW_W >= GLOW_SHARP_MAX || IN_GLOW_H >= GLOW_SHARP_MAX) {
+   if (IN_GLOW_W >= GLOW_SHARP_MAX && IN_GLOW_H >= GLOW_SHARP_MAX) {
       FragColor = texture(shift_and_bleed_pass, vTexCoord);
       return;
    }
