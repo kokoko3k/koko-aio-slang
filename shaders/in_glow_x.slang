@@ -5,19 +5,21 @@
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
+layout(location = 1) out float vIN_GLOW_W;
 
 void main() {
    gl_Position = global.MVP * Position;
    vTexCoord = TexCoord ;  
+   vIN_GLOW_W = IN_GLOW_W / NEW_SCALEMOD_X; //Make it resolution independent.
 }
 
 
 #pragma stage fragment
 
 layout(location = 0) in vec2 vTexCoord;
+layout(location = 1) in float vIN_GLOW_W;
 layout(location = 0) out vec4 FragColor;
-layout(set = 0, binding = 3) uniform sampler2D FXAA_pass;
-layout(set = 0, binding = 4) uniform sampler2D first_pass;
+
 layout(set = 0, binding = 5) uniform sampler2D shift_and_bleed_pass;
 
 
@@ -33,7 +35,7 @@ void main() {
    }
    
    vec3 pixel_glowed;
-   FragColor = vec4( blur9_x(shift_and_bleed_pass, vTexCoord, global.first_passSize.xy, IN_GLOW_W), 1.0);
+   FragColor = vec4( blur9_x(shift_and_bleed_pass, vTexCoord, global.first_passSize.xy, vIN_GLOW_W), 1.0);
 
 }
 

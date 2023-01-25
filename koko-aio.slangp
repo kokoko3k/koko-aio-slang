@@ -2,8 +2,7 @@
 #    Guess more aspect ratios: edit. nope: Guessing is impossible..
 #    Update pipeline graph
 
-#    Investigate the possible use of mipmapping in bloom function too.
-#    Try to move flickering scanlines into main, maybe by faking them with screenlines?
+
 
     
 # Performances:

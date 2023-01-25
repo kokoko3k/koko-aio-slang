@@ -37,8 +37,8 @@
 #define IN_GLOW_BIAS_MAX 1.0
 
 	//Try to keep blur sizes consistent across input resolutions
-#define new_scalemod_x params.OriginalSize.x/360.0 / 2.2
-#define new_scalemod_y params.OriginalSize.y/270.0 / 2.2
+#define NEW_SCALEMOD_X (params.OriginalSize.x/360.0 / 2.2)
+#define NEW_SCALEMOD_Y (params.OriginalSize.y/270.0 / 2.2)
 
 #define eps 1e-5
 #define pi 3.141592654
@@ -239,8 +239,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 // Input Blur / light glowing
 #pragma parameter DO_IN_GLOW               "★ Glow/Blur enable? ==>"	 					0.0	0.0 1.0 1.0
 #pragma parameter IN_GLOW_POWER            "        Input signal strength"					0.45 	0.0 5.0 0.05
-#pragma parameter IN_GLOW_W                "        Sharpness, horizontal"					2.5	0.4 7.0 0.05
-#pragma parameter IN_GLOW_H                "        Sharpness, vertical"					2.5	0.4 7.0 0.05
+#pragma parameter IN_GLOW_W                "        Sharpness, horizontal"					2.5	0.35 7.0 0.05
+#pragma parameter IN_GLOW_H                "        Sharpness, vertical"					2.5	0.35 7.0 0.05
 #pragma parameter IN_GLOW_GAMMA            "        Gamma, the higher, the less the glow on dark colors"	1.0 	1.0 10.0 0.1
 #pragma parameter IN_GLOW_AMOUNT           "        Light spread amount"					0.6 	0.0 4.0 0.05
 #pragma parameter IN_GLOW_BIAS             "        Glow to blur bias"					    	1.0     0.0 1.0 0.05 
@@ -266,8 +266,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 // Halo
 #pragma parameter DO_HALO       "★ Halo enable? ==>" 						0.0	0.0 1.0 1.0
 #pragma parameter HALO_POWER    "        Strength"						0.9 	0.0  5.0 0.025
-#pragma parameter HALO_W        "        Sharpness, horizontal"					1.75	0.4  7.0 0.05
-#pragma parameter HALO_H        "        Sharpness, Vertical"					1.75	0.4  7.0 0.05
+#pragma parameter HALO_W        "        Sharpness, horizontal"					1.75	0.35  7.0 0.05
+#pragma parameter HALO_H        "        Sharpness, Vertical"					1.75	0.35  7.0 0.05
 #pragma parameter HALO_GAMMA    "        Gamma, the higher, the less the halo on dark colors"	2.0 	1.0  10.0 0.1
 #pragma parameter HALO_VS_SCAN  "        Light up scanlines too"				0.0	0.0  1.0  0.1
 
