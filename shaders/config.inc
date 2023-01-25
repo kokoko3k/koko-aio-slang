@@ -242,7 +242,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter IN_GLOW_W                "        Sharpness, horizontal"					2.5	0.4 7.0 0.05
 #pragma parameter IN_GLOW_H                "        Sharpness, vertical"					2.5	0.4 7.0 0.05
 #pragma parameter IN_GLOW_GAMMA            "        Gamma, the higher, the less the glow on dark colors"	1.0 	1.0 10.0 0.1
-#pragma parameter IN_GLOW_AMOUNT           "        Light spread amount"					0.6 	0.0 2.0 0.05
+#pragma parameter IN_GLOW_AMOUNT           "        Light spread amount"					0.6 	0.0 4.0 0.05
 #pragma parameter IN_GLOW_BIAS             "        Glow to blur bias"					    	1.0     0.0 1.0 0.05 
 
 
