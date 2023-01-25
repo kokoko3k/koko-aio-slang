@@ -31,8 +31,9 @@ void main() {
       FragColor = vec4( glow_dumb(Source, HALO_POWER, HALO_GAMMA, vTexCoord), 1.0);
       return;
    }
-    
+
     pixel_haloed = blur9_y(Source, vTexCoord, global.first_passSize.xy, HALO_H) * HALO_POWER;
+    //pixel_haloed = blur9_y_alpha_aware(Source, vTexCoord, global.first_passSize.xy, HALO_H) * HALO_POWER;
     FragColor = vec4(pixel_haloed.rgb,1.0);
     
     

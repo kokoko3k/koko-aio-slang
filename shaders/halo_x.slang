@@ -27,16 +27,23 @@ void main() {
     if (DO_HALO == 0.0 ) return;
 
     vec3 pixel_haloed;
-
-    if (DO_IN_GLOW == 1.0)
+    //float pixel_in_alpha ;
+    if (DO_IN_GLOW == 1.0) {
         pixel_haloed = blur9_x(in_glow_pass, vTexCoord, global.FXAA_passSize.xy, HALO_W);
-    else if ( DO_SHIFT_RGB + DO_SAT_BLEED > 0.0)
+        //pixel_in_alpha = texture(in_glow_pass, vTexCoord).a;
+    }
+    else if ( DO_SHIFT_RGB + DO_SAT_BLEED > 0.0) {
         pixel_haloed = blur9_x(shift_and_bleed_pass, vTexCoord, global.FXAA_passSize.xy, HALO_W);
-    else if (DO_FXAA > 0.0)
+        //pixel_in_alpha = texture(shift_and_bleed_pass, vTexCoord).a;
+    }
+    else if (DO_FXAA > 0.0) {
         pixel_haloed = blur9_x(FXAA_pass, vTexCoord, global.FXAA_passSize.xy, HALO_W);
-    else
+        //pixel_in_alpha = texture(FXAA_pass, vTexCoord).a;
+    }
+    else {
         pixel_haloed = blur9_x(first_pass, vTexCoord, global.FXAA_passSize.xy, HALO_W);
+        //pixel_in_alpha = texture(first_pass, vTexCoord).a;
+    }
         
-    pixel_haloed = pow(pixel_haloed, vec3(HALO_GAMMA));
-    FragColor = vec4(pixel_haloed.rgb,1.0);
+    FragColor = vec4(pixel_haloed.rgb, 1.0);
 }

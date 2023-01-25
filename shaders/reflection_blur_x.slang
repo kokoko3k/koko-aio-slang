@@ -127,8 +127,8 @@ void main() {
    ///Quality, Directions, Size, coords, lod
    
    vec3 pixel_blur;
-   pixel_blur = blur(1,4,2,coords_curved, 2.0);
-   //pixel_blur = blur_unroll(1.5,coords_curved, 2.0);
+   //pixel_blur = blur(1,4,2,coords_curved, 2.0);
+   pixel_blur = blur_unroll(1.5,coords_curved, 2.0);
    
    FragColor = vec4(apply_fuzzy_main_pass(pixel_blur),1.0);
 

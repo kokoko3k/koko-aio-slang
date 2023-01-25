@@ -18,6 +18,7 @@ layout(location = 2) out vec2 spot_offset;
 layout(location = 3) out vec2 vFragCoord;
 layout(location = 4) out float vIsRotated;
 
+
 //Curvature:
     layout(location = 5) out vec2 vWarp_vexp;
     layout(location = 6) out vec2 vWarp_arg2;
@@ -27,7 +28,7 @@ layout(location = 4) out float vIsRotated;
     layout(location = 8) out float vFlickeringScanlines;
     layout(location = 9) out float vScanlinePeriod;
     layout(location = 10) out float vScanlinesAlternate;
-
+    //layout(location = 11) out float vScanlinePhase;
 
 #include "includes/functions.include.slang"
 
@@ -64,6 +65,8 @@ void main() {
                 if (params.FrameCount % 2 == 0.0) vScanlinesAlternate = 1.0;
                 if (params.OriginalSize.y > MIN_LINES_INTERLACED )  vScanlinePeriod = 0.5;
             }
+            //vScanlinePhase = 0.0;
+            //vScanlinePhase = vScanlinePeriod * pi - pi/4.0; //<-- needed to match scanlines done in first_pass. //FIXME check what happens for highter res.
         }
 
 }
@@ -81,7 +84,9 @@ layout(location = 7) in float vIsInterlaced;
 layout(location = 8) in float vFlickeringScanlines;
 layout(location = 9) in float vScanlinePeriod;
 layout(location = 10) in float vScanlinesAlternate;
+//layout(location = 11) in float vScanlinePhase;
 
+    
 layout(location = 0) out vec4 FragColor;
 
 
@@ -93,13 +98,9 @@ layout(set = 0, binding = 6)  uniform sampler2D monitor_body_straight;
 layout(set = 0, binding = 7)  uniform sampler2D monitor_body_curved;
 layout(set = 0, binding = 8)  uniform sampler2D bg_under;
 layout(set = 0, binding = 9)  uniform sampler2D bg_over;
-layout(set = 0, binding = 10)  uniform sampler2D first_pass;
-layout(set = 0, binding = 11) uniform sampler2D shift_and_bleed_pass;
-
-//Ex main_pass layouts:
-    layout(set = 0, binding = 12) uniform sampler2D FXAA_pass;
-    layout(set = 0, binding = 13) uniform sampler2D in_glow_pass;
-    layout(set = 0, binding = 14) uniform sampler2D halo_pass;
+layout(set = 0, binding = 10) uniform sampler2D shift_and_bleed_pass;
+layout(set = 0, binding = 11) uniform sampler2D in_glow_pass;
+layout(set = 0, binding = 12) uniform sampler2D halo_pass;
 
 
 
@@ -232,7 +233,7 @@ float scanline_shape(vec2 coords, bool do_slotmask, float lum) {
     //...to scale scanline tickness:
         float lum_scaled = scale_to_range(lum,SCANLINE_MIN+eps,1.0);
 
-    float angle_base = coords.y * pi * params.OriginalSize.y * period;
+    float angle_base = coords.y * pi * params.OriginalSize.y * period;// + vScanlinePhase;
 
     float lines = 1.0;
     
@@ -339,13 +340,10 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
     //if drawing scanlines on first pass too)
     if  (DO_IN_GLOW == 1.0) {
             pixel_glowed = texture(in_glow_pass,coords).rgb;
-            pixel_in = pixel_glowed; }
-    else if ( DO_SHIFT_RGB + DO_SAT_BLEED > 0.0)
+            pixel_in = pixel_glowed; 
+    } else {
         pixel_in = texture(shift_and_bleed_pass,coords).rgb ;
-    else if (DO_FXAA > 0.0)
-        pixel_in = texture(FXAA_pass,coords).rgb ;
-    else
-        pixel_in = texture(first_pass,coords).rgb ;
+    }
 
 
     vec3 pixel_out = pixel_in;
@@ -712,7 +710,7 @@ void main() {
     //Luminosity dependant zoom
     if (DO_DYNZOOM == 1.0) {
         float zoomin = 1.0 + (texture(avglum_pass, vec2(0.25,0.25)    ).a/ DYNZOOM_FACTOR);
-        coords = zoom(coords, zoomin);
+//         coords = zoom(coords, zoomin);
     }
     
     //Curvature

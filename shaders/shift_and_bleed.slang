@@ -158,8 +158,9 @@ vec3 pixel_bleed(vec3 pixel_in, vec2 co, sampler2D in_texture, vec4 sourcesize2)
 
 }
 void main() {
-   if (DO_SHIFT_RGB + DO_SAT_BLEED == 0.0) return;
+   //if (DO_SHIFT_RGB + DO_SAT_BLEED == 0.0) return;
    
+   vec3 pixel_out;
    //Handle case where both are needed:
    //First shift the right source, then pass it to bleed function.
    if (DO_SHIFT_RGB + DO_SAT_BLEED > 1.0) {
@@ -171,30 +172,35 @@ void main() {
             pixel_out = pixel_bleed(pixel_out, vTexCoord, first_pass, global.first_passSize);
          }
       }
-      FragColor = vec4(pixel_out,0.0);
-      return;
-   }
-   
-   //Handle case where only color shifting is requested
-   if (DO_SHIFT_RGB > 0.0) {
-      vec3 pixel_out = pixel_offset_wrap(vTexCoord);
-      FragColor = vec4(pixel_out,0.0);
-      return;
-   }
-   
-   //Handle case where only chroma bleed is requested
-   if (DO_SAT_BLEED > 0.0) {      
-      vec3 pixel_out;
+   } else
+      //Handle case where only color shifting is requested
+      if (DO_SHIFT_RGB > 0.0) {
+         pixel_out = pixel_offset_wrap(vTexCoord);
+   } else 
+      if (DO_SAT_BLEED > 0.0) {      
+         //Handle case where only chroma bleed is requested
+         if ( DO_FXAA == 1.0)  {
+            pixel_out = texture(FXAA_pass, vTexCoord).rgb;
+            pixel_out = pixel_bleed(pixel_out, vTexCoord, FXAA_pass, global.FXAA_passSize);
+         } else {
+            pixel_out = texture(first_pass, vTexCoord).rgb;
+            pixel_out = pixel_bleed(pixel_out, vTexCoord, first_pass, global.first_passSize);
+         }
+   } else
+      //Passthrough
       if ( DO_FXAA == 1.0)  {
          pixel_out = texture(FXAA_pass, vTexCoord).rgb;
-         pixel_out = pixel_bleed(pixel_out, vTexCoord, FXAA_pass, global.FXAA_passSize);
       } else {
          pixel_out = texture(first_pass, vTexCoord).rgb;
-         pixel_out = pixel_bleed(pixel_out, vTexCoord, first_pass, global.first_passSize);
       }
-      FragColor = vec4(pixel_out,0.0);
-      return;
-   }
+
+   //pre-gamma if needed by glow or halo.
+   if (DO_IN_GLOW != 0.0) 
+      pixel_out = pow(pixel_out, vec3(IN_GLOW_GAMMA));
+         else if (DO_HALO != 0.0) 
+            pixel_out = pow(pixel_out, vec3(HALO_GAMMA));
    
 
+   FragColor = vec4(pixel_out,0.0);
+   return;
 }

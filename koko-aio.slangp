@@ -138,7 +138,9 @@ float_framebuffer1 = false
         wrap_mode2 = "mirrored_repeat"
 float_framebuffer2 = false
 
-
+# This pass emulates composite color bleeding and deconvergence
+# deconvergence should be applied in th final pass, but it is too heavy there.
+# This pass also apply the input gamma needed for halo or glow.
            shader3 = shaders/shift_and_bleed.slang
             alias3 = "shift_and_bleed_pass"
     filter_linear3 = true
