@@ -164,7 +164,7 @@ void main() {
    //Handle case where both are needed:
    //First shift the right source, then pass it to bleed function.
    if (DO_SHIFT_RGB + DO_SAT_BLEED > 1.0) {
-      vec3 pixel_out = pixel_offset_wrap(vTexCoord);
+      pixel_out = pixel_offset_wrap(vTexCoord);
       if (DO_SAT_BLEED > 0.0) {      
          if ( DO_FXAA == 1.0)  {
             pixel_out = pixel_bleed(pixel_out, vTexCoord, FXAA_pass, global.FXAA_passSize);
