@@ -353,5 +353,20 @@ float random(float power, vec2 seed) {
 		return color;
 	}
 	
-	
-	
+	//smoothly shade x and y < 0.0, currently unused	
+	float blur_shade(vec2 co, float size) {
+		
+		float co_1D;	
+		(co.x < 0.0 || co.x > 1.0) ? co_1D = co.x : co_1D = co.y ;
+
+		float side_hi_switch = float(co_1D > 1.0);
+		float side_lo_switch = float(co_1D < 0.0);
+		
+		float smooth_min = 1.0 * side_hi_switch;
+		float smooth_max = smooth_min + ( 
+						( size * side_hi_switch) + 
+						(-size * side_lo_switch ) 
+						);	
+		
+		return smoothstep(smooth_min, smooth_max, co_1D);
+	}

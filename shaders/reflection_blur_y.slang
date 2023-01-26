@@ -66,9 +66,8 @@ void main() {
     vec2 dir = vec2(0.0,1.0);
     ///Quality, Directions, Size, coords
     //FragColor = vec4(blur(1,4,2,vTexCoord),1.0);
-    
+
     FragColor = vec4(blur_unroll(1.5,vTexCoord),1.0);
-    //FragColor = vec4(blur(1,4,1,vTexCoord),1.0);
 
 }
  

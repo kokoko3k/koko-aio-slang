@@ -749,5 +749,7 @@ void main() {
     //pixel_out = texture(reflected_blurred_pass2, vOutputCoord);
     FragColor = pixel_out;
     
+    //FragColor = vec4(blur_shade(vTexCoord) );
+    
     //FragColor = vec4(random(1.0, vTexCoord * params.FrameCount));
 }

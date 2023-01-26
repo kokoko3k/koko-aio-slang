@@ -80,7 +80,7 @@ void main() {
             coords_curved = Warp_fast(coords_curved, vWarp_vexp, vWarp_arg2); //coords_curved = Warp(coords_curved,GEOM_WARP_X,GEOM_WARP_Y);
    }
    //coords_curved = zoomout_coords(coords_curved, -BEZEL_INNER_ZOOM , 1.0);
-   coords_curved = zoomout_coords(coords_curved, BEZEL_REFLECTION_AREA_SIZE , 1.0);
+   coords_curved = zoomout_coords(coords_curved, BEZEL_BORDER_SIZE , 1.0);
    
    
 
@@ -127,9 +127,9 @@ void main() {
    ///Quality, Directions, Size, coords, lod
    
    vec3 pixel_blur;
-   pixel_blur = blur(1,4,2,coords_curved, 2.0);
-   //pixel_blur = blur_unroll(1.5,coords_curved, 2.0);
-   //pixel_blur = texture(first_pass, coords_curved).rgb;
+   //pixel_blur = blur(1,4,2,coords_curved, 2.0);
+   pixel_blur = blur_unroll(1.5,coords_curved, 2.0);
+   
    FragColor = vec4(apply_fuzzy_main_pass(pixel_blur),1.0);
 
 }

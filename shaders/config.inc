@@ -5,10 +5,10 @@
 #define NOISEPOWER 1/192.0
 //((params.OutputSize.z)*3)
 
-	//Bezel reflection area size in relation to the game frame
+	//Bezel border size in relation to the game frame
 	//Use the lowest possible value for best performance
 	//It is also used to compute wrap/repeated coordinates.
-#define BEZEL_REFLECTION_AREA_SIZE 0.175
+#define BEZEL_BORDER_SIZE 0.175
 
 	// 0.0-1.0: sensitivity to scene change (ambilike stuff), 0.0 changes more
 #define AMBI_SCENE_CHG_THRSHLD 0.07  
