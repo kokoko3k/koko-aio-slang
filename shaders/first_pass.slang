@@ -193,8 +193,10 @@ void main() {
    pixel_out = pixel_no_flicker(vTexCoord);
 
    
-   //vec3 noise = vec3(random(1.0, vTexCoord * params.FrameCount));
-   //pixel_out += noise * 0.21;
+   if (RF_NOISE_STRENGTH > 0.0) {
+      vec3 noise = vec3(random(RF_NOISE_STRENGTH, vTexCoord * params.FrameCount));
+      pixel_out += noise;
+   }
    
    FragColor = vec4(pixel_out, 1.0);
 }

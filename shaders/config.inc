@@ -195,6 +195,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float GLOBAL_OFFY;
 	float GLOBAL_SHZO;
 	
+	float RF_NOISE_STRENGTH;
+	
 } global;
 
 // Color correction
@@ -212,6 +214,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 // Apply an antialiasing filter via FXAA from Nvidia.
 #pragma parameter DO_FXAA "★ FXAA enable? ==>"	0.0 	0.0 1.0 1.0
 
+
+
 // NTSC color artifacting
 #pragma parameter DO_NTSC_ARTIFACTS "★ CVBS: NTSC color artifacts enable? ==>"	0.0 	0.0 1.0 1.0
 #pragma parameter NTSC_FILTER_WIDTH "        Filter width"			17.0	5.0 21.0 4.0
@@ -221,6 +225,9 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 //#pragma parameter NTSC_DOT_CRAWL    "        Dot Crawl"			1.0	0.0 1.0  1.0
 #pragma parameter NTSC_MIX          "        Strength"				0.5	0.0 3.0  0.05
 
+#pragma parameter label_rfnoise	 "★ RF Noise "							0.0  0.0  1.0     1.0
+#pragma parameter RF_NOISE_STRENGTH "        Strength"				0.0 	0.0 1.0 0.01
+
 // YIQ/YUV bandwidth limited chroma bleeding and NTSC color artifacts.
 #pragma parameter DO_SAT_BLEED "★ CVBS: Bandwidth limited chroma enable? ==>"	0.0 	0.0 1.0 1.0
 #pragma parameter SAT_BLEED_PAL           "        Use PAL colorspace, not NTSC"	0.0 	 0.0 1.0 1.0
@@ -229,12 +236,15 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter SAT_BLEED_SIZE_RIGHT    "        Size Right"				5.0 	 1.0 40.0  1.0
 #pragma parameter SAT_BLEED_FALLOFF  	  "        Falloff"				1.7 	 1.0 2.0 0.01
 
+
+
 //Offset RGB
 #pragma parameter DO_SHIFT_RGB       "★ RGB deconvergence enable? (bad with FXAA) ==>"	0.0	 0.0 1.0 1.0
 #pragma parameter OFFSET_STRENGTH "        Strength"			0.3 	 0.0 1.0 0.05
 #pragma parameter SHIFT_R         "        Red offset"			-40.0 	-210.0 189.0 1
 #pragma parameter SHIFT_G         "        Green offset"		40.0 	-210.0 189.0 1
 #pragma parameter SHIFT_B         "        Blue offset"			3.0 	-210.0 189.0 1
+
 
 
 // Input Blur / light glowing
@@ -323,11 +333,15 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BEZEL_IMAGE_BORDER "        Image border"		1.01   1.0 1.2 0.01
 #pragma parameter BEZEL_REFL_ZOOM    "        Reflections zoom"		0.955   0.0 2.0 0.005
 
+
+
 //Global Zoom/Offset
 #pragma parameter GLOBAL_SHZO	 "★ Global shift/zoom"				0.0   0.0  1.0 	  1.0
 #pragma parameter GLOBAL_OFFX	 "        X axis shift "			0.0  -1.0  1.0    0.0005
 #pragma parameter GLOBAL_OFFY	 "        Y axis shift "			0.0  -1.0  1.0    0.0005
 #pragma parameter GLOBAL_ZOOM	 "        Zoom"					2.0   0.0  3.0    0.0005
+
+
 
 //Background Image
 #pragma parameter DO_BG_IMAGE	 "★ Backgound image enable? ==>"			0.0  0.0  1.0     1.0
@@ -534,3 +548,5 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #define GLOBAL_OFFX      global.GLOBAL_OFFX
 #define GLOBAL_OFFY      global.GLOBAL_OFFY
 #define GLOBAL_SHZO      global.GLOBAL_SHZO
+
+#define RF_NOISE_STRENGTH global.RF_NOISE_STRENGTH
