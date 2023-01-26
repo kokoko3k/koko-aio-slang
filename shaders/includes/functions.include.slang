@@ -109,9 +109,10 @@ float random(float power, vec2 seed) {
     float dt = dot(seed.xy, vec2(RND_A, RND_B));
     float sn = mod(dt,3.14);
 
-    float noise_out = fract(sin(sn) * RND_C) - 0.5;
-    noise_out = clamp(noise_out, -power, power);
-    return noise_out ;
+    float noise_out = fract(sin(sn) * RND_C);
+    //noise_out = clamp(noise_out, -power, power);
+    noise_out = scale_to_range(noise_out, -power, power);
+    return noise_out;
 }
 
 

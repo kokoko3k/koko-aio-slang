@@ -2,7 +2,8 @@
 #define MIN_LINES_INTERLACED 380
 
 	//Sort of dithering used in vignette, spot, backlight leds
-#define NOISEPOWER ((params.OutputSize.z)*3)
+#define NOISEPOWER 1/192.0
+//((params.OutputSize.z)*3)
 
 	//Bezel reflection area size in relation to the game frame
 	//Use the lowest possible value for best performance
@@ -326,7 +327,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter GLOBAL_SHZO	 "★ Global shift/zoom"				0.0   0.0  1.0 	  1.0
 #pragma parameter GLOBAL_OFFX	 "        X axis shift "			0.0  -1.0  1.0    0.0005
 #pragma parameter GLOBAL_OFFY	 "        Y axis shift "			0.0  -1.0  1.0    0.0005
-#pragma parameter GLOBAL_ZOOM	 "        Zoom"					1.0   2.0  3.0    0.0005
+#pragma parameter GLOBAL_ZOOM	 "        Zoom"					2.0   0.0  3.0    0.0005
 
 //Background Image
 #pragma parameter DO_BG_IMAGE	 "★ Backgound image enable? ==>"			0.0  0.0  1.0     1.0

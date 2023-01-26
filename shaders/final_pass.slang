@@ -479,7 +479,7 @@ vec3 pixel_border(bool image_over) {
      */
     vec3 pixel_out = vec3(1.0);
     if (DO_AMBILIGHT == 1.0)
-        pixel_out =  texture(ambi_temporal_pass, vOutputCoord + global_noise ).rgb;
+        pixel_out =  texture(ambi_temporal_pass, vOutputCoord).rgb + vec3(global_noise);
     if (DO_BG_IMAGE == 1.0 && !image_over) {
         vec4 bg_image = pixel_background_image(false);
         pixel_out = mix(pixel_out,bg_image.rgb,bg_image.a);
@@ -636,7 +636,7 @@ vec4 pixel_inner_frame(vec2 coords, bool bBorder_needed) {
             if (DO_VIGNETTE == 1.0) {
                 float vignette;
                 float dist = length(vec2((coords.x-0.5)*in_aspect,coords.y-0.5));
-                vignette = smoothstep(V_SIZE,0.0,dist)*V_POWER+global_noise;
+                vignette = smoothstep(V_SIZE,0.0,dist)*V_POWER;
                 if (V_BYPASS < 1.0) pixel_out = vignette * clamp(pixel_out,0.0,1.0);
                     else
                 pixel_out = vec3(vignette);
@@ -645,11 +645,12 @@ vec4 pixel_inner_frame(vec2 coords, bool bBorder_needed) {
             if (DO_SPOT == 1.0) {
             float spot;
             float dist = length(vec2((coords.x-0.5)*in_aspect,coords.y-0.5)+spot_offset);
-            spot = smoothstep(S_SIZE,0.0,dist)*S_POWER+global_noise;
+            spot = smoothstep(S_SIZE,0.0,dist)*S_POWER;
             if (S_BYPASS < 1.0) pixel_out = spot + pixel_out;
                 else
             pixel_out = vec3(spot);
             }
+            pixel_out += global_noise;
         }
 
     //smooth border (edge)
@@ -747,4 +748,6 @@ void main() {
       
     //pixel_out = texture(reflected_blurred_pass2, vOutputCoord);
     FragColor = pixel_out;
+    
+    //FragColor = vec4(random(1.0, vTexCoord * params.FrameCount));
 }
