@@ -1,3 +1,38 @@
+/* There yoy have a chance to boost your FPS.
+ * 
+ * The more lines you edit, the more your FPS will be high.
+ * 
+ * Edit lines that way, eg:
+ * 
+ * #define SCANLINE_DARK	params.SCANLINE_DARK
+ * turns to:
+ * #define SCANLINE_DARK	0.2
+ * 
+ * or:
+ * #define DO_CCORRECTION	global.DO_CCORRECTION
+ * turns to
+ * #define DO_CCORRECTION	0.0
+ * 
+ * 
+ * ...that's it, you just need to copy the values from the
+ * preset you like to the right setting here.
+ * 
+ * The downside of using this method is that every setting
+ * you turn, will be static and you will not be able to
+ * modify it "on-the-fly" in retroarch.
+ * The only way to change that values will be edit this file
+ * again, so maybe doing multiple copies of this file
+ * or even of the whole koko-shader would be a good idea.
+ * 
+ * 
+ * I suggest you to start from the easy ones, the ones that
+ * starts with DO_****, like DO_SCANLINES.
+ * it takes a value = 0 or 1, where 0 means no, 1 means yes.
+ * 
+ * 
+ */
+
+
 
 #define DO_CCORRECTION	global.DO_CCORRECTION
 #define GAMMA_OUT	global.GAMMA_OUT
@@ -8,7 +43,9 @@
 #define TEMPERATURE	global.TEMPERATURE
 
 
+
 #define DO_FXAA	global.DO_FXAA
+
 
 
 #define DO_NTSC_ARTIFACTS	global.DO_NTSC_ARTIFACTS
@@ -17,6 +54,7 @@
 #define NTSC_FILTER_FC		global.NTSC_FILTER_FC
 #define NTSC_MIX		global.NTSC_MIX
 #define NTSC_PHASE_SHIFT	global.NTSC_PHASE_SHIFT
+
 
 
 #define RF_NOISE_STRENGTH	global.RF_NOISE_STRENGTH
@@ -31,11 +69,13 @@
 #define SAT_BLEED_PAL		global.SAT_BLEED_PAL
 
 
+
 #define DO_SHIFT_RGB		global.DO_SHIFT_RGB
 #define SHIFT_R			global.SHIFT_R
 #define SHIFT_G			global.SHIFT_G
 #define SHIFT_B			global.SHIFT_B
 #define OFFSET_STRENGTH		global.OFFSET_STRENGTH
+
 
 
 #define DO_IN_GLOW		global.DO_IN_GLOW
