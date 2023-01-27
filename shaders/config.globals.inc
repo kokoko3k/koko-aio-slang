@@ -4,19 +4,19 @@
  * 
  * Edit lines that way, eg:
  * 
- * #define SCANLINE_DARK	params.SCANLINE_DARK
- * turns to:
- * #define SCANLINE_DARK	0.2
+ * 	#define SCANLINE_DARK	params.SCANLINE_DARK
+ * 	turns to:
+ * 	#define SCANLINE_DARK	0.2
  * 
  * or:
- * #define DO_CCORRECTION	global.DO_CCORRECTION
- * turns to
- * #define DO_CCORRECTION	0.0
+ * 	#define DO_CCORRECTION	global.DO_CCORRECTION
+ * 	turns to
+ * 	#define DO_CCORRECTION	0.0
  * 
  * 
  * Since everything after "//" is ignored,
  * you can even do something like:
- * #define DO_CCORRECTION	0.0 //global.DO_CCORRECTION
+ * 	#define DO_CCORRECTION	0.0 //global.DO_CCORRECTION
  * 
  * 
  * ...that's it, you just need to copy the values from the
@@ -36,9 +36,9 @@
  * it takes a value = 0 or 1, where 0 means no, 1 means yes.
  * I repeat: if you always wants scanlines, just use:
  * 
- * #define DO_SCANLINES		1.0
- * instead of
- * #define #DO_SCANLINES	global.DO_SCANLINES
+ * 	#define DO_SCANLINES		1.0
+ * 	instead of
+ * 	#define #DO_SCANLINES	global.DO_SCANLINES
  * 
  * 
  * Also, take a copy of this (modified) file, because it would be overwritten by

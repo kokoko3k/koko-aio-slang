@@ -315,11 +315,11 @@ float scanline_shape(vec2 coords, bool do_slotmask, float lum) {
         lines = pow(lines, 1/(sqrt(lum_scaled) ) );
 
     //Thickness (max):
-        /*
-            lines = pow(abs(lines), 1/(10*lum_scaled*lum_scaled));
-            float clamp_start=0.2;
-            if (lum_scaled>clamp_start) lines = clamp(lines,(lum_scaled-clamp_start)/(1-clamp_start) ,1.0); //FIXME use step?
-        */
+        
+            //lines = pow(abs(lines), 1/(10*lum_scaled*lum_scaled));
+            //float clamp_start=0.2;
+            //if (lum_scaled>clamp_start) lines = clamp(lines,(lum_scaled-clamp_start)/(1-clamp_start) ,1.0); //FIXME use step?
+        
         
     lines = lines * ((1-SCANLINE_DARK) ) + SCANLINE_DARK ;
     return lines;
