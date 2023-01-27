@@ -73,7 +73,7 @@ vec3 ambi_pre_pass() {
     
     //Scale to the original aspect
     vec2 coords = get_scaled_coords(vTexCoord, global.FinalViewportSize, is_rotated);
-    if (GLOBAL_SHZO >0.5)
+    if (DO_GLOBAL_SHZO >0.5)
         coords = zoom(coords + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM );
     
     if (DO_BEZEL==1.0) coords = zoomout_coords(coords, -BEZEL_INNER_ZOOM , 1.0);

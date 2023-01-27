@@ -37,7 +37,7 @@ void main() {
     vIsRotated = float(is_rotated());
     vTexCoord = get_scaled_coords(TexCoord,global.FinalViewportSize, bool(vIsRotated) ) + vec2(0.00001);
     
-    if (GLOBAL_SHZO >0.5)
+    if (DO_GLOBAL_SHZO >0.5)
         vTexCoord = zoom(vTexCoord + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM );
     
     vOutputCoord = TexCoord;

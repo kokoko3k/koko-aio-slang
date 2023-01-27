@@ -110,13 +110,13 @@ vec3 pixel_offset_wrap (vec2 coord) {
 }
 
 
-
 vec3 pixel_bleed_side_NTSC(vec3 pixel_in, vec2 co, float size, float side, sampler2D in_texture, vec4 sourcesize2) {
    float w = SAT_BLEED_STRENGTH;
    vec3 blur_YIQ = pixel_in * mat3_RGB2YIQ;    //Work in YIQ space
    float i = 0.0;
    for ( i=1 ; i <= size ; i++ ){
-      w=w/SAT_BLEED_FALLOFF;
+       w=w/SAT_BLEED_FALLOFF;
+      //w = w * exp(i*i*(1-SAT_BLEED_FALLOFF)*0.1);
       //w=clamp(w,0.0,1.0);
       vec3 smp_YIQ = texture(first_pass, co - side * vec2(sourcesize2.z*i,0.0)).rgb * mat3_RGB2YIQ;
       blur_YIQ.x = mix(blur_YIQ.x, smp_YIQ.x, w/bandwidth_mhz_Y_ntsc);   // Blur Y
@@ -126,6 +126,7 @@ vec3 pixel_bleed_side_NTSC(vec3 pixel_in, vec2 co, float size, float side, sampl
    //blur_YIQ.z/=i;
    return vec3(blur_YIQ.x, blur_YIQ.y, blur_YIQ.z) * mat3_YIQ2RGB; //return to RGB colorspace
 }
+
 vec3 pixel_bleed_side_PAL(vec3 pixel_in, vec2 co, float size, float side, sampler2D in_texture, vec4 sourcesize2) {
    float w = SAT_BLEED_STRENGTH;
    vec3 blur_YUV = pixel_in * mat3_RGB2YUV;    //Work in YIQ space
