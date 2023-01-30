@@ -231,7 +231,8 @@ float scanline_shape(vec2 coords, bool do_slotmask, float lum) {
     bool do_flicker = bool(vFlickeringScanlines);
 
     //...to scale scanline tickness:
-        float lum_scaled = scale_to_range(lum,SCANLINE_MIN+eps,1.0);
+        //float lum_scaled = scale_to_range(lum,SCANLINE_MIN+eps,1.0);
+        float lum_scaled = scale_to_range(lum, SCANLINE_MIN, SCANLINE_MAX);
 
     float angle_base = coords.y * pi * params.OriginalSize.y * period;// + vScanlinePhase;
 
@@ -309,19 +310,38 @@ float scanline_shape(vec2 coords, bool do_slotmask, float lum) {
         }
     }
 
- 
+
     //Thickness (min):
         //lines = pow(lines, 1/(lum_scaled+eps) );
-        lines = pow(lines, 1/(sqrt(lum_scaled) ) );
+        //lines = pow(lines, 1/(sqrt(lum_scaled) ) );
+//lines = pow(lines, 1/(lum_scaled*lum_scaled+eps) );
+
+//lines = pow( lines , 1/(lum_scaled ) ) ;
+
+//0.0125 is an anti-moiree measure.
+
+lines = pow(   max(lines, 0.05),   1/lum_scaled) ;
+
+//lines = pow(lines, 1/(sqrt(lum_scaled) ) );
+
+        //float extra_power_1 = 3.0;
+        //lines = pow(clamp(lines + 0.05, 0.0,1.0) , 1/(sqrt(lum_scaled*lum_scaled*extra_power_1) ) ) * extra_power_1/2.0;
+
+
+        //lines = pow(clamp(lines + 0.05, 0.0,1.0) , 1/(lum_scaled*lum_scaled));
 
     //Thickness (max):
-        
+
             //lines = pow(abs(lines), 1/(10*lum_scaled*lum_scaled));
             //float clamp_start=0.2;
             //if (lum_scaled>clamp_start) lines = clamp(lines,(lum_scaled-clamp_start)/(1-clamp_start) ,1.0); //FIXME use step?
-        
-        
-    lines = lines * ((1-SCANLINE_DARK) ) + SCANLINE_DARK ;
+//min-max, ma difficile da gestire con la slotmask.
+//    float extra_power = 2.0;
+//    float m = mod(angle_base + (vScanlinesAlternate * HALF_PI), pi);
+//    lines = exp( -pow((m-(HALF_PI)),2) / ( lum*extra_power ) ) * extra_power;
+
+
+    lines = lines * (1-SCANLINE_DARK ) + SCANLINE_DARK ;
     return lines;
 }
 
@@ -414,6 +434,7 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
             
             
             pixel_out = pixel_out * ( scanline_shape + ( pixel_bleed * SCANLINES_BLEEDING * ( 1 - scanline_shape ) ));
+            //pixel_out *= scanline_shape;
 
     }
 

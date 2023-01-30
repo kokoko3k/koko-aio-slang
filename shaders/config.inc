@@ -129,6 +129,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float SCANLINE_SM_TYPE;
 	float SCANLINE_SM_VOFFSET;
 	float SCANLINE_MIN;
+	float SCANLINE_MAX;
 	float RGB_MASK_STRENGTH;
 	float DARKLINES_STRENGTH;
 	float GAMMA_OUT ; //1
@@ -286,7 +287,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 // Scanlines
 #pragma parameter DO_SCANLINES	         "★ Scanlines enable? ==>"						0.0 	0.0  1.0 1.0
-#pragma parameter SCANLINE_MIN          "        Minimum height"			  		1.0 	0.00 1.0 0.05
+#pragma parameter SCANLINE_MIN          "        Minimum height"			  		1.0 	0.05 1.0 0.05
+#pragma parameter SCANLINE_MAX          "        Maximum height"			  		1.0 	0.05 25.0 0.1
 
 #pragma parameter SCANLINE_DARK          "        Gap brightness"			  		0.0 	-0.5 1.0 0.05
 #pragma parameter SCANLINE_COMPENSATION  "        Compensate for brightness loss"				0.0	0.0 1.0 0.1
