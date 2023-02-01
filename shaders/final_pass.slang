@@ -456,21 +456,23 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
 
 float global_noise;
 
-vec3 pixel_backdrop_image() {
-    vec2 backdrop_offset=vec2(BACKDROP_OFFX,BACKDROP_OFFY);
+#ifdef STATIC_SUPPORT_BACKDROP
+    vec3 pixel_backdrop_image() {
+        vec2 backdrop_offset=vec2(BACKDROP_OFFX,BACKDROP_OFFY);
 
-    vec2 backdrop_tex_size = textureSize(backdrop, 0);
-    float backdrop_lod = log2(backdrop_tex_size.y / global.FinalViewportSize.y);
+        vec2 backdrop_tex_size = textureSize(backdrop, 0);
+        float backdrop_lod = log2(backdrop_tex_size.y / global.FinalViewportSize.y);
 
-    vec2 backdrop_coords =  get_scaled_coords_aspect(
-                            vOutputCoord+backdrop_offset,
-                            global.FinalViewportSize,
-                            backdrop_tex_size.x/backdrop_tex_size.y,
-                            bool(vIsRotated));
+        vec2 backdrop_coords =  get_scaled_coords_aspect(
+                                vOutputCoord+backdrop_offset,
+                                global.FinalViewportSize,
+                                backdrop_tex_size.x/backdrop_tex_size.y,
+                                bool(vIsRotated));
 
-    backdrop_coords=zoom(backdrop_coords, BACKDROP_ZOOM);
-    return textureLod(backdrop, backdrop_coords, backdrop_lod).rgb;
-}
+        backdrop_coords=zoom(backdrop_coords, BACKDROP_ZOOM);
+        return textureLod(backdrop, backdrop_coords, backdrop_lod).rgb;
+    }
+#endif
 
 
 vec4 pixel_background_image(bool over){
@@ -793,18 +795,6 @@ void main() {
         //split screen
         //if (vTexCoord.y < 0.5) pixel_out = texture(first_pass,vTexCoord);
         //pixel_out = texture(avglum_pass,vTexCoord);
-          vec2 backdrop_offset=vec2(BACKDROP_OFFX,BACKDROP_OFFY);
-
-    vec2 backdrop_tex_size = textureSize(backdrop, 0);
-    float backdrop_lod = log2(backdrop_tex_size.y / global.FinalViewportSize.y);
-
-    vec2 backdrop_coords =  get_scaled_coords_aspect(
-                            vOutputCoord+backdrop_offset,
-                            global.FinalViewportSize,
-                            backdrop_tex_size.x/backdrop_tex_size.y,
-                            bool(vIsRotated));
-
-    backdrop_coords=zoom(backdrop_coords, BACKDROP_ZOOM);
     //pixel_out = texture(reflected_blurred_pass2, vOutputCoord);
     FragColor = pixel_out;
     
