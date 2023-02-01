@@ -294,7 +294,8 @@
     becomes: <br>
     #define STATIC_SUPPORT_BACKDROP 1.0 <br>
     You can only combine the static backdrop with images <br>
-    that are painted over the screen.
+    that are painted over the screen.<br>
+    If you need to zoom the game content only, use the global zoom controls.
 
 
 
