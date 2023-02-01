@@ -41,6 +41,14 @@
 #define NEW_SCALEMOD_X (params.OriginalSize.x/360.0 / 2.2)
 #define NEW_SCALEMOD_Y (params.OriginalSize.y/270.0 / 2.2)
 
+
+	//Support for backdrops has to be enable by uncommenting:
+//#define STATIC_SUPPORT_BACKDROP 1.0
+#define BACKDROP_OFFX 0.0
+#define BACKDROP_OFFY 0.0
+#define BACKDROP_ZOOM 1.0
+
+
 #define eps 1e-5
 #define pi  3.141592653589793
 #define TAU 6.28318530717958647693

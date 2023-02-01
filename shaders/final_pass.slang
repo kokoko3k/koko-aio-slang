@@ -102,7 +102,9 @@ layout(set = 0, binding = 10) uniform sampler2D shift_and_bleed_pass;
 layout(set = 0, binding = 11) uniform sampler2D in_glow_pass;
 layout(set = 0, binding = 12) uniform sampler2D halo_pass;
 
-
+#ifdef STATIC_SUPPORT_BACKDROP
+    layout(set = 0, binding = 13) uniform sampler2D backdrop;
+#endif
 
 #define HALF_PI 1.5707963267949
 #define QUARTER_PI 0.785398163397448
@@ -454,6 +456,21 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
 
 float global_noise;
 
+vec3 pixel_backdrop_image() {
+    vec2 backdrop_offset=vec2(BACKDROP_OFFX,BACKDROP_OFFY);
+
+    vec2 backdrop_tex_size = textureSize(backdrop, 0);
+    float backdrop_lod = log2(backdrop_tex_size.y / global.FinalViewportSize.y);
+
+    vec2 backdrop_coords =  get_scaled_coords_aspect(
+                            vOutputCoord+backdrop_offset,
+                            global.FinalViewportSize,
+                            backdrop_tex_size.x/backdrop_tex_size.y,
+                            bool(vIsRotated));
+
+    backdrop_coords=zoom(backdrop_coords, BACKDROP_ZOOM);
+    return textureLod(backdrop, backdrop_coords, backdrop_lod).rgb;
+}
 
 
 vec4 pixel_background_image(bool over){
@@ -496,9 +513,13 @@ vec4 pixel_background_image(bool over){
 
 vec3 pixel_border(bool image_over) {
     /* Returns the surrounding of the tube/bezel:
-     * The led light alone
+     * The led lights alone
      * the led light "under" a background image (alpha driven)
+     * black if we need to overlay a game backdrop
      */
+    #ifdef STATIC_SUPPORT_BACKDROP
+        return vec3(0.0);
+    #endif
     vec3 pixel_out = vec3(1.0);
     if (DO_AMBILIGHT == 1.0)
         pixel_out =  texture(ambi_temporal_pass, vOutputCoord).rgb + vec3(global_noise);
@@ -750,6 +771,11 @@ void main() {
     //"Just" handle inner and outer frame here:
     vec4 pixel_out = main_wrap(coords);
 
+
+#ifdef STATIC_SUPPORT_BACKDROP
+    pixel_out += vec4(pixel_backdrop_image(), 1.0);
+#endif
+
     //Draw bezel
     if (DO_BEZEL == 1.0) {
         pixel_out = vec4(compose_bezel_over(pixel_out.rgb),1.0);
@@ -767,7 +793,18 @@ void main() {
         //split screen
         //if (vTexCoord.y < 0.5) pixel_out = texture(first_pass,vTexCoord);
         //pixel_out = texture(avglum_pass,vTexCoord);
-      
+          vec2 backdrop_offset=vec2(BACKDROP_OFFX,BACKDROP_OFFY);
+
+    vec2 backdrop_tex_size = textureSize(backdrop, 0);
+    float backdrop_lod = log2(backdrop_tex_size.y / global.FinalViewportSize.y);
+
+    vec2 backdrop_coords =  get_scaled_coords_aspect(
+                            vOutputCoord+backdrop_offset,
+                            global.FinalViewportSize,
+                            backdrop_tex_size.x/backdrop_tex_size.y,
+                            bool(vIsRotated));
+
+    backdrop_coords=zoom(backdrop_coords, BACKDROP_ZOOM);
     //pixel_out = texture(reflected_blurred_pass2, vOutputCoord);
     FragColor = pixel_out;
     

@@ -61,7 +61,7 @@
 #   - The alpha channel in the inner frame represents the part of the bezel that will be filled by the game content
 #   - The blue channel represents the part of the bezel that will be filled by the game reflection.
 
-                textures = "monitor_body_curved;monitor_body_straight;bg_under;bg_over"
+                textures = "monitor_body_curved;monitor_body_straight;bg_under;bg_over;backdrop"
                 
             monitor_body_curved = "textures/monitor_body_curved.png"
      monitor_body_curved_linear = "true"
@@ -84,11 +84,12 @@
           bg_over_linear = "true"
        bg_over_wrap_mode = "mirrored_repeat"
           bg_over_mipmap = "true"
-          
-                 bg_over = "textures/background_over.png"
-          bg_over_linear = "true"
-       bg_over_wrap_mode = "mirrored_repeat"
-          bg_over_mipmap = "true"
+
+        #This is for support for arcade backdrop pictures, enable it in config.inc.
+                backdrop = "textures/boothill.jpg"
+         backdrop_linear = "true"
+      backdrop_wrap_mode = "mirrored_repeat"
+         backdrop_mipmap = "true"
 
 shaders = 19
 # For P-uae defaults, doubling just y0 seems the best option.

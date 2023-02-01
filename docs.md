@@ -285,3 +285,17 @@
         You can blank single line or a group of them at once.
         See what performs better on your display.
 
+**Backdrop support:**
+    Some (not so much) old arcades used a mirror trick to overlay the
+    game content over an high definition printed image.<br>
+    koko-aio supports them but you will explicitely need to enable<br>
+    that feature in config.inc file, by uncommenting a string this way:<br>
+    //#define STATIC_SUPPORT_BACKDROP 1.0 <br>
+    becomes: <br>
+    #define STATIC_SUPPORT_BACKDROP 1.0 <br>
+    You can only combine the static backdrop with images <br>
+    that are painted over the screen.
+
+
+
+

@@ -196,7 +196,11 @@ float random(float power, vec2 seed) {
 //AMBILIGHT RELATED
 	bool border_needed() {
 		//returns if we need to draw on the border
+		#ifdef STATIC_SUPPORT_BACKDROP
+		return true;
+		#else
 		return (DO_AMBILIGHT + DO_BG_IMAGE > 0.0);
+		#endif
 	}
 
 	
