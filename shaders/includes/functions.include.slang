@@ -319,6 +319,33 @@ float random(float power, vec2 seed) {
 		return color;
 	}
 
+	/*float is_scanline(vec2 uv){
+		return float(int(mod(uv.y * params.OutputSize.y , 2.0 )) !=0.0) ;
+	}
+
+	vec3 blur9_y_e_scanline(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_y) {
+
+		float mymod = int(mod(uv.y * params.OutputSize.y , 2.0 )) ;
+		float scanline = float(   (mymod != 0.0)   ) ;
+
+		vec2 resolution = sourcesize * sharpness_y;
+		vec3 color = vec3(0.0);
+		vec2 off1 = vec2(0.0, 1.3846153846) ;
+		vec2 off2 = vec2(0.0, 3.2307692308) ;
+		scanline = is_scanline(uv);
+		color += texture(image, uv).rgb   * scanline         * 0.2270270270;
+		scanline = is_scanline(uv + (off1 / resolution));
+		color += texture(image, uv + (off1 / resolution)).rgb * scanline * 0.3162162162;
+		scanline = is_scanline(uv - (off1 / resolution)  );
+		color += texture(image, uv - (off1 / resolution)).rgb * scanline *  0.3162162162;
+		scanline = is_scanline(uv + (off2 / resolution)  );
+		color += texture(image, uv + (off2 / resolution)).rgb * scanline *  0.0702702703;
+		scanline = is_scanline(uv - (off2 / resolution)  );
+		color += texture(image, uv - (off2 / resolution)).rgb * scanline *  0.0702702703;
+		return color;
+	}
+
+
 	vec3 blur9_y_alpha_aware(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_y) {
 		vec2 resolution = sourcesize * sharpness_y;
 		vec2 off1 = vec2(0.0, 1.3846153846) ;
@@ -331,7 +358,7 @@ float random(float power, vec2 seed) {
 		lookup = texture(image, uv  - (off2 / resolution)); color += lookup.a * lookup.rgb * 0.0702702703;
 		return color;
 	}
-
+	*/
 	
 	vec3 blur5_x(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_x, float lod) {
 		vec2 resolution = sourcesize * sharpness_x;
@@ -354,7 +381,7 @@ float random(float power, vec2 seed) {
 	}
 	
 	//smoothly shade x and y < 0.0, currently unused	
-	float blur_shade(vec2 co, float size) {
+	/*float blur_shade(vec2 co, float size) {
 		
 		float co_1D;	
 		(co.x < 0.0 || co.x > 1.0) ? co_1D = co.x : co_1D = co.y ;
@@ -370,3 +397,4 @@ float random(float power, vec2 seed) {
 		
 		return smoothstep(smooth_min, smooth_max, co_1D);
 	}
+	*/

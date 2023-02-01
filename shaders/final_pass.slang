@@ -312,6 +312,7 @@ float scanline_shape(vec2 coords, bool do_slotmask, float lum) {
 
 
     //Thickness (min):
+
         //lines = pow(lines, 1/(lum_scaled+eps) );
         //lines = pow(lines, 1/(sqrt(lum_scaled) ) );
 //lines = pow(lines, 1/(lum_scaled*lum_scaled+eps) );

@@ -42,8 +42,8 @@
 #define NEW_SCALEMOD_Y (params.OriginalSize.y/270.0 / 2.2)
 
 #define eps 1e-5
-#define pi 3.141592654
-#define TAU  6.28318530717958647693
+#define pi  3.141592653589793
+#define TAU 6.28318530717958647693
 #define alpha_mark 0.1
 
 

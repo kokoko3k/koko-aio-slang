@@ -26,7 +26,7 @@ layout(set = 0, binding = 2) uniform sampler2D first_pass;
 void main() {
     if (DO_BLOOM == 0.0) return;
     
-    vec3 bloomed = bloom(
+    vec3 bloomed = bloom_gamma(
         first_pass,
         vTexCoord,
         params.OriginalSize,

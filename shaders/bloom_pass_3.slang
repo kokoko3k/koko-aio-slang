@@ -21,6 +21,7 @@ layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D Source;
 
 #include "includes/blooms.include.slang"
+#define offset 0.3926990816987242 //TAU/8.0/4.0*2.0
 
 void main() {
     if (DO_BLOOM == 0.0) return;
@@ -31,11 +32,10 @@ void main() {
         params.SourceSize,
         vec2(BLOOM_SIZE),
         BLOOM_QUALITY,
-        1.0,
-        0.39269908125,
+        offset,
         0.0
     );
 
-    FragColor = vec4(bloomed.rgb, 1.0);
+    FragColor = vec4(bloomed.rgb, 1.0); //FragColor = texture(Source,vTexCoord);
 
 }
