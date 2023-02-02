@@ -316,21 +316,27 @@ float scanline_shape(vec2 coords, bool do_slotmask, float lum) {
 
 //0.0125 is an anti-moiree measure.
 
-lines = pow(   max(lines, 0.05),   1/lum_scaled) ;
+//lines = pow(   max(lines, 0.05),   1/lum_scaled) ;
 
 //lines = pow(lines, 1/(sqrt(lum_scaled) ) );
 
-        //float extra_power_1 = 3.0;
-        //lines = pow(clamp(lines + 0.05, 0.0,1.0) , 1/(sqrt(lum_scaled*lum_scaled*extra_power_1) ) ) * extra_power_1/2.0;
+//lines = pow(clamp(lines + 0.05, 0.0,1.0) , 1/sqrt(lum_scaled));
+//float extra_power_1 = 3.0;
+
+float extra_power_1 = max(SCANLINE_MAX/3.0, 1.0);
+lines = pow(clamp(lines, 0.0,1.0) , 1/(sqrt(lum_scaled*lum_scaled*extra_power_1) ) );
+
+//lines = pow(clamp(lines + 0.05, 0.0,1.0) , 1/(sqrt(lum_scaled*lum_scaled*extra_power_1) ) ) * extra_power_1/2.0;
 
 
         //lines = pow(clamp(lines + 0.05, 0.0,1.0) , 1/(lum_scaled*lum_scaled));
 
     //Thickness (max):
 
-            //lines = pow(abs(lines), 1/(10*lum_scaled*lum_scaled));
-            //float clamp_start=0.2;
-            //if (lum_scaled>clamp_start) lines = clamp(lines,(lum_scaled-clamp_start)/(1-clamp_start) ,1.0); //FIXME use step?
+            /*lines = pow(abs(lines), 1/(10*lum_scaled*lum_scaled));
+            float clamp_start=0.5;
+            if (lum_scaled>clamp_start) lines = clamp(lines,(lum_scaled-clamp_start)/(1-clamp_start) ,1.0); //FIXME use step?*/
+
 //min-max, ma difficile da gestire con la slotmask.
 //    float extra_power = 2.0;
 //    float m = mod(angle_base + (vScanlinesAlternate * HALF_PI), pi);
