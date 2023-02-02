@@ -201,14 +201,7 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
         bool odd_line_piu_densa = !(mod(vFragCoord.y, darkline_every/2) < VMASK_DARKLINE_SCALE && odd_line_meno_densa);
         bool odd_column = mod(vFragCoord.x + Darkline_part_w  , Darkline_part_w_x2) < Darkline_part_w;
         bool draw_mask = odd_line_piu_densa && !odd_column || odd_column && odd_line_meno_densa;
-        
-        /*
-        //quante scanline è alta la darkline
-        float darkline_height = 1/2.0;      
-        draw_mask = drawit(darkline_height,0.0, coords) && odd_column || drawit(darkline_height,0.5, coords) && !odd_column;
-        return source * float(!draw_mask);
-        */
-        
+
         return source * clamp(float(draw_mask),darkline_trans,1.0);
     }
     
@@ -351,8 +344,9 @@ lines = pow(   max(lines, 0.05),   1/lum_scaled) ;
 vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
     //Exit if we don't need a border (ambient light/background picture)
     //And we are outside the the border (unsure if this double check is good for performance) //FIXME
-    if (bBorder_needed)
-        if (vTexCoord.x < 0.0 || vTexCoord.x > 1.0 || vTexCoord.y < 0.0 || vTexCoord.y > 1.0) return vec4(0.0);
+    if (bBorder_needed &&
+       (vTexCoord.x < 0.0 || vTexCoord.x > 1.0 || vTexCoord.y < 0.0 || vTexCoord.y > 1.0))
+       return vec4(0.0);
 
     vec3 pixel_in;
     vec3 pixel_glowed;

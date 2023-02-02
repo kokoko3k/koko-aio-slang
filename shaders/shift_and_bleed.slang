@@ -61,7 +61,7 @@ const mat3 mat3_RGB2YIQ = mat3(
    0.2989,  0.5959,  0.2115,
    0.5870, -0.2744, -0.5229,
    0.1140, -0.3216,  0.3114);
-      
+
 const mat3 mat3_YIQ2RGB = mat3(
    1.0,     1.0,     1.0,
    0.956,  -0.2720, -1.1060,
@@ -148,6 +148,8 @@ vec3 pixel_bleed_side_PAL(vec3 pixel_in, vec2 co, float size, float side, sample
 
 vec3 pixel_bleed(vec3 pixel_in, vec2 co, sampler2D in_texture, vec4 sourcesize2) {
    vec3 side_left ; vec3 side_right;
+   //Tried to unbranch the following, no gain (even worse) probably due to not using constants anymore.
+   //Just dont try again.
    if (SAT_BLEED_PAL == 1.0) {
       side_right = pixel_bleed_side_PAL(pixel_in, co, SAT_BLEED_SIZE_RIGHT, SIDE_RIGHT, in_texture, sourcesize2);
       side_left = pixel_bleed_side_PAL(pixel_in, co, SAT_BLEED_SIZE_LEFT, SIDE_LEFT, in_texture, sourcesize2);
