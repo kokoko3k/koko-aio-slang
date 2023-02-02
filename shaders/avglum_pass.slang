@@ -41,7 +41,7 @@ float get_avg_lum_from_mip() {
     return (mip.r+mip.g+mip.b)/3.0;
 }
 
-float get_avglum() {
+/*float get_avglum() {
     bool coordinate_for_scene_detection = 
             vTexCoord.x > 0.24 && vTexCoord.x < 0.26 &&
             vTexCoord.y > 0.24 && vTexCoord.y < 0.26 ;
@@ -55,10 +55,22 @@ float get_avglum() {
     // Implicit else: we are in a coordinate that is not used for scene detection
     //So just return the feedback of this pass to spare gpu cycles.
     return texture(avglum_passFeedback,vTexCoord).a;
+}*/
+
+
+float get_avglum() {
+    bool coordinate_for_reduced_sampling =
+            vTexCoord.x > 0.24 && vTexCoord.x < 0.26 &&
+            vTexCoord.y > 0.24 && vTexCoord.y < 0.26 ;
+
+    bool reduced_sample_time_is_now = (mod(params.FrameCount,AMBI_AVGLUM_DIVIDER) == 0);
+
+    if (coordinate_for_reduced_sampling && !reduced_sample_time_is_now)
+        return texture(avglum_passFeedback,vTexCoord).a;
+            else
+        return get_avg_lum_from_mip();
+
 }
-
-
-
 
 void main() {
     /*Grab a mipmap from the first pass.

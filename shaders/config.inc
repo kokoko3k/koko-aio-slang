@@ -192,7 +192,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float BG_IMAGE_OFFX;
 	float BG_IMAGE_ZOOM;
 	float BG_IMAGE_ROTATION;
-	
+
 	float DO_SHIFT_RGB;
 	float SHIFT_R;
 	float SHIFT_G;
