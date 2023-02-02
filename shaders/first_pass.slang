@@ -52,6 +52,7 @@ layout(set = 0, binding = 2) uniform sampler2D Source;
 
 #include "includes/functions.include.slang"
 
+#define W vec3(0.2125, 0.7154, 0.0721)
 
 vec3 color_tools(vec3 pixel_out) {
 //Apply color corrections to input signal.
@@ -61,7 +62,6 @@ vec3 color_tools(vec3 pixel_out) {
 
    //Modify saturation
    if (!(SATURATION == 1.0)) {
-      const vec3 W = vec3(0.2125, 0.7154, 0.0721);
       vec3 intensity = vec3(dot(pixel_out.rgb, W));
       pixel_out.rgb = mix(intensity, pixel_out.rgb, SATURATION);
    }
@@ -89,13 +89,13 @@ vec3 pixel_flickering() {
 /* Simulates the flickering effect of the interlaced screens.
  * As I remember, it was visible when a line and the next had high
  * luminosity differences.
- * So we need sample the current line and the previous one
+ * So we need to sample the current line and the previous one
  * (eventually applying color corrections to both).
  *
  * Repeating the following:
  * On frame 0, return the "clean" pixel
  * On frame 1, mix the upper pixel with the current one
- * On frame 2, mix the lower pixel with the current oneZ
+ * On frame 2, mix the lower pixel with the current one
  *
  * The effect of the mix is the flickering itself, and we modulate
  * the mix according to the luminance difference between the current

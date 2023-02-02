@@ -126,17 +126,19 @@ if (coords.x > tol_start && coords.x < tol_end && coords.y > tol_start && coords
 float ambi_step(float start, float end, float mystep) {
     float diff = start-end;
     if (abs(diff) < mystep) return end;
+    //Does not worth to try to unbranch:
     if (start >= end)
         return start - mystep;
             else
         return start + mystep;
+
 }
 
 vec3 ambi_step_rgb(vec3 s,vec3 d, vec3 mystep){
     //step fade (f) rom s to d
-    return vec3 ( ambi_step(s.r,d.r,mystep.r),
-                  ambi_step(s.g,d.g,mystep.g),
-                  ambi_step(s.b,d.b,mystep.b)
+    return vec3 ( ambi_step(s.r, d.r, mystep.r),
+                  ambi_step(s.g, d.g, mystep.g),
+                  ambi_step(s.b, d.b, mystep.b)
                 );
 }
 
@@ -162,7 +164,7 @@ vec4 pixel_ambilight() {
     if (scene_change_remaining > 0.0) {
         mystep = vec3(max(1.0/MAX_STEPS, AMBI_FAST_STEP)); // <- Never slow down fades due to fast step when changing scene
         scene_change_remaining -=  AMBI_FAST_STEP;
-            } else {
+    } else {
         mystep = abs((past_pixel - present_pixel) / MAX_STEPS); //OK
     }
     

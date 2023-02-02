@@ -43,14 +43,14 @@ vec3 hsv2rgb(vec3 c){
 	return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
 
+#define eps10 1.0e-10
 vec3 rgb2hsv(vec3 c){
    vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
    vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));
    vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
 
    float d = q.x - min(q.w, q.y);
-   float e = 1.0e-10;
-   return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
+   return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + eps10)), d / (q.x + eps10), q.x);
 }
 
 #define bandwidth_mhz_Y_ntsc 4.2
@@ -99,13 +99,10 @@ vec3 pixel_offset(vec3 pixel_cur,vec2 coord, sampler2D in_texture, vec4 sourcesi
 
 
 vec3 pixel_offset_wrap (vec2 coord) {
-   vec3 pixel_in;
    if ( DO_FXAA == 1.0)  {
-      pixel_in = texture(FXAA_pass, vTexCoord).rgb;
-      return pixel_offset(pixel_in, vTexCoord, FXAA_pass, global.FXAA_passSize);
+      return pixel_offset(texture(FXAA_pass, vTexCoord).rgb,  vTexCoord, FXAA_pass, global.FXAA_passSize);
    } else {
-      pixel_in = texture(first_pass, vTexCoord).rgb;
-      return pixel_offset(pixel_in, vTexCoord, first_pass, global.first_passSize);
+      return pixel_offset(texture(first_pass, vTexCoord).rgb, vTexCoord, first_pass, global.first_passSize);
    }
 }
 
@@ -122,9 +119,12 @@ vec3 pixel_bleed_side_NTSC(vec3 pixel_in, vec2 co, float size, float side, sampl
       blur_YIQ.x = mix(blur_YIQ.x, smp_YIQ.x, w/bandwidth_mhz_Y_ntsc);   // Blur Y
       blur_YIQ.y = mix(blur_YIQ.y, smp_YIQ.y, w/bandwidth_mhz_I     );   // Blur I
       blur_YIQ.z = mix(blur_YIQ.z, smp_YIQ.z, w/bandwidth_mhz_Q     );   //  BlurQ
+      //Tried to optimize as follows to no avail:
+      //vec3 vec3_mix = vec3(w/bandwidth_mhz_Y_ntsc, w/bandwidth_mhz_I, w/bandwidth_mhz_Q);
+      //blur_YIQ = mix(blur_YIQ.xyz, smp_YIQ.xyz, vec3_mix);
    }
    //blur_YIQ.z/=i;
-   return vec3(blur_YIQ.x, blur_YIQ.y, blur_YIQ.z) * mat3_YIQ2RGB; //return to RGB colorspace
+   return blur_YIQ.xyz * mat3_YIQ2RGB; //return to RGB colorspace
 }
 
 vec3 pixel_bleed_side_PAL(vec3 pixel_in, vec2 co, float size, float side, sampler2D in_texture, vec4 sourcesize2) {
@@ -139,7 +139,7 @@ vec3 pixel_bleed_side_PAL(vec3 pixel_in, vec2 co, float size, float side, sample
       blur_YUV.y = mix(blur_YUV.y, smp_YUV.y, w/bandwidth_mhz_U     );   // Blur U
       blur_YUV.z = mix(blur_YUV.z, smp_YUV.z, w/bandwidth_mhz_V     );   // Blur V
    }
-   return vec3(blur_YUV.x, blur_YUV.y, blur_YUV.z) * mat3_YUV2RGB; //return to RGB colorspace
+   return blur_YUV.xyz * mat3_YUV2RGB; //return to RGB colorspace
 }
 
 #define SIDE_RIGHT 1

@@ -102,9 +102,7 @@ vec3 ntscdec(vec2 uv ){
       for (int n=0; n < N; n++) {
          vec2 pos = uv + vec2(float(n-NTSC_FILTER_MIDDLE) / size.x, 0.0);
          float phase =  TAU * (vNTSC_FILTER_SCF * size.x * pos.x);
-         //phase += ( pos.x * 3.14 * 20) ; // rainbow width
          if (NTSC_PHASE_SHIFT > 0.5) phase += ( pos.y * -pi10 ) ; // 45 degree
-         //if (NTSC_DOT_CRAWL > 0.5)  phase += (params.FrameCount % 3140) /2.0 ;
          //float phase =  TAU * (vNTSC_FILTER_SCF * size.x * pos.x) + ( pos.y * -pi10 * NTSC_PHASE_SHIFT) 
          // ( pos.y * - 31.4);
          //Just sample luminance via yiq:
@@ -117,18 +115,6 @@ vec3 ntscdec(vec2 uv ){
 
    //ADD artifacted Y and Q.
    vec3 YIQ_result = vec3(YIQ_ori.x, YIQ_ori.yz + YIQ_processed.yz * NTSC_MIX);
-
-
-  /* se li vogliamo aggiungere come complemento ad 1?
-   * tutto il
-   * tipo ho y1 = 0.5 -> aggiungo y2 al max fino a 0.5, quindi come una sorta di clamp.
-   * oppure partendo dall'opposto. e aggiungendo l'orinale all'ntsc.
-   */
-
-// YIQ_result.y = YIQ_ori.y + clamp(YIQ_processed.y, 0.0, (1-YIQ_ori.y)) * NTSC_MIX;
-//  YIQ_result.z = YIQ_ori.z + clamp(YIQ_processed.z, 0.0, (1-YIQ_ori.z)) * NTSC_MIX;
-
-//return YIQ_processed * YIQ2RGB;
 
   return YIQ_result * YIQ2RGB;
 }
