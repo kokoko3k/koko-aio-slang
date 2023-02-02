@@ -135,9 +135,9 @@ void debug() {
 //Just test patterns here
    vec3 pixel_debug;
    //Use one of the following to debug:
-      //pixel_debug=vec3(abs(sin(params.FrameCount/3.14/8.0))); //white fade
+      pixel_debug=vec3(abs(sin(params.FrameCount/3.14/8.0))); //white fade
       //pixel_debug=vec3(abs(sin(params.FrameCount/3.14/20)),0.0,0.0); //red fade
-      pixel_debug=vec3(1.0);
+      //pixel_debug=vec3(1.0);
       //pixel_debug=vec3(0.0,1.0,0.0);
       //pixel_debug=vec3(0.38,0.0,1.0)*vTexCoord.x;
       //pixel_debug=vec3(vTexCoord.x); //H bw gradient
@@ -159,15 +159,6 @@ void main() {
       FragColor = pixel_debug;
       return;
       */
-      /*if (mymod != 0.0)
-         pixel_debug.a *= 1.0;
-            else
-         pixel_debug *= 0.0;
-   
-   
-      FragColor = pixel_debug;
-      return;*/
-
    
    
    //debug(); return;

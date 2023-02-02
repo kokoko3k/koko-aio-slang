@@ -404,7 +404,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter GLOBAL_ZOOM	 "        Zoom"					2.0   0.0  3.0    0.0005
 
 
-
 //Aspect Ratio
 #pragma parameter label_ar	 "★ Aspect Ratio "							0.0  0.0  1.0     1.0
 #pragma parameter ASPECT_X       "        Aspect Ratio Numerator (-x for a preset below)"   		0.0  -6.0 256. 1.0

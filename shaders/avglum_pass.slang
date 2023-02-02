@@ -52,13 +52,16 @@ float get_avglum() {
     if (reduced_sample_time_is_now)      return get_avg_lum_from_mip();
     if (coordinate_for_scene_detection && reduced_sample_time_is_now) return get_avg_lum_from_mip();
     
-    /* Implicit else: we are in a coordinate that is not used for scene detection
-     * So just return the feedback of this pass to spare gpu cycles. */
+    // Implicit else: we are in a coordinate that is not used for scene detection
+    //So just return the feedback of this pass to spare gpu cycles.
     return texture(avglum_passFeedback,vTexCoord).a;
 }
 
+
+
+
 void main() {
-    /*Grab a mipmap from the previous pass.
+    /*Grab a mipmap from the first pass.
       Calculate the average luminance from the smallest mipmap and put into the alpha channel
       So that can be used:
       1 - continuously at coordinate 0.5,0.5
