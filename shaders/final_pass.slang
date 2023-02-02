@@ -324,7 +324,7 @@ float scanline_shape(vec2 coords, bool do_slotmask, float lum) {
 //float extra_power_1 = 3.0;
 
 float extra_power_1 = max(SCANLINE_MAX/3.0, 1.0);
-lines = pow(clamp(lines, 0.0,1.0) , 1/(sqrt(lum_scaled*lum_scaled*extra_power_1) ) );
+lines = pow(clamp(lines, SCANLINE_DARK, 1.0) , 1/(sqrt(lum_scaled*lum_scaled*extra_power_1) ) );
 
 //lines = pow(clamp(lines + 0.05, 0.0,1.0) , 1/(sqrt(lum_scaled*lum_scaled*extra_power_1) ) ) * extra_power_1/2.0;
 
