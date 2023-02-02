@@ -665,7 +665,10 @@ vec4 pixel_inner_frame(vec2 coords, bool bBorder_needed) {
                     over_white_correction =1- b_brightness;
             }
 
-            pixel_out = pixel_out + (bloomed * BLOOM_MIX * over_white_correction);
+            float smoothed_avglum = texture(avglum_pass, vec2(0.75)).a * BLOOM_ADPT;
+            float bloom_mix_adapted = max(0.0, BLOOM_MIX - smoothed_avglum);
+
+            pixel_out = pixel_out + (bloomed * bloom_mix_adapted  )* over_white_correction ;
         }
     }
 
@@ -755,7 +758,7 @@ void main() {
     vec2 coords = vTexCoord;
     //Luminosity dependant zoom
     if (DO_DYNZOOM == 1.0) {
-        float zoomin = 1.0 + (texture(avglum_pass, vec2(0.5,0.5)    ).a/ DYNZOOM_FACTOR);
+        float zoomin = 1.0 + (texture(avglum_pass, vec2(0.75,0.75)    ).a/ DYNZOOM_FACTOR);
         coords = zoom(coords, zoomin);
     }
     

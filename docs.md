@@ -151,6 +151,8 @@
     
     Final mix:
         Modulates between the original images and the bloomed one.
+    Less on bright scenes:
+        How much to reduce the mix as the scene gets brighter.
     Radius:
         Controls how much the bloom has to be wide.
     Quality:

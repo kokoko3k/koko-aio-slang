@@ -107,6 +107,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float IN_GLOW_POWER;
 	float IN_GLOW_GAMMA;
 	float BLOOM_MIX;
+	float BLOOM_ADPT;
  	float BLOOM_SIZE;
 	float BLOOM_GAMMA;
 	float BLOOM_BYPASS;
@@ -313,6 +314,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 // Bloom
 #pragma parameter DO_BLOOM           "★ Bloom enable? ==>" 				0.0  0.0  1.0  1.0
 #pragma parameter BLOOM_MIX          "        Final mix, (0.0=off)"			0.2 0.0 1.0  0.01
+#pragma parameter BLOOM_ADPT         "        Less on bright scenes"	0.0	0.0	5.0	 0.1
 #pragma parameter BLOOM_SIZE         "        Radius"					2.0  0.25 30.0 0.25
 #pragma parameter BLOOM_QUALITY      "        Quality: more is better but slower"	1.0  1.0 32.0 1.0
 #pragma parameter BLOOM_GAMMA        "        Input Gamma"				10.0  1.0 10.0 0.1

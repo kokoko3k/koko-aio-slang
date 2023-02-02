@@ -57,18 +57,39 @@ float get_avg_lum_from_mip() {
     return texture(avglum_passFeedback,vTexCoord).a;
 }*/
 
+#define SMOOTHNESS_SPEED 0.05
 
 float get_avglum() {
-    bool coordinate_for_reduced_sampling =
+    /* avglum alfa has 3 zones::
+     * 0.25 -> reduced sampling, used for to aid scene detection
+     * 0.75 -> smoothed_sampling, used to adapt bloom and
+     * anything else: continuous sampling
+     */
+
+
+    bool reduced_sampling_co =
             vTexCoord.x > 0.24 && vTexCoord.x < 0.26 &&
             vTexCoord.y > 0.24 && vTexCoord.y < 0.26 ;
 
-    bool reduced_sample_time_is_now = (mod(params.FrameCount,AMBI_AVGLUM_DIVIDER) == 0);
+    bool smoothed_sampling_co =
+            vTexCoord.x > 0.74 && vTexCoord.x < 0.76 &&
+            vTexCoord.y > 0.74 && vTexCoord.y < 0.76 ;
 
-    if (coordinate_for_reduced_sampling && !reduced_sample_time_is_now)
+
+    if (reduced_sampling_co) {
+        //in the reduced sampling zone, only update at right time; else return the previous frame.
+        bool reduced_sample_time_is_now = (mod(params.FrameCount,AMBI_AVGLUM_DIVIDER) == 0);
+        if (reduced_sample_time_is_now)
+            return get_avg_lum_from_mip();
         return texture(avglum_passFeedback,vTexCoord).a;
-            else
-        return get_avg_lum_from_mip();
+    }
+
+    if (smoothed_sampling_co) {
+        return mix(texture(avglum_passFeedback,vTexCoord).a, get_avg_lum_from_mip(), SMOOTHNESS_SPEED);
+    }
+
+    //Outside specific areas, update continuously; this is used by bezel highlights.
+    return get_avg_lum_from_mip();
 
 }
 
