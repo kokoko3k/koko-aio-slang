@@ -755,7 +755,7 @@ void main() {
     vec2 coords = vTexCoord;
     //Luminosity dependant zoom
     if (DO_DYNZOOM == 1.0) {
-        float zoomin = 1.0 + (texture(avglum_pass, vec2(0.25,0.25)    ).a/ DYNZOOM_FACTOR);
+        float zoomin = 1.0 + (texture(avglum_pass, vec2(0.5,0.5)    ).a/ DYNZOOM_FACTOR);
         coords = zoom(coords, zoomin);
     }
     
