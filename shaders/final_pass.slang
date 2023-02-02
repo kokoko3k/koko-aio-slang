@@ -390,7 +390,6 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
 
     }
 
-    
     float lum = clamp(max(max(pixel_out.r,pixel_out.g),pixel_out.b), 0.0,1.0);
     
     //Halo
@@ -398,7 +397,6 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
     if (DO_HALO == 1.0 ) {
         pixel_haloed = texture(halo_pass,coords).rgb;
         pixel_out += pixel_haloed * (1 - HALO_VS_SCAN);
-        //pixel_out += (pixel_haloed * (lum));
     }
 
     /* Non flickering scanlines, Don't do them if
@@ -547,13 +545,9 @@ vec3 bezel_color(float lum)  {
     //Colorize bezel frame
     vec3 col = vec3(BEZEL_R,BEZEL_G,BEZEL_B) + lum;
     float con_max =  0.5 * BEZEL_CON + 0.5;
-
-    col.r = scale_to_range(col.r, -con_max+1, con_max); //contrast
-    col.g = scale_to_range(col.g, -con_max+1, con_max); //contrast
-    col.b = scale_to_range(col.b, -con_max+1, con_max); //contrast
+    col = scale_to_range_vec3(col, -con_max+1, con_max);
     return clamp(col,0.0,1.0);
 }
-
 
 
 vec3 compose_bezel_over(vec3 full_viewport) {
