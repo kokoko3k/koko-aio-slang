@@ -1,6 +1,6 @@
 #reference "tv-slotmask-bloom-bezelwider.slangp"
 
-DO_BLOOM = "0.0"
+DO_BLOOM = "1.0"
 DO_FXAA = "1.0"
 DO_AMBILIGHT = "1.0"
 DO_CURVATURE = "1.0"

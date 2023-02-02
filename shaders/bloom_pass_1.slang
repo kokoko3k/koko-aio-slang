@@ -26,18 +26,18 @@ layout(set = 0, binding = 2) uniform sampler2D first_pass;
 void main() {
     if (DO_BLOOM == 0.0) return;
     
-    vec3 bloomed = bloom_gamma(
+    vec3 bloomed = bloom_gamma_power(
         first_pass,
         vTexCoord,
         params.OriginalSize,
         vec2(BLOOM_SIZE),
         BLOOM_QUALITY,
-        BLOOM_GAMMA,
+        BLOOM_GAMMA, BLOOM_POWER,
         0.0,
         0.0
     );
 
-    bloomed = apply_fuzzy_main_pass(bloomed) * BLOOM_POWER;
+    bloomed = apply_fuzzy_main_pass(bloomed);
     FragColor = vec4(bloomed, 1.0);
     
 }
