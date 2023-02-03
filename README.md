@@ -13,6 +13,9 @@ Several presets are included.<br>
 ***Additional documentation:***
 * [See here](docs.md)
 
+***Additional artwork:***
+* https://github.com/kokoko3k/koko-aio-slang-presets-and-overlays
+
 ***Actually, it provides emulation for:***
 * Scanlines
 * Screenlines
