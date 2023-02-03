@@ -6,7 +6,7 @@
 #    [ ] Vignette and spot could be done earlier at lower res?
 #    [ ] check branching conditions in first_pass.slang
 #    [ ] reference new repo from the main one
-
+#    [ ] Noise is not visible on black or white, much more on gray, why?
     
 # Performances:
 # haswell igp: i5-4590 CPU @ 3.30GHz

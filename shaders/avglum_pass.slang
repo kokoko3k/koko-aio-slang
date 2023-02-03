@@ -57,7 +57,7 @@ float get_avg_lum_from_mip() {
     return texture(avglum_passFeedback,vTexCoord).a;
 }*/
 
-#define SMOOTHNESS_SPEED 0.05
+#define SMOOTHNESS_SPEED 0.02
 
 float get_avglum() {
     /* avglum alfa has 3 zones::
