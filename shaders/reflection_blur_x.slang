@@ -61,7 +61,7 @@ vec3 blur(float Quality, float Directions, float Size, vec2 co,float lod) {
 }
 
 
-vec3 blur_unroll(float Size, vec2 co,float lod) {  
+vec3 blur_unroll(float Size, vec2 co,float lod) {
     vec3 color;
     vec2 d = SourceTextureSize.zw * Size;
     color =  textureLod( SourceTexture, co + d * vec2(-1.0,  1.0 )  ,lod).rgb ;
@@ -122,16 +122,15 @@ void main() {
       return;
    }
       
-   vec2 res = vec2(global.first_passSize.x, global.first_passSize.y);
-   vec2 dir = vec2(1.0,0.0);
+   //vec2 res = vec2(global.first_passSize.x, global.first_passSize.y);
+   //vec2 dir = vec2(1.0,0.0);
    ///Quality, Directions, Size, coords, lod
    
    vec3 pixel_blur;
    //pixel_blur = blur(1,4,2,coords_curved, 2.0);
-   pixel_blur = blur_unroll(1.5,coords_curved, 2.0);
+   pixel_blur = blur_unroll(1.5,coords_curved, 1.0);
    
    FragColor = vec4(apply_fuzzy_main_pass(pixel_blur),1.0);
-
 }
  
  

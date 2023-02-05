@@ -7,7 +7,9 @@
 #    [ ] check branching conditions in first_pass.slang
 #    [ ] reference new repo from the main one
 #    [ ] Noise is not visible on black or white, much more on gray, why?
-    
+#    [ ] Try to get rid of mark_unneeded() in reflection_blur_y
+#    [ ] Why tv presets have +5% brightness?
+
 # Performances:
 # haswell igp: i5-4590 CPU @ 3.30GHz
 # Output on aspect: full, 1080p, 16:9, 60fps
@@ -61,6 +63,7 @@
 #   - The alpha channel in the inner frame represents the part of the bezel that will be filled by the game content
 #   - The blue channel represents the part of the bezel that will be filled by the game reflection.
 
+
                 textures = "monitor_body_curved;monitor_body_straight;bg_under;bg_over;backdrop"
                 
             monitor_body_curved = "textures/monitor_body_curved.png"
@@ -111,8 +114,6 @@ shaders = 19
        scale_type0 = source
             scale0 = 1.0
         wrap_mode0 = "mirrored_repeat"
-float_framebuffer0 = false
-
 
            shader1 = shaders/first_pass.slang
             alias1 = "first_pass"
@@ -120,7 +121,6 @@ float_framebuffer0 = false
        scale_type1 = source
             scale1 = 2.0
         wrap_mode1 = "mirrored_repeat"
-float_framebuffer1 = false
 
 # Nvidia fxaa pass:
 #   works good for "SD" resolutions
@@ -139,7 +139,6 @@ float_framebuffer1 = false
 
      mipmap_input2 = true
         wrap_mode2 = "mirrored_repeat"
-float_framebuffer2 = false
 
 # This pass emulates composite color bleeding and deconvergence
 # deconvergence should be applied in th final pass, but it is too heavy there.
@@ -149,7 +148,7 @@ float_framebuffer2 = false
     filter_linear3 = true
             scale3 = 1.0
        scale_type3 = source
-float_framebuffer3 = false
+float_framebuffer3 = true
      mipmap_input3 = false
         wrap_mode3 = "mirrored_repeat"
 
@@ -216,7 +215,7 @@ float_framebuffer7 = true
                 scale8 = 0.5
             wrap_mode8 = "mirrored_repeat"
          mipmap_input8 = false
-         
+
 # The following 2 passes will blur the mirrored part of main pass
 #   to emulate bezel reflections.
    
@@ -226,14 +225,14 @@ float_framebuffer7 = true
            scale_type9 = source
                 scale9 = 1.0
             wrap_mode9 = "mirrored_repeat"
-         
+
                shader10 = shaders/reflection_blur_y.slang
                 alias10 = "reflected_blurred_pass2"
         filter_linear10 = true
            scale_type10 = source
                 scale10 = 1.0
             wrap_mode10 = "mirrored_repeat"
-            
+
 
 # In the subsequent passes we do first a fast bloom  by first
 #   sampling the original texture and scale it down to keep
@@ -246,8 +245,7 @@ float_framebuffer7 = true
            scale_type11 = source
                 scale11 = 1.0
 # I NEED TO SET **THIS** TO mirrored_repeat TO HAVE THE PREVIOUS PASS mirrored_repeated (!?)
-            wrap_mode11 = "mirrored_repeat" 
-    float_framebuffer11 = true
+            wrap_mode11 = "mirrored_repeat"
     
     
                shader12 = shaders/bloom_pass_2.slang
@@ -287,7 +285,6 @@ float_framebuffer7 = true
                 scale15 = 1.0
             wrap_mode15 = "mirrored_repeat"
          mipmap_input15 = false
-    float_framebuffer15 = true
 
 # Gather mipmaps from prevous pass and use them to light virtual leds under the virtual monitor 
 # and Temporally smooth led lights.
