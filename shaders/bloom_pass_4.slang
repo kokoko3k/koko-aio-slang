@@ -20,6 +20,7 @@ layout(location = 0) in vec2 vTexCoord;
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D Source;
 
+#include "includes/functions.include.slang"
 #include "includes/blooms.include.slang"
 #define offset 0.5890486225480862 // TAU/8.0/4.0*3.0
 
@@ -35,7 +36,10 @@ void main() {
         offset,
         0.0
     );
-
-    FragColor = vec4(pow(bloomed,vec3(BLOOM_GAMMA_OUT)),1.0); //FragColor = texture(Source,vTexCoord);
+    
+    bloomed = pow(bloomed,vec3(BLOOM_GAMMA_OUT));
+    bloomed*=BLOOM_POWER;
+    bloomed = pixel_push_luminance(bloomed, BLOOM_POWER);
+    FragColor = vec4(bloomed, 1.0); //FragColor = texture(Source,vTexCoord);
 
 }

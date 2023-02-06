@@ -32,11 +32,10 @@ void main() {
         params.OriginalSize,
         vec2(BLOOM_SIZE),
         BLOOM_QUALITY,
-        BLOOM_GAMMA, BLOOM_POWER,
+        BLOOM_GAMMA, 1.0,
         0.0,
         0.0
     );
-
     bloomed = apply_fuzzy_main_pass(bloomed);
     FragColor = vec4(bloomed, 1.0);
     

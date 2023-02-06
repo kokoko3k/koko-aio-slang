@@ -662,6 +662,10 @@ vec4 pixel_inner_frame(vec2 coords, bool bBorder_needed) {
 
             float smoothed_avglum = texture(avglum_pass, vec2(0.75)).a * BLOOM_ADPT;
             float bloom_mix_adapted = max(0.0, BLOOM_MIX - smoothed_avglum);
+            
+            float shoulder = 0.33; //0.15; //= 0.25;
+            
+            bloom_mix_adapted = BLOOM_MIX * ( 1- pow(smoothed_avglum, shoulder-smoothed_avglum*shoulder     ));
 
             pixel_out = pixel_out + (bloomed * bloom_mix_adapted  )* over_white_correction ;
         }
