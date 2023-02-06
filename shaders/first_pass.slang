@@ -142,9 +142,9 @@ void debug() {
       //pixel_debug=vec3(0.38,0.0,1.0)*vTexCoord.x;
       //pixel_debug=vec3(vTexCoord.x); //H bw gradient
       //pixel_debug=vec3(floor(vTexCoord.x*16)/16); //H bw gradient 16gray
-      //pixel_debug=vec3(floor(vTexCoord.x*64)/64); //H bw gradient 64gray
+      pixel_debug=vec3(floor(vTexCoord.x*64)/64); //H bw gradient 64gray
       //pixel_debug=vec3(floor(vTexCoord.x*128)/128); //H bw gradient 128gray
-      pixel_debug=vec3(floor(vTexCoord.x*256)/256); //H bw gradient 128gray
+      //pixel_debug=vec3(floor(vTexCoord.x*256)/256); //H bw gradient 128gray
       //pixel_debug=vec3(1,0,0,0)*floor(vTexCoord.x*64)/64; //H red gradient 64
       //if  (mod(params.FrameCount,100) < 50) pixel_debug=vec3(0.5) ; else pixel_debug=vec3(1.0);
       //FragColor = vec4(color_tools(pixel_debug).rgb,1.0);
@@ -185,7 +185,7 @@ void main() {
    pixel_out = pixel_no_flicker(vTexCoord);
 
    
-   if (RF_NOISE_STRENGTH > 0.0) {
+   if (DO_RF_NOISE > 0.0) {
       vec3 noise = vec3(random(RF_NOISE_STRENGTH, vTexCoord * params.FrameCount));
       pixel_out += noise;
    }

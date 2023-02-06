@@ -71,7 +71,8 @@
 
 
 
-#define RF_NOISE_STRENGTH	global.RF_NOISE_STRENGTH
+#define DO_RF_NOISE		global.DO_RF_NOISE
+	#define RF_NOISE_STRENGTH	global.RF_NOISE_STRENGTH
 
 
 

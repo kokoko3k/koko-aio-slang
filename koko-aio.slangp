@@ -5,36 +5,14 @@
 #    	    Tried, does not produce great visible improvements
 #    [ ] Vignette and spot could be done earlier at lower res?
 #    [ ] check branching conditions in first_pass.slang
-#    [ ] reference new repo from the main one
-#    [ ] Noise is not visible on black or white, much more on gray, why?
+#    [v] reference new repo from the main one
+#    [v] Noise is not visible on black or white, much more on gray, why?
+#        Probably a matter of post processing
 #    [ ] Try to get rid of mark_unneeded() in reflection_blur_y
-#    [ ] Why tv presets have +5% brightness?
+#    [v] Why tv presets have +5% brightness?
+#        Because the contrast is pushed too.
 
-# Performances:
-# haswell igp: i5-4590 CPU @ 3.30GHz
-# Output on aspect: full, 1080p, 16:9, 60fps
-# All measurements made with aspect=full, so as long as ambient light is not used, the whole screen is filled by the shader.
-# This means that all the measurements, but ambient light itself are likely higher than real use.
 
-# input: mame, dynamite dux:                         26/09/2022          27/10/2022     02/11/2022
-#                    GPU%        Delta% vs Basal:
-#         no shader: 11          -23.6               11                  10             10
-#             basal: 34.6        0.0                 31.5                29.5           27.7
-#              FXAA: 37.5        2.9                 34.15               32.2           
-#         scanlines: 36.5        1.9                 32.3                31.5           
-#     ...flickering: 36.2        1.6                 32.4                32             
-#input glow gamma 3: 40          5.4                 36.75               35.2           
-#          rgb mask: 35.7        1.1                 32.60               33.4 **
-#          slotmask: 36.5        1.9                 33.6                32.1
-#      halo gamma 3: 40.0        5.4                 36.9                35.5
-#         bloom(q2): 38          3.4                 35.8                35             30.5 
-# color corrections: 35          0.4                 31.6                29.5
-#    curvature warp: 39.2        4.6                 33.5                34.1
-#     vignette+spot: 35.2        0.6                 33.2                34 
-#     ambient light: 38          3.4                 32.1                33.6
-#             Bezel:                                 37.5                33.7
-#-----------------------------------------------
-#Total basal + all the features: 72.2                65.3                65.2           61.2 (bloom q1)
     
 #    Koko-aio shader is meant to be an all-in one crt shader.
 #    It can be configured with many parameters, so that can be

@@ -44,16 +44,6 @@ DO_SCANLINES = "1.0"
 	SCANLINES_BLEEDING = "0.0"
 	
 DO_BLOOM = "0.0"
-	#shoulder 0.15, troppo forte nei bassi, poco negli alti
-	#BLOOM_MIX = "1.0"
-	#BLOOM_ADPT = "1.3"
-	#BLOOM_SIZE = "1.75"
-	#BLOOM_QUALITY = "1.0"
-	#BLOOM_GAMMA = "10.0"
-	#BLOOM_POWER = "1.15"
-	#BLOOM_GAMMA_OUT = "0.8"
-	#BLOOM_OVER_WHITE = "0.50"
-
 	#shoulder 0.33
 	BLOOM_MIX = "0.5"
 	BLOOM_ADPT = "0.8"

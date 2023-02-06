@@ -205,7 +205,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float GLOBAL_OFFX;
 	float GLOBAL_OFFY;
 
-	
+	float DO_RF_NOISE;
 	float RF_NOISE_STRENGTH;
 	
 } global;
@@ -236,8 +236,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 //#pragma parameter NTSC_DOT_CRAWL    "        Dot Crawl"			1.0	0.0 1.0  1.0
 #pragma parameter NTSC_MIX          "        Strength"				0.5	0.0 3.0  0.05
 
-#pragma parameter label_rfnoise	 "★ RF Noise "							0.0  0.0  1.0     1.0
-#pragma parameter RF_NOISE_STRENGTH "        Strength"				0.0 	0.0 1.0 0.01
+#pragma parameter DO_RF_NOISE	 "★ RF Noise enable? ==>"			0.0 	0.0  1.0     1.0
+#pragma parameter RF_NOISE_STRENGTH "        Strength"				0.05	0.0 1.0 0.01
 
 // YIQ/YUV bandwidth limited chroma bleeding and NTSC color artifacts.
 #pragma parameter DO_SAT_BLEED "★ CVBS: Bandwidth limited chroma enable? ==>"	0.0 	0.0 1.0 1.0
