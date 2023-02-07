@@ -797,7 +797,7 @@ void main() {
         //split screen
         //if (vTexCoord.y < 0.5) pixel_out = texture(first_pass,vTexCoord);
         //pixel_out = texture(avglum_pass,vTexCoord);
-    //pixel_out = texture(reflected_blurred_pass2, vOutputCoord);
+    //pixel_out = texture(halo_pass, vOutputCoord);
     FragColor = pixel_out;
     
     //FragColor = vec4(blur_shade(vTexCoord) );

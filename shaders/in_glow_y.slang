@@ -63,9 +63,6 @@ void main() {
       }
    }
 
-   //pre-gamma if needed by halo.
-   if (DO_HALO == 1.0)
-      pixel_glowed = pow(pixel_glowed, vec3(HALO_GAMMA));
    
    FragColor = vec4(pixel_glowed,1.0);
 }

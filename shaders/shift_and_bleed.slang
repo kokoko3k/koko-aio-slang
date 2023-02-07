@@ -197,11 +197,9 @@ void main() {
          pixel_out = texture(first_pass, vTexCoord).rgb;
       }
 
-   //pre-gamma if needed by glow or halo.
+   //pre-gamma if needed by glow.
    if (DO_IN_GLOW > 0.5) 
       pixel_out = pow(pixel_out, vec3(IN_GLOW_GAMMA));
-         else if (DO_HALO > 0.5) 
-            pixel_out = pow(pixel_out, vec3(HALO_GAMMA));
   
 
    FragColor = vec4(pixel_out,0.0);
