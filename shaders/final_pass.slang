@@ -713,7 +713,7 @@ vec4 pixel_inner_frame(vec2 coords, bool bBorder_needed) {
                 //spot = smoothstep(S_SIZE,0.0,dist)*S_POWER;
                 vec2 scoords = clamp(coords + spot_offset, 0.0,1.0);
                 float spot = vS_POWER * (vS_SIZE + 16.0*scoords.x*scoords.y*(1.0-scoords.x)*(1.0-scoords.y));
-                if (S_BYPASS < 1.0) pixel_out = spot + pixel_out;
+                if (S_BYPASS < 1.0) pixel_out = max(spot,0.0) + pixel_out;
                     else
                 pixel_out = vec3(spot);
             }

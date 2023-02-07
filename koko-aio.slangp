@@ -3,7 +3,8 @@
 #			nope: Guessing is impossible..
 #    [v] Use gauss blur for composite color bleeding?
 #    	    Tried, does not produce great visible improvements
-#    [ ] Vignette and spot could be done earlier at lower res?
+#    [v] Vignette and spot could be done earlier at lower res?
+#        Made a bit lighter version right in final_pass instead.
 #    [ ] check branching conditions in first_pass.slang
 #    [v] reference new repo from the main one
 #    [v] Noise is not visible on black or white, much more on gray, why?
