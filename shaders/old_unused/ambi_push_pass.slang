@@ -24,7 +24,7 @@ layout(set = 0, binding = 2) uniform sampler2D first_pass;
 #include "includes/functions.include.slang"
 
 void main() {
-   if (DO_AMBILIGHT != 1.0) return; 
+  if (DO_AMBILIGHT != 1.0) return; 
    
    vec3 pixel_out = texture(first_pass, vTexCoord).rgb;
    pixel_out = apply_fuzzy_main_pass(pixel_out);

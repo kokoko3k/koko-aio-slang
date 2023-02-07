@@ -73,7 +73,7 @@
       backdrop_wrap_mode = "mirrored_repeat"
          backdrop_mipmap = "true"
 
-shaders = 19
+shaders = 18
 # For P-uae defaults, doubling just y0 seems the best option.
 #  90% of games are lowres in vertical size and p-uae defaults
 #  to 720 pixels width, which is enough for this preset to work as intended.
@@ -256,25 +256,15 @@ float_framebuffer7 = true
 # from the very previous pass, the next one will just passthrough the original image
 
 
-               shader15 = shaders/ambi_push_pass.slang
-                alias15 = "ambi_push_pass"
-# I NEED TO SET **THIS** TO true TO HAVE THE PREVIOUS PASS linearly filtered
+# Gather mipmaps from first_pass and use them to light virtual leds under the virtual monitor 
+# and Temporally smooth led lights.
+               shader15 = shaders/ambi_temporal_pass.slang
+                alias15 = "ambi_temporal_pass"
         filter_linear15 = true
            scale_type15 = source
-                scale15 = 1.0
-            wrap_mode15 = "mirrored_repeat"
-         mipmap_input15 = false
-
-# Gather mipmaps from prevous pass and use them to light virtual leds under the virtual monitor 
-# and Temporally smooth led lights.
-               shader16 = shaders/ambi_pre_pass.slang
-                alias16 = "ambi_temporal_pass"
-        filter_linear16 = true
-           scale_type16 = source
-                scale16 = 0.5
-         mipmap_input16 = true
-            wrap_mode16 = "clamp_to_border"
-    float_framebuffer16 = true
+                scale15 = 0.5
+            wrap_mode15 = "clamp_to_border"
+    float_framebuffer15 = true
 
 
 # In this pass we gather information about the rotated state of the source
@@ -283,12 +273,12 @@ float_framebuffer7 = true
 #   The feedback of this pass will be queried by previous ones.
 #   I tried to move this into final_pass, but the gpu consumption was higher.
 
-           shader17 = shaders/isrotated.slang
-            alias17 = "isrotated_pass"
-    filter_linear17 = true
-            scale17 = 0.1
-       scale_type17 = viewport
-        wrap_mode17 = "mirrored_repeat"   
+           shader16 = shaders/isrotated.slang
+            alias16 = "isrotated_pass"
+    filter_linear16 = true
+            scale16 = 0.1
+       scale_type16 = viewport
+        wrap_mode16 = "mirrored_repeat"   
 
 # In this pass we emulate scanlines, glowing,
 #   RGB vertical mask, slot mask,haloing and color corrections
@@ -297,10 +287,10 @@ float_framebuffer7 = true
 #   with the bloomed image, vignette and spot light,  black frame insertions
 #   and Bezel emulation
 
-           shader18 = shaders/final_pass.slang
-            alias18 = "final_pass"
-    filter_linear18 = true
-       scale_type18 = viewport
-            scale18 = 1.0
-        wrap_mode18 = "mirrored_repeat"
+           shader17 = shaders/final_pass.slang
+            alias17 = "final_pass"
+    filter_linear17 = true
+       scale_type17 = viewport
+            scale17 = 1.0
+        wrap_mode17 = "mirrored_repeat"
 

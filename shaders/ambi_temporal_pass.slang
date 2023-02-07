@@ -30,7 +30,8 @@ void main() {
     fstep = (border_max - border_min)  / (leds_per_strip-1);
     
     //Calc a lod for a texture sized led_strip x led_strip
-        lod = log2(params.SourceSize.y / leds_per_strip);
+        //lod = log2(params.SourceSize.y / leds_per_strip);
+        lod = log2(global.first_passSize.y / leds_per_strip);
     
     //Precalc some Curvature/Warp values:
         vWarp_vexp = 1.0/ (1 + (vec2(GEOM_WARP_X, GEOM_WARP_Y) * 0.2)) ;
@@ -53,13 +54,22 @@ layout(set = 0, binding = 3) uniform sampler2D isrotated_passFeedback;
 layout(set = 0, binding = 4) uniform sampler2D PastSampler;
 layout(set = 0, binding = 5) uniform sampler2D avglum_pass;
 layout(set = 0, binding = 6) uniform sampler2D avglum_passFeedback;
+layout(set = 0, binding = 7) uniform sampler2D first_pass;
+
 
 #include "includes/functions.include.slang"
+
+vec3 ambi_push_pass(vec2 coords, float f_lod) {
+   vec3 pixel_out = textureLod(first_pass, coords, f_lod).rgb;
+   pixel_out = apply_fuzzy_main_pass(pixel_out);
+   pixel_out = pixel_push_luminance(pixel_out, AMBI_POWER-1);
+   return pixel_out;
+}
 
 vec3 circle_smooth(vec2 coords, vec2 middle, float f_radius, float FALLOFF, float f_lod) {
     float fdistance=distance(middle, vec2(coords.x, coords.y));
     float circle = (1-smoothstep(f_radius-FALLOFF, f_radius+FALLOFF, fdistance));
-    vec3 circle_color = textureLod(Source, middle, f_lod).rgb * circle;
+    vec3 circle_color = ambi_push_pass(middle, f_lod) * circle;
     //return pow(circle_color, vec3(2.0));
     return circle_color;
 }
@@ -172,7 +182,7 @@ vec4 pixel_ambilight() {
 }
 
 
-void main() {
+void main() {    
     if (DO_AMBILIGHT != 1.0) return; 
     FragColor = pixel_ambilight();
 }
