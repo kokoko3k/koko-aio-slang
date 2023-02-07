@@ -28,8 +28,13 @@ layout(location = 4) out float vIsRotated;
     layout(location = 8) out float vFlickeringScanlines;
     layout(location = 9) out float vScanlinePeriod;
     layout(location = 10) out float vScanlinesAlternate;
-    //layout(location = 11) out float vScanlinePhase;
 
+//Vignette, spot
+    layout(location = 11) out float vV_POWER;
+    layout(location = 12) out float vV_SIZE;
+    layout(location = 13) out float vS_POWER;
+    layout(location = 14) out float vS_SIZE;
+    
 #include "includes/functions.include.slang"
 
 void main() {
@@ -41,9 +46,6 @@ void main() {
         vTexCoord = zoom(vTexCoord + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM );
     
     vOutputCoord = TexCoord;
-
-    spot_offset = offsets_from_float(S_POSITION+420.0,40);
-    spot_offset = spot_offset / 10.0 + vec2(0.0,1.0);
 
     vFragCoord = vec2( floor(vOutputCoord.x * params.OutputSize.x),
                        floor(vOutputCoord.y * params.OutputSize.y));
@@ -69,6 +71,17 @@ void main() {
             //vScanlinePhase = vScanlinePeriod * pi - pi/4.0; //<-- needed to match scanlines done in first_pass. //FIXME check what happens for highter res.
         }
 
+    //Vignette
+        float V_SIZE_ADAPTED = V_SIZE*2.0;
+        vV_POWER = V_POWER/V_SIZE_ADAPTED;
+        vV_SIZE = (V_SIZE_ADAPTED-1.0);
+
+    //Spot:
+        spot_offset = offsets_from_float(S_POSITION+420.0,40);
+        spot_offset = spot_offset / 10.0 + vec2(0.0,1.0);
+        float S_SIZE_ADAPTED = S_SIZE*1.3;
+        vS_POWER = S_POWER/S_SIZE_ADAPTED;
+        vS_SIZE = (S_SIZE_ADAPTED-1.0);
 }
 
 
@@ -84,7 +97,10 @@ layout(location = 7) in float vIsInterlaced;
 layout(location = 8) in float vFlickeringScanlines;
 layout(location = 9) in float vScanlinePeriod;
 layout(location = 10) in float vScanlinesAlternate;
-//layout(location = 11) in float vScanlinePhase;
+layout(location = 11) in float vV_POWER;
+layout(location = 12) in float vV_SIZE;
+layout(location = 13) in float vS_POWER;
+layout(location = 14) in float vS_SIZE;
 
     
 layout(location = 0) out vec4 FragColor;
@@ -681,21 +697,25 @@ vec4 pixel_inner_frame(vec2 coords, bool bBorder_needed) {
             float in_aspect = get_in_aspect();
 
             if (DO_VIGNETTE == 1.0) {
-                float vignette;
-                float dist = length(vec2((coords.x-0.5)*in_aspect,coords.y-0.5));
-                vignette = smoothstep(V_SIZE,0.0,dist)*V_POWER;
+                //float vignette;
+                //float dist = length(vec2((coords.x-0.5)*in_aspect,coords.y-0.5));
+                //vignette = smoothstep(V_SIZE,0.0,dist)*V_POWER;                
+                
+                float vignette = vV_POWER * (vV_SIZE + 16.0*coords.x*coords.y*(1.0-coords.x)*(1.0-coords.y));
                 if (V_BYPASS < 1.0) pixel_out = vignette * clamp(pixel_out,0.0,1.0);
                     else
                 pixel_out = vec3(vignette);
             }
 
             if (DO_SPOT == 1.0) {
-            float spot;
-            float dist = length(vec2((coords.x-0.5)*in_aspect,coords.y-0.5)+spot_offset);
-            spot = smoothstep(S_SIZE,0.0,dist)*S_POWER;
-            if (S_BYPASS < 1.0) pixel_out = spot + pixel_out;
-                else
-            pixel_out = vec3(spot);
+                //float spot;
+                //float dist = length(vec2((coords.x-0.5)*in_aspect,coords.y-0.5)+spot_offset);
+                //spot = smoothstep(S_SIZE,0.0,dist)*S_POWER;
+                vec2 scoords = clamp(coords + spot_offset, 0.0,1.0);
+                float spot = vS_POWER * (vS_SIZE + 16.0*scoords.x*scoords.y*(1.0-scoords.x)*(1.0-scoords.y));
+                if (S_BYPASS < 1.0) pixel_out = spot + pixel_out;
+                    else
+                pixel_out = vec3(spot);
             }
             pixel_out += global_noise;
         }

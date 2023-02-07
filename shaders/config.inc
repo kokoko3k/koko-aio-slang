@@ -382,7 +382,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 //Vignette and spot
 #pragma parameter DO_VIGNETTE	"★ Vignette enable? ==>"	0.0  0.0  1.0  1.0
 #pragma parameter V_BYPASS	"        bypass "	        0.0  0.0  1.0  1.0
-#pragma parameter V_SIZE	"        size"			1.7  0.0  3.0  0.05
+#pragma parameter V_SIZE	"        size"			1.7  0.0  5.0  0.05
 #pragma parameter V_POWER	"        power"			1.1  0.05 2.0  0.05
 
 #pragma parameter DO_SPOT	"★ Spot enable? ==>"		0.0   0.0   1.0 1.0
