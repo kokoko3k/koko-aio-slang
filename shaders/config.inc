@@ -22,7 +22,8 @@
 	// when changing scene. (range 0..1)
 	// It is wise to correlate it with avglum_divider
 	// try between (1/avglum_divider) and (1/avglum_divider)/3
-#define AMBI_FAST_STEP 0.125 
+//#define AMBI_FAST_STEP 0.125 
+#define AMBI_FAST_STEP 0.25
 
 	//Setting the glow/halo sharpness parameter to this
 	//will skip the blurring phase and lowers the gpu use

@@ -68,7 +68,6 @@ vec3 circle_smooth(vec2 coords, vec2 middle, float f_radius, float FALLOFF, floa
     float fdistance=distance(middle, vec2(coords.x, coords.y));
     float circle = (1-smoothstep(f_radius-FALLOFF, f_radius+FALLOFF, fdistance));
     vec3 circle_color = ambi_push_pass(middle, f_lod) * circle;
-    //return pow(circle_color, vec3(2.0));
     return circle_color;
 }
 
@@ -179,8 +178,17 @@ vec4 pixel_ambilight() {
     return vec4(ambi_step_rgb(past_pixel, present_pixel, mystep), scene_change_remaining);
 }
 
+//3.0 makes scene detection not working.
+#define FRAME_DIVIDER 2.0
 
 void main() {    
     if (DO_AMBILIGHT != 1.0) return; 
+    
+    if ( mod(params.FrameCount,FRAME_DIVIDER) != 0.0) {
+        FragColor = texture(PastSampler, vTexCoord);
+        return;
+    }
+    
+    
     FragColor = pixel_ambilight();
 }
