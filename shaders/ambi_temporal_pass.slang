@@ -30,7 +30,6 @@ void main() {
     fstep = (border_max - border_min)  / (leds_per_strip-1);
     
     //Calc a lod for a texture sized led_strip x led_strip
-        //lod = log2(params.SourceSize.y / leds_per_strip);
         lod = log2(global.first_passSize.y / leds_per_strip);
     
     //Precalc some Curvature/Warp values:
@@ -49,12 +48,11 @@ layout(location = 6) in vec2 vWarp_arg2;
 
 layout(location = 0) out vec4 FragColor;
 
-layout(set = 0, binding = 2) uniform sampler2D Source;
-layout(set = 0, binding = 3) uniform sampler2D isrotated_passFeedback;
-layout(set = 0, binding = 4) uniform sampler2D PastSampler;
-layout(set = 0, binding = 5) uniform sampler2D avglum_pass;
-layout(set = 0, binding = 6) uniform sampler2D avglum_passFeedback;
-layout(set = 0, binding = 7) uniform sampler2D first_pass;
+layout(set = 0, binding = 1) uniform sampler2D isrotated_passFeedback;
+layout(set = 0, binding = 2) uniform sampler2D PastSampler;
+layout(set = 0, binding = 3) uniform sampler2D avglum_pass;
+layout(set = 0, binding = 4) uniform sampler2D avglum_passFeedback;
+layout(set = 0, binding = 5) uniform sampler2D first_pass;
 
 
 #include "includes/functions.include.slang"
