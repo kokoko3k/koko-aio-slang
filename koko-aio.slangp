@@ -8,7 +8,8 @@
 #    [v] reference new repo from the main one
 #    [v] Noise is not visible on black or white, much more on gray, why?
 #        Probably a matter of post processing
-#    [ ] Try to get rid of mark_unneeded() in reflection_blur_y
+#    [v] Try to get rid of mark_unneeded() in reflection_blur_y
+#        didit and it is useless, no measurable perf increase.
 #    [v] Why tv presets have +5% brightness?
 #        Because the contrast is pushed too.
 

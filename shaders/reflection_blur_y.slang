@@ -55,8 +55,6 @@ vec3 blur_unroll(float Size, vec2 co) {
     return color;
 }
 
-
-
 void main() {
     if (DO_BEZEL == 0.0) return;
     
