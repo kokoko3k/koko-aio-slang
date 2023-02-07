@@ -51,18 +51,16 @@ vec3 glow_blur_bias(sampler2D source_tex, vec2 co, vec3 pixel_glowed, float bias
 
 void main() { 
    if (DO_IN_GLOW == 0.0) return;
-   
+
+   vec3 pixel_glowed;
    //apply just gamma and power for tighter blurs and exit:
    if (IN_GLOW_W >= GLOW_SHARP_MAX && IN_GLOW_H >= GLOW_SHARP_MAX) {
-      FragColor = vec4( glow_dumb(Source, IN_GLOW_POWER, IN_GLOW_GAMMA, vTexCoord), 1.0);
-      return;
-   }
-
-   vec3 pixel_glowed = texture(Source, vTexCoord).rgb;
-   pixel_glowed = blur9_y(Source, vTexCoord, params.SourceSize.xy, vIN_GLOW_H) * IN_GLOW_POWER;
-
-   if (IN_GLOW_BIAS < IN_GLOW_BIAS_MAX && (IN_GLOW_W < GLOW_SHARP_MAX || IN_GLOW_H < GLOW_SHARP_MAX) ) {
+      pixel_glowed = glow_dumb(Source, IN_GLOW_POWER, IN_GLOW_GAMMA, vTexCoord);
+   } else {
+      pixel_glowed = blur9_y(Source, vTexCoord, params.SourceSize.xy, vIN_GLOW_H) * IN_GLOW_POWER;
+      if (IN_GLOW_BIAS < IN_GLOW_BIAS_MAX && (IN_GLOW_W < GLOW_SHARP_MAX || IN_GLOW_H < GLOW_SHARP_MAX) ) {
            pixel_glowed = glow_blur_bias(shift_and_bleed_pass, vTexCoord, pixel_glowed, IN_GLOW_BIAS);
+      }
    }
 
    //pre-gamma if needed by halo.
