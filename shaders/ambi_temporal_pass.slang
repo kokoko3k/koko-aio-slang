@@ -48,11 +48,10 @@ layout(location = 6) in vec2 vWarp_arg2;
 
 layout(location = 0) out vec4 FragColor;
 
-layout(set = 0, binding = 1) uniform sampler2D isrotated_passFeedback;
-layout(set = 0, binding = 2) uniform sampler2D PastSampler;
-layout(set = 0, binding = 3) uniform sampler2D avglum_pass;
-layout(set = 0, binding = 4) uniform sampler2D avglum_passFeedback;
-layout(set = 0, binding = 5) uniform sampler2D first_pass;
+layout(set = 0, binding = 1) uniform sampler2D PastSampler;
+layout(set = 0, binding = 2) uniform sampler2D avglum_pass;
+layout(set = 0, binding = 3) uniform sampler2D avglum_passFeedback;
+layout(set = 0, binding = 4) uniform sampler2D first_pass;
 
 
 #include "includes/functions.include.slang"
@@ -75,11 +74,9 @@ vec3 circle_smooth(vec2 coords, vec2 middle, float f_radius, float FALLOFF, floa
 #define tol_end   0.94 //1-tol_start
 
 vec3 ambi_pre_pass() {
-
-    bool is_rotated = texture(isrotated_passFeedback, vec2(0.5, 0.5)).r > 0.5;
-    
+   
     //Scale to the original aspect
-    vec2 coords = get_scaled_coords(vTexCoord, global.FinalViewportSize, is_rotated);
+    vec2 coords = get_scaled_coords(vTexCoord, global.FinalViewportSize, is_rotated());
     if (DO_GLOBAL_SHZO >0.5)
         coords = zoom(coords + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM );
     

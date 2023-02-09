@@ -29,7 +29,6 @@ layout(location = 1) in vec2 vWarp_vexp;
 layout(location = 2) in vec2 vWarp_arg2;
 
 layout(set = 0, binding = 1) uniform sampler2D first_pass;
-layout(set = 0, binding = 2) uniform sampler2D isrotated_passFeedback;
 
 #define SourceTexture first_pass
 #define SourceTextureSize global.first_passSize

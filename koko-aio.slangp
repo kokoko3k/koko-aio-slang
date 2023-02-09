@@ -74,7 +74,7 @@
       backdrop_wrap_mode = "mirrored_repeat"
          backdrop_mipmap = "true"
 
-shaders = 18
+shaders = 17
 # For P-uae defaults, doubling just y0 seems the best option.
 #  90% of games are lowres in vertical size and p-uae defaults
 #  to 720 pixels width, which is enough for this preset to work as intended.
@@ -262,8 +262,8 @@ float_framebuffer7 = true
                shader15 = shaders/ambi_temporal_pass.slang
                 alias15 = "ambi_temporal_pass"
         filter_linear15 = true
-           scale_type15 = source
-                scale15 = 0.5
+           scale_type15 = viewport
+                scale15 = 0.05
             wrap_mode15 = "clamp_to_border"
     float_framebuffer15 = true
 
@@ -274,12 +274,12 @@ float_framebuffer7 = true
 #   The feedback of this pass will be queried by previous ones.
 #   I tried to move this into final_pass, but the gpu consumption was higher.
 
-           shader16 = shaders/isrotated.slang
-            alias16 = "isrotated_pass"
-    filter_linear16 = true
-            scale16 = 0.1
-       scale_type16 = viewport
-        wrap_mode16 = "mirrored_repeat"   
+#           shader15 = shaders/isrotated.slang
+#            alias15 = "isrotated_pass"
+#    filter_linear15 = true
+#            scale15 = 0.1
+#       scale_type15 = viewport
+#        wrap_mode15 = "mirrored_repeat"   
 
 # In this pass we emulate scanlines, glowing,
 #   RGB vertical mask, slot mask,haloing and color corrections
@@ -288,10 +288,10 @@ float_framebuffer7 = true
 #   with the bloomed image, vignette and spot light,  black frame insertions
 #   and Bezel emulation
 
-           shader17 = shaders/final_pass.slang
-            alias17 = "final_pass"
-    filter_linear17 = true
-       scale_type17 = viewport
-            scale17 = 1.0
-        wrap_mode17 = "mirrored_repeat"
+           shader16 = shaders/final_pass.slang
+            alias16 = "final_pass"
+    filter_linear16 = true
+       scale_type16 = viewport
+            scale16 = 1.0
+        wrap_mode16 = "mirrored_repeat"
 
