@@ -22,6 +22,7 @@ layout(set = 0, binding = 2) uniform sampler2D Source;
 
 #include "includes/functions.include.slang"
 #include "includes/blooms.include.slang"
+
 #define offset 0.5890486225480862 // TAU/8.0/4.0*3.0
 
 void main() {

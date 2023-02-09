@@ -20,11 +20,12 @@ layout(location = 0) in vec2 vTexCoord;
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D first_pass;
 
-#include "includes/blooms.include.slang"
 #include "includes/functions.include.slang"
+#include "includes/blooms.include.slang"
 
 void main() {
     if (DO_BLOOM == 0.0) return;
+    
     
     vec3 bloomed = bloom_gamma_power(
         first_pass,

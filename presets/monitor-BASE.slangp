@@ -47,7 +47,7 @@ DO_BLOOM = "0.0"
 	#shoulder 0.33
 	BLOOM_MIX = "0.5"
 	BLOOM_ADPT = "0.8"
-	BLOOM_SIZE = "1.75"
+	BLOOM_SIZE = "2.0"
 	BLOOM_QUALITY = "1.0"
 	BLOOM_GAMMA = "10.0"
 	BLOOM_POWER = "1.15"

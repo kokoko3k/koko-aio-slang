@@ -39,6 +39,9 @@
 #define IN_GLOW_BIAS_MAX 1.0
 
 	//Try to keep blur sizes consistent across input resolutions
+#define SCALEMOD_X 360
+#define SCALEMOD_Y 270
+
 #define NEW_SCALEMOD_X (params.OriginalSize.x/360.0 / 2.2)
 #define NEW_SCALEMOD_Y (params.OriginalSize.y/270.0 / 2.2)
 
