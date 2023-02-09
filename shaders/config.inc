@@ -389,7 +389,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter S_BYPASS	"        bypass"	        0.0   0.0   1.0 1.0
 #pragma parameter S_POSITION 	"        Position"		0.0   -420.0 378.0 1
 #pragma parameter S_SIZE	"        size"			0.4   0.0  1.0 0.01
-#pragma parameter S_POWER	"        power" 		0.1  0.05  2.0 0.05
+#pragma parameter S_POWER	"        power" 		0.05  0.01  2.0 0.01
 
 
 
