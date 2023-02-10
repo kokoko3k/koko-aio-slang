@@ -84,6 +84,7 @@ shaders = 17
 # Being a fast single pass process, don't expect it to be 100% accurate
 # It is able to drag rainbows as seen in Megadrive games with an option
 # To make it oblique.
+# It also does input colot corrections to the input signal (saturation,brightness,contrast...)
            shader0 = shaders/ntsc_pass.slang
             alias0 = "ntsc_pass"
     filter_linear0 = false
@@ -93,8 +94,7 @@ shaders = 17
 
 
         
-# This pass, wrongly named first pass, since we prepended the ntsc pass,
-# does olor corrections to the input signal (saturation,brightness,contrast...)
+# This pass, wrongly named first pass, since we prepended the ntsc pass
 # and emulates the flickering observed on crts when the input signal is interlaced
 # and there is high brightness difference between adiacent scanlines.
 # This pass is able to generate mipmaps because the next pass has mipmap_input true.
