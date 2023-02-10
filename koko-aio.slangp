@@ -13,9 +13,13 @@
 #        didit and it is useless, no measurable perf increase.
 #    [v] Why tv presets have +5% brightness?
 #        Because the contrast is pushed too.
-#    [ ] First bloom pass: why don't we use an higher lod?
-#        Does quality improve if we sample from ntsc_pass or original instead?
-
+#    [v] First bloom pass: why don't we use an higher lod?
+#        Using an higher lod makes the bloom less prone to detect thinner lines
+#        So, no.
+#    [ ] Does bloom quality improve if we sample from original?
+#        
+#    [ ] Should the flickering be aware of the scanline?
+#        read: does a scanline dark gap increment the flickering or not?
     
 #    Koko-aio shader is meant to be an all-in one crt shader.
 #    It can be configured with many parameters, so that can be
@@ -31,9 +35,7 @@
 #        black frame insertions, interlace emulation, antialiasing.
 
 #    External code by:
-#    * CRT - Guest - Dr.Venom (single pass bloom function)
 #    * Nvidia (FXAA)
-
 
 
 

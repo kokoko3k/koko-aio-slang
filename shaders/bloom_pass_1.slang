@@ -18,7 +18,7 @@ void main() {
 
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 0) out vec4 FragColor;
-layout(set = 0, binding = 2) uniform sampler2D first_pass;
+layout(set = 0, binding = 1) uniform sampler2D first_pass;
 
 #include "includes/functions.include.slang"
 #include "includes/blooms.include.slang"

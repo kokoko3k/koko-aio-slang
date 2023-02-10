@@ -7,13 +7,39 @@
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
+layout(location = 1) out vec3 vTemperature_rgb;
 layout(location = 0) out vec2 vTexCoord;
 layout(location = 2) out float vNTSC_FILTER_FC;
 layout(location = 3) out float vNTSC_FILTER_SCF;
 layout(location = 4) out float vNTSC_weights[NTSC_FILTER_WIDTH_MAX];
 
+
 #include "includes/functions.include.slang"
 
+
+vec3 kelvin2rgb(float k) {
+   //Convert kelvin temperature to rgb factors
+   k = clamp(k,1000,40000);
+   k=k/100.0;
+   float tmpCalc;
+    vec3 pixel_out;
+   if (k<=66) {
+      pixel_out.r = 255;
+      pixel_out.g = 99.47080258612 * log(k) - 161.11956816610;
+   } else {
+      pixel_out.r = 329.6987274461 * pow(k - 60 ,-0.13320475922);
+      pixel_out.g = 288.12216952833 * pow(k-60, -0.07551484921);
+   }
+
+   if (k >= 66)
+      pixel_out.b = 255;
+   else if (k<=19)
+      pixel_out.b = 0;
+   else
+      pixel_out.b = 138.51773122311 * log(k - 10) - 305.04479273072;
+
+   return pixel_out/255.0;
+}
 
 /* hann() sinc() functions by xot:
  * copyright (c) 2017-2018, John Leffingwell
@@ -23,13 +49,10 @@ layout(location = 4) out float vNTSC_weights[NTSC_FILTER_WIDTH_MAX];
  * https://www.shadertoy.com/view/Mdffz7
  */
 
-
-//	Hann windowing function
 float hann(float n, float N) {
     return 0.5 * (1.0 - cos((TAU*n)/(N-1.0)));
 }
 
-//	Sinc function
 float sinc(float x) {
     if (x == 0.0) return 1.0;
 	return sin(pi*x) / (pi*x);
@@ -55,15 +78,22 @@ void main() {
          vNTSC_weights[n] /= sum;
       }
    }
-
+   if (TEMPERATURE != 6500)
+      vTemperature_rgb = kelvin2rgb(TEMPERATURE);
 }
 
 
 #pragma stage fragment
+
+#include "includes/functions.include.slang"
+
 layout(location = 0) in vec2 vTexCoord;
+layout(location = 1) in vec3 vTemperature_rgb;
 layout(location = 2) in float vNTSC_FILTER_FC;
 layout(location = 3) in float vNTSC_FILTER_SCF;
 layout(location = 4) in float vNTSC_weights[NTSC_FILTER_WIDTH_MAX];
+
+
 layout(location = 0) out vec4 FragColor;
 
 layout(set = 0, binding = 2) uniform sampler2D Source;
@@ -79,17 +109,6 @@ const mat3 RGB2YIQ = mat3(
          0.5870, -0.2744, -0.5229,
          0.1140, -0.3216, 0.3114);
 
-
-//	Hann windowing function
-float hann(float n, float N) {
-    return 0.5 * (1.0 - cos((TAU*n)/(N-1.0)));
-}
-
-//	Sinc function
-float sinc(float x) {
-    if (x == 0.0) return 1.0;
-	return sin(pi*x) / (pi*x);
-}
 
 #define pi10 pi*10
 
@@ -119,13 +138,40 @@ vec3 ntscdec(vec2 uv ){
   return YIQ_result * YIQ2RGB;
 }
 
+#define W vec3(0.2125, 0.7154, 0.0721)
+
+vec3 color_tools(vec3 pixel_out) {
+//Apply color corrections to input signal.
+
+   //Push luminance without clipping
+   pixel_out = pixel_push_luminance(pixel_out,LUMINANCE);
+
+   //Modify saturation
+   if (!(SATURATION == 1.0)) {
+      vec3 intensity = vec3(dot(pixel_out.rgb, W));
+      pixel_out.rgb = mix(intensity, pixel_out.rgb, SATURATION);
+   }
+
+   //Modify contrast and brightness
+   if (CONTRAST != 0.0 || BRIGHTNESS != 0.0)
+      pixel_out.rgb = scale_to_range_vec3(pixel_out.rgb, -CONTRAST, 1+CONTRAST) + BRIGHTNESS;
+
+   //Modify color temperature
+   if (TEMPERATURE != 6500.0) pixel_out.rgb = pixel_out.rgb * vTemperature_rgb;
+   return pixel_out;
+}
 
 void main() {
+   vec3 pixel_out;
    if (DO_NTSC_ARTIFACTS > 0.5)
-      FragColor = vec4(ntscdec(vTexCoord),1.0);
+      pixel_out = ntscdec(vTexCoord);
          else
-      FragColor = texture(Source, vTexCoord);
-   return;
+      pixel_out = texture(Source, vTexCoord).rgb;
+   
+   if (DO_CCORRECTION == 1.0)
+      pixel_out = color_tools(pixel_out);
+   
+   FragColor = vec4(pixel_out, 1.0);
 }
 
 

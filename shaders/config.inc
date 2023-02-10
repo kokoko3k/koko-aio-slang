@@ -325,7 +325,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BLOOM_POWER        "        Power multiplier"			1.25  1.0 20.0 0.05
 #pragma parameter BLOOM_GAMMA_OUT    "        Output Gamma"				10.0  0.1 10.0 0.1
 #pragma parameter BLOOM_OVER_WHITE   "        Strength on bright areas (0 = aura)"	0.5  0.0 1.0  0.05
-#pragma parameter BLOOM_BYPASS       "        Bypass"					0.0  0.0 1.0  1.0
+#pragma parameter BLOOM_BYPASS       "        Bypass/Solo"				0.0  0.0 1.0  1.0
 
 
 
@@ -384,15 +384,15 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 //Vignette and spot
 #pragma parameter DO_VIGNETTE	"★ Vignette enable? ==>"	0.0  0.0  1.0  1.0
-#pragma parameter V_BYPASS	"        bypass "	        0.0  0.0  1.0  1.0
-#pragma parameter V_SIZE	"        size"			1.7  0.0  5.0  0.05
-#pragma parameter V_POWER	"        power"			1.1  0.05 2.0  0.05
+#pragma parameter V_BYPASS	"        Bypass/Solo"	        0.0  0.0  1.0  1.0
+#pragma parameter V_SIZE	"        Size"			1.7  0.0  5.0  0.05
+#pragma parameter V_POWER	"        Power"			1.1  0.05 2.0  0.05
 
 #pragma parameter DO_SPOT	"★ Spot enable? ==>"		0.0   0.0   1.0 1.0
-#pragma parameter S_BYPASS	"        bypass"	        0.0   0.0   1.0 1.0
+#pragma parameter S_BYPASS	"        Bypass/Solo"	        0.0   0.0   1.0 1.0
 #pragma parameter S_POSITION 	"        Position"		0.0   -420.0 378.0 1
-#pragma parameter S_SIZE	"        size"			0.4   0.0  1.0 0.01
-#pragma parameter S_POWER	"        power" 		0.05  0.01  2.0 0.01
+#pragma parameter S_SIZE	"        Size"			0.4   0.0  1.0 0.01
+#pragma parameter S_POWER	"        Power" 		0.05  0.01  2.0 0.01
 
 
 
