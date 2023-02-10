@@ -41,26 +41,11 @@ float get_avg_lum_from_mip() {
     return (mip.r+mip.g+mip.b)/3.0;
 }
 
-/*float get_avglum() {
-    bool coordinate_for_scene_detection = 
-            vTexCoord.x > 0.24 && vTexCoord.x < 0.26 &&
-            vTexCoord.y > 0.24 && vTexCoord.y < 0.26 ;
-            
-    bool reduced_sample_time_is_now = (mod(params.FrameCount,AMBI_AVGLUM_DIVIDER) == 0);
-
-    if (!coordinate_for_scene_detection) return get_avg_lum_from_mip();
-    if (reduced_sample_time_is_now)      return get_avg_lum_from_mip();
-    if (coordinate_for_scene_detection && reduced_sample_time_is_now) return get_avg_lum_from_mip();
-    
-    // Implicit else: we are in a coordinate that is not used for scene detection
-    //So just return the feedback of this pass to spare gpu cycles.
-    return texture(avglum_passFeedback,vTexCoord).a;
-}*/
 
 #define SMOOTHNESS_SPEED 0.05
 
 float get_avglum() {
-    /* avglum alfa has 3 zones::
+    /* avglum alpha has 3 zones::
      * 0.25 -> reduced sampling, used for to aid scene detection
      * 0.75 -> smoothed_sampling, used to adapt bloom and
      * anything else: continuous sampling

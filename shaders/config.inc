@@ -295,7 +295,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter HALO_W        "        Sharpness, horizontal"					1.75	0.35  7.0 0.05
 #pragma parameter HALO_H        "        Sharpness, Vertical"					1.75	0.35  7.0 0.05
 #pragma parameter HALO_GAMMA    "        Gamma, the higher, the less the halo on dark colors"	2.0 	1.0  10.0 0.1
-#pragma parameter HALO_VS_SCAN  "        Light up scanlines too"				0.0	0.0  1.0  0.1
+#pragma parameter HALO_VS_SCAN  "        Light up scanlines gaps too"				0.0	0.0  1.0  0.1
 
 
 // Scanlines

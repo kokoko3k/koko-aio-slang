@@ -13,7 +13,8 @@
 #        didit and it is useless, no measurable perf increase.
 #    [v] Why tv presets have +5% brightness?
 #        Because the contrast is pushed too.
-
+#    [ ] First bloom pass: why don't we use an higher lod?
+#        Does quality improve if we sample from ntsc_pass or original instead?
 
     
 #    Koko-aio shader is meant to be an all-in one crt shader.
@@ -75,19 +76,12 @@
          backdrop_mipmap = "true"
 
 shaders = 17
-# For P-uae defaults, doubling just y0 seems the best option.
-#  90% of games are lowres in vertical size and p-uae defaults
-#  to 720 pixels width, which is enough for this preset to work as intended.
-#  Rest warned, that when a game sets an interlaced resolution, p-uae
-#  will output even 560 h-lines which, doubled, will result in
-#  1120 h lines. too much even for a 1080p screen.
-#  Auto-Cropping/overscan emulation could be added in a future release.
-#  For other emulators/systems, probably it is best and safe to doulbe x0 too.
 
-# In the first pass we draw an optional black border around the image for bezel purposes
-#   and scale the image to something better usable by FXAA
-#   Scaling y to 2x is needed by flickering scanlines pass.
-
+# NTSC Color artifacts pass:
+# The very first pass emulates ntsc color artifacting.
+# Being a fast single pass process, don't expect it to be 100% accurate
+# It is able to drag rainbows as seen in Megadrive games with an option
+# To make it oblique.
            shader0 = shaders/ntsc_pass.slang
             alias0 = "ntsc_pass"
     filter_linear0 = false
@@ -95,34 +89,59 @@ shaders = 17
             scale0 = 1.0
         wrap_mode0 = "mirrored_repeat"
 
+
+        
+# This pass, wrongly named first pass, since we prepended the ntsc pass,
+# does olor corrections to the input signal (saturation,brightness,contrast...)
+# and emulates the flickering observed on crts when the input signal is interlaced
+# and there is high brightness difference between adiacent scanlines.
+# This pass is able to generate mipmaps because the next pass has mipmap_input true.
+#
+# Note that the wrap_mode is set to "mirrored_repeat".
+# This allow to cheaply generate a mirrored image that will be used later on to
+# draw reflections on the bezel.
+#
+# Also, it upscales the input signal to 2X.
+# This is needed because FXAA, the glow and the halo pass works best at at least 640x480 resolution.
+# Note that this is needed only for lowres content, but if the input signal is already at that
+# size, there is no need to scale to 2x, and it is possible to gain performance by turning
+# scale_x1 and scale_y1 from 2.0 to 1.0.
+#
+# A special note for P-UAE core (Commodore Amiga), is needed, because it outputs by default to
+# 720 pixel width and about 280p; this means that for P-UAE you can use scale_x1 = 1.0
+# and only scale_y1 = 2.0 is needed.
+# As an alternative option you can configure P-UAE to always output to low resolution for x and y
+# But this way you loose the emulation for hires content (not much games uses it anyway).
            shader1 = shaders/first_pass.slang
             alias1 = "first_pass"
     filter_linear1 = false
        scale_type1 = source
-            scale1 = 2.0
+          scale_x1 = 2.0
+          scale_y1 = 2.0  
         wrap_mode1 = "mirrored_repeat"
 
+
+
 # Nvidia fxaa pass:
-#   works good for "SD" resolutions
+# works good for "SD" resolutions
+# FXAA don't really need any mipmap, but since mipmaps from first_pass are needed by
+# some subsequent passes, specify that FXAA_pass wants mipmaps
+# makes first_pass mipmaps available to everyone.
+# Even if theoretically not needed, texture() occurrence in FXAA_pass needed to be switched 
+# to textureLod(..,0.0) or it acts weird, don't ask me why.
            shader2 = shaders/fxaa.slang
             alias2 = "FXAA_pass"
     filter_linear2 = true
        scale_type2 = source
             scale2 = 1.0
-            
-#   FXAA don't really need any mipmap, but avglum_pass several passes after it does.
-#   and for the weird way retroarch manages mipmaps, specify that FXAA_pass wants mipmaps
-#   makes first_pass mipmaps available to everyone.
-#   even if theoretically not needed, texture() occurrence in FXAA_pass needed to be switched 
-#   to textureLod(..,0.0) or it acts weird, don't ask me why.
-#   yay.
-
      mipmap_input2 = true
         wrap_mode2 = "mirrored_repeat"
 
-# This pass emulates composite color bleeding and deconvergence
-# deconvergence should be applied in th final pass, but it is too heavy there.
-# This pass also apply the input gamma needed for halo or glow.
+        
+
+# This pass emulates NTSC/PAL composite color bleeding and deconvergence
+# deconvergence should really be applied in th final pass, but it is too heavy there.
+# This pass also apply the input gamma needed for glow pass.
            shader3 = shaders/shift_and_bleed.slang
             alias3 = "shift_and_bleed_pass"
     filter_linear3 = true
@@ -132,14 +151,10 @@ float_framebuffer3 = true
      mipmap_input3 = false
         wrap_mode3 = "mirrored_repeat"
 
-
-
-# Blur and glow the image as requested 
-#   This pass aims to simulate the signal input power.
-#   Glowing will be used to weighting the scanlines.
-#   In this pass we also generate flickering scanlines by blindly blanking
-#   alternate lines at #frame interval
-
+        
+        
+# Blur and/or glows the image as requested 
+# This passes aims to simulate the signal input power.
            shader4 = shaders/in_glow_x.slang
             alias4 = "in_glow_pass_x"
     filter_linear4 = true
@@ -157,9 +172,10 @@ float_framebuffer5 = true
         wrap_mode5 = "mirrored_repeat"
             
           
+        
 # This essentially is the same as glowing by a code point of view.
-#   But this pass will be added later on instead of mixed
-
+# But the result of this pass will be added (+) to the input signal
+# in the final pass.
            shader6 = shaders/halo_x.slang
             alias6 = "halo_pass_x"
     filter_linear6 = true
@@ -177,7 +193,9 @@ float_framebuffer6 = true
 float_framebuffer7 = true
      mipmap_input7 = false
         wrap_mode7 = "mirrored_repeat"
-        
+
+
+
 # Get the average luminance needed by ambilight here, because:
 #   * mipmap_input only works on "Source" texture
 #   * the following pass does not use the previous one 
@@ -188,6 +206,13 @@ float_framebuffer7 = true
 #   The alpha channel contains the sum/3.0 of rgb channels
 #   used to detect scene changes.
 
+# This pass computes the average luminance of the image
+# by grabbing a mipmap from first_pass.
+# It stores at:
+# alpha@coords 0.25,0.25 at reduced sampling to aid ambient light scene change detection
+# alpha@coords 0.75,0.75 temporally smoother for use with bloom exposure and dynamic zoom
+# rgb: it puts a small mipmap from first_pass that will be used to light-up the
+# alpha@other coords: simple continuous sampling used to modulate bezel highlights strength.
                shader8 = shaders/avglum_pass.slang
                 alias8 = "avglum_pass"
         filter_linear8 = true
@@ -196,9 +221,10 @@ float_framebuffer7 = true
             wrap_mode8 = "mirrored_repeat"
          mipmap_input8 = false
 
-# The following 2 passes will blur the mirrored part of main pass
-#   to emulate bezel reflections.
-   
+         
+         
+# The following 2 passes will blur the mirrored part of first_pass
+# to emulate soft bezel reflections.
                shader9 = shaders/reflection_blur_x.slang
                 alias9 = "reflected_blurred_pass1"
         filter_linear9 = true
@@ -214,17 +240,17 @@ float_framebuffer7 = true
             wrap_mode10 = "mirrored_repeat"
 
 
-# In the subsequent passes we do first a fast bloom  by first
-#   sampling the original texture and scale it down to keep
-#   it fast, next we do subsequent blurd of the bloomed
-#   pass.
-   
+
+# In the following passes we emulate bloom effect.
+# Since the radius has to be high, we sample first_pass
+# and then do other blur passes at reduced size to keep it fast.
+# Every blur pass samples radially around the center and offsets
+# the starting point in every subsequent pass.
                shader11 = shaders/bloom_pass_1.slang
                 alias11 = "bloom_pass_1"
         filter_linear11 = true
            scale_type11 = source
                 scale11 = 1.0
-# I NEED TO SET **THIS** TO mirrored_repeat TO HAVE THE PREVIOUS PASS mirrored_repeated (!?)
             wrap_mode11 = "mirrored_repeat"
     
     
@@ -251,14 +277,12 @@ float_framebuffer7 = true
                 scale14 = 1.0
             wrap_mode14 = "mirrored_repeat"
 
-        
-# Back led lights:
-# Since the next pass will need mipmaps of the original image, and is only possible to get mipmaps
-# from the very previous pass, the next one will just passthrough the original image
 
 
 # Gather mipmaps from first_pass and use them to light virtual leds under the virtual monitor 
-# and Temporally smooth led lights.
+# and temporally smooth led lights.
+# Extra logic makes it possible to lower the led reaction time when a scene change is detected.
+# this is achieved through average luminance sampling from avglum_pass
                shader15 = shaders/ambi_temporal_pass.slang
                 alias15 = "ambi_temporal_pass"
         filter_linear15 = true
@@ -268,26 +292,15 @@ float_framebuffer7 = true
     float_framebuffer15 = true
 
 
-# In this pass we gather information about the rotated state of the source
-#   This information can only be taken when a pass scales to viewport
-#   So use a low output resolution to keep things as light as possible.
-#   The feedback of this pass will be queried by previous ones.
-#   I tried to move this into final_pass, but the gpu consumption was higher.
 
-#           shader15 = shaders/isrotated.slang
-#            alias15 = "isrotated_pass"
-#    filter_linear15 = true
-#            scale15 = 0.1
-#       scale_type15 = viewport
-#        wrap_mode15 = "mirrored_repeat"   
-
-# In this pass we emulate scanlines, glowing,
-#   RGB vertical mask, slot mask,haloing and color corrections
-        
-# This pass pass will do the composition of the previous passes
-#   with the bloomed image, vignette and spot light,  black frame insertions
-#   and Bezel emulation
-
+# This pass pass will do everything needed to happen at screen coordinates:
+# * The composition of the previous passes with the bloomed image, 
+# * vignette and spot light
+# * Scanlines
+# * Phosphors masks 
+# * Black frame insertions
+# * Bezel
+# * Background images
            shader16 = shaders/final_pass.slang
             alias16 = "final_pass"
     filter_linear16 = true
