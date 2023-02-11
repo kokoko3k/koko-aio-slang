@@ -105,7 +105,9 @@ layout(location = 14) in float vS_SIZE;
     
 layout(location = 0) out vec4 FragColor;
 
-
+#ifdef STATIC_SUPPORT_BACKDROP
+    layout(set = 0, binding = 1) uniform sampler2D backdrop;
+#endif
 layout(set = 0, binding = 2)  uniform sampler2D bloom_pass_final;
 layout(set = 0, binding = 3)  uniform sampler2D reflected_blurred_pass2;
 layout(set = 0, binding = 4)  uniform sampler2D ambi_temporal_pass;
@@ -117,11 +119,8 @@ layout(set = 0, binding = 9)  uniform sampler2D bg_over;
 layout(set = 0, binding = 10) uniform sampler2D shift_and_bleed_pass;
 layout(set = 0, binding = 11) uniform sampler2D in_glow_pass;
 layout(set = 0, binding = 12) uniform sampler2D halo_pass;
-layout(set = 0, binding = 13) uniform sampler2D first_pass;
 
-#ifdef STATIC_SUPPORT_BACKDROP
-    layout(set = 0, binding = 13) uniform sampler2D backdrop;
-#endif
+
 
 #define HALF_PI 1.5707963267949
 #define QUARTER_PI 0.785398163397448
