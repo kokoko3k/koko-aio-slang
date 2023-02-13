@@ -64,11 +64,9 @@
         the screen.
         This option is disabled if a vertical game is detected 
         (mame 2003 plus and fbneo cores)
-    . Triads H-Gap (2.0 = unrotated games only):
+    . Horizontal Gap between triads:
         In real displays, rgb triads are separated by a black space.
         You can emulate it by turning this feature on.
-        if you set it to 2.0, no gap will be used when a vertical game is detected.
-        (mame 2003 plus and fbneo cores)
     . Affect bright colors:
         Emulating RGB masks will lower the resulting image brightness and you
         cant just push input signal brightness without clipping the signal.
