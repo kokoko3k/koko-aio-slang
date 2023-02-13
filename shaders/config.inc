@@ -41,7 +41,6 @@
 	//Try to keep blur sizes consistent across input resolutions
 #define SCALEMOD_X 360
 #define SCALEMOD_Y 270
-
 #define NEW_SCALEMOD_X (params.OriginalSize.x/360.0 / 2.2)
 #define NEW_SCALEMOD_Y (params.OriginalSize.y/270.0 / 2.2)
 
@@ -51,6 +50,9 @@
 #define BACKDROP_OFFX 0.0
 #define BACKDROP_OFFY 0.0
 #define BACKDROP_ZOOM 1.0
+
+	//Workaround for https://github.com/kokoko3k/koko-aio-slang/issues/3
+//#define MAC_VIGNETTE_CURVATURE_WORKAROUND 1.0
 
 
 #define eps 1e-5

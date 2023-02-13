@@ -696,22 +696,28 @@ vec4 pixel_inner_frame(vec2 coords, bool bBorder_needed) {
             float in_aspect = get_in_aspect();
 
             if (DO_VIGNETTE == 1.0) {
-                //float vignette;
-                //float dist = length(vec2((coords.x-0.5)*in_aspect,coords.y-0.5));
-                //vignette = smoothstep(V_SIZE,0.0,dist)*V_POWER;                
+                #ifdef MAC_VIGNETTE_CURVATURE_WORKAROUND
+                    //https://github.com/kokoko3k/koko-aio-slang/issues/3
+                    float dist = length(vec2((coords.x-0.5)*in_aspect,coords.y-0.5));
+                    float vignette = smoothstep(V_SIZE,0.0,dist)*V_POWER;                
+                #else
+                    float vignette = vV_POWER * (vV_SIZE + 16.0*coords.x*coords.y*(1.0-coords.x)*(1.0-coords.y));
+                #endif
+                    if (V_BYPASS < 1.0) pixel_out = vignette * clamp(pixel_out,0.0,1.0);
+                        else
+                    pixel_out = vec3(vignette);
                 
-                float vignette = vV_POWER * (vV_SIZE + 16.0*coords.x*coords.y*(1.0-coords.x)*(1.0-coords.y));
-                if (V_BYPASS < 1.0) pixel_out = vignette * clamp(pixel_out,0.0,1.0);
-                    else
-                pixel_out = vec3(vignette);
             }
 
             if (DO_SPOT == 1.0) {
-                //float spot;
-                //float dist = length(vec2((coords.x-0.5)*in_aspect,coords.y-0.5)+spot_offset);
-                //spot = smoothstep(S_SIZE,0.0,dist)*S_POWER;
-                vec2 scoords = clamp(coords + spot_offset, 0.0,1.0);
-                float spot = vS_POWER * (vS_SIZE + 16.0*scoords.x*scoords.y*(1.0-scoords.x)*(1.0-scoords.y));
+                #ifdef MAC_VIGNETTE_CURVATURE_WORKAROUND
+                    ////https://github.com/kokoko3k/koko-aio-slang/issues/3
+                    float dist = length(vec2((coords.x-0.5)*in_aspect,coords.y-0.5)+spot_offset);
+                    float spot = smoothstep(S_SIZE,0.0,dist)*S_POWER;
+                #else
+                    vec2 scoords = clamp(coords + spot_offset, 0.0,1.0);
+                    float spot = vS_POWER * (vS_SIZE + 16.0*scoords.x*scoords.y*(1.0-scoords.x)*(1.0-scoords.y));
+                #endif
                 if (S_BYPASS < 1.0) pixel_out = max(spot,0.0) + pixel_out;
                     else
                 pixel_out = vec3(spot);
