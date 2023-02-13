@@ -213,7 +213,7 @@ float_framebuffer7 = true
 # It stores at:
 # alpha@coords 0.25,0.25 at reduced sampling to aid ambient light scene change detection
 # alpha@coords 0.75,0.75 temporally smoother for use with bloom exposure and dynamic zoom
-# rgb: it puts a small mipmap from first_pass that will be used to light-up the
+# rgb: it puts a small mipmap from first_pass that will be used to light-up the bezel highlights
 # alpha@other coords: simple continuous sampling used to modulate bezel highlights strength.
                shader8 = shaders/avglum_pass.slang
                 alias8 = "avglum_pass"

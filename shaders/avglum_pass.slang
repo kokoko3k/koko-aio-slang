@@ -5,7 +5,7 @@
 
 #include "config.inc"
 
-//The mipmap wideness needed by the reflection on the bezel.
+//The mipmap wideness needed by the highlights on the bezel.
 #define min_w 16 
 
 #pragma stage vertex
@@ -35,11 +35,19 @@ layout(set = 0, binding = 3) uniform sampler2D avglum_passFeedback;
 
 #include "includes/functions.include.slang"
 
+
+float rgb_to_gray(vec3 rgb) {
+    return dot(rgb, vec3(0.299, 0.587, 0.114));
+}
+
+#define RGB_TO_GRAYSCALE = vec3(0.299, 0.587, 0.114)
 float get_avg_lum_from_mip() {
     vec3 mip = textureLod(first_pass, vec2(0.5,0.5),20.0).rgb;
     mip = apply_fuzzy_main_pass(mip);
-    return (mip.r+mip.g+mip.b)/3.0;
+    //return (mip.r+mip.g+mip.b)/3.0;
+    return rgb_to_gray(mip);
 }
+
 
 
 #define SMOOTHNESS_SPEED 0.05
@@ -47,7 +55,7 @@ float get_avg_lum_from_mip() {
 float get_avglum() {
     /* avglum alpha has 3 zones::
      * 0.25 -> reduced sampling, used for to aid scene detection
-     * 0.75 -> smoothed_sampling, used to adapt bloom and
+     * 0.75 -> smoothed_sampling, used to adapt bloom exposure
      * anything else: continuous sampling
      */
 
@@ -98,5 +106,4 @@ void main() {
     }
     FragColor = pixel_out;
 
-     
 }
