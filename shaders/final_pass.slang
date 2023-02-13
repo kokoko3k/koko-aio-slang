@@ -660,30 +660,11 @@ vec4 pixel_inner_frame(vec2 coords, bool bBorder_needed) {
     //Mix bloom texture
     if (DO_BLOOM == 1.0 ) {
         bloomed=texture(bloom_pass_final, coords).rgb ;
-        if (BLOOM_BYPASS == 1.0)
+                
+        if (BLOOM_BYPASS > 0.5)
             pixel_out = bloomed;
-        else {
-            float over_white_correction = 1.0;
-            if (BLOOM_OVER_WHITE < 1.0) {
-                    //Use mipmap to identify bright areas.
-                    vec3 avglum = texture(avglum_pass,coords).rgb;
-                    //avglum = apply_fuzzy_main_pass(avglum);
-                    float b_brightness = max(avglum.b,max(avglum.r,avglum.g));
-                    //b_brightness = max(pixel_out.b,max(pixel_out.r,pixel_out.g));
-                    
-                    b_brightness *= 1-BLOOM_OVER_WHITE;
-                    over_white_correction =1- b_brightness;
-            }
-
-            float smoothed_avglum = texture(avglum_pass, vec2(0.75)).a * BLOOM_ADPT;
-            float bloom_mix_adapted = max(0.0, BLOOM_MIX - smoothed_avglum);
-            
-            float shoulder = 0.33; //0.15; //= 0.25;
-            
-            bloom_mix_adapted = BLOOM_MIX * ( 1- pow(smoothed_avglum, shoulder-smoothed_avglum*shoulder     ));
-
-            pixel_out = pixel_out + (bloomed * bloom_mix_adapted  )* over_white_correction ;
-        }
+        else
+            pixel_out += bloomed;
     }
 
     //Black frame insertion

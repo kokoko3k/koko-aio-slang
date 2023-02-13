@@ -18,7 +18,10 @@ void main() {
 
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 0) out vec4 FragColor;
-layout(set = 0, binding = 2) uniform sampler2D Source;
+layout(set = 0, binding = 1) uniform sampler2D Source;
+layout(set = 0, binding = 2) uniform sampler2D avglum_pass;
+
+
 
 #include "includes/functions.include.slang"
 #include "includes/blooms.include.slang"
@@ -41,6 +44,39 @@ void main() {
     bloomed = pow(bloomed,vec3(BLOOM_GAMMA_OUT));
     bloomed*=BLOOM_POWER;
     bloomed = pixel_push_luminance(bloomed, BLOOM_POWER);
+    
+    if (BLOOM_BYPASS < 0.5) {
+        float over_white_correction = 1.0;
+        if (BLOOM_OVER_WHITE < 1.0) {
+            //Use mipmap available in avglum_pass to identify bright areas.
+            vec3 avglum = texture(avglum_pass,vTexCoord).rgb;
+            float b_brightness = max(avglum.b,max(avglum.r,avglum.g));
+            b_brightness *= 1-BLOOM_OVER_WHITE;
+            over_white_correction =1- b_brightness;
+        }
+        
+        // Modulate exposure                                                            //FIXME: Branch if BLOOM_ADPT == 0.0?
+        float smoothed_avglum = texture(avglum_pass, vec2(0.75)).a * BLOOM_ADPT; 
+        float bloom_mix_adapted = max(0.0, BLOOM_MIX - smoothed_avglum);
+        
+        float shoulder = 0.33; //0.15; //= 0.25;
+        
+        bloom_mix_adapted = BLOOM_MIX * ( 1- pow(smoothed_avglum, shoulder-smoothed_avglum * shoulder) );
+        
+        bloomed = bloomed * bloom_mix_adapted * over_white_correction ;
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     FragColor = vec4(bloomed, 1.0); //FragColor = texture(Source,vTexCoord);
 
 }
