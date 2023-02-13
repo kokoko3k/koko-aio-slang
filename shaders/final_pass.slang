@@ -18,36 +18,29 @@ layout(location = 2) out vec2 spot_offset;
 layout(location = 3) out vec2 vFragCoord;
 layout(location = 4) out float vIsRotated;
 
-
 //Curvature:
-    layout(location = 5) out vec2 vWarp_vexp;
-    layout(location = 6) out vec2 vWarp_arg2;
+    #define vWarp_vexp vWarp_vexp_arg2.xy
+    #define vWarp_arg2 vWarp_vexp_arg2.zw
+    layout(location = 5) out vec4 vWarp_vexp_arg2;
 
 //Scanlines:
-    layout(location = 7) out float vIsInterlaced;
-    layout(location = 8) out float vFlickeringScanlines;
-    layout(location = 9) out float vScanlinePeriod;
-    layout(location = 10) out float vScanlinesAlternate;
+    layout(location = 6) out float vIsInterlaced;
+    layout(location = 7) out float vFlickeringScanlines;
+    layout(location = 8) out float vScanlinePeriod;
+    layout(location = 9) out float vScanlinesAlternate;
 
 //Vignette, spot
     #define vV_POWER vV_POWER_SIZE.x
     #define vV_SIZE  vV_POWER_SIZE.y
     #define vS_POWER vS_POWER_SIZE.x
     #define vS_SIZE  vS_POWER_SIZE.y
-    layout(location = 11) out vec2 vV_POWER_SIZE;
-    layout(location = 12) out vec2 vS_POWER_SIZE;
-    //layout(location = 11) out float vV_POWER;
-    //layout(location = 12) out float vV_SIZE;
-    //layout(location = 13) out float vS_POWER;
-    //layout(location = 14) out float vS_SIZE;
+    layout(location = 10) out vec2 vV_POWER_SIZE;
+    layout(location = 11) out vec2 vS_POWER_SIZE;
     
 //Vertical mask helpers
-    layout(location = 13) out float vVMASK_USE_GM;
+    layout(location = 12) out float vVMASK_USE_GM;
     
-    
-//Prova
-    layout(location = 14) out float vPROVA;
-    
+
 #include "includes/functions.include.slang"
 
 void main() {
@@ -65,6 +58,8 @@ void main() {
 
     //Precalc some Curvature/Warp values:
         vWarp_vexp = 1.0/ (1 + (vec2(GEOM_WARP_X, GEOM_WARP_Y) * 0.2)) ;
+        
+        
         vWarp_arg2 = 1.0 - pow(vec2(0.29289321881345247559915563789515), vWarp_vexp );
         
     //Help scanline code too:
@@ -100,11 +95,7 @@ void main() {
         //Disable Green/Magenta trick on rotated content.
         vVMASK_USE_GM = VMASK_USE_GM * (1-vIsRotated) + SHIFT_R;
         
-        
-        
 }
-
-
 
 
 #pragma stage fragment
@@ -113,30 +104,23 @@ layout(location = 1) in vec2 vOutputCoord;
 layout(location = 2) in vec2 spot_offset;
 layout(location = 3) in vec2 vFragCoord;
 layout(location = 4) in float vIsRotated;
-layout(location = 5) in vec2 vWarp_vexp;
-layout(location = 6) in vec2 vWarp_arg2;
-layout(location = 7) in float vIsInterlaced;
-layout(location = 8) in float vFlickeringScanlines;
-layout(location = 9) in float vScanlinePeriod;
-layout(location = 10) in float vScanlinesAlternate;
+#define vWarp_vexp vWarp_vexp_arg2.xy
+#define vWarp_arg2 vWarp_vexp_arg2.zw
+layout(location = 5) in vec4 vWarp_vexp_arg2;  
+layout(location = 6) in float vIsInterlaced;
+layout(location = 7) in float vFlickeringScanlines;
+layout(location = 8) in float vScanlinePeriod;
+layout(location = 9) in float vScanlinesAlternate;
 #define vV_POWER vV_POWER_SIZE.x
 #define vV_SIZE  vV_POWER_SIZE.y
 #define vS_POWER vS_POWER_SIZE.x
 #define vS_SIZE  vS_POWER_SIZE.y
-layout(location = 11) in vec2 vV_POWER_SIZE;
-layout(location = 12) in vec2 vS_POWER_SIZE;
-/*layout(location = 11) in float vV_POWER;
-layout(location = 12) in float vV_SIZE;
-layout(location = 13) in float vS_POWER;
-layout(location = 14) in float vS_SIZE;*/
-
-
-layout(location = 13) in float vVMASK_USE_GM;
-    
-
-layout(location = 14) in float vPROVA;
+layout(location = 10) in vec2 vV_POWER_SIZE;
+layout(location = 11) in vec2 vS_POWER_SIZE;
+layout(location = 12) in float vVMASK_USE_GM;
 
 layout(location = 0) out vec4 FragColor;
+
 
 #ifdef STATIC_SUPPORT_BACKDROP
     layout(set = 0, binding = 1) uniform sampler2D backdrop;
@@ -152,7 +136,6 @@ layout(set = 0, binding = 9)  uniform sampler2D bg_over;
 layout(set = 0, binding = 10) uniform sampler2D shift_and_bleed_pass;
 layout(set = 0, binding = 11) uniform sampler2D in_glow_pass;
 layout(set = 0, binding = 12) uniform sampler2D halo_pass;
-
 
 
 #define HALF_PI 1.5707963267949
