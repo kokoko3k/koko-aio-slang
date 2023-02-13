@@ -50,8 +50,6 @@ void main() {
     
     float fbloom_mix = BLOOM_MIX;
     if (BLOOM_BYPASS == 0.0 || BLOOM_BYPASS == 2.0) {
-        //utente non vuole bypass, allora fai modulazione.
-        //devo fare il caso in cui utente vuole il bypass con modulazione.
         float over_white_correction = 1.0;
         if (BLOOM_OVER_WHITE < 1.0) {
             //Use mipmap available in avglum_pass to identify bright areas.
@@ -61,7 +59,8 @@ void main() {
             over_white_correction =1- b_brightness;
         }
         
-        // Modulate exposure                                                            //FIXME: Branch if BLOOM_ADPT == 0.0?
+        // Modulate exposure
+        // Branching with (if BLOOM_ADPT == 0.0) does not gain anything.
         float smoothed_avglum = texture(avglum_pass, vec2(0.75)).a * BLOOM_ADPT; 
         float bloom_mix_adapted = max(0.0, BLOOM_MIX - smoothed_avglum);
                 

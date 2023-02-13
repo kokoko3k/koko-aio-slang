@@ -151,8 +151,6 @@
     
     Final mix:
         Modulates between the original images and the bloomed one.
-    Less on bright scenes:
-        How much to reduce the mix as the scene gets brighter.
     Radius:
         Controls how much the bloom has to be wide.
     Quality:
@@ -164,13 +162,17 @@
         Just apply a gain to the final bloom.
     Output Gamma:
         Play with it.
-    Strength on bright areas:
+    Modulate: Less on bright scenes:
+        How much to reduce the mix as the scene gets brighter.
+    Modulate: Strength on bright areas:
         Since the light produced by the bloom effect is added to the underlying
         image, it can produce burn effects on the already bright areas.
         This is actually an hack that will avoid to bloom them.
         Don't use too low values.
-    Bypass:
+    Bypass/Solo:
         See how the bloomed image looks alone.
+        Use 1.0 to see naked bloom without any modulation applied
+        Use 2.0 to see naked bloom with modulation applied 
 
 **Curvature:**
     Emulates a curved CRT display.
@@ -250,6 +252,8 @@
     to be set to "full", you have to provide the source aspect
     ratio to the shader.
     Use -6 for MAME cores that pre-rotates the game (TATE mode)
+    With Mame 2003 plus and fbneo cores, koko-aio detects if the
+    game is rotated or not without any user intervention.
     
     Aspect Ratio Numerator:
         Setting non positive value here will switch to a predefined
