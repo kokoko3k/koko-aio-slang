@@ -35,6 +35,10 @@ layout(location = 4) out float vIsRotated;
     layout(location = 13) out float vS_POWER;
     layout(location = 14) out float vS_SIZE;
     
+//Vertical mask helpers
+    layout(location = 15) out float vVMASK_USE_GM;
+    layout(location = 16) out float vVMASK_GAP;
+    
 #include "includes/functions.include.slang"
 
 void main() {
@@ -82,6 +86,16 @@ void main() {
         float S_SIZE_ADAPTED = S_SIZE*1.3;
         vS_POWER = S_POWER/S_SIZE_ADAPTED;
         vS_SIZE = (S_SIZE_ADAPTED-1.0);
+        
+    //vmask
+        vVMASK_USE_GM = VMASK_USE_GM;
+        vVMASK_GAP = min(VMASK_GAP, 1.0);
+        //Disable Green/Magenta trick on rotated content.
+        //and optionally disable vmask Gap too.
+        if (is_rotated()) {
+            if (VMASK_GAP > 1.1) vVMASK_GAP = 0.0;
+            vVMASK_USE_GM = 0.0;
+        }
 }
 
 
@@ -101,7 +115,8 @@ layout(location = 11) in float vV_POWER;
 layout(location = 12) in float vV_SIZE;
 layout(location = 13) in float vS_POWER;
 layout(location = 14) in float vS_SIZE;
-
+layout(location = 15) in float vVMASK_USE_GM;
+layout(location = 16) in float vVMASK_GAP;
     
 layout(location = 0) out vec4 FragColor;
 
@@ -139,7 +154,7 @@ vec3 pixel_vmask(vec3 source, vec3 white_reference, float over_white) {
     
     vec3 pixel_out;
     vec3 vmasked;
-    vec4 vec_mod=(vec4(3,1,2,3) + vec4(VMASK_GAP,0.0,0.0,0.0))* VMASK_DARKLINE_SCALE ;
+    vec4 vec_mod=(vec4(3,1,2,3) + vec4(vVMASK_GAP,0.0,0.0,0.0))* VMASK_DARKLINE_SCALE ;
     
     float fcol = vOutputCoord.x * params.OutputSize.x;
     if (mod(fcol, vec_mod.x) < vec_mod.y)
@@ -173,7 +188,7 @@ vec3 pixel_vmask_gm(vec3 source, vec3 white_reference, float over_white) {
     float fcol = vOutputCoord.s * params.OutputSize.x;
     vec3 pixel_out;
     vec3 vmasked;
-    vec3 vec_mod=(vec3(2,1,2) + vec3(VMASK_GAP,0.0,0.0))* VMASK_DARKLINE_SCALE ;
+    vec3 vec_mod=(vec3(2,1,2) + vec3(vVMASK_GAP,0.0,0.0))* VMASK_DARKLINE_SCALE ;
 
     if (mod(fcol, vec_mod.x) < vec_mod.y)
         vmasked = m1 * source;
@@ -199,7 +214,7 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
     * or slotmasks
     */
     
-    float Darkline_part_w = (3.0 - VMASK_USE_GM + VMASK_GAP) * VMASK_DARKLINE_SCALE;
+    float Darkline_part_w = (3.0 - vVMASK_USE_GM + vVMASK_GAP) * VMASK_DARKLINE_SCALE;
     float Darkline_part_w_x2 = Darkline_part_w*2;
 
     darkline_every *= VMASK_DARKLINE_SCALE;
@@ -270,7 +285,7 @@ float scanline_shape(vec2 coords, bool do_slotmask, float lum) {
             lines = lines * pixel_darklines(vec3(1.0),DARKLINES_PERIOD,1-SCANLINE_SM_STRENGTH,1.0,vec3(0.0),1.0, coords).r;
 
         } else {
-            float Darkline_part_w = (3.0 - VMASK_USE_GM + VMASK_GAP) * VMASK_DARKLINE_SCALE;
+            float Darkline_part_w = (3.0 - vVMASK_USE_GM + vVMASK_GAP) * VMASK_DARKLINE_SCALE;
             float Darkline_part_w_x2 = Darkline_part_w*2;
             bool odd_column = mod(vFragCoord.x + Darkline_part_w  , Darkline_part_w_x2) < Darkline_part_w;
 
@@ -396,7 +411,7 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
         
         if (RGB_MASK_STRENGTH > 0.0) {
             //Use RGB pattern or exploit RGB layout with green and magenta?
-            if (VMASK_USE_GM < 1.0)
+            if (vVMASK_USE_GM < 1.0)
                 pixel_out = pixel_vmask(pixel_in_compensated, pixel_in_clamped, VMASK_OVERWHITE);
             else
                 pixel_out = pixel_vmask_gm(pixel_in_compensated, pixel_in_clamped, VMASK_OVERWHITE);

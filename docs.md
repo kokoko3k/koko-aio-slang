@@ -62,9 +62,13 @@
         If you have reddish tint, please double check that your monitor is
         running at native resolution and the operating system is not scaling
         the screen.
-    . Horizontal Gap between triads:
+        This option is disabled if a vertical game is detected 
+        (mame 2003 plus and fbneo cores)
+    . Triads H-Gap (2.0 = unrotated games only):
         In real displays, rgb triads are separated by a black space.
         You can emulate it by turning this feature on.
+        if you set it to 2.0, no gap will be used when a vertical game is detected.
+        (mame 2003 plus and fbneo cores)
     . Affect bright colors:
         Emulating RGB masks will lower the resulting image brightness and you
         cant just push input signal brightness without clipping the signal.
