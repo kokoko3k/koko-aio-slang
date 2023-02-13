@@ -45,7 +45,10 @@ void main() {
     bloomed*=BLOOM_POWER;
     bloomed = pixel_push_luminance(bloomed, BLOOM_POWER);
     
-    if (BLOOM_BYPASS < 0.5) {
+    float fbloom_mix = BLOOM_MIX;
+    if (BLOOM_BYPASS == 0.0 || BLOOM_BYPASS == 2.0) {
+        //utente non vuole bypass, allora fai modulazione.
+        //devo fare il caso in cui utente vuole il bypass con modulazione.
         float over_white_correction = 1.0;
         if (BLOOM_OVER_WHITE < 1.0) {
             //Use mipmap available in avglum_pass to identify bright areas.
@@ -61,22 +64,14 @@ void main() {
         
         float shoulder = 0.33; //0.15; //= 0.25;
         
-        bloom_mix_adapted = BLOOM_MIX * ( 1- pow(smoothed_avglum, shoulder-smoothed_avglum * shoulder) );
+        
+        if (BLOOM_BYPASS == 2.0) fbloom_mix = 1.0;
+        bloom_mix_adapted = fbloom_mix * ( 1- pow(smoothed_avglum, shoulder-smoothed_avglum * shoulder) );
         
         bloomed = bloomed * bloom_mix_adapted * over_white_correction ;
     }
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+      
     FragColor = vec4(bloomed, 1.0); //FragColor = texture(Source,vTexCoord);
 
 }
