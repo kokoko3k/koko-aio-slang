@@ -28,6 +28,9 @@ layout(set = 0, binding = 2) uniform sampler2D avglum_pass;
 
 #define offset 0.5890486225480862 // TAU/8.0/4.0*3.0
 
+//The curve shoulder to map scene luminance to bloom mix strength
+#define BLOOM_EXPOSURE_CURVE_SHOULDER 0.33
+
 void main() {
     if (DO_BLOOM == 0.0) return;
 
@@ -61,12 +64,9 @@ void main() {
         // Modulate exposure                                                            //FIXME: Branch if BLOOM_ADPT == 0.0?
         float smoothed_avglum = texture(avglum_pass, vec2(0.75)).a * BLOOM_ADPT; 
         float bloom_mix_adapted = max(0.0, BLOOM_MIX - smoothed_avglum);
-        
-        float shoulder = 0.33; //0.15; //= 0.25;
-        
-        
+                
         if (BLOOM_BYPASS == 2.0) fbloom_mix = 1.0;
-        bloom_mix_adapted = fbloom_mix * ( 1- pow(smoothed_avglum, shoulder-smoothed_avglum * shoulder) );
+        bloom_mix_adapted = fbloom_mix * ( 1- pow(smoothed_avglum, BLOOM_EXPOSURE_CURVE_SHOULDER -smoothed_avglum * BLOOM_EXPOSURE_CURVE_SHOULDER) );
         
         bloomed = bloomed * bloom_mix_adapted * over_white_correction ;
     }
