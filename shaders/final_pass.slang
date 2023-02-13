@@ -30,13 +30,23 @@ layout(location = 4) out float vIsRotated;
     layout(location = 10) out float vScanlinesAlternate;
 
 //Vignette, spot
-    layout(location = 11) out float vV_POWER;
-    layout(location = 12) out float vV_SIZE;
-    layout(location = 13) out float vS_POWER;
-    layout(location = 14) out float vS_SIZE;
+    #define vV_POWER vV_POWER_SIZE.x
+    #define vV_SIZE  vV_POWER_SIZE.y
+    #define vS_POWER vS_POWER_SIZE.x
+    #define vS_SIZE  vS_POWER_SIZE.y
+    layout(location = 11) out vec2 vV_POWER_SIZE;
+    layout(location = 12) out vec2 vS_POWER_SIZE;
+    //layout(location = 11) out float vV_POWER;
+    //layout(location = 12) out float vV_SIZE;
+    //layout(location = 13) out float vS_POWER;
+    //layout(location = 14) out float vS_SIZE;
     
 //Vertical mask helpers
-    layout(location = 15) out float vVMASK_USE_GM;
+    layout(location = 13) out float vVMASK_USE_GM;
+    
+    
+//Prova
+    layout(location = 14) out float vPROVA;
     
 #include "includes/functions.include.slang"
 
@@ -88,8 +98,13 @@ void main() {
         
     //vmask
         //Disable Green/Magenta trick on rotated content.
-        vVMASK_USE_GM = VMASK_USE_GM * (1-vIsRotated);
+        vVMASK_USE_GM = VMASK_USE_GM * (1-vIsRotated) + SHIFT_R;
+        
+        
+        
 }
+
+
 
 
 #pragma stage fragment
@@ -104,12 +119,23 @@ layout(location = 7) in float vIsInterlaced;
 layout(location = 8) in float vFlickeringScanlines;
 layout(location = 9) in float vScanlinePeriod;
 layout(location = 10) in float vScanlinesAlternate;
-layout(location = 11) in float vV_POWER;
+#define vV_POWER vV_POWER_SIZE.x
+#define vV_SIZE  vV_POWER_SIZE.y
+#define vS_POWER vS_POWER_SIZE.x
+#define vS_SIZE  vS_POWER_SIZE.y
+layout(location = 11) in vec2 vV_POWER_SIZE;
+layout(location = 12) in vec2 vS_POWER_SIZE;
+/*layout(location = 11) in float vV_POWER;
 layout(location = 12) in float vV_SIZE;
 layout(location = 13) in float vS_POWER;
-layout(location = 14) in float vS_SIZE;
-layout(location = 15) in float vVMASK_USE_GM;
+layout(location = 14) in float vS_SIZE;*/
+
+
+layout(location = 13) in float vVMASK_USE_GM;
     
+
+layout(location = 14) in float vPROVA;
+
 layout(location = 0) out vec4 FragColor;
 
 #ifdef STATIC_SUPPORT_BACKDROP
