@@ -16,10 +16,11 @@
 #    [v] First bloom pass: why don't we use an higher lod?
 #        Using an higher lod makes the bloom less prone to detect thinner lines
 #        So, no.
-#    [ ] Does bloom quality improve if we sample from original?
-#        
+#    [v] Does bloom quality improve if we sample from original?
+#        yeah!
 #    [ ] Should the flickering be aware of the scanline?
 #        read: does a scanline dark gap increment the flickering or not?
+
     
 #    Koko-aio shader is meant to be an all-in one crt shader.
 #    It can be configured with many parameters, so that can be

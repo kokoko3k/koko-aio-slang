@@ -45,13 +45,14 @@ float get_avg_lum_from_mip() {
 }
 
 
-
-#define SMOOTHNESS_SPEED 0.05
+//0.1 seems like a good tradeoff that works well with bloom exposire and fullscreen zoom
+//...maybe bloom exposure works best at 0.05; you may consider another zone of smooth sampling.
+#define SMOOTHNESS_SPEED 0.1
 
 float get_avglum() {
     /* avglum alpha has 3 zones::
      * 0.25 -> reduced sampling, used for to aid scene detection
-     * 0.75 -> smoothed_sampling, used to adapt bloom exposure
+     * 0.75 -> smoothed_sampling, used to adapt bloom exposure and dynamic fullscreen zoom
      * anything else: continuous sampling
      */
 
