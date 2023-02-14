@@ -645,7 +645,9 @@ vec3 compose_bezel_over(vec3 full_viewport) {
 
     //Mix a bit of ambient light over the bezel
         vec4 pixel_avglum = texture(avglum_pass,vOutputCoord);
-        bezel_out = bezel_out + (pixel_avglum.rgb * 0.05);
+        //bezel_out = bezel_out + (pixel_avglum.rgb * 0.05);
+        vec3 pixel_ambilight = texture(ambi_temporal_pass, vOutputCoord).rgb * DO_AMBILIGHT;
+        bezel_out = bezel_out + pixel_ambilight * AMBI_OVER_BEZEL;
 
     //We use the green component to express Hardness/Specularity; there the reflection will be completely diffused.
     //For the task, we use a mipmap whit adeguate precision.
@@ -808,7 +810,7 @@ void main() {
         //split screen
         //if (vTexCoord.y < 0.5) pixel_out = texture(first_pass,vTexCoord);
         //pixel_out = texture(avglum_pass,vTexCoord);
-    //pixel_out = texture(halo_pass, vOutputCoord);
+    //pixel_out = texture(ambi_temporal_pass, vOutputCoord);
     FragColor = pixel_out;
     
     //FragColor = vec4(blur_shade(vTexCoord) );
