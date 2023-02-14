@@ -246,8 +246,9 @@
         How wide is the area illuminated.
     Led power:
         Leds post gain.
-    Note: To avoid burn-in effects, keep Light Falloff + Led power < 1.4
-
+        Note: To avoid burn-in effects, keep Light Falloff + Led power not too high.
+    Colorize Bezel
+        Allow to add an amount of the ambient light over the bezel frame
 
 **Aspect Ratio:**
     When using effects that need Retroarch aspect ratio option
