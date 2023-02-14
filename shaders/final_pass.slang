@@ -167,7 +167,54 @@ vec3 pixel_vmask(vec3 source, vec3 white_reference, float over_white) {
    return pixel_out;  
     
 }
+
+vec3 pixel_vmask_and_gm(vec3 source, vec3 white_reference, float over_white) {
+// Simple RGB mask emulation with or without horizontal gap
+    float ooo = 1.0 - RGB_MASK_STRENGTH;
     
+    // RGB mask:     R     G     B
+    vec3 m1_rgb =  vec3( 1.0 , ooo , ooo );  //col 1
+    vec3 m2_rgb =  vec3( ooo , 1.0 , ooo );  //col 2
+    vec3 m3_rgb =  vec3( ooo , ooo , 1.0 );  //col 3
+    vec3 gap = vec3( ooo );
+       
+    vec3 m1_gm = vec3( ooo , 1.0 , ooo );    //col 1
+    vec3 m2_gm = vec3( 1.0 , ooo , 1.0 );    //col 2
+    
+    
+    vec3 m1 = (m1_gm * VMASK_USE_GM) + (m1_rgb * (1-VMASK_USE_GM));
+    vec3 m2 = (m2_gm * VMASK_USE_GM) + (m2_rgb * (1-VMASK_USE_GM));
+    vec3 m3 = m3_rgb;
+    
+    
+    vec3 pixel_out;
+    vec3 vmasked;
+    vec4 vec_mod_rgb = vec4(3,1,2,3);
+    vec4 vec_mod_gm =  vec4(2,1,2,0.0);
+    vec4 vec_mod = (vec_mod_gm * VMASK_USE_GM) + (vec_mod_rgb* (1-VMASK_USE_GM));
+    vec_mod=(vec_mod + vec4(VMASK_GAP,0.0,0.0,0.0))* VMASK_DARKLINE_SCALE ;
+
+
+    float fcol = vOutputCoord.s * params.OutputSize.x;
+    if (mod(fcol, vec_mod.x) < vec_mod.y)
+        vmasked = m1 * source;
+    else if (mod(fcol, vec_mod.x) < vec_mod.z) 
+        vmasked = m2 * source;
+    else if (    mod(fcol, vec_mod.x) <  vec_mod.w && VMASK_USE_GM < 1.0  )
+        vmasked = m3 * source;
+    else vmasked = gap * source;
+    
+    if (over_white == 1.0) pixel_out = vmasked;
+        else {
+            float whiteness=max(max(white_reference.r,white_reference.g),white_reference.b);
+            whiteness-= over_white;
+            whiteness=  clamp(whiteness,0.0,1.0);
+            pixel_out=  mix(vmasked,source,whiteness);
+        }
+   return pixel_out;  
+    
+}
+
 
 vec3 pixel_vmask_gm(vec3 source, vec3 white_reference, float over_white) {
 // Simple RGB mask emulation with or without horizontal gap
@@ -407,6 +454,8 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
                 pixel_out = pixel_vmask(pixel_in_compensated, pixel_in_clamped, VMASK_OVERWHITE);
             else
                 pixel_out = pixel_vmask_gm(pixel_in_compensated, pixel_in_clamped, VMASK_OVERWHITE);
+            //Tried to unbranch to no avail (worse performances)
+            //pixel_out = pixel_vmask_and_gm(pixel_in_compensated, pixel_in_clamped, VMASK_OVERWHITE);
         }
 
         pixel_out = pixel_push_luminance(pixel_out, DARKLINES_STRENGTH * (1.0/DARKLINES_PERIOD) * MASK_COMPENSATION); 
