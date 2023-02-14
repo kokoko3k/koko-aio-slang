@@ -37,10 +37,6 @@ layout(location = 4) out float vIsRotated;
     layout(location = 10) out vec2 vV_POWER_SIZE;
     layout(location = 11) out vec2 vS_POWER_SIZE;
     
-//Vertical mask helpers
-    layout(location = 12) out float vVMASK_USE_GM;
-    
-
 #include "includes/functions.include.slang"
 
 void main() {
@@ -90,11 +86,7 @@ void main() {
         float S_SIZE_ADAPTED = S_SIZE*1.3;
         vS_POWER = S_POWER/S_SIZE_ADAPTED;
         vS_SIZE = (S_SIZE_ADAPTED-1.0);
-        
-    //vmask
-        //Disable Green/Magenta trick on rotated content.
-        vVMASK_USE_GM = VMASK_USE_GM * (1-vIsRotated) + SHIFT_R;
-        
+                
 }
 
 
@@ -117,7 +109,6 @@ layout(location = 9) in float vScanlinesAlternate;
 #define vS_SIZE  vS_POWER_SIZE.y
 layout(location = 10) in vec2 vV_POWER_SIZE;
 layout(location = 11) in vec2 vS_POWER_SIZE;
-layout(location = 12) in float vVMASK_USE_GM;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -215,7 +206,7 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
     * or slotmasks
     */
     
-    float Darkline_part_w = (3.0 - vVMASK_USE_GM + VMASK_GAP) * VMASK_DARKLINE_SCALE;
+    float Darkline_part_w = (3.0 - VMASK_USE_GM + VMASK_GAP) * VMASK_DARKLINE_SCALE;
     float Darkline_part_w_x2 = Darkline_part_w*2;
 
     darkline_every *= VMASK_DARKLINE_SCALE;
@@ -286,7 +277,7 @@ float scanline_shape(vec2 coords, bool do_slotmask, float lum) {
             lines = lines * pixel_darklines(vec3(1.0),DARKLINES_PERIOD,1-SCANLINE_SM_STRENGTH,1.0,vec3(0.0),1.0, coords).r;
 
         } else {
-            float Darkline_part_w = (3.0 - vVMASK_USE_GM + VMASK_GAP) * VMASK_DARKLINE_SCALE;
+            float Darkline_part_w = (3.0 - VMASK_USE_GM + VMASK_GAP) * VMASK_DARKLINE_SCALE;
             float Darkline_part_w_x2 = Darkline_part_w*2;
             bool odd_column = mod(vFragCoord.x + Darkline_part_w  , Darkline_part_w_x2) < Darkline_part_w;
 
@@ -412,7 +403,7 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
         
         if (RGB_MASK_STRENGTH > 0.0) {
             //Use RGB pattern or exploit RGB layout with green and magenta?
-            if (vVMASK_USE_GM < 1.0)
+            if (VMASK_USE_GM < 1.0)
                 pixel_out = pixel_vmask(pixel_in_compensated, pixel_in_clamped, VMASK_OVERWHITE);
             else
                 pixel_out = pixel_vmask_gm(pixel_in_compensated, pixel_in_clamped, VMASK_OVERWHITE);
@@ -693,28 +684,26 @@ vec4 pixel_inner_frame(vec2 coords, bool bBorder_needed) {
             float in_aspect = get_in_aspect();
 
             if (DO_VIGNETTE == 1.0) {
-                #ifdef MAC_VIGNETTE_CURVATURE_WORKAROUND
-                    //https://github.com/kokoko3k/koko-aio-slang/issues/3
-                    float dist = length(vec2((coords.x-0.5)*in_aspect,coords.y-0.5));
-                    float vignette = smoothstep(V_SIZE,0.0,dist)*V_POWER;                
-                #else
-                    float vignette = vV_POWER * (vV_SIZE + 16.0*coords.x*coords.y*(1.0-coords.x)*(1.0-coords.y));
-                #endif
-                    if (V_BYPASS < 1.0) pixel_out = vignette * clamp(pixel_out,0.0,1.0);
-                        else
-                    pixel_out = vec3(vignette);
+                    //float dist = length(vec2((coords.x-0.5)*in_aspect,coords.y-0.5));
+                    //float vignette = smoothstep(V_SIZE,0.0,dist)*V_POWER;                
+                    float vignette = vV_POWER * (vV_SIZE + 16.0* coords.x*coords.y*(1.0-coords.x)*(1.0-coords.y));
+                    vignette = min(vignette,99999.0); //<--- big wtf here, why is this needed? 
+                    //...see: https://github.com/kokoko3k/koko-aio-slang/issues/3
+                    if (V_BYPASS < 1.0) 
+                        pixel_out = vignette * clamp(pixel_out,0.0,1.0);
+                            else
+                        pixel_out = vec3(vignette);
                 
             }
 
             if (DO_SPOT == 1.0) {
-                #ifdef MAC_VIGNETTE_CURVATURE_WORKAROUND
-                    ////https://github.com/kokoko3k/koko-aio-slang/issues/3
-                    float dist = length(vec2((coords.x-0.5)*in_aspect,coords.y-0.5)+spot_offset);
-                    float spot = smoothstep(S_SIZE,0.0,dist)*S_POWER;
-                #else
+
+                    //float dist = length(vec2((coords.x-0.5)*in_aspect,coords.y-0.5)+spot_offset);
+                    //float spot = smoothstep(S_SIZE,0.0,dist)*S_POWER;
+
                     vec2 scoords = clamp(coords + spot_offset, 0.0,1.0);
                     float spot = vS_POWER * (vS_SIZE + 16.0*scoords.x*scoords.y*(1.0-scoords.x)*(1.0-scoords.y));
-                #endif
+
                 if (S_BYPASS < 1.0) pixel_out = max(spot,0.0) + pixel_out;
                     else
                 pixel_out = vec3(spot);
