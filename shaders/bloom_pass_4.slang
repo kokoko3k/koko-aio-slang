@@ -45,7 +45,6 @@ void main() {
     );
     
     bloomed = pow(bloomed,vec3(BLOOM_GAMMA_OUT));
-    bloomed*=BLOOM_POWER;
     bloomed = pixel_push_luminance(bloomed, BLOOM_POWER);
     
     float fbloom_mix = BLOOM_MIX;
@@ -58,6 +57,9 @@ void main() {
             b_brightness *= 1-BLOOM_OVER_WHITE;
             over_white_correction =1- b_brightness;
         }
+        
+        
+        bloomed*=BLOOM_POWER;
         
         // Modulate exposure
         // Branching with (if BLOOM_ADPT == 0.0) does not gain anything.

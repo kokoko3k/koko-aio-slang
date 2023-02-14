@@ -402,6 +402,10 @@ float random(float power, vec2 seed) {
 		return color;
 	}
 	
+float rgb_to_gray(vec3 rgb) {
+    return dot(rgb, vec3(0.299, 0.587, 0.114));
+}
+	
 	//smoothly shade x and y < 0.0, currently unused	
 	/*float blur_shade(vec2 co, float size) {
 		
@@ -420,3 +424,6 @@ float random(float power, vec2 seed) {
 		return smoothstep(smooth_min, smooth_max, co_1D);
 	}
 	*/
+
+	
+	
