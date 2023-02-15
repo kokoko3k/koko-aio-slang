@@ -655,10 +655,9 @@ vec3 bezel_color(float lum)  {
 }
 
 
+#define STATIC_BEZEL_USE_MIPMAP 1.0
+
 vec3 compose_bezel_over(vec3 full_viewport) {
-    vec2 bezel_lut_size = textureSize(monitor_body_curved,0); //no need to branch here if we assume straight and curved textures are the same size.
-                                                              //FIXME ?
-    float bezel_frame_lod = log2(bezel_lut_size.y * (BEZEL_FRAME_ZOOM+1.0) /global.FinalViewportSize.y);
     vec2 coords_for_bezel = vTexCoord;
     
     if (BEZEL_FRAME_ZOOM != 0.0)
@@ -696,10 +695,19 @@ vec3 compose_bezel_over(vec3 full_viewport) {
 
     //Main lut:
     vec4 bezel;
-    if (BEZEL_USE_STRAIGHT < 0.5)
-        bezel = textureLod(monitor_body_curved,coords_for_bezel,bezel_frame_lod);
-            else
-        bezel = textureLod(monitor_body_straight,coords_for_bezel,bezel_frame_lod);
+    #ifdef STATIC_BEZEL_USE_MIPMAP
+        vec2 bezel_lut_size = textureSize(monitor_body_curved,0); //no need to branch here if we assume straight and curved textures are the same size. //FIXME?
+        float bezel_frame_lod = log2(bezel_lut_size.y * (BEZEL_FRAME_ZOOM+1.0) /global.FinalViewportSize.y);
+        if (BEZEL_USE_STRAIGHT < 0.5)
+            bezel = textureLod(monitor_body_curved,coords_for_bezel,bezel_frame_lod);
+                else
+            bezel = textureLod(monitor_body_straight,coords_for_bezel,bezel_frame_lod);
+    #else
+        if (BEZEL_USE_STRAIGHT < 0.5)
+            bezel = texture(monitor_body_curved,coords_for_bezel);
+                else
+            bezel = texture(monitor_body_straight,coords_for_bezel);
+    #endif
     
 //return mix(bezel.rgb, vec3(kx), 0.5);
     //No need to draw anything on full alpha:

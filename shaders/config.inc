@@ -1,3 +1,7 @@
+	// Uncomment this to improve bezel downscaling.
+	// If you are using standard bezel, leave commented to gain performance.
+//#define STATIC_BEZEL_USE_MIPMAP 1.0
+
 	//Consider content interlaced if lines are more than this
 #define MIN_LINES_INTERLACED 380
 
