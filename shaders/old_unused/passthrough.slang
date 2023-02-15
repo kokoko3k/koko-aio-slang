@@ -1,5 +1,5 @@
 #version 450
-#include "config.inc"
+#include "../config.inc"
 
 #pragma stage vertex
 layout(location = 0) in vec4 Position;

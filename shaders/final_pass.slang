@@ -18,24 +18,22 @@ layout(location = 2) out vec2 spot_offset;
 layout(location = 3) out vec2 vFragCoord;
 layout(location = 4) out float vIsRotated;
 
+
 //Curvature:
-    #define vWarp_vexp vWarp_vexp_arg2.xy
-    #define vWarp_arg2 vWarp_vexp_arg2.zw
-    layout(location = 5) out vec4 vWarp_vexp_arg2;
+    layout(location = 5) out vec2 vWarp_vexp;
+    layout(location = 6) out vec2 vWarp_arg2;
 
 //Scanlines:
-    layout(location = 6) out float vIsInterlaced;
-    layout(location = 7) out float vFlickeringScanlines;
-    layout(location = 8) out float vScanlinePeriod;
-    layout(location = 9) out float vScanlinesAlternate;
+    layout(location = 7) out float vIsInterlaced;
+    layout(location = 8) out float vFlickeringScanlines;
+    layout(location = 9) out float vScanlinePeriod;
+    layout(location = 10) out float vScanlinesAlternate;
 
 //Vignette, spot
-    #define vV_POWER vV_POWER_SIZE.x
-    #define vV_SIZE  vV_POWER_SIZE.y
-    #define vS_POWER vS_POWER_SIZE.x
-    #define vS_SIZE  vS_POWER_SIZE.y
-    layout(location = 10) out vec2 vV_POWER_SIZE;
-    layout(location = 11) out vec2 vS_POWER_SIZE;
+    layout(location = 11) out float vV_POWER;
+    layout(location = 12) out float vV_SIZE;
+    layout(location = 13) out float vS_POWER;
+    layout(location = 14) out float vS_SIZE;
     
 #include "includes/functions.include.slang"
 
@@ -96,19 +94,16 @@ layout(location = 1) in vec2 vOutputCoord;
 layout(location = 2) in vec2 spot_offset;
 layout(location = 3) in vec2 vFragCoord;
 layout(location = 4) in float vIsRotated;
-#define vWarp_vexp vWarp_vexp_arg2.xy
-#define vWarp_arg2 vWarp_vexp_arg2.zw
-layout(location = 5) in vec4 vWarp_vexp_arg2;  
-layout(location = 6) in float vIsInterlaced;
-layout(location = 7) in float vFlickeringScanlines;
-layout(location = 8) in float vScanlinePeriod;
-layout(location = 9) in float vScanlinesAlternate;
-#define vV_POWER vV_POWER_SIZE.x
-#define vV_SIZE  vV_POWER_SIZE.y
-#define vS_POWER vS_POWER_SIZE.x
-#define vS_SIZE  vS_POWER_SIZE.y
-layout(location = 10) in vec2 vV_POWER_SIZE;
-layout(location = 11) in vec2 vS_POWER_SIZE;
+layout(location = 5) in vec2 vWarp_vexp;
+layout(location = 6) in vec2 vWarp_arg2;
+layout(location = 7) in float vIsInterlaced;
+layout(location = 8) in float vFlickeringScanlines;
+layout(location = 9) in float vScanlinePeriod;
+layout(location = 10) in float vScanlinesAlternate;
+layout(location = 11) in float vV_POWER;
+layout(location = 12) in float vV_SIZE;
+layout(location = 13) in float vS_POWER;
+layout(location = 14) in float vS_SIZE;
 
 layout(location = 0) out vec4 FragColor;
 

@@ -20,8 +20,13 @@
 #        yeah!
 #    [ ] Should the flickering be aware of the scanline?
 #        read: does a scanline dark gap increment the flickering or not?
+#    [ ] #pragmas to vertex shader to fragment shader
+#        Why and when performances start to degrade?
+#    [ ] What if i do vmask and darklines (scanlines too in alpha??)
+#        in a little pass that scales to absolute size?
+#        or even a lut with the mask...
 
-    
+
 #    Koko-aio shader is meant to be an all-in one crt shader.
 #    It can be configured with many parameters, so that can be
 #    scaled to run on even on modest gpus while still developed to
@@ -78,7 +83,7 @@
       backdrop_wrap_mode = "mirrored_repeat"
          backdrop_mipmap = "true"
 
-shaders = 17
+shaders = 18
 
 # NTSC Color artifacts pass:
 # The very first pass emulates ntsc color artifacting.
@@ -294,7 +299,14 @@ float_framebuffer7 = true
             wrap_mode15 = "clamp_to_border"
     float_framebuffer15 = true
 
+           shader16 = shaders/old_unused/passthrough.slang
+            alias16 = "pt"
+    filter_linear16 = true
+       scale_type16 = viewport
+       scale_x16 = 0.05
+       scale_y16 = 0.05 
 
+    
 
 # This pass pass will do everything needed to happen at screen coordinates:
 # * The composition of the previous passes with the bloomed image, 
@@ -304,10 +316,13 @@ float_framebuffer7 = true
 # * Black frame insertions
 # * Bezel
 # * Background images
-           shader16 = shaders/final_pass.slang
-            alias16 = "final_pass"
-    filter_linear16 = true
-       scale_type16 = viewport
-            scale16 = 1.0
-        wrap_mode16 = "mirrored_repeat"
+           shader17 = shaders/final_pass.slang
+            alias17 = "final_pass"
+    filter_linear17 = true
+       scale_type17 = viewport
+            scale17 = 1.0
+        wrap_mode17 = "mirrored_repeat"
+        
+
+
 
