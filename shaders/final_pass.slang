@@ -129,7 +129,7 @@ layout(set = 0, binding = 12) uniform sampler2D halo_pass;
 
 #include "includes/functions.include.slang"
 
-vec3 pixel_vmask(vec3 source, vec3 white_reference, float over_white) {
+vec3 pixel_vmask(vec3 source, float white_reference, float over_white) {
 // Simple RGB mask emulation with or without horizontal gap
     float ooo = 1.0 - RGB_MASK_STRENGTH;
     
@@ -154,16 +154,15 @@ vec3 pixel_vmask(vec3 source, vec3 white_reference, float over_white) {
     
     if (over_white == 1.0) pixel_out = vmasked;
         else {
-            float whiteness=max(max(white_reference.r,white_reference.g),white_reference.b);
-            whiteness-= over_white;
-            whiteness=  clamp(whiteness,0.0,1.0);
-            pixel_out=  mix(vmasked,source,whiteness);
+            white_reference-= over_white;
+            white_reference=  clamp(white_reference,0.0,1.0);
+            pixel_out=  mix(vmasked,source,white_reference);
         }
    return pixel_out;  
     
 }
 
-vec3 pixel_vmask_and_gm(vec3 source, vec3 white_reference, float over_white) {
+vec3 pixel_vmask_and_gm(vec3 source, float white_reference, float over_white) {
 // Simple RGB mask emulation with or without horizontal gap
     float ooo = 1.0 - RGB_MASK_STRENGTH;
     
@@ -201,17 +200,16 @@ vec3 pixel_vmask_and_gm(vec3 source, vec3 white_reference, float over_white) {
     
     if (over_white == 1.0) pixel_out = vmasked;
         else {
-            float whiteness=max(max(white_reference.r,white_reference.g),white_reference.b);
-            whiteness-= over_white;
-            whiteness=  clamp(whiteness,0.0,1.0);
-            pixel_out=  mix(vmasked,source,whiteness);
+            white_reference-= over_white;
+            white_reference=  clamp(white_reference,0.0,1.0);
+            pixel_out=  mix(vmasked,source,white_reference);
         }
    return pixel_out;  
     
 }
 
 
-vec3 pixel_vmask_gm(vec3 source, vec3 white_reference, float over_white) {
+vec3 pixel_vmask_gm(vec3 source, float white_reference, float over_white) {
 // Simple RGB mask emulation with or without horizontal gap
     float ooo = 1.0 - RGB_MASK_STRENGTH;
     // RGB mask:     R     G     B
@@ -233,17 +231,16 @@ vec3 pixel_vmask_gm(vec3 source, vec3 white_reference, float over_white) {
 
     if (over_white == 1.0) pixel_out = vmasked;
         else {
-            float whiteness=max(max(white_reference.r,white_reference.g),white_reference.b);
-            whiteness-= over_white;
-            whiteness=  clamp(whiteness,0.0,1.0);
-            pixel_out=  mix(vmasked,source,whiteness);
+            white_reference-= over_white;
+            white_reference=  clamp(white_reference,0.0,1.0);
+            pixel_out=  mix(vmasked,source,white_reference);
         }
 
    return pixel_out;
 }
 
 /*vec3 pixel_darklines_old(vec3 source,float darkline_every, float darkline_trans,
-                     float do_offset, vec3 white_reference,float over_white, vec2 coords) {
+                     float do_offset, float white_reference,float over_white, vec2 coords) {
     // "darklines" are vertical gaps that can be used to emulate aperturegrille
     // or slotmasks
     //
@@ -255,8 +252,7 @@ vec3 pixel_vmask_gm(vec3 source, vec3 white_reference, float over_white) {
 
     if (over_white != 1.0) {
         //less effect on bright colors.
-        float whiteness=max(max(white_reference.r,white_reference.g),white_reference.b);
-        darkline_trans+=(whiteness-over_white);
+        darkline_trans+=(white_reference-over_white);
         darkline_trans=clamp(darkline_trans,0.0,1.0);
     }
 
@@ -278,7 +274,7 @@ vec3 pixel_vmask_gm(vec3 source, vec3 white_reference, float over_white) {
 
 
 vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
-                     float do_offset, vec3 white_reference,float over_white, vec2 coords) {
+                     float do_offset, float white_reference,float over_white, vec2 coords) {
     
     
     float period_x = (3.0 - VMASK_USE_GM + VMASK_GAP) * VMASK_DARKLINE_SCALE;
@@ -289,8 +285,7 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
     
     if (over_white != 1.0) {
         //less effect on bright colors.
-        float whiteness=max(max(white_reference.r,white_reference.g),white_reference.b);
-        darkline_trans+=(whiteness-over_white);
+        darkline_trans+=(white_reference-over_white);
         darkline_trans=clamp(darkline_trans,0.0,1.0);
     }
     
@@ -348,7 +343,7 @@ float scanline_shape(vec2 coords, bool do_slotmask, float lum) {
     if (do_slotmask) {
         if (do_flicker) {
             //Fallback to old darklines code to avoid glitches/artifacts.
-            lines = lines * pixel_darklines(vec3(1.0),DARKLINES_PERIOD,1-SCANLINE_SM_STRENGTH,1.0,vec3(0.0),1.0, coords).r;
+            lines = lines * pixel_darklines(vec3(1.0),DARKLINES_PERIOD,1-SCANLINE_SM_STRENGTH,1.0, 0.0 ,1.0, coords).r;
 
         } else {
             float Darkline_part_w = (3.0 - VMASK_USE_GM + VMASK_GAP) * VMASK_DARKLINE_SCALE;
@@ -444,6 +439,12 @@ lines = pow(clamp(lines, SCANLINE_DARK, 1.0) , 1/(sqrt(lum_scaled*lum_scaled*ext
     return lines;
 }
 
+float get_clamped_white_reference(vec3 pixel_in){
+    float white_reference = max(max(pixel_in.r,pixel_in.g),pixel_in.b);
+    white_reference = min(white_reference,1.0); //Clamp here for both vmask and darklines.
+    return white_reference;
+}
+
 vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
     //Exit if we don't need a border (ambient light/background picture)
     //And we are outside the the border (unsure if this double check is good for performance) //FIXME
@@ -467,8 +468,11 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
 
 
     vec3 pixel_out = pixel_in;
-    vec3 pixel_in_clamped = min(pixel_in,vec3(1.0)); //Clamp here for both vmask and darklines.
-
+    float white_reference;
+    if (VMASK_OVERWHITE+DRKLN_OVERWHITE  < 2.0 ) {
+        white_reference = get_clamped_white_reference(pixel_in);
+    }
+    
     //Mask and darklines:
     if (DO_VMASK_AND_DARKLINES == 1.0 ) {
         vec3 pixel_in_compensated = pixel_in;
@@ -478,11 +482,11 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
         if (RGB_MASK_STRENGTH > 0.0) {
             //Use RGB pattern or exploit RGB layout with green and magenta?
             if (VMASK_USE_GM < 1.0)
-                pixel_out = pixel_vmask(pixel_in_compensated, pixel_in_clamped, VMASK_OVERWHITE);
+                pixel_out = pixel_vmask(pixel_in_compensated, white_reference, VMASK_OVERWHITE);
             else
-                pixel_out = pixel_vmask_gm(pixel_in_compensated, pixel_in_clamped, VMASK_OVERWHITE);
+                pixel_out = pixel_vmask_gm(pixel_in_compensated, white_reference, VMASK_OVERWHITE);
             //Tried to unbranch to no avail (worse performances)
-            //pixel_out = pixel_vmask_and_gm(pixel_in_compensated, pixel_in_clamped, VMASK_OVERWHITE);
+            //pixel_out = pixel_vmask_and_gm(pixel_in_compensated, white_reference, VMASK_OVERWHITE);
         }
 
         pixel_out = pixel_push_luminance(pixel_out, DARKLINES_STRENGTH * (1.0/DARKLINES_PERIOD) * MASK_COMPENSATION); 
@@ -490,7 +494,7 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
         //Screen lines (slotmask aperture grille)
         if (   DARKLINES_STRENGTH > 0.0 ) {
             float MYDARKLINES_TRANSPARENCY = 1.0 - DARKLINES_STRENGTH;
-            pixel_out = pixel_darklines(pixel_out,DARKLINES_PERIOD,MYDARKLINES_TRANSPARENCY,DARKLINES_VOFFSET,pixel_in_clamped,DRKLN_OVERWHITE, coords);
+            pixel_out = pixel_darklines(pixel_out, DARKLINES_PERIOD, MYDARKLINES_TRANSPARENCY, DARKLINES_VOFFSET, white_reference, DRKLN_OVERWHITE, coords);
         }
 
     }

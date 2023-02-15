@@ -20,11 +20,21 @@
 #        yeah!
 #    [ ] Should the flickering be aware of the scanline?
 #        read: does a scanline dark gap increment the flickering or not?
-#    [ ] #pragmas to vertex shader to fragment shader
+#    [v] #pragmas to vertex shader to fragment shader
 #        Why and when performances start to degrade?
-#    [ ] What if i do vmask and darklines (scanlines too in alpha??)
+#        ...It seems it happen when too many UBOs or Push constants are readed
+#           by the Vertex shader and passed to the fragment one.
+#           (not tested if the pass from fragment to vertex is needed to reproduce the issue)
+#    [v] What if i do vmask and darklines (scanlines too in alpha??)
 #        in a little pass that scales to absolute size?
 #        or even a lut with the mask...
+#        No gain, texture lookups are heavier than expected.
+#    [v] textureSize() appears to be quite heavy, consider to make bezel coords fixed.
+#        Done, expected to gain more, if something.
+#        You just use it to calc lods, is it worth?
+#    [ ] Darkline e vmask, il whiteness, potrebbe essere calcolato fuori dato che è usato da entrambe (max(max()))
+
+
 
 
 #    Koko-aio shader is meant to be an all-in one crt shader.

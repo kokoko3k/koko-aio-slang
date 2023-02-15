@@ -79,13 +79,13 @@ void debug() {
       //pixel_debug=vec3(0.0,1.0,0.0);
       //pixel_debug=vec3(0.38,0.0,1.0)*vTexCoord.x;
       //pixel_debug=vec3(vTexCoord.x); //H bw gradient
-      //pixel_debug=vec3(floor(vTexCoord.x*16)/16); //H bw gradient 16gray
+      pixel_debug=vec3(floor(vTexCoord.x*16)/16); //H bw gradient 16gray
       //pixel_debug=vec3(floor(vTexCoord.x*64)/64); //H bw gradient 64gray
       //pixel_debug=vec3(floor(vTexCoord.x*128)/128); //H bw gradient 128gray
       //pixel_debug=vec3(floor(vTexCoord.x*256)/256); //H bw gradient 256gray
       //pixel_debug=vec3(1,0,0,0)*floor(vTexCoord.x*64)/64; //H red gradient 64
-         float blink_time = 20;
-            if  (mod(params.FrameCount,blink_time*2) < blink_time) pixel_debug=vec3(0.2) ; else pixel_debug=vec3(1.0);
+      //   float blink_time = 20;
+      //      if  (mod(params.FrameCount,blink_time*2) < blink_time) pixel_debug=vec3(0.2) ; else pixel_debug=vec3(1.0);
       //FragColor = vec4(color_tools(pixel_debug).rgb,1.0);
       FragColor = vec4(pixel_debug,1.0);
 }
