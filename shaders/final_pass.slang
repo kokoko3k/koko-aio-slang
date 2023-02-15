@@ -242,11 +242,11 @@ vec3 pixel_vmask_gm(vec3 source, vec3 white_reference, float over_white) {
    return pixel_out;
 }
 
-vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
+/*vec3 pixel_darklines_old(vec3 source,float darkline_every, float darkline_trans,
                      float do_offset, vec3 white_reference,float over_white, vec2 coords) {
-    /* "darklines" are vertical gaps that can be used to emulate aperturegrille
-    * or slotmasks
-    */
+    // "darklines" are vertical gaps that can be used to emulate aperturegrille
+    // or slotmasks
+    //
     
     float Darkline_part_w = (3.0 - VMASK_USE_GM + VMASK_GAP) * VMASK_DARKLINE_SCALE;
     float Darkline_part_w_x2 = Darkline_part_w*2;
@@ -274,8 +274,40 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
         bool draw_dark = mod(vFragCoord.y, darkline_every) < VMASK_DARKLINE_SCALE;
         bool draw_color = !draw_dark;
         return source * ( float(draw_color) +  float(draw_dark) * darkline_trans );
-}
+}*/
 
+
+vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
+                     float do_offset, vec3 white_reference,float over_white, vec2 coords) {
+    
+    
+    float period_x = (3.0 - VMASK_USE_GM + VMASK_GAP) * VMASK_DARKLINE_SCALE;
+    float period_y = darkline_every * VMASK_DARKLINE_SCALE;
+    
+    vec2 FragCoord = vFragCoord;
+
+    
+    if (over_white != 1.0) {
+        //less effect on bright colors.
+        float whiteness=max(max(white_reference.r,white_reference.g),white_reference.b);
+        darkline_trans+=(whiteness-over_white);
+        darkline_trans=clamp(darkline_trans,0.0,1.0);
+    }
+    
+    
+    if (do_offset > 0.0) {
+        float column = int(floor(mod(FragCoord.x, period_x*2.0)));
+        if (column < period_x) FragCoord.y+=period_y/2.0;
+    }
+    
+    float row = int(floor(mod(FragCoord.y, period_y)));
+
+    if (row < VMASK_DARKLINE_SCALE)
+        return source * darkline_trans;
+            else
+        return source;
+    
+}
 
 
 float scanline_shape(vec2 coords, bool do_slotmask, float lum) {
