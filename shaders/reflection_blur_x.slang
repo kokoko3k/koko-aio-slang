@@ -41,33 +41,35 @@ layout(set = 0, binding = 1) uniform sampler2D first_pass;
 #define Pi2 6.28318530717959
 
 vec3 blur(float Quality, float Directions, float Size, vec2 co,float lod) {
-    vec4 iResolution = SourceTextureSize;
-    vec2 Radius = Size/iResolution.xy ;
+   Size = Size * NEW_SCALEMOD_X;
+   vec4 iResolution = SourceTextureSize;
+   vec2 Radius = Size/iResolution.xy ;
 
-    vec3 color  = vec3(0.0,0.0,0.0);
-    vec3 lookup = vec3(0.0,0.0,0.0);
-    float steps=0.0;
-    for( float d=0.0; d<Pi2; d+=Pi2/Directions) {
-        for(float i=1.0/Quality; i<=1.0; i+=1.0/Quality) {
-            lookup = textureLod( SourceTexture, co + vec2(cos(d)  + b_offset_x , sin(d))*Radius*i  ,lod).rgb ;
-            color +=lookup.rgb;
-            steps+=1.0;
-        }
-    }
-    color /= steps;
-    if ( steps > 4.0) return vec3(1.0);
-    return color;
+   vec3 color  = vec3(0.0,0.0,0.0);
+   vec3 lookup = vec3(0.0,0.0,0.0);
+   float steps=0.0;
+   for( float d=0.0; d<Pi2; d+=Pi2/Directions) {
+      for(float i=1.0/Quality; i<=1.0; i+=1.0/Quality) {
+         lookup = textureLod( SourceTexture, co + vec2(cos(d)  + b_offset_x , sin(d))*Radius*i  ,lod).rgb ;
+         color +=lookup.rgb;
+         steps+=1.0;
+      }
+   }
+   color /= steps;
+   if ( steps > 4.0) return vec3(1.0);
+   return color;
 }
 
 
 vec3 blur_unroll(float Size, vec2 co,float lod) {
-    vec3 color;
-    vec2 d = SourceTextureSize.zw * Size;
-    color =  textureLod( SourceTexture, co + d * vec2(-1.0,  1.0 )  ,lod).rgb ;
-    color += textureLod( SourceTexture, co + d * vec2( 1.0,  1.0 )  ,lod).rgb ;
-    color += textureLod( SourceTexture, co + d * vec2(-1.0,  -1.0 ) ,lod).rgb ;
-    color += textureLod( SourceTexture, co + d * vec2( 1.0,  -1.0 ) ,lod).rgb ;
-    return color / 4.0;
+   Size = Size * NEW_SCALEMOD_X;
+   vec3 color;
+   vec2 d = SourceTextureSize.zw * Size;
+   color =  textureLod( SourceTexture, co + d * vec2(-1.0,  1.0 )  ,lod).rgb ;
+   color += textureLod( SourceTexture, co + d * vec2( 1.0,  1.0 )  ,lod).rgb ;
+   color += textureLod( SourceTexture, co + d * vec2(-1.0,  -1.0 ) ,lod).rgb ;
+   color += textureLod( SourceTexture, co + d * vec2( 1.0,  -1.0 ) ,lod).rgb ;
+   return color / 4.0;
 }
 
 void main() {
@@ -127,7 +129,7 @@ void main() {
    
    vec3 pixel_blur;
    //pixel_blur = blur(1,4,2,coords_curved, 2.0);
-   pixel_blur = blur_unroll(1.5,coords_curved, 2.0);
+   pixel_blur = blur_unroll(3.3,coords_curved, 2.0);
    
    FragColor = vec4(apply_fuzzy_main_pass(pixel_blur),1.0);
 }

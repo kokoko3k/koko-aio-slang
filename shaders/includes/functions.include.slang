@@ -425,5 +425,3 @@ float rgb_to_gray(vec3 rgb) {
 	}
 	*/
 
-	
-	

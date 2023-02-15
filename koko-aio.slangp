@@ -32,7 +32,9 @@
 #    [v] textureSize() appears to be quite heavy, consider to make bezel coords fixed.
 #        Done, expected to gain more, if something.
 #        You just use it to calc lods, is it worth?
-#    [ ] Darkline e vmask, il whiteness, potrebbe essere calcolato fuori dato che è usato da entrambe (max(max()))
+#    [.] Darkline, vmask: whiteness can be pre-calculated outside.
+#        Half done, gained something.
+#    [ ] Reflection blur size, make id not dependand on input resolution.
 
 
 

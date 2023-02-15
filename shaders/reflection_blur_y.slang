@@ -25,9 +25,7 @@ layout(set = 0, binding = 2) uniform sampler2D Source;
 #define b_offset_x -0.05
 #define Pi2 6.28318530717959
 vec3 blur(float Quality, float Directions, float Size, vec2 co) {
-    //q = 1
-    //direzioni 4
-    //size = 2
+    Size = Size * NEW_SCALEMOD_Y;
     vec4 iResolution = SourceTextureSize;
     vec2 Radius = Size/iResolution.xy ;
     vec3 color  = vec3(0.0,0.0,0.0);
@@ -44,7 +42,8 @@ vec3 blur(float Quality, float Directions, float Size, vec2 co) {
     return color;
 }
 
-vec3 blur_unroll(float Size, vec2 co) {  
+vec3 blur_unroll(float Size, vec2 co) {
+    Size = Size * NEW_SCALEMOD_Y;
     vec3 color  = vec3(0.0,0.0,0.0);    
     vec2 d = SourceTextureSize.zw * Size;
     color =  texture( SourceTexture, co + d * vec2(-1.0,   1.0 )).rgb ;
@@ -65,7 +64,7 @@ void main() {
     ///Quality, Directions, Size, coords
     //FragColor = vec4(blur(1,4,2,vTexCoord),1.0);
 
-    FragColor = vec4(blur_unroll(1.5,vTexCoord),1.0);
+    FragColor = vec4(blur_unroll(3.3,vTexCoord),1.0);
 }
  
  

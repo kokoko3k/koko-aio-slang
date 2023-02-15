@@ -1,6 +1,6 @@
 #define bdirections 8
 
-vec2 radius(vec4 smpsize, vec2 bsize){
+vec2 radius_blur_adapt(vec2 bsize){
     vec2 r;
     r.x = bsize.x / SCALEMOD_X;
     r.y = r.x *  get_in_aspect();
@@ -8,7 +8,7 @@ vec2 radius(vec4 smpsize, vec2 bsize){
 }
 
 vec3 bloom_gamma_power(sampler2D smp, vec2 uv, vec4 smpsize, vec2 bsize, float quality, float gamma, float power, float start_offset, float lod) {
-    vec2 r = radius(smpsize, bsize) ;
+    vec2 r = radius_blur_adapt(bsize) ;
     vec3 lookup;
     vec3 color  = vec3(0.0);
     vec3 vec3gamma = vec3(gamma);
@@ -24,7 +24,7 @@ vec3 bloom_gamma_power(sampler2D smp, vec2 uv, vec4 smpsize, vec2 bsize, float q
 }
 
 vec3 bloom_gamma(sampler2D smp, vec2 uv, vec4 smpsize, vec2 bsize, float quality, float gamma, float start_offset, float lod) {
-    vec2 r = radius(smpsize, bsize);
+    vec2 r = radius_blur_adapt(bsize);
     vec3 lookup;
     vec3 color  = vec3(0.0);
     vec3 vec3gamma = vec3(gamma);
@@ -40,7 +40,7 @@ vec3 bloom_gamma(sampler2D smp, vec2 uv, vec4 smpsize, vec2 bsize, float quality
 }
 
 vec3 bloom(sampler2D smp, vec2 uv, vec4 smpsize, vec2 bsize, float quality, float start_offset, float lod) {
-    vec2 r = radius(smpsize, bsize);
+    vec2 r = radius_blur_adapt(bsize);
     vec3 lookup;
     vec3 color  = vec3(0.0);
     for( float d=start_offset; d<TAU; d+=TAU/bdirections) {
