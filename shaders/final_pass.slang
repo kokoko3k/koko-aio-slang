@@ -566,7 +566,7 @@ float global_noise;
         float backdrop_lod = log2(backdrop_tex_size.y / global.FinalViewportSize.y);
 
         vec2 backdrop_coords =  get_scaled_coords_aspect(
-                                vBackdrop_coords+backdrop_offset,
+                                vOutputCoord+backdrop_offset,
                                 global.FinalViewportSize,
                                 backdrop_tex_size.x/backdrop_tex_size.y,
                                 bool(vIsRotated));
