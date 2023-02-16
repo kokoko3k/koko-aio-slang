@@ -35,7 +35,7 @@
 #    [.] Darkline, vmask: whiteness can be pre-calculated outside.
 #        Half done, gained something.
 #    [ ] Reflection blur size, make id not dependand on input resolution.
-
+#    [ ] Better debanding?
 
 
 
