@@ -577,6 +577,14 @@ float global_noise;
 #endif
 
 vec4 textureLod_wrap(sampler2D tex, vec2 co, float lod, float wrap_mode) {
+    /*
+    // Mirrored repeat, once, useless since is done by default
+    if (co.x > 1.0 || co.x < 0.0)
+        co.x = 1- mod(co.x, 1.0);
+    if (co.y > 1.0 || co.y < 0.0)
+        co.y = 1- mod(co.y, 1.0);
+    */
+    
     if (wrap_mode == 1.0) {
         //Clamp to border, black.
         bool bOutside = (co.x < 0.0 || co.x > 1.0 || co.y < 0.0 || co.y > 1.0 ) ;
