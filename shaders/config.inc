@@ -14,6 +14,10 @@
 	//It is also used to compute wrap/repeated coordinates.
 #define BEZEL_BORDER_SIZE 0.175
 
+	//Used to push reflection strength near the outer bezel
+	//reflection area. 30 works good for the default provided bezel
+#define BEZEL_REFLECTION_SHADE_PUSH 30
+
 	// 0.0-1.0: sensitivity to scene change (ambilike stuff), 0.0 changes more
 #define AMBI_SCENE_CHG_THRSHLD 0.07  
 	

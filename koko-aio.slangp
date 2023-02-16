@@ -34,9 +34,11 @@
 #        You just use it to calc lods, is it worth?
 #    [.] Darkline, vmask: whiteness can be pre-calculated outside.
 #        Half done, gained something.
-#    [ ] Reflection blur size, make id not dependand on input resolution.
+#    [v] Reflection blur size, make id not dependand on input resolution.
+#    [v] When colorizing bezel with ambilight, apply noise over it as well
 #    [ ] Better debanding?
-
+#    [ ] When using dynamic zoom, bezel reflection should be dynamically adapted
+#    [ ] Blur less near the start of the bezel
 
 
 #    Koko-aio shader is meant to be an all-in one crt shader.
