@@ -229,7 +229,13 @@
     Rotate image mode
         This could be needed when dealing with vertical games.
         Use -1 to let the shader try to guess if the rotation is needed.
-    
+    Wrap mode:
+        What to do outside the image:
+        0  Mirrored repeat because so is configured in main .slangp.
+        1  Clamp to border and it means black.
+        2  Clamp to edge and means that it repeats the edge color.
+        3  Plain repeat without mirroring.
+
 **Ambient light leds:**
     Emulates the presence of led strips under the monitor that lights the
     surroundings according to the edges of the game content.
