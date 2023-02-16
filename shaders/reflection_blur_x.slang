@@ -84,7 +84,7 @@ void main() {
       
       float shade = min(shadex, shadey);
       
-      shade = shade * BEZEL_REFLECTION_SHADE_PUSH + 0.01;
+      shade = shade * BEZEL_RFL_BLR_SHD + 0.01;
    
    FragColor = vec4(apply_fuzzy_main_pass(pixel_blur),shade);
    

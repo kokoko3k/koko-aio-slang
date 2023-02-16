@@ -195,6 +195,7 @@
     - The alpha channel in the inner frame represents the part of the bezel
       that will be filled by the game content
     - The blue channel represents the part of the bezel that will be filled by the game reflection.
+    
     Straight
         Use a straight bezel instead of a curved one.
     Bezel color (red,green,blue) and contrast:
@@ -207,7 +208,11 @@
         Draws a black border around the game content.
     Reflections zoom:
         "Zoom" the reflections if they don't match the content.
-
+    Reflections blur shade
+        Set the start point of the blur over the reflection area.
+        0 means no blur at all.
+        
+        
 **Global shift/zoom image:**
     Zoom and shift everything on screen, but background pictures.
         

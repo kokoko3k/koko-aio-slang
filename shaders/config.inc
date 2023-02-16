@@ -14,10 +14,6 @@
 	//It is also used to compute wrap/repeated coordinates.
 #define BEZEL_BORDER_SIZE 0.175
 
-	//Used to push reflection strength near the outer bezel
-	//reflection area. 30 works good for the default provided bezel
-#define BEZEL_REFLECTION_SHADE_PUSH 30
-
 	// 0.0-1.0: sensitivity to scene change (ambilike stuff), 0.0 changes more
 #define AMBI_SCENE_CHG_THRSHLD 0.07  
 	
@@ -179,6 +175,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float BEZEL_REFL_ZOOM;
 	float BEZEL_FRAME_ZOOM;
 	float BEZEL_USE_STRAIGHT;
+	float BEZEL_RFL_BLR_SHD;
 
 	float DO_SPOT;
 	float S_POSITION; 
@@ -361,6 +358,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BEZEL_FRAME_ZOOM   "        Frame zoom"		0.0   -1.5 0.5 0.01
 #pragma parameter BEZEL_IMAGE_BORDER "        Image border"		1.01   1.0 1.2 0.01
 #pragma parameter BEZEL_REFL_ZOOM    "        Reflections zoom"		0.955   0.0 2.0 0.005
+#pragma parameter BEZEL_RFL_BLR_SHD  "        Reflections blur shade"	30.0    0.0 100.0 1.0
 
 
 
