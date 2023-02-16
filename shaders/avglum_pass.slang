@@ -52,7 +52,7 @@ float get_avg_lum_from_mip() {
 float get_avglum() {
     /* avglum alpha has 3 zones::
      * 0.25 -> reduced sampling, used for to aid scene detection
-     * 0.75 -> smoothed_sampling, used to adapt bloom exposure and dynamic fullscreen zoom
+     * 0.75 -> smoothed_sampling, used to adapt fullscreen zoom
      * anything else: continuous sampling
      */
 

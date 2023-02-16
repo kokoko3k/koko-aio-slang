@@ -5,7 +5,6 @@
 #    	    Tried, does not produce great visible improvements
 #    [v] Vignette and spot could be done earlier at lower res?
 #        Made a bit lighter version right in final_pass instead.
-#    [ ] check branching conditions in first_pass.slang
 #    [v] reference new repo from the main one
 #    [v] Noise is not visible on black or white, much more on gray, why?
 #        Probably a matter of post processing
@@ -18,8 +17,6 @@
 #        So, no.
 #    [v] Does bloom quality improve if we sample from original?
 #        yeah!
-#    [ ] Should the flickering be aware of the scanline?
-#        read: does a scanline dark gap increment the flickering or not?
 #    [v] #pragmas to vertex shader to fragment shader
 #        Why and when performances start to degrade?
 #        ...It seems it happen when too many UBOs or Push constants are readed
@@ -32,18 +29,25 @@
 #    [v] textureSize() appears to be quite heavy, consider to make bezel coords fixed.
 #        Done, expected to gain more, if something.
 #        You just use it to calc lods, is it worth?
-#    [.] Darkline, vmask: whiteness can be pre-calculated outside.
-#        Half done, gained something.
 #    [v] Reflection blur size, make id not dependand on input resolution.
 #    [v] When colorizing bezel with ambilight, apply noise over it as well
-#    [ ] Better debanding?
 #    [v] Blur less near the start of the bezel
 #    [v] Make the reflection blur shade point configurable
-#    [ ] When using dynamic zoom, bezel reflection should be dynamically adapted
-#        ...this is tough, zomoing reflection wouldn't work.
 #    [v] Rotate image: auto (-1)... Does it work?
 #        yes.
-#    [ ] Put blank lines after #pragma parameter groups
+#    [v] Put blank lines after #pragma parameter groups
+#    [.] Darkline, vmask: whiteness can be pre-calculated outside.
+#        Half done, gained something.
+#    [ ] check branching conditions in first_pass.slang
+#    [ ] Better debanding?
+#    [ ] Should the flickering be aware of the scanline?
+#        read: does a scanline dark gap increment the flickering or not?
+#    [ ] When using dynamic zoom, bezel reflection should be dynamically adapted
+#        ...this is tough, zomoing reflection wouldn't work.
+#    [ ] Bloom: would it make sense to gather the average luminosity in a wide
+#        zone around the current pixel instead of the whole scene?
+#    [ ] should min_w in avglum_pass depend on content resolution?
+#    [ ] lod = log2(params.SourceSize.y / min_w); in avglum_pass is wrong (w/y?)
 
 #    Koko-aio shader is meant to be an all-in one crt shader.
 #    It can be configured with many parameters, so that can be
@@ -302,6 +306,7 @@ float_framebuffer7 = true
            scale_type14 = source
                 scale14 = 1.0
             wrap_mode14 = "mirrored_repeat"
+    float_framebuffer14 = "true"
 
 
 
