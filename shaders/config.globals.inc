@@ -195,7 +195,7 @@
 	#define BG_IMAGE_OFFX		global.BG_IMAGE_OFFX
 	#define BG_IMAGE_ZOOM		global.BG_IMAGE_ZOOM
 	#define BG_IMAGE_ROTATION	global.BG_IMAGE_ROTATION
-
+	#define BG_IMAGE_WRAP_MODE	global.BG_IMAGE_WRAP_MODE
 
 
 #define DO_AMBILIGHT		global.DO_AMBILIGHT

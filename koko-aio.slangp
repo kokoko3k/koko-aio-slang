@@ -37,9 +37,12 @@
 #    [v] Reflection blur size, make id not dependand on input resolution.
 #    [v] When colorizing bezel with ambilight, apply noise over it as well
 #    [ ] Better debanding?
+#    [v] Blur less near the start of the bezel
+#    [ ] Make the blur shade strength configurable?
 #    [ ] When using dynamic zoom, bezel reflection should be dynamically adapted
-#    [ ] Blur less near the start of the bezel
-
+#        ...this is tough, zomoing reflection wouldn't work.
+#    [ ] Rotate image: auto (-1)... Does it work?
+#    [ ] Put blank lines after #pragma parameter groups
 
 #    Koko-aio shader is meant to be an all-in one crt shader.
 #    It can be configured with many parameters, so that can be

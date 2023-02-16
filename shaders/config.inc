@@ -208,6 +208,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float BG_IMAGE_OFFX;
 	float BG_IMAGE_ZOOM;
 	float BG_IMAGE_ROTATION;
+	float BG_IMAGE_WRAP_MODE;
 
 	float DO_SHIFT_RGB;
 	float SHIFT_R;
@@ -364,13 +365,14 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 
 //Background Image
-#pragma parameter DO_BG_IMAGE	 "★ Backgound image enable? ==>"			0.0  0.0  1.0     1.0
-#pragma parameter LABEL_WARNING1 "    ⚠ RetroArch aspect needs to be set to Full! ⚠"	1.0  1.0  1.0     1.0
-#pragma parameter BG_IMAGE_OVER	 "        Image over content (alpha channel driven)?"	0.0  0.0  1.0     1.0
-#pragma parameter BG_IMAGE_OFFX	 "        Shift Image over X axis"			0.0  -1.0  1.0    0.0005
-#pragma parameter BG_IMAGE_OFFY	 "        Shift Image over Y axis"			0.0  -1.0  1.0    0.0005
-#pragma parameter BG_IMAGE_ZOOM	 "        Zoom Image"					1.0  -1.0  3.0    0.0005
-#pragma parameter BG_IMAGE_ROTATION "        Rotate image mode (-1 for auto)"	     	-1.0  -1.0  2.0    1.0
+#pragma parameter DO_BG_IMAGE	     "★ Backgound image enable? ==>"				0.0  0.0  1.0     1.0
+#pragma parameter LABEL_WARNING1     "    ⚠ RetroArch aspect needs to be set to Full! ⚠"	1.0  1.0  1.0     1.0
+#pragma parameter BG_IMAGE_OVER	     "        Image over content (alpha channel driven)?"	0.0  0.0  1.0     1.0
+#pragma parameter BG_IMAGE_OFFX	     "        Shift Image over X axis"				0.0  -1.0  1.0    0.0005
+#pragma parameter BG_IMAGE_OFFY	     "        Shift Image over Y axis"				0.0  -1.0  1.0    0.0005
+#pragma parameter BG_IMAGE_ZOOM	     "        Zoom Image"					1.0  -1.0  3.0    0.0005
+#pragma parameter BG_IMAGE_ROTATION  "        Rotate image mode (-1 for auto)"	     		-1.0  -1.0  2.0    1.0
+#pragma parameter BG_IMAGE_WRAP_MODE "        Wrap mode: Default, clamp to border, edge, repeat"	0.0  0.0    3.0    1.0
 
 
 

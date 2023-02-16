@@ -34,6 +34,7 @@ layout(location = 4) out float vIsRotated;
     layout(location = 12) out float vV_SIZE;
     layout(location = 13) out float vS_POWER;
     layout(location = 14) out float vS_SIZE;
+
     
 #include "includes/functions.include.slang"
 
@@ -46,7 +47,7 @@ void main() {
         vTexCoord = zoom(vTexCoord + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM );
     
     vOutputCoord = TexCoord;
-
+    
     vFragCoord = vec2( floor(vOutputCoord.x * params.OutputSize.x),
                        floor(vOutputCoord.y * params.OutputSize.y));
 
@@ -565,7 +566,7 @@ float global_noise;
         float backdrop_lod = log2(backdrop_tex_size.y / global.FinalViewportSize.y);
 
         vec2 backdrop_coords =  get_scaled_coords_aspect(
-                                vOutputCoord+backdrop_offset,
+                                vBackdrop_coords+backdrop_offset,
                                 global.FinalViewportSize,
                                 backdrop_tex_size.x/backdrop_tex_size.y,
                                 bool(vIsRotated));
@@ -574,6 +575,22 @@ float global_noise;
         return textureLod(backdrop, backdrop_coords, backdrop_lod).rgb;
     }
 #endif
+
+vec4 textureLod_wrap(sampler2D tex, vec2 co, float lod, float wrap_mode) {
+    if (wrap_mode == 1.0) {
+        //Clamp to border, black.
+        bool bOutside = (co.x < 0.0 || co.x > 1.0 || co.y < 0.0 || co.y > 1.0 ) ;
+        if (bOutside) return vec4(0.0,0.0,0.0,1.0);
+    } else if (wrap_mode == 2.0) {
+        //Clamp to edge:
+        co = clamp(co, 0.00, 1.0);
+    } else if (wrap_mode == 3.0) {
+        //Repeat no mirror:
+        co = mod(co, 1.0);
+    }
+    
+    return textureLod(tex, co, lod);
+}
 
 
 vec4 pixel_background_image(bool over){
@@ -585,7 +602,7 @@ vec4 pixel_background_image(bool over){
 
         if (BG_IMAGE_ROTATION > 0.0  || ( BG_IMAGE_ROTATION < 0.0 && bool(vIsRotated) )  ) tex_size.xy = tex_size.yx;
 
-        vec2 back_coords =  get_scaled_coords_aspect(vOutputCoord+bg_image_offset,global.FinalViewportSize, tex_size.x/tex_size.y, bool(vIsRotated));
+        vec2 back_coords = get_scaled_coords_aspect(vOutputCoord + bg_image_offset, global.FinalViewportSize, tex_size.x/tex_size.y, bool(vIsRotated));
         
         if (BG_IMAGE_ROTATION < 0.0 && bool(vIsRotated) ) {
             //handle automatic rotation of bg image for rotated games
@@ -598,20 +615,21 @@ vec4 pixel_background_image(bool over){
             if (BG_IMAGE_ROTATION == 2.0) back_coords.x = 1 - back_coords.x;
         }
         back_coords=zoom(back_coords, BG_IMAGE_ZOOM);
-        return textureLod(bg_over,back_coords,bg_over_lod);
+        return textureLod_wrap(bg_over, back_coords, bg_over_lod, BG_IMAGE_WRAP_MODE);
     }
     //under
         vec2 tex_size = textureSize(bg_under, 0); // * BG_ZOOM;
         if (BG_IMAGE_ROTATION > 0.0) tex_size.xy = tex_size.yx;
         float bg_under_lod = log2(tex_size.y / global.FinalViewportSize.y);
-        vec2 back_coords =  get_scaled_coords_aspect(vOutputCoord+bg_image_offset,global.FinalViewportSize, tex_size.x/tex_size.y, bool(vIsRotated));
+        vec2 back_coords = get_scaled_coords_aspect(vOutputCoord + bg_image_offset,global.FinalViewportSize, tex_size.x/tex_size.y, bool(vIsRotated));
         if (BG_IMAGE_ROTATION > 0.0) {
             back_coords.xy = vec2(back_coords.y, back_coords.x);
             if (BG_IMAGE_ROTATION == 1.0) back_coords.y = 1 - back_coords.y;
             if (BG_IMAGE_ROTATION == 2.0) back_coords.x = 1 - back_coords.x;
         }
         back_coords=zoom(back_coords, BG_IMAGE_ZOOM);
-        return textureLod(bg_under,back_coords,bg_under_lod);
+        return textureLod_wrap(bg_under,back_coords,bg_under_lod, BG_IMAGE_WRAP_MODE);
+        //return textureLod(bg_under,back_coords,bg_under_lod);
 }
 
 vec3 pixel_border(bool image_over) {
