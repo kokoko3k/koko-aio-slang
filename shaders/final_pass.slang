@@ -606,11 +606,11 @@ vec4 pixel_background_image(bool over){
         
         if (BG_IMAGE_ROTATION < 0.0 && bool(vIsRotated) ) {
             //handle automatic rotation of bg image for rotated games
-            back_coords.xy = vec2(back_coords.y, back_coords.x);
+            back_coords.xy = back_coords.yx;
             back_coords.y = 1 - back_coords.y;
         } else if (BG_IMAGE_ROTATION > 0.0) {
             //rotate as user prefs
-            back_coords.xy = vec2(back_coords.y, back_coords.x);
+            back_coords.xy = back_coords.yx;
             if (BG_IMAGE_ROTATION == 1.0) back_coords.y = 1 - back_coords.y;
             if (BG_IMAGE_ROTATION == 2.0) back_coords.x = 1 - back_coords.x;
         }
