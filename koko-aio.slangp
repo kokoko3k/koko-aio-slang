@@ -36,6 +36,13 @@
 #    [v] Rotate image: auto (-1)... Does it work?
 #        yes.
 #    [v] Put blank lines after #pragma parameter groups
+#    [v] Bloom: would it make sense to gather the average luminosity in a wide
+#        zone around the current pixel instead of the whole scene?
+#        Yes, it works good.
+#    [v] should min_w in avglum_pass depend on content resolution?
+#        lod = log2(params.SourceSize.y / min_w); in avglum_pass is wrong (w/y?)
+#        Both fixed by specifying the lod instead of doing stupid calculations.mip_lod
+#        So fixed, and achieved what was needed.
 #    [.] Darkline, vmask: whiteness can be pre-calculated outside.
 #        Half done, gained something.
 #    [ ] check branching conditions in first_pass.slang
@@ -44,10 +51,8 @@
 #        read: does a scanline dark gap increment the flickering or not?
 #    [ ] When using dynamic zoom, bezel reflection should be dynamically adapted
 #        ...this is tough, zomoing reflection wouldn't work.
-#    [ ] Bloom: would it make sense to gather the average luminosity in a wide
-#        zone around the current pixel instead of the whole scene?
-#    [ ] should min_w in avglum_pass depend on content resolution?
-#    [ ] lod = log2(params.SourceSize.y / min_w); in avglum_pass is wrong (w/y?)
+
+
 
 #    Koko-aio shader is meant to be an all-in one crt shader.
 #    It can be configured with many parameters, so that can be

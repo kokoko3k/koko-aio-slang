@@ -6,7 +6,8 @@
 #include "config.inc"
 
 //The mipmap wideness needed by the highlights on the bezel.
-#define min_w 16 
+//the higher, the smoother.
+#define mip_lod 5
 
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
@@ -16,8 +17,7 @@ layout(location = 1) out float lod;
 
 void main() {
    gl_Position = global.MVP * Position;
-   vTexCoord = TexCoord;
-   lod = log2(params.SourceSize.y / min_w);
+   vTexCoord = TexCoord;  
 }
 
 #pragma stage fragment
@@ -99,7 +99,7 @@ void main() {
     pixel_out.a = get_avglum();
     if (DO_BEZEL + DO_BLOOM > 0.0) {
         //Create a small mipmap to be used to light the bezel corners.
-        pixel_out.rgb = textureLod(first_pass, vTexCoord,lod).rgb;
+        pixel_out.rgb = textureLod(first_pass, vTexCoord, mip_lod).rgb;
     }
     FragColor = pixel_out;
 
