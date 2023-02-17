@@ -157,16 +157,18 @@
         Controls how much the bloom has to be wide.
     Quality:
         How much the shape of the bloomed picture will reflect the original one.
-    Input Gamma:
+    Input Gamma (threshold):
         Use this as a threshold to control how much a pixel has to be bright
         to produce a bloom effect.
+    Output Gamma (contour smoothness):
+        Lowering it will make the bloom contour more pronunced.
+        Handy to simulate well defined "Aura" effects.
     Power multiplier:
         Just apply a gain to the final bloom.
-    Output Gamma:
-        Play with it.
-    Modulate: Less on bright scenes:
-        How much to reduce the mix as the scene gets brighter.
-    Modulate: Strength on bright areas:
+    Modulate: Temporal eye exposure adaption strength
+        Simulate the process through which the pupil adapt itself to different
+        light conditions.
+    Modulate: Modulate: Eye temporal adaption strength
         Since the light produced by the bloom effect is added to the underlying
         image, it can produce burn effects on the already bright areas.
         This is actually an hack that will avoid to bloom them.

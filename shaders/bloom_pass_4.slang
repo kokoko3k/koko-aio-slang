@@ -44,9 +44,9 @@ float get_avg_lum_from_mip(sampler2D tex, vec2 co, float lod) {
     //return (mip.r+mip.g+mip.b)/3.0;
     float luminance = rgb_to_gray(mip);
     //temporal smooth.
-    //the speed of the "emulated" eye adaption has to be divided by adaption strength (BLOOM_ADPT)
-    //to keep the speed adaption constant.
-    float eye_adaption_speed = (BLOOM_PUPIL_ADAPTION_SPEED / BLOOM_ADPT);
+    //the defined emulated eye adaption speed needs to be divided 
+    //by the eye adaption strength (BLOOM_EYE_ADPT_SRT)
+    float eye_adaption_speed = (BLOOM_PUPIL_ADAPTION_SPEED / BLOOM_EYE_ADPT_SRT);
     eye_adaption_speed = clamp(BLOOM_PUPIL_ADAPTION_SPEED, 0.01, 1.0);
     luminance = mix(texture(bloom_pass_finalFeedback,vTexCoord).a, luminance, eye_adaption_speed);
     return luminance + eps;
@@ -91,8 +91,8 @@ void main() {
         bloomed*=BLOOM_POWER;
         
         // Modulate exposure over time too.
-        // Branching with (if BLOOM_ADPT == 0.0) does not gain anything.
-        float smoothed_avglum = zone_luminance * BLOOM_ADPT;
+        // Branching with (if BLOOM_EYE_ADPT_SRT == 0.0) does not gain anything.
+        float smoothed_avglum = zone_luminance * BLOOM_EYE_ADPT_SRT;
         float bloom_mix_adapted = max(0.0, BLOOM_MIX - smoothed_avglum);
         
         
