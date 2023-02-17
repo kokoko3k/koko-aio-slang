@@ -161,7 +161,23 @@ vec3 color_tools(vec3 pixel_out) {
    return pixel_out;
 }
 
+
+vec3 debug() {
+   vec3 pixel_debug;
+   float blink_time = 60;
+   vec2 center = vTexCoord - vec2(0.5,0.5);
+   float radius = 0.1;
+   pixel_debug = vec3(1 - step(radius, length(center)));
+   pixel_debug *= float((mod(params.FrameCount,blink_time*2) < blink_time));
+   return pixel_debug;
+}
+
 void main() {
+   
+   //FragColor = vec4(debug(), 1.0); return;
+   
+   
+   
    vec3 pixel_out;
    if (DO_NTSC_ARTIFACTS > 0.5)
       pixel_out = ntscdec(vTexCoord);
@@ -172,6 +188,10 @@ void main() {
       pixel_out = color_tools(pixel_out);
    
    FragColor = vec4(pixel_out, 1.0);
+   
+   
+
+   
 }
 
 

@@ -42,7 +42,10 @@ float get_avg_lum_from_mip(sampler2D tex, vec2 co, float lod) {
     vec3 mip = textureLod(first_pass, co, lod).rgb;
     mip = apply_fuzzy_main_pass(mip);
     //return (mip.r+mip.g+mip.b)/3.0;
-    return rgb_to_gray(mip);
+    float luminance = rgb_to_gray(mip);
+    //temporal smooth:
+    luminance = mix(texture(bloom_pass_finalFeedback,vTexCoord).a, luminance, BLOOM_SMOOTHNESS_SPEED);
+    return luminance;
 }
 
 
@@ -53,7 +56,7 @@ void main() {
     
     //Smooth luminance with specified lod in this alpha channel
     float zone_luminance = get_avg_lum_from_mip(first_pass, vTexCoord, BLOOM_LUM_ZONE_W);
-    zone_luminance = mix(texture(bloom_pass_finalFeedback,vTexCoord).a, zone_luminance, BLOOM_SMOOTHNESS_SPEED);
+    
     
       
     vec3 bloomed = bloom(
@@ -88,9 +91,13 @@ void main() {
         //float smoothed_avglum = texture(avglum_pass, vec2(0.75)).a * BLOOM_ADPT; 
         float smoothed_avglum = zone_luminance * BLOOM_ADPT;
         float bloom_mix_adapted = max(0.0, BLOOM_MIX - smoothed_avglum);
-                
+        
         if (BLOOM_BYPASS == 2.0) fbloom_mix = 1.0;
-        bloom_mix_adapted = fbloom_mix * ( 1- pow(smoothed_avglum, BLOOM_EXPOSURE_CURVE_SHOULDER -smoothed_avglum * BLOOM_EXPOSURE_CURVE_SHOULDER) );
+        
+        float pow_exp = BLOOM_EXPOSURE_CURVE_SHOULDER - smoothed_avglum * BLOOM_EXPOSURE_CURVE_SHOULDER;
+        pow_exp = max(0.0, pow_exp); //avoid negative exps.
+        
+        bloom_mix_adapted = fbloom_mix * ( 1- pow(smoothed_avglum, pow_exp) );
         
         bloomed = bloomed * bloom_mix_adapted * over_white_correction ;
     }

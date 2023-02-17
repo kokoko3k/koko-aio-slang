@@ -87,6 +87,15 @@ void debug() {
       //   float blink_time = 20;
       //      if  (mod(params.FrameCount,blink_time*2) < blink_time) pixel_debug=vec3(0.2) ; else pixel_debug=vec3(1.0);
       //FragColor = vec4(color_tools(pixel_debug).rgb,1.0);
+      //White circle, blinking
+      /*   float blink_time = 20;
+         vec2 center = vTexCoord - vec2(0.5,0.5);
+         float radius = 0.1;
+         pixel_debug = vec3(1 - step(radius, length(center)));
+         pixel_debug *= float((mod(params.FrameCount,blink_time*2) < blink_time));
+      */
+      
+      
       FragColor = vec4(pixel_debug,1.0);
 }
 
