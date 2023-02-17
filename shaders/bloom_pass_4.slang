@@ -36,7 +36,7 @@ layout(set = 0, binding = 4) uniform sampler2D bloom_pass_finalFeedback;
 //smaller than the area? read: the lod, use pot
 #define BLOOM_LUM_ZONE_W 7
 
-#define BLOOM_PUPIL_ADAPTION_SPEED 0.2
+#define BLOOM_PUPIL_ADAPTION_SPEED 0.1
 
 float get_avg_lum_from_mip(sampler2D tex, vec2 co, float lod) {
     vec3 mip = textureLod(first_pass, co, lod).rgb;
