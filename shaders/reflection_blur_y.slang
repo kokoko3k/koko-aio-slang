@@ -79,7 +79,7 @@ void main() {
     vec3 pixel_sharp = texture( first_pass, co_adapted).rgb;
     pixel_sharp = apply_fuzzy_main_pass(pixel_sharp);
 
-
+    pixel_source.a = pow(pixel_source.a, 0.3);
     vec3 pixel_out = mix(pixel_sharp, pixel_blur, pixel_source.a);
 
     FragColor = vec4(pixel_out, 1.0);

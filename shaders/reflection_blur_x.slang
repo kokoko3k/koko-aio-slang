@@ -68,7 +68,7 @@ void main() {
    }
       
 
-   vec3 pixel_blur = blur_unroll(3.3,coords_curved, 2.0);
+   vec3 pixel_blur = blur_unroll(BEZEL_REFL_BLUR_MAX,coords_curved, 2.0);
 
    //Put a gradient shade in the alpha channel
    //This will be used by the next pass as the mix

@@ -210,11 +210,9 @@
         Draws a black border around the game content.
     Reflections zoom:
         "Zoom" the reflections if they don't match the content.
-    Reflections blur shade
-        Set the start point of the blur over the reflection area.
-        0 means no blur at all.
-        
-        
+    Reflections blur size
+        Modulates the shade between sharp reflection and blurred reflection
+
 **Global shift/zoom image:**
     Zoom and shift everything on screen, but background pictures.
         

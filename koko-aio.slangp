@@ -51,8 +51,8 @@
 #        read: does a scanline dark gap increment the flickering or not?
 #    [ ] When using dynamic zoom, bezel reflection should be dynamically adapted
 #        ...this is tough, zomoing reflection wouldn't work.
-#    [ ] Further tune bloom shade
-#    [ ] Do a debug image with a white object on black backgroud to tune bloom exposure over time
+#    [] Further tune reflection shade
+#    [v] Do a debug image with a white object on black backgroud to tune bloom exposure over time
 
 
 #    Koko-aio shader is meant to be an all-in one crt shader.
