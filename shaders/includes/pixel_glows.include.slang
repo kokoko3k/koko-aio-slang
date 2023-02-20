@@ -228,12 +228,12 @@ vec4 pixel_glow_std_pow(sampler2D in_texture, float my_glowpix, float my_glowpix
     return vec4(Bloom*my_glow,1.0);
 }
 
-vec4 dumb_glow(sampler2D in_texture, float my_glow, float glow_gamma, vec2 coords) {
+/*vec4 dumb_glow(sampler2D in_texture, float my_glow, float glow_gamma, vec2 coords) {
     vec3 pixel_in = texture(in_texture, coords ).rgb;
     pixel_in = pow(pixel_in,vec3(glow_gamma))*my_glow;
     return vec4(pixel_in,0.0);
 }
-
+*/
 
 
 
