@@ -6,8 +6,7 @@ layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
 
-void main()
-{
+void main() {
    gl_Position = global.MVP * Position;
    vTexCoord = TexCoord;
 }
@@ -15,7 +14,6 @@ void main()
 #pragma stage fragment
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 0) out vec4 FragColor;
-layout(set = 0, binding = 1) uniform sampler2D first_pass;
 layout(set = 0, binding = 2) uniform sampler2D Source;
 
 #include "includes/functions.include.slang"
@@ -58,19 +56,15 @@ vec3 blur_unroll(float Size, vec2 co) {
 void main() {
     
     if (DO_BEZEL == 0.0) return;
+    
     vec4 pixel_source = texture(Source, vTexCoord);
     if (is_useless(pixel_source)) return;
-    
-    vec2 co_adapted = zoom(vTexCoord, BEZEL_REFL_ZOOM);
 
-    co_adapted = zoomout_coords(co_adapted, BEZEL_BORDER_SIZE , 1.0);
 
-    vec3 pixel_blur = blur_unroll(3.3,vTexCoord);
-    vec3 pixel_sharp = texture( first_pass, co_adapted).rgb;
-    pixel_sharp = apply_fuzzy_main_pass(pixel_sharp);
+    float blur_modulation = pixel_source.a;
+    vec3 pixel_out = blur_unroll(BEZEL_REFL_BLUR_MAX * blur_modulation, vTexCoord);
 
-    pixel_source.a = pow(pixel_source.a, 0.3);
-    vec3 pixel_out = mix(pixel_sharp, pixel_blur, pixel_source.a);
+    //pixel_out = mix(vec3(blur_modulation), pixel_out, 0.5);
 
     FragColor = vec4(pixel_out, 1.0);
 }

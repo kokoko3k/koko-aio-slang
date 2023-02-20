@@ -212,7 +212,7 @@ float random(float power, vec2 seed) {
 	}
 	#define is_useless(x) is_outer_frame(x)
 	bool is_outer_frame(vec4 pixel) {
-		return pixel.a == 0.0;
+		return pixel.a <= 0.004; // about 1/256
 		/*Check if a pixel is marked as border by comparing the value of its alpha channel
 		Tolerance is needed, because precision can be as low as 1/256; since I don't need
 		alpha channel, use an even large tolerance.
@@ -425,3 +425,7 @@ float rgb_to_gray(vec3 rgb) {
 	}
 	*/
 
+float get_dyn_zoom(sampler2D tex) {
+	return 1.0 + (texture(tex, vec2(0.75,0.75)    ).a/ DYNZOOM_FACTOR);
+	//return DYNZOOM_FACTOR/1000.0 +1 ;
+}

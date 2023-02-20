@@ -124,7 +124,7 @@ shaders = 18
     filter_linear0 = false
        scale_type0 = source
             scale0 = 1.0
-        wrap_mode0 = "mirrored_repeat"
+        wrap_mode0 = "clamp_to_edge"
 
 
         
@@ -154,7 +154,7 @@ shaders = 18
        scale_type1 = source
           scale_x1 = 2.0
           scale_y1 = 2.0  
-        wrap_mode1 = "mirrored_repeat"
+        wrap_mode1 = "clamp_to_edge"
 
 
 
@@ -171,7 +171,7 @@ shaders = 18
        scale_type2 = source
             scale2 = 1.0
      mipmap_input2 = true
-        wrap_mode2 = "mirrored_repeat"
+        wrap_mode2 = "clamp_to_edge"
 
         
 
@@ -185,7 +185,7 @@ shaders = 18
        scale_type3 = source
 float_framebuffer3 = true
      mipmap_input3 = false
-        wrap_mode3 = "mirrored_repeat"
+        wrap_mode3 = "clamp_to_edge"
 
         
         
@@ -205,7 +205,7 @@ float_framebuffer4 = true
             scale5 = 1.0
        scale_type5 = source    
 float_framebuffer5 = true
-        wrap_mode5 = "mirrored_repeat"
+        wrap_mode5 = "clamp_to_edge"
             
           
         
@@ -219,7 +219,7 @@ float_framebuffer5 = true
        scale_type6 = source
 float_framebuffer6 = true
      mipmap_input6 = false
-        wrap_mode6 = "mirrored_repeat"
+        wrap_mode6 = "clamp_to_edge"
         
            shader7 = shaders/halo_y.slang
             alias7 = "halo_pass"
@@ -228,7 +228,7 @@ float_framebuffer6 = true
        scale_type7 = source
 float_framebuffer7 = true
      mipmap_input7 = false
-        wrap_mode7 = "mirrored_repeat"
+        wrap_mode7 = "clamp_to_edge"
 
 
 

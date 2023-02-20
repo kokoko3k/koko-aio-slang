@@ -12,14 +12,18 @@
 	//Bezel border size in relation to the game frame
 	//Use the lowest possible value for best performance
 	//It is also used to compute wrap/repeated coordinates.
+	//If you change the default bezel texture, you may have ti o edit this to
+	//align bezel reflections and game content.
 #define BEZEL_BORDER_SIZE 0.175
 
-	//The maximum radius of the reflection blur.
-#define BEZEL_REFL_BLUR_MAX 3.3
+	//If bezel reflections are not aligned, you can use this to correct:
+#define BEZEL_REFL_ZOOM 0.975
+
+	//The maximum radius of the reflection blur. //3.3
+	#define BEZEL_REFL_BLUR_MAX 4.0
 
 	// 0.0-1.0: sensitivity to scene change (ambilike stuff), 0.0 changes more
 #define AMBI_SCENE_CHG_THRSHLD 0.07  
-	
 	// The following will allow to sample at reduced interval
 	// The scene change detection logic will take advantage of it
 	// So that quick fades will still be treated as scene changes
@@ -175,7 +179,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float BEZEL_CON;
 	float BEZEL_INNER_ZOOM;
 	float BEZEL_IMAGE_BORDER;
-	float BEZEL_REFL_ZOOM;
 	float BEZEL_FRAME_ZOOM;
 	float BEZEL_USE_STRAIGHT;
 	float BEZEL_RFL_BLR_SHD;
@@ -379,8 +382,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BEZEL_INNER_ZOOM   "        Image zoom"		-0.18   -1.5 0.5 0.01
 #pragma parameter BEZEL_FRAME_ZOOM   "        Frame zoom"		0.0   -1.5 0.5 0.01
 #pragma parameter BEZEL_IMAGE_BORDER "        Image border"		1.01   1.0 1.2 0.01
-#pragma parameter BEZEL_REFL_ZOOM    "        Reflections zoom"		0.955   0.0 2.0 0.005
-#pragma parameter BEZEL_RFL_BLR_SHD  "        Reflections blur size"	25.0    0.0 100.0 1.0
+#pragma parameter BEZEL_RFL_BLR_SHD  "        Sharp reflections"	0.0    -1.0 1.0 0.1
 #pragma parameter BLANK15 " " 0.0 0.0 1.0 1.0
 
 
@@ -415,7 +417,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 //Modulate the image zooming depending on the image luminosity.
 //You can lower the effect power through the DYNZOOM_FACTOR parameter.
 #pragma parameter DO_DYNZOOM	     "★ Luminosity dependant zoom enable? ==>"		1.0   0.0   1.0  1.0
-#pragma parameter DYNZOOM_FACTOR     "        Narrowness"				80.0  30.0  120.0 1.0
+#pragma parameter DYNZOOM_FACTOR     "        Narrowness"				80.0  1.0  120.0 0.5
 #pragma parameter BLANK18 " " 0.0 0.0 1.0 1.0
 
 

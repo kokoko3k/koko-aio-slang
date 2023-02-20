@@ -887,8 +887,9 @@ void main() {
     //Luminosity dependant zoom
     if (DO_DYNZOOM == 1.0) {
         //float zoomin = 1.0 + (texture(bloom_pass_final, coords   ).a/ DYNZOOM_FACTOR * 80.0); <<-- funny.
-        float zoomin = 1.0 + (texture(avglum_pass, vec2(0.75,0.75)    ).a/ DYNZOOM_FACTOR);
-        coords = zoom(coords, zoomin);
+        //float dynzoom = 1.0 + (texture(avglum_pass, vec2(0.75,0.75)    ).a/ DYNZOOM_FACTOR);
+        float dynzoom = get_dyn_zoom(avglum_pass);
+        coords = zoom(coords, dynzoom);
     }
     
     //Curvature
@@ -927,7 +928,7 @@ void main() {
         //split screen
         //if (vTexCoord.y < 0.5) pixel_out = texture(first_pass,vTexCoord);
         //pixel_out = texture(avglum_pass,vTexCoord);
-    //pixel_out = texture(ambi_temporal_pass, vOutputCoord);
+    //pixel_out = texture(reflected_blurred_pass2, vOutputCoord);
     FragColor = pixel_out;
     
     //FragColor = vec4(blur_shade(vTexCoord) );
