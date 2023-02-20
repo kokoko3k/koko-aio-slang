@@ -687,7 +687,7 @@ vec3 bezel_color(float lum)  {
 
 #define STATIC_BEZEL_USE_MIPMAP 1.0
 
-vec3 compose_bezel_over(vec3 full_viewport) {
+vec3 compose_bezel_over(vec3 full_viewport, vec2 coords_curved) {
     vec2 coords_for_bezel = vTexCoord;
     
     if (BEZEL_FRAME_ZOOM != 0.0)
@@ -719,10 +719,12 @@ vec3 compose_bezel_over(vec3 full_viewport) {
     
 
     
-    vec2 coords_for_mirror = coords_for_bezel;
+
     //No need to draw anything outside this:
     if (coords_for_bezel.x < 0  || coords_for_bezel.y < 0 || coords_for_bezel.x > 1.0 || coords_for_bezel.y > 1.0) return full_viewport;
 
+    vec2 coords_for_mirror = zoomout_coords(coords_curved,-BEZEL_BORDER_SIZE ,1.0);  ;
+    
     //Main lut:
     vec4 bezel;
     #ifdef STATIC_BEZEL_USE_MIPMAP
@@ -910,7 +912,7 @@ void main() {
 
     //Draw bezel
     if (DO_BEZEL == 1.0) {
-        pixel_out = vec4(compose_bezel_over(pixel_out.rgb),1.0);
+        pixel_out = vec4(compose_bezel_over(pixel_out.rgb, coords),1.0);
     }
 
     //Draw an image "Over" the bezel with an hole inside by the alpha channel
