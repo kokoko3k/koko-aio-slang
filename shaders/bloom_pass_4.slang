@@ -77,34 +77,40 @@ void main() {
     bloomed = pixel_push_luminance(bloomed, BLOOM_POWER);
     
     float fbloom_mix = BLOOM_MIX;
-    if (BLOOM_BYPASS == 0.0 || BLOOM_BYPASS == 2.0) {
-        float over_white_correction = 1.0;
-        if (BLOOM_OVER_WHITE < 1.0) {
-            //Use mipmap available in avglum_pass to identify bright areas.
-            vec3 avglum = texture(avglum_pass,vTexCoord).rgb;
-            float b_brightness = max(avglum.b,max(avglum.r,avglum.g));
-            b_brightness *= 1-BLOOM_OVER_WHITE;
-            over_white_correction =1- b_brightness;
-        }
-        
-        
-        bloomed*=BLOOM_POWER;
-        
-        // Modulate exposure over time too.
-        // Branching with (if BLOOM_EYE_ADPT_SRT == 0.0) does not gain anything.
-        float smoothed_avglum = zone_luminance * BLOOM_EYE_ADPT_SRT;
-        float bloom_mix_adapted = max(0.0, BLOOM_MIX - smoothed_avglum);
-        
-        
-        if (BLOOM_BYPASS == 2.0) fbloom_mix = 1.0;
-        
-        
-        float pow_exp = BLOOM_EXPOSURE_CURVE_SHOULDER - smoothed_avglum * BLOOM_EXPOSURE_CURVE_SHOULDER;
-        pow_exp = max(0.0, pow_exp); //avoid negative exps.
-        bloom_mix_adapted = fbloom_mix * ( 1- pow(smoothed_avglum, pow_exp) );
-        
-        bloomed = bloomed * bloom_mix_adapted * over_white_correction ;
+    float bloom_mix_adapted = 1.0;
+    float over_white_correction = 1.0;
+    
+    
+    if (BLOOM_OVER_WHITE < 1.0) {
+        //Use mipmap available in avglum_pass to identify bright areas.
+        vec3 avglum = texture(avglum_pass,vTexCoord).rgb;
+        float b_brightness = max(avglum.b,max(avglum.r,avglum.g));
+        b_brightness *= 1-BLOOM_OVER_WHITE;
+        over_white_correction =1- b_brightness;
     }
+    
+    bloomed*=BLOOM_POWER;
+    
+    // Modulate exposure over time too.
+    // Branching with (if BLOOM_EYE_ADPT_SRT == 0.0) does not gain anything.
+    float smoothed_avglum = zone_luminance * BLOOM_EYE_ADPT_SRT;
+    bloom_mix_adapted = max(0.0, BLOOM_MIX - smoothed_avglum);
+    
+    
+    if (BLOOM_BYPASS == 2.0) fbloom_mix = 1.0;
+    
+    
+    float pow_exp = BLOOM_EXPOSURE_CURVE_SHOULDER - smoothed_avglum * BLOOM_EXPOSURE_CURVE_SHOULDER;
+    pow_exp = max(0.0, pow_exp); //avoid negative exps.
+    bloom_mix_adapted = fbloom_mix * ( 1- pow(smoothed_avglum, pow_exp) );
+    
+    
+    if (BLOOM_BYPASS == 1.0)
+        bloomed = bloomed;
+            else
+        bloomed = bloomed * bloom_mix_adapted * over_white_correction ;
+    
+
     
     FragColor = vec4(bloomed, zone_luminance);   
     
