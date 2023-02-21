@@ -799,7 +799,7 @@ vec4 pixel_inner_frame(vec2 coords, bool bBorder_needed) {
 
     //vignette and spot
         if (DO_VIGNETTE + DO_SPOT >0.0) {
-            float in_aspect = get_in_aspect();
+            //float in_aspect = get_in_aspect();
 
             if (DO_VIGNETTE == 1.0) {
                     //float dist = length(vec2((coords.x-0.5)*in_aspect,coords.y-0.5));

@@ -76,14 +76,13 @@ DO_BEZEL = "0.0"
 	AMBI_POWER = "1.0000000"
 
 DO_VIGNETTE = "0.0"
-	V_SIZE = "2.7"
-	V_POWER = "1.05"
-
+	V_SIZE = "2.25"
+	V_POWER = "1.11"
 
 DO_SPOT = "0.0"
-	S_POSITION = "194.0"
-	S_SIZE = "0.4"
-	S_POWER = "0.05"
+	S_POSITION = "195.0"
+	S_SIZE = "0.3"
+	S_POWER = "0.09"
 	
 DO_DYNZOOM = "1.0"
 	DYNZOOM_FACTOR = "80"
