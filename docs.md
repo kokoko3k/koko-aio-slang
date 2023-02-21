@@ -168,11 +168,10 @@
     Modulate: Temporal eye exposure adaption strength
         Simulate the process through which the pupil adapt itself to different
         light conditions.
-    Modulate: Modulate: Eye temporal adaption strength
+    Modulate: Strength on bright areas (0 = aura)
         Since the light produced by the bloom effect is added to the underlying
-        image, it can produce burn effects on the already bright areas.
+        image, it can produce clipping effects on the already bright areas.
         This is actually an hack that will avoid to bloom them.
-        Don't use too low values.
     Bypass/Solo:
         See how the bloomed image looks alone.
         Use 1.0 to see naked bloom without any modulation applied
@@ -208,10 +207,8 @@
         Allows to shrink or expand the monitor frame to fit the game content.
     Image Border:
         Draws a black border around the game content.
-    Reflections zoom:
-        "Zoom" the reflections if they don't match the content.
-    Reflections blur size
-        Modulates the shade between sharp reflection and blurred reflection
+    Sharp reflections
+        Modulates from totally blurred to totally sharp reflection appearance.
 
 **Global shift/zoom image:**
     Zoom and shift everything on screen, but background pictures.
