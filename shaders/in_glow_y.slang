@@ -48,6 +48,38 @@ vec3 glow_blur_bias(sampler2D source_tex, vec2 co, vec3 pixel_glowed, float bias
 
 }
 
+/*
+vec3 antialias_blur_bias(sampler2D source_tex, vec2 co, vec3 pixel_glowed, float bias){
+   //Create a dilated and an eroded image, then mix between them via the blurred color.
+   
+   vec3 pixel_source = texture(source_tex, co).rgb;
+   pixel_source  = pixel_source * IN_GLOW_POWER;
+   
+   vec3 glow_light = clamp((pixel_glowed - pixel_source) * IN_GLOW_AMOUNT, 0.0, 1.0);
+
+   vec3 pixel_glowed_inv = 1 - clamp(pixel_glowed, 0.0, 1.0);
+   vec3 pixel_source_inv = 1 - clamp(pixel_source, 0.0, 1.0);
+   
+   vec3 pixel_dark = clamp((pixel_glowed_inv - pixel_source_inv) * IN_GLOW_AMOUNT, 0.0, 1.0) ;
+
+   vec3 pixel_dilated = pixel_source + glow_light ;
+   vec3 pixel_eroded  = pixel_source - pixel_dark ;
+
+
+   //Dilate or erode depending on blurred brightness:
+      vec3 pixel_dilated_eroded =  mix(pixel_eroded, pixel_dilated, pixel_glowed);
+   
+   //Unsharp mask:
+      float sharpamt = 0.5;
+      pixel_dilated_eroded =  pixel_dilated_eroded + ((1 - pixel_glowed)*sharpamt);
+      pixel_dilated_eroded = (pixel_dilated_eroded - sharpamt) * (1 + 2*sharpamt);
+
+   
+   return mix(pixel_dilated_eroded, pixel_glowed, max(0.0, bias));   
+   //return mix(pixel_out, pixel_glowed, max(0.0, bias));   
+
+}
+*/
 
 void main() { 
    if (DO_IN_GLOW == 0.0) return;
@@ -60,6 +92,7 @@ void main() {
       pixel_glowed = blur9_y(Source, vTexCoord, params.SourceSize.xy, vIN_GLOW_H) * IN_GLOW_POWER;
       if (IN_GLOW_BIAS < IN_GLOW_BIAS_MAX && (IN_GLOW_W < GLOW_SHARP_MAX || IN_GLOW_H < GLOW_SHARP_MAX) ) {
            pixel_glowed = glow_blur_bias(shift_and_bleed_pass, vTexCoord, pixel_glowed, IN_GLOW_BIAS);
+           //pixel_glowed = antialias_blur_bias(shift_and_bleed_pass, vTexCoord, pixel_glowed, IN_GLOW_BIAS);
       }
    }
 
