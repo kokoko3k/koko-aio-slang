@@ -105,9 +105,7 @@ void main() {
     bloom_mix_adapted = fbloom_mix * ( 1- pow(smoothed_avglum, pow_exp) );
     
     
-    if (BLOOM_BYPASS == 1.0)
-        bloomed = bloomed;
-            else
+    if (BLOOM_BYPASS != 1.0)
         bloomed = bloomed * bloom_mix_adapted * over_white_correction ;
     
 
