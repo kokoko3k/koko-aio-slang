@@ -1,60 +1,3 @@
-# TODO:
-#    [v] Guess more aspect ratios:
-#			nope: Guessing is impossible..
-#    [v] Use gauss blur for composite color bleeding?
-#    	    Tried, does not produce great visible improvements
-#    [v] Vignette and spot could be done earlier at lower res?
-#        Made a bit lighter version right in final_pass instead.
-#    [v] reference new repo from the main one
-#    [v] Noise is not visible on black or white, much more on gray, why?
-#        Probably a matter of post processing
-#    [v] Try to get rid of mark_unneeded() in reflection_blur_y
-#        didit and it is useless, no measurable perf increase.
-#    [v] Why tv presets have +5% brightness?
-#        Because the contrast is pushed too.
-#    [v] First bloom pass: why don't we use an higher lod?
-#        Using an higher lod makes the bloom less prone to detect thinner lines
-#        So, no.
-#    [v] Does bloom quality improve if we sample from original?
-#        yeah!
-#    [v] #pragmas to vertex shader to fragment shader
-#        Why and when performances start to degrade?
-#        ...It seems it happen when too many UBOs or Push constants are readed
-#           by the Vertex shader and passed to the fragment one.
-#           (not tested if the pass from fragment to vertex is needed to reproduce the issue)
-#    [v] What if i do vmask and darklines (scanlines too in alpha??)
-#        in a little pass that scales to absolute size?
-#        or even a lut with the mask...
-#        No gain, texture lookups are heavier than expected.
-#    [v] textureSize() appears to be quite heavy, consider to make bezel coords fixed.
-#        Done, expected to gain more, if something.
-#        You just use it to calc lods, is it worth?
-#    [v] Reflection blur size, make id not dependand on input resolution.
-#    [v] When colorizing bezel with ambilight, apply noise over it as well
-#    [v] Blur less near the start of the bezel
-#    [v] Make the reflection blur shade point configurable
-#    [v] Rotate image: auto (-1)... Does it work?
-#        yes.
-#    [v] Put blank lines after #pragma parameter groups
-#    [v] Bloom: would it make sense to gather the average luminosity in a wide
-#        zone around the current pixel instead of the whole scene?
-#        Yes, it works good.
-#    [v] should min_w in avglum_pass depend on content resolution?
-#        lod = log2(params.SourceSize.y / min_w); in avglum_pass is wrong (w/y?)
-#        Both fixed by specifying the lod instead of doing stupid calculations.mip_lod
-#        So fixed, and achieved what was needed.
-#    [.] Darkline, vmask: whiteness can be pre-calculated outside.
-#        Half done, gained something.
-#    [ ] check branching conditions in first_pass.slang
-#    [ ] Better debanding?
-#    [ ] Should the flickering be aware of the scanline?
-#        read: does a scanline dark gap increment the flickering or not?
-#    [ ] When using dynamic zoom, bezel reflection should be dynamically adapted
-#        ...this is tough, zomoing reflection wouldn't work.
-#    [] Further tune reflection shade
-#    [v] Do a debug image with a white object on black backgroud to tune bloom exposure over time
-
-
 #    Koko-aio shader is meant to be an all-in one crt shader.
 #    It can be configured with many parameters, so that can be
 #    scaled to run on even on modest gpus while still developed to
@@ -355,3 +298,61 @@ float_framebuffer7 = true
 
 
 
+
+        
+# TODO:
+#    [v] Guess more aspect ratios:
+#			nope: Guessing is impossible..
+#    [v] Use gauss blur for composite color bleeding?
+#    	    Tried, does not produce great visible improvements
+#    [v] Vignette and spot could be done earlier at lower res?
+#        Made a bit lighter version right in final_pass instead.
+#    [v] reference new repo from the main one
+#    [v] Noise is not visible on black or white, much more on gray, why?
+#        Probably a matter of post processing
+#    [v] Try to get rid of mark_unneeded() in reflection_blur_y
+#        didit and it is useless, no measurable perf increase.
+#    [v] Why tv presets have +5% brightness?
+#        Because the contrast is pushed too.
+#    [v] First bloom pass: why don't we use an higher lod?
+#        Using an higher lod makes the bloom less prone to detect thinner lines
+#        So, no.
+#    [v] Does bloom quality improve if we sample from original?
+#        yeah!
+#    [v] #pragmas to vertex shader to fragment shader
+#        Why and when performances start to degrade?
+#        ...It seems it happen when too many UBOs or Push constants are readed
+#           by the Vertex shader and passed to the fragment one.
+#           (not tested if the pass from fragment to vertex is needed to reproduce the issue)
+#    [v] What if i do vmask and darklines (scanlines too in alpha??)
+#        in a little pass that scales to absolute size?
+#        or even a lut with the mask...
+#        No gain, texture lookups are heavier than expected.
+#    [v] textureSize() appears to be quite heavy, consider to make bezel coords fixed.
+#        Done, expected to gain more, if something.
+#        You just use it to calc lods, is it worth?
+#    [v] Reflection blur size, make id not dependand on input resolution.
+#    [v] When colorizing bezel with ambilight, apply noise over it as well
+#    [v] Blur less near the start of the bezel
+#    [v] Make the reflection blur shade point configurable
+#    [v] Rotate image: auto (-1)... Does it work?
+#        yes.
+#    [v] Put blank lines after #pragma parameter groups
+#    [v] Bloom: would it make sense to gather the average luminosity in a wide
+#        zone around the current pixel instead of the whole scene?
+#        Yes, it works good.
+#    [v] should min_w in avglum_pass depend on content resolution?
+#        lod = log2(params.SourceSize.y / min_w); in avglum_pass is wrong (w/y?)
+#        Both fixed by specifying the lod instead of doing stupid calculations.mip_lod
+#        So fixed, and achieved what was needed.
+#    [v] When using dynamic zoom, bezel reflection should be dynamically adapted
+#        ...this is tough, zomoing reflection wouldn't work.
+#    v] Further tune reflection shade
+#    [v] Do a debug image with a white object on black backgroud to tune bloom exposure over time
+#    [.] Darkline, vmask: whiteness can be pre-calculated outside.
+#        Half done, gained something.
+#    [ ] check branching conditions in first_pass.slang
+#    [ ] Better debanding?
+#    [ ] Should the flickering be aware of the scanline?
+#        read: does a scanline dark gap increment the flickering or not?
+        
