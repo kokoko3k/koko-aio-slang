@@ -43,3 +43,5 @@ DO_SHIFT_RGB = "0.000000"
 	IN_GLOW_H = "1.0"
 
 	HALO_VS_SCAN = "1.0"
+
+#	BLOOM_POWER = "1.15"
