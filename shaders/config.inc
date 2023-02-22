@@ -19,8 +19,8 @@
 	//If bezel reflections are not aligned, you can use this to correct:
 #define BEZEL_REFL_ZOOM 0.975
 
-	//The maximum radius of the reflection blur. //3.3
-	#define BEZEL_REFL_BLUR_MAX 4.0
+	//The maximum radius of the reflection blur. //3.3..4.0 max
+#define BEZEL_REFL_BLUR_MAX 4.0
 
 	// 0.0-1.0: sensitivity to scene change (ambilike stuff), 0.0 changes more
 #define AMBI_SCENE_CHG_THRSHLD 0.07  
