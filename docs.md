@@ -165,7 +165,7 @@
         Handy to simulate well defined "Aura" effects.
     Power multiplier:
         Just apply a gain to the final bloom.
-    Modulate: Temporal eye exposure adaption strength
+    Modulate: Local exposure eye adaption strength
         Simulate the process through which the pupil adapt itself to different
         light conditions.
     Modulate: Strength on bright areas (0 = aura)

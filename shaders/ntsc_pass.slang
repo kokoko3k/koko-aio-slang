@@ -164,7 +164,7 @@ vec3 color_tools(vec3 pixel_out) {
 
 vec3 debug() {
    vec3 pixel_debug;
-   float blink_time = 60;
+   float blink_time = 120;
    vec2 center = vTexCoord - vec2(0.5,0.5);
    float radius = 0.1;
    pixel_debug = vec3(1 - step(radius, length(center)));

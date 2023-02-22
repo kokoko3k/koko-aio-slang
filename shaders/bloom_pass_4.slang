@@ -30,25 +30,37 @@ layout(set = 0, binding = 4) uniform sampler2D bloom_pass_finalFeedback;
 #define offset 0.5890486225480862 // TAU/8.0/4.0*3.0
 
 //The curve shoulder to map scene luminance to bloom mix strength
-#define BLOOM_EXPOSURE_CURVE_SHOULDER 0.33
+#define BLOOM_PUPIL_EXPOSURE_CURVE_SHOULDER 0.33
 
-//How much times (sqrt) is the zone that will motulate the bloom mix
-//smaller than the area? read: the lod, use pot
-#define BLOOM_LUM_ZONE_W 7
+//How big is the zone in which the luminance will be computed for puple temporal adaption (range 2..20)
+#define BLOOM_PUPIL_LUM_ZONE_W 7
 
-#define BLOOM_PUPIL_ADAPTION_SPEED 0.1
+//The speed of the pupil adaption
+#define BLOOM_PUPIL_ADAPTION_SPEED 0.2
+
+//The time the light has to be there before the pupil starts to react (range 10..10000)
+#define BLOOM_PUPIL_INERTIA 1500
 
 float get_avg_lum_from_mip(sampler2D tex, vec2 co, float lod) {
     vec3 mip = textureLod(first_pass, co, lod).rgb;
     mip = apply_fuzzy_main_pass(mip);
     //return (mip.r+mip.g+mip.b)/3.0;
-    float luminance = rgb_to_gray(mip);
+    float luminance_from_feedback = rgb_to_gray(mip);
+    float luminance_first_pass = texture(bloom_pass_finalFeedback,vTexCoord).a;
     //temporal smooth.
     //the defined emulated eye adaption speed needs to be divided 
     //by the eye adaption strength (BLOOM_EYE_ADPT_SRT)
-    float eye_adaption_speed = (BLOOM_PUPIL_ADAPTION_SPEED / BLOOM_EYE_ADPT_SRT);
-    eye_adaption_speed = clamp(BLOOM_PUPIL_ADAPTION_SPEED, 0.01, 1.0);
-    luminance = mix(texture(bloom_pass_finalFeedback,vTexCoord).a, luminance, eye_adaption_speed);
+
+    //The following makes the adaption speed more constant:
+        float eye_adaption_speed = BLOOM_PUPIL_ADAPTION_SPEED * ( luminance_first_pass / luminance_from_feedback ) ;
+
+    //The following is needed so that the speed is the same even for higher strength
+        eye_adaption_speed = (eye_adaption_speed / BLOOM_EYE_ADPT_SRT);
+        
+    //The following simulates pupil inertia
+    eye_adaption_speed = clamp(eye_adaption_speed, 1.0/BLOOM_PUPIL_INERTIA, 1.0);
+    
+    float luminance = mix(luminance_first_pass, luminance_from_feedback, eye_adaption_speed);
     return luminance + eps;
 }
 
@@ -59,7 +71,7 @@ void main() {
 
     
     //Smooth luminance with specified lod in this alpha channel
-    float zone_luminance = get_avg_lum_from_mip(first_pass, vTexCoord, BLOOM_LUM_ZONE_W);
+    float zone_luminance = get_avg_lum_from_mip(first_pass, vTexCoord, BLOOM_PUPIL_LUM_ZONE_W);
     
     
       
@@ -100,7 +112,7 @@ void main() {
     if (BLOOM_BYPASS == 2.0) fbloom_mix = 1.0;
     
     
-    float pow_exp = BLOOM_EXPOSURE_CURVE_SHOULDER - smoothed_avglum * BLOOM_EXPOSURE_CURVE_SHOULDER;
+    float pow_exp = BLOOM_PUPIL_EXPOSURE_CURVE_SHOULDER - smoothed_avglum * BLOOM_PUPIL_EXPOSURE_CURVE_SHOULDER;
     pow_exp = max(0.0, pow_exp); //avoid negative exps.
     bloom_mix_adapted = fbloom_mix * ( 1- pow(smoothed_avglum, pow_exp) );
     
