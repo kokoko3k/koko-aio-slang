@@ -187,12 +187,10 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float S_POSITION; 
 	float S_SIZE;
 	float S_POWER;
-	float S_BYPASS;
 
 	float DO_VIGNETTE;
 	float V_SIZE;
 	float V_POWER;
-	float V_BYPASS;
 
 	float DO_DYNZOOM;
 	float DYNZOOM_FACTOR;
@@ -423,12 +421,10 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 //Vignette and spot
 #pragma parameter DO_VIGNETTE	"★ Vignette enable? ==>"	0.0  0.0  1.0  1.0
-#pragma parameter V_BYPASS	"        Bypass/Solo"	        0.0  0.0  1.0  1.0
 #pragma parameter V_SIZE	"        Size"			1.7  0.0  20.0  0.05
 #pragma parameter V_POWER	"        Power"			1.1  0.05 2.0  0.01
 
 #pragma parameter DO_SPOT	"★ Spot enable? ==>"		0.0   0.0   1.0 1.0
-#pragma parameter S_BYPASS	"        Bypass/Solo"	        0.0   0.0   1.0 1.0
 #pragma parameter S_POSITION 	"        Position"		0.0   -420.0 378.0 1
 #pragma parameter S_SIZE	"        Size"			0.4   0.0  1.0 0.01
 #pragma parameter S_POWER	"        Power" 		0.05  0.01  2.0 0.01

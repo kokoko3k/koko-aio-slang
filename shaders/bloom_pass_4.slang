@@ -68,13 +68,7 @@ float get_avg_lum_from_mip(sampler2D tex, vec2 co, float lod) {
 
 void main() {
     if (DO_BLOOM == 0.0) return;
-
     
-    //Smooth luminance with specified lod in this alpha channel
-    float zone_luminance = get_avg_lum_from_mip(first_pass, vTexCoord, BLOOM_PUPIL_LUM_ZONE_W);
-    
-    
-      
     vec3 bloomed = bloom(
         Source,
         vTexCoord,
@@ -103,8 +97,10 @@ void main() {
     
     bloomed*=BLOOM_POWER;
     
+    //                                                  (Branching with (if BLOOM_EYE_ADPT_SRT == 0.0) does not gain anything.)
     // Modulate exposure over time too.
-    // Branching with (if BLOOM_EYE_ADPT_SRT == 0.0) does not gain anything.
+    //Smooth luminance with specified lod in this alpha channel
+    float zone_luminance = get_avg_lum_from_mip(first_pass, vTexCoord, BLOOM_PUPIL_LUM_ZONE_W);
     float smoothed_avglum = zone_luminance * BLOOM_EYE_ADPT_SRT;
     bloom_mix_adapted = max(0.0, BLOOM_MIX - smoothed_avglum);
     

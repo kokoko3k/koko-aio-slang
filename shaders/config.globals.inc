@@ -174,7 +174,6 @@
 
 
 #define DO_SPOT		global.DO_SPOT
-	#define S_BYPASS	global.S_BYPASS
 	#define S_POSITION	global.S_POSITION
 	#define S_SIZE		global.S_SIZE
 	#define S_POWER		global.S_POWER
@@ -182,7 +181,6 @@
 
 
 #define DO_VIGNETTE	global.DO_VIGNETTE
-	#define V_BYPASS	global.V_BYPASS
 	#define V_SIZE		global.V_SIZE
 	#define V_POWER		global.V_POWER
 

@@ -802,29 +802,20 @@ vec4 pixel_inner_frame(vec2 coords, bool bBorder_needed) {
             //float in_aspect = get_in_aspect();
 
             if (DO_VIGNETTE == 1.0) {
-                    //float dist = length(vec2((coords.x-0.5)*in_aspect,coords.y-0.5));
-                    //float vignette = smoothstep(V_SIZE,0.0,dist)*V_POWER;                
-                    float vignette = vV_POWER * (vV_SIZE + 16.0* coords.x*coords.y*(1.0-coords.x)*(1.0-coords.y));
-                    vignette = min(vignette,99999.0); //<--- big wtf here, why is this needed? 
-                    //...see: https://github.com/kokoko3k/koko-aio-slang/issues/3
-                    if (V_BYPASS < 1.0) 
-                        pixel_out = vignette * clamp(pixel_out,0.0,1.0);
-                            else
-                        pixel_out = vec3(vignette);
-                
+                //float dist = length(vec2((coords.x-0.5)*in_aspect,coords.y-0.5));
+                //float vignette = smoothstep(V_SIZE,0.0,dist)*V_POWER;                
+                float vignette = vV_POWER * (vV_SIZE + 16.0* coords.x*coords.y*(1.0-coords.x)*(1.0-coords.y));
+                vignette = min(vignette,99999.0); //<--- big wtf here, why is this needed? 
+                //...see: https://github.com/kokoko3k/koko-aio-slang/issues/3
+                pixel_out = pixel_out * vignette;
             }
 
             if (DO_SPOT == 1.0) {
-
-                    //float dist = length(vec2((coords.x-0.5)*in_aspect,coords.y-0.5)+spot_offset);
-                    //float spot = smoothstep(S_SIZE,0.0,dist)*S_POWER;
-
-                    vec2 scoords = clamp(coords + spot_offset, 0.0,1.0);
-                    float spot = vS_POWER * (vS_SIZE + 16.0*scoords.x*scoords.y*(1.0-scoords.x)*(1.0-scoords.y));
-
-                if (S_BYPASS < 1.0) pixel_out = max(spot,0.0) + pixel_out;
-                    else
-                pixel_out = vec3(spot);
+                //float dist = length(vec2((coords.x-0.5)*in_aspect,coords.y-0.5)+spot_offset);
+                //float spot = smoothstep(S_SIZE,0.0,dist)*S_POWER;
+                vec2 scoords = clamp(coords + spot_offset, 0.0,1.0);
+                float spot = vS_POWER * (vS_SIZE + 16.0*scoords.x*scoords.y*(1.0-scoords.x)*(1.0-scoords.y));
+                pixel_out = pixel_out + spot;
             }
             pixel_out += global_noise;
         }
