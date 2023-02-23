@@ -262,26 +262,6 @@ float random(float power, vec2 seed) {
 		return scale_coord;
 	}
 	
-	vec2 get_scaled_coords_get_aspect(vec2 pTexCoord, vec4 destsize, bool is_rotated, out float aspect){
-		if (!border_needed()) return pTexCoord;
-			//else
-		float scale_x = 1.0;
-		float scale_y = 1.0;
-		float offset_x = 0.0 ;
-		float offset_y = 0.0 ;
-		aspect = get_in_aspect();
-		if (is_rotated) {
-			scale_y = destsize.x/(destsize.y / aspect );			
-			offset_y = (0.5 * scale_y ) - 0.5 ;
-		} else {
-			scale_x = destsize.x/(destsize.y * aspect);
-			offset_x = (0.5 * scale_x ) - 0.5 ;
-		}
-
-		vec2 scale_coord=vec2(pTexCoord.x*scale_x - offset_x , pTexCoord.y*scale_y - offset_y);
-		return scale_coord;
-	}
-	
 	vec2 get_scaled_coords(vec2 pTexCoord, vec4 destsize, bool is_rotated){
 		if (!border_needed()) return pTexCoord;
 			//else

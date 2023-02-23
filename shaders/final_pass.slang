@@ -39,9 +39,9 @@ layout(location = 4) out float vIsRotated;
 void main() {
     gl_Position = global.MVP * Position;
     vIsRotated = float(is_rotated());
+    vIn_aspect = get_in_aspect();
+    vTexCoord = get_scaled_coords_aspect(TexCoord,global.FinalViewportSize, vIn_aspect, bool(vIsRotated)) + vec2(0.00001);
 
-    vTexCoord = get_scaled_coords_get_aspect(TexCoord,global.FinalViewportSize, bool(vIsRotated), vIn_aspect ) + vec2(0.00001);
-    
     if (DO_GLOBAL_SHZO >0.5)
         vTexCoord = zoom(vTexCoord + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM );
     
@@ -72,7 +72,10 @@ void main() {
             //vScanlinePhase = 0.0;
             //vScanlinePhase = vScanlinePeriod * pi - pi/4.0; //<-- needed to match scanlines done in first_pass. //FIXME check what happens for highter res.
         }
-
+    //SPOT
+        spot_offset = offsets_from_float(S_POSITION+420.0,40);
+        spot_offset = spot_offset / 10.0 + vec2(0.0,1.0);
+        
 }
 
 
@@ -801,7 +804,7 @@ vec4 pixel_inner_frame(vec2 coords, bool bBorder_needed) {
                 //float spot = vS_POWER * (vS_SIZE + 16.0*scoords.x*scoords.y*(1.0-scoords.x)*(1.0-scoords.y));
                 pixel_out = pixel_out + spot;
             }
-            pixel_out += global_noise;
+            //pixel_out += global_noise;
         }
 
     //smooth border (edge)
