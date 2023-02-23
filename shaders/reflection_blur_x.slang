@@ -12,10 +12,8 @@ layout(location = 0) out vec2 vTexCoord;
 void main() {
    gl_Position = global.MVP * Position;
    vTexCoord = TexCoord;
-
    if (DO_BEZEL > 0.5)
-      vTexCoord = zoom(vTexCoord, BEZEL_REFL_ZOOM);
-
+      vTexCoord = zoom(TexCoord, BEZEL_REFL_ZOOM);
 }
 
 #pragma stage fragment
@@ -77,10 +75,16 @@ void main() {
    float coords_crop_point = 0.0;
    //* set the mirror point according to the dynamic zoom?
       if (DO_DYNZOOM == 1.0) {
-         coords_crop_point = get_dyn_zoom(avglum_pass) - 1.0;
+         //Crop coordinates to move the mirror axes
+         float dyn_zoom = get_dyn_zoom(avglum_pass);
+         coords_crop_point = dyn_zoom - 1.0;
          coords_crop_point = coords_crop_point * 0.5;
+         //Zoom image coords to align it
+         coords = zoom(coords, dyn_zoom);
       }
+   coords_crop_point += BEZEL_RFL_OFFSET;
 
+      
    //Do mirrored_repeat 
    coords = mirrored_repeat(coords, coords_crop_point);
   
@@ -95,16 +99,20 @@ void main() {
         
       shade1 = min(shade1, shade2);
       shade2 = min(shade3, shade4);
-      float shade  = min(shade1, shade2) * 1/(BEZEL_BORDER_SIZE * 0.5) ;
+      float shade  = min(shade1, shade2) * 1/(BEZEL_BORDER_SIZE * 0.3) ;
       shade = shade - BEZEL_RFL_BLR_SHD;
       
-      //Clamp to min 0.006 because anything lower will cause the next pass to think
+      //Clamp to min 0.01 because anything lower will cause the next pass to think
       //the pixel is useless.
-      shade = clamp(shade, 0.006, 1.0);     
+      shade = clamp(shade, 0.01, 1.0);     
       
    vec3 pixel_blur = blur_unroll(BEZEL_REFL_BLUR_MAX * shade, coords, 2.0);   
-
+   
    FragColor = vec4(apply_fuzzy_main_pass(pixel_blur),shade);
+   
+   
+   
+   //FragColor = vec4(shade);
    
 }
  

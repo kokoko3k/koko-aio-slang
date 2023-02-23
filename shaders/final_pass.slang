@@ -674,7 +674,7 @@ vec3 bezel_color(float lum)  {
 
 #define STATIC_BEZEL_USE_MIPMAP 1.0
 
-vec3 compose_bezel_over(vec3 full_viewport, vec2 coords_curved) {
+vec3 compose_bezel_over(vec3 full_viewport) {
     vec2 coords_for_bezel = vTexCoord;
     
     if (BEZEL_FRAME_ZOOM != 0.0)
@@ -710,7 +710,7 @@ vec3 compose_bezel_over(vec3 full_viewport, vec2 coords_curved) {
     //No need to draw anything outside this:
     if (coords_for_bezel.x < 0  || coords_for_bezel.y < 0 || coords_for_bezel.x > 1.0 || coords_for_bezel.y > 1.0) return full_viewport;
 
-    vec2 coords_for_mirror = zoomout_coords(coords_curved,-BEZEL_BORDER_SIZE ,1.0);  ;
+    vec2 coords_for_mirror = coords_for_bezel;
     
     //Main lut:
     vec4 bezel;
@@ -738,7 +738,7 @@ vec3 compose_bezel_over(vec3 full_viewport, vec2 coords_curved) {
     //This is the reflection to be composed over the bezel);
     vec3 pixel_mirrored = texture(reflected_blurred_pass2,
                           coords_for_mirror + random( min(global.FinalViewportSize.z,global.FinalViewportSize.w)*1.5, vTexCoord ) ).rgb;
-
+//return pixel_mirrored;
     //Take the reflection modifier from the texture blue component into account; it is/may be used to lower the reflection in the corners.
         //float reflection = (reflection_shade * 1.4 -  0.4)  * bezel.b ;
         //reflection = clamp (reflection, 0.0, 1.0);
@@ -862,6 +862,7 @@ vec4 main_wrap(vec2 coords){
 void main() {
     
     vec2 coords = vTexCoord;
+
     //Luminosity dependant zoom
     if (DO_DYNZOOM == 1.0) {
         //float zoomin = 1.0 + (texture(bloom_pass_final, coords   ).a/ DYNZOOM_FACTOR * 80.0); <<-- funny.
@@ -869,13 +870,13 @@ void main() {
         float dynzoom = get_dyn_zoom(avglum_pass);
         coords = zoom(coords, dynzoom);
     }
-    
+
     //Curvature
     if (DO_CURVATURE == 1.0) {
         if ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0))
             coords = Warp_fast(coords, vWarp_vexp, vWarp_arg2);
     }
-
+    
     //Scale coords according to bezel settings?
     if (DO_BEZEL == 1.0) {
         coords = zoomout_coords(coords, -BEZEL_INNER_ZOOM , 1.0);
@@ -889,9 +890,11 @@ void main() {
     pixel_out += vec4(pixel_backdrop_image(), 1.0);
 #endif
 
+
+    
     //Draw bezel
     if (DO_BEZEL == 1.0) {
-        pixel_out = vec4(compose_bezel_over(pixel_out.rgb, coords),1.0);
+        pixel_out = vec4(compose_bezel_over(pixel_out.rgb),1.0);
     }
 
     //Draw an image "Over" the bezel with an hole inside by the alpha channel
@@ -907,6 +910,11 @@ void main() {
         //if (vTexCoord.y < 0.5) pixel_out = texture(first_pass,vTexCoord);
         //pixel_out = texture(avglum_pass,vTexCoord);
     //pixel_out = texture(reflected_blurred_pass2, vOutputCoord);
+    
+    //vec4 pixel_mirrored = texture(reflected_blurred_pass2,vTexCoord);
+    //pixel_out = pixel_mirrored;
+    
+    
     FragColor = pixel_out;
     
     //FragColor = vec4(blur_shade(vTexCoord) );

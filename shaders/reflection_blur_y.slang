@@ -5,16 +5,23 @@
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
-
+layout(location = 1) out vec2 vWarp_vexp;
+layout(location = 2) out vec2 vWarp_arg2;
 void main() {
    gl_Position = global.MVP * Position;
    vTexCoord = TexCoord;
+  //Precalc some Curvature/Warp values:
+      vWarp_vexp = 1.0/ (1 + (vec2(GEOM_WARP_X, GEOM_WARP_Y) * 0.2)) ;
+      vWarp_arg2 = 1.0 - pow(vec2(0.29289321881345247559915563789515), vWarp_vexp );
 }
 
 #pragma stage fragment
 layout(location = 0) in vec2 vTexCoord;
+layout(location = 1) in vec2 vWarp_vexp;
+layout(location = 2) in vec2 vWarp_arg2;
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D Source;
+
 
 #include "includes/functions.include.slang"
 
@@ -57,16 +64,28 @@ void main() {
     
     if (DO_BEZEL == 0.0) return;
     
-    vec4 pixel_source = texture(Source, vTexCoord);
+    
+    vec2 coords = vTexCoord;
+    vec4 pixel_source = texture(Source, coords);
     if (is_useless(pixel_source)) return;
 
 
+    
+   if (DO_CURVATURE == 1.0) {
+        if ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0))
+            coords = Warp_fast(coords, vWarp_vexp, vWarp_arg2); //coords_curved = Warp(coords_curved,GEOM_WARP_X,GEOM_WARP_Y);
+    }
+    
+    
     float blur_modulation = pixel_source.a;
-    vec3 pixel_out = blur_unroll(BEZEL_REFL_BLUR_MAX * blur_modulation, vTexCoord);
+    vec3 pixel_out = blur_unroll(BEZEL_REFL_BLUR_MAX * blur_modulation, coords);
 
     //pixel_out = mix(vec3(blur_modulation), pixel_out, 0.5);
 
     FragColor = vec4(pixel_out, 1.0);
+    
+    //FragColor = vec4(blur_modulation);
+    
 }
  
  

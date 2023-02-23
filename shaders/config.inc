@@ -9,12 +9,12 @@
 #define NOISEPOWER 1/192.0
 //((params.OutputSize.z)*3)
 
-	//Bezel border size in relation to the game frame
-	//Use the lowest possible value for best performance
-	//It is also used to compute wrap/repeated coordinates.
-	//If you change the default bezel texture, you may have ti o edit this to
-	//align bezel reflections and game content.
-#define BEZEL_BORDER_SIZE 0.175
+	//If you change the default bezel texture, you may have to edit this to
+	//align bezel reflections and game content. (it seems to depend on the curvature amount)
+#define BEZEL_BORDER_SIZE 0.197
+
+	//Use this to "crop" bezel reflections
+#define BEZEL_RFL_OFFSET -0.002
 
 	//If bezel reflections are not aligned, you can use this to correct:
 #define BEZEL_REFL_ZOOM 0.975
