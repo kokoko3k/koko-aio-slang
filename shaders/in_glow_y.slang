@@ -55,7 +55,7 @@ vec3 glow_blur_bias(sampler2D source_tex, vec2 co, vec3 pixel_glowed, float bias
     * FIXME: How to deal with this?
     */
    
-   glow_light = pow(glow_light, vec3(2.0));
+   //glow_light = pow(glow_light, vec3(2.0));
    
    
    
