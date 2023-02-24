@@ -35,8 +35,12 @@
     
     Input signal strength:
         The input signal gain
+    Glow spread amount:
+        The higher, the more the bright colors will smoothly expand.
+        It emulates the natural antialiasing you see on CRTs on bright areas.
     Sharpness (horizontal, vertical):
-        How much the glow will "spread".
+        The lower, the blurrier the image.
+        When set to zero, his value is handled using "Glow spread amount"
         When pushed to its maximum value, no blurring will occour.
     Gamma:
         Controls how much the signal has to be bright to produce the glow.
