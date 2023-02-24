@@ -42,6 +42,11 @@
 	//of IN_GLOW_W/H, HALO_W/H
 #define GLOW_SHARP_MAX 7	        
 
+	//Minumum glow sharpness
+	//I set this to allow negative values for glow sharpness
+	//that will calc their values from light spread amount
+#define MIN_IN_GLOW_SHARP 0.45
+
 	//Setting glow to blur bias parameter to this
 	//will skip the glow/blur mix codem and just return
 	//the blurred image
@@ -55,6 +60,11 @@
 #define NEW_SCALEMOD_X (params.OriginalSize.x/360.0 / 2.2)
 #define NEW_SCALEMOD_Y (params.OriginalSize.y/270.0 / 2.2)
 
+   // When Glow sharpness is controlled by light spread amount
+   // The following ratio is used:
+#define IN_GLOW_SHARPNESS_SPREAD_RATIO_W 0.8334
+#define IN_GLOW_SHARPNESS_SPREAD_RATIO_H 2.0
+
 
 	//Support for backdrops has to be enable by uncommenting:
 //#define STATIC_SUPPORT_BACKDROP 1.0
@@ -62,8 +72,8 @@
 #define BACKDROP_OFFY 0.0
 #define BACKDROP_ZOOM 1.0
 
-	//Workaround for https://github.com/kokoko3k/koko-aio-slang/issues/3
-//#define MAC_VIGNETTE_CURVATURE_WORKAROUND 1.0
+
+
 
 
 #define eps 1e-5
@@ -117,7 +127,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float DO_CCORRECTION;
 	float DO_ALT_BLANK;
 	float IN_GLOW_BIAS ;
-	float IN_GLOW_AMOUNT ;
+	float IN_GLOW_SPREAD ;
 	float SCANLINES_BLEEDING ;
 	float IN_GLOW_W;
 	float IN_GLOW_H;
@@ -289,10 +299,10 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 // Input Blur / light glowing
 #pragma parameter DO_IN_GLOW               "★ Glow/Blur enable? ==>"	 					0.0	0.0 1.0 1.0
 #pragma parameter IN_GLOW_POWER            "        Input signal strength"					0.45 	0.0 5.0 0.05
-#pragma parameter IN_GLOW_W                "        Sharpness, horizontal"					2.5	0.35 7.0 0.05
-#pragma parameter IN_GLOW_H                "        Sharpness, vertical"					2.5	0.35 7.0 0.05
+#pragma parameter IN_GLOW_SPREAD           "        Light spread amount"					0.6 	0.0 4.0 0.05
+#pragma parameter IN_GLOW_W                "        Sharpness X (0 = controlled by light spread)"		2.5	0.0 7.0 0.05
+#pragma parameter IN_GLOW_H                "        Sharpness Y (0 = controlled by light spread)"		2.5	0.0 7.0 0.05
 #pragma parameter IN_GLOW_GAMMA            "        Gamma, the higher, the less the glow on dark colors"	1.0 	1.0 10.0 0.1
-#pragma parameter IN_GLOW_AMOUNT           "        Light spread amount"					0.6 	0.0 4.0 0.05
 #pragma parameter IN_GLOW_BIAS             "        Glow to blur bias"					    	1.0     0.0 1.0 0.05 
 #pragma parameter BLANK7 " " 0.0 0.0 1.0 1.0
 
@@ -346,7 +356,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 //p1.20,r2.0
 // Bloom
 #pragma parameter DO_BLOOM           "★ Bloom enable? ==>" 						0.0  0.0  1.0  1.0
-#pragma parameter BLOOM_MIX          "        Final mix, (0.0=off)"					0.6 0.0 1.0  0.01
+#pragma parameter BLOOM_MIX          "        Final mix, (0.0=off)"					0.55 0.0 1.0  0.01
 #pragma parameter BLOOM_SIZE         "        Radius"							4.0  0.25 30.0 0.25
 #pragma parameter BLOOM_QUALITY      "        Quality: more is better but slower"			1.0  1.0 8.0 1.0
 #pragma parameter BLOOM_GAMMA        "        Gamma in (threshold)"					8.0  1.0 10.0 0.5

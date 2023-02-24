@@ -95,7 +95,7 @@
 
 #define DO_IN_GLOW		global.DO_IN_GLOW
 	#define IN_GLOW_BIAS		global.IN_GLOW_BIAS
-	#define IN_GLOW_AMOUNT		global.IN_GLOW_AMOUNT
+	#define IN_GLOW_SPREAD		global.IN_GLOW_SPREAD
 	#define IN_GLOW_W		global.IN_GLOW_W
 	#define IN_GLOW_H		global.IN_GLOW_H
 	#define IN_GLOW_POWER		global.IN_GLOW_POWER

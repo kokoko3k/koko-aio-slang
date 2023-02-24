@@ -69,7 +69,7 @@ vec3 glow_blur_bias_sharper_AA(sampler2D source_tex, vec2 co, vec3 pixel_glowed,
 vec3 glow_blur_bias(sampler2D source_tex, vec2 co, vec3 pixel_glowed, float bias){
    vec3 pixel_source = texture(source_tex, co).rgb;
    pixel_source  = pow(pixel_source,vec3(IN_GLOW_GAMMA)) * IN_GLOW_POWER;
-   vec3 glow_light = clamp((pixel_glowed - pixel_source) * IN_GLOW_AMOUNT, 0.0, 1.0);
+   vec3 glow_light = clamp((pixel_glowed - pixel_source) * IN_GLOW_SPREAD, 0.0, 1.0);
 
    /* powering glow_light is fine when not dealing with scanline minimum thickness,
     * but then the scanline shape gets smaller, it kinda produces a visive

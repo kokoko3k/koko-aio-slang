@@ -10,7 +10,17 @@ layout(location = 1) out float vIN_GLOW_H;
 void main() {
    gl_Position = global.MVP * Position;
    vTexCoord = TexCoord ;  
-   vIN_GLOW_H = IN_GLOW_H / NEW_SCALEMOD_Y; //Make it resolution independent.
+
+   float IN_GLOW_H_ADAPTED = IN_GLOW_H;
+
+   //Auto calc glow sharpness via IN_GLOW_SPREAD
+   if (IN_GLOW_H <= 0.00001)
+      IN_GLOW_H_ADAPTED = IN_GLOW_SPREAD * IN_GLOW_SHARPNESS_SPREAD_RATIO_H;
+
+   //don't allow lower values that look bad:
+   IN_GLOW_H_ADAPTED = max(IN_GLOW_H_ADAPTED, MIN_IN_GLOW_SHARP);
+   
+   vIN_GLOW_H = IN_GLOW_H_ADAPTED / NEW_SCALEMOD_Y; //Make it resolution independent.
 }
 
 
@@ -34,7 +44,7 @@ vec3 glow_blur_bias(sampler2D source_tex, vec2 co, vec3 pixel_glowed, float bias
    //       pixel_source  = pow(pixel_source,vec3(IN_GLOW_GAMMA)) * IN_GLOW_POWER;
    pixel_source  = pixel_source * IN_GLOW_POWER;
    
-   vec3 glow_light = clamp((pixel_glowed - pixel_source) * IN_GLOW_AMOUNT, 0.0, 1.0);
+   vec3 glow_light = clamp((pixel_glowed - pixel_source) * IN_GLOW_SPREAD, 0.0, 1.0);
 
    /* powering glow_light is fine when not dealing with scanline minimum thickness,
     * but when the scanline shape gets smaller, it kinda produces a visive
@@ -42,8 +52,7 @@ vec3 glow_blur_bias(sampler2D source_tex, vec2 co, vec3 pixel_glowed, float bias
     * It makes sense, because we are emulating the light spread twice.
     * FIXME: How to deal with this?
     */
-   vec3 proper_glow = glow_light * glow_light + pixel_source;
-
+   vec3 proper_glow = glow_light * glow_light + pixel_source;  
    return mix(proper_glow, pixel_glowed, max(0.0, bias));   
 
 }
@@ -55,12 +64,12 @@ vec3 antialias_blur_bias(sampler2D source_tex, vec2 co, vec3 pixel_glowed, float
    vec3 pixel_source = texture(source_tex, co).rgb;
    pixel_source  = pixel_source * IN_GLOW_POWER;
    
-   vec3 glow_light = clamp((pixel_glowed - pixel_source) * IN_GLOW_AMOUNT, 0.0, 1.0);
+   vec3 glow_light = clamp((pixel_glowed - pixel_source) * IN_GLOW_SPREAD, 0.0, 1.0);
 
    vec3 pixel_glowed_inv = 1 - clamp(pixel_glowed, 0.0, 1.0);
    vec3 pixel_source_inv = 1 - clamp(pixel_source, 0.0, 1.0);
    
-   vec3 pixel_dark = clamp((pixel_glowed_inv - pixel_source_inv) * IN_GLOW_AMOUNT, 0.0, 1.0) ;
+   vec3 pixel_dark = clamp((pixel_glowed_inv - pixel_source_inv) * IN_GLOW_SPREAD, 0.0, 1.0) ;
 
    vec3 pixel_dilated = pixel_source + glow_light ;
    vec3 pixel_eroded  = pixel_source - pixel_dark ;
