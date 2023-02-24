@@ -157,7 +157,8 @@ vec3 pixel_bleed(vec3 pixel_in, vec2 co, sampler2D in_texture, vec4 sourcesize2)
       side_right = pixel_bleed_side_NTSC(pixel_in, co, SAT_BLEED_SIZE_RIGHT, SIDE_RIGHT, in_texture, sourcesize2);
       side_left = pixel_bleed_side_NTSC(pixel_in, co, SAT_BLEED_SIZE_LEFT, SIDE_LEFT, in_texture, sourcesize2);
    }
-   return mix(side_left,side_right,0.5);
+   //Clamping min to 0.0 is needed for nvidia to avoid bad graphical glitches, why? 
+   return max( mix(side_left,side_right,0.5), 0.0) ;  
 
 }
 void main() {
@@ -200,8 +201,7 @@ void main() {
    //pre-gamma if needed by glow.
    if (DO_IN_GLOW > 0.5) 
       pixel_out = pow(pixel_out, vec3(IN_GLOW_GAMMA));
-  
-
+     
    FragColor = vec4(pixel_out,0.0);
    return;
 }

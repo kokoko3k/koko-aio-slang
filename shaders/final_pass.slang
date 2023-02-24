@@ -909,8 +909,7 @@ void main() {
         //split screen
         //if (vTexCoord.y < 0.5) pixel_out = texture(first_pass,vTexCoord);
         //pixel_out = texture(avglum_pass,vTexCoord);
-    //pixel_out = texture(reflected_blurred_pass2, vOutputCoord);
-    
+
     //vec4 pixel_mirrored = texture(reflected_blurred_pass2,vTexCoord);
     //pixel_out = pixel_mirrored;
     

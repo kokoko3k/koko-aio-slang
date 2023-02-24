@@ -38,7 +38,7 @@ layout(set = 0, binding = 5) uniform sampler2D shift_and_bleed_pass;
 void main() { 
    if (DO_IN_GLOW == 0.0) return;
    
-   //Pass the right texture unchanged for tighter blurs:
+   //Pass the right texture unchanged for no blurs:
    if (IN_GLOW_W >= GLOW_SHARP_MAX && IN_GLOW_H >= GLOW_SHARP_MAX) {
       FragColor = texture(shift_and_bleed_pass, vTexCoord);
       return;
