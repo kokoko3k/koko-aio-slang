@@ -11,7 +11,7 @@ void main() {
    gl_Position = global.MVP * Position;
    vTexCoord = TexCoord;
   //Precalc some Curvature/Warp values:
-      vWarp_vexp = 1.0/ (1 + (vec2(GEOM_WARP_X, GEOM_WARP_Y) * 0.2)) ;
+      vWarp_vexp = 1.0/ (1 + (vec2(GEOM_WARP_X * BEZEL_REFL_WARP_CORRECTION_FACTOR, GEOM_WARP_Y * BEZEL_REFL_WARP_CORRECTION_FACTOR) * 0.2)) ;
       vWarp_arg2 = 1.0 - pow(vec2(0.29289321881345247559915563789515), vWarp_vexp );
 }
 

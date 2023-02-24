@@ -5,7 +5,7 @@
 	//Consider content interlaced if lines are more than this
 #define MIN_LINES_INTERLACED 380
 
-	//Sort of dithering used in vignette, spot, backlight leds
+	//Sort of dithering/debanding used in vignette, spot, backlight leds
 #define NOISEPOWER 1/192.0
 //((params.OutputSize.z)*3)
 
@@ -13,14 +13,18 @@
 	//align bezel reflections and game content. (it seems to depend on the curvature amount)
 #define BEZEL_BORDER_SIZE 0.197
 
-	//Use this to "crop" bezel reflections
-#define BEZEL_RFL_OFFSET -0.002
+	//Use this to "crop" bezel reflections (usually in range -0.009..+0.009)
+#define BEZEL_RFL_OFFSET 0.000
 
 	//If bezel reflections are not aligned, you can use this to correct:
 #define BEZEL_REFL_ZOOM 0.975
 
 	//The maximum radius of the reflection blur. //3.3..4.0 max
 #define BEZEL_REFL_BLUR_MAX 4.0
+
+	//Bezel reflection warping (curvature) may need a correction factor.
+	//Modify this if bezel reflections does not follow the border
+#define BEZEL_REFL_WARP_CORRECTION_FACTOR 1.15
 
 	// 0.0-1.0: sensitivity to scene change (ambilike stuff), 0.0 changes more
 #define AMBI_SCENE_CHG_THRSHLD 0.07  
@@ -299,10 +303,10 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 // Input Blur / light glowing
 #pragma parameter DO_IN_GLOW               "★ Glow/Blur enable? ==>"	 					0.0	0.0 1.0 1.0
 #pragma parameter IN_GLOW_POWER            "        Input signal strength"					0.45 	0.0 5.0 0.05
+#pragma parameter IN_GLOW_GAMMA            "        Input gamma, the higher, the less glow on dark colors"	1.0 	1.0 10.0 0.1
 #pragma parameter IN_GLOW_SPREAD           "        Glow spread amount"					0.6 	0.0 4.0 0.05
 #pragma parameter IN_GLOW_W                "        Sharpness X (0 = controlled by glow spread)"		2.5	0.0 7.0 0.05
 #pragma parameter IN_GLOW_H                "        Sharpness Y (0 = controlled by glow spread)"		2.5	0.0 7.0 0.05
-#pragma parameter IN_GLOW_GAMMA            "        Gamma, the higher, the less the glow on dark colors"	1.0 	1.0 10.0 0.1
 #pragma parameter IN_GLOW_BIAS             "        Glow to blur bias"					    	1.0     0.0 1.0 0.05 
 #pragma parameter BLANK7 " " 0.0 0.0 1.0 1.0
 
