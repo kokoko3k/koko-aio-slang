@@ -68,13 +68,50 @@ void main() {
    if (DO_BEZEL == 0.0) return;
    
    vec2 coords = zoomout_coords(vTexCoord, BEZEL_BORDER_SIZE, 1.0);
-   
-  /*    if (DO_CURVATURE == 1.0) {
-        if ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0))
-            coords = Warp_fast(coords, vWarp_vexp, vWarp_arg2); //coords_curved = Warp(coords_curved,GEOM_WARP_X,GEOM_WARP_Y);
-    }
-    */
    vec2 coords_zoomedout = coords;
+   
+
+    
+  
+  /*
+   if (DO_CURVATURE == 1.0) {
+        if ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0)) {
+            
+        vec2 geom_warp_adapted = vec2(GEOM_WARP_X, GEOM_WARP_Y);
+            
+        vec2 curved_coords_x0 = Warp(vec2(0.0 , coords.y),geom_warp_adapted.x, geom_warp_adapted.y );
+        vec2 curved_coords_y0 = Warp(vec2(coords.x, 0.0) ,geom_warp_adapted.x, geom_warp_adapted.y );
+
+
+   
+   //Calcola il massimo spostamento della coordinata 0 data la curvatura.
+   coords = zoomout_coords(vTexCoord, BEZEL_BORDER_SIZE, 1.0);
+   vec2 max_bezel_offset = Warp(vec2(0.0,0.0),GEOM_WARP_X, GEOM_WARP_Y );
+   
+   vec2 coords_left   = vec2(coords.x + curved_coords_x0.x, curved_coords_x0.y);
+   vec2 coords_right  = vec2(coords.x - curved_coords_x0.x, curved_coords_x0.y);
+   vec2 coords_bottom = vec2(curved_coords_y0.x, coords.y - curved_coords_y0.y);
+   vec2 coords_top    = vec2(curved_coords_y0.x, coords.y + curved_coords_y0.y);
+   
+   bool side_left = coords.x <= -max_bezel_offset.x;
+   bool side_top =  coords.y <= -max_bezel_offset.y;
+   bool side_bottom = coords.y >= 1.0 + max_bezel_offset.y;
+   bool side_right =  coords.x >= 1.0 +max_bezel_offset.x;
+   
+   if (side_left && !side_top && !side_bottom)
+      coords = coords_left;
+   if (side_top && !side_left && !side_right)
+      coords = coords_top;
+   if (side_right && !side_top && !side_bottom)
+      coords = coords_right;   
+   if (side_bottom && !side_left && !side_right)
+      coords = coords_bottom;   
+
+        }
+   }
+   */
+   
+
 
    bool skip_condition = (coords.x < 1.0 - c_tolerance && coords.x > c_tolerance && 
                           coords.y < 1.0 - c_tolerance && coords.y > c_tolerance ) ;
@@ -83,7 +120,12 @@ void main() {
       FragColor = mark_useless(vec3(0.0));
       return;
    }
-       
+
+      
+   if (DO_CURVATURE == 1.0 && ( GEOM_WARP_X > 0.0 || GEOM_WARP_Y > 0.0)  ) {
+         coords = Warp_fast(coords, vWarp_vexp, vWarp_arg2); //coords_curved = Warp(coords_curved,GEOM_WARP_X,GEOM_WARP_Y);
+   }
+   
    float coords_crop_point = 0.0;
    //* set the mirror point according to the dynamic zoom?
       if (DO_DYNZOOM == 1.0) {
@@ -95,7 +137,15 @@ void main() {
          coords = zoom(coords, dyn_zoom);
       }
    coords_crop_point += BEZEL_RFL_OFFSET;
+   
+   
 
+   //inside curved coords...
+   if (coords.x > 0.0 && coords.x < 1.0 && coords.y > 0.0 && coords.y < 1.0) {
+      FragColor = mark_useless(vec3(0.0));
+      return;
+   }
+   
       
    //Do mirrored_repeat 
    coords = mirrored_repeat(coords, coords_crop_point);
@@ -118,9 +168,10 @@ void main() {
       //the pixel is useless.
       shade = clamp(shade, 0.01, 1.0);     
       
-   vec3 pixel_blur = blur_unroll(BEZEL_REFL_BLUR_MAX * shade, coords, 2.0);   
+   vec3 pixel_out = blur_unroll(BEZEL_REFL_BLUR_MAX * shade, coords, 2.0);   
    
-   FragColor = vec4(apply_fuzzy_main_pass(pixel_blur),shade);
+   
+   FragColor = vec4(apply_fuzzy_main_pass(pixel_out),shade);
    
    
    

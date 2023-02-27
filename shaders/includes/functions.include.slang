@@ -416,5 +416,5 @@ float rgb_to_gray(vec3 rgb) {
 	*/
 
 float get_dyn_zoom(sampler2D tex) {
-	return 1.0 + (texture(tex, vec2(0.75,0.75)    ).a/ DYNZOOM_FACTOR);
+	return 1.0 + (texture(tex, vec2(0.75,0.75)    ).a/ DYNZOOM_FACTOR) ;
 }

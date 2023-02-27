@@ -14,10 +14,10 @@
 #define BEZEL_BORDER_SIZE 0.197
 
 	//Use this to "crop" bezel reflections (usually in range -0.009..+0.009)
-#define BEZEL_RFL_OFFSET 0.000
+#define BEZEL_RFL_OFFSET 0.003
 
 	//If bezel reflections are not aligned, you can use this to correct:
-#define BEZEL_REFL_ZOOM 0.964
+#define BEZEL_REFL_ZOOM 1.0 - 0.02
 
 	//The maximum radius of the reflection blur. //3.3..4.0 max
 #define BEZEL_REFL_BLUR_MAX 4.0
