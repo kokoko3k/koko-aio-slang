@@ -14,7 +14,7 @@
 #define BEZEL_BORDER_SIZE 0.197
 
 	//Use this to "crop" bezel reflections (usually in range -0.009..+0.009)
-#define BEZEL_RFL_OFFSET -0.001
+#define BEZEL_RFL_OFFSET 0.000
 
 	//If bezel reflections are not aligned, you can use this to correct:
 #define BEZEL_REFL_ZOOM 0.964

@@ -68,7 +68,7 @@ DO_BEZEL = "0.0"
         BEZEL_REF_START = "0.88"
         BEZEL_REF_END = "0.95"
         BEZEL_FRAME_ZOOM = "0.0"
-        BEZEL_INNER_ZOOM = "-0.18"
+        BEZEL_INNER_ZOOM = "-0.16"
         BEZEL_IMAGE_BORDER = "1.02"
 
 

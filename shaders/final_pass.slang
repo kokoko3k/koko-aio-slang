@@ -51,7 +51,12 @@ void main() {
                        floor(vOutputCoord.y * params.OutputSize.y));
 
     //Precalc some Curvature/Warp values:
-        vWarp_vexp = 1.0/ (1 + (vec2(GEOM_WARP_X, GEOM_WARP_Y) * 0.2)) ;
+        vec2 geom_warp_adapted = vec2(GEOM_WARP_X, GEOM_WARP_Y);
+        
+       /* if (DO_BEZEL > 0.0) {
+            geom_warp_adapted *= (-BEZEL_INNER_ZOOM) + 1;
+        }*/
+        vWarp_vexp = 1.0/ (1 + (vec2(geom_warp_adapted.x, geom_warp_adapted.y) * 0.2)) ;
         
         
         vWarp_arg2 = 1.0 - pow(vec2(0.29289321881345247559915563789515), vWarp_vexp );
@@ -872,17 +877,19 @@ void main() {
         coords = zoom(coords, dynzoom);
     }
 
+    //Scale coords according to bezel settings?
+    if (DO_BEZEL == 1.0) {
+        coords = zoomout_coords(coords, -BEZEL_INNER_ZOOM , 1.0);
+        coords = clamp(coords, 0.0,1.0);
+    }
+    
     //Curvature
     if (DO_CURVATURE == 1.0) {
         if ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0))
             coords = Warp_fast(coords, vWarp_vexp, vWarp_arg2);
+            
     }
-    
-    //Scale coords according to bezel settings?
-    if (DO_BEZEL == 1.0) {
-        coords = zoomout_coords(coords, -BEZEL_INNER_ZOOM , 1.0);
-    }
-
+     
     //"Just" handle inner and outer frame here:
     vec4 pixel_out = main_wrap(coords);
 

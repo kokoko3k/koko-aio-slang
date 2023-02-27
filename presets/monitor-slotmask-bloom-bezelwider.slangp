@@ -1,6 +1,6 @@
 #reference "monitor-slotmask-bloom-bezel.slangp"
 
-GEOM_WARP_X = 0.50
+GEOM_WARP_X = 0.45
 GEOM_WARP_Y = 0.50
 
 BEZEL_FRAME_ZOOM = "0.17"
