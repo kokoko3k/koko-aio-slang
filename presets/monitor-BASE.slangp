@@ -5,10 +5,10 @@ DO_CCORRECTION = "1.0"
 	SATURATION = "1.00"
 	LUMINANCE = "0.2"
 	
-DO_SHIFT_RGB = "1.0"
-	OFFSET_STRENGTH = "0.3"
+DO_SHIFT_RGB = "0.0"
+	OFFSET_STRENGTH = "0.6"
 	SHIFT_R = "-40.0"        
-	SHIFT_G = "3.0"        
+	SHIFT_G = "2.0"        
 	SHIFT_B = "40.0"
 	
 DO_IN_GLOW = "1.0"

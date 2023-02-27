@@ -355,4 +355,5 @@ float_framebuffer7 = true
 #    [ ] Better debanding?
 #    [ ] Should the flickering be aware of the scanline?
 #        read: does a scanline dark gap increment the flickering or not?
-        
+#    [ ] deconvergence after glow/halo?
+#    [ ] Glow spread in final pass?

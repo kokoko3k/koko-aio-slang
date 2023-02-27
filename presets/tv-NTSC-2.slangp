@@ -29,6 +29,7 @@ DO_SHIFT_RGB = "0.0"
 
 	
 	SCANLINE_DARK = "0.3"
+	SCANLINE_MIN = "1.0"
 	
 	IN_GLOW_W = "1.0"
 	IN_GLOW_H = "1.0"
