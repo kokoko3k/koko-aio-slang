@@ -65,7 +65,7 @@
 #define NEW_SCALEMOD_Y (params.OriginalSize.y/270.0 / 2.2)
 
    // When Glow sharpness is controlled by light spread amount
-   // The following ratio is used:
+   // The following ratio is used, the lower, the blurrier:
 #define IN_GLOW_SHARPNESS_SPREAD_RATIO_W 0.8334
 #define IN_GLOW_SHARPNESS_SPREAD_RATIO_H 2.0
 
