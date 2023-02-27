@@ -13,12 +13,6 @@
 	//align bezel reflections and game content. (it seems to depend on the curvature amount)
 #define BEZEL_BORDER_SIZE 0.197
 
-	//Use this to "crop" bezel reflections (usually in range -0.009..+0.009)
-#define BEZEL_RFL_OFFSET 0.003
-
-	//If bezel reflections are not aligned, you can use this to correct:
-#define BEZEL_REFL_ZOOM 1.0 - 0.02
-
 	//The maximum radius of the reflection blur. //3.3..4.0 max
 #define BEZEL_REFL_BLUR_MAX 4.0
 
@@ -196,6 +190,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float BEZEL_FRAME_ZOOM;
 	float BEZEL_USE_STRAIGHT;
 	float BEZEL_RFL_BLR_SHD;
+	float BEZEL_RFL_OFFSET;
+	float BEZEL_REFL_ZOOM;
 
 	float DO_SPOT;
 	float S_POSITION; 
@@ -394,6 +390,9 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BEZEL_FRAME_ZOOM   "        Frame zoom"		0.0   -1.5 0.5 0.01
 #pragma parameter BEZEL_IMAGE_BORDER "        Image border"		1.01   1.0 1.2 0.01
 #pragma parameter BEZEL_RFL_BLR_SHD  "        Sharp reflections"	0.0    -1.0 1.0 0.1
+#pragma parameter BEZEL_RFL_OFFSET   "        Align reflections: offset"	0.003    -0.01 0.01 0.001
+#pragma parameter BEZEL_REFL_ZOOM   "        Align reflections: zoom"		0.98    0.8 1.2 0.001
+
 #pragma parameter BLANK15 " " 0.0 0.0 1.0 1.0
 
 

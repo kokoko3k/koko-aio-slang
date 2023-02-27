@@ -140,12 +140,12 @@ void main() {
    
    
 
-   //inside curved coords...
+/*   //inside curved coords...
    if (coords.x > 0.0 && coords.x < 1.0 && coords.y > 0.0 && coords.y < 1.0) {
       FragColor = mark_useless(vec3(0.0));
       return;
    }
-   
+  */ 
       
    //Do mirrored_repeat 
    coords = mirrored_repeat(coords, coords_crop_point);
