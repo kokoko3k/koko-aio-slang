@@ -14,17 +14,17 @@
 #define BEZEL_BORDER_SIZE 0.197
 
 	//Use this to "crop" bezel reflections (usually in range -0.009..+0.009)
-#define BEZEL_RFL_OFFSET 0.000
+#define BEZEL_RFL_OFFSET -0.006
 
 	//If bezel reflections are not aligned, you can use this to correct:
-#define BEZEL_REFL_ZOOM 0.975
+#define BEZEL_REFL_ZOOM 0.964
 
 	//The maximum radius of the reflection blur. //3.3..4.0 max
 #define BEZEL_REFL_BLUR_MAX 4.0
 
 	//Bezel reflection warping (curvature) may need a correction factor.
 	//Modify this if bezel reflections does not follow the border
-#define BEZEL_REFL_WARP_CORRECTION_FACTOR 1.15
+#define BEZEL_REFL_WARP_CORRECTION_FACTOR 1.9
 
 	// 0.0-1.0: sensitivity to scene change (ambilike stuff), 0.0 changes more
 #define AMBI_SCENE_CHG_THRSHLD 0.07  
