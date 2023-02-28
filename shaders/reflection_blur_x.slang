@@ -37,17 +37,24 @@ layout(set = 0, binding = 2) uniform sampler2D avglum_pass;
 
 #define c_tolerance 0.051
 
-vec3 blur_unroll(float Size, vec2 co,float lod) {
+vec3 texture_clamp_to_border(sampler2D tex, vec2 coords, float lod) {
+   if (coords.x < 0.0 || coords.x > 1.0 || coords.y < 0.0 || coords.y > 1.0)
+      return vec3(0.0);
+   else
+      return textureLod( tex, coords, lod).rgb ;
+}
+
+
+vec3 blur_unroll(float Size, vec2 co, float lod, float coords_crop_point) {
    Size = Size * NEW_SCALEMOD_X;
    vec3 color;
    vec2 d = SourceTextureSize.zw * Size;
-   color =  textureLod( SourceTexture, co + d * vec2(-1.0,  1.0 )  ,lod).rgb ;
-   color += textureLod( SourceTexture, co + d * vec2( 1.0,  1.0 )  ,lod).rgb ;
-   color += textureLod( SourceTexture, co + d * vec2(-1.0,  -1.0 ) ,lod).rgb ;
-   color += textureLod( SourceTexture, co + d * vec2( 1.0,  -1.0 ) ,lod).rgb ;
+   color =  texture_clamp_to_border( SourceTexture, co + d * vec2(-1.0,  1.0 )  ,lod).rgb;
+   color += texture_clamp_to_border( SourceTexture, co + d * vec2( 1.0,  1.0 )  ,lod).rgb;
+   color += texture_clamp_to_border( SourceTexture, co + d * vec2(-1.0,  -1.0 ) ,lod).rgb;
+   color += texture_clamp_to_border( SourceTexture, co + d * vec2( 1.0,  -1.0 ) ,lod).rgb;
    return color / 4.0;
 }
-
 
 vec2 mirrored_repeat(vec2 co, float crop) {
    //Don't try to unbranch me, it is a matter of 1/1000.
@@ -71,48 +78,6 @@ void main() {
    vec2 coords_zoomedout = coords;
    
 
-    
-  
-  /*
-   if (DO_CURVATURE == 1.0) {
-        if ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0)) {
-            
-        vec2 geom_warp_adapted = vec2(GEOM_WARP_X, GEOM_WARP_Y);
-            
-        vec2 curved_coords_x0 = Warp(vec2(0.0 , coords.y),geom_warp_adapted.x, geom_warp_adapted.y );
-        vec2 curved_coords_y0 = Warp(vec2(coords.x, 0.0) ,geom_warp_adapted.x, geom_warp_adapted.y );
-
-
-   
-   //Calcola il massimo spostamento della coordinata 0 data la curvatura.
-   coords = zoomout_coords(vTexCoord, BEZEL_BORDER_SIZE, 1.0);
-   vec2 max_bezel_offset = Warp(vec2(0.0,0.0),GEOM_WARP_X, GEOM_WARP_Y );
-   
-   vec2 coords_left   = vec2(coords.x + curved_coords_x0.x, curved_coords_x0.y);
-   vec2 coords_right  = vec2(coords.x - curved_coords_x0.x, curved_coords_x0.y);
-   vec2 coords_bottom = vec2(curved_coords_y0.x, coords.y - curved_coords_y0.y);
-   vec2 coords_top    = vec2(curved_coords_y0.x, coords.y + curved_coords_y0.y);
-   
-   bool side_left = coords.x <= -max_bezel_offset.x;
-   bool side_top =  coords.y <= -max_bezel_offset.y;
-   bool side_bottom = coords.y >= 1.0 + max_bezel_offset.y;
-   bool side_right =  coords.x >= 1.0 +max_bezel_offset.x;
-   
-   if (side_left && !side_top && !side_bottom)
-      coords = coords_left;
-   if (side_top && !side_left && !side_right)
-      coords = coords_top;
-   if (side_right && !side_top && !side_bottom)
-      coords = coords_right;   
-   if (side_bottom && !side_left && !side_right)
-      coords = coords_bottom;   
-
-        }
-   }
-   */
-   
-
-
    bool skip_condition = (coords.x < 1.0 - c_tolerance && coords.x > c_tolerance && 
                           coords.y < 1.0 - c_tolerance && coords.y > c_tolerance ) ;
 
@@ -131,15 +96,12 @@ void main() {
       if (DO_DYNZOOM == 1.0) {
          //Crop coordinates to move the mirror axes
          float dyn_zoom = get_dyn_zoom(avglum_pass);
-         coords_crop_point = dyn_zoom - 1.0;
-         coords_crop_point = coords_crop_point * 0.5;
+         coords_crop_point = (dyn_zoom - 1.0) * 0.5;
          //Zoom image coords to align it
          coords = zoom(coords, dyn_zoom);
       }
    coords_crop_point += BEZEL_RFL_OFFSET;
    
-   
-
 /*   //inside curved coords...
    if (coords.x > 0.0 && coords.x < 1.0 && coords.y > 0.0 && coords.y < 1.0) {
       FragColor = mark_useless(vec3(0.0));
@@ -168,7 +130,7 @@ void main() {
       //the pixel is useless.
       shade = clamp(shade, 0.01, 1.0);     
       
-   vec3 pixel_out = blur_unroll(BEZEL_REFL_BLUR_MAX * shade, coords, 2.0);   
+   vec3 pixel_out = blur_unroll(BEZEL_REFL_BLUR_MAX * shade, coords, 2.0, coords_crop_point);   
    
    
    FragColor = vec4(apply_fuzzy_main_pass(pixel_out),shade);
