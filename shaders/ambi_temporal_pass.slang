@@ -179,7 +179,9 @@ vec4 pixel_ambilight() {
 #define FRAME_DIVIDER 2.0
 
 void main() {    
-    if (DO_AMBILIGHT != 1.0) return; 
+    if (DO_AMBILIGHT != 1.0)
+        return; 
+
     
     if ( mod(params.FrameCount,FRAME_DIVIDER) != 0.0) {
         FragColor = texture(PastSampler, vTexCoord);

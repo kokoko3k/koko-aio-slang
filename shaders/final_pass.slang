@@ -751,20 +751,19 @@ vec3 compose_bezel_over(vec3 full_viewport) {
         float reflection = bezel.b;
 
         vec3 bezel_out = bezel_colored + (pixel_mirrored * reflection * 0.5) ;
-
-    //Mix a bit of ambient light over the bezel
-        vec4 pixel_avglum = texture(avglum_pass,vOutputCoord);
-        //bezel_out = bezel_out + (pixel_avglum.rgb * 0.05);
-        vec3 pixel_ambilight = texture(ambi_temporal_pass, vOutputCoord).rgb * DO_AMBILIGHT + global_noise;
+        
+        //Mix ambient light over bezel?
+        vec3 pixel_ambilight = DO_AMBILIGHT * (texture(ambi_temporal_pass, vOutputCoord).rgb + global_noise);
         bezel_out = bezel_out + pixel_ambilight * AMBI_OVER_BEZEL;
-
-    //We use the green component to express Hardness/Specularity; there the reflection will be completely diffused.
-    //For the task, we use a mipmap whit adeguate precision.
+        
+        //We use the green component to express Hardness/Specularity; there the reflection will be completely diffused.
+        //For the task, we use a mipmap whit adeguate precision.
         float lut_hardness = bezel.g;
         if (lut_hardness > 0.0) {
+            vec4 pixel_avglum = texture(avglum_pass,vOutputCoord);
             bezel_out = bezel_out + ( ( pixel_avglum.rgb + pixel_avglum.a*0.5)       * lut_hardness/3.5);
         }
-
+        
     return mix(full_viewport, bezel_out, bezel.a);
 }
 
