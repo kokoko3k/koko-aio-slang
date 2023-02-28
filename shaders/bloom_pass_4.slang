@@ -38,8 +38,6 @@ layout(set = 0, binding = 4) uniform sampler2D bloom_pass_finalFeedback;
 //The speed of the pupil adaption
 #define BLOOM_PUPIL_ADAPTION_SPEED 0.2
 
-//The time the light has to be there before the pupil starts to react (range 10..10000)
-#define BLOOM_PUPIL_INERTIA 1500
 
 float get_avg_lum_from_mip(sampler2D tex, vec2 co, float lod) {
     vec3 mip = textureLod(first_pass, co, lod).rgb;
@@ -58,7 +56,7 @@ float get_avg_lum_from_mip(sampler2D tex, vec2 co, float lod) {
         eye_adaption_speed = (eye_adaption_speed / BLOOM_EYE_ADPT_SRT);
         
     //The following simulates pupil inertia
-    eye_adaption_speed = clamp(eye_adaption_speed, 1.0/BLOOM_PUPIL_INERTIA, 1.0);
+    eye_adaption_speed = clamp(eye_adaption_speed, 1.0/BLOOM_EYE_INERTIA, 1.0);
     
     float luminance = mix(luminance_first_pass, luminance_from_feedback, eye_adaption_speed);
     return luminance + eps;

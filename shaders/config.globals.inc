@@ -143,6 +143,7 @@
 #define DO_BLOOM		params.DO_BLOOM
 	#define BLOOM_MIX		global.BLOOM_MIX
 	#define BLOOM_EYE_ADPT_SRT	global.BLOOM_EYE_ADPT_SRT
+	#define BLOOM_EYE_INERTIA	global.BLOOM_EYE_INERTIA
 	#define BLOOM_QUALITY		params.BLOOM_QUALITY
 	#define BLOOM_SIZE		global.BLOOM_SIZE
 	#define BLOOM_GAMMA		global.BLOOM_GAMMA

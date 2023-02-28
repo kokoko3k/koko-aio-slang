@@ -133,6 +133,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float IN_GLOW_GAMMA;
 	float BLOOM_MIX;
 	float BLOOM_EYE_ADPT_SRT;
+	float BLOOM_EYE_INERTIA;
  	float BLOOM_SIZE;
 	float BLOOM_GAMMA;
 	float BLOOM_BYPASS;
@@ -363,6 +364,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BLOOM_GAMMA_OUT    "        Gamma out (contour smoothness)"				1.0  0.1 10.0 0.1
 #pragma parameter BLOOM_POWER        "        Power multiplier"						1.20  1.0 20.0 0.05  
 #pragma parameter BLOOM_EYE_ADPT_SRT "        Modulate: Local exposure eye adaption strength"		0.8   0.0 10.0 0.05
+#pragma parameter BLOOM_EYE_INERTIA  "        Modulate: Time before eye adaption starts"		1500  10.0 10000 50.0
 #pragma parameter BLOOM_OVER_WHITE   "        Modulate: Strength on bright areas (0 = aura)"		0.5  0.0 1.0  0.05
 #pragma parameter BLOOM_BYPASS       "        Bypass/Solo (1=Unmodulated, 2=Modulated)"			0.0  0.0 2.0  1.0
 #pragma parameter BLANK13 " " 0.0 0.0 1.0 1.0
