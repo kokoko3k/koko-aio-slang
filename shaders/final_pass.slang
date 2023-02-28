@@ -749,8 +749,10 @@ vec3 compose_bezel_over(vec3 full_viewport) {
         //float reflection = (reflection_shade * 1.4 -  0.4)  * bezel.b ;
         //reflection = clamp (reflection, 0.0, 1.0);
         float reflection = bezel.b;
-
-        vec3 bezel_out = bezel_colored + (pixel_mirrored * reflection * 0.5) ;
+        //return vec3(reflection);
+        pixel_mirrored = pixel_mirrored * reflection;
+        //return pixel_mirrored;
+        vec3 bezel_out = bezel_colored + pixel_mirrored;
         
         //Mix ambient light over bezel?
         vec3 pixel_ambilight = DO_AMBILIGHT * (texture(ambi_temporal_pass, vOutputCoord).rgb + global_noise);
