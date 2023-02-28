@@ -38,9 +38,9 @@ layout(set = 0, binding = 2) uniform sampler2D avglum_pass;
 #define c_tolerance 0.051
 
 vec3 texture_clamp_to_border(sampler2D tex, vec2 coords, float lod) {
-   if (coords.x < 0.0 || coords.x > 1.0 || coords.y < 0.0 || coords.y > 1.0)
+/*   if (coords.x < 0.0 || coords.x > 1.0 || coords.y < 0.0 || coords.y > 1.0)
       return vec3(0.0);
-   else
+   else*/
       return textureLod( tex, coords, lod).rgb ;
 }
 
