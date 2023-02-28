@@ -154,10 +154,10 @@ void main() {
    //This will be used in this and the next
    //pass to modulate the blur radius.
    //This allow to blur less near the content.
-      float shade1 = abs(     coords_zoomedout.x - coords_crop_point );
-      float shade2 = abs( 1 - coords_zoomedout.x - coords_crop_point );
-      float shade3 = abs(     coords_zoomedout.y - coords_crop_point );
-      float shade4 = abs( 1 - coords_zoomedout.y - coords_crop_point );
+      float shade1 = abs(     coords.x - coords_crop_point );
+      float shade2 = abs( 1 - coords.x - coords_crop_point );
+      float shade3 = abs(     coords.y - coords_crop_point );
+      float shade4 = abs( 1 - coords.y - coords_crop_point );
         
       shade1 = min(shade1, shade2);
       shade2 = min(shade3, shade4);
@@ -172,8 +172,7 @@ void main() {
    
    
    FragColor = vec4(apply_fuzzy_main_pass(pixel_out),shade);
-   
-   
+
    
    //FragColor = vec4(shade);
    
