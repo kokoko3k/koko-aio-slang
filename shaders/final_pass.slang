@@ -750,7 +750,7 @@ vec3 compose_bezel_over(vec3 full_viewport) {
         //reflection = clamp (reflection, 0.0, 1.0);
         float reflection = bezel.b;
         //return vec3(reflection);
-        pixel_mirrored = pixel_mirrored * reflection;
+        pixel_mirrored = pixel_mirrored * reflection * BEZEL_REFL_STRENGTH;
         //return pixel_mirrored;
         vec3 bezel_out = bezel_colored + pixel_mirrored;
         

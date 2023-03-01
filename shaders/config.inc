@@ -25,6 +25,9 @@
 #define BEZEL_REFL_CORNER_BLANK_SIZE 0.0685
 #define BEZEL_REFL_CORNER_BLANK_SHADE 0.05  // keep it > 0.0
 
+	//The reflection intensity
+#define BEZEL_REFL_STRENGTH 0.5
+
 	// 0.0-1.0: sensitivity to scene change (ambilike stuff), 0.0 changes more
 #define AMBI_SCENE_CHG_THRSHLD 0.07  
 	// The following will allow to sample at reduced interval
