@@ -20,6 +20,11 @@
 	//Modify this if bezel reflections does not follow the border
 #define BEZEL_REFL_WARP_CORRECTION_FACTOR 1.9
 
+	// Define the size and the smoothness of the rectangle 
+	// in the bezel corners that will hide and blur the reflections 
+#define BEZEL_REFL_CORNER_BLANK_SIZE 0.0685
+#define BEZEL_REFL_CORNER_BLANK_SHADE 0.05  // keep it > 0.0
+
 	// 0.0-1.0: sensitivity to scene change (ambilike stuff), 0.0 changes more
 #define AMBI_SCENE_CHG_THRSHLD 0.07  
 	// The following will allow to sample at reduced interval
