@@ -152,8 +152,10 @@ float random(float power, vec2 seed) {
 		uv = uv * 2.0 - 1.0;
 		vec2 pow_exp = 1.0/(1.0+vec2(wx, wy) * 0.2 ) ;
 		float curvedCoordsDistance = length(uv);
+		vec2 pow_base = vec2(1.0-(curvedCoordsDistance/1.4142135623730950488016887242097));
+		pow_base = abs(pow_base); // <-- this way intel and nvidia (probably amd) acts the same.
 		uv /= curvedCoordsDistance;
-		uv *= (1.0-pow(vec2(1.0-(curvedCoordsDistance/1.4142135623730950488016887242097)),  pow_exp ));
+		uv *= (1.0-pow(pow_base,  pow_exp ));
 		uv /= (1.0-pow(vec2(0.29289321881345247559915563789515),  pow_exp ));
 		// Transform coordinates back to [0, 1]
 		return uv* 0.5 + 0.5;
@@ -167,6 +169,8 @@ float random(float power, vec2 seed) {
 		// Transform coordinates to range [-1, 1]
 		uv = uv * 2.0 - 1.0;
 		float curvedCoordsDistance = length(uv);
+		vec2 pow_base = vec2(1.0-(curvedCoordsDistance/1.4142));
+		pow_base = abs(pow_base); // <-- this way intel and nvidia (probably amd) acts the same.
 		uv /= curvedCoordsDistance;
 		uv *= 1.0-pow(vec2(1.0-(curvedCoordsDistance/1.4142)), v_exp );
 		uv /= arg2;

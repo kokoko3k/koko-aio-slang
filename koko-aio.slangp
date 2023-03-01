@@ -67,7 +67,7 @@ shaders = 18
     filter_linear0 = false
        scale_type0 = source
             scale0 = 1.0
-        wrap_mode0 = "clamp_to_edge"
+        wrap_mode0 = "mirrored_repeat"
 
 
         
@@ -97,7 +97,7 @@ shaders = 18
        scale_type1 = source
           scale_x1 = 2.0
           scale_y1 = 2.0  
-        wrap_mode1 = "clamp_to_edge"
+        wrap_mode1 = "mirrored_repeat"
 
 
 
@@ -114,7 +114,7 @@ shaders = 18
        scale_type2 = source
             scale2 = 1.0
      mipmap_input2 = true
-        wrap_mode2 = "clamp_to_edge"
+        wrap_mode2 = "mirrored_repeat"
 
         
 
@@ -128,7 +128,7 @@ shaders = 18
        scale_type3 = source
 float_framebuffer3 = true
      mipmap_input3 = false
-        wrap_mode3 = "clamp_to_edge"
+        wrap_mode3 = "mirrored_repeat"
 
         
         
@@ -148,7 +148,7 @@ float_framebuffer4 = true
             scale5 = 1.0
        scale_type5 = source    
 float_framebuffer5 = true
-        wrap_mode5 = "clamp_to_edge"
+        wrap_mode5 = "mirrored_repeat"
             
           
         

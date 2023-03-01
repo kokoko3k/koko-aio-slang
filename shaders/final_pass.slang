@@ -754,8 +754,10 @@ vec3 compose_bezel_over(vec3 full_viewport) {
         //return pixel_mirrored;
         vec3 bezel_out = bezel_colored + pixel_mirrored;
         
-        //Mix ambient light over bezel?
-        vec3 pixel_ambilight = DO_AMBILIGHT * (texture(ambi_temporal_pass, vOutputCoord).rgb + global_noise);
+        //Mix ambient light over bezel? (branching this is worse)     
+        vec3 ambitemporalpass = texture(ambi_temporal_pass, vOutputCoord).rgb;
+        ambitemporalpass = max(ambitemporalpass, 0.0); //<-- this to avoid undefined results
+        vec3 pixel_ambilight = DO_AMBILIGHT * (ambitemporalpass + global_noise);
         bezel_out = bezel_out + pixel_ambilight * AMBI_OVER_BEZEL;
         
         //We use the green component to express Hardness/Specularity; there the reflection will be completely diffused.
