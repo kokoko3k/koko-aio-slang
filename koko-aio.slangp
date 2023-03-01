@@ -357,3 +357,7 @@ float_framebuffer7 = true
 #        read: does a scanline dark gap increment the flickering or not?
 #    [ ] deconvergence after glow/halo?
 #    [ ] Glow spread in final pass?
+#    [ ] Find a way to smooth borders without cropping the image
+#    [ ] Set content aspect ratio only.
+#    [ ] Allow to configure new bezel parameters?
+#        Reflection strength, corner shape, size and fade?  

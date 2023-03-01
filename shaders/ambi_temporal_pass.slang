@@ -184,7 +184,9 @@ void main() {
 
     
     if ( mod(params.FrameCount,FRAME_DIVIDER) != 0.0) {
-        FragColor = texture(PastSampler, vTexCoord);
+        vec4 past_sampler = texture(PastSampler, vTexCoord);
+        past_sampler = max(past_sampler, 0.0); // <- Sanitize input to avoid glitches when enabling the option runtime.
+        FragColor = past_sampler;
         return;
     }
     

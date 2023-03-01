@@ -71,7 +71,9 @@ float get_avglum() {
         bool reduced_sample_time_is_now = (mod(params.FrameCount,AMBI_AVGLUM_DIVIDER) == 0);
         if (reduced_sample_time_is_now)
             return get_avg_lum_from_mip();
-        return texture(avglum_passFeedback,vTexCoord).a;
+        float avglum_feedback = texture(avglum_passFeedback,vTexCoord).a;
+        avglum_feedback = max(avglum_feedback, 0.0); // <- Sanitize input to avoid glitches when enabling the option runtime.
+        return avglum_feedback;
     }
 
     if (smoothed_sampling_co) {

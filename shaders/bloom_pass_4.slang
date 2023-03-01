@@ -45,6 +45,7 @@ float get_avg_lum_from_mip(sampler2D tex, vec2 co, float lod) {
     //return (mip.r+mip.g+mip.b)/3.0;
     float luminance_from_feedback = rgb_to_gray(mip);
     float luminance_first_pass = texture(bloom_pass_finalFeedback,vTexCoord).a;
+    luminance_first_pass = max(luminance_first_pass, 0.0); // <- Sanitize input to avoid glitches when enabling the option runtime.
     //temporal smooth.
     //the defined emulated eye adaption speed needs to be divided 
     //by the eye adaption strength (BLOOM_EYE_ADPT_SRT)
@@ -59,7 +60,13 @@ float get_avg_lum_from_mip(sampler2D tex, vec2 co, float lod) {
     eye_adaption_speed = clamp(eye_adaption_speed, 1.0/BLOOM_EYE_INERTIA, 1.0);
     
     float luminance = mix(luminance_first_pass, luminance_from_feedback, eye_adaption_speed);
+    
+
+    
     return luminance + eps;
+    
+  
+    
 }
 
 
