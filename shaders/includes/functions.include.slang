@@ -172,7 +172,7 @@ float random(float power, vec2 seed) {
 		vec2 pow_base = vec2(1.0-(curvedCoordsDistance/1.4142));
 		pow_base = abs(pow_base); // <-- this way intel and nvidia (probably amd) acts the same.
 		uv /= curvedCoordsDistance;
-		uv *= 1.0-pow(vec2(1.0-(curvedCoordsDistance/1.4142)), v_exp );
+		uv *= 1.0-pow(pow_base, v_exp );
 		uv /= arg2;
 		// Transform coordinates back to [0, 1]
 		return uv * 0.5 + 0.5;
