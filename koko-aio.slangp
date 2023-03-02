@@ -361,3 +361,5 @@ float_framebuffer7 = true
 #    [ ] Set content aspect ratio only.
 #    [ ] Allow to configure new bezel parameters?
 #        Reflection strength, corner shape, size and fade?  
+#    [ ] Allow to set a different aspect for content
+#        (which could be translated to a different aspect for bezel, maybe simpler)
