@@ -311,8 +311,11 @@ float scanline_shape(vec2 coords, bool do_slotmask, float lum) {
     bool do_flicker = bool(vFlickeringScanlines);
 
     //...to scale scanline tickness:
-        //float lum_scaled = scale_to_range(lum,SCANLINE_MIN+eps,1.0);
-        float lum_scaled = scale_to_range(lum, SCANLINE_MIN, SCANLINE_MAX);
+    //float lum_scaled = scale_to_range(lum, SCANLINE_MIN, SCANLINE_MAX);
+    float lum_scaled = lum * SCANLINE_MAX; 
+          lum_scaled = clamp( lum_scaled, SCANLINE_MIN, SCANLINE_MAX );
+              
+        
 
      
     float angle_base = coords.y * pi * params.OriginalSize.y * period;// + vScanlinePhase;
