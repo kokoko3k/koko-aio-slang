@@ -381,8 +381,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 //Curvature parameters:
 #pragma parameter DO_CURVATURE	     "★ Curvature enable? ==>"			0.0   0.0 1.0 1.0
-#pragma parameter GEOM_WARP_X        "        Warp X"				0.3  0.0 6.0 0.05
-#pragma parameter GEOM_WARP_Y        "        Warp Y"				0.0   0.0 6.0 0.05
+#pragma parameter GEOM_WARP_X        "        Warp X"				0.3  0.0 6.0 0.025
+#pragma parameter GEOM_WARP_Y        "        Warp Y"				0.0   0.0 6.0 0.025
 #pragma parameter GEOM_CORNER_SIZE   "        Corner radius"			0.01  0.01 0.1 0.005
 #pragma parameter GEOM_CORNER_SMOOTH "        Corner sharpness"			350.0 15.0 1000.0 1.0
 #pragma parameter BLANK14 " " 0.0 0.0 1.0 1.0
@@ -396,8 +396,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BEZEL_G            "        Color: Green"		-0.3   -0.5 0.5  0.01
 #pragma parameter BEZEL_B            "        Color: Blue"		-0.3   -0.5 0.5  0.01
 #pragma parameter BEZEL_CON          "        Contrast"			1.3   0.0  10.0 0.01
-#pragma parameter BEZEL_INNER_ZOOM   "        Image zoom"		-0.18   -1.5 0.5 0.01
-#pragma parameter BEZEL_FRAME_ZOOM   "        Frame zoom"		0.0   -1.5 0.5 0.01
+#pragma parameter BEZEL_INNER_ZOOM   "        Image zoom"		-0.18   -1.5 0.5 0.005
+#pragma parameter BEZEL_FRAME_ZOOM   "        Frame zoom"		0.0   -1.5 0.5 0.005
 #pragma parameter BEZEL_IMAGE_BORDER "        Image border"		1.01   1.0 1.2 0.01
 #pragma parameter BEZEL_RFL_BLR_SHD  "        Sharp reflections"	0.0    -1.0 1.0 0.1
 #pragma parameter BEZEL_RFL_OFFSET   "        Align reflections: offset"	0.003    -0.01 0.01 0.001
@@ -427,7 +427,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter AMBI_STEPS	  "        Slowness"							60.0 5.0  1000.0  5.0
 #pragma parameter AMBI_FALLOFF    "        Light Falloff"						0.7  0.1  3.0     0.01
 #pragma parameter AMBI_POWER      "        Led power"							1.5  1.0  7.0     0.05
-#pragma parameter AMBI_OVER_BEZEL "        Colorize Bezel"						0.05 0.0 1.0     0.01
+#pragma parameter AMBI_OVER_BEZEL "        Colorize Bezel"						0.1 0.0 1.0     0.01
 #pragma parameter BLANK17 " " 0.0 0.0 1.0 1.0
 
 
