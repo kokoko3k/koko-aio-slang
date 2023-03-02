@@ -533,8 +533,8 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
             float lum = max(max(pixel_out.r, pixel_out.g), pixel_out.b);
             float scanline_shape = scanline_shape(coords, SCANLINE_SM_TYPE > 0.0, lum );
             
-            
             pixel_out = pixel_out * ( scanline_shape + ( pixel_bleed * SCANLINES_BLEEDING * ( 1 - scanline_shape ) ));
+                        
             //pixel_out *= scanline_shape;
 
     }
@@ -546,7 +546,7 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
      }
      
     // Apply color correction (in this pass it is just the final output gamma)
-    if (DO_CCORRECTION == 1.0) pixel_out = pow(pixel_out,vec3(GAMMA_OUT));
+    if (DO_CCORRECTION == 1.0) pixel_out = pow(max(pixel_out, vec3(0.0)),vec3(GAMMA_OUT));
 
     //Out
     return vec4(pixel_out,1.0) ; //* border(border_coords);
