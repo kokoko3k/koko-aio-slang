@@ -1,8 +1,11 @@
-#reference "monitor-slotmask-bloom-bezelwider.slangp"
+#reference "monitor-bloom-bezel.slangp"
 
-SCANLINE_SM_TYPE = "0.0"
 
-DARKLINES_STRENGTH = "0.0"
+SCANLINE_MIN = "0.2"
+
+BEZEL_FRAME_ZOOM = "0.17"
+BEZEL_INNER_ZOOM = "-0.01"
+BEZEL_IMAGE_BORDER = "1.02"
 
 AMBI_FALLOFF = "0.4"
 AMBI_POWER = "5.0"

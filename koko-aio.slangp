@@ -363,3 +363,4 @@ float_framebuffer7 = true
 #        Reflection strength, corner shape, size and fade?  
 #    [ ] Allow to set a different aspect for content
 #        (which could be translated to a different aspect for bezel, maybe simpler)
+#    [ ] Negative gap brightness produces glitches on bezel (nvidia specific?)

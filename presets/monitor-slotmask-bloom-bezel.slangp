@@ -1,13 +1,15 @@
 #reference "monitor-slotmask-bloom.slangp"
 
-
+#Need to mitigate a bit of moiree due to scaled down dimensions:
+	SCANLINE_MIN = "0.3"
+	SCANLINE_DARK = "0.000000"
+	SCANLINES_BLEEDING = "0.300000"
 
 DO_BEZEL = "1.0"
         BEZEL_FRAME_ZOOM = "0.04"
         BEZEL_INNER_ZOOM = "-0.165"
 
 DO_CURVATURE = 1.0
-
 
 DO_VIGNETTE = "1.0"
 

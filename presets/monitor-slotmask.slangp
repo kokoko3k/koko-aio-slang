@@ -1,7 +1,8 @@
 #reference "monitor-BASE.slangp"
 
+SCANLINE_DARK = "0.0"
+
 SCANLINE_SM_TYPE = "1.0"
 SCANLINE_SM_STRENGTH = "1.0"
 SCANLINE_SM_VOFFSET = "70.0"
-
 

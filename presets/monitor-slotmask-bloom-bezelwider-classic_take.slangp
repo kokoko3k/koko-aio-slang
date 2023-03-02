@@ -1,7 +1,6 @@
 #reference "monitor-slotmask-bloom-bezelwider.slangp"
 GAMMA_OUT = "0.525"
-IN_GLOW_W = "2.0"
-IN_GLOW_H = "7.000000"
+IN_GLOW_SPREAD = "1.2"
  
 DARKLINES_STRENGTH = "0.650000"
 DARKLINES_PERIOD = "2.000000"

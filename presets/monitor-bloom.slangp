@@ -1,3 +1,3 @@
-#reference "monitor-slotmask-bloom.slangp"
+#reference "monitor-BASE.slangp"
 
-SCANLINE_SM_TYPE = "0.0"
+DO_BLOOM = "1.0"
