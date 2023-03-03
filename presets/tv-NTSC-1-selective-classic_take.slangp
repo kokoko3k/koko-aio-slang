@@ -1,4 +1,4 @@
 #reference "tv-NTSC-1-classic_take.slangp"
 
-IN_GLOW_NTSC_ARTF_MULT = "1.5"
+IN_GLOW_NTSC_ARTF_MULT = "1.1"
 
