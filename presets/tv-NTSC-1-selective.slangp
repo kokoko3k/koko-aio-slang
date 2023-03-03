@@ -1,0 +1,3 @@
+#reference "tv-NTSC-1.slangp"
+
+IN_GLOW_NTSC_ARTF_MULT = "1.5"
