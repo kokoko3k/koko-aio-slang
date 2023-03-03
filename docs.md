@@ -48,6 +48,10 @@
         Higher negative values -> more glow : brighter colors expands over darker ones.
         Higher positive values -> means blur: all the colors are blurred.
         0.0 means no blur, no glow.
+    Blur NTSC artifacts more
+        When NTSC artifacts emulation is enabled, this option will let you blur
+        them more, this would help to selectively blur things like waterfalls
+        in Sonic 2.
         
     
 **RGB Masks and/or Darklines:**

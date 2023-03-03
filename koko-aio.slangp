@@ -364,3 +364,4 @@ float_framebuffer7 = true
 #    [ ] Allow to set a different aspect for content
 #        (which could be translated to a different aspect for bezel, maybe simpler)
 #    [ ] Negative gap brightness produces glitches on bezel (nvidia specific?)
+#    [ ] Unrolled blur in relfections is not gaussiany(gaussianx), was that a mistake?

@@ -103,6 +103,8 @@ layout(location = 0) out vec4 FragColor;
 
 #ifdef STATIC_SUPPORT_BACKDROP
     layout(set = 0, binding = 1) uniform sampler2D backdrop;
+        #else
+    layout(set = 0, binding = 1) uniform sampler2D first_pass;
 #endif
 layout(set = 0, binding = 2)  uniform sampler2D bloom_pass_final;
 layout(set = 0, binding = 3)  uniform sampler2D reflected_blurred_pass2;

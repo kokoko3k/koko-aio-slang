@@ -267,5 +267,10 @@ layout(set = 0, binding = 2) uniform sampler2D first_pass;
 
 void main() {  
     if ( DO_FXAA == 0.0 ) return;
-    FragColor = vec4(FxaaPixelShader(vTexCoord, first_pass, vec2(global.first_passSize.z, global.first_passSize.w)),0.0);
+    
+    //Here lies the blur modifier from ntsc pass to glow.
+    //I'm not expecting any performance hit, since the lookup should have been cached alreadyl
+        float pixel_alpha = texture(first_pass, vTexCoord).a;
+    
+   FragColor = vec4(FxaaPixelShader(vTexCoord, first_pass, vec2(global.first_passSize.z, global.first_passSize.w)),pixel_alpha);
 }

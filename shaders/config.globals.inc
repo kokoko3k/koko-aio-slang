@@ -68,7 +68,7 @@
 	#define NTSC_FILTER_FC		global.NTSC_FILTER_FC
 	#define NTSC_MIX		global.NTSC_MIX
 	#define NTSC_PHASE_SHIFT	global.NTSC_PHASE_SHIFT
-
+	#define NTSC_ARTFCT_BLUR	global.NTSC_ARTFCT_BLUR
 
 
 #define DO_RF_NOISE		global.DO_RF_NOISE
@@ -100,7 +100,7 @@
 	#define IN_GLOW_H		global.IN_GLOW_H
 	#define IN_GLOW_POWER		global.IN_GLOW_POWER
 	#define IN_GLOW_GAMMA		global.IN_GLOW_GAMMA
-
+	#define IN_GLOW_NTSC_ARTF_MULT	global.IN_GLOW_NTSC_ARTF_MULT
 
 
 #define DO_VMASK_AND_DARKLINES	global.DO_VMASK_AND_DARKLINES

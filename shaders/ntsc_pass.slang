@@ -177,19 +177,29 @@ void main() {
    //FragColor = vec4(debug(), 1.0); return;
    
    
+   //This will go into alpha channel to make glow aware of it and blur more.
+   //It could be configurable.
+   float artifacts = 0.0;
    
    vec3 pixel_out;
-   if (DO_NTSC_ARTIFACTS > 0.5)
+   if (DO_NTSC_ARTIFACTS > 0.5) {
+      vec3 pixel_source = texture(Source, vTexCoord).rgb;
       pixel_out = ntscdec(vTexCoord);
-         else
+      artifacts = abs(pixel_source.r - pixel_out.r) + abs(pixel_source.g - pixel_out.g) + abs(pixel_source.b - pixel_out.b) ;
+      artifacts = artifacts / 3.0 ;
+      artifacts = pow(artifacts * 10, 0.5);
+   } else {
       pixel_out = texture(Source, vTexCoord).rgb;
+   }
    
    if (DO_CCORRECTION == 1.0)
       pixel_out = color_tools(pixel_out);
    
-   FragColor = vec4(pixel_out, 1.0);
+   FragColor = vec4(pixel_out, artifacts);
    
+
    
+  // FragColor = vec4(artifacts);
 
    
 }

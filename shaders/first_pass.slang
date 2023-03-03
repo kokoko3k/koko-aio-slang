@@ -138,7 +138,11 @@ void main() {
       pixel_out += noise;
    }
    
-   FragColor = vec4(pixel_out, 1.0);
+   //Here lies the blur modifier from ntsc pass to glow.
+   //I'm not expecting any performance hit, since the lookup should have been cached alreadyl
+      float pixel_alpha = texture(Source, vTexCoord).a;
+   
+   FragColor = vec4(pixel_out, pixel_alpha);
 }
 
 

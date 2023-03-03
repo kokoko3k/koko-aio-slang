@@ -44,7 +44,15 @@ void main() {
    }
    
    vec3 pixel_glowed;
-   FragColor = vec4( blur9_x(shift_and_bleed_pass, vTexCoord, global.first_passSize.xy, vIN_GLOW_W), 1.0);
+
+   //Here lies the blur modifier from ntsc pass to glow.
+   //I'm not expecting any performance hit, 
+   //since the lookup should have been cached already or will serve so.
+      float blur_modifier = texture(shift_and_bleed_pass, vTexCoord).a;
+      float vIN_GLOW_W_adapted = vIN_GLOW_W - (blur_modifier * IN_GLOW_NTSC_ARTF_MULT);
+      vIN_GLOW_W_adapted = clamp(vIN_GLOW_W_adapted, MIN_IN_GLOW_SHARP, 7.0); // Obey minimum sharpness.
+
+   FragColor = vec4( blur9_x(shift_and_bleed_pass, vTexCoord, global.first_passSize.xy, vIN_GLOW_W_adapted), 1.0);
 
 }
 
