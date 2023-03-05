@@ -51,7 +51,7 @@
 	//Minumum glow sharpness
 	//I set this to allow negative values for glow sharpness
 	//that will calc their values from light spread amount
-#define MIN_IN_GLOW_SHARP 0.45
+#define MIN_IN_GLOW_SHARP 0.40
 
 	//Setting glow to blur bias parameter to this
 	//will skip the glow/blur mix codem and just return
@@ -141,6 +141,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float IN_GLOW_POWER;
 	float IN_GLOW_GAMMA;
 	float IN_GLOW_NTSC_ARTF_MULT;
+	float IN_GLOW_NTSC_ARTF_TRSH;
 	float BLOOM_MIX;
 	float BLOOM_EYE_ADPT_SRT;
 	float BLOOM_EYE_INERTIA;
@@ -314,7 +315,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter IN_GLOW_W                "        Sharpness X (0 = controlled by glow spread)"		2.5	0.0 7.0 0.05
 #pragma parameter IN_GLOW_H                "        Sharpness Y (0 = controlled by glow spread)"		2.5	0.0 7.0 0.05
 #pragma parameter IN_GLOW_BIAS             "        Glow to blur bias"					    	1.0     0.0 1.0 0.05
-#pragma parameter IN_GLOW_NTSC_ARTF_MULT   "        Blur NTSC artifacts more"					0.0	0.0 3.0 0.1
+#pragma parameter IN_GLOW_NTSC_ARTF_MULT   "        Blur NTSC artifacts more"					0.0	0.0 1.0 0.1
+#pragma parameter IN_GLOW_NTSC_ARTF_TRSH   "        Blur more NTSC artifacts"					5.0	0.0 16.0 0.1
 #pragma parameter BLANK7 " " 0.0 0.0 1.0 1.0
 
 

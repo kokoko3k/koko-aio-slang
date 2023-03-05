@@ -61,7 +61,7 @@ float sinc(float x) {
 
 void main() {
    gl_Position = global.MVP * Position;
-   vTexCoord = TexCoord;
+   vTexCoord = TexCoord * 1.0001;
 
    if (DO_NTSC_ARTIFACTS > 0.0) {
       vNTSC_FILTER_FC = NTSC_FILTER_FC * 0.1;
@@ -122,7 +122,7 @@ vec3 ntscdec(vec2 uv ){
          vec2 pos = uv + vec2(float(n-NTSC_FILTER_MIDDLE) / size.x, 0.0);
          float phase =  TAU * (vNTSC_FILTER_SCF * size.x * pos.x);
          if (NTSC_PHASE_SHIFT > 0.5) phase += ( pos.y * -pi10 ) ; // 45 degree
-         //float phase =  TAU * (vNTSC_FILTER_SCF * size.x * pos.x) + ( pos.y * -pi10 * NTSC_PHASE_SHIFT) 
+         //float phase =  TAU * (vNTSC_FILTER_SCF * size.x * pos.x) + ( pos.y * -pi10 * NTSC_PHASE_SHIFT)
          // ( pos.y * - 31.4);
          //Just sample luminance via yiq:
             vec3 smp = vec3((texture(Source, pos).rgb * RGB2YIQ).x);
@@ -173,35 +173,36 @@ vec3 debug() {
 }
 
 void main() {
-   
+
    //FragColor = vec4(debug(), 1.0); return;
-   
-   
+
+
    //This will go into alpha channel to make glow aware of it and blur more.
    //It could be configurable.
    float artifacts = 0.0;
-   
+
    vec3 pixel_out;
    if (DO_NTSC_ARTIFACTS > 0.5) {
       vec3 pixel_source = texture(Source, vTexCoord).rgb;
       pixel_out = ntscdec(vTexCoord);
       artifacts = abs(pixel_source.r - pixel_out.r) + abs(pixel_source.g - pixel_out.g) + abs(pixel_source.b - pixel_out.b) ;
-      artifacts = artifacts / 3.0 ;
-      artifacts = pow(artifacts * 10, 0.5);
+      artifacts = artifacts * IN_GLOW_NTSC_ARTF_TRSH;
+      artifacts = pow(artifacts * IN_GLOW_NTSC_ARTF_TRSH * 2 , max(1.0, IN_GLOW_NTSC_ARTF_TRSH));
+      //artifacts = smoothstep(0.5, 1.0, artifacts);
    } else {
       pixel_out = texture(Source, vTexCoord).rgb;
    }
-   
+
    if (DO_CCORRECTION == 1.0)
       pixel_out = color_tools(pixel_out);
-   
-   FragColor = vec4(pixel_out, artifacts);
-   
 
-   
+   FragColor = vec4(pixel_out, artifacts);
+
+
+
   // FragColor = vec4(artifacts);
 
-   
+
 }
 
 

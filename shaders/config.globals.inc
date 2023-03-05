@@ -63,12 +63,12 @@
 
 
 #define DO_NTSC_ARTIFACTS	global.DO_NTSC_ARTIFACTS
-	#define NTSC_FILTER_WIDTH	global.NTSC_FILTER_WIDTH
-	#define NTSC_FILTER_SCF		global.NTSC_FILTER_SCF
-	#define NTSC_FILTER_FC		global.NTSC_FILTER_FC
-	#define NTSC_MIX		global.NTSC_MIX
-	#define NTSC_PHASE_SHIFT	global.NTSC_PHASE_SHIFT
-	#define NTSC_ARTFCT_BLUR	global.NTSC_ARTFCT_BLUR
+	#define NTSC_FILTER_WIDTH		global.NTSC_FILTER_WIDTH
+	#define NTSC_FILTER_SCF			global.NTSC_FILTER_SCF
+	#define NTSC_FILTER_FC			global.NTSC_FILTER_FC
+	#define NTSC_MIX				global.NTSC_MIX
+	#define NTSC_PHASE_SHIFT		global.NTSC_PHASE_SHIFT
+
 
 
 #define DO_RF_NOISE		global.DO_RF_NOISE
@@ -89,18 +89,19 @@
 	#define SHIFT_R			global.SHIFT_R
 	#define SHIFT_G			global.SHIFT_G
 	#define SHIFT_B			global.SHIFT_B
-	#define OFFSET_STRENGTH		global.OFFSET_STRENGTH
+	#define OFFSET_STRENGTH	global.OFFSET_STRENGTH
 
 
 
 #define DO_IN_GLOW		global.DO_IN_GLOW
-	#define IN_GLOW_BIAS		global.IN_GLOW_BIAS
-	#define IN_GLOW_SPREAD		global.IN_GLOW_SPREAD
-	#define IN_GLOW_W		global.IN_GLOW_W
-	#define IN_GLOW_H		global.IN_GLOW_H
-	#define IN_GLOW_POWER		global.IN_GLOW_POWER
-	#define IN_GLOW_GAMMA		global.IN_GLOW_GAMMA
+	#define IN_GLOW_BIAS			global.IN_GLOW_BIAS
+	#define IN_GLOW_SPREAD			global.IN_GLOW_SPREAD
+	#define IN_GLOW_W				global.IN_GLOW_W
+	#define IN_GLOW_H				global.IN_GLOW_H
+	#define IN_GLOW_POWER			global.IN_GLOW_POWER
+	#define IN_GLOW_GAMMA			global.IN_GLOW_GAMMA
 	#define IN_GLOW_NTSC_ARTF_MULT	global.IN_GLOW_NTSC_ARTF_MULT
+	#define IN_GLOW_NTSC_ARTF_TRSH	global.IN_GLOW_NTSC_ARTF_TRSH
 
 
 #define DO_VMASK_AND_DARKLINES	global.DO_VMASK_AND_DARKLINES
@@ -108,7 +109,7 @@
 	#define RGB_MASK_STRENGTH	global.RGB_MASK_STRENGTH
 	#define VMASK_OVERWHITE		params.VMASK_OVERWHITE
 	#define VMASK_DARKLINE_SCALE	params.VMASK_DARKLINE_SCALE
-	#define VMASK_GAP		params.VMASK_GAP
+	#define VMASK_GAP			params.VMASK_GAP
 	#define VMASK_USE_GM		params.VMASK_USE_GM
 	#define DARKLINES_STRENGTH	global.DARKLINES_STRENGTH
 	#define DRKLN_OVERWHITE		params.DRKLN_OVERWHITE
