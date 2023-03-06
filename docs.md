@@ -52,7 +52,12 @@
         When NTSC artifacts emulation is enabled, this option will let you blur
         them more, this would help to selectively blur things like waterfalls
         in Sonic 2.
-        
+    Blur less NTSC artifacts (min treshold)
+        In relation to the previous setting, this allow to blur only the most
+        prominent artifacts.
+    Show NTSC artifacts mask (debug)
+        This will help you to set the previous 2 values as it will show only
+        the artifacts that will modify the blur.
     
 **RGB Masks and/or Darklines:**
     Emulates CRT RGB phosphors (RGB Mask),
