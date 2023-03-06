@@ -16,17 +16,14 @@
 	//The maximum radius of the reflection blur. //3.3..4.0 max
 #define BEZEL_REFL_BLUR_MAX 4.0
 
-	//Bezel reflection warping (curvature) may need a correction factor.
-	//Modify this if bezel reflections does not follow the border
-#define BEZEL_REFL_WARP_CORRECTION_FACTOR 1.9
-
 	// Define the size and the smoothness of the rectangle 
 	// in the bezel corners that will hide and blur the reflections 
 #define BEZEL_REFL_CORNER_BLANK_SIZE 0.0685
 #define BEZEL_REFL_CORNER_BLANK_SHADE 0.05  // keep it > 0.0
 
-	//The reflection intensity
-#define BEZEL_REFL_STRENGTH 0.5
+	//Bezel reflection warping (curvature) may need a correction factor.
+	//Modify this if bezel reflections does not follow the border
+#define BEZEL_REFL_WARP_CORRECTION_FACTOR 1.9
 
 	// 0.0-1.0: sensitivity to scene change (ambilike stuff), 0.0 changes more
 #define AMBI_SCENE_CHG_THRSHLD 0.07  
@@ -205,6 +202,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float BEZEL_RFL_BLR_SHD;
 	float BEZEL_RFL_OFFSET;
 	float BEZEL_REFL_ZOOM;
+	float BEZEL_REFL_STRENGTH;
 
 	float DO_SPOT;
 	float S_POSITION; 
@@ -396,18 +394,20 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 
 //Bezel related
-#pragma parameter DO_BEZEL	     "★ Bezel enable? ==>"		0.0   0.0 1.0 1.0
-#pragma parameter BEZEL_USE_STRAIGHT "        Straight"			0.0	0.0 1.0  1.0 
-#pragma parameter BEZEL_R            "        Color: Red"		-0.3   -0.5 0.5  0.01
-#pragma parameter BEZEL_G            "        Color: Green"		-0.3   -0.5 0.5  0.01
-#pragma parameter BEZEL_B            "        Color: Blue"		-0.3   -0.5 0.5  0.01
-#pragma parameter BEZEL_CON          "        Contrast"			1.3   0.0  10.0 0.01
-#pragma parameter BEZEL_INNER_ZOOM   "        Image zoom"		-0.18   -1.5 0.5 0.005
-#pragma parameter BEZEL_FRAME_ZOOM   "        Frame zoom"		0.0   -1.5 0.5 0.005
-#pragma parameter BEZEL_IMAGE_BORDER "        Image border"		1.01   1.0 1.2 0.01
-#pragma parameter BEZEL_RFL_BLR_SHD  "        Sharp reflections"	0.0    -1.0 1.0 0.1
-#pragma parameter BEZEL_RFL_OFFSET   "        Align reflections: offset"	0.003    -0.01 0.01 0.001
-#pragma parameter BEZEL_REFL_ZOOM   "        Align reflections: zoom"		0.98    0.8 1.2 0.001
+#pragma parameter DO_BEZEL	      "★ Bezel enable? ==>"		0.0   0.0 1.0 1.0
+#pragma parameter BEZEL_USE_STRAIGHT  "        Straight"			0.0	0.0 1.0  1.0 
+#pragma parameter BEZEL_R             "        Color: Red"		-0.3   -0.5 0.5  0.01
+#pragma parameter BEZEL_G             "        Color: Green"		-0.3   -0.5 0.5  0.01
+#pragma parameter BEZEL_B             "        Color: Blue"		-0.3   -0.5 0.5  0.01
+#pragma parameter BEZEL_CON           "        Contrast"			1.3   0.0  10.0 0.01
+#pragma parameter BEZEL_INNER_ZOOM    "        Image zoom"		-0.18   -1.5 0.5 0.005
+#pragma parameter BEZEL_FRAME_ZOOM    "        Frame zoom"		0.0   -1.5 0.5 0.005
+#pragma parameter BEZEL_IMAGE_BORDER  "        Image border"		1.01   1.0 1.2 0.01
+#pragma parameter BEZEL_REFL_STRENGTH "        Reflection strength"	0.5    0.0 1.0 0.1
+#pragma parameter BEZEL_RFL_BLR_SHD   "        Sharp reflections"	0.0    -1.0 1.0 0.1
+#pragma parameter BEZEL_RFL_OFFSET    "        Align reflections: offset"	0.003    -0.01 0.01 0.001
+#pragma parameter BEZEL_REFL_ZOOM     "        Align reflections: zoom"		0.98    0.8 1.2 0.001
+
 
 #pragma parameter BLANK15 " " 0.0 0.0 1.0 1.0
 

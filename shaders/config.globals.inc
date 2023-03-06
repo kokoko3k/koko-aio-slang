@@ -176,7 +176,8 @@
 	#define BEZEL_RFL_BLR_SHD	global.BEZEL_RFL_BLR_SHD
 	#define BEZEL_RFL_OFFSET	global.BEZEL_RFL_OFFSET
 	#define BEZEL_REFL_ZOOM		global.BEZEL_REFL_ZOOM
-
+	#define BEZEL_REFL_STRENGTH	global.BEZEL_REFL_STRENGTH
+	
 #define DO_SPOT		global.DO_SPOT
 	#define S_POSITION	global.S_POSITION
 	#define S_SIZE		global.S_SIZE
