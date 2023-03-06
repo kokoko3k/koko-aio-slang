@@ -347,9 +347,11 @@ float_framebuffer7 = true
 #        So fixed, and achieved what was needed.
 #    [v] When using dynamic zoom, bezel reflection should be dynamically adapted
 #        ...this is tough, zomoing reflection wouldn't work.
-#    v] Further tune reflection shade
+#    [v] Further tune reflection shade
 #    [v] Do a debug image with a white object on black backgroud to tune bloom exposure over time
 #    [v] Unbranch phase shift in ntsc pass, trivial
+#    [v] Negative gap brightness produces glitches on bezel (nvidia specific?)
+#        yes, due to negative pow base.         
 #    [.] Darkline, vmask: whiteness can be pre-calculated outside.
 #        Half done, gained something.
 #    [ ] check branching conditions in first_pass.slang
@@ -359,11 +361,9 @@ float_framebuffer7 = true
 #    [ ] deconvergence after glow/halo?
 #    [ ] Glow spread in final pass?
 #    [ ] Find a way to smooth borders without cropping the image
-#    [ ] Set content aspect ratio only.
 #    [ ] Allow to configure new bezel parameters?
 #        Reflection strength, corner shape, size and fade?  
 #    [ ] Allow to set a different aspect for content
 #        (which could be translated to a different aspect for bezel, maybe simpler)
-#    [ ] Negative gap brightness produces glitches on bezel (nvidia specific?)
 #    [ ] Unrolled blur in relfections is not gaussiany(gaussianx), was that a mistake?
 
