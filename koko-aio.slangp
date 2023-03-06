@@ -54,7 +54,7 @@
       backdrop_wrap_mode = "mirrored_repeat"
          backdrop_mipmap = "true"
 
-shaders = 18
+shaders = 17
 
 # NTSC Color artifacts pass:
 # The very first pass emulates ntsc color artifacting.
@@ -270,14 +270,6 @@ float_framebuffer7 = true
                 scale15 = 0.05
             wrap_mode15 = "clamp_to_border"
     float_framebuffer15 = true
-
-           shader16 = shaders/old_unused/passthrough.slang
-            alias16 = "pt"
-    filter_linear16 = true
-       scale_type16 = viewport
-       scale_x16 = 0.05
-       scale_y16 = 0.05 
-
     
 
 # This pass pass will do everything needed to happen at screen coordinates:
@@ -288,12 +280,12 @@ float_framebuffer7 = true
 # * Black frame insertions
 # * Bezel
 # * Background images
-           shader17 = shaders/final_pass.slang
-            alias17 = "final_pass"
-    filter_linear17 = true
-       scale_type17 = viewport
-            scale17 = 1.0
-        wrap_mode17 = "mirrored_repeat"
+           shader16 = shaders/final_pass.slang
+            alias16 = "final_pass"
+    filter_linear16 = true
+       scale_type16 = viewport
+            scale16 = 1.0
+        wrap_mode16 = "mirrored_repeat"
         
 
 
