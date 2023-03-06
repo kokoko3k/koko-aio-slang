@@ -33,7 +33,7 @@ void main() {
    float IN_GLOW_W_ADAPTED;
    //Auto calc glow sharpness via IN_GLOW_SPREAD
       if (IN_GLOW_W <= 0.00001)
-         IN_GLOW_W_ADAPTED= IN_GLOW_SPREAD * IN_GLOW_SHARPNESS_SPREAD_RATIO_W;
+         IN_GLOW_W_ADAPTED = IN_GLOW_SPREAD * IN_GLOW_SHARPNESS_SPREAD_RATIO_W;
 
 
    //Here lies the blur modifier from ntsc pass to glow.
@@ -41,12 +41,15 @@ void main() {
    //since the lookup should have been cached already or will serve so.
       float ntsc_artifacts = texture(shift_and_bleed_pass, vTexCoord).a;
 
-   // The more the ntsc
-      float added_blur = (IN_GLOW_W * ntsc_artifacts * IN_GLOW_NTSC_ARTF_MULT);
-      //FragColor=vec4(added_blur); return;
+   //apply an optional gain to artifacts
+      ntsc_artifacts = ntsc_artifacts * IN_GLOW_NTSC_ARTF_MULT;
+   //then apply the minimum treshold and scale them to input sharpness so that they can always blur to max.
+      ntsc_artifacts = smoothstep(IN_GLOW_NTSC_ARTF_TRSH, 1.0, ntsc_artifacts * IN_GLOW_NTSC_ARTF_MULT) * IN_GLOW_W;
 
+      
 
-      IN_GLOW_W_ADAPTED = IN_GLOW_W - added_blur;
+   //finally "subtract" them to the configured sharpness (-> more blur)
+      IN_GLOW_W_ADAPTED = IN_GLOW_W - ntsc_artifacts;
 
    //don't allow lower values that look bad:
       IN_GLOW_W_ADAPTED = max(IN_GLOW_W_ADAPTED, MIN_IN_GLOW_SHARP);
@@ -56,5 +59,9 @@ void main() {
 
    FragColor = vec4( blur9_x(shift_and_bleed_pass, vTexCoord, global.first_passSize.xy, IN_GLOW_W_ADAPTED), 1.0);
 
+   //To debug ntsc artifacts mask:
+   if (IN_GLOW_SHOW_ARTF_MASK > 0.5)
+      FragColor = vec4(ntsc_artifacts);
+   
 }
 
