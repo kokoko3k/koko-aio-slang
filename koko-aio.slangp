@@ -349,6 +349,7 @@ float_framebuffer7 = true
 #        ...this is tough, zomoing reflection wouldn't work.
 #    v] Further tune reflection shade
 #    [v] Do a debug image with a white object on black backgroud to tune bloom exposure over time
+#    [v] Unbranch phase shift in ntsc pass, trivial
 #    [.] Darkline, vmask: whiteness can be pre-calculated outside.
 #        Half done, gained something.
 #    [ ] check branching conditions in first_pass.slang
@@ -365,4 +366,4 @@ float_framebuffer7 = true
 #        (which could be translated to a different aspect for bezel, maybe simpler)
 #    [ ] Negative gap brightness produces glitches on bezel (nvidia specific?)
 #    [ ] Unrolled blur in relfections is not gaussiany(gaussianx), was that a mistake?
-#    [ ] Unbranch phase shift in ntsc pass, trivial
+

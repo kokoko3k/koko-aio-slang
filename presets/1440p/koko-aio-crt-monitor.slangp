@@ -1,6 +1,0 @@
-#reference "../1080p/koko-aio-crt-monitor.slangp"
-
-	RGB_MASK_STRENGTH = "1.0"
-	VMASK_USE_GM = "0.0"
-	VMASK_GAP = "1.0"
-	VMASK_OVERWHITE = "1.000000"

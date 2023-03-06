@@ -1,4 +1,4 @@
 #reference "tv-aperturegrille.slangp"
 
 DO_BLOOM = "1.0"
-IN_GLOW_POWER = "1.750000"
+
