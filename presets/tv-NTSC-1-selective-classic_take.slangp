@@ -1,4 +1,5 @@
 #reference "tv-NTSC-1-classic_take.slangp"
 
+NTSC_FILTER_FC = "0.000000"
 IN_GLOW_NTSC_ARTF_MULT = "1.0"
 IN_GLOW_NTSC_ARTF_TRSH = "0.0"

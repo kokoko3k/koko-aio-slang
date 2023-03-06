@@ -50,12 +50,13 @@ vec3 kelvin2rgb(float k) {
  */
 
 float hann(float n, float N) {
-    return 0.5 * (1.0 - cos((TAU*n)/(N-1.0)));
+    return 0.5 * (1.0 - cos((TAU*n)/(N-1.0))) ;
 }
 
 float sinc(float x) {
-    if (x == 0.0) return 1.0;
-	return sin(pi*x) / (pi*x);
+   //if (x == 0.0) return 1.0;
+   x = x + eps;
+   return sin(pi*x) / (pi*x);
 }
 
 
@@ -136,10 +137,8 @@ vec4 ntscdec(vec2 uv) {
       for (int n=0; n < N; n++) {
          vec2 pos = uv + vec2(float(n-NTSC_FILTER_MIDDLE) / size.x, 0.0);
          float phase =  TAU * (vNTSC_FILTER_SCF * size.x * pos.x);
-         float phase_shift_for_blur = phase + PHASE_SHIFT_FOR_BLUR_K;
+         float phase_shift_for_blur = phase  + PHASE_SHIFT_FOR_BLUR_K;
          
-         
-         //if (NTSC_PHASE_SHIFT > 0.5) phase += ( pos.y * -pi10 ) ; // 45 degree //FIXME: unbranchme
          phase += ( pos.y * -pi10 ) * (NTSC_PHASE_SHIFT);
          
          //float phase =  TAU * (vNTSC_FILTER_SCF * size.x * pos.x) + ( pos.y * -pi10 * NTSC_PHASE_SHIFT)
