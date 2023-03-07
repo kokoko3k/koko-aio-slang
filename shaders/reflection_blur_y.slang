@@ -62,7 +62,7 @@ void main() {
     vec2 coords = vTexCoord;
     vec4 pixel_source = texture(Source, coords);
     if (is_useless(pixel_source))  {
-        FragColor = vec4(0.0);
+        //FragColor = vec4(0.0);
         return;
     }
     
