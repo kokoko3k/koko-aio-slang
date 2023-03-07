@@ -1,8 +1,8 @@
 #reference "monitor-slotmask-bloom-bezel.slangp"
 
 AMBI_STEPS = "5.000000"
-AMBI_FALLOFF = "0.6"
-AMBI_POWER = "1.7"
+AMBI_FALLOFF = "0.7"
+AMBI_POWER = "2.1"
 
 
 DO_BG_IMAGE = "1.000000"
