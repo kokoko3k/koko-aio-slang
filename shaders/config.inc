@@ -387,7 +387,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter DO_CURVATURE	     "★ Curvature enable? ==>"			0.0   0.0 1.0 1.0
 #pragma parameter GEOM_WARP_X        "        Warp X"				0.3  0.0 6.0 0.025
 #pragma parameter GEOM_WARP_Y        "        Warp Y"				0.0   0.0 6.0 0.025
-#pragma parameter GEOM_CORNER_SIZE   "        Corner radius"			0.01  0.01 0.1 0.005
+#pragma parameter GEOM_CORNER_SIZE   "        Corner radius"			0.005  0.005 0.1 0.001
 #pragma parameter GEOM_CORNER_SMOOTH "        Corner sharpness"			350.0 15.0 1000.0 1.0
 #pragma parameter BLANK14 " " 0.0 0.0 1.0 1.0
 
