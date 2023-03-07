@@ -40,7 +40,6 @@ Several presets are included.<br>
 * Full screen glowing
 
 ***External code by:***
-* CRT - Guest - Dr.Venom (single pass bloom function)
 * Nvidia (FXAA)
 * EasyMode (curvature related code)
         
