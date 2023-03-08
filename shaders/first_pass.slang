@@ -59,7 +59,7 @@ vec3 pixel_flickering() {
 
    float lumdiff = abs(flickline.r + flickline.g + flickline.b - pixel_cur.r - pixel_cur.g - pixel_cur.b);
 
-   lumdiff = scale_to_range(lumdiff,0.0,SCANLINE_FLICKERING_POWER);
+   lumdiff = min(lumdiff * SCANLINE_FLICKERING_POWER, 1.0);
    return mix(pixel_cur,flickline,lumdiff);
    
 
