@@ -98,6 +98,7 @@ layout(location = 4) in float vNTSC_weights[NTSC_FILTER_WIDTH_MAX];
 layout(location = 0) out vec4 FragColor;
 
 layout(set = 0, binding = 2) uniform sampler2D Source;
+//layout(set = 0, binding = 3) uniform sampler2D ntsc_passFeedback;
 
 
 //	Colorspace conversion matrix for YIQ-to-RGB
@@ -210,7 +211,9 @@ void main() {
       pixel_out = pixel_out_vec4.rgb;
 
       artifacts = pixel_out_vec4.a;
-
+      //artifacts = mix(artifacts, texture(ntsc_passFeedback, vTexCoord).a, 0.5);  <-- this helps
+//FragColor = vec4(artifacts); return;
+      
 /*
       //artifacts = pow(artifacts, IN_GLOW_NTSC_ARTF_TRSH * 8.0);
       artifacts = artifacts * IN_GLOW_NTSC_ARTF_MULT;
@@ -225,6 +228,10 @@ void main() {
    if (DO_CCORRECTION == 1.0)
       pixel_out = color_tools(pixel_out);
 
+   
+   
+   
+   
    FragColor = vec4(pixel_out, artifacts);
 
 

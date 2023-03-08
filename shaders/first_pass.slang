@@ -45,27 +45,24 @@ vec3 pixel_flickering() {
  * to see the effect (the lcd panel would just mix the pixels by itself (meh).
  */
 
+   
    vec3 pixel_cur = texture(Source,vTexCoord).rgb;   
    float mymod = params.FrameCount % 3;
 
    if (mymod == 0.0) return pixel_cur;
    float line_tick = (params.OriginalSize.y > MIN_LINES_INTERLACED ) ? 1 : 2 ;
-
    vec3 flickline;
    if (mymod == 1.0 )
       flickline = texture(Source, vTexCoord + vec2(0.0,params.OriginalSize.w/line_tick)).rgb;
    else if (mymod == 2.0)
       flickline = texture(Source, vTexCoord - vec2(0.0,params.OriginalSize.w/line_tick)).rgb;
 
-   float lumdiff = (flickline.r+flickline.g+flickline.b)/3.0 -
-                   (pixel_cur.r+pixel_cur.g+pixel_cur.b)/3.0;
+   float lumdiff = abs(flickline.r + flickline.g + flickline.b - pixel_cur.r - pixel_cur.g - pixel_cur.b);
 
-   if (lumdiff > 0.0) {
-      lumdiff = scale_to_range(lumdiff,0.0,SCANLINE_FLICKERING_POWER);
-      return mix(pixel_cur,flickline,lumdiff);
-   } else {
-      return pixel_cur;
-   }
+   lumdiff = scale_to_range(lumdiff,0.0,SCANLINE_FLICKERING_POWER);
+   return mix(pixel_cur,flickline,lumdiff);
+   
+
 }
 
 
