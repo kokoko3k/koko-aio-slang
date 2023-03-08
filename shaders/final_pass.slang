@@ -776,7 +776,7 @@ vec3 compose_bezel_over(vec3 full_viewport) {
         float lut_hardness = bezel.g;
         if (lut_hardness > 0.0) {
             vec4 pixel_avglum = texture(avglum_pass,vOutputCoord);
-            bezel_out = bezel_out + ( ( pixel_avglum.rgb + pixel_avglum.a*0.5)  * lut_hardness/3.5);
+            bezel_out = bezel_out + ( ( pixel_avglum.rgb + pixel_avglum.a*0.5)  * lut_hardness * 0.57 * BEZEL_REFL_STRENGTH );
         }
         
     return mix(full_viewport, bezel_out, bezel.a);
