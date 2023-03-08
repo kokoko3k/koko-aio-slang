@@ -807,7 +807,7 @@ vec4 pixel_inner_frame(vec2 coords, bool bBorder_needed) {
     //vignette and spot
         if (DO_VIGNETTE + DO_SPOT >0.0) {
             //float in_aspect = get_in_aspect();
-
+            //pixel_out = clamp(pixel_out, 0.0,1.0); //<--unsure
             if (DO_VIGNETTE == 1.0) {
                 float dist = length(vec2((coords.x-0.5)*vIn_aspect,coords.y-0.5));
                 float vignette = smoothstep(V_SIZE,0.0,dist)*V_POWER;                
