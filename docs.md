@@ -69,7 +69,7 @@
         you may want to scale this filter by a factor.
     Vmask Strength:
         How much will the RGB mask be visible.
-    . (LoDPI) Green,Magenta -> BGR:
+    . (LoDPI) Green,Magenta -> RGB:
         By exploiting common monitors RGB subpixel order, this causes
         the RGB mask, to be emulated by using just 2 pixels instead of 3.
         Very useful for 1080p (or lower) displays and to keep more brightness.
