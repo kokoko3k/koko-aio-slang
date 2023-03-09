@@ -52,6 +52,7 @@
         When NTSC artifacts emulation is enabled, this option will let you blur
         them more, this would help to selectively blur things like waterfalls
         in Sonic 2.
+        The value you set it will be subtracted from glow horizontal sharpness.
     Blur less NTSC artifacts (min treshold)
         In relation to the previous setting, this allow to blur only the most
         prominent artifacts.
