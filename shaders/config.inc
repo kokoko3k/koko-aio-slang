@@ -49,7 +49,6 @@
 	//I set this to allow negative values for glow sharpness
 	//that will calc their values from light spread amount
 #define MIN_IN_GLOW_SHARP 0.40
-
 	//Setting glow to blur bias parameter to this
 	//will skip the glow/blur mix codem and just return
 	//the blurred image
