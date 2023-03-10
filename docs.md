@@ -219,8 +219,6 @@
         Allows to shrink or expand the game content to fit the monitor frame.
     Frame zoom:
         Allows to shrink or expand the monitor frame to fit the game content.
-    Image Border:
-        Draws a black border around the game content.
     Sharp reflections
         Modulates from totally blurred to totally sharp reflection appearance.
 

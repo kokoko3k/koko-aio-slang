@@ -865,10 +865,9 @@ vec4 main_wrap(vec2 coords){
                 //Not painting ambilights here is the best way to cheaply draw a border around the frame
                 if (DO_BEZEL == 1.0) {
                     vec2 vTexCoord_zoomout = zoomout_coords(vTexCoord, -BEZEL_INNER_ZOOM , 1.0);
-                    float border_start = 1-BEZEL_IMAGE_BORDER;
                     //Not using curved coords here because crazy things would happen with vertical games
-                    draw_border = vTexCoord_zoomout.x < border_start || vTexCoord_zoomout.x > BEZEL_IMAGE_BORDER ||
-                                vTexCoord_zoomout.y < border_start || vTexCoord_zoomout.y > BEZEL_IMAGE_BORDER ;
+                    draw_border = vTexCoord_zoomout.x < 1.0 || vTexCoord_zoomout.x > 1.0 ||
+                                vTexCoord_zoomout.y < 1.0 || vTexCoord_zoomout.y > 1.0 ;
                 }
                 if (draw_border)
                     return vec4(mix(pixel_border(BG_IMAGE_OVER == 1.0).rgb,vPixel_inner_frame.rgb,min(vPixel_inner_frame.a*1.5,1.0)),vPixel_inner_frame.a);
