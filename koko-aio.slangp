@@ -364,3 +364,4 @@ float_framebuffer7 = true
 #        Problem is reflection alignment.
 #    [ ] When colorizing the bezel via ambilight, a small area betweeb the tube and the
 #        bezel border is colored and should not.
+#    [ ] Why lowering contrast turns the bezel shadow into an aura?
