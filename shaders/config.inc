@@ -1,13 +1,9 @@
+
+// BEZEL STATIC CONFIG ##############################################################################################
+
 	// Uncomment this to improve bezel downscaling.
 	// If you are using standard bezel, leave commented to gain performance.
 //#define STATIC_BEZEL_USE_MIPMAP 1.0
-
-	//Consider content interlaced if lines are more than this
-#define MIN_LINES_INTERLACED 380
-
-	//Sort of dithering/debanding used in vignette, spot, backlight leds
-#define NOISEPOWER 1/192.0
-//((params.OutputSize.z)*3)
 
 	//If you change the default bezel texture, you may have to edit this to
 	//align bezel reflections and game content. (it seems to depend on the curvature amount)
@@ -15,6 +11,10 @@
 
 	//The maximum radius of the reflection blur. //3.3..4.0 max
 #define BEZEL_REFL_BLUR_MAX 4.0
+
+	//When switching from curved bezel to straight bezel, the reflection zoom 
+	//is auto adjusted by the following amount to keep them aligned:
+#define BEZEL_REFL_ZOOM_STRAIGHT_OFFSET -0.015
 
 	// Define the size and the smoothness of the rectangle 
 	// in the bezel corners that will hide and blur the reflections 
@@ -24,6 +24,14 @@
 	//Bezel reflection warping (curvature) may need a correction factor.
 	//Modify this if bezel reflections does not follow the border
 #define BEZEL_REFL_WARP_CORRECTION_FACTOR 1.9
+
+
+
+
+
+
+
+// AMBIENT LIGHT STATIC CONFIG ##########################################################################################
 
 	// 0.0-1.0: sensitivity to scene change (ambilike stuff), 0.0 changes more
 #define AMBI_SCENE_CHG_THRSHLD 0.07  
@@ -38,6 +46,14 @@
 	// try between (1/avglum_divider) and (1/avglum_divider)/3
 //#define AMBI_FAST_STEP 0.125 
 #define AMBI_FAST_STEP 0.25
+
+
+
+
+
+
+
+// GLOW STATIC CONFIG ##########################################################################################
 
 	//Setting the glow/halo sharpness parameter to this
 	//will skip the blurring phase and lowers the gpu use
@@ -68,11 +84,44 @@
 #define IN_GLOW_SHARPNESS_SPREAD_RATIO_H 2.0
 
 
+
+
+
+
+
+// BACKDROP STATIC CONFIG ##########################################################################################
+
 	//Support for backdrops has to be enable by uncommenting:
 //#define STATIC_SUPPORT_BACKDROP 1.0
 #define BACKDROP_OFFX 0.0
 #define BACKDROP_OFFY 0.0
 #define BACKDROP_ZOOM 1.0
+
+
+
+
+
+
+
+// MISC STATIC CONFIG ##########################################################################################
+	//Consider content interlaced if lines are more than this
+#define MIN_LINES_INTERLACED 380
+
+	//Sort of dithering/debanding used in vignette, spot, backlight leds
+#define NOISEPOWER 1/192.0
+
+
+
+
+
+
+
+// STATIC CONFIG ENDS HERE ##########################################################################################
+
+
+
+
+
 
 
 

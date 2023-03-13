@@ -17,8 +17,10 @@ void main() {
       vWarp_vexp = 1.0/ (1 + (vec2(GEOM_WARP_X, GEOM_WARP_Y) * 0.2)) ;
       vWarp_arg2 = 1.0 - pow(vec2(0.29289321881345247559915563789515), vWarp_vexp );
       
+      
+      
    if (DO_BEZEL > 0.5)
-      vTexCoord = zoom(TexCoord, BEZEL_REFL_ZOOM);
+      vTexCoord = zoom(TexCoord, BEZEL_REFL_ZOOM + (BEZEL_REFL_ZOOM_STRAIGHT_OFFSET *  BEZEL_USE_STRAIGHT) );
 }
 
 #pragma stage fragment
