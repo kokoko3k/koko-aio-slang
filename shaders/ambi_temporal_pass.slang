@@ -86,7 +86,8 @@ vec3 ambi_pre_pass() {
     coords_for_skip = coords;
     if (DO_BEZEL==1.0) {
         coords = zoomout_coords(coords, -BEZEL_INNER_ZOOM , 1.0);
-        coords_for_skip = zoomout_coords(coords_for_skip, -BEZEL_FRAME_ZOOM , 1.0);
+        //coords_for_skip = zoomout_coords(coords_for_skip, -BEZEL_FRAME_ZOOM , 1.0);
+        coords_for_skip = coords;
     }
     
     //Skip coords in the rect "under the monitor"

@@ -764,8 +764,6 @@ vec3 compose_bezel_over(vec3 full_viewport) {
         vec3 ambitemporalpass = texture(ambi_temporal_pass, vOutputCoord).rgb;
         ambitemporalpass = max(ambitemporalpass, 0.0); //<-- this to avoid undefined results
         vec3 pixel_ambilight = DO_AMBILIGHT * (ambitemporalpass + global_noise);
-        
-
         float opacita = bezel.a;
         bezel_out = bezel_out + pixel_ambilight * AMBI_OVER_BEZEL * (1 -reflection) * bezel.a;
         
@@ -777,7 +775,7 @@ vec3 compose_bezel_over(vec3 full_viewport) {
         if (lut_specular > 0.0) {
             vec4 pixel_avglum = texture(avglum_pass,coords_for_mirror);
             //bezel_out = bezel_out + ( ( pixel_avglum.rgb + pixel_avglum.a*0.5)  * lut_hardness * 0.57 * BEZEL_REFL_STRENGTH );
-            bezel_out = bezel_out + ( ( pixel_avglum.rgb )  * lut_specular * BEZEL_REFL_STRENGTH );
+            bezel_out = bezel_out + ( ( pixel_avglum.rgb )  * lut_specular ) ;
         }
     return mix(full_viewport, bezel_out, bezel.a);
 }
@@ -846,17 +844,16 @@ vec4 main_wrap(vec2 coords){
     //Just do pixel_inner_frame() and exit when there is no need to paint border.
     if (!border_needed()) return pixel_inner_frame(coords, false);
 
+    //bezel_coords = zoomout_coords(bezel_coords, -BEZEL_INNER_ZOOM , 1.0);
+    
     //From now on, we need a border.
         bool bIs_outer_frame = ((vTexCoord.x < 0.0) || (vTexCoord.x > 1.0));
 
+    
         //Handle outer frame cases
             //if we want ambilights in the outer frame, draw it and return
             if (bIs_outer_frame)
                 return vec4(pixel_border(BG_IMAGE_OVER == 1.0),1.0);
-
-            //But if it is just outer frame, just make it black.
-            if (bIs_outer_frame) return vec4(0.0);
-
 
         //Handle inner frame cases
             vec4 vPixel_inner_frame = pixel_inner_frame(coords, true);
@@ -864,10 +861,10 @@ vec4 main_wrap(vec2 coords){
                 bool draw_border = true;
                 //Not painting ambilights here is the best way to cheaply draw a border around the frame
                 if (DO_BEZEL == 1.0) {
-                    vec2 vTexCoord_zoomout = zoomout_coords(vTexCoord, -BEZEL_INNER_ZOOM , 1.0);
+                    vec2 vTexCoord_zoomout = zoomout_coords(vTexCoord, (-BEZEL_FRAME_ZOOM + 0.1) , 1.0);
                     //Not using curved coords here because crazy things would happen with vertical games
-                    draw_border = vTexCoord_zoomout.x < 1.0 || vTexCoord_zoomout.x > 1.0 ||
-                                vTexCoord_zoomout.y < 1.0 || vTexCoord_zoomout.y > 1.0 ;
+                    draw_border = (vTexCoord_zoomout.x < 0.0 || vTexCoord_zoomout.x > 1.0 ||
+                                  vTexCoord_zoomout.y < 0.0 || vTexCoord_zoomout.y > 1.0) ;
                 }
                 if (draw_border)
                     return vec4(mix(pixel_border(BG_IMAGE_OVER == 1.0).rgb,vPixel_inner_frame.rgb,min(vPixel_inner_frame.a*1.5,1.0)),vPixel_inner_frame.a);
