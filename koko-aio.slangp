@@ -348,6 +348,8 @@ float_framebuffer7 = true
 #        yes, due to negative pow base.         
 #    [v] Unrolled blur in relfections is not gaussiany(gaussianx), was that a mistake?
 #        No mistake, they look best that way since we need big blurs.
+#    [v] When colorizing the bezel via ambilight, a small area between the tube and the
+#        bezel border is colored and should not.
 #    [.] Darkline, vmask: whiteness can be pre-calculated outside.
 #        Half done, gained something.
 #    [ ] check branching conditions in first_pass.slang
@@ -362,6 +364,5 @@ float_framebuffer7 = true
 #    [ ] Allow to set a different aspect for content
 #        (which could be translated to a different aspect for bezel, maybe simpler)
 #        Problem is reflection alignment.
-#    [ ] When colorizing the bezel via ambilight, a small area betweeb the tube and the
-#        bezel border is colored and should not.
-#    [ ] Why lowering contrast turns the bezel shadow into an aura?
+
+
