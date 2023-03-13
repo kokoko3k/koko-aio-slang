@@ -753,9 +753,10 @@ vec3 compose_bezel_over(vec3 full_viewport) {
     //Take the reflection modifier from the texture blue component into account; it is/may be used to lower the reflection in the corners.
         //float reflection = (reflection_shade * 1.4 -  0.4)  * bezel.b ;
         //reflection = clamp (reflection, 0.0, 1.0);
-        float reflection = bezel.b;
+        float reflection = bezel.b * BEZEL_REFL_STRENGTH;
+        float lut_specular = bezel.g * BEZEL_SPCL_STRENGTH;
         //return vec3(reflection);
-        pixel_mirrored = pixel_mirrored * reflection * BEZEL_REFL_STRENGTH;
+        pixel_mirrored = pixel_mirrored * reflection * (1+lut_specular);
         //return pixel_mirrored;
         vec3 bezel_out = bezel_colored + pixel_mirrored;
         
@@ -770,15 +771,14 @@ vec3 compose_bezel_over(vec3 full_viewport) {
         
         //bezel_out = vec3(bezel.a);
         
-         //(1- (max(reflection, lut_hardness), bezel.a)) ;
+         //(1- (max(reflection, lut_specular), bezel.a)) ;
         //We use the green component to express Hardness/Specularity; there the reflection will be completely diffused.
         //For the task, we use a mipmap whit adeguate precision.
-        float lut_hardness = bezel.g;
-        if (lut_hardness > 0.0) {
-            vec4 pixel_avglum = texture(avglum_pass,vOutputCoord);
-            bezel_out = bezel_out + ( ( pixel_avglum.rgb + pixel_avglum.a*0.5)  * lut_hardness * 0.57 * BEZEL_REFL_STRENGTH );
+        if (lut_specular > 0.0) {
+            vec4 pixel_avglum = texture(avglum_pass,coords_for_mirror);
+            //bezel_out = bezel_out + ( ( pixel_avglum.rgb + pixel_avglum.a*0.5)  * lut_hardness * 0.57 * BEZEL_REFL_STRENGTH );
+            bezel_out = bezel_out + ( ( pixel_avglum.rgb )  * lut_specular * BEZEL_REFL_STRENGTH );
         }
-        
     return mix(full_viewport, bezel_out, bezel.a);
 }
 
