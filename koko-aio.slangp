@@ -116,7 +116,7 @@ shaders = 16
        scale_type2 = source
             scale2 = 1.0
      mipmap_input2 = true
-        wrap_mode2 = "mirrored_repeat"
+        wrap_mode2 = "clamp_to_border"
 
         
 
@@ -210,7 +210,7 @@ float_framebuffer7 = true
                 alias9 = "reflected_blurred_pass"
         filter_linear9 = true
            scale_type9 = source
-                scale9 = 1.0
+                scale9 = 2.0
             wrap_mode9 = "mirrored_repeat"
 
 
@@ -224,7 +224,7 @@ float_framebuffer7 = true
         filter_linear10 = true
            scale_type10 = source
                 scale10 = 1.0
-            wrap_mode10 = "mirrored_repeat"
+            wrap_mode10 = "clamp_to_border"
     
     
                shader11 = shaders/bloom_pass_2.slang
@@ -344,6 +344,7 @@ float_framebuffer7 = true
 #        bezel border is colored and should not.
 #    [.] Darkline, vmask: whiteness can be pre-calculated outside.
 #        Half done, gained something.
+#    [v] reflection blur: can we make better use of mipmaps instead of blindly use lod = 2.0?
 #    [ ] check branching conditions in first_pass.slang
 #    [ ] Better debanding?
 #    [ ] Should the flickering be aware of the scanline?
@@ -356,5 +357,6 @@ float_framebuffer7 = true
 #    [ ] Allow to set a different aspect for content
 #        (which could be translated to a different aspect for bezel, maybe simpler)
 #        Problem is reflection alignment.
-#    [ ] reflection blur: can we make better use of mipmaps instead of blindly use lod = 2.0?
+#    [ ] Ambi temporal pass, move content override code to vertex shader
+#    [ ] avglum_pass needs to react to content aspect override
 

@@ -291,6 +291,13 @@ float random(float power, vec2 seed) {
 		return scale_coord;
 	}
 	
+	vec2 content_aspect_override(vec2 co, float aspect, float in_aspect){
+		float scale_y = aspect/in_aspect;
+		float offset_y = (0.5 * scale_y ) - 0.5 ;
+		co.y = co.y*scale_y - offset_y;
+		return co;
+	}
+	
 //Blur/Glow
 	vec3 glow_dumb(sampler2D in_texture, float glow_power, float gamma, vec2 coords) {
 		return pow( texture(in_texture, coords).rgb, vec3(gamma) ) * glow_power;

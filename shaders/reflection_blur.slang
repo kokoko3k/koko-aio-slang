@@ -47,13 +47,28 @@ vec3 texture_clamp_to_border(sampler2D tex, vec2 coords, float lod) {
       return textureLod( tex, coords, lod).rgb ;
 }
 
+/*
+   #define crop_xmin crop.x
+   #define crop_ymin crop.y
+   #define crop_xmax crop.z
+   #define crop_ymax crop.w
+*/
 
-vec2 mirrored_repeat(vec2 co, vec2 crop) {
+vec2 mirrored_repeat(vec2 co, vec4 crop) {
+   //Crop = vec4(xmin,xmax,ymin,ymax)
+   
    //Do a coords mirrored repeat with the mirror axis
    //shifted by a "crop" amount.
    //Don't try to unbranch me, it is a matter of 1/1000.
-   vec2 cmin = 0.0 + crop ;
-   vec2 cmax = 1.0 - crop ; 
+   vec2 cmin ; //= 0.0 + crop ;
+   cmin.x = 0.0 + crop.x;
+   cmin.y = 0.0 + crop.y;
+   
+   vec2 cmax ; //= 1.0 - crop ; 
+   cmax.x = 1.0 - crop.z;
+   cmax.y = 1.0 - crop.w;
+   
+   
    if (co.x < cmin.x )
       co.x = 2*cmin.x - co.x;
    if (co.y < cmin.y)
@@ -110,24 +125,27 @@ float corners_shade(vec2 co, float size, float smoothsize){
    return max(max(max(squares.x, squares.y), squares.z), squares.w);
 }
 
-float borders_gradient(vec2 co, vec2 foffset) {
+float borders_gradient(vec2 co, vec4 foffset) {
    // Create a b/w shade near the borders that will be used to 
    // Modulate from sharp reflections to blur reflections.
    vec4 shades;
    shades.x = abs(     co.x - foffset.x );
-   shades.y = abs( 1 - co.x - foffset.x );
-   shades.z = abs(     co.y - foffset.y );
-   shades.w = abs( 1 - co.y - foffset.y );
+   shades.y = abs(     co.y - foffset.y );
+   shades.z = abs( 1 - co.x - foffset.z );
+   shades.w = abs( 1 - co.y - foffset.w );
    return min(min(min(shades.x, shades.y), shades.z), shades.w);
 }
 
-bool is_void_area(vec2 co, vec2 crop_point) {
+bool is_void_area(vec2 co, vec4 crop_point) {
    // Given a coordinate and a negative crop_point,
    // this returns if the point falls into an blank area
-   return (co.y < 0.0 && co.y > crop_point.y*2) || (co.y > 1.0 && co.y < 1 - crop_point.y*2) ||
-          (co.x < 0.0 && co.x > crop_point.x*2) || (co.x > 1.0 && co.x < 1 - crop_point.x*2);
+   return (co.y < 0.0 && co.y > crop_point.y*2) || (co.y > 1.0 && co.y < 1 - crop_point.w*2) ||
+          (co.x < 0.0 && co.x > crop_point.x*2) || (co.x > 1.0 && co.x < 1 - crop_point.z*2);
 }
 
+//FIXME: where does the following comes from?
+//it is needed to align reflection and content when content is v-shifted.
+#define VSHIFT_CORRECTION 1.16
 
 void main() {
    
@@ -143,13 +161,6 @@ void main() {
       bool skip_condition = (coords.x < 1.0 - c_tolerance && coords.x > c_tolerance && 
                            coords.y < 1.0 - c_tolerance && coords.y > c_tolerance ) ;
 
-   
-   //Mark the pixel as not useful, so that the next pass will be aware of it and skip rendering too:
-      if (skip_condition) {
-         FragColor = mark_useless(vec3(0.0));
-         return;
-      }
-
 
    //If coords needs to be curved, do it now:
       if (DO_CURVATURE == 1.0 && ( GEOM_WARP_X > 0.0 || GEOM_WARP_Y > 0.0)  ) {
@@ -161,11 +172,11 @@ void main() {
    //where the mirror axis is.
    //The mirror axis position may depend on the dynamic zoom level
    //(the feature that zooms the image in when it is bright)
-      vec2 coords_crop_point = vec2(0.0);
+      vec4 coords_crop_point = vec4(0.0);
       if (DO_DYNZOOM == 1.0) {
          //Crop coordinates to move the mirror axes
          float dyn_zoom = get_dyn_zoom(avglum_pass);
-         coords_crop_point = vec2((dyn_zoom - 1.0) * 0.5);
+         coords_crop_point = -vec4( (1.0/(2*dyn_zoom) ) - (1.0/2.0) );
          //Zoom image coords to align it
          coords = zoom(coords, dyn_zoom);
       }
@@ -173,15 +184,26 @@ void main() {
    
       //Mirror repeat the image by taking the crop point (mirror axis offset) into account:
          vec2 coords_for_mirrored_repeat = coords;
-      /* float test_zoom_y = 0.5;
-         coords_for_mirrored_repeat = vec2(coords.x, zoom1D(coords.y, test_zoom_y));
-         if (test_zoom_y < 1.0)
-            coords_crop_point.y += - ( (1.0/(4*test_zoom_y) ) - (1.0/4.0) );
-               else
-            coords_crop_point.y += ( test_zoom_y - 1.0) * 0.5;
-      */
+
+         //override game geometry? 
+         if (DO_GAME_GEOM_OVERRIDE > 0.5) {
+            float scale_y = get_in_aspect()/GAME_GEOM_ASPECT;   
+            float voffset = GAME_GEOM_VSHIFT/10.0;
+
+            
+            coords_for_mirrored_repeat = vec2(coords_for_mirrored_repeat.x, zoom1D(coords.y, scale_y));
+            coords_for_mirrored_repeat.y = coords_for_mirrored_repeat.y + (GAME_GEOM_VSHIFT/10.0) * VSHIFT_CORRECTION;
+            
+            coords_crop_point.y -= ( (1.0/(2*scale_y) ) - (1.0/2.0) ) - voffset;
+            coords_crop_point.w -= ( (1.0/(2*scale_y) ) - (1.0/2.0) ) + voffset;
+
+         }
+         
+         
          coords = mirrored_repeat(coords_for_mirrored_repeat, coords_crop_point);
-                     
+         //coords.y = coords.y - GAME_GEOM_VSHIFT;
+
+   
 
       
    //Create gradients in the corners to fadeout reflections and to blur more near them:
@@ -205,13 +227,14 @@ void main() {
          float shade_sharp_blur_adapted = shade_sharp_blur * 3.0;
          float lod0 = floor(shade_sharp_blur_adapted);
          float lod1 = lod0 + 1;
+                                                                                 //lod0=0.0;lod1=0.0; //DEBUG
          vec3 s1 = textureLod( SourceTexture, coords, lod0).rgb;
          vec3 s2 = textureLod( SourceTexture, coords, lod1).rgb;
          float lodmix = fract(shade_sharp_blur_adapted);
          pixel_out = mix(s1, s2, lodmix);
       }
          else
-      pixel_out = vec3(0.0);
+      pixel_out = vec3(0.0,0.0,0.0);
       
       
    //multiply the blurred image by the corner shade so that reflections will not be visible in the corners.

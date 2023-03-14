@@ -7,6 +7,7 @@
 
 	//If you change the default bezel texture, you may have to edit this to
 	//align bezel reflections and game content. (it seems to depend on the curvature amount)
+//#define BEZEL_BORDER_SIZE 0.197
 #define BEZEL_BORDER_SIZE 0.197
 
 	//When switching from curved bezel to straight bezel, the reflection zoom 
@@ -291,6 +292,10 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float DO_RF_NOISE;
 	float RF_NOISE_STRENGTH;
 	
+	float DO_GAME_GEOM_OVERRIDE;
+	float GAME_GEOM_ASPECT;
+	float GAME_GEOM_VSHIFT;
+	
 } global;
 
 // Color correction
@@ -536,7 +541,13 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter label_aspect_preset4 "          (-4 = Megadrive 10/7)" 0.0 0.0 0.0 1.0
 #pragma parameter label_aspect_preset5 "          (-5 = Uncorrected)" 0.0 0.0 0.0 1.0
 #pragma parameter label_aspect_preset6 "          (-6 = MAME rotated/TATE 0.75)" 0.0 0.0 0.0 1.0
+#pragma parameter BLANK23 " " 0.0 0.0 1.0 1.0
 
 
+
+//Content geomerty overrides
+#pragma parameter DO_GAME_GEOM_OVERRIDE	 "★ Override content geometry"			0.0   0.0  1.0 	  1.0
+#pragma parameter GAME_GEOM_ASPECT	 "        Aspect"					1.3333333333333  0.1  3.0 	  0.005
+#pragma parameter GAME_GEOM_VSHIFT	 "        Vertical position"				0.0   -10.0 10.0  0.1
 
 #include "config.globals.inc"

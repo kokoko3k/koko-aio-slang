@@ -76,7 +76,14 @@ vec3 circle_smooth(vec2 coords, vec2 middle, float f_radius, float FALLOFF, floa
 vec3 ambi_pre_pass() {
    
     //Scale to the original aspect
-    vec2 coords = get_scaled_coords(vTexCoord, global.FinalViewportSize, is_rotated());
+    float in_aspect = get_in_aspect();
+    vec2 coords = get_scaled_coords_aspect(vTexCoord, global.FinalViewportSize, in_aspect, is_rotated());
+    
+    if (DO_GAME_GEOM_OVERRIDE > 0.5) {
+        coords = content_aspect_override(coords, GAME_GEOM_ASPECT, in_aspect);
+        coords.y += GAME_GEOM_VSHIFT/10.0;
+    }
+    
     vec2 coords_for_skip;
     
     if (DO_GLOBAL_SHZO >0.5)

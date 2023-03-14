@@ -32,7 +32,7 @@ layout(location = 4) out float vIsRotated;
 //Vignette, spot:
     layout(location = 11) out float vIn_aspect;
 
-
+layout(location = 12) out vec2 vTexCoord_content_overridden;
     
 #include "includes/functions.include.slang"
 
@@ -44,6 +44,12 @@ void main() {
 
     if (DO_GLOBAL_SHZO >0.5)
         vTexCoord = zoom(vTexCoord + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM );
+
+    vTexCoord_content_overridden = vTexCoord;
+    if (DO_GAME_GEOM_OVERRIDE > 0.5) {
+        vTexCoord_content_overridden = content_aspect_override(vTexCoord, GAME_GEOM_ASPECT, vIn_aspect);
+        vTexCoord_content_overridden.y += GAME_GEOM_VSHIFT/10.0;
+    }
     
     vOutputCoord = TexCoord;
     
@@ -97,6 +103,7 @@ layout(location = 8) in float vFlickeringScanlines;
 layout(location = 9) in float vScanlinePeriod;
 layout(location = 10) in float vScanlinesAlternate;
 layout(location = 11) in float vIn_aspect;
+layout(location = 12) in vec2 vTexCoord_content_overridden;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -690,33 +697,6 @@ vec3 compose_bezel_over(vec3 full_viewport) {
     
     if (BEZEL_FRAME_ZOOM != 0.0)
         coords_for_bezel = zoomout_coords(coords_for_bezel,-BEZEL_FRAME_ZOOM,1.0);  
-    
-    /* Bezel image is a fixed png file, and is curved.
-     * To have a straight bezel, we can "unwarp" it and then curve it again
-     * Too lame?
-                    float BEZEL_IMG_BORDER_START_X = 120.0/2923.0; //= 0.03; 120
-                    float BEZEL_IMG_BORDER_END_X = 220.0/2923.0 ;//= 0.2;    220
-                    
-                    float BEZEL_IMG_BORDER_START_Y = 75.0/2178.0; //= 0.01;  75
-                    float BEZEL_IMG_BORDER_END_Y = 160.0/2178.0;//= 0.4;    160
-                    
-                    float BEZEL_IMG_CURVATURE_X = 0.6;
-                    float BEZEL_IMG_CURVATURE_Y = 0.6;
-                    
-                    float min_x = min(coords_for_bezel.x, 1-coords_for_bezel.x);
-                    float min_y = min(coords_for_bezel.y, 1-coords_for_bezel.y);
-
-                    
-                    
-                    float kx = smoothstep(BEZEL_IMG_BORDER_START_X, BEZEL_IMG_BORDER_END_X, min(coords_for_bezel.x, 1-coords_for_bezel.x));
-                    float ky = smoothstep(BEZEL_IMG_BORDER_START_Y, BEZEL_IMG_BORDER_END_Y, min(coords_for_bezel.y, 1-coords_for_bezel.y));
-                    coords_for_bezel = Warp(coords_for_bezel,-BEZEL_IMG_CURVATURE_X * kx , -BEZEL_IMG_CURVATURE_Y * ky ); 
-                    coords_for_bezel = Warp(coords_for_bezel,GEOM_WARP_X * kx , GEOM_WARP_Y * ky );
-    */
-
-    
-
-    
 
     //No need to draw anything outside this:
     if (coords_for_bezel.x < 0  || coords_for_bezel.y < 0 || coords_for_bezel.x > 1.0 || coords_for_bezel.y > 1.0) return full_viewport;
@@ -877,8 +857,8 @@ vec4 main_wrap(vec2 coords){
 
 void main() {
     
-    vec2 coords = vTexCoord;
-
+    vec2 coords = vTexCoord_content_overridden;
+    
     //Luminosity dependant zoom
     if (DO_DYNZOOM == 1.0) {
         //float zoomin = 1.0 + (texture(bloom_pass_final, coords   ).a/ DYNZOOM_FACTOR * 80.0); <<-- funny.
@@ -896,6 +876,7 @@ void main() {
     //Curvature
     if (DO_CURVATURE == 1.0) {
         if ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0))
+            coords = clamp(coords, -0.1,1.1);
             coords = Warp_fast(coords, vWarp_vexp, vWarp_arg2);
             
     }
