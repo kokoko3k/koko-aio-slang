@@ -107,7 +107,7 @@ layout(location = 0) out vec4 FragColor;
     layout(set = 0, binding = 1) uniform sampler2D first_pass;
 #endif
 layout(set = 0, binding = 2)  uniform sampler2D bloom_pass_final;
-layout(set = 0, binding = 3)  uniform sampler2D reflected_blurred_pass2;
+layout(set = 0, binding = 3)  uniform sampler2D reflected_blurred_pass;
 layout(set = 0, binding = 4)  uniform sampler2D ambi_temporal_pass;
 layout(set = 0, binding = 5)  uniform sampler2D avglum_pass;
 layout(set = 0, binding = 6)  uniform sampler2D monitor_body_straight;
@@ -747,7 +747,7 @@ vec3 compose_bezel_over(vec3 full_viewport) {
     vec3 bezel_colored = bezel_color(bezel_luminance);
 
     //This is the reflection to be composed over the bezel);
-    vec3 pixel_mirrored = texture(reflected_blurred_pass2,
+    vec3 pixel_mirrored = texture(reflected_blurred_pass,
                           coords_for_mirror + random( min(global.FinalViewportSize.z,global.FinalViewportSize.w)*1.5, vTexCoord ) ).rgb;
 //return pixel_mirrored;
     //Take the reflection modifier from the texture blue component into account; it is/may be used to lower the reflection in the corners.
@@ -928,7 +928,7 @@ void main() {
         //if (vTexCoord.y < 0.5) pixel_out = texture(first_pass,vTexCoord);
         //pixel_out = texture(avglum_pass,vTexCoord);
 
-    //vec4 pixel_mirrored = texture(reflected_blurred_pass2,vTexCoord);
+    //vec4 pixel_mirrored = texture(reflected_blurred_pass,vTexCoord);
     //pixel_out = pixel_mirrored;
     
     

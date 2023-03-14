@@ -56,7 +56,7 @@
       backdrop_wrap_mode = "mirrored_repeat"
          backdrop_mipmap = "true"
 
-shaders = 17
+shaders = 16
 
 # NTSC Color artifacts pass:
 # The very first pass emulates ntsc color artifacting.
@@ -204,22 +204,14 @@ float_framebuffer7 = true
 
          
          
-# The following 2 passes will blur the mirrored part of first_pass
+# The following pass will blur the mirrored part of first_pass
 # to emulate soft bezel reflections.
-               shader9 = shaders/reflection_blur_x.slang
-                alias9 = "reflected_blurred_pass1"
+               shader9 = shaders/reflection_blur.slang
+                alias9 = "reflected_blurred_pass"
         filter_linear9 = true
            scale_type9 = source
                 scale9 = 1.0
             wrap_mode9 = "mirrored_repeat"
-
-               shader10 = shaders/reflection_blur_y.slang
-                alias10 = "reflected_blurred_pass2"
-        filter_linear10 = true
-           scale_type10 = source
-                scale10 = 1.0
-            wrap_mode10 = "mirrored_repeat"
-
 
 
 # In the following passes we emulate bloom effect.
@@ -227,37 +219,37 @@ float_framebuffer7 = true
 # and then do other blur passes at reduced size to keep it fast.
 # Every blur pass samples radially around the center and offsets
 # the starting point in every subsequent pass.
-               shader11 = shaders/bloom_pass_1.slang
-                alias11 = "bloom_pass_1"
+               shader10 = shaders/bloom_pass_1.slang
+                alias10 = "bloom_pass_1"
+        filter_linear10 = true
+           scale_type10 = source
+                scale10 = 1.0
+            wrap_mode10 = "mirrored_repeat"
+    
+    
+               shader11 = shaders/bloom_pass_2.slang
+                alias11 = "bloom_pass_2"
         filter_linear11 = true
            scale_type11 = source
-                scale11 = 1.0
-            wrap_mode11 = "mirrored_repeat"
-    
-    
-               shader12 = shaders/bloom_pass_2.slang
-                alias12 = "bloom_pass_2"
-        filter_linear12 = true
-           scale_type12 = source
-                scale12 = 0.5
-            wrap_mode12 = "clamp_to_edge"
+                scale11 = 0.5
+            wrap_mode11 = "clamp_to_edge"
 
             
-               shader13 = shaders/bloom_pass_3.slang
-                alias13 = "bloom_pass_3"
+               shader12 = shaders/bloom_pass_3.slang
+                alias12 = "bloom_pass_3"
+        filter_linear12 = true
+           scale_type12 = source
+                scale12 = 1.0
+            wrap_mode12 = "clamp_to_edge"
+
+        
+               shader13 = shaders/bloom_pass_4.slang
+                alias13 = "bloom_pass_final"
         filter_linear13 = true
            scale_type13 = source
                 scale13 = 1.0
-            wrap_mode13 = "clamp_to_edge"
-
-        
-               shader14 = shaders/bloom_pass_4.slang
-                alias14 = "bloom_pass_final"
-        filter_linear14 = true
-           scale_type14 = source
-                scale14 = 1.0
-            wrap_mode14 = "mirrored_repeat"
-    float_framebuffer14 = "true"
+            wrap_mode13 = "mirrored_repeat"
+    float_framebuffer13 = "true"
 
 
 
@@ -265,13 +257,13 @@ float_framebuffer7 = true
 # and temporally smooth led lights.
 # Extra logic makes it possible to lower the led reaction time when a scene change is detected.
 # this is achieved through average luminance sampling from avglum_pass
-               shader15 = shaders/ambi_temporal_pass.slang
-                alias15 = "ambi_temporal_pass"
-        filter_linear15 = true
-           scale_type15 = viewport
-                scale15 = 0.05
-            wrap_mode15 = "clamp_to_border"
-    float_framebuffer15 = true
+               shader14 = shaders/ambi_temporal_pass.slang
+                alias14 = "ambi_temporal_pass"
+        filter_linear14 = true
+           scale_type14 = viewport
+                scale14 = 0.05
+            wrap_mode14 = "clamp_to_border"
+    float_framebuffer14 = true
     
 
 # This pass pass will do everything needed to happen at screen coordinates:
@@ -282,12 +274,12 @@ float_framebuffer7 = true
 # * Black frame insertions
 # * Bezel
 # * Background images
-           shader16 = shaders/final_pass.slang
-            alias16 = "final_pass"
-    filter_linear16 = true
-       scale_type16 = viewport
-            scale16 = 1.0
-        wrap_mode16 = "mirrored_repeat"
+           shader15 = shaders/final_pass.slang
+            alias15 = "final_pass"
+    filter_linear15 = true
+       scale_type15 = viewport
+            scale15 = 1.0
+        wrap_mode15 = "mirrored_repeat"
         
 
 

@@ -228,8 +228,18 @@ void main() {
       
    //blur the reflection along x axis:
       vec3 pixel_out;
-      if ( !is_void_area(coords_for_mirrored_repeat, coords_crop_point) )
-         pixel_out = blur_unroll(BEZEL_REFL_BLUR_MAX * shade_sharp_blur, coords, shade_sharp_blur*3.0 );   
+      if ( !is_void_area(coords_for_mirrored_repeat, coords_crop_point) ) {
+         float lod0 = floor(shade_sharp_blur*3.0);
+         float lod1 = lod0 + 1;
+         vec3 s1 = textureLod( SourceTexture, coords, lod0).rgb;
+         vec3 s2 = textureLod( SourceTexture, coords, lod1).rgb;
+         float lodmix = fract(shade_sharp_blur*3.0);
+         pixel_out = mix(s1, s2, lodmix);
+         pixel_out = textureLod( SourceTexture, coords, shade_sharp_blur*3.0).rgb;
+         //pixel_out = blur_unroll(BEZEL_REFL_BLUR_MAX * shade_sharp_blur, coords, shade_sharp_blur*3.0 );   
+
+      }
+         
             else
          pixel_out = vec3(0.0);
 
