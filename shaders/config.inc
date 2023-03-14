@@ -454,6 +454,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BEZEL_REFL_STRENGTH "        Reflection strength"	0.5    0.0 1.0 0.01
 #pragma parameter BEZEL_RFL_BLR_SHD   "        Sharp reflections"	0.0    -1.0 1.0 0.1
 #pragma parameter BEZEL_RFL_OFFSET    "        Align reflections: offset"	0.003    -0.01 0.01 0.001
+//#pragma parameter BEZEL_RFL_OFFSET    "        Align reflections: offset"	0.003    -1.01 1.01 0.01
 #pragma parameter BEZEL_REFL_ZOOM     "        Align reflections: zoom"		0.98    0.8 1.2 0.001
 
 

@@ -58,6 +58,11 @@ vec2 zoom(vec2 in_coords, float zoom_factor) {
    return (in_coords/zoom_factor)-off;
 }
 
+float zoom1D(float in_coord, float zoom_factor) {
+   float off = 1.0/(zoom_factor*2.0) - 0.5;
+   return (in_coord/zoom_factor)-off;
+}
+
 vec2 zoomxy(vec2 in_coords, vec2 zoom_factor) {
    vec2 off = 1.0/(zoom_factor*2.0) - 0.5;
    return (in_coords/zoom_factor)-off;

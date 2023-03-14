@@ -48,9 +48,8 @@ vec3 texture_clamp_to_border(sampler2D tex, vec2 coords, float lod) {
 }
 
 
-vec3 blur_unroll_clamp_to_border(float Size, vec2 co, float lod, float coords_crop_point) {
+vec3 blur_unroll_clamp_to_border(float Size, vec2 co, float lod) {
    //Blur the image along x axis and emulate a clamp_to_border when outside the [0..1] range
-   //FIXME: coords_crop_point are not taken into account? CHECKME if you ever use this.
    Size = Size * NEW_SCALEMOD_X; //<- so that blur size doesn't depend on output resolution
    vec3 color;
    vec2 d = SourceTextureSize.zw * Size;
@@ -73,20 +72,20 @@ vec3 blur_unroll(float Size, vec2 co, float lod) {
    return color / 4.0;
 }
 
-vec2 mirrored_repeat(vec2 co, float crop) {
+vec2 mirrored_repeat(vec2 co, vec2 crop) {
    //Do a coords mirrored repeat with the mirror axis
    //shifted by a "crop" amount.
    //Don't try to unbranch me, it is a matter of 1/1000.
-   float cmin = 0.0 + crop ;
-   float cmax = 1.0 - crop ; 
-   if (co.x < cmin )
-      co.x = 2*cmin - co.x;
-   if (co.y < cmin)
-      co.y = 2*cmin - co.y;
-   if (co.x > cmax )
-      co.x = 2*cmax - co.x;
-   if (co.y > cmax )
-      co.y = 2*cmax - co.y;
+   vec2 cmin = 0.0 + crop ;
+   vec2 cmax = 1.0 - crop ; 
+   if (co.x < cmin.x )
+      co.x = 2*cmin.x - co.x;
+   if (co.y < cmin.y)
+      co.y = 2*cmin.y - co.y;
+   if (co.x > cmax.x )
+      co.x = 2*cmax.x - co.x;
+   if (co.y > cmax.y )
+      co.y = 2*cmax.y - co.y;
    return co;
 }
 
@@ -135,17 +134,23 @@ float corners_shade(vec2 co, float size, float smoothsize){
    return max(max(max(squares.x, squares.y), squares.z), squares.w);
 }
 
-float borders_gradient(vec2 co, float foffset) {
+float borders_gradient(vec2 co, vec2 foffset) {
    // Create a b/w shade near the borders that will be used to 
    // Modulate from sharp reflections to blur reflections.
    vec4 shades;
-   shades.x = abs(     co.x - foffset );
-   shades.y = abs( 1 - co.x - foffset );
-   shades.z = abs(     co.y - foffset );
-   shades.w = abs( 1 - co.y - foffset );
+   shades.x = abs(     co.x - foffset.x );
+   shades.y = abs( 1 - co.x - foffset.x );
+   shades.z = abs(     co.y - foffset.y );
+   shades.w = abs( 1 - co.y - foffset.y );
    return min(min(min(shades.x, shades.y), shades.z), shades.w);
 }
 
+bool is_void_area(vec2 co, vec2 crop_point) {
+   // Given a coordinate and a negative crop_point,
+   // this returns if the point falls into an blank area
+   return (co.y < 0.0 && co.y > crop_point.y*2) || (co.y > 1.0 && co.y < 1 - crop_point.y*2) ||
+          (co.x < 0.0 && co.x > crop_point.x*2) || (co.x > 1.0 && co.x < 1 - crop_point.x*2);
+}
 
 
 void main() {
@@ -154,8 +159,8 @@ void main() {
    //Zoom out the image coordinates by the bezel border size to make room for reflections:
       vec2 coords = zoomout_coords(vTexCoord, BEZEL_BORDER_SIZE, 1.0);
       vec2 coords_zoomedout = coords;
-   
-   //This skip condition will be used to spped-up processing by discarding unuseful pixels.
+  
+   //This skip condition will be used to speed-up processing by discarding unuseful pixels.
    //the c_tolerance parameter is a safe measure /FIXME: for what?
       bool skip_condition = (coords.x < 1.0 - c_tolerance && coords.x > c_tolerance && 
                            coords.y < 1.0 - c_tolerance && coords.y > c_tolerance ) ;
@@ -167,6 +172,7 @@ void main() {
          return;
       }
 
+
    //If coords needs to be curved, do it now:
       if (DO_CURVATURE == 1.0 && ( GEOM_WARP_X > 0.0 || GEOM_WARP_Y > 0.0)  ) {
             coords = Warp_fast(coords, vWarp_vexp, vWarp_arg2); //coords_curved = Warp(coords_curved,GEOM_WARP_X,GEOM_WARP_Y);
@@ -177,19 +183,28 @@ void main() {
    //where the mirror axis is.
    //The mirror axis position may depend on the dynamic zoom level
    //(the feature that zooms the image in when it is bright)
-      float coords_crop_point = 0.0;
+      vec2 coords_crop_point = vec2(0.0);
       if (DO_DYNZOOM == 1.0) {
          //Crop coordinates to move the mirror axes
          float dyn_zoom = get_dyn_zoom(avglum_pass);
-         coords_crop_point = (dyn_zoom - 1.0) * 0.5;
+         coords_crop_point = vec2((dyn_zoom - 1.0) * 0.5);
          //Zoom image coords to align it
          coords = zoom(coords, dyn_zoom);
       }
       coords_crop_point += BEZEL_RFL_OFFSET; // <- Adding the user offset
    
-   //Mirror repeat the image by taking the crop point (mirror axis offset) into account:
-      coords = mirrored_repeat(coords, coords_crop_point);
-  
+      //Mirror repeat the image by taking the crop point (mirror axis offset) into account:
+         vec2 coords_for_mirrored_repeat = coords;
+      /* float test_zoom_y = 0.5;
+         coords_for_mirrored_repeat = vec2(coords.x, zoom1D(coords.y, test_zoom_y));
+         if (test_zoom_y < 1.0)
+            coords_crop_point.y += - ( (1.0/(4*test_zoom_y) ) - (1.0/4.0) );
+               else
+            coords_crop_point.y += ( test_zoom_y - 1.0) * 0.5;
+      */
+         coords = mirrored_repeat(coords_for_mirrored_repeat, coords_crop_point);
+                     
+
       
    //Create gradients in the corners to fadeout reflections and to blur more near them:
       float fcorners_shade = corners_shade(vTexCoord, BEZEL_REFL_CORNER_BLANK_SIZE, BEZEL_REFL_CORNER_BLANK_SHADE);
@@ -212,11 +227,16 @@ void main() {
 
       
    //blur the reflection along x axis:
-      vec3 pixel_out = blur_unroll(BEZEL_REFL_BLUR_MAX * shade_sharp_blur, coords, 2.0);   
+      vec3 pixel_out;
+      if ( !is_void_area(coords_for_mirrored_repeat, coords_crop_point) )
+         pixel_out = blur_unroll(BEZEL_REFL_BLUR_MAX * shade_sharp_blur, coords, 2.0 );   
+            else
+         pixel_out = vec3(0.0);
+
          // I tried, instead of simple blur_unroll() to take a black border into account ( blur_unroll_clamp_to_border() )
          // to emulate the reflection of black border into the main content
          // when it is smaller than the bezel, but due to the low resolution of this pass, the results are bad:
-         // vec3 pixel_out = blur_unroll_clamp_to_border(BEZEL_REFL_BLUR_MAX * shade_sharp_blur, coords, 2.0, coords_crop_point);   
+      //pixel_out = blur_unroll_clamp_to_border(BEZEL_REFL_BLUR_MAX * shade_sharp_blur, coords, 2.0);   
       
       
    //multiply the blurred image by the corner shade so that reflections will not be visible in the corners.
@@ -226,6 +246,7 @@ void main() {
    // Finally, output the blurred image and put the sharp to blurred gradient in the alpha channel
    // to be used by the next blur-y pass too to modulate the blur radius.
       FragColor = vec4(apply_fuzzy_main_pass(pixel_out), shade_sharp_blur);
+      
    
 }
  
