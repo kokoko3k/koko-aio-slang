@@ -229,7 +229,7 @@ void main() {
    //blur the reflection along x axis:
       vec3 pixel_out;
       if ( !is_void_area(coords_for_mirrored_repeat, coords_crop_point) )
-         pixel_out = blur_unroll(BEZEL_REFL_BLUR_MAX * shade_sharp_blur, coords, 2.0 );   
+         pixel_out = blur_unroll(BEZEL_REFL_BLUR_MAX * shade_sharp_blur, coords, shade_sharp_blur*3.0 );   
             else
          pixel_out = vec3(0.0);
 
