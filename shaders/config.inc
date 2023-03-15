@@ -5,7 +5,9 @@
 	// If you are using standard bezel, leave commented to gain performance.
 //#define STATIC_BEZEL_USE_MIPMAP 1.0
 
-
+	//This is used to skip calculations in the reflection blur code.
+	//set it to minimum value that allows you to see reflection entirely
+#define BEZEL_BORDER_SIZE 0.07
 
 
 

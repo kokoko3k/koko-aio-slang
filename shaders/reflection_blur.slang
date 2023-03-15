@@ -33,7 +33,15 @@ float borders_gradient(vec2 co, float smoothness) {
 }
 
 void main() {
+   
    if (DO_BEZEL == 0.0) return;
+   
+   
+   if (vTexCoord.x > BEZEL_BORDER_SIZE && vTexCoord.x < 1.0 - BEZEL_BORDER_SIZE &&
+       vTexCoord.y > BEZEL_BORDER_SIZE && vTexCoord.y < 1.0 - BEZEL_BORDER_SIZE ) {
+      FragColor = vec4(0.0);
+      return;
+   }
    
    vec2 coords = vTexCoord;
    
@@ -41,8 +49,6 @@ void main() {
    if (DO_GAME_GEOM_OVERRIDE > 0.5) {
       coords = content_aspect_override(coords, GAME_GEOM_ASPECT, get_in_aspect());
       coords.y += (GAME_GEOM_VSHIFT/10.0) *  (1 - BEZEL_INNER_ZOOM);
-      
-
    }
    
    if (DO_DYNZOOM == 1.0) 
@@ -73,6 +79,8 @@ void main() {
    float lodmix = fract(shade_sharp_blur_adapted);
    
    vec3 pixel_out = mix(s1, s2, lodmix);
+   
+   pixel_out = apply_fuzzy_main_pass(pixel_out);
    
    FragColor = vec4(pixel_out, 0.0);
 }
