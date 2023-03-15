@@ -740,7 +740,7 @@ vec3 compose_bezel_over(vec3 full_viewport, vec2 param_coords_for_mirror) {
         ambitemporalpass = max(ambitemporalpass, 0.0); //<-- this to avoid undefined results
         vec3 pixel_ambilight = DO_AMBILIGHT * (ambitemporalpass + global_noise);
         float opacita = bezel.a;
-        bezel_out = bezel_out + pixel_ambilight * AMBI_OVER_BEZEL * (1 -  reflection * 1.9 ) * bezel.a;
+        bezel_out = bezel_out + pixel_ambilight * AMBI_OVER_BEZEL * (1 -  reflection * 1.9 ) * bezel.a; 
         
         //bezel_out = vec3(bezel.a);
         
@@ -748,7 +748,7 @@ vec3 compose_bezel_over(vec3 full_viewport, vec2 param_coords_for_mirror) {
         //We use the green component to express Hardness/Specularity; there the reflection will be completely diffused.
         //For the task, we use a mipmap whit adeguate precision.
         if (lut_specular > 0.0) {
-            vec4 pixel_avglum = texture(avglum_pass,coords_for_mirror);
+            vec4 pixel_avglum = texture(avglum_pass,vTexCoord);
             //bezel_out = bezel_out + ( ( pixel_avglum.rgb + pixel_avglum.a*0.5)  * lut_hardness * 0.57 * BEZEL_REFL_STRENGTH );
             bezel_out = bezel_out + ( ( pixel_avglum.rgb )  * lut_specular ) ;
         }
@@ -919,7 +919,8 @@ void main() {
     //vec4 pixel_mirrored = texture(reflected_blurred_pass,coords_for_mirror);
     //pixel_out = pixel_mirrored;
     
-    
+    //pixel_out = texture(avglum_pass, vTexCoord);
+
 
     
     FragColor = pixel_out;

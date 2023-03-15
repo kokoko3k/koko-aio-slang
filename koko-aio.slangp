@@ -116,7 +116,7 @@ shaders = 16
        scale_type2 = source
             scale2 = 1.0
      mipmap_input2 = true
-        wrap_mode2 = "mirrored_repeat"
+        wrap_mode2 = "clamp_to border"
 
         
 
@@ -211,7 +211,7 @@ float_framebuffer7 = true
         filter_linear9 = true
            scale_type9 = source
                 scale9 = 1.0
-            wrap_mode9 = "mirrored_repeat"
+            wrap_mode9 = "clamp_to_border"
 
 
 # In the following passes we emulate bloom effect.
@@ -345,6 +345,7 @@ float_framebuffer7 = true
 #    [.] Darkline, vmask: whiteness can be pre-calculated outside.
 #        Half done, gained something.
 #    [v] reflection blur: can we make better use of mipmaps instead of blindly use lod = 2.0?
+#    [v] avglum_pass needs to react to content aspect override
 #    [ ] check branching conditions in first_pass.slang
 #    [ ] Better debanding?
 #    [ ] Should the flickering be aware of the scanline?
@@ -358,5 +359,5 @@ float_framebuffer7 = true
 #        (which could be translated to a different aspect for bezel, maybe simpler)
 #        Problem is reflection alignment.
 #    [ ] Ambi temporal pass, move content override code to vertex shader
-#    [ ] avglum_pass needs to react to content aspect override
-
+#    [ ] Bezel colorization via ambilight acts strangely when the content aspect is shrinked
+#    [ ] bloom coords/lookup zones need to be adapted to content geom override.
