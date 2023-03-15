@@ -740,7 +740,7 @@ vec3 compose_bezel_over(vec3 full_viewport, vec2 param_coords_for_mirror) {
         ambitemporalpass = max(ambitemporalpass, 0.0); //<-- this to avoid undefined results
         vec3 pixel_ambilight = DO_AMBILIGHT * (ambitemporalpass + global_noise);
         float opacita = bezel.a;
-        bezel_out = bezel_out + pixel_ambilight * AMBI_OVER_BEZEL * (1 -reflection) * bezel.a;
+        bezel_out = bezel_out + pixel_ambilight * AMBI_OVER_BEZEL * (1 -  reflection * 1.9 ) * bezel.a;
         
         //bezel_out = vec3(bezel.a);
         
