@@ -116,7 +116,7 @@ shaders = 16
        scale_type2 = source
             scale2 = 1.0
      mipmap_input2 = true
-        wrap_mode2 = "clamp_to_border"
+        wrap_mode2 = "mirrored_repeat"
 
         
 
@@ -210,7 +210,7 @@ float_framebuffer7 = true
                 alias9 = "reflected_blurred_pass"
         filter_linear9 = true
            scale_type9 = source
-                scale9 = 2.0
+                scale9 = 1.0
             wrap_mode9 = "mirrored_repeat"
 
 
@@ -224,7 +224,7 @@ float_framebuffer7 = true
         filter_linear10 = true
            scale_type10 = source
                 scale10 = 1.0
-            wrap_mode10 = "clamp_to_border"
+            wrap_mode10 = "mirrored_repeat"
     
     
                shader11 = shaders/bloom_pass_2.slang

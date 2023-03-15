@@ -4,8 +4,7 @@
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
-layout(location = 1) out vec2 vWarp_vexp;
-layout(location = 2) out vec2 vWarp_arg2;
+
 layout(location = 0) out vec2 vTexCoord;
 
 #include "includes/functions.include.slang"
@@ -13,239 +12,69 @@ layout(location = 0) out vec2 vTexCoord;
 void main() {
    gl_Position = global.MVP * Position;
    vTexCoord = TexCoord;
-  //Precalc some Curvature/Warp values:
-      vWarp_vexp = 1.0/ (1 + (vec2(GEOM_WARP_X, GEOM_WARP_Y) * 0.2)) ;
-      vWarp_arg2 = 1.0 - pow(vec2(0.29289321881345247559915563789515), vWarp_vexp );
-      
-      
-      
-   if (DO_BEZEL > 0.5)
-      vTexCoord = zoom(TexCoord, BEZEL_REFL_ZOOM + (BEZEL_REFL_ZOOM_STRAIGHT_OFFSET *  BEZEL_USE_STRAIGHT) );
 }
 
 #pragma stage fragment
 layout(location = 0) in vec2 vTexCoord;
-layout(location = 1) in vec2 vWarp_vexp;
-layout(location = 2) in vec2 vWarp_arg2;
+
 layout(location = 0) out vec4 FragColor;
 
 layout(set = 0, binding = 1) uniform sampler2D first_pass;
 layout(set = 0, binding = 2) uniform sampler2D avglum_pass;
 
-#define SourceTexture first_pass
-#define SourceTextureSize global.first_passSize
-
 #include "includes/functions.include.slang"
 
-#define c_tolerance 0.051
-
-vec3 texture_clamp_to_border(sampler2D tex, vec2 coords, float lod) {
-   //This emulates clamp to border:
-   if (coords.x < 0.0 || coords.x > 1.0 || coords.y < 0.0 || coords.y > 1.0)
-      return vec3(0.0);
-   else
-      return textureLod( tex, coords, lod).rgb ;
-}
-
-/*
-   #define crop_xmin crop.x
-   #define crop_ymin crop.y
-   #define crop_xmax crop.z
-   #define crop_ymax crop.w
-*/
-
-vec2 mirrored_repeat(vec2 co, vec4 crop) {
-   //Crop = vec4(xmin,xmax,ymin,ymax)
-   
-   //Do a coords mirrored repeat with the mirror axis
-   //shifted by a "crop" amount.
-   //Don't try to unbranch me, it is a matter of 1/1000.
-   vec2 cmin ; //= 0.0 + crop ;
-   cmin.x = 0.0 + crop.x;
-   cmin.y = 0.0 + crop.y;
-   
-   vec2 cmax ; //= 1.0 - crop ; 
-   cmax.x = 1.0 - crop.z;
-   cmax.y = 1.0 - crop.w;
-   
-   
-   if (co.x < cmin.x )
-      co.x = 2*cmin.x - co.x;
-   if (co.y < cmin.y)
-      co.y = 2*cmin.y - co.y;
-   if (co.x > cmax.x )
-      co.x = 2*cmax.x - co.x;
-   if (co.y > cmax.y )
-      co.y = 2*cmax.y - co.y;
-   return co;
-}
-
-float circle_smooth(vec2 coords, vec2 middle, float f_radius, float FALLOFF) {
-   //Draw a circle with smoothed borders:
-   float fdistance=distance(middle, vec2(coords.x, coords.y));
-   float circle = (1-smoothstep(f_radius-FALLOFF, f_radius+FALLOFF, fdistance));
-   return circle;
-}
-
-float square_smooth(vec2 co, vec2 corner, float size, float smoothshade) {
+float borders_gradient(vec2 co, float smoothness) {
    //Draws a square with smooth borders:
-   vec4 rect = vec4(corner.x, corner.y, corner.x+size, corner.y+size);
-   vec2 hv = smoothstep(rect.xy - smoothshade, rect.xy, co) * smoothstep(co - smoothshade, co, rect.zw);
+   float size = 1.0;
+   vec4 rect = vec4(0.0+smoothness, 0.0+smoothness, size - smoothness, size - smoothness);
+   vec2 hv = smoothstep(rect.xy - smoothness, rect.xy, co) * smoothstep(co - smoothness, co, rect.zw);
    return  hv.x * hv.y;
 }
 
-float corners_shade(vec2 co, float size, float smoothsize){
-   //Draws 4 smooth squares or circles in the corners.
-   //They are intended to modulate the blur radius and the strength of the reflection.
-   
-   /*
-      vec4 circles;
-      float circle_radius = size; //0.13?
-      float circle_falloff = smoothsize; //0.05?
-      float circle_power =2.0;
-      circles.x = circle_smooth(co, vec2(0.0,0.0), circle_radius, circle_falloff) * circle_power;
-      circles.y = circle_smooth(co, vec2(0.0,1.0), circle_radius, circle_falloff) * circle_power;
-      circles.z = circle_smooth(co, vec2(1.0,0.0), circle_radius, circle_falloff) * circle_power;
-      circles.w = circle_smooth(co, vec2(1.0,1.0), circle_radius, circle_falloff) * circle_power;
-               
-      float circle = max(max(max(circles.x, circles.y), circles.z), circles.w);
-      circle = min(circle, 1.0);
-      circle = 1-circle;
-      
-      return circle;
-   */      
-   vec4 squares;
-   float squaresize = size;
-   float squarefade = smoothsize;
-   //(vec2 co, vec2 corner, float size, float smoothshade) {
-   squares.x = square_smooth(co, vec2(0.0,0.0), squaresize, squarefade);
-   squares.y = square_smooth(co, vec2(1.0 - squaresize, 0.0), squaresize, squarefade);
-   squares.z = square_smooth(co, vec2(0.0, 1-squaresize), squaresize, squarefade);
-   squares.w = square_smooth(co, vec2(1-squaresize, 1-squaresize), squaresize, squarefade);
-   return max(max(max(squares.x, squares.y), squares.z), squares.w);
-}
-
-float borders_gradient(vec2 co, vec4 foffset) {
-   // Create a b/w shade near the borders that will be used to 
-   // Modulate from sharp reflections to blur reflections.
-   vec4 shades;
-   shades.x = abs(     co.x - foffset.x );
-   shades.y = abs(     co.y - foffset.y );
-   shades.z = abs( 1 - co.x - foffset.z );
-   shades.w = abs( 1 - co.y - foffset.w );
-   return min(min(min(shades.x, shades.y), shades.z), shades.w);
-}
-
-bool is_void_area(vec2 co, vec4 crop_point) {
-   // Given a coordinate and a negative crop_point,
-   // this returns if the point falls into an blank area
-   return (co.y < 0.0 && co.y > crop_point.y*2) || (co.y > 1.0 && co.y < 1 - crop_point.w*2) ||
-          (co.x < 0.0 && co.x > crop_point.x*2) || (co.x > 1.0 && co.x < 1 - crop_point.z*2);
-}
-
-//FIXME: where does the following comes from?
-//it is needed to align reflection and content when content is v-shifted.
-#define VSHIFT_CORRECTION 1.16
-
 void main() {
-   
-   
    if (DO_BEZEL == 0.0) return;
    
-   //Zoom out the image coordinates by the bezel border size to make room for reflections:
-      vec2 coords = zoomout_coords(vTexCoord, BEZEL_BORDER_SIZE, 1.0);
-      vec2 coords_zoomedout = coords;
-  
-   //This skip condition will be used to speed-up processing by discarding unuseful pixels.
-   //the c_tolerance parameter is a safe measure /FIXME: for what?
-      bool skip_condition = (coords.x < 1.0 - c_tolerance && coords.x > c_tolerance && 
-                           coords.y < 1.0 - c_tolerance && coords.y > c_tolerance ) ;
-
-
-   //If coords needs to be curved, do it now:
-      if (DO_CURVATURE == 1.0 && ( GEOM_WARP_X > 0.0 || GEOM_WARP_Y > 0.0)  ) {
-            coords = Warp_fast(coords, vWarp_vexp, vWarp_arg2); //coords_curved = Warp(coords_curved,GEOM_WARP_X,GEOM_WARP_Y);
-      }
+   vec2 coords = vTexCoord;
    
-   
-   //Since we will use a mirrored_repeat trick to simulate reflections, we need to know
-   //where the mirror axis is.
-   //The mirror axis position may depend on the dynamic zoom level
-   //(the feature that zooms the image in when it is bright)
-      vec4 coords_crop_point = vec4(0.0);
-      if (DO_DYNZOOM == 1.0) {
-         //Crop coordinates to move the mirror axes
-         float dyn_zoom = get_dyn_zoom(avglum_pass);
-         coords_crop_point = -vec4( (1.0/(2*dyn_zoom) ) - (1.0/2.0) );
-         //Zoom image coords to align it
-         coords = zoom(coords, dyn_zoom);
-      }
-      coords_crop_point += BEZEL_RFL_OFFSET; // <- Adding the user offset
-   
-      //Mirror repeat the image by taking the crop point (mirror axis offset) into account:
-         vec2 coords_for_mirrored_repeat = coords;
-
-         //override game geometry? 
-         if (DO_GAME_GEOM_OVERRIDE > 0.5) {
-            float scale_y = get_in_aspect()/GAME_GEOM_ASPECT;   
-            float voffset = GAME_GEOM_VSHIFT/10.0;
-
-            
-            coords_for_mirrored_repeat = vec2(coords_for_mirrored_repeat.x, zoom1D(coords.y, scale_y));
-            coords_for_mirrored_repeat.y = coords_for_mirrored_repeat.y + (GAME_GEOM_VSHIFT/10.0) * VSHIFT_CORRECTION;
-            
-            coords_crop_point.y -= ( (1.0/(2*scale_y) ) - (1.0/2.0) ) - voffset;
-            coords_crop_point.w -= ( (1.0/(2*scale_y) ) - (1.0/2.0) ) + voffset;
-
-         }
-         
-         
-         coords = mirrored_repeat(coords_for_mirrored_repeat, coords_crop_point);
-         //coords.y = coords.y - GAME_GEOM_VSHIFT;
-
-   
-
+   //override aspect
+   if (DO_GAME_GEOM_OVERRIDE > 0.5) {
+      coords = content_aspect_override(coords, GAME_GEOM_ASPECT, get_in_aspect());
+      coords.y += (GAME_GEOM_VSHIFT/10.0) *  (1 - BEZEL_INNER_ZOOM);
       
-   //Create gradients in the corners to fadeout reflections and to blur more near them:
-      float fcorners_shade = corners_shade(vTexCoord, BEZEL_REFL_CORNER_BLANK_SIZE, BEZEL_REFL_CORNER_BLANK_SHADE);
+
+   }
    
+   if (DO_DYNZOOM == 1.0) 
+      coords = zoom(coords, get_dyn_zoom(avglum_pass));
+
+   coords = zoom(coords, 1 + BEZEL_RFL_OFFSET * 0.05); 
+   
+   //eventually return black pixel
+   if (coords.y < 0.0 || coords.y > 1.0 || coords.x < 0.0 || coords.x > 1.0) {
+      FragColor = vec4(0.0);
+      return;
+   }
+
+
       
    //Create a gradient near borders to modulate between blurrend and sharp refection.
    //This also goes into output alpha channel to make the next pass aware of it.
-      float shade_sharp_blur = borders_gradient(coords, coords_crop_point);
-      shade_sharp_blur = shade_sharp_blur * 1/(BEZEL_BORDER_SIZE * 0.3) ;
-      shade_sharp_blur = shade_sharp_blur - BEZEL_RFL_BLR_SHD; //Modulates between sharp and blur via user parameter
+   float smoothness = 0.08;
+   float shade_sharp_blur = borders_gradient(vTexCoord, smoothness);
+   shade_sharp_blur = shade_sharp_blur - BEZEL_RFL_BLR_SHD; //Modulates between sharp and blur via user parameter
+
       
-      
-   //Also modulate in the corners via fcorners_shade (fcorners_shade 
-      shade_sharp_blur = max(fcorners_shade, shade_sharp_blur);
-      
-          
-   //blur the reflection along x axis:
-      vec3 pixel_out;
-      if ( !is_void_area(coords_for_mirrored_repeat, coords_crop_point) ) {
-         float shade_sharp_blur_adapted = shade_sharp_blur * 3.0;
-         float lod0 = floor(shade_sharp_blur_adapted);
-         float lod1 = lod0 + 1;
-                                                                                 //lod0=0.0;lod1=0.0; //DEBUG
-         vec3 s1 = textureLod( SourceTexture, coords, lod0).rgb;
-         vec3 s2 = textureLod( SourceTexture, coords, lod1).rgb;
-         float lodmix = fract(shade_sharp_blur_adapted);
-         pixel_out = mix(s1, s2, lodmix);
-      }
-         else
-      pixel_out = vec3(0.0,0.0,0.0);
-      
-      
-   //multiply the blurred image by the corner shade so that reflections will not be visible in the corners.
-      pixel_out = pixel_out * (1 - fcorners_shade);
+   float shade_sharp_blur_adapted = shade_sharp_blur * 3.0;
+   float lod0 = floor(shade_sharp_blur_adapted);
+   float lod1 = lod0 + 1;
+   vec3 s1 = textureLod( first_pass, coords, lod0).rgb;
+   vec3 s2 = textureLod( first_pass, coords, lod1).rgb;
+   float lodmix = fract(shade_sharp_blur_adapted);
    
-               
-   // Finally, output the blurred image and put the sharp to blurred gradient in the alpha channel
-   // to be used by the next blur-y pass too to modulate the blur radius.
-      FragColor = vec4(apply_fuzzy_main_pass(pixel_out), 1.0);
-      
+   vec3 pixel_out = mix(s1, s2, lodmix);
    
+   FragColor = vec4(pixel_out, 0.0);
 }
  
  

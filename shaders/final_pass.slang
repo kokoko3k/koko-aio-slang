@@ -32,7 +32,6 @@ layout(location = 4) out float vIsRotated;
 //Vignette, spot:
     layout(location = 11) out float vIn_aspect;
 
-layout(location = 12) out vec2 vTexCoord_content_overridden;
     
 #include "includes/functions.include.slang"
 
@@ -45,19 +44,14 @@ void main() {
     if (DO_GLOBAL_SHZO >0.5)
         vTexCoord = zoom(vTexCoord + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM );
 
-    vTexCoord_content_overridden = vTexCoord;
-    if (DO_GAME_GEOM_OVERRIDE > 0.5) {
-        vTexCoord_content_overridden = content_aspect_override(vTexCoord, GAME_GEOM_ASPECT, vIn_aspect);
-        vTexCoord_content_overridden.y += GAME_GEOM_VSHIFT/10.0;
-    }
-    
     vOutputCoord = TexCoord;
     
     vFragCoord = vec2( floor(vOutputCoord.x * params.OutputSize.x),
                        floor(vOutputCoord.y * params.OutputSize.y));
 
     //Precalc some Curvature/Warp values:
-        vec2 geom_warp_adapted = vec2(GEOM_WARP_X, GEOM_WARP_Y);
+        float warp_adaption =  1 - BEZEL_INNER_ZOOM * 4.0;
+        vec2 geom_warp_adapted = vec2(GEOM_WARP_X, GEOM_WARP_Y) * warp_adaption;
         
        /* if (DO_BEZEL > 0.0) {
             geom_warp_adapted *= (-BEZEL_INNER_ZOOM) + 1;
@@ -103,7 +97,6 @@ layout(location = 8) in float vFlickeringScanlines;
 layout(location = 9) in float vScanlinePeriod;
 layout(location = 10) in float vScanlinesAlternate;
 layout(location = 11) in float vIn_aspect;
-layout(location = 12) in vec2 vTexCoord_content_overridden;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -461,6 +454,7 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
     vec3 pixel_in;
     vec3 pixel_glowed;
 
+    
     //Get the first available pixel_in:
     //vec2 off=vec2(0.0,+ global.first_passSize.w*0.5); needed
     //To be added to the following coords and to halo coords (FIXME: WHY?)
@@ -692,7 +686,7 @@ vec3 bezel_color(float lum)  {
 
 #define STATIC_BEZEL_USE_MIPMAP 1.0
 
-vec3 compose_bezel_over(vec3 full_viewport) {
+vec3 compose_bezel_over(vec3 full_viewport, vec2 param_coords_for_mirror) {
     vec2 coords_for_bezel = vTexCoord;
     
     if (BEZEL_FRAME_ZOOM != 0.0)
@@ -701,7 +695,7 @@ vec3 compose_bezel_over(vec3 full_viewport) {
     //No need to draw anything outside this:
     if (coords_for_bezel.x < 0  || coords_for_bezel.y < 0 || coords_for_bezel.x > 1.0 || coords_for_bezel.y > 1.0) return full_viewport;
 
-    vec2 coords_for_mirror = coords_for_bezel;
+    vec2 coords_for_mirror = param_coords_for_mirror;
     
     //Main lut:
     vec4 bezel;
@@ -729,6 +723,7 @@ vec3 compose_bezel_over(vec3 full_viewport) {
     //This is the reflection to be composed over the bezel);
     vec3 pixel_mirrored = texture(reflected_blurred_pass,
                           coords_for_mirror + random( min(global.FinalViewportSize.z,global.FinalViewportSize.w)*1.5, vTexCoord ) ).rgb;
+                          
 //return pixel_mirrored;
     //Take the reflection modifier from the texture blue component into account; it is/may be used to lower the reflection in the corners.
         //float reflection = (reflection_shade * 1.4 -  0.4)  * bezel.b ;
@@ -818,6 +813,8 @@ vec4 pixel_inner_frame(vec2 coords, bool bBorder_needed) {
 
 
 vec4 main_wrap(vec2 coords){
+    
+    
     /* Handle inner border and outer border, not bezel */
     if (DO_VIGNETTE + DO_SPOT + DO_AMBILIGHT >0.0) global_noise = random(NOISEPOWER, vTexCoord * params.FrameCount);
     
@@ -856,8 +853,22 @@ vec4 main_wrap(vec2 coords){
 
 
 void main() {
+  
+
     
-    vec2 coords = vTexCoord_content_overridden;
+    vec2 coords = vTexCoord;
+    
+    
+    //Curvature
+    if (DO_CURVATURE == 1.0  &&  ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0))) {
+            coords = Warp_fast(coords, vWarp_vexp, vWarp_arg2);
+    }
+    vec2 coords_for_mirror = coords;
+    
+    if (DO_GAME_GEOM_OVERRIDE > 0.5) {
+        coords = content_aspect_override(coords, GAME_GEOM_ASPECT, vIn_aspect);
+        coords.y += GAME_GEOM_VSHIFT/10.0;
+    }
     
     //Luminosity dependant zoom
     if (DO_DYNZOOM == 1.0) {
@@ -867,20 +878,16 @@ void main() {
         coords = zoom(coords, dynzoom);
     }
 
-    //Scale coords according to bezel settings?
+    
+
+
+        //Scale coords according to bezel settings?
     if (DO_BEZEL == 1.0) {
         coords = zoomout_coords(coords, -BEZEL_INNER_ZOOM , 1.0);
-        coords = clamp(coords, 0.0,1.0);
+        coords_for_mirror = zoomout_coords(coords_for_mirror, -BEZEL_INNER_ZOOM , 1.0);
     }
+
     
-    //Curvature
-    if (DO_CURVATURE == 1.0) {
-        if ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0))
-            coords = clamp(coords, -0.1,1.1);
-            coords = Warp_fast(coords, vWarp_vexp, vWarp_arg2);
-            
-    }
-     
     //"Just" handle inner and outer frame here:
     vec4 pixel_out = main_wrap(coords);
 
@@ -893,7 +900,7 @@ void main() {
     
     //Draw bezel
     if (DO_BEZEL == 1.0) {
-        pixel_out = vec4(compose_bezel_over(pixel_out.rgb),1.0);
+        pixel_out = vec4(compose_bezel_over(pixel_out.rgb, coords_for_mirror),1.0);
     }
 
     //Draw an image "Over" the bezel with an hole inside by the alpha channel
@@ -909,9 +916,11 @@ void main() {
         //if (vTexCoord.y < 0.5) pixel_out = texture(first_pass,vTexCoord);
         //pixel_out = texture(avglum_pass,vTexCoord);
 
-    //vec4 pixel_mirrored = texture(reflected_blurred_pass,vTexCoord);
+    //vec4 pixel_mirrored = texture(reflected_blurred_pass,coords_for_mirror);
     //pixel_out = pixel_mirrored;
     
+    
+
     
     FragColor = pixel_out;
     

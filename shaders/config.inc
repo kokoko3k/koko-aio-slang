@@ -5,26 +5,6 @@
 	// If you are using standard bezel, leave commented to gain performance.
 //#define STATIC_BEZEL_USE_MIPMAP 1.0
 
-	//If you change the default bezel texture, you may have to edit this to
-	//align bezel reflections and game content. (it seems to depend on the curvature amount)
-//#define BEZEL_BORDER_SIZE 0.197
-#define BEZEL_BORDER_SIZE 0.197
-
-	//When switching from curved bezel to straight bezel, the reflection zoom 
-	//is auto adjusted by the following amount to keep them aligned:
-#define BEZEL_REFL_ZOOM_STRAIGHT_OFFSET -0.015
-
-	// Define the size and the smoothness of the rectangle 
-	// in the bezel corners that will hide and blur the reflections 
-#define BEZEL_REFL_CORNER_BLANK_SIZE 0.0685
-#define BEZEL_REFL_CORNER_BLANK_SHADE 0.05  // keep it > 0.0
-
-	//Bezel reflection warping (curvature) may need a correction factor.
-	//Modify this if bezel reflections does not follow the border
-#define BEZEL_REFL_WARP_CORRECTION_FACTOR 1.9
-
-
-
 
 
 
@@ -246,7 +226,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float BEZEL_USE_STRAIGHT;
 	float BEZEL_RFL_BLR_SHD;
 	float BEZEL_RFL_OFFSET;
-	float BEZEL_REFL_ZOOM;
 	float BEZEL_REFL_STRENGTH;
 	float BEZEL_SPCL_STRENGTH;
 
@@ -455,9 +434,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BEZEL_SPCL_STRENGTH "        Specularity strength"	0.5    0.0 3.0 0.05
 #pragma parameter BEZEL_REFL_STRENGTH "        Reflection strength"	0.5    0.0 1.0 0.01
 #pragma parameter BEZEL_RFL_BLR_SHD   "        Sharp reflections"	-0.4    -1.0 1.0 0.1
-#pragma parameter BEZEL_RFL_OFFSET    "        Align reflections: offset"	0.003    -0.01 0.01 0.001
-//#pragma parameter BEZEL_RFL_OFFSET    "        Align reflections: offset"	0.003    -1.01 1.01 0.01
-#pragma parameter BEZEL_REFL_ZOOM     "        Align reflections: zoom"		0.98    0.8 1.2 0.001
+#pragma parameter BEZEL_RFL_OFFSET    "        Align reflections: offset" 0.00    -1.0 1.0 0.1
 
 
 #pragma parameter BLANK15 " " 0.0 0.0 1.0 1.0

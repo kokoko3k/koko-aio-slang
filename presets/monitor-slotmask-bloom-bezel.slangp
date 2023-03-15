@@ -7,7 +7,7 @@
 
 DO_BEZEL = "1.0"
         BEZEL_FRAME_ZOOM = "0.04"
-        BEZEL_INNER_ZOOM = "-0.165"
+        BEZEL_INNER_ZOOM = "-0.1825"
 
 DO_CURVATURE = 1.0
 
