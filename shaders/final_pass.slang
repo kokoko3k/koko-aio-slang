@@ -735,12 +735,17 @@ vec3 compose_bezel_over(vec3 full_viewport, vec2 param_coords_for_mirror) {
         //return pixel_mirrored;
         vec3 bezel_out = bezel_colored + pixel_mirrored;
         
-        //Mix ambient light over bezel? (branching this is worse)     
-        vec3 ambitemporalpass = texture(ambi_temporal_pass, vOutputCoord).rgb;
-        ambitemporalpass = max(ambitemporalpass, 0.0); //<-- this to avoid undefined results
-        vec3 pixel_ambilight = DO_AMBILIGHT * (ambitemporalpass + global_noise);
-        float opacita = bezel.a;
-        bezel_out = bezel_out + pixel_ambilight * AMBI_OVER_BEZEL * (1 -  reflection * 1.9 ) * bezel.a; 
+        //Mix ambient light over bezel? (branching this is worse)   
+            //Disabled till we'll find a less glitchy way yo do it.
+            //By now it:
+            //bleeds over alpha channel in the tube
+            //it colors shaded corners when no reflections are painted over it.
+            /*vec3 ambitemporalpass = texture(ambi_temporal_pass, vOutputCoord).rgb;
+            ambitemporalpass = max(ambitemporalpass, 0.0); //<-- this to avoid undefined results
+            vec3 pixel_ambilight = DO_AMBILIGHT * (ambitemporalpass + global_noise);
+            float opacita = bezel.a;
+            bezel_out = bezel_out + pixel_ambilight * AMBI_OVER_BEZEL * (1 -  reflection * 1.9 ) *  (1 - lut_specular * 1.9) * bezel.a; 
+            */
         
         //bezel_out = vec3(bezel.a);
         

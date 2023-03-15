@@ -36,9 +36,9 @@ void main() {
    
    if (DO_BEZEL == 0.0) return;
    
-   
-   if (vTexCoord.x > BEZEL_BORDER_SIZE && vTexCoord.x < 1.0 - BEZEL_BORDER_SIZE &&
-       vTexCoord.y > BEZEL_BORDER_SIZE && vTexCoord.y < 1.0 - BEZEL_BORDER_SIZE ) {
+   float skip_border = BEZEL_BORDER_SIZE  ;
+   if (vTexCoord.x > skip_border && vTexCoord.x < 1.0 - skip_border &&
+       vTexCoord.y > skip_border && vTexCoord.y < 1.0 - skip_border ) {
       FragColor = vec4(0.0);
       return;
    }

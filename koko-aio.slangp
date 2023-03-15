@@ -359,5 +359,7 @@ float_framebuffer7 = true
 #        (which could be translated to a different aspect for bezel, maybe simpler)
 #        Problem is reflection alignment.
 #    [ ] Ambi temporal pass, move content override code to vertex shader
-#    [ ] Bezel colorization via ambilight acts strangely when the content aspect is shrinked
-#    [ ] bloom coords/lookup zones need to be adapted to content geom override.
+#    [..] Bezel colorization via ambilight acts strangely when the content aspect is shrinked
+#          [  ] It also bleeds over alpha channel in the internal frame.
+#          [  ] disabled by now till we find a better way to handle it.
+#    [ ] bloom should bleed over when forcing geometry aspect
