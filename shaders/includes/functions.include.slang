@@ -69,6 +69,10 @@ vec2 zoomxy(vec2 in_coords, vec2 zoom_factor) {
 }
 
 vec2 zoomout_coords(vec2 in_coords, float zoom_out, float aspect) {
+   // to convert to standard zoom:
+   // zoomout_coords(x) = zoom( 1/(x+1) );
+
+	
    vec2 zoom   = vec2( 1 + zoom_out, 
                        1 + (zoom_out * aspect) 
                      );

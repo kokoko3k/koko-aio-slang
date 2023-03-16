@@ -7,7 +7,26 @@
 
 	//This is used to skip calculations in the reflection blur code.
 	//set it to minimum value that allows you to see reflection entirely
-#define BEZEL_BORDER_SIZE 0.07
+#define BEZEL_BORDER_SIZE 0.08
+
+	//In the second reflection pass, the coordinates are zoomedout by the
+	//BEZEL_REFL_ZOOMOUT_ROOM so that the image is mirrored-repeated by retroarch.
+	//they are adjusted by an inverse amount in final pass to align them
+	//lowering this value makes more room for reflections, but this steals
+	//pixels for reflection resolution, so make it higher as possible as
+	//long as you can see the reflections on the reflective area without
+	//them blanking or repeating.
+	//Modifying it require you to tweak BEZEL_REFL_CORNER_BLANK_SIZE too.
+#define BEZEL_REFL_ZOOMOUT_ROOM 0.8
+
+
+	// Define the size and the smoothness of the rectangle 
+	// in the bezel corners that will hide and blur the reflections 
+#define BEZEL_REFL_CORNER_BLANK_SIZE 0.08
+#define BEZEL_REFL_CORNER_BLANK_SHADE 0.05  // keep it > 0.0
+
+
+
 
 
 
@@ -227,7 +246,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float BEZEL_FRAME_ZOOM;
 	float BEZEL_USE_STRAIGHT;
 	float BEZEL_RFL_BLR_SHD;
-	float BEZEL_RFL_OFFSET;
+	float BEZEL_RFL_ZOOM;
 	float BEZEL_REFL_STRENGTH;
 	float BEZEL_SPCL_STRENGTH;
 
@@ -276,6 +295,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float DO_GAME_GEOM_OVERRIDE;
 	float GAME_GEOM_ASPECT;
 	float GAME_GEOM_VSHIFT;
+	float GAME_GEOM_HSHIFT;
 	
 } global;
 
@@ -433,11 +453,10 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BEZEL_CON           "        Contrast"			1.3   0.0  10.0 0.01
 #pragma parameter BEZEL_INNER_ZOOM    "        Image zoom"		-0.18   -1.5 0.5 0.005
 #pragma parameter BEZEL_FRAME_ZOOM    "        Frame zoom"		0.0   -1.5 0.5 0.005
-#pragma parameter BEZEL_SPCL_STRENGTH "        Specularity strength"	0.5    0.0 3.0 0.05
+#pragma parameter BEZEL_RFL_ZOOM      "        Reflections zoom"	0.0   -1.5 0.5 0.005
 #pragma parameter BEZEL_REFL_STRENGTH "        Reflection strength"	0.5    0.0 1.0 0.01
-#pragma parameter BEZEL_RFL_BLR_SHD   "        Sharp reflections"	-0.4    -1.0 1.0 0.1
-#pragma parameter BEZEL_RFL_OFFSET    "        Align reflections: offset" 0.00    -1.0 1.0 0.1
-
+#pragma parameter BEZEL_RFL_BLR_SHD   "        Reflections sharpness"	-0.0  -0.5 1.0 0.01
+#pragma parameter BEZEL_SPCL_STRENGTH "        Specularity strength"	0.5    0.0 3.0 0.05
 
 #pragma parameter BLANK15 " " 0.0 0.0 1.0 1.0
 
@@ -528,5 +547,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter DO_GAME_GEOM_OVERRIDE	 "★ Override content geometry"			0.0   0.0  1.0 	  1.0
 #pragma parameter GAME_GEOM_ASPECT	 "        Aspect"					1.3333333333333  0.1  3.0 	  0.005
 #pragma parameter GAME_GEOM_VSHIFT	 "        Vertical position"				0.0   -10.0 10.0  0.1
+#pragma parameter GAME_GEOM_HSHIFT	 "        Horizontal position"				0.0   -10.0 10.0  0.1
 
 #include "config.globals.inc"

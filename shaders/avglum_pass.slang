@@ -25,7 +25,8 @@ void main() {
    
     if (DO_GAME_GEOM_OVERRIDE > 0.5) {
         vTexCoord = content_aspect_override(vTexCoord, GAME_GEOM_ASPECT, get_in_aspect());
-        vTexCoord.y += GAME_GEOM_VSHIFT/10.0;
+        vTexCoord.y -= GAME_GEOM_VSHIFT/10.0;
+        vTexCoord.x -= GAME_GEOM_HSHIFT/10.0;
     }
 
 }

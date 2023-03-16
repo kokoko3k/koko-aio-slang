@@ -862,17 +862,30 @@ void main() {
 
     
     vec2 coords = vTexCoord;
-    
+                                          
     
     //Curvature
     if (DO_CURVATURE == 1.0  &&  ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0))) {
             coords = Warp_fast(coords, vWarp_vexp, vWarp_arg2);
+
     }
-    vec2 coords_for_mirror = coords;
+    vec2 coords_for_mirror = coords;     
+    
+    
+        //Scale coords according to bezel settings?
+    if (DO_BEZEL == 1.0) {
+        coords = zoomout_coords(coords, -BEZEL_INNER_ZOOM , 1.0);
+        
+        coords_for_mirror = coords;
+        coords_for_mirror = zoom(coords_for_mirror, 1/BEZEL_REFL_ZOOMOUT_ROOM);
+        //coords_for_mirror = zoomout_coords(coords, -BEZEL_INNER_ZOOM , 1.0);
+        //coords_for_mirror = zoom(coords_for_mirror,BEZEL_REFL_ROOM_COMPENSATION);
+    }
     
     if (DO_GAME_GEOM_OVERRIDE > 0.5) {
         coords = content_aspect_override(coords, GAME_GEOM_ASPECT, vIn_aspect);
-        coords.y += GAME_GEOM_VSHIFT/10.0;
+        coords.y -= GAME_GEOM_VSHIFT/10.0;
+        coords.x -= GAME_GEOM_HSHIFT/10.0;
     }
     
     //Luminosity dependant zoom
@@ -886,11 +899,7 @@ void main() {
     
 
 
-        //Scale coords according to bezel settings?
-    if (DO_BEZEL == 1.0) {
-        coords = zoomout_coords(coords, -BEZEL_INNER_ZOOM , 1.0);
-        coords_for_mirror = zoomout_coords(coords_for_mirror, -BEZEL_INNER_ZOOM , 1.0);
-    }
+
 
     
     //"Just" handle inner and outer frame here:
