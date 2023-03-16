@@ -373,7 +373,10 @@ float_framebuffer7 = true
 #          [  ] disabled by now till we find a better way to handle it.
 #               This: https://github.com/kokoko3k/koko-aio-slang/commit/1fbbee4f73948cd85e0d53db3a2d4eaab8951a8f is a reference commit
 #               where i switched from a try to a second one.
+#          [  ] maybe it can be modulated from the outside via min(coord.x,coord.y)
 #    [ ] bloom should bleed over when forcing geometry aspect
 #    [ ] reflection blurriness should not depend on input resolution
 #    [ ] specular reflections does not 100% follow the image when overriding aspect
 #    [ ] copy base presets to overlay shader
+#    [ ] Ambient light skip coords ahould be aware of the h/v shift override or black box whould appear
+#        (check local preset: testambishift)        
