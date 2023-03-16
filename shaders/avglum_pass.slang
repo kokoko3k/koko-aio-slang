@@ -27,6 +27,7 @@ void main() {
         vTexCoord = content_aspect_override(vTexCoord, GAME_GEOM_ASPECT, get_in_aspect());
         vTexCoord.y -= GAME_GEOM_VSHIFT/10.0;
         vTexCoord.x -= GAME_GEOM_HSHIFT/10.0;
+        vTexCoord = zoom(vTexCoord, GAME_GEOM_ZOOM);
     }
 
 }

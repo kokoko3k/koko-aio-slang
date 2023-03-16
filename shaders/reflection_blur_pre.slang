@@ -43,6 +43,7 @@ void main() {
       coords = content_aspect_override(coords, GAME_GEOM_ASPECT, get_in_aspect());
       coords.y -= (GAME_GEOM_VSHIFT/10.0) *  (1 - BEZEL_INNER_ZOOM);
       coords.x -= (GAME_GEOM_HSHIFT/10.0) *  (1 - BEZEL_INNER_ZOOM);
+      coords = zoom(coords, GAME_GEOM_ZOOM);
    }
    
    

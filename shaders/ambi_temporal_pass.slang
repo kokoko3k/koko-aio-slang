@@ -83,6 +83,7 @@ vec3 ambi_pre_pass() {
         coords = content_aspect_override(coords, GAME_GEOM_ASPECT, in_aspect);
         coords.y -= GAME_GEOM_VSHIFT/10.0;
         coords.x -= GAME_GEOM_HSHIFT/10.0;
+        coords = zoom(coords, GAME_GEOM_ZOOM);
     }
     
     vec2 coords_for_skip;
