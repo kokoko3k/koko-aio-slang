@@ -81,7 +81,7 @@ void main() {
    
    if (DO_BEZEL == 0.0) return;
 
-   float skip_border = BEZEL_BORDER_SIZE / BEZEL_REFL_ZOOMOUT_ROOM ;
+   float skip_border = BEZEL_REFL_SKIP_SIZE / BEZEL_REFL_ZOOMOUT_ROOM ;
    if (vTexCoord.x > skip_border && vTexCoord.x < 1.0 - skip_border &&
        vTexCoord.y > skip_border && vTexCoord.y < 1.0 - skip_border ) {
       FragColor = vec4(0.0);

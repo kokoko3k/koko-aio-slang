@@ -686,12 +686,8 @@ vec3 bezel_color(float lum)  {
 
 #define STATIC_BEZEL_USE_MIPMAP 1.0
 
-vec3 compose_bezel_over(vec3 full_viewport, vec2 param_coords_for_mirror) {
-    vec2 coords_for_bezel = vTexCoord;
-    
-    if (BEZEL_FRAME_ZOOM != 0.0)
-        coords_for_bezel = zoomout_coords(coords_for_bezel,-BEZEL_FRAME_ZOOM,1.0);  
-
+vec3 compose_bezel_over(vec3 full_viewport, vec2 coords_for_bezel, vec2 param_coords_for_mirror) {
+  
     //No need to draw anything outside this:
     if (coords_for_bezel.x < 0  || coords_for_bezel.y < 0 || coords_for_bezel.x > 1.0 || coords_for_bezel.y > 1.0) return full_viewport;
 
@@ -713,7 +709,7 @@ vec3 compose_bezel_over(vec3 full_viewport, vec2 param_coords_for_mirror) {
             bezel = texture(monitor_body_straight,coords_for_bezel);
     #endif
     
-//return mix(bezel.rgb, vec3(kx), 0.5);
+
     //No need to draw anything on full alpha:
     if (bezel.a == 0.0) return full_viewport;
 
@@ -829,7 +825,8 @@ vec4 main_wrap(vec2 coords){
     //bezel_coords = zoomout_coords(bezel_coords, -BEZEL_INNER_ZOOM , 1.0);
     
     //From now on, we need a border.
-        bool bIs_outer_frame = ((vTexCoord.x < 0.0) || (vTexCoord.x > 1.0));
+        float outer_frame_offset = DO_BEZEL * BEZEL_BORDER_SIZE;
+        bool bIs_outer_frame = ((vTexCoord.x < 0.0 + outer_frame_offset) || (vTexCoord.x > 1.0 - outer_frame_offset));
 
     
         //Handle outer frame cases
@@ -915,7 +912,9 @@ void main() {
     
     //Draw bezel
     if (DO_BEZEL == 1.0) {
-        pixel_out = vec4(compose_bezel_over(pixel_out.rgb, coords_for_mirror),1.0);
+    vec2 coords_for_bezel = vTexCoord;
+        coords_for_bezel = zoomout_coords(coords_for_bezel,-BEZEL_FRAME_ZOOM,1.0);
+        pixel_out = vec4(compose_bezel_over(pixel_out.rgb, coords_for_bezel, coords_for_mirror),1.0);
     }
 
     //Draw an image "Over" the bezel with an hole inside by the alpha channel

@@ -7,7 +7,17 @@
 
 	//This is used to skip calculations in the reflection blur code.
 	//set it to minimum value that allows you to see reflection entirely
-#define BEZEL_BORDER_SIZE 0.08
+#define BEZEL_REFL_SKIP_SIZE 0.08
+
+	//This is the size (in 0..1 range) of the bezel texture that does
+	//not include the center tube ie: one border (not all 4 borders),
+	//including reflection area, and the shadow.
+	//It is actually used to skip drawing game content under the bezel or
+	//over its shadow.
+	//Set it to the maximum size as long as you see the full game content
+	//in the bezel.
+#define BEZEL_BORDER_SIZE 0.04
+
 
 	//In the second reflection pass, the coordinates are zoomedout by the
 	//BEZEL_REFL_ZOOMOUT_ROOM so that the image is mirrored-repeated by retroarch.
@@ -24,7 +34,6 @@
 	// in the bezel corners that will hide and blur the reflections 
 #define BEZEL_REFL_CORNER_BLANK_SIZE 0.08
 #define BEZEL_REFL_CORNER_BLANK_SHADE 0.05  // keep it > 0.0
-
 
 
 
