@@ -32,7 +32,7 @@ layout(location = 4) out float vIsRotated;
 //Vignette, spot:
     layout(location = 11) out float vIn_aspect;
 
-    
+
 #include "includes/functions.include.slang"
 
 void main() {
@@ -45,28 +45,28 @@ void main() {
         vTexCoord = zoom(vTexCoord + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM );
 
     vOutputCoord = TexCoord;
-    
+
     vFragCoord = vec2( floor(vOutputCoord.x * params.OutputSize.x),
                        floor(vOutputCoord.y * params.OutputSize.y));
 
     //Precalc some Curvature/Warp values:
         float warp_adaption =  1 - BEZEL_INNER_ZOOM * 4.0;
         vec2 geom_warp_adapted = vec2(GEOM_WARP_X, GEOM_WARP_Y) * warp_adaption;
-        
+
        /* if (DO_BEZEL > 0.0) {
             geom_warp_adapted *= (-BEZEL_INNER_ZOOM) + 1;
         }*/
         vWarp_vexp = 1.0/ (1 + (vec2(geom_warp_adapted.x, geom_warp_adapted.y) * 0.2)) ;
-        
-        
+
+
         vWarp_arg2 = 1.0 - pow(vec2(0.29289321881345247559915563789515), vWarp_vexp );
-        
+
     //Help scanline code too:
         if (DO_SCANLINES > 0.5) {
             bool bIs_Interlaced = is_interlaced();
             vIsInterlaced = float(bIs_Interlaced);
             vFlickeringScanlines = float((DO_SCANLINES == 1.0) && scanline_have_to_flicker(bIs_Interlaced)) ;
-            
+
             //Scanline period:
             vScanlinePeriod = 1.0;
             vScanlinesAlternate = 0.0;
@@ -80,7 +80,7 @@ void main() {
     //SPOT
         spot_offset = offsets_from_float(S_POSITION+420.0,40);
         spot_offset = spot_offset / 10.0 + vec2(0.0,1.0);
-        
+
 }
 
 
@@ -127,55 +127,55 @@ layout(set = 0, binding = 12) uniform sampler2D halo_pass;
 vec3 pixel_vmask(vec3 source, float white_reference, float over_white) {
 // Simple RGB mask emulation with or without horizontal gap
     float ooo = 1.0 - RGB_MASK_STRENGTH;
-    
+
     // RGB mask:     R     G     B
     vec3 m1 =  vec3( 1.0 , ooo , ooo );  //col 1
     vec3 m2 =  vec3( ooo , 1.0 , ooo );  //col 2
     vec3 m3 =  vec3( ooo , ooo , 1.0 );  //col 3
     vec3 gap = vec3( ooo );
-    
+
     vec3 pixel_out;
     vec3 vmasked;
     vec4 vec_mod=(vec4(3,1,2,3) + vec4(VMASK_GAP,0.0,0.0,0.0))* VMASK_DARKLINE_SCALE ;
-    
+
     float fcol = vOutputCoord.x * params.OutputSize.x;
     if (mod(fcol, vec_mod.x) < vec_mod.y)
         vmasked = m1 * source;
-    else if (mod(fcol, vec_mod.x) < vec_mod.z) 
+    else if (mod(fcol, vec_mod.x) < vec_mod.z)
         vmasked = m2 * source;
     else if (mod(fcol, vec_mod.x) <  vec_mod.w)
         vmasked = m3 * source;
     else vmasked = gap * source;
-    
+
     if (over_white == 1.0) pixel_out = vmasked;
         else {
             white_reference-= over_white;
             white_reference=  clamp(white_reference,0.0,1.0);
             pixel_out=  mix(vmasked,source,white_reference);
         }
-   return pixel_out;  
-    
+   return pixel_out;
+
 }
 
 vec3 pixel_vmask_and_gm(vec3 source, float white_reference, float over_white) {
 // Simple RGB mask emulation with or without horizontal gap
     float ooo = 1.0 - RGB_MASK_STRENGTH;
-    
+
     // RGB mask:     R     G     B
     vec3 m1_rgb =  vec3( 1.0 , ooo , ooo );  //col 1
     vec3 m2_rgb =  vec3( ooo , 1.0 , ooo );  //col 2
     vec3 m3_rgb =  vec3( ooo , ooo , 1.0 );  //col 3
     vec3 gap = vec3( ooo );
-       
+
     vec3 m1_gm = vec3( ooo , 1.0 , ooo );    //col 1
     vec3 m2_gm = vec3( 1.0 , ooo , 1.0 );    //col 2
-    
-    
+
+
     vec3 m1 = (m1_gm * VMASK_USE_GM) + (m1_rgb * (1-VMASK_USE_GM));
     vec3 m2 = (m2_gm * VMASK_USE_GM) + (m2_rgb * (1-VMASK_USE_GM));
     vec3 m3 = m3_rgb;
-    
-    
+
+
     vec3 pixel_out;
     vec3 vmasked;
     vec4 vec_mod_rgb = vec4(3,1,2,3);
@@ -187,20 +187,20 @@ vec3 pixel_vmask_and_gm(vec3 source, float white_reference, float over_white) {
     float fcol = vOutputCoord.s * params.OutputSize.x;
     if (mod(fcol, vec_mod.x) < vec_mod.y)
         vmasked = m1 * source;
-    else if (mod(fcol, vec_mod.x) < vec_mod.z) 
+    else if (mod(fcol, vec_mod.x) < vec_mod.z)
         vmasked = m2 * source;
     else if (    mod(fcol, vec_mod.x) <  vec_mod.w && VMASK_USE_GM < 1.0  )
         vmasked = m3 * source;
     else vmasked = gap * source;
-    
+
     if (over_white == 1.0) pixel_out = vmasked;
         else {
             white_reference-= over_white;
             white_reference=  clamp(white_reference,0.0,1.0);
             pixel_out=  mix(vmasked,source,white_reference);
         }
-   return pixel_out;  
-    
+   return pixel_out;
+
 }
 
 
@@ -211,7 +211,7 @@ vec3 pixel_vmask_gm(vec3 source, float white_reference, float over_white) {
     vec3 m1 =  vec3( ooo , 1.0 , ooo );    //col 1
     vec3 m2 =  vec3( 1.0 , ooo , 1.0 );    //col 2
     vec3 gap = vec3( ooo );
-    
+
     float fcol = vOutputCoord.s * params.OutputSize.x;
     vec3 pixel_out;
     vec3 vmasked;
@@ -221,7 +221,7 @@ vec3 pixel_vmask_gm(vec3 source, float white_reference, float over_white) {
         vmasked = m1 * source;
     else if (mod(fcol, vec_mod.x) < vec_mod.z)
         vmasked = m2 * source;
-    else 
+    else
         vmasked = gap * source;
 
     if (over_white == 1.0) pixel_out = vmasked;
@@ -239,7 +239,7 @@ vec3 pixel_vmask_gm(vec3 source, float white_reference, float over_white) {
     // "darklines" are vertical gaps that can be used to emulate aperturegrille
     // or slotmasks
     //
-    
+
     float Darkline_part_w = (3.0 - VMASK_USE_GM + VMASK_GAP) * VMASK_DARKLINE_SCALE;
     float Darkline_part_w_x2 = Darkline_part_w*2;
 
@@ -260,7 +260,7 @@ vec3 pixel_vmask_gm(vec3 source, float white_reference, float over_white) {
 
         return source * clamp(float(draw_mask),darkline_trans,1.0);
     }
-    
+
     //Aperture grille (darklines are drawn straight)
         bool draw_dark = mod(vFragCoord.y, darkline_every) < VMASK_DARKLINE_SCALE;
         bool draw_color = !draw_dark;
@@ -270,33 +270,33 @@ vec3 pixel_vmask_gm(vec3 source, float white_reference, float over_white) {
 
 vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
                      float do_offset, float white_reference,float over_white, vec2 coords) {
-    
-    
+
+
     float period_x = (3.0 - VMASK_USE_GM + VMASK_GAP) * VMASK_DARKLINE_SCALE;
     float period_y = darkline_every * VMASK_DARKLINE_SCALE;
-    
+
     vec2 FragCoord = vFragCoord;
 
-    
+
     if (over_white != 1.0) {
         //less effect on bright colors.
         darkline_trans+=(white_reference-over_white);
         darkline_trans=clamp(darkline_trans,0.0,1.0);
     }
-    
-    
+
+
     if (do_offset > 0.0) {
         float column = int(floor(mod(FragCoord.x, period_x*2.0)));
         if (column < period_x) FragCoord.y+=period_y/2.0;
     }
-    
+
     float row = int(floor(mod(FragCoord.y, period_y)));
 
     if (row < VMASK_DARKLINE_SCALE)
         return source * darkline_trans;
             else
         return source;
-    
+
 }
 
 
@@ -314,26 +314,26 @@ float scanline_shape(vec2 coords, bool do_slotmask, float lum) {
 
     //...to scale scanline tickness:
     //float lum_scaled = scale_to_range(lum, SCANLINE_MIN, SCANLINE_MAX);
-    float lum_scaled = lum * SCANLINE_MAX; 
+    float lum_scaled = lum * SCANLINE_MAX;
           lum_scaled = clamp( lum_scaled, SCANLINE_MIN, SCANLINE_MAX );
-              
-        
 
-     
+
+
+
     float angle_base = coords.y * pi * params.OriginalSize.y * period;// + vScanlinePhase;
 
     float lines = 1.0;
-    
+
     if (!( is_interlaced && SCANLINE_DISABLE_ON_INTERLACE == 1.0 )) {
-        
+
         /*if (alternate)
-            lines = -sin(angle_base + HALF_PI); 
+            lines = -sin(angle_base + HALF_PI);
                 else
             lines = sin(angle_base);
         */
         //Unbranched the previous if/then/else:
         lines = (2*vScanlinesAlternate -1) * sin(angle_base + (vScanlinesAlternate * HALF_PI)) ;
-         
+
         lines = (lines*lines);
     }
 
@@ -454,14 +454,14 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
     vec3 pixel_in;
     vec3 pixel_glowed;
 
-    
+
     //Get the first available pixel_in:
     //vec2 off=vec2(0.0,+ global.first_passSize.w*0.5); needed
     //To be added to the following coords and to halo coords (FIXME: WHY?)
     //if drawing scanlines on first pass too)
     if  (DO_IN_GLOW == 1.0) {
             pixel_glowed = texture(in_glow_pass,coords).rgb;
-            pixel_in = pixel_glowed; 
+            pixel_in = pixel_glowed;
     } else {
         pixel_in = texture(shift_and_bleed_pass,coords).rgb ;
     }
@@ -472,13 +472,13 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
     if (VMASK_OVERWHITE+DRKLN_OVERWHITE  < 2.0 ) {
         white_reference = get_clamped_white_reference(pixel_in);
     }
-    
+
     //Mask and darklines:
     if (DO_VMASK_AND_DARKLINES == 1.0 ) {
         vec3 pixel_in_compensated = pixel_in;
-        
+
         pixel_in_compensated = pixel_push_luminance(pixel_in, RGB_MASK_STRENGTH * MASK_COMPENSATION);
-        
+
         if (RGB_MASK_STRENGTH > 0.0) {
             //Use RGB pattern or exploit RGB layout with green and magenta?
             if (VMASK_USE_GM < 1.0)
@@ -489,8 +489,8 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
             //pixel_out = pixel_vmask_and_gm(pixel_in_compensated, white_reference, VMASK_OVERWHITE);
         }
 
-        pixel_out = pixel_push_luminance(pixel_out, DARKLINES_STRENGTH * (1.0/DARKLINES_PERIOD) * MASK_COMPENSATION); 
-        
+        pixel_out = pixel_push_luminance(pixel_out, DARKLINES_STRENGTH * (1.0/DARKLINES_PERIOD) * MASK_COMPENSATION);
+
         //Screen lines (slotmask aperture grille)
         if (   DARKLINES_STRENGTH > 0.0 ) {
             float MYDARKLINES_TRANSPARENCY = 1.0 - DARKLINES_STRENGTH;
@@ -500,7 +500,7 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
     }
 
     float lum = clamp(max(max(pixel_out.r,pixel_out.g),pixel_out.b), 0.0,1.0);
-    
+
     //Halo
     vec3 pixel_haloed;
     if (DO_HALO == 1.0 ) {
@@ -515,39 +515,39 @@ vec4 pixel_main_pass(vec2 coords, bool bBorder_needed) {
     if  ( DO_SCANLINES == 1.0 ) {
         /* pixel_bleed is the color that will bleed over scanline gap.
          * It is selected by the first available one depending on the shader
-         * features enabled by the user */ 
+         * features enabled by the user */
         vec3 pixel_bleed;
-        /*if (DO_HALO == 1.0) 
+        /*if (DO_HALO == 1.0)
             pixel_bleed = pixel_haloed;
         else */if (DO_IN_GLOW == 1.0)
             pixel_bleed = pixel_glowed;
-        else 
+        else
             pixel_bleed = pixel_in;
-        
+
         // Optionally apply a gamma correction to the scanline shape.
         if (SCANLINE_COMPENSATION > 0.0) {
             float mypow = mix(1.0, (0.33 * SCANLINE_DARK + 0.67), SCANLINE_COMPENSATION);
             pixel_out = pow(pixel_out,vec3(mypow));
         }
-        
+
         //Obtain the scanlines screen by multiplying the scanline shape by the pixel color.
         //and emulate the bleeding of the color over the dark part of the scanlined screen.
-        //float scanline_shape = scanline_shape(coords, SCANLINE_SM_TYPE > 0.0 );     
+        //float scanline_shape = scanline_shape(coords, SCANLINE_SM_TYPE > 0.0 );
             float lum = max(max(pixel_out.r, pixel_out.g), pixel_out.b);
             float scanline_shape = scanline_shape(coords, SCANLINE_SM_TYPE > 0.0, lum );
-            
+
             pixel_out = pixel_out * ( scanline_shape + ( pixel_bleed * SCANLINES_BLEEDING * ( 1 - scanline_shape ) ));
-                        
+
             //pixel_out *= scanline_shape;
 
     }
 
-    
+
      if (DO_HALO == 1.0 ) {
         pixel_out += pixel_haloed * HALO_VS_SCAN;
         //pixel_out = pixel_out + (pixel_haloed * (1-lum));
      }
-     
+
     // Apply color correction (in this pass it is just the final output gamma)
     if (DO_CCORRECTION == 1.0) pixel_out = pow(max(pixel_out, vec3(0.0)),vec3(GAMMA_OUT));
 
@@ -583,7 +583,7 @@ vec4 textureLod_wrap(sampler2D tex, vec2 co, float lod, float wrap_mode) {
     if (co.y > 1.0 || co.y < 0.0)
         co.y = 1- mod(co.y, 1.0);
     */
-    
+
     if (wrap_mode == 1.0) {
         //Clamp to border, black.
         bool bOutside = (co.x < 0.0 || co.x > 1.0 || co.y < 0.0 || co.y > 1.0 ) ;
@@ -595,7 +595,7 @@ vec4 textureLod_wrap(sampler2D tex, vec2 co, float lod, float wrap_mode) {
         //Repeat no mirror:
         co = mod(co, 1.0);
     }
-    
+
     return textureLod(tex, co, lod);
 }
 
@@ -610,7 +610,7 @@ vec4 pixel_background_image(bool over){
         if (BG_IMAGE_ROTATION > 0.0  || ( BG_IMAGE_ROTATION < 0.0 && bool(vIsRotated) )  ) tex_size.xy = tex_size.yx;
 
         vec2 back_coords = get_scaled_coords_aspect(vOutputCoord + bg_image_offset, global.FinalViewportSize, tex_size.x/tex_size.y, bool(vIsRotated));
-        
+
         if (BG_IMAGE_ROTATION < 0.0 && bool(vIsRotated) ) {
             //handle automatic rotation of bg image for rotated games
             back_coords.xy = back_coords.yx;
@@ -687,12 +687,12 @@ vec3 bezel_color(float lum)  {
 #define STATIC_BEZEL_USE_MIPMAP 1.0
 
 vec3 compose_bezel_over(vec3 full_viewport, vec2 coords_for_bezel, vec2 param_coords_for_mirror) {
-  
+
     //No need to draw anything outside this:
     if (coords_for_bezel.x < 0  || coords_for_bezel.y < 0 || coords_for_bezel.x > 1.0 || coords_for_bezel.y > 1.0) return full_viewport;
 
     vec2 coords_for_mirror = param_coords_for_mirror;
-    
+
     //Main lut:
     vec4 bezel;
     #ifdef STATIC_BEZEL_USE_MIPMAP
@@ -708,7 +708,7 @@ vec3 compose_bezel_over(vec3 full_viewport, vec2 coords_for_bezel, vec2 param_co
                 else
             bezel = texture(monitor_body_straight,coords_for_bezel);
     #endif
-    
+
 
     //No need to draw anything on full alpha:
     if (bezel.a == 0.0) return full_viewport;
@@ -719,7 +719,7 @@ vec3 compose_bezel_over(vec3 full_viewport, vec2 coords_for_bezel, vec2 param_co
     //This is the reflection to be composed over the bezel);
     vec3 pixel_mirrored = texture(reflected_blurred_pass,
                           coords_for_mirror + random( min(global.FinalViewportSize.z,global.FinalViewportSize.w)*1.5, vTexCoord ) ).rgb;
-                          
+
 //return pixel_mirrored;
     //Take the reflection modifier from the texture blue component into account; it is/may be used to lower the reflection in the corners.
         //float reflection = (reflection_shade * 1.4 -  0.4)  * bezel.b ;
@@ -730,8 +730,8 @@ vec3 compose_bezel_over(vec3 full_viewport, vec2 coords_for_bezel, vec2 param_co
         pixel_mirrored = pixel_mirrored * reflection * (1+lut_specular);
         //return pixel_mirrored;
         vec3 bezel_out = bezel_colored + pixel_mirrored;
-        
-        //Mix ambient light over bezel? (branching this is worse)   
+
+        //Mix ambient light over bezel? (branching this is worse)
             //Disabled till we'll find a less glitchy way yo do it.
             //By now it:
             //bleeds over alpha channel in the tube
@@ -740,11 +740,11 @@ vec3 compose_bezel_over(vec3 full_viewport, vec2 coords_for_bezel, vec2 param_co
             ambitemporalpass = max(ambitemporalpass, 0.0); //<-- this to avoid undefined results
             vec3 pixel_ambilight = DO_AMBILIGHT * (ambitemporalpass + global_noise);
             float opacita = bezel.a;
-            bezel_out = bezel_out + pixel_ambilight * AMBI_OVER_BEZEL * (1 -  reflection * 1.9 ) *  (1 - lut_specular * 1.9) * bezel.a; 
+            bezel_out = bezel_out + pixel_ambilight * AMBI_OVER_BEZEL * (1 -  reflection * 1.9 ) *  (1 - lut_specular * 1.9) * bezel.a;
             */
-        
+
         //bezel_out = vec3(bezel.a);
-        
+
          //(1- (max(reflection, lut_specular), bezel.a)) ;
         //We use the green component to express Hardness/Specularity; there the reflection will be completely diffused.
         //For the task, we use a mipmap whit adeguate precision.
@@ -758,7 +758,7 @@ vec3 compose_bezel_over(vec3 full_viewport, vec2 coords_for_bezel, vec2 param_co
 
 vec4 pixel_inner_frame(vec2 coords, bool bBorder_needed) {
 //This takes care of drawing the main content.
-    
+
     vec4 pixel_in = pixel_main_pass(coords, bBorder_needed);
     vec3 pixel_out = pixel_in.rgb;
     vec3 bloomed;
@@ -766,7 +766,7 @@ vec4 pixel_inner_frame(vec2 coords, bool bBorder_needed) {
     //Mix bloom texture
     if (DO_BLOOM == 1.0 ) {
         bloomed=texture(bloom_pass_final, coords).rgb ;
-                
+
         if (BLOOM_BYPASS > 0.5)
             pixel_out = bloomed;
         else
@@ -784,9 +784,9 @@ vec4 pixel_inner_frame(vec2 coords, bool bBorder_needed) {
             //pixel_out = clamp(pixel_out, 0.0,1.0); //<--unsure
             if (DO_VIGNETTE == 1.0) {
                 float dist = length(vec2((coords.x-0.5)*vIn_aspect,coords.y-0.5));
-                float vignette = smoothstep(V_SIZE,0.0,dist)*V_POWER;                
+                float vignette = smoothstep(V_SIZE,0.0,dist)*V_POWER;
                 //float vignette = vV_POWER * (vV_SIZE + 16.0* coords.x*coords.y*(1.0-coords.x)*(1.0-coords.y));
-                //vignette = min(vignette,99999.0); //<--- big wtf here, why is this needed? 
+                //vignette = min(vignette,99999.0); //<--- big wtf here, why is this needed?
                 ////...see: https://github.com/kokoko3k/koko-aio-slang/issues/3
                 pixel_out = pixel_out * vignette;
             }
@@ -813,22 +813,21 @@ vec4 pixel_inner_frame(vec2 coords, bool bBorder_needed) {
 }
 
 
-vec4 main_wrap(vec2 coords){
-    
-    
+vec4 main_wrap(vec2 coords, float outer_frame_offset){
+
+
     /* Handle inner border and outer border, not bezel */
     if (DO_VIGNETTE + DO_SPOT + DO_AMBILIGHT >0.0) global_noise = random(NOISEPOWER, vTexCoord * params.FrameCount);
-    
+
     //Just do pixel_inner_frame() and exit when there is no need to paint border.
     if (!border_needed()) return pixel_inner_frame(coords, false);
 
     //bezel_coords = zoomout_coords(bezel_coords, -BEZEL_INNER_ZOOM , 1.0);
-    
+
     //From now on, we need a border.
-        float outer_frame_offset = DO_BEZEL * BEZEL_BORDER_SIZE;
         bool bIs_outer_frame = ((vTexCoord.x < 0.0 + outer_frame_offset) || (vTexCoord.x > 1.0 - outer_frame_offset));
 
-    
+
         //Handle outer frame cases
             //if we want ambilights in the outer frame, draw it and return
             if (bIs_outer_frame)
@@ -855,53 +854,41 @@ vec4 main_wrap(vec2 coords){
 
 
 void main() {
-  
 
-    
     vec2 coords = vTexCoord;
-                                          
-    
+
     //Curvature
     if (DO_CURVATURE == 1.0  &&  ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0))) {
             coords = Warp_fast(coords, vWarp_vexp, vWarp_arg2);
 
     }
-    vec2 coords_for_mirror = coords;     
-    
-    
-        //Scale coords according to bezel settings?
+    vec2 coords_for_mirror = coords;
+
+    //Scale coords according to bezel settings?
+    float outer_frame_offset = 0.0;
     if (DO_BEZEL == 1.0) {
         coords = zoomout_coords(coords, -BEZEL_INNER_ZOOM , 1.0);
-        
-        coords_for_mirror = coords;
-        coords_for_mirror = zoom(coords_for_mirror, 1/BEZEL_REFL_ZOOMOUT_ROOM);
-        //coords_for_mirror = zoomout_coords(coords, -BEZEL_INNER_ZOOM , 1.0);
-        //coords_for_mirror = zoom(coords_for_mirror,BEZEL_REFL_ROOM_COMPENSATION);
+        coords_for_mirror = zoom(coords, 1/BEZEL_REFL_ZOOMOUT_ROOM);
+        outer_frame_offset = 0.0; //(1 + BEZEL_BORDER_SIZE) * BEZEL_FRAME_ZOOM;
     }
-    
+
     if (DO_GAME_GEOM_OVERRIDE > 0.5) {
         coords = content_aspect_override(coords, GAME_GEOM_ASPECT, vIn_aspect);
         coords.y -= GAME_GEOM_VSHIFT/10.0;
         coords.x -= GAME_GEOM_HSHIFT/10.0;
         coords = zoom(coords, GAME_GEOM_ZOOM);
     }
-    
+
     //Luminosity dependant zoom
     if (DO_DYNZOOM == 1.0) {
         //float zoomin = 1.0 + (texture(bloom_pass_final, coords   ).a/ DYNZOOM_FACTOR * 80.0); <<-- funny.
-        //float dynzoom = 1.0 + (texture(avglum_pass, vec2(0.75,0.75)    ).a/ DYNZOOM_FACTOR);
         float dynzoom = get_dyn_zoom(avglum_pass);
         coords = zoom(coords, dynzoom);
     }
 
-    
 
-
-
-
-    
     //"Just" handle inner and outer frame here:
-    vec4 pixel_out = main_wrap(coords);
+    vec4 pixel_out = main_wrap(coords, outer_frame_offset);
 
 
 #ifdef STATIC_SUPPORT_BACKDROP
@@ -909,7 +896,6 @@ void main() {
 #endif
 
 
-    
     //Draw bezel
     if (DO_BEZEL == 1.0) {
     vec2 coords_for_bezel = vTexCoord;
@@ -932,14 +918,14 @@ void main() {
 
     //vec4 pixel_mirrored = texture(reflected_blurred_pass,coords_for_mirror);
     //pixel_out = pixel_mirrored;
-    
+
     //pixel_out = texture(avglum_pass, vTexCoord);
 
 
-    
+
     FragColor = pixel_out;
-    
+
     //FragColor = vec4(blur_shade(vTexCoord) );
-    
+
     //FragColor = vec4(random(1.0, vTexCoord * params.FrameCount));
 }
