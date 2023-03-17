@@ -813,7 +813,38 @@ vec4 pixel_inner_frame(vec2 coords, bool bBorder_needed) {
 }
 
 
-vec4 main_wrap(vec2 coords, float outer_frame_offset){
+vec2 get_scaled_offset(vec2 foffset, vec2 co1, vec2 co2) {
+    // dato un offset e due coordinate, ritorna l'offset 
+    // sommato alla differenza delle coordinate.
+    
+    //Branched and unbranched version, they perform almost the same.
+    
+    vec2 off_left_up = co1 - co2;
+    vec2 off_right_bottom = co2 - co1;
+    vec2 bool_is_side_right_bottom = step(0.5, co2);
+    vec2 bool_is_side_left_up = 1 - bool_is_side_right_bottom;
+    return foffset - (off_left_up * bool_is_side_left_up + 
+                            off_right_bottom * bool_is_side_right_bottom);
+
+
+/*
+    vec2 offset_out;
+    if (vTexCoord.x > 0.5) 
+        offset_out.x = foffset.x - (co1.x - co2.x);
+            else
+        offset_out.x = foffset.x - (co2.x - co1.x);
+    
+    
+    if (vTexCoord.y > 0.5)
+        offset_out.y = foffset.y - (co1.y - co2.y);
+            else
+        offset_out.y = foffset.y - (co2.y - co1.y);
+
+    return offset_out;
+*/
+}
+
+vec4 main_wrap(vec2 coords, vec2 outer_frame_offset){
 
 
     /* Handle inner border and outer border, not bezel */
@@ -825,7 +856,8 @@ vec4 main_wrap(vec2 coords, float outer_frame_offset){
     //bezel_coords = zoomout_coords(bezel_coords, -BEZEL_INNER_ZOOM , 1.0);
 
     //From now on, we need a border.
-        bool bIs_outer_frame = ((vTexCoord.x < 0.0 + outer_frame_offset) || (vTexCoord.x > 1.0 - outer_frame_offset));
+        bool bIs_outer_frame = vTexCoord.x < 0.0 + outer_frame_offset.x || vTexCoord.x > 1.0 - outer_frame_offset.x ||
+                               vTexCoord.y < 0.0 + outer_frame_offset.y || vTexCoord.y > 1.0 - outer_frame_offset.y ;
 
 
         //Handle outer frame cases
@@ -852,6 +884,14 @@ vec4 main_wrap(vec2 coords, float outer_frame_offset){
             return vPixel_inner_frame;
 }
 
+vec2 get_scaled_coords_for_bezel() {
+    //This function is here because compiler gets mad if i calc coords_for_bezel
+    //outside the main branch "if DO_BEZEL then compose_bezel_over"
+    //performances falls down for no apparent reason.
+    //But still, i need to access it twice in the code.
+    //So this is a function that ensures me that i always calc it the same way.
+    return zoomout_coords(vTexCoord,-BEZEL_FRAME_ZOOM,1.0);
+}
 
 void main() {
 
@@ -865,11 +905,13 @@ void main() {
     vec2 coords_for_mirror = coords;
 
     //Scale coords according to bezel settings?
-    float outer_frame_offset = 0.0;
+    vec2 outer_frame_offset = vec2(0.0);
+    
     if (DO_BEZEL == 1.0) {
         coords = zoomout_coords(coords, -BEZEL_INNER_ZOOM , 1.0);
         coords_for_mirror = zoom(coords, 1/BEZEL_REFL_ZOOMOUT_ROOM);
-        outer_frame_offset = 0.0; //(1 + BEZEL_BORDER_SIZE) * BEZEL_FRAME_ZOOM;
+        vec2 coords_for_bezel1 = get_scaled_coords_for_bezel();
+        outer_frame_offset = get_scaled_offset(BEZEL_BORDER_SIZE, coords_for_bezel1, vTexCoord);
     }
 
     if (DO_GAME_GEOM_OVERRIDE > 0.5) {
@@ -898,9 +940,8 @@ void main() {
 
     //Draw bezel
     if (DO_BEZEL == 1.0) {
-    vec2 coords_for_bezel = vTexCoord;
-        coords_for_bezel = zoomout_coords(coords_for_bezel,-BEZEL_FRAME_ZOOM,1.0);
-        pixel_out = vec4(compose_bezel_over(pixel_out.rgb, coords_for_bezel, coords_for_mirror),1.0);
+        vec2 coords_for_bezel2 = get_scaled_coords_for_bezel();
+        pixel_out = vec4(compose_bezel_over(pixel_out.rgb, coords_for_bezel2, coords_for_mirror),1.0);
     }
 
     //Draw an image "Over" the bezel with an hole inside by the alpha channel
