@@ -378,4 +378,4 @@ float_framebuffer7 = true
 #    [ ] bloom should bleed over when forcing geometry aspect
 #    [ ] reflection blurriness should not depend on input resolution
 #    [ ] copy base presets to overlay shader
-
+#    [ ] check if unbranching line: if (BLOOM_BYPASS > 0.5) in final pass has some gain

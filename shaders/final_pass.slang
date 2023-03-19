@@ -715,7 +715,7 @@ vec4 pixel_inner_frame(vec2 coords, bool bBorder_needed) {
     //Mix bloom texture
     if (DO_BLOOM == 1.0 ) {
         bloomed=texture(bloom_pass_final, coords).rgb ;
-
+        //pixel_out = bloomed + (pixel_out * (1 - BLOOM_BYPASS));
         if (BLOOM_BYPASS > 0.5)
             pixel_out = bloomed;
         else
@@ -884,9 +884,9 @@ void main() {
     vec4 pixel_out = main_wrap(coords, outer_frame_offset);
 
 
-#ifdef STATIC_SUPPORT_BACKDROP
-    pixel_out += vec4(pixel_backdrop_image(), 1.0);
-#endif
+    #ifdef STATIC_SUPPORT_BACKDROP
+        pixel_out += vec4(pixel_backdrop_image(), 1.0);
+    #endif
 
 
     //Draw bezel
