@@ -827,21 +827,21 @@ vec2 get_scaled_offset(vec2 foffset, vec2 co1, vec2 co2) {
                             off_right_bottom * bool_is_side_right_bottom);
 
 
-/*
+    /*
     vec2 offset_out;
-    if (vTexCoord.x > 0.5) 
+    if (vTexCoord.x > 0.5)
         offset_out.x = foffset.x - (co1.x - co2.x);
             else
         offset_out.x = foffset.x - (co2.x - co1.x);
-    
-    
+
+
     if (vTexCoord.y > 0.5)
         offset_out.y = foffset.y - (co1.y - co2.y);
             else
         offset_out.y = foffset.y - (co2.y - co1.y);
 
     return offset_out;
-*/
+    */
 }
 
 vec4 main_wrap(vec2 coords, vec2 outer_frame_offset){

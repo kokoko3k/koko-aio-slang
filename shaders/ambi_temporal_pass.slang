@@ -79,52 +79,26 @@ vec3 ambi_pre_pass() {
     float in_aspect = get_in_aspect();
     vec2 coords = get_scaled_coords_aspect(vTexCoord, global.FinalViewportSize, in_aspect, is_rotated());
     
+    if (DO_GLOBAL_SHZO >0.5)
+        coords = zoom(coords + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM );
+
     if (DO_GAME_GEOM_OVERRIDE > 0.5) {
+        coords = zoom(coords, GAME_GEOM_ZOOM);
         coords = content_aspect_override(coords, GAME_GEOM_ASPECT, in_aspect);
         coords.y -= GAME_GEOM_VSHIFT/10.0;
         coords.x -= GAME_GEOM_HSHIFT/10.0;
-        coords = zoom(coords, GAME_GEOM_ZOOM);
     }
-    
-    vec2 coords_for_skip;
-    
-    if (DO_GLOBAL_SHZO >0.5)
-        coords = zoom(coords + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM );
-        
-    
-    coords_for_skip = coords;
-    if (DO_BEZEL==1.0) {
+
+    if (DO_BEZEL > 0.5)
         coords = zoomout_coords(coords, -BEZEL_INNER_ZOOM , 1.0);
-        //coords_for_skip = zoomout_coords(coords_for_skip, -BEZEL_FRAME_ZOOM , 1.0);
-        coords_for_skip = coords;
-    }
     
     //Skip coords in the rect "under the monitor"
-    FragColor = vec4(0.0);
-    
-    //First consider to skip the curved coords
-    if (DO_CURVATURE == 1.0) {
-        if ((GEOM_WARP_X > 0.0) || (GEOM_WARP_Y > 0.0)) {
-            vec2 coords_curved = Warp_fast(coords_for_skip, vWarp_vexp, vWarp_arg2); 
-            if ( ( (coords_curved.x > tol_start && coords_curved.x < 1.0 - tol_start )       && 
-                   (coords_curved.y > tol_start && coords_curved.y < 1.0 - tol_start))       &&
-                  !((coords_for_skip.x < - tol_start || coords_for_skip.x > 1.0 + tol_start) ||
-                   (coords_for_skip.y < - tol_start || coords_for_skip.y > 1.0 + tol_start) ) )
-            return vec3(0.0);                               
-        }       
-    }    
-
-    //...next, the straight ones (needed even when curvature is due, because it returns particular values in the corners)
-    //skip_pass = skip_pass && !( (coords.x < 0.0 -tol || coords.x > 1.0 +tol) ||  (coords.y < 0.0 -tol || coords.y > 1.0 +tol) );
-        if (coords_for_skip.x > tol_start && 
-            coords_for_skip.x < tol_end   && 
-            coords_for_skip.y > tol_start && 
-            coords_for_skip.y < tol_end)  
-        return vec3(0.0);               
+    if (coords.x > tol_start &&
+        coords.x < tol_end   &&
+        coords.y > tol_start &&
+        coords.y < tol_end)
+    return vec3(0.0);
    
-
-
- 
 
 
     //Finally, emulate leds.
