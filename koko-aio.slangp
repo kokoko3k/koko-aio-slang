@@ -355,6 +355,8 @@ float_framebuffer7 = true
 #        Half done, gained something.
 #    [v] reflection blur: can we make better use of mipmaps instead of blindly use lod = 2.0?
 #    [v] avglum_pass needs to react to content aspect override
+#    [x] Ambient light skip coords should be aware of the h/v shift override or black box whould appear
+#        Not a big deal, since it happens when moving the image far, far away.
 #    [ ] check branching conditions in first_pass.slang
 #    [ ] Better debanding?
 #    [ ] Should the flickering be aware of the scanline?
@@ -378,5 +380,4 @@ float_framebuffer7 = true
 #    [ ] reflection blurriness should not depend on input resolution
 #    [ ] specular reflections does not 100% follow the image when overriding aspect
 #    [ ] copy base presets to overlay shader
-#    [ ] Ambient light skip coords ahould be aware of the h/v shift override or black box whould appear
-#        (check local preset: testambishift)        
+
