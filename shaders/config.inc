@@ -117,6 +117,9 @@
 	//Sort of dithering/debanding used in vignette, spot, backlight leds
 #define NOISEPOWER 1/192.0
 
+	//Alternating blanking feature has been disabled by default, you can enable it by
+	//uncommenting the following line:
+//#define ALLOW_ALT_BLANK
 
 
 
@@ -518,14 +521,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 
 
-// Alternative blanking
-#pragma parameter DO_ALT_BLANK       "★ Alternate line blanking enable? ==>"			0.0 0.0 1.0 1.0
-#pragma parameter ALT_BLANK_STRENGTH "        Alternate black frame insertion strength" 	0.5 0.0 1.0 0.1
-#pragma parameter ALT_BLANK_PERIOD   "        Blank lines period" 				4.0 0.0 20.0 1.0
-#pragma parameter BLANK20 " " 0.0 0.0 1.0 1.0
-
-
-
 //Global Zoom/Offset
 #pragma parameter DO_GLOBAL_SHZO	 "★ Global shift/zoom"			0.0   0.0  1.0 	  1.0
 #pragma parameter GLOBAL_OFFX	 "        X axis shift "			0.0  -1.0  1.0    0.0005
@@ -558,5 +553,15 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter GAME_GEOM_VSHIFT	 "        Vertical position"		0.0   -10.0 10.0  0.01
 #pragma parameter GAME_GEOM_HSHIFT	 "        Horizontal position"		0.0   -10.0 10.0  0.01
 #pragma parameter GAME_GEOM_ZOOM	 "        Zoom"				1.0    0.0  2.0  0.01
+#pragma parameter BLANK20 " " 0.0 0.0 1.0 1.0
+
+// Alternative blanking, needs to be statically enabled, see docs.md.
+#pragma parameter DO_ALT_BLANK       "★ Alternate line blanking enable? ==>"			0.0 0.0 1.0 1.0
+#pragma parameter label_alt_blank    "THIS FEATURE IS STATIC, SEE docs.md TO ENABLE"    0.0 0.0 0.0 1.0
+#pragma parameter ALT_BLANK_STRENGTH "        Alternate black frame insertion strength" 	0.5 0.0 1.0 0.1
+#pragma parameter ALT_BLANK_PERIOD   "        Blank lines period" 				4.0 0.0 20.0 1.0
+#pragma parameter BLANK20ì4 " " 0.0 0.0 1.0 1.0
+
+
 
 #include "config.globals.inc"

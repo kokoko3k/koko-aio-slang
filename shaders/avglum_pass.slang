@@ -22,7 +22,6 @@ void main() {
    
    vTexCoord = TexCoord;
 
-   
     if (DO_GAME_GEOM_OVERRIDE > 0.5) {
         vTexCoord = content_aspect_override(vTexCoord, GAME_GEOM_ASPECT, get_in_aspect());
         vTexCoord.y -= GAME_GEOM_VSHIFT/10.0;
@@ -112,7 +111,8 @@ void main() {
     vec4 pixel_out;
     pixel_out.a = get_avglum();
     if (DO_BEZEL + DO_BLOOM > 0.0) {
-        //Create a small mipmap to be used to light the bezel corners.
+        //Create a small mipmap to be used to light the bezel corners
+        //and by the bloom pass to identify bright areas.
         pixel_out.rgb = textureLod(first_pass, vTexCoord, mip_lod).rgb;
     }
 

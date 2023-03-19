@@ -303,6 +303,9 @@
     Simulates external light reflected by the monitor glass.
 
 **Alternate line blanking:**
+    *This feature has been disabled by defaut, if you want to try it,
+    you have to manually enable it by removing the leading: "//"
+    from "//#define ALLOW_ALT_BLANK" in config.inc.*
     CRT monitors \*real\* refresh was amazing, today is just "meh" in most cases.
     This emmulates the low pixel persistance of CRT monitors 
     and reduces the motion blur, typical of LCD displays, by blanking even/odd

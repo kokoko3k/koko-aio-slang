@@ -357,6 +357,9 @@ float_framebuffer7 = true
 #    [v] avglum_pass needs to react to content aspect override
 #    [x] Ambient light skip coords should be aware of the h/v shift override or black box whould appear
 #        Not a big deal, since it happens when moving the image far, far away.
+#    [..] specular reflections does not 100% follow the image when overriding aspect
+#        It is hard and probably would require another pass for somethig nobody would ever notice.
+#        ...also, avglum_pass is used by bloom pass too.
 #    [ ] check branching conditions in first_pass.slang
 #    [ ] Better debanding?
 #    [ ] Should the flickering be aware of the scanline?
@@ -366,10 +369,6 @@ float_framebuffer7 = true
 #    [ ] Find a way to smooth borders without cropping the image
 #    [ ] Allow to configure new bezel parameters?
 #        Reflection strength, corner shape, size and fade?  
-#    [ ] Allow to set a different aspect for content
-#        (which could be translated to a different aspect for bezel, maybe simpler)
-#        Problem is reflection alignment.
-#    [ ] Ambi temporal pass, move content override code to vertex shader
 #    [..] Bezel colorization via ambilight acts strangely when the content aspect is shrinked
 #          [  ] It also bleeds over alpha channel in the internal frame.
 #          [  ] disabled by now till we find a better way to handle it.
@@ -378,6 +377,5 @@ float_framebuffer7 = true
 #          [  ] maybe it can be modulated from the outside via min(coord.x,coord.y)
 #    [ ] bloom should bleed over when forcing geometry aspect
 #    [ ] reflection blurriness should not depend on input resolution
-#    [ ] specular reflections does not 100% follow the image when overriding aspect
 #    [ ] copy base presets to overlay shader
 
