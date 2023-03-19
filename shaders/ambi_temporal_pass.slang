@@ -18,8 +18,7 @@ layout(location = 1) out float border_min;
 layout(location = 2) out float border_max;
 layout(location = 3) out float fstep;
 layout(location = 4) out float lod;
-layout(location = 5) out vec2 vWarp_vexp;
-layout(location = 6) out vec2 vWarp_arg2;
+
 
 void main() {
     gl_Position = global.MVP * Position;
@@ -32,9 +31,6 @@ void main() {
     //Calc a lod for a texture sized led_strip x led_strip
         lod = log2(global.first_passSize.y / leds_per_strip);
     
-    //Precalc some Curvature/Warp values:
-        vWarp_vexp = 1.0/ (1 + (vec2(GEOM_WARP_X, GEOM_WARP_Y) * 0.2)) ;
-        vWarp_arg2 = 1.0 - pow(vec2(0.29289321881345247559915563789515), vWarp_vexp );
 }
 
 #pragma stage fragment
@@ -43,8 +39,7 @@ layout(location = 1) in float border_min;
 layout(location = 2) in float border_max;
 layout(location = 3) in float fstep;
 layout(location = 4) in float lod;
-layout(location = 5) in vec2 vWarp_vexp;
-layout(location = 6) in vec2 vWarp_arg2;
+
 
 layout(location = 0) out vec4 FragColor;
 
