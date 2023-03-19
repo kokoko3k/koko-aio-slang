@@ -3,6 +3,7 @@
 /* This pass simulates the presence of a led strip placed on the back of the virtual screen */
 
 #include "config.inc"
+#include "includes/functions.include.slang"
 
 #define PastSampler ambi_temporal_passFeedback
 
@@ -18,7 +19,7 @@ layout(location = 1) out float border_min;
 layout(location = 2) out float border_max;
 layout(location = 3) out float fstep;
 layout(location = 4) out float lod;
-
+layout(location = 5) out vec2 pre_pass_coords;
 
 void main() {
     gl_Position = global.MVP * Position;
@@ -31,6 +32,23 @@ void main() {
     //Calc a lod for a texture sized led_strip x led_strip
         lod = log2(global.first_passSize.y / leds_per_strip);
     
+
+   //Scale to the original aspect
+    float in_aspect = get_in_aspect();
+    pre_pass_coords = get_scaled_coords_aspect(vTexCoord, global.FinalViewportSize, in_aspect, is_rotated());
+
+    if (DO_GLOBAL_SHZO >0.5)
+        pre_pass_coords = zoom(pre_pass_coords + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM );
+
+    if (DO_GAME_GEOM_OVERRIDE > 0.5) {
+        pre_pass_coords = zoom(pre_pass_coords, GAME_GEOM_ZOOM);
+        pre_pass_coords = content_aspect_override(pre_pass_coords, GAME_GEOM_ASPECT, in_aspect);
+        pre_pass_coords.y -= GAME_GEOM_VSHIFT/10.0;
+        pre_pass_coords.x -= GAME_GEOM_HSHIFT/10.0;
+    }
+
+    if (DO_BEZEL > 0.5)
+        pre_pass_coords = zoomout_coords(pre_pass_coords, -BEZEL_INNER_ZOOM , 1.0);
 }
 
 #pragma stage fragment
@@ -39,7 +57,7 @@ layout(location = 1) in float border_min;
 layout(location = 2) in float border_max;
 layout(location = 3) in float fstep;
 layout(location = 4) in float lod;
-
+layout(location = 5) in vec2 pre_pass_coords;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -49,7 +67,7 @@ layout(set = 0, binding = 3) uniform sampler2D avglum_passFeedback;
 layout(set = 0, binding = 4) uniform sampler2D first_pass;
 
 
-#include "includes/functions.include.slang"
+
 
 vec3 ambi_push_pass(vec2 coords, float f_lod) {
    vec3 pixel_out = textureLod(first_pass, coords, f_lod).rgb;
@@ -68,25 +86,8 @@ vec3 circle_smooth(vec2 coords, vec2 middle, float f_radius, float FALLOFF, floa
 #define tol_start 0.08 //skip tolerance
 #define tol_end   1-tol_start
 
-vec3 ambi_pre_pass() {
+vec3 ambi_pre_pass(vec2 coords) {
    
-    //Scale to the original aspect
-    float in_aspect = get_in_aspect();
-    vec2 coords = get_scaled_coords_aspect(vTexCoord, global.FinalViewportSize, in_aspect, is_rotated());
-    
-    if (DO_GLOBAL_SHZO >0.5)
-        coords = zoom(coords + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM );
-
-    if (DO_GAME_GEOM_OVERRIDE > 0.5) {
-        coords = zoom(coords, GAME_GEOM_ZOOM);
-        coords = content_aspect_override(coords, GAME_GEOM_ASPECT, in_aspect);
-        coords.y -= GAME_GEOM_VSHIFT/10.0;
-        coords.x -= GAME_GEOM_HSHIFT/10.0;
-    }
-
-    if (DO_BEZEL > 0.5)
-        coords = zoomout_coords(coords, -BEZEL_INNER_ZOOM , 1.0);
-    
     //Skip coords in the rect "under the monitor"
     if (coords.x > tol_start &&
         coords.x < tol_end   &&
@@ -144,10 +145,10 @@ vec3 ambi_step_rgb(vec3 s,vec3 d, vec3 mystep){
 }
 
 
-vec4 pixel_ambilight() {
+vec4 pixel_ambilight(vec2 local_pre_pass_coords) {
 
     vec4 past_pixel_vec4 = texture(PastSampler, vTexCoord);
-    vec3 present_pixel =  ambi_pre_pass().rgb;
+    vec3 present_pixel =  ambi_pre_pass(local_pre_pass_coords).rgb;
     vec3 past_pixel =     past_pixel_vec4.rgb;
 
     float scene_change_remaining = past_pixel_vec4.a;
@@ -188,5 +189,5 @@ void main() {
     }
     
     
-    FragColor = pixel_ambilight();
+    FragColor = pixel_ambilight(pre_pass_coords);
 }
