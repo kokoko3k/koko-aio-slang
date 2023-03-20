@@ -715,14 +715,16 @@ vec4 pixel_inner_frame(vec2 coords, bool bBorder_needed) {
     //Mix bloom texture
     if (DO_BLOOM == 1.0 ) {
         bloomed=texture(bloom_pass_final, coords).rgb ;
-        /*
-        if (BLOOM_BYPASS > 0.5)
+        
+        /*if (BLOOM_BYPASS > 0.5)
             pixel_out = bloomed;
         else
             pixel_out += bloomed;
         */
-        //Unbranched version
-        pixel_out = bloomed + (pixel_out * (1 - BLOOM_BYPASS));
+        //unbranched version, maybe a bit faster.
+        pixel_out = bloomed + (pixel_out * (1 - min(BLOOM_BYPASS, 1.0) ));
+
+
     }
 
     //Black frame insertion, made static, enable it in config.inc.
