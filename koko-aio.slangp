@@ -377,4 +377,3 @@ float_framebuffer7 = true
 #    [ ] reflection blurriness should not depend on input resolution
 #    [ ] copy base presets to overlay shader
 #    [ ] check if unbranching line: if (BLOOM_BYPASS > 0.5) in final pass has some gain
-#    [ ] Remove leftover STATIC_BEZEL_USE_MIPMAP in finalpass

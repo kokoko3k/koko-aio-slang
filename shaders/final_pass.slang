@@ -664,7 +664,6 @@ vec3 bezel_color(float lum)  {
 }
 
 
-#define STATIC_BEZEL_USE_MIPMAP 1.0
 float fuzzyrect(vec2 uv, vec2 size, float radius, float blur) {
     vec2 hSize = size / 2.0 - radius;
     float d = length(max(abs(uv - vec2(0.5)),hSize)-hSize);
