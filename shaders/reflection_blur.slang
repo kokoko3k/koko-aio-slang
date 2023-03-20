@@ -106,7 +106,7 @@ void main() {
    //Also modulate in the corners via fcorners_shade (fcorners_shade 
       shade_sharp_blur = max(fcorners_shade, shade_sharp_blur);
       
-   float shade_sharp_blur_adapted = shade_sharp_blur * 3.5;      
+   float shade_sharp_blur_adapted = shade_sharp_blur * 5.5;      
    float lod0 = floor(shade_sharp_blur_adapted);
    float lod1 = lod0 + 1;
    vec3 s1 = textureLod( Source, coords, lod0).rgb;
