@@ -41,8 +41,11 @@ void main() {
     vIn_aspect = get_in_aspect();
     vTexCoord = get_scaled_coords_aspect(TexCoord,global.FinalViewportSize, vIn_aspect, bool(vIsRotated)) + vec2(0.00001);
 
-    if (DO_GLOBAL_SHZO >0.5)
-        vTexCoord = zoom(vTexCoord + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM );
+    //if (DO_GLOBAL_SHZO >0.5)
+    //    vTexCoord = zoom(vTexCoord + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM );
+    //..unbranched previous
+    vTexCoord = (zoom(vTexCoord + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM ) * DO_GLOBAL_SHZO) + 
+                (vTexCoord * (1-DO_GLOBAL_SHZO)  );
 
     vOutputCoord = TexCoord;
 
@@ -56,6 +59,10 @@ void main() {
         vWarp_vexp = 1.0/ (1 + (vec2(geom_warp_adapted.x, geom_warp_adapted.y) * 0.2)) ;
         vWarp_arg2 = 1.0 - pow(vec2(0.29289321881345247559915563789515), vWarp_vexp );
 
+    //SPOT
+        spot_offset = offsets_from_float(S_POSITION+420.0,40);
+        spot_offset = spot_offset / 10.0 + vec2(0.0,1.0);
+        
     //Help scanline code too:
         if (DO_SCANLINES > 0.5) {
             bool bIs_Interlaced = is_interlaced();
@@ -69,12 +76,11 @@ void main() {
                 if (params.FrameCount % 2 == 0.0) vScanlinesAlternate = 1.0;
                 if (params.OriginalSize.y > MIN_LINES_INTERLACED )  vScanlinePeriod = 0.5;
             }
+            
             //vScanlinePhase = 0.0;
             //vScanlinePhase = vScanlinePeriod * pi - pi/4.0; //<-- needed to match scanlines done in first_pass. //FIXME check what happens for highter res.
         }
-    //SPOT
-        spot_offset = offsets_from_float(S_POSITION+420.0,40);
-        spot_offset = spot_offset / 10.0 + vec2(0.0,1.0);
+
 
 }
 
@@ -134,14 +140,28 @@ vec3 pixel_vmask(vec3 source, float white_reference, float over_white) {
     vec4 vec_mod=(vec4(3,1,2,3) + vec4(VMASK_GAP,0.0,0.0,0.0))* VMASK_DARKLINE_SCALE ;
 
     float fcol = vOutputCoord.x * params.OutputSize.x;
-    if (mod(fcol, vec_mod.x) < vec_mod.y)
+    float mod_compare = mod(fcol, vec_mod.x);
+    
+
+    if (mod_compare < vec_mod.y)
         vmasked = m1 * source;
-    else if (mod(fcol, vec_mod.x) < vec_mod.z)
+    else if (mod_compare < vec_mod.z)
         vmasked = m2 * source;
-    else if (mod(fcol, vec_mod.x) <  vec_mod.w)
+    else if (mod_compare <  vec_mod.w)
         vmasked = m3 * source;
     else vmasked = gap * source;
 
+    
+    //Unbranched previous, worse performance.
+        /*
+        bool bm1 = (mod_compare < vec_mod.y);
+        bool bm2 = (mod_compare < vec_mod.z) && !bm1;
+        bool bm3 = (mod_compare < vec_mod.w) && !bm1 && !bm2;
+        bool bgap = !bm3 && !bm2 && !bm1;
+        vmasked = m1*float(bm1) + m2*float(bm2) + m3*float(bm3) + gap*float(bgap);
+        vmasked = source * vmasked;
+        */
+    
     if (over_white == 1.0) pixel_out = vmasked;
         else {
             white_reference-= over_white;
@@ -151,6 +171,49 @@ vec3 pixel_vmask(vec3 source, float white_reference, float over_white) {
    return pixel_out;
 
 }
+
+
+vec3 pixel_vmask_gm(vec3 source, float white_reference, float over_white) {
+    // Simple RGB mask emulation with or without horizontal gap
+    float ooo = 1.0 - RGB_MASK_STRENGTH;
+    // RGB mask:     R     G     B
+    vec3 m1 =  vec3( ooo , 1.0 , ooo );    //col 1
+    vec3 m2 =  vec3( 1.0 , ooo , 1.0 );    //col 2
+    vec3 gap = vec3( ooo );
+
+    float fcol = vOutputCoord.s * params.OutputSize.x;
+    vec3 pixel_out;
+    vec3 vmasked;
+    vec3 vec_mod=(vec3(2,1,2) + vec3(VMASK_GAP,0.0,0.0))* VMASK_DARKLINE_SCALE ;
+
+    float mod_compare = mod(fcol, vec_mod.x);
+    
+   /* 
+    if (mod_compare < vec_mod.y)
+        vmasked = m1 * source;
+    else if (mod_compare < vec_mod.z)
+        vmasked = m2 * source;
+    else
+        vmasked = gap * source;
+    */
+   
+    //Unbranched previous, same performance.
+        bool bm1 = (mod_compare < vec_mod.y);
+        bool bm2 = (mod_compare < vec_mod.z) && !bm1;
+        bool bgap = !bm2 && !bm1;
+        vmasked = m1*float(bm1) + m2*float(bm2) + gap*float(bgap);
+        vmasked = source * vmasked;
+    
+    if (over_white == 1.0) pixel_out = vmasked;
+        else {
+            white_reference-= over_white;
+            white_reference=  clamp(white_reference,0.0,1.0);
+            pixel_out=  mix(vmasked,source,white_reference);
+        }
+
+   return pixel_out;
+}
+
 
 vec3 pixel_vmask_and_gm(vec3 source, float white_reference, float over_white) {
     // Simple RGB mask emulation with or without horizontal gap
@@ -194,37 +257,6 @@ vec3 pixel_vmask_and_gm(vec3 source, float white_reference, float over_white) {
         }
    return pixel_out;
 
-}
-
-
-vec3 pixel_vmask_gm(vec3 source, float white_reference, float over_white) {
-    // Simple RGB mask emulation with or without horizontal gap
-    float ooo = 1.0 - RGB_MASK_STRENGTH;
-    // RGB mask:     R     G     B
-    vec3 m1 =  vec3( ooo , 1.0 , ooo );    //col 1
-    vec3 m2 =  vec3( 1.0 , ooo , 1.0 );    //col 2
-    vec3 gap = vec3( ooo );
-
-    float fcol = vOutputCoord.s * params.OutputSize.x;
-    vec3 pixel_out;
-    vec3 vmasked;
-    vec3 vec_mod=(vec3(2,1,2) + vec3(VMASK_GAP,0.0,0.0))* VMASK_DARKLINE_SCALE ;
-
-    if (mod(fcol, vec_mod.x) < vec_mod.y)
-        vmasked = m1 * source;
-    else if (mod(fcol, vec_mod.x) < vec_mod.z)
-        vmasked = m2 * source;
-    else
-        vmasked = gap * source;
-
-    if (over_white == 1.0) pixel_out = vmasked;
-        else {
-            white_reference-= over_white;
-            white_reference=  clamp(white_reference,0.0,1.0);
-            pixel_out=  mix(vmasked,source,white_reference);
-        }
-
-   return pixel_out;
 }
 
 
