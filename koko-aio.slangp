@@ -1,5 +1,3 @@
-
-
 #    Koko-aio shader is meant to be an all-in one crt shader.
 #    It can be configured with many parameters, so that can be
 #    scaled to run on even on modest gpus while still developed to
