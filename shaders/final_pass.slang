@@ -305,17 +305,17 @@ float scanline_shape(vec2 coords, bool do_slotmask, float lum) {
     float lum_scaled = lum * SCANLINE_MAX;
           lum_scaled = clamp( lum_scaled, SCANLINE_MIN, SCANLINE_MAX );
 
-
     float angle_base = coords.y * pi * params.OriginalSize.y * period;// + vScanlinePhase;
 
     float lines = 1.0;
 
     if (!( is_interlaced && SCANLINE_DISABLE_ON_INTERLACE == 1.0 )) {
 
-        /*if (alternate)
-            lines = -sin(angle_base + HALF_PI);
-                else
-            lines = sin(angle_base);
+        /*
+            if (alternate)
+                lines = -sin(angle_base + HALF_PI);
+                    else
+                lines = sin(angle_base);
         */
         //Unbranched the previous if/then/else:
         lines = (2*vScanlinesAlternate -1) * sin(angle_base + (vScanlinesAlternate * HALF_PI)) ;
@@ -333,7 +333,6 @@ float scanline_shape(vec2 coords, bool do_slotmask, float lum) {
             float Darkline_part_w = (3.0 - VMASK_USE_GM + VMASK_GAP) * VMASK_DARKLINE_SCALE;
             float Darkline_part_w_x2 = Darkline_part_w*2;
             bool odd_column = mod(vFragCoord.x + Darkline_part_w  , Darkline_part_w_x2) < Darkline_part_w;
-
 
             if (SCANLINE_SM_TYPE == 1.0) {
                 // Slotmask is out oh phase every "odd" triple and mixed with
@@ -666,6 +665,11 @@ vec3 bezel_color(float lum)  {
 
 
 #define STATIC_BEZEL_USE_MIPMAP 1.0
+float fuzzyrect(vec2 uv, vec2 size, float radius, float blur) {
+    vec2 hSize = size / 2.0 - radius;
+    float d = length(max(abs(uv - vec2(0.5)),hSize)-hSize);
+    return smoothstep(-radius-blur, -radius+blur, -d);
+}
 
 vec3 compose_bezel_over(vec3 full_viewport, vec2 coords_for_bezel, vec2 param_coords_for_mirror) {
 
@@ -723,8 +727,21 @@ vec3 compose_bezel_over(vec3 full_viewport, vec2 coords_for_bezel, vec2 param_co
             float opacita = bezel.a;
             bezel_out = bezel_out + pixel_ambilight * AMBI_OVER_BEZEL * (1 -  reflection * 1.9 ) *  (1 - lut_specular * 1.9) * bezel.a;
             */
-
-        //bezel_out = vec3(bezel.a);
+            vec3 ambitemporalpass = texture(ambi_temporal_pass, vOutputCoord).rgb;
+            vec3 pixel_ambilight = DO_AMBILIGHT * (ambitemporalpass + global_noise);
+            
+            //Create a shaded box to apply ambilight on external borders only
+                float blur = AMBI_OVER_BEZEL_SIZE;
+                vec2 size = vec2(1.0, 2 - AMBI_OVER_BEZEL_AR_CORRECTION)-blur;
+                float radius = 0.0;
+                float ambi_colorize_shade =  1 - fuzzyrect(coords_for_bezel, size,  radius,  blur) * 2;
+                bezel_out = bezel_out + (pixel_ambilight * AMBI_OVER_BEZEL * bezel.a * ambi_colorize_shade * (1-reflection));
+                /*
+                vec2 coords_for_ambi_shade = coords_for_bezel * vec2(1.0,AMBI_OVER_BEZEL_AR_CORRECTION) - vec2(0.0,(AMBI_OVER_BEZEL_AR_CORRECTION-1)*0.5  );
+                vec2 ambi_smoothbox = (coords_for_ambi_shade * (1-coords_for_ambi_shade));
+                float ambi_bezel_bleed = 1 - min(ambi_smoothbox.x, ambi_smoothbox.y) * AMBI_OVER_BEZEL_SIZE;
+                bezel_out = bezel_out + (pixel_ambilight * AMBI_OVER_BEZEL * bezel.a * ambi_bezel_bleed);
+                */
 
          //(1- (max(reflection, lut_specular), bezel.a)) ;
         //We use the green component to express Hardness/Specularity; there the reflection will be completely diffused.
@@ -755,8 +772,6 @@ vec4 pixel_inner_frame(vec2 coords, bool bBorder_needed) {
         */
         //unbranched version, maybe a bit faster.
         pixel_out = bloomed + (pixel_out * (1 - min(BLOOM_BYPASS, 1.0) ));
-
-
     }
 
     //Black frame insertion, made static, enable it in config.inc.

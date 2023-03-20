@@ -35,6 +35,11 @@
 #define BEZEL_REFL_CORNER_BLANK_SHADE 0.05  // keep it > 0.0
 
 
+	//When colorizing the bezel via ambient light, it is possible to choose where 
+	//the colorization ends. depending on the bezel texture/lut used, the following
+	//parameter wil allow to colorize top/bottom and left/right border with the
+	//same shade amount.
+#define AMBI_OVER_BEZEL_AR_CORRECTION 0.98
 
 
 
@@ -277,6 +282,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float AMBI_FALLOFF;
 	float AMBI_POWER;
 	float AMBI_OVER_BEZEL;
+	float AMBI_OVER_BEZEL_SIZE;
 	float ASPECT_X;
 	float ASPECT_Y;
 	float AMBI_STEPS;
@@ -489,12 +495,13 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 //Back leds
 //Emulates leds under the monitor frame that slowly reacts to image contents
-#pragma parameter DO_AMBILIGHT	  "★ Ambient light leds enable? ==> "					1.0  0.0  1.0     1.0
-#pragma parameter LABEL_WARNING3  "    ⚠ RetroArch aspect needs to be set to Full! ⚠"			1.0  1.0  1.0     1.0
-#pragma parameter AMBI_STEPS	  "        Slowness"							60.0 5.0  1000.0  5.0
-#pragma parameter AMBI_FALLOFF    "        Light Falloff"						0.7  0.1  3.0     0.01
-#pragma parameter AMBI_POWER      "        Led power"							1.5  1.0  7.0     0.05
-//#pragma parameter AMBI_OVER_BEZEL "        Colorize Bezel"						0.1 0.0 1.0     0.01
+#pragma parameter DO_AMBILIGHT	        "★ Ambient light leds enable? ==> "			1.0  0.0  1.0     1.0
+#pragma parameter LABEL_WARNING3        "    ⚠ RetroArch aspect needs to be set to Full! ⚠"	1.0  1.0  1.0     1.0
+#pragma parameter AMBI_STEPS	        "        Slowness"					60.0 5.0  1000.0  5.0
+#pragma parameter AMBI_FALLOFF          "        Light Falloff"					0.7  0.1  3.0     0.01
+#pragma parameter AMBI_POWER            "        Led power"					1.5  1.0  7.0     0.05
+#pragma parameter AMBI_OVER_BEZEL       "        Colorize Bezel"				0.2  0.0  5.0     0.05
+#pragma parameter AMBI_OVER_BEZEL_SIZE  "        Colorization size"				0.15  0.0  0.5     0.001
 #pragma parameter BLANK17 " " 0.0 0.0 1.0 1.0
 
 

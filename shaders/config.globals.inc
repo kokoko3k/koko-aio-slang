@@ -200,12 +200,13 @@
 
 
 #define DO_AMBILIGHT		global.DO_AMBILIGHT
-	#define AMBI_STEPS	global.AMBI_STEPS
-	#define AMBI_FALLOFF	global.AMBI_FALLOFF
-	#define AMBI_POWER	global.AMBI_POWER
-	#define AMBI_OVER_BEZEL global.AMBI_OVER_BEZEL
-	#define ASPECT_X	global.ASPECT_X
-	#define ASPECT_Y	global.ASPECT_Y
+	#define AMBI_STEPS		global.AMBI_STEPS
+	#define AMBI_FALLOFF		global.AMBI_FALLOFF
+	#define AMBI_POWER		global.AMBI_POWER
+	#define AMBI_OVER_BEZEL		global.AMBI_OVER_BEZEL
+	#define AMBI_OVER_BEZEL_SIZE	global.AMBI_OVER_BEZEL_SIZE
+	#define ASPECT_X		global.ASPECT_X
+	#define ASPECT_Y		global.ASPECT_Y
 
 
 

@@ -368,12 +368,13 @@ float_framebuffer7 = true
 #    [ ] Allow to configure new bezel parameters?
 #        Reflection strength, corner shape, size and fade?  
 #    [..] Bezel colorization via ambilight acts strangely when the content aspect is shrinked
-#          [  ] It also bleeds over alpha channel in the internal frame.
-#          [  ] disabled by now till we find a better way to handle it.
+#          [x] It also bleeds over alpha channel in the internal frame.
+#          [x] disabled by now till we find a better way to handle it.
 #               This: https://github.com/kokoko3k/koko-aio-slang/commit/1fbbee4f73948cd85e0d53db3a2d4eaab8951a8f is a reference commit
 #               where i switched from a try to a second one.
-#          [  ] maybe it can be modulated from the outside via min(coord.x,coord.y)
+#          [x] maybe it can be modulated from the outside via min(coord.x,coord.y)
 #    [ ] bloom should bleed over when forcing geometry aspect
 #    [ ] reflection blurriness should not depend on input resolution
 #    [ ] copy base presets to overlay shader
 #    [ ] check if unbranching line: if (BLOOM_BYPASS > 0.5) in final pass has some gain
+#    [ ] Remove leftover STATIC_BEZEL_USE_MIPMAP in finalpass
