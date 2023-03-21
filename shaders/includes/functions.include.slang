@@ -305,7 +305,15 @@ float random(float power, vec2 seed) {
 
 	vec2 content_geom_override(vec2 co, float aspect, float in_aspect, float vshift, float hshift, float out_zoom){
 		//Aspect
-		float scale_y = aspect/in_aspect;
+		float bUse_original_aspect = float(aspect < 0.01);
+		float scale_y;
+		if (aspect > eps) 
+			scale_y = aspect/in_aspect;
+				else
+			scale_y = 1.0;
+		
+		scale_y = (aspect/in_aspect * (1-bUse_original_aspect)) + bUse_original_aspect;
+		
 		float offset_y = (0.5 * scale_y ) - 0.5 ;
 		co.y = co.y*scale_y - offset_y;
 		//shift

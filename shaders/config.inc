@@ -559,7 +559,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 //Content geomerty overrides
 #pragma parameter DO_GAME_GEOM_OVERRIDE	 "★ Override content geometry enable? ==>"	0.0   0.0  1.0 	  1.0
-#pragma parameter GAME_GEOM_ASPECT	 "        Aspect"				1.3333333333333  0.1  3.0 	  0.005
+#pragma parameter GAME_GEOM_ASPECT	 "        Aspect (0 = unchanged)"		1.3333333333333  0.0  3.0 	  0.005
 #pragma parameter GAME_GEOM_VSHIFT	 "        Vertical position"			0.0   -10.0 10.0  0.01
 #pragma parameter GAME_GEOM_HSHIFT	 "        Horizontal position"			0.0   -10.0 10.0  0.01
 #pragma parameter GAME_GEOM_ZOOM	 "        Zoom"					1.0    0.0  2.0  0.01
