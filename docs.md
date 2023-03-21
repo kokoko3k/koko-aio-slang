@@ -10,11 +10,6 @@
     Use it if you don't want to blur the image and you still don't like
     jagged or too much pixelated images.
 
-**RGB deconvergence:**
-    Shift R,G,B components separately to mimic channel deconvergence.
-    By varying Red, Green and Blue offsets, the relative component will be
-    shifted column by column, row by row.
-
 **CVBS: NTSC color artifacts: **
     Tries to emulate typical NTSC color artifacting without emulating
     full NTSC coding/decoding pipeline.
@@ -22,12 +17,20 @@
     an accurate emulation (yet?)
     As today, it is enough to emulate rainbowing effects on genesis.
     
+** RF Noise: **
+    Emulates radio frequency noise with a given strength
+    
 **CVBS: Bandwidth limited chroma:**
     Will cause an horizontal chroma bleed which cheaply mimics the effect of
     poor composite video signals.
     It can be used with RGB shifting and image blurring to give the picture
     an ntsc look without dealing with specific encoding/decoding stuffs. 
 
+**RGB deconvergence:**
+    Shift R,G,B components separately to mimic channel deconvergence.
+    By varying Red, Green and Blue offsets, the relative component will be
+    shifted column by column, row by row.
+    
 **Glow/Blur:**
     Emulate the CRT glowing "feature", so that the brighter areas of
     the image will light their surroundings,
@@ -215,16 +218,19 @@
         Use a straight bezel instead of a curved one.
     Bezel color (red,green,blue) and contrast:
         Allows to choose the color of the monitor frame.
+    Reflections strength
+        The amount of reflections
+    Reflections sharpness
+        Modulates from totally blurred to totally sharp reflection appearance.
+    Specularity strength
+        The amount of specular reflection
+    Reflections roughness
+        The amount of material roughness in reflection area
     Image zoom:
         Allows to shrink or expand the game content to fit the monitor frame.
     Frame zoom:
-        Allows to shrink or expand the monitor frame to fit the game content.
-    Sharp reflections
-        Modulates from totally blurred to totally sharp reflection appearance.
-
-**Global shift/zoom image:**
-    Zoom and shift everything on screen, but background pictures.
-        
+          Allows to shrink or expand the monitor frame to fit the game content.
+          
 **Backgound image:**
     Draws an image on screen picked from the "textures" shader subdirectory,
     named: background.png<br>
@@ -270,6 +276,16 @@
     Colorize Bezel
         Allow to add an amount of the ambient light over the bezel frame
 
+**Luminosity dependant zoom:**
+    On older CRT monitors, the picture gets bigger when the image was brighter.
+
+**Vignette:**
+    Will cause uneven brightness of the image, more at the center,
+    less at the edges.
+    
+**Spot:**
+    Simulates external light reflected by the monitor glass.
+            
 **Aspect Ratio:**
     When using effects that need Retroarch aspect ratio option
     to be set to "full", you have to provide the source aspect
@@ -292,16 +308,18 @@
         As long as Aspect Ratio Numerator is positive, this will
         be used as the denominator of the fraction.
 
-**Luminosity dependant zoom:**
-    On older CRT monitors, the picture gets bigger when the image was brighter.
+**Global shift/zoom image:**
+    Zoom and shift everything on screen, but background pictures.
 
-**Vignette:**
-    Will cause uneven brightness of the image, more at the center,
-    less at the edges.
+**Override content geometry:**
+    Contrary to the global aspect ratio control, this changes only the game geometry.
+    Bezel stays the same.
     
-**Spot:**
-    Simulates external light reflected by the monitor glass.
+    Aspect: Change aspect ratio.
+    Vertical/Horizontal position: Shifts the game position
+    Zoom: Change the size
 
+    
 **Alternate line blanking:**
     *This feature has been disabled by defaut, if you want to try it,
     you have to manually enable it by removing the leading: "//"

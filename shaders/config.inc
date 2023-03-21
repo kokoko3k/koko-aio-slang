@@ -265,6 +265,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float BEZEL_RFL_ZOOM;
 	float BEZEL_REFL_STRENGTH;
 	float BEZEL_SPCL_STRENGTH;
+	float BEZEL_ROUGHNESS;
 
 	float DO_SPOT;
 	float S_POSITION; 
@@ -366,7 +367,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 
 //Offset RGB
-#pragma parameter DO_SHIFT_RGB       "★ RGB deconvergence enable? (bad with FXAA) ==>"	0.0	 0.0 1.0 1.0
+#pragma parameter DO_SHIFT_RGB       "★ RGB deconvergence enable? ==>"	0.0	 0.0 1.0 1.0
 #pragma parameter OFFSET_STRENGTH "        Strength"			0.6 	 0.0 1.0 0.05
 #pragma parameter SHIFT_R         "        Red offset"			-40.0 	-210.0 189.0 1
 #pragma parameter SHIFT_G         "        Green offset"		2.0 	-210.0 189.0 1
@@ -464,17 +465,19 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 //Bezel related
 #pragma parameter DO_BEZEL	      "★ Bezel enable? ==>"		0.0   0.0 1.0 1.0
-#pragma parameter BEZEL_USE_STRAIGHT  "        Straight"			0.0	0.0 1.0  1.0 
+#pragma parameter BEZEL_USE_STRAIGHT  "        Straight"		0.0	0.0 1.0  1.0 
+#pragma parameter BEZEL_INNER_ZOOM    "        Image zoom"		-0.18   -1.5 0.5 0.005
+#pragma parameter BEZEL_FRAME_ZOOM    "        Frame zoom"		0.0   -1.5 0.5 0.005
 #pragma parameter BEZEL_R             "        Color: Red"		-0.3   -1.0 1.0  0.01
 #pragma parameter BEZEL_G             "        Color: Green"		-0.3   -1.0 1.0  0.01
 #pragma parameter BEZEL_B             "        Color: Blue"		-0.3   -1.0 1.0  0.01
 #pragma parameter BEZEL_CON           "        Contrast"			1.3   0.0  10.0 0.01
-#pragma parameter BEZEL_INNER_ZOOM    "        Image zoom"		-0.18   -1.5 0.5 0.005
-#pragma parameter BEZEL_FRAME_ZOOM    "        Frame zoom"		0.0   -1.5 0.5 0.005
 #pragma parameter BEZEL_RFL_ZOOM      "        Reflections zoom"	0.0   -1.5 0.5 0.005
-#pragma parameter BEZEL_REFL_STRENGTH "        Reflection strength"	0.5    0.0 1.0 0.01
+#pragma parameter BEZEL_REFL_STRENGTH "        Reflections strength"	0.5    0.0 1.0 0.01
 #pragma parameter BEZEL_RFL_BLR_SHD   "        Reflections sharpness"	-0.0  -0.5 1.0 0.01
+#pragma parameter BEZEL_ROUGHNESS     "        Reflections roughness"	1.5    0.0 5.0 0.1
 #pragma parameter BEZEL_SPCL_STRENGTH "        Specularity strength"	0.5    0.0 3.0 0.05
+
 
 #pragma parameter BLANK15 " " 0.0 0.0 1.0 1.0
 
@@ -529,7 +532,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 
 //Global Zoom/Offset
-#pragma parameter DO_GLOBAL_SHZO	 "★ Global shift/zoom"			0.0   0.0  1.0 	  1.0
+#pragma parameter DO_GLOBAL_SHZO	 "★ Global shift/zoom enable? ==>"	0.0   0.0  1.0 	  1.0
 #pragma parameter GLOBAL_OFFX	 "        X axis shift "			0.0  -1.0  1.0    0.0005
 #pragma parameter GLOBAL_OFFY	 "        Y axis shift "			0.0  -1.0  1.0    0.0005
 #pragma parameter GLOBAL_ZOOM	 "        Zoom"					2.0   0.0  3.0    0.0005
@@ -555,11 +558,11 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 
 //Content geomerty overrides
-#pragma parameter DO_GAME_GEOM_OVERRIDE	 "★ Override content geometry"		0.0   0.0  1.0 	  1.0
-#pragma parameter GAME_GEOM_ASPECT	 "        Aspect"			1.3333333333333  0.1  3.0 	  0.005
-#pragma parameter GAME_GEOM_VSHIFT	 "        Vertical position"		0.0   -10.0 10.0  0.01
-#pragma parameter GAME_GEOM_HSHIFT	 "        Horizontal position"		0.0   -10.0 10.0  0.01
-#pragma parameter GAME_GEOM_ZOOM	 "        Zoom"				1.0    0.0  2.0  0.01
+#pragma parameter DO_GAME_GEOM_OVERRIDE	 "★ Override content geometry enable? ==>"	0.0   0.0  1.0 	  1.0
+#pragma parameter GAME_GEOM_ASPECT	 "        Aspect"				1.3333333333333  0.1  3.0 	  0.005
+#pragma parameter GAME_GEOM_VSHIFT	 "        Vertical position"			0.0   -10.0 10.0  0.01
+#pragma parameter GAME_GEOM_HSHIFT	 "        Horizontal position"			0.0   -10.0 10.0  0.01
+#pragma parameter GAME_GEOM_ZOOM	 "        Zoom"					1.0    0.0  2.0  0.01
 #pragma parameter BLANK20 " " 0.0 0.0 1.0 1.0
 
 // Alternative blanking, needs to be statically enabled, see docs.md.

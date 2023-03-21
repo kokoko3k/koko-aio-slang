@@ -697,19 +697,22 @@ vec3 compose_bezel_over(vec3 full_viewport, vec2 coords_for_bezel, vec2 param_co
     //No need to draw anything on full alpha:
     if (bezel.a == 0.0) return full_viewport;
 
+    float reflection = bezel.b * BEZEL_REFL_STRENGTH;
+    float lut_specular = bezel.g * BEZEL_SPCL_STRENGTH;
+    
     //We use the red component of the bezel to express its luminance (define bezel_luminance bezel.r)
     vec3 bezel_colored = bezel_color(bezel_luminance);
-
+    float roughness = random( min(global.FinalViewportSize.z,global.FinalViewportSize.w) * BEZEL_ROUGHNESS, vTexCoord ) *  (1 - min(lut_specular * 10, 1.0));
     //This is the reflection to be composed over the bezel);
+    //vec3 pixel_mirrored = texture(reflected_blurred_pass,
+    //                      coords_for_mirror + roughness).rgb;
     vec3 pixel_mirrored = texture(reflected_blurred_pass,
-                          coords_for_mirror + random( min(global.FinalViewportSize.z,global.FinalViewportSize.w)*1.5, vTexCoord ) ).rgb;
+                           coords_for_mirror + roughness).rgb; // + (roughness*BEZEL_ROUGHNESS);
 
 //return pixel_mirrored;
     //Take the reflection modifier from the texture blue component into account; it is/may be used to lower the reflection in the corners.
         //float reflection = (reflection_shade * 1.4 -  0.4)  * bezel.b ;
         //reflection = clamp (reflection, 0.0, 1.0);
-        float reflection = bezel.b * BEZEL_REFL_STRENGTH;
-        float lut_specular = bezel.g * BEZEL_SPCL_STRENGTH;
         //return vec3(reflection);
         pixel_mirrored = pixel_mirrored * reflection * (1+lut_specular);
         //return pixel_mirrored;
