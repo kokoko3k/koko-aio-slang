@@ -307,11 +307,12 @@ float random(float power, vec2 seed) {
 		//Aspect
 		float bUse_original_aspect = float(aspect < 0.01);
 		float scale_y;
-		if (aspect > eps) 
+		/*if (aspect > eps) 
 			scale_y = aspect/in_aspect;
 				else
 			scale_y = 1.0;
-		
+		*/
+		//Unbranched previous:
 		scale_y = (aspect/in_aspect * (1-bUse_original_aspect)) + bUse_original_aspect;
 		
 		float offset_y = (0.5 * scale_y ) - 0.5 ;
