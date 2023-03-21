@@ -770,7 +770,8 @@ vec4 pixel_inner_frame(vec2 coords, bool bBorder_needed) {
             pixel_out += bloomed;
         */
         //unbranched version, maybe a bit faster.
-        pixel_out = bloomed + (pixel_out * (1 - min(BLOOM_BYPASS, 1.0) ));
+        pixel_out = bloomed + float(BLOOM_BYPASS < 0.5) * pixel_out;
+        //pixel_out = bloomed + (pixel_out * (1 - min(BLOOM_BYPASS, 1.0) ));
     }
 
     //Black frame insertion, made static, enable it in config.inc.

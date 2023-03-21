@@ -353,7 +353,13 @@ float_framebuffer7 = true
 #        Half done, gained something.
 #    [v] reflection blur: can we make better use of mipmaps instead of blindly use lod = 2.0?
 #    [v] avglum_pass needs to react to content aspect override
-#    [x] Ambient light skip coords should be aware of the h/v shift override or black box whould appear
+#    [v] Bezel colorization via ambilight acts strangely when the content aspect is shrinked
+#          [v] It also bleeds over alpha channel in the internal frame.
+#          [v] disabled by now till we find a better way to handle it.
+#               This: https://github.com/kokoko3k/koko-aio-slang/commit/1fbbee4f73948cd85e0d53db3a2d4eaab8951a8f is a reference commit
+#               where i switched from a try to a second one.
+#          [v] maybe it can be modulated from the outside via min(coord.x,coord.y)
+#    [v] Ambient light skip coords should be aware of the h/v shift override or black box whould appear
 #        Not a big deal, since it happens when moving the image far, far away.
 #    [..] specular reflections does not 100% follow the image when overriding aspect
 #        It is hard and probably would require another pass for somethig nobody would ever notice.
@@ -367,14 +373,9 @@ float_framebuffer7 = true
 #    [ ] Find a way to smooth borders without cropping the image
 #    [ ] Allow to configure new bezel parameters?
 #        Reflection strength, corner shape, size and fade?  
-#    [..] Bezel colorization via ambilight acts strangely when the content aspect is shrinked
-#          [x] It also bleeds over alpha channel in the internal frame.
-#          [x] disabled by now till we find a better way to handle it.
-#               This: https://github.com/kokoko3k/koko-aio-slang/commit/1fbbee4f73948cd85e0d53db3a2d4eaab8951a8f is a reference commit
-#               where i switched from a try to a second one.
-#          [x] maybe it can be modulated from the outside via min(coord.x,coord.y)
+
 #    [ ] bloom should bleed over when forcing geometry aspect
 #    [ ] reflection blurriness should not depend on input resolution
 #    [ ] copy base presets to overlay repo (after release)
-#    [ ] check if unbranching line: if (BLOOM_BYPASS > 0.5) in final pass has some gain
-#    [ ] ntsc artifacts debug has no effect (?)
+
+
