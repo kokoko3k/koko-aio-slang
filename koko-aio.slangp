@@ -375,5 +375,6 @@ float_framebuffer7 = true
 #          [x] maybe it can be modulated from the outside via min(coord.x,coord.y)
 #    [ ] bloom should bleed over when forcing geometry aspect
 #    [ ] reflection blurriness should not depend on input resolution
-#    [ ] copy base presets to overlay shader
+#    [ ] copy base presets to overlay repo (after release)
 #    [ ] check if unbranching line: if (BLOOM_BYPASS > 0.5) in final pass has some gain
+#    [ ] ntsc artifacts debug has no effect (?)
