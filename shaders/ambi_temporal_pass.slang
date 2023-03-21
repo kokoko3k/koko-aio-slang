@@ -40,12 +40,9 @@ void main() {
     if (DO_GLOBAL_SHZO >0.5)
         pre_pass_coords = zoom(pre_pass_coords + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM );
 
-    if (DO_GAME_GEOM_OVERRIDE > 0.5) {
-        pre_pass_coords = zoom(pre_pass_coords, GAME_GEOM_ZOOM);
-        pre_pass_coords = content_aspect_override(pre_pass_coords, GAME_GEOM_ASPECT, in_aspect);
-        pre_pass_coords.y -= GAME_GEOM_VSHIFT/10.0;
-        pre_pass_coords.x -= GAME_GEOM_HSHIFT/10.0;
-    }
+    if (DO_GAME_GEOM_OVERRIDE > 0.5)
+        pre_pass_coords = content_geom_override(pre_pass_coords, GAME_GEOM_ASPECT, get_in_aspect(), GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
+
 
     if (DO_BEZEL > 0.5)
         pre_pass_coords = zoomout_coords(pre_pass_coords, -BEZEL_INNER_ZOOM , 1.0);

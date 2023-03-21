@@ -17,18 +17,14 @@ layout(location = 1) out float lod;
 
 #include "includes/functions.include.slang"
 
+
 void main() {
    gl_Position = global.MVP * Position;
    
    vTexCoord = TexCoord;
 
-    if (DO_GAME_GEOM_OVERRIDE > 0.5) {
-        vTexCoord = content_aspect_override(vTexCoord, GAME_GEOM_ASPECT, get_in_aspect());
-        vTexCoord.y -= GAME_GEOM_VSHIFT/10.0;
-        vTexCoord.x -= GAME_GEOM_HSHIFT/10.0;
-        vTexCoord = zoom(vTexCoord, GAME_GEOM_ZOOM);
-    }
-
+    if (DO_GAME_GEOM_OVERRIDE > 0.5)
+        vTexCoord = content_geom_override(vTexCoord, GAME_GEOM_ASPECT, get_in_aspect(), GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
 }
 
 #pragma stage fragment

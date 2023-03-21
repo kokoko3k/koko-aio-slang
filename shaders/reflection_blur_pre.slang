@@ -15,12 +15,9 @@ void main() {
    vTexCoord = TexCoord;
    vCoordsAdapted = vTexCoord;
    //override aspect?
-   if (DO_GAME_GEOM_OVERRIDE > 0.5) {
-      vCoordsAdapted = content_aspect_override(vCoordsAdapted, GAME_GEOM_ASPECT, get_in_aspect());
-      vCoordsAdapted.y -= (GAME_GEOM_VSHIFT/10.0);// *  (1 - BEZEL_INNER_ZOOM);
-      vCoordsAdapted.x -= (GAME_GEOM_HSHIFT/10.0);// *  (1 - BEZEL_INNER_ZOOM);
-      vCoordsAdapted = zoom(vCoordsAdapted, GAME_GEOM_ZOOM);
-   }
+   if (DO_GAME_GEOM_OVERRIDE > 0.5)
+      vCoordsAdapted = content_geom_override(vCoordsAdapted, GAME_GEOM_ASPECT, get_in_aspect(), GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
+
    vCoordsAdapted = zoomout_coords( vCoordsAdapted, BEZEL_RFL_ZOOM, 1.0);
 }
 

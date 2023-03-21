@@ -216,6 +216,10 @@
     
     Straight
         Use a straight bezel instead of a curved one.
+    Image zoom:
+        Allows to shrink or expand the game content to fit the monitor frame.
+    Frame zoom:
+          Allows to shrink or expand the monitor frame to fit the game content.
     Bezel color (red,green,blue) and contrast:
         Allows to choose the color of the monitor frame.
     Reflections strength
@@ -226,10 +230,6 @@
         The amount of specular reflection
     Reflections roughness
         The amount of material roughness in reflection area
-    Image zoom:
-        Allows to shrink or expand the game content to fit the monitor frame.
-    Frame zoom:
-          Allows to shrink or expand the monitor frame to fit the game content.
           
 **Backgound image:**
     Draws an image on screen picked from the "textures" shader subdirectory,

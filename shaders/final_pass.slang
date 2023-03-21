@@ -920,12 +920,8 @@ void main() {
         outer_frame_offset = get_scaled_offset(BEZEL_BORDER_SIZE, coords_for_bezel1, vTexCoord);
     }
 
-    if (DO_GAME_GEOM_OVERRIDE > 0.5) {
-        coords = content_aspect_override(coords, GAME_GEOM_ASPECT, vIn_aspect);
-        coords.y -= GAME_GEOM_VSHIFT/10.0;
-        coords.x -= GAME_GEOM_HSHIFT/10.0;
-        coords = zoom(coords, GAME_GEOM_ZOOM);
-    }
+    if (DO_GAME_GEOM_OVERRIDE > 0.5)
+        coords = content_geom_override(coords, GAME_GEOM_ASPECT, vIn_aspect, GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
 
     //Luminosity dependant zoom
     if (DO_DYNZOOM == 1.0) {
