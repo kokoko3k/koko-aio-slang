@@ -275,7 +275,17 @@
         Note: To avoid burn-in effects, keep Light Falloff + Led power not too high.
     Colorize Bezel
         Allow to add an amount of the ambient light over the bezel frame
-
+    Colorization size
+        How much the ambient light should bleed over the monitor.
+        Pushing this too high would make it bleed over the tube.
+        This is not supported.
+    Back/Foreground image alpha blend
+        When displaying background or foreground images, ambient lights are
+        shown on their transparent areas (alpha channel)
+        Switching this you can choose if you want to emulate leds:
+        under the image (0/mix) or over the image (1/add)
+        
+        
 **Luminosity dependant zoom:**
     On older CRT monitors, the picture gets bigger when the image was brighter.
 

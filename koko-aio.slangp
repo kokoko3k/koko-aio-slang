@@ -42,7 +42,7 @@
          bg_under_linear = "true"
       bg_under_wrap_mode = "mirrored_repeat"
          bg_under_mipmap = "true"
-          
+         
                  bg_over = "textures/background_over.png"
           bg_over_linear = "true"
        bg_over_wrap_mode = "mirrored_repeat"
@@ -377,5 +377,7 @@ float_framebuffer7 = true
 #    [ ] bloom should bleed over when forcing geometry aspect
 #    [ ] reflection blurriness should not depend on input resolution
 #    [ ] copy base presets to overlay repo (after release)
-
-
+#    [ ] ambilight leds falloff should use a gamma function/pow
+#    [ ] mirror bg_under image so that reflective parts points to the center.
+#    [ ] Sembra strano, controlla se esatto in finalpass:
+#        float ambi_colorize_shade =  1 - fuzzyrect(coords_for_bezel, size,  radius,  blur) * 2;

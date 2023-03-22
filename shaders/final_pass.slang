@@ -144,13 +144,14 @@ vec3 pixel_vmask(vec3 source, float white_reference, float over_white) {
     
 
     if (mod_compare < vec_mod.y)
-        vmasked = m1 * source;
+        vmasked = m1;
     else if (mod_compare < vec_mod.z)
-        vmasked = m2 * source;
+        vmasked = m2;
     else if (mod_compare <  vec_mod.w)
-        vmasked = m3 * source;
-    else vmasked = gap * source;
-
+        vmasked = m3;
+    else vmasked = gap;
+    
+    vmasked *= source;
     
     //Unbranched previous, worse performance.
         /*
@@ -161,7 +162,7 @@ vec3 pixel_vmask(vec3 source, float white_reference, float over_white) {
         vmasked = m1*float(bm1) + m2*float(bm2) + m3*float(bm3) + gap*float(bgap);
         vmasked = source * vmasked;
         */
-    
+          
     if (over_white == 1.0) pixel_out = vmasked;
         else {
             white_reference-= over_white;
@@ -630,10 +631,30 @@ vec3 pixel_border(bool image_over) {
     #endif
     vec3 pixel_out = vec3(1.0);
     if (DO_AMBILIGHT == 1.0)
-        pixel_out =  texture(ambi_temporal_pass, vOutputCoord).rgb + vec3(global_noise);
+        pixel_out =  texture(ambi_temporal_pass, vOutputCoord).rgb + global_noise;
     if (DO_BG_IMAGE == 1.0 && !image_over) {
         vec4 bg_image = pixel_background_image(false);
-        pixel_out = mix(pixel_out,bg_image.rgb,bg_image.a);
+        // Mix or add ambilight to the background image?
+            //...with ternary operator:
+            pixel_out = (AMBI_BG_IMAGE_BLEND_MODE == 0.0) ? 
+                mix(pixel_out,bg_image.rgb,bg_image.a) 
+                    : 
+                bg_image.rgb + (pixel_out * (1 - bg_image.a));
+            //...with if/then:
+            /*if (AMBI_BG_IMAGE_BLEND_MODE == 0.0)
+                pixel_out = mix(pixel_out,bg_image.rgb,bg_image.a);
+                    else
+                pixel_out = bg_image.rgb + (pixel_out * (1 - bg_image.a));
+            */
+            //..unbranched versions:
+            /*  ...mix is the slower.
+                vec3 pixel_out_alpha_blend_mix = mix(pixel_out,bg_image.rgb,bg_image.a);
+                vec3 pixel_out_alpha_blend_add = bg_image.rgb + (pixel_out * (1 - bg_image.a));
+                pixel_out = (pixel_out_alpha_blend_add *  AMBI_BG_IMAGE_BLEND_MODE) + 
+                            (pixel_out_alpha_blend_mix *  (1-AMBI_BG_IMAGE_BLEND_MODE));
+            */
+
+        
     }
     return pixel_out;
 }
@@ -670,10 +691,19 @@ float fuzzyrect(vec2 uv, vec2 size, float radius, float blur) {
     return smoothstep(-radius-blur, -radius+blur, -d);
 }
 
+float create_ambi_colorize_shade(vec2 co) {
+    float blur = AMBI_OVER_BEZEL_SIZE;
+    vec2 size = vec2(1.0, 2 - AMBI_OVER_BEZEL_AR_CORRECTION)-blur;
+    float radius = 0.0;
+    return  1 - fuzzyrect(co, size,  radius,  blur) * 2;
+}
+    
+
 vec3 compose_bezel_over(vec3 full_viewport, vec2 coords_for_bezel, vec2 param_coords_for_mirror) {
 
     //No need to draw anything outside this:
-    if (coords_for_bezel.x < 0  || coords_for_bezel.y < 0 || coords_for_bezel.x > 1.0 || coords_for_bezel.y > 1.0) return full_viewport;
+    if (coords_for_bezel.x < 0  || coords_for_bezel.y < 0 || coords_for_bezel.x > 1.0 || coords_for_bezel.y > 1.0)
+        return full_viewport;
 
     vec2 coords_for_mirror = param_coords_for_mirror;
 
@@ -692,7 +722,7 @@ vec3 compose_bezel_over(vec3 full_viewport, vec2 coords_for_bezel, vec2 param_co
                 else
             bezel = texture(monitor_body_straight,coords_for_bezel);
     #endif
-
+    
 
     //No need to draw anything on full alpha:
     if (bezel.a == 0.0) return full_viewport;
@@ -709,48 +739,24 @@ vec3 compose_bezel_over(vec3 full_viewport, vec2 coords_for_bezel, vec2 param_co
     vec3 pixel_mirrored = texture(reflected_blurred_pass,
                            coords_for_mirror + roughness).rgb; // + (roughness*BEZEL_ROUGHNESS);
 
-//return pixel_mirrored;
+
     //Take the reflection modifier from the texture blue component into account; it is/may be used to lower the reflection in the corners.
-        //float reflection = (reflection_shade * 1.4 -  0.4)  * bezel.b ;
-        //reflection = clamp (reflection, 0.0, 1.0);
-        //return vec3(reflection);
         pixel_mirrored = pixel_mirrored * reflection * (1+lut_specular);
-        //return pixel_mirrored;
+
         vec3 bezel_out = bezel_colored + pixel_mirrored;
 
         //Mix ambient light over bezel? (branching this is worse)
-            //Disabled till we'll find a less glitchy way yo do it.
-            //By now it:
-            //bleeds over alpha channel in the tube
-            //it colors shaded corners when no reflections are painted over it.
-            /*vec3 ambitemporalpass = texture(ambi_temporal_pass, vOutputCoord).rgb;
-            ambitemporalpass = max(ambitemporalpass, 0.0); //<-- this to avoid undefined results
-            vec3 pixel_ambilight = DO_AMBILIGHT * (ambitemporalpass + global_noise);
-            float opacita = bezel.a;
-            bezel_out = bezel_out + pixel_ambilight * AMBI_OVER_BEZEL * (1 -  reflection * 1.9 ) *  (1 - lut_specular * 1.9) * bezel.a;
-            */
             vec3 ambitemporalpass = texture(ambi_temporal_pass, vOutputCoord).rgb;
             vec3 pixel_ambilight = DO_AMBILIGHT * (ambitemporalpass + global_noise);
             
             //Create a shaded box to apply ambilight on external borders only
-                float blur = AMBI_OVER_BEZEL_SIZE;
-                vec2 size = vec2(1.0, 2 - AMBI_OVER_BEZEL_AR_CORRECTION)-blur;
-                float radius = 0.0;
-                float ambi_colorize_shade =  1 - fuzzyrect(coords_for_bezel, size,  radius,  blur) * 2;
+                float ambi_colorize_shade = create_ambi_colorize_shade(coords_for_bezel);
                 bezel_out = bezel_out + (pixel_ambilight * AMBI_OVER_BEZEL * bezel.a * ambi_colorize_shade * (1-reflection));
-                /*
-                vec2 coords_for_ambi_shade = coords_for_bezel * vec2(1.0,AMBI_OVER_BEZEL_AR_CORRECTION) - vec2(0.0,(AMBI_OVER_BEZEL_AR_CORRECTION-1)*0.5  );
-                vec2 ambi_smoothbox = (coords_for_ambi_shade * (1-coords_for_ambi_shade));
-                float ambi_bezel_bleed = 1 - min(ambi_smoothbox.x, ambi_smoothbox.y) * AMBI_OVER_BEZEL_SIZE;
-                bezel_out = bezel_out + (pixel_ambilight * AMBI_OVER_BEZEL * bezel.a * ambi_bezel_bleed);
-                */
 
-         //(1- (max(reflection, lut_specular), bezel.a)) ;
         //We use the green component to express Hardness/Specularity; there the reflection will be completely diffused.
         //For the task, we use a mipmap whit adeguate precision.
         if (lut_specular > 0.0) {
             vec4 pixel_avglum = texture(avglum_pass,vTexCoord);
-            //bezel_out = bezel_out + ( ( pixel_avglum.rgb + pixel_avglum.a*0.5)  * lut_hardness * 0.57 * BEZEL_REFL_STRENGTH );
             bezel_out = bezel_out + ( ( pixel_avglum.rgb )  * lut_specular ) ;
         }
     return mix(full_viewport, bezel_out, bezel.a);
@@ -949,7 +955,18 @@ void main() {
     //Draw an image "Over" the bezel with an hole inside by the alpha channel
     if (DO_BG_IMAGE == 1.0 && BG_IMAGE_OVER==1.0) {
         vec4 bg_image = pixel_background_image(true);
-        pixel_out = mix(pixel_out,bg_image,bg_image.a);
+        pixel_out.rgb = mix(pixel_out.rgb, bg_image.rgb, bg_image.a);
+        
+        //If one wants to add instead of mixing ambilight, do it now.
+        //Note that mixing done just before is necessary to display the
+        //background image.
+        if (DO_AMBILIGHT > 0.5 && AMBI_BG_IMAGE_BLEND_MODE > 0.5) { 
+            vec3 ambitemporalpass = texture(ambi_temporal_pass, vOutputCoord).rgb;
+            vec3 pixel_ambilight = DO_AMBILIGHT * (ambitemporalpass + global_noise);
+            float ambi_over_bezel_mask = create_ambi_colorize_shade(get_scaled_coords_for_bezel());
+            pixel_out.rgb = pixel_out.rgb + (pixel_ambilight.rgb * (ambi_over_bezel_mask) * (1-bg_image.a));
+        }
+
     }
 
     //For debug purposes:

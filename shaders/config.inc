@@ -284,9 +284,11 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float AMBI_POWER;
 	float AMBI_OVER_BEZEL;
 	float AMBI_OVER_BEZEL_SIZE;
+	float AMBI_STEPS;
+	float AMBI_BG_IMAGE_BLEND_MODE;
+
 	float ASPECT_X;
 	float ASPECT_Y;
-	float AMBI_STEPS;
 	
 	float DO_BG_IMAGE;
 	float BG_IMAGE_OVER;
@@ -484,7 +486,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 
 //Background Image
-#pragma parameter DO_BG_IMAGE	     "★ Backgound image enable? ==>"				 0.0  0.0  1.0     1.0
+#pragma parameter DO_BG_IMAGE	     "★ Back/Foreground image enable? ==>"				 0.0  0.0  1.0     1.0
 #pragma parameter LABEL_WARNING1     "    ⚠ RetroArch aspect needs to be set to Full! ⚠"	 1.0  1.0  1.0     1.0
 #pragma parameter BG_IMAGE_OVER	     "        Image over content (alpha channel driven)?"	 0.0  0.0  1.0     1.0
 #pragma parameter BG_IMAGE_OFFX	     "        Shift Image over X axis"				 0.0  -1.0  1.0    0.0005
@@ -498,13 +500,14 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 //Back leds
 //Emulates leds under the monitor frame that slowly reacts to image contents
-#pragma parameter DO_AMBILIGHT	        "★ Ambient light leds enable? ==> "			1.0  0.0  1.0     1.0
-#pragma parameter LABEL_WARNING3        "    ⚠ RetroArch aspect needs to be set to Full! ⚠"	1.0  1.0  1.0     1.0
-#pragma parameter AMBI_STEPS	        "        Slowness"					60.0 5.0  1000.0  5.0
-#pragma parameter AMBI_FALLOFF          "        Light Falloff"					0.7  0.1  3.0     0.01
-#pragma parameter AMBI_POWER            "        Led power"					1.5  1.0  7.0     0.05
-#pragma parameter AMBI_OVER_BEZEL       "        Colorize Bezel"				0.2  0.0  5.0     0.05
-#pragma parameter AMBI_OVER_BEZEL_SIZE  "        Colorization size"				0.15  0.0  0.5     0.001
+#pragma parameter DO_AMBILIGHT	            "★ Ambient light leds enable? ==> "				1.0  0.0  1.0     1.0
+#pragma parameter LABEL_WARNING3            "    ⚠ RetroArch aspect needs to be set to Full! ⚠"		1.0  1.0  1.0     1.0
+#pragma parameter AMBI_STEPS	            "        Slowness"						60.0 5.0  1000.0  5.0
+#pragma parameter AMBI_FALLOFF              "        Light Falloff"						0.7  0.1  3.0     0.01
+#pragma parameter AMBI_POWER                "        Led power"						1.5  1.0  7.0     0.05
+#pragma parameter AMBI_OVER_BEZEL           "        Colorize Bezel"					0.2  0.0  5.0     0.05
+#pragma parameter AMBI_OVER_BEZEL_SIZE      "        Colorization size"					0.15  0.0  0.5    0.001
+#pragma parameter AMBI_BG_IMAGE_BLEND_MODE  "        Back/Foreground image alpha blend (0=mix, 1/check=add)"	0.0   0.0  1.0    1.0
 #pragma parameter BLANK17 " " 0.0 0.0 1.0 1.0
 
 
