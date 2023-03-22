@@ -207,7 +207,7 @@
 	#define AMBI_OVER_BEZEL			global.AMBI_OVER_BEZEL
 	#define AMBI_OVER_BEZEL_SIZE		global.AMBI_OVER_BEZEL_SIZE
 	#define AMBI_BG_IMAGE_BLEND_MODE	global.AMBI_BG_IMAGE_BLEND_MODE
-
+	#define AMBI_BG_IMAGE_FORCE		global.AMBI_BG_IMAGE_FORCE
 
 //Global aspect ratio related
 	#define ASPECT_X		global.ASPECT_X

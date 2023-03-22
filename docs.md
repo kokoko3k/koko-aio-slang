@@ -284,7 +284,12 @@
         shown on their transparent areas (alpha channel)
         Switching this you can choose if you want to emulate leds:
         under the image (0/mix) or over the image (1/add)
-        
+    Always colorize Foreground image (add mode only)
+        When "Back/Foreground image alpha blend" is set to 1/add,
+        you can choose to always colorize the foreground image by a certain amount.
+        This can be used to produce big haloes all around the tube.
+        This internally works by adding the amount of your choice to the alpha channel
+        of the foreground image.
         
 **Luminosity dependant zoom:**
     On older CRT monitors, the picture gets bigger when the image was brighter.

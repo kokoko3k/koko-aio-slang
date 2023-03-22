@@ -964,7 +964,8 @@ void main() {
             vec3 ambitemporalpass = texture(ambi_temporal_pass, vOutputCoord).rgb;
             vec3 pixel_ambilight = DO_AMBILIGHT * (ambitemporalpass + global_noise);
             float ambi_over_bezel_mask = create_ambi_colorize_shade(get_scaled_coords_for_bezel());
-            pixel_out.rgb = pixel_out.rgb + (pixel_ambilight.rgb * (ambi_over_bezel_mask) * (1-bg_image.a));
+            float bg_image_alpha_adapted = max(bg_image.a - AMBI_BG_IMAGE_FORCE - 10, 0.0);
+            pixel_out.rgb = pixel_out.rgb + (pixel_ambilight.rgb * (ambi_over_bezel_mask) * (1- bg_image_alpha_adapted));
         }
 
     }
