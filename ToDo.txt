@@ -66,7 +66,12 @@
 #          [v] maybe it can be modulated from the outside via min(coord.x,coord.y)
 #    [v] Ambient light skip coords should be aware of the h/v shift override or black box whould appear
 #        Not a big deal, since it happens when moving the image far, far away.
-#    [..] specular reflections does not 100% follow the image when overriding aspect
+#    [.] ambilight leds falloff should use a gamma function/pow
+#        ...technically correct, but it would be required to do this before applying the color
+#        to the circle mask, or color gamma would suffer.
+#        Unfortunately this is not possible, because ambi_temporal_pass
+#        runs at loooow resolution and lowering gamma there leads to visual artifacts.
+#    [.] specular reflections does not 100% follow the image when overriding aspect
 #        It is hard and probably would require another pass for somethig nobody would ever notice.
 #        ...also, avglum_pass is used by bloom pass too.
 #    [ ] check branching conditions in first_pass.slang
@@ -77,12 +82,15 @@
 #    [ ] Glow spread in final pass?
 #    [ ] Find a way to smooth borders without cropping the image
 #    [ ] Allow to configure new bezel parameters?
-#        Reflection strength, corner shape, size and fade?  
+#        corner shape, size and fade?  
 
 #    [ ] bloom should bleed over when forcing geometry aspect
 #    [ ] reflection blurriness should not depend on input resolution
 #    [ ] copy base presets to overlay repo (after release)
-#    [ ] ambilight leds falloff should use a gamma function/pow
-#    [ ] mirror bg_under image so that reflective parts points to the center.
+
 #    [ ] Sembra strano, controlla se esatto in finalpass:
 #        float ambi_colorize_shade =  1 - fuzzyrect(coords_for_bezel, size,  radius,  blur) * 2;
+#    [ ] When the mask is scaled, is it right to scale the gap too?
+#        Yes and no, probably it has to scale by half.
+#    [ ] Does using gap with green-magenta trick f* the underlying rgb match?
+#    [ ] alpha hole in 1084s needs to be adjusted a bit for the specular reflections to be visible.

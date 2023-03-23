@@ -142,7 +142,6 @@ vec3 pixel_vmask(vec3 source, float white_reference, float over_white) {
     float fcol = vOutputCoord.x * params.OutputSize.x;
     float mod_compare = mod(fcol, vec_mod.x);
     
-
     if (mod_compare < vec_mod.y)
         vmasked = m1;
     else if (mod_compare < vec_mod.z)
@@ -216,7 +215,7 @@ vec3 pixel_vmask_gm(vec3 source, float white_reference, float over_white) {
 }
 
 
-vec3 pixel_vmask_and_gm(vec3 source, float white_reference, float over_white) {
+/*vec3 pixel_vmask_and_gm(vec3 source, float white_reference, float over_white) {
     // Simple RGB mask emulation with or without horizontal gap
     float ooo = 1.0 - RGB_MASK_STRENGTH;
 
@@ -258,7 +257,7 @@ vec3 pixel_vmask_and_gm(vec3 source, float white_reference, float over_white) {
         }
    return pixel_out;
 
-}
+}*/
 
 
 vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
