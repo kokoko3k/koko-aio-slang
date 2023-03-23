@@ -114,7 +114,6 @@
 
 
 
-
 // MISC STATIC CONFIG ##########################################################################################
 	//Consider content interlaced if lines are more than this
 #define MIN_LINES_INTERLACED 380
@@ -126,7 +125,9 @@
 	//uncommenting the following line:
 //#define ALLOW_ALT_BLANK
 
-
+	//Should texture wrapping be allowed as a shader parameter?
+	//since it causes branching, better set it as a static value.
+//#define ALLOW_BG_IMAGE_TEXTURE_WRAP_IN_SHADER
 
 
 
@@ -494,7 +495,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BG_IMAGE_OFFY	     "        Shift Image over Y axis"				 0.0  -1.0  1.0    0.0005
 #pragma parameter BG_IMAGE_ZOOM	     "        Zoom Image"					 1.0  -1.0  3.0    0.0005
 #pragma parameter BG_IMAGE_ROTATION  "        Rotate image mode (-1 for auto)"	     		 -1.0  -1.0  2.0    1.0
-#pragma parameter BG_IMAGE_WRAP_MODE "        Wrap mode: default, clamp to border, edge, repeat" 0.0  0.0    3.0    1.0
+#pragma parameter LABEL_0101         "        !NEXT FEATURE IS STATIC, SEE docs.md TO ENABLE"    0.0 0.0 1.0 1.0
+#pragma parameter BG_IMAGE_WRAP_MODE "            Wrap mode: default, clamp to border, edge, repeat" 0.0  0.0    3.0    1.0
 #pragma parameter BLANK16 " " 0.0 0.0 1.0 1.0
 
 
@@ -572,7 +574,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 // Alternative blanking, needs to be statically enabled, see docs.md.
 #pragma parameter DO_ALT_BLANK       "★ Alternate line blanking enable? ==>"			0.0 0.0 1.0 1.0
-#pragma parameter label_alt_blank    "THIS FEATURE IS STATIC, SEE docs.md TO ENABLE"    0.0 0.0 0.0 1.0
+#pragma parameter label_alt_blank    "  !THIS FEATURE IS STATIC, SEE docs.md TO ENABLE"    0.0 0.0 0.0 1.0
 #pragma parameter ALT_BLANK_STRENGTH "        Alternate black frame insertion strength" 	0.5 0.0 1.0 0.1
 #pragma parameter ALT_BLANK_PERIOD   "        Blank lines period" 				4.0 0.0 20.0 1.0
 #pragma parameter BLANK20ì4 " " 0.0 0.0 1.0 1.0

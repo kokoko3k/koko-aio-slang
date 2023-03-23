@@ -250,6 +250,10 @@
         This could be needed when dealing with vertical games.
         Use -1 to let the shader try to guess if the rotation is needed.
     Wrap mode:
+        This feature is static, to use it 
+        you have to manually enable it by removing the leading: "//"
+        from "//#define ALLOW_BG_IMAGE_TEXTURE_WRAP_IN_SHADER" in config.inc
+        
         What to do outside the image:
         0  Mirrored repeat because so is configured in main .slangp.
         1  Clamp to border and it means black.
@@ -336,13 +340,14 @@
 
     
 **Alternate line blanking:**
-    *This feature has been disabled by defaut, if you want to try it,
-    you have to manually enable it by removing the leading: "//"
-    from "//#define ALLOW_ALT_BLANK" in config.inc.*
     CRT monitors \*real\* refresh was amazing, today is just "meh" in most cases.
-    This emmulates the low pixel persistance of CRT monitors 
+    This emulates the low pixel persistance of CRT monitors 
     and reduces the motion blur, typical of LCD displays, by blanking even/odd
     screen lines on even/odd frames, by sacrificing image brightness, ofc.
+    
+    This feature is static, to use it 
+    you have to manually enable it by removing the leading: "//"
+    from "//#define ALLOW_ALT_BLANK" in config.inc
     
     Frame insertion strength:
         How much the line will be blanked.

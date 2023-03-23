@@ -556,26 +556,27 @@ float global_noise;
 #endif
 
 vec4 textureLod_wrap(sampler2D tex, vec2 co, float lod, float wrap_mode) {
-    /*
-    // Mirrored repeat, once, useless since is done by default
-    if (co.x > 1.0 || co.x < 0.0)
-        co.x = 1- mod(co.x, 1.0);
-    if (co.y > 1.0 || co.y < 0.0)
-        co.y = 1- mod(co.y, 1.0);
-    */
+    #ifdef ALLOW_BG_IMAGE_TEXTURE_WRAP_IN_SHADER
+        /*
+        // Mirrored repeat, once, useless since is done by default
+        if (co.x > 1.0 || co.x < 0.0)
+            co.x = 1- mod(co.x, 1.0);
+        if (co.y > 1.0 || co.y < 0.0)
+            co.y = 1- mod(co.y, 1.0);
+        */
 
-    if (wrap_mode == 1.0) {
-        //Clamp to border, black.
-        bool bOutside = (co.x < 0.0 || co.x > 1.0 || co.y < 0.0 || co.y > 1.0 ) ;
-        if (bOutside) return vec4(0.0,0.0,0.0,1.0);
-    } else if (wrap_mode == 2.0) {
-        //Clamp to edge:
-        co = clamp(co, 0.00, 1.0);
-    } else if (wrap_mode == 3.0) {
-        //Repeat no mirror:
-        co = mod(co, 1.0);
-    }
-
+        if (wrap_mode == 1.0) {
+            //Clamp to border, black.
+            bool bOutside = (co.x < 0.0 || co.x > 1.0 || co.y < 0.0 || co.y > 1.0 ) ;
+            if (bOutside) return vec4(0.0,0.0,0.0,1.0);
+        } else if (wrap_mode == 2.0) {
+            //Clamp to edge:
+            co = clamp(co, 0.00, 1.0);
+        } else if (wrap_mode == 3.0) {
+            //Repeat no mirror:
+            co = mod(co, 1.0);
+        }
+    #endif
     return textureLod(tex, co, lod);
 }
 
