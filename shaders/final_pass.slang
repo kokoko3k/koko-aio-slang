@@ -755,7 +755,7 @@ vec3 compose_bezel_over(vec3 full_viewport, vec2 coords_for_bezel, vec2 param_co
         //We use the green component to express Hardness/Specularity; there the reflection will be completely diffused.
         //For the task, we use a mipmap whit adeguate precision.
         if (lut_specular > 0.0) {
-            vec4 pixel_avglum = texture(avglum_pass,vTexCoord);
+            vec4 pixel_avglum = texture(avglum_pass,coords_for_mirror);
             bezel_out = bezel_out + ( ( pixel_avglum.rgb )  * lut_specular ) ;
         }
     return mix(full_viewport, bezel_out, bezel.a);
