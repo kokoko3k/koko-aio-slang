@@ -675,7 +675,6 @@ vec3 pixel_alternate(vec3 source, float whiteness) {
 }
 
 
-#define bezel_luminance bezel.r
 vec3 bezel_color(float lum)  {
     //Colorize bezel frame
     vec3 col = vec3(BEZEL_R,BEZEL_G,BEZEL_B) + lum;
@@ -702,64 +701,66 @@ float create_ambi_colorize_shade(vec2 co) {
 
 vec3 compose_bezel_over(vec3 full_viewport, vec2 coords_for_bezel, vec2 coords_for_mirror) {
 
-    //No need to draw anything outside this:
-    if (coords_for_bezel.x < 0  || coords_for_bezel.y < 0 || coords_for_bezel.x > 1.0 || coords_for_bezel.y > 1.0)
-        return full_viewport;
+    //Exit if we are outside bezel coordinates
+        if (coords_for_bezel.x < 0  || coords_for_bezel.y < 0 || coords_for_bezel.x > 1.0 || coords_for_bezel.y > 1.0)
+            return full_viewport;
 
-
-    //Main lut:
-    vec4 bezel;
-    #ifdef STATIC_BEZEL_USE_MIPMAP
-        vec2 bezel_lut_size = textureSize(monitor_body_curved,0); //no need to branch here if we assume straight and curved textures are the same size. //FIXME?
-        float bezel_frame_lod = log2(bezel_lut_size.y * (BEZEL_FRAME_ZOOM+1.0) /global.FinalViewportSize.y);
-        if (BEZEL_USE_STRAIGHT < 0.5)
-            bezel = textureLod(monitor_body_curved,coords_for_bezel,bezel_frame_lod);
-                else
-            bezel = textureLod(monitor_body_straight,coords_for_bezel,bezel_frame_lod);
-    #else
-        if (BEZEL_USE_STRAIGHT < 0.5)
-            bezel = texture(monitor_body_curved,coords_for_bezel);
-                else
-            bezel = texture(monitor_body_straight,coords_for_bezel);
-    #endif
+    //Sample main bezel texture:
+        vec4 bezel;
+        #ifdef STATIC_BEZEL_USE_MIPMAP
+            vec2 bezel_lut_size = textureSize(monitor_body_curved,0); //no need to branch here if we assume straight and curved textures are the same size. //FIXME?
+            float bezel_frame_lod = log2(bezel_lut_size.y * (BEZEL_FRAME_ZOOM+1.0) /global.FinalViewportSize.y);
+            if (BEZEL_USE_STRAIGHT < 0.5)
+                bezel = textureLod(monitor_body_curved,coords_for_bezel,bezel_frame_lod);
+                    else
+                bezel = textureLod(monitor_body_straight,coords_for_bezel,bezel_frame_lod);
+        #else
+            if (BEZEL_USE_STRAIGHT < 0.5)
+                bezel = texture(monitor_body_curved,coords_for_bezel);
+                    else
+                bezel = texture(monitor_body_straight,coords_for_bezel);
+        #endif
     
 
-    //No need to draw anything on full alpha:
-    if (bezel.a == 0.0) return full_viewport;
-
-    float reflection = bezel.b * BEZEL_REFL_STRENGTH;
-    float lut_specular = bezel.g * BEZEL_SPCL_STRENGTH;
+    //Exit if the bezel is completely transparent (the tube)
+        if (bezel.a == 0.0) return full_viewport;
+        
+    //Colorize the bezel (bezel.r expresses the luminance)
+        vec3 bezel_colored = bezel_color(bezel.r);
     
-    //We use the red component of the bezel to express its luminance (define bezel_luminance bezel.r)
-    vec3 bezel_colored = bezel_color(bezel_luminance);
-    float roughness = random( min(global.FinalViewportSize.z,global.FinalViewportSize.w) * BEZEL_ROUGHNESS, vTexCoord ) *  (1 - min(lut_specular * 10, 1.0));
-    //This is the reflection to be composed over the bezel);
-    //vec3 pixel_mirrored = texture(reflected_blurred_pass,
-    //                      coords_for_mirror + roughness).rgb;
-    vec3 pixel_mirrored = texture(reflected_blurred_pass,
-                           coords_for_mirror + roughness).rgb; // + (roughness*BEZEL_ROUGHNESS);
+    //Calculate the bezel roughness to apply to the reflecting area. (bezel.g expresses the specularity)
+        float lut_specular = bezel.g * BEZEL_SPCL_STRENGTH;
+        float roughness = random( min(global.FinalViewportSize.z,global.FinalViewportSize.w) * BEZEL_ROUGHNESS, vTexCoord );
+        roughness *=  (1 - min(lut_specular * 10, 1.0)); // <-roughness over specular area looks bad.
+        
+    //Reflections:
+        float reflection_modifier = bezel.b * BEZEL_REFL_STRENGTH; //bezel.b expresses how much the area is reflective
+        
+        //Sample the reflection pass with small offset to simulate the roughness
+            vec3 pixel_mirrored = texture(reflected_blurred_pass, coords_for_mirror + roughness).rgb; 
+        
+        //Push it over the specular areas and apply the reflection modifier
+            pixel_mirrored = pixel_mirrored * (1 + lut_specular) * reflection_modifier;
 
-
-    //Take the reflection modifier from the texture blue component into account; it is/may be used to lower the reflection in the corners.
-        pixel_mirrored = pixel_mirrored * reflection * (1+lut_specular);
-
-        vec3 bezel_out = bezel_colored + pixel_mirrored;
-
-        //Mix ambient light over bezel? (branching this is worse)
-            vec3 ambitemporalpass = texture(ambi_temporal_pass, vOutputCoord).rgb;
-            ambitemporalpass = max(ambitemporalpass, 0.0); //<-- antiglitch. Needed to avoid undefined variable on vulkan.
-            vec3 pixel_ambilight = DO_AMBILIGHT * (  ambitemporalpass   + global_noise);
+        //Apply reflections
+            vec3 bezel_out = bezel_colored + pixel_mirrored;
             
-            //Create a shaded box to apply ambilight on external borders only
-                float ambi_colorize_shade = create_ambi_colorize_shade(coords_for_bezel);
-                bezel_out = bezel_out + (pixel_ambilight * AMBI_OVER_BEZEL * bezel.a * ambi_colorize_shade * (1-reflection));
+    
+    //Mix ambient light over bezel? (branching this is worse)
+        vec3 ambitemporalpass = texture(ambi_temporal_pass, vOutputCoord).rgb;
+        ambitemporalpass = max(ambitemporalpass, 0.0); //<-- antiglitch. Needed to avoid undefined variable on vulkan.
+        vec3 pixel_ambilight = DO_AMBILIGHT * ( ambitemporalpass + global_noise);
+            
+        //Create a shaded box to apply ambilight on external borders only
+            float ambi_colorize_shade = create_ambi_colorize_shade(coords_for_bezel);
+            bezel_out = bezel_out + (AMBI_OVER_BEZEL * pixel_ambilight * bezel.a * ambi_colorize_shade * (1-reflection_modifier));
 
-        //We use the green component to express Hardness/Specularity; there the reflection will be completely diffused.
-        //For the task, we use a mipmap whit adeguate precision.
+    //Diffuse the light over specular areas, we use a mipmap with low precision.
         if (lut_specular > 0.0) {
-            vec4 pixel_avglum = texture(avglum_pass,coords_for_mirror);
-            bezel_out = bezel_out + ( ( pixel_avglum.rgb )  * lut_specular ) ;
+            vec4 pixel_avglum = texture(avglum_pass, coords_for_mirror);
+            bezel_out = bezel_out + (pixel_avglum.rgb * lut_specular) ;
         }
+    
     return mix(full_viewport, bezel_out, bezel.a);
 }
 
