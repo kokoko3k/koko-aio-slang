@@ -507,7 +507,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter LABEL_WARNING3            "    ⚠ RetroArch aspect needs to be set to Full! ⚠"		1.0  1.0  1.0     1.0
 #pragma parameter AMBI_STEPS	            "        Slowness"						60.0 5.0  1000.0  5.0
 #pragma parameter AMBI_FALLOFF              "        Light Falloff"						0.7  0.1  3.0     0.01
-#pragma parameter AMBI_POWER                "        Led power"						1.5  1.0  7.0     0.05
+#pragma parameter AMBI_POWER                "        Led power"						1.5  0.0  7.0     0.05
 #pragma parameter AMBI_OVER_BEZEL           "        Colorize Bezel"					0.2  0.0  5.0     0.05
 #pragma parameter AMBI_OVER_BEZEL_SIZE      "        Colorization size"					0.15  0.0  0.5    0.001
 #pragma parameter AMBI_BG_IMAGE_BLEND_MODE  "        Back/Foreground image alpha blend (0=mix, 1/check=add)"	0.0   0.0  1.0    1.0

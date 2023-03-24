@@ -92,11 +92,9 @@
 
 #    [ ] bloom should bleed over when forcing geometry aspect
 #    [ ] reflection blurriness should not depend on input resolution
-#    [ ] copy base presets to overlay repo (after release)
 
-#    [ ] Sembra strano, controlla se esatto in finalpass:
-#        float ambi_colorize_shade =  1 - fuzzyrect(coords_for_bezel, size,  radius,  blur) * 2;
 #    [ ] When the mask is scaled, is it right to scale the gap too?
 #        Yes and no, probably it has to scale by half.
-
 #    [ ] allow to stretch background image?
+#    [ ] copy base presets to overlay repo (after release)
+#    [ ] dynamic contrast, the more the brigher the content, the less the bezel and back/foreground image?

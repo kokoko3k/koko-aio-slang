@@ -65,6 +65,21 @@ vec3 pixel_flickering() {
 
 }
 
+vec3 hsv2rgb(vec3 c) {
+  vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+  vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+  return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+}
+
+vec3 colorwheel(vec2 uv){
+   float timeoffset = params.FrameCount / 120.0;
+   vec2 uvc = -1.0 * ((2.0 * uv) - 1.0);
+   float dist = length(uvc);
+   float ang = (atan(uvc.y, uvc.x) + pi) / (2.0 * pi) - timeoffset;
+   ang = mod(ang, 1.0);
+   vec3 colHSV = vec3(ang, 1.0, dist);
+   return hsv2rgb(colHSV);
+}
 
 void debug() {
 //Just test patterns here
@@ -76,7 +91,7 @@ void debug() {
       //pixel_debug=vec3(0.0,1.0,0.0);
       //pixel_debug=vec3(0.38,0.0,1.0)*vTexCoord.x;
       //pixel_debug=vec3(vTexCoord.x); //H bw gradient
-      pixel_debug=vec3(floor(vTexCoord.x*16)/16); //H bw gradient 16gray
+      //pixel_debug=vec3(floor(vTexCoord.x*16)/16); //H bw gradient 16gray
       //pixel_debug=vec3(floor(vTexCoord.x*64)/64); //H bw gradient 64gray
       //pixel_debug=vec3(floor(vTexCoord.x*128)/128); //H bw gradient 128gray
       //pixel_debug=vec3(floor(vTexCoord.x*256)/256); //H bw gradient 256gray
@@ -91,7 +106,7 @@ void debug() {
          pixel_debug = vec3(1 - step(radius, length(center)));
          pixel_debug *= float((mod(params.FrameCount,blink_time*2) < blink_time));
       */
-      
+      pixel_debug = colorwheel(vTexCoord);
       
       FragColor = vec4(pixel_debug,1.0);
 }
