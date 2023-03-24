@@ -695,22 +695,17 @@ float create_ambi_colorize_shade(vec2 co) {
     float blur = AMBI_OVER_BEZEL_SIZE;
     vec2 size = vec2(1.0, 2 - AMBI_OVER_BEZEL_AR_CORRECTION)-blur;
     float radius = 0.0;
-    
-    
-    //float o =  1 - fuzzyrect(co, size,  radius,  blur) * 3;
-    //if (o < 0.0)  return 0.0;
-    
+
     return  1 - min ( fuzzyrect(co, size,  radius,  blur) * 2, 1.0);
 }
     
 
-vec3 compose_bezel_over(vec3 full_viewport, vec2 coords_for_bezel, vec2 param_coords_for_mirror) {
+vec3 compose_bezel_over(vec3 full_viewport, vec2 coords_for_bezel, vec2 coords_for_mirror) {
 
     //No need to draw anything outside this:
     if (coords_for_bezel.x < 0  || coords_for_bezel.y < 0 || coords_for_bezel.x > 1.0 || coords_for_bezel.y > 1.0)
         return full_viewport;
 
-    vec2 coords_for_mirror = param_coords_for_mirror;
 
     //Main lut:
     vec4 bezel;
