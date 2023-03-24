@@ -72,8 +72,12 @@
 #        Unfortunately this is not possible, because ambi_temporal_pass
 #        runs at loooow resolution and lowering gamma there leads to visual artifacts.
 #    [.] specular reflections does not 100% follow the image when overriding aspect
-#        It is hard and probably would require another pass for somethig nobody would ever notice.
-#        ...also, avglum_pass is used by bloom pass too.
+#        This is because in compose_bezel_over we sample avglum_pass which is not 100% aware of them.
+#        the correct and final solution to this would be to sample the first reflection pass which
+#        already exports mipmaps and is 100% aware of aspect override, but this would mean sacrificing
+#        another Sampler2D binding in final pass which is already short.
+#        
+#
 #    [ ] check branching conditions in first_pass.slang
 #    [ ] Better debanding?
 #    [ ] Should the flickering be aware of the scanline?

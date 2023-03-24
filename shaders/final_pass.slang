@@ -747,7 +747,8 @@ vec3 compose_bezel_over(vec3 full_viewport, vec2 coords_for_bezel, vec2 param_co
 
         //Mix ambient light over bezel? (branching this is worse)
             vec3 ambitemporalpass = texture(ambi_temporal_pass, vOutputCoord).rgb;
-            vec3 pixel_ambilight = DO_AMBILIGHT * (ambitemporalpass + global_noise);
+            ambitemporalpass = max(ambitemporalpass, 0.0); //<-- antiglitch. Needed to avoid undefined variable on vulkan.
+            vec3 pixel_ambilight = DO_AMBILIGHT * (  ambitemporalpass   + global_noise);
             
             //Create a shaded box to apply ambilight on external borders only
                 float ambi_colorize_shade = create_ambi_colorize_shade(coords_for_bezel);
