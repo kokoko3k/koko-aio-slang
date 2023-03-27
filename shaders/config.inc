@@ -190,6 +190,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float DO_SCANLINES;
 	float DO_IN_GLOW;
 	float DO_VMASK_AND_DARKLINES ;
+	float VMASK_USE_DUMB;
 	float MASK_COMPENSATION ;
 	float DO_HALO ;
 	float DO_CCORRECTION;
@@ -402,8 +403,9 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter MASK_COMPENSATION      "        Compensate for brightness loss"			0.0 	0.0 1.0 0.05
 #pragma parameter VMASK_DARKLINE_SCALE   "        (HiDPI) Vmask and Darklines multiplier"		1.0  	1.0 4.0 1.0
 #pragma parameter RGB_MASK_STRENGTH      "        RGB Mask Strength (0.0 to disable)"			0.75  	0.0 1.0 0.05
-#pragma parameter VMASK_USE_GM           "           . (LoDPI) Green,Magenta -> RGB"			0.0  	0.0 1.0 1.0
-#pragma parameter VMASK_GAP              "           . Horizontal Gap between triads:"			0.0  	0.0 1.0 1.0
+#pragma parameter VMASK_USE_GM           "           . Use LoDPI Green,Magenta -> RGB"			0.0  	0.0 1.0 1.0
+#pragma parameter VMASK_GAP              "           . Horizontal Gap between triads"			0.0  	0.0 1.0 1.0
+#pragma parameter VMASK_USE_DUMB         "           . Just draw gap"					0.0  	0.0 1.0 1.0
 #pragma parameter VMASK_OVERWHITE        "           . Affect bright colors"				1.0 	0.0 1.0 0.05
 
 #pragma parameter DARKLINES_STRENGTH     "        Darklines strength (0.0 to disable)"				0.65 	0.0 1.0   0.05

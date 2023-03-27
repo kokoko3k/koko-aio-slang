@@ -134,13 +134,14 @@ layout(set = 0, binding = 12) uniform sampler2D halo_pass;
 
 vec3 pixel_vmask(vec3 source, float white_reference, float over_white) {
     // Simple RGB mask emulation with or without horizontal gap
-    float ooo = 1.0 - RGB_MASK_STRENGTH;
+    float ggg = 1.0 - RGB_MASK_STRENGTH;
+    float ooo = max( VMASK_USE_DUMB + 1 - RGB_MASK_STRENGTH, 0.0); //<- make a dumb mask?
 
     // RGB mask:     R     G     B
     vec3 m1 =  vec3( 1.0 , ooo , ooo );  //col 1
     vec3 m2 =  vec3( ooo , 1.0 , ooo );  //col 2
     vec3 m3 =  vec3( ooo , ooo , 1.0 );  //col 3
-    vec3 gap = vec3( ooo );
+    vec3 gap = vec3( ggg );
 
     vec3 pixel_out;
     vec3 vmasked;
@@ -182,11 +183,13 @@ vec3 pixel_vmask(vec3 source, float white_reference, float over_white) {
 
 vec3 pixel_vmask_gm(vec3 source, float white_reference, float over_white) {
     // Simple RGB mask emulation with or without horizontal gap
-    float ooo = 1.0 - RGB_MASK_STRENGTH;
+    float ggg = 1.0 - RGB_MASK_STRENGTH;
+    float ooo = max( VMASK_USE_DUMB + 1 - RGB_MASK_STRENGTH, 0.0); //<- make a dumb mask?
+    
     // RGB mask:     R     G     B
     vec3 m1 =  vec3( ooo , 1.0 , ooo );    //col 1
     vec3 m2 =  vec3( 1.0 , ooo , 1.0 );    //col 2
-    vec3 gap = vec3( ooo );
+    vec3 gap = vec3( ggg );
 
     float fcol = vOutputCoord.s * params.OutputSize.x;
     vec3 pixel_out;
@@ -615,7 +618,11 @@ vec4 pixel_background_image(bool over){
             if (BG_IMAGE_ROTATION == 2.0) back_coords.x = 1 - back_coords.x;
         }
         back_coords=zoom(back_coords, BG_IMAGE_ZOOM);
-        return textureLod_wrap(bg_over, back_coords, bg_over_lod, BG_IMAGE_WRAP_MODE);
+        vec4 pixel_bgover = textureLod_wrap(bg_over, back_coords, bg_over_lod, BG_IMAGE_WRAP_MODE);
+        return pixel_bgover;
+        
+        
+        
     }
     //under
         vec2 tex_size = textureSize(bg_under, 0); // * BG_ZOOM;
