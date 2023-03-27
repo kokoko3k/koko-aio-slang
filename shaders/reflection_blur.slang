@@ -81,15 +81,18 @@ void main() {
    
    if (DO_BEZEL == 0.0) return;
 
-   float skip_border = BEZEL_REFL_SKIP_SIZE / BEZEL_REFL_ZOOMOUT_ROOM ;
-   if (vTexCoord.x > skip_border && vTexCoord.x < 1.0 - skip_border &&
-       vTexCoord.y > skip_border && vTexCoord.y < 1.0 - skip_border ) {
+   
+   //Zoom out the image coordinates by the bezel border size to make room for reflections:
+      vec2 coords = zoom(vTexCoord, BEZEL_REFL_ZOOMOUT_ROOM);
+   
+   float skip_border = BEZEL_REFL_SKIP_SIZE;
+   if (coords.x > skip_border && coords.x < 1.0 - skip_border &&
+       coords.y > skip_border && coords.y < 1.0 - skip_border ) {
       FragColor = vec4(0.0);
       return;
    }   
 
-   //Zoom out the image coordinates by the bezel border size to make room for reflections:
-      vec2 coords = zoom(vTexCoord, BEZEL_REFL_ZOOMOUT_ROOM);
+
    
 
 
