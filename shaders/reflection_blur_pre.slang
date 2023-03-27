@@ -39,7 +39,7 @@ void main() {
    float skip_border = BEZEL_REFL_SKIP_SIZE;
    if (vTexCoord.x > skip_border && vTexCoord.x < 1.0 - skip_border &&
        vTexCoord.y > skip_border && vTexCoord.y < 1.0 - skip_border ) {
-      FragColor = vec4(0.0);
+      //FragColor = vec4(0.0);
       return;
    }
    
