@@ -68,6 +68,8 @@
 #        Not a big deal, since it happens when moving the image far, far away.
 #    [v] Does using gap with green-magenta trick f* the underlying rgb match?
 #        Nope, yay.
+#    [v] scanline minimum height does not work with intscale preset ?
+#        it seems coords needs +vec2(0.0001), don't know why.
 #    [.] ambilight leds falloff should use a gamma function/pow
 #        ...technically correct, but it would be required to do this before applying the color
 #        to the circle mask, or color gamma would suffer.
@@ -98,6 +100,5 @@
 #    [ ] allow to stretch background image?
 #    [ ] copy base presets to overlay repo (after release)
 #    [ ] dynamic contrast, the more the brigher the content, the less the bezel and back/foreground image?
-#    [ ] scanline minimum height does not work with intscale preset ?
 #    [ ] Allow for a v-gap-only mask.
 #    [ ] When int scaling is naked (no borders, no bezel, no ambilight), it repeats in the borders.

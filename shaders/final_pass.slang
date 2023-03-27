@@ -872,44 +872,47 @@ vec2 get_scaled_offset(vec2 foffset, vec2 co1, vec2 co2) {
 }
 
 vec4 main_wrap(vec2 coords, vec2 outer_frame_offset){
+/* Handle inner border and outer border, not bezel */
 
+    //Calc a random noise if we need debanding
+        if (DO_VIGNETTE + DO_SPOT + DO_AMBILIGHT >0.0) global_noise = random(NOISEPOWER, vTexCoord * params.FrameCount);
 
-    /* Handle inner border and outer border, not bezel */
-    if (DO_VIGNETTE + DO_SPOT + DO_AMBILIGHT >0.0) global_noise = random(NOISEPOWER, vTexCoord * params.FrameCount);
-
-    //Just do pixel_inner_frame() and exit when there is no need to paint border.
-    if (!border_needed()) return pixel_inner_frame(coords, false);
-
-    //bezel_coords = zoomout_coords(bezel_coords, -get_BEZEL_INNER_ZOOM() , 1.0);
-
-    //From now on, we need a border.
+    //Calc outside coords:
         bool bIs_outer_frame = vTexCoord.x < 0.0 + outer_frame_offset.x || vTexCoord.x > 1.0 - outer_frame_offset.x ||
                                vTexCoord.y < 0.0 + outer_frame_offset.y || vTexCoord.y > 1.0 - outer_frame_offset.y ;
+    
+    //If we don't need a border, we may still need to blank the outside area when doing integer scaling:
+        if (!border_needed()) {
+            return pixel_inner_frame(coords, false) * float(!bIs_outer_frame);
+        }
 
 
-        //Handle outer frame cases
-            //if we want ambilights in the outer frame, draw it and return
-            if (bIs_outer_frame)
-                return vec4(pixel_border(BG_IMAGE_OVER == 1.0),1.0);
+    /* From now on, we need a real border, so start handle outer frame cases */
 
-        //Handle inner frame cases
-            vec4 vPixel_inner_frame = pixel_inner_frame(coords, true);
-                //mix ambilight in the inner frame too, as curvature could shrink into the inner frame.
 
-                bool draw_border = true;
-                //Not painting ambilights here is the best way to cheaply draw a border around the frame
-                if (DO_BEZEL == 1.0) {
-                    vec2 vTexCoord_zoomout = zoomout_coords(vTexCoord, (-BEZEL_FRAME_ZOOM + 0.1) , 1.0);
-                    //Not using curved coords here because crazy things would happen with vertical games
-                    draw_border = (vTexCoord_zoomout.x < 0.0 || vTexCoord_zoomout.x > 1.0 ||
-                                  vTexCoord_zoomout.y < 0.0 || vTexCoord_zoomout.y > 1.0) ;
-                }
-                if (draw_border)
-                    return vec4(mix(pixel_border(BG_IMAGE_OVER == 1.0).rgb,vPixel_inner_frame.rgb,min(vPixel_inner_frame.a*1.5,1.0)),vPixel_inner_frame.a);
-                //return vec4(1.0,0.0,0.0,1.0);
+    //if we want ambilights or back/foreground images in the outer frame, draw it and return
+        if (bIs_outer_frame)
+            return vec4(pixel_border(BG_IMAGE_OVER == 1.0),1.0);
 
-        //Last case, inner border without ambilight:
-            return vPixel_inner_frame;
+    //Handle particular (?) inner frame cases
+        vec4 vPixel_inner_frame = pixel_inner_frame(coords, true);
+        
+
+        bool draw_border = true;
+        //Not painting ambilights here is the best way to cheaply draw a border around the frame
+        if (DO_BEZEL == 1.0) {
+            vec2 vTexCoord_zoomout = zoomout_coords(vTexCoord, (-BEZEL_FRAME_ZOOM + 0.1) , 1.0);
+            //Not using curved coords here because crazy things would happen with vertical games
+            draw_border = (vTexCoord_zoomout.x < 0.0 || vTexCoord_zoomout.x > 1.0 ||
+                            vTexCoord_zoomout.y < 0.0 || vTexCoord_zoomout.y > 1.0) ;
+        }
+        //mix ambilight in the inner frame too, as curvature could shrink into the inner frame.
+            if (draw_border)
+                return vec4(mix(pixel_border(BG_IMAGE_OVER == 1.0).rgb,vPixel_inner_frame.rgb,min(vPixel_inner_frame.a*1.5,1.0)),vPixel_inner_frame.a);
+        
+
+    //Last case, inner border without ambilight:
+        return vPixel_inner_frame;
 }
 
 vec2 get_scaled_coords_for_bezel() {
