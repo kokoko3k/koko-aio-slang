@@ -39,13 +39,13 @@ void main() {
     gl_Position = global.MVP * Position;
     vIsRotated = float(is_rotated());
     vIn_aspect = get_in_aspect();
-    vTexCoord = get_scaled_coords_aspect(TexCoord,global.FinalViewportSize, vIn_aspect, bool(vIsRotated)) + vec2(0.0001);
+    
 
     //Calculate vTexcoord as fractional or integer scaled?
         if ( !do_integer_scale() )
             vTexCoord = get_scaled_coords_aspect(TexCoord,global.FinalViewportSize, vIn_aspect, bool(vIsRotated)) + vec2(0.0001);
                 else
-            vTexCoord = integer_scale(TexCoord, vIn_aspect, bool(vIsRotated)) + vec2(0.0001);
+            vTexCoord = integer_scale(TexCoord, vIn_aspect, bool(vIsRotated)) + vec2(0.0001); //<- without the offset, SCANLINE_MIN doesn't work.
 
         
     //if (DO_GLOBAL_SHZO >0.5)
