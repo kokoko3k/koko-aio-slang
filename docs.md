@@ -336,8 +336,9 @@
     Bezel stays the same.
     
     Integer scale: Game content zoom height is rounded to nearest integer.
-                 * beware: the following options in this group
-                   overrides the integer scale.
+    Maximum integer scale: Dont allow integer scaling more than this
+                     * beware: the following options in this group
+                       overrides the integer scale.
     Aspect: Change aspect ratio.
     Vertical/Horizontal position: Shifts the game position
     Zoom: Change the size

@@ -316,6 +316,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	
 	float DO_GAME_GEOM_OVERRIDE;
 	float GAME_GEOM_INT_SCALE;
+	float GAME_GEOM_INT_SCALE_MAX;
 	float GAME_GEOM_ASPECT;
 	float GAME_GEOM_VSHIFT;
 	float GAME_GEOM_HSHIFT;
@@ -567,13 +568,14 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 
 //Content geomerty overrides
-#pragma parameter DO_GAME_GEOM_OVERRIDE	 "★ Override content geometry enable? ==>"	0.0   0.0  1.0 	  1.0
-#pragma parameter GAME_GEOM_INT_SCALE    "        Integer scale (disables inner zoom)"	0.0   0.0  1.0    1.0
-#pragma parameter LABEL_WARNING4         "    ⚠ The following will override integer scale ⚠"	1.0  1.0  1.0     1.0
-#pragma parameter GAME_GEOM_ASPECT	 "        Aspect (0 = unchanged)"		0.0    0.0  3.0	  0.005
-#pragma parameter GAME_GEOM_VSHIFT	 "        Vertical position"			0.0   -10.0 10.0  0.01
-#pragma parameter GAME_GEOM_HSHIFT	 "        Horizontal position"			0.0   -10.0 10.0  0.01
-#pragma parameter GAME_GEOM_ZOOM	 "        Zoom"					1.0    0.0  2.0  0.01
+#pragma parameter DO_GAME_GEOM_OVERRIDE	  "★ Override content geometry enable? ==>"	0.0   0.0  1.0 	  1.0
+#pragma parameter GAME_GEOM_INT_SCALE     "        Integer scale (disables inner zoom)"	0.0   0.0  1.0    1.0
+#pragma parameter GAME_GEOM_INT_SCALE_MAX "        Maximum integer scale" 		10.0  1.0  100.0  1.0
+#pragma parameter LABEL_WARNING4          "    ⚠ The following will override integer scale ⚠"	1.0  1.0  1.0     1.0
+#pragma parameter GAME_GEOM_ASPECT	  "        Aspect (0 = unchanged)"		0.0    0.0  3.0	  0.005
+#pragma parameter GAME_GEOM_VSHIFT	  "        Vertical position"			0.0   -10.0 10.0  0.01
+#pragma parameter GAME_GEOM_HSHIFT	  "        Horizontal position"			0.0   -10.0 10.0  0.01
+#pragma parameter GAME_GEOM_ZOOM	  "        Zoom"					1.0    0.0  2.0  0.01
 #pragma parameter BLANK20 " " 0.0 0.0 1.0 1.0
 
 // Alternative blanking, needs to be statically enabled, see docs.md.

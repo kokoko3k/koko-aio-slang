@@ -974,7 +974,9 @@ void main() {
     //Draw an image "Over" the bezel with an hole inside by the alpha channel
     if (DO_BG_IMAGE == 1.0 && BG_IMAGE_OVER==1.0) {
         vec4 bg_image = pixel_background_image(true);
-        pixel_out.rgb = mix(pixel_out.rgb, bg_image.rgb, bg_image.a);
+        
+        
+        pixel_out.rgb = mix(pixel_out.rgb, bg_image.rgb, bg_image.a );
         
         //If one wants to add instead of mixing ambilight, do it now.
         //Note that mixing done just before is necessary to display the

@@ -352,10 +352,14 @@ float random(float power, vec2 seed) {
 			//This is 1X integer zoom:
 			izoom = params.OriginalSize.xy / global.FinalViewportSize.xy;
 			//Find the maximum zoom allowed
-			izoom = izoom * floor(global.FinalViewportSize.y / params.OriginalSize.y );
+			float int_zoom = floor(global.FinalViewportSize.y / params.OriginalSize.y );
+			int_zoom = clamp(int_zoom, 1.0, GAME_GEOM_INT_SCALE_MAX);
+			izoom *= int_zoom;
 		} else {
 			izoom = params.OriginalSize.xy / global.FinalViewportSize.yx;
-			izoom = izoom * floor(global.FinalViewportSize.y / (params.OriginalSize.x*adapted_aspect) );
+			float int_zoom = floor(global.FinalViewportSize.y / (params.OriginalSize.x*adapted_aspect) );
+			int_zoom = clamp(int_zoom, 1.0, GAME_GEOM_INT_SCALE_MAX);
+			izoom *= int_zoom;
 		}
 		return zoomxy(in_coords, izoom);
 	}
