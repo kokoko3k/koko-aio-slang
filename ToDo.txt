@@ -99,3 +99,5 @@
 #    [ ] copy base presets to overlay repo (after release)
 #    [ ] dynamic contrast, the more the brigher the content, the less the bezel and back/foreground image?
 #    [ ] scanline minimum height does not work with intscale preset ?
+#    [ ] Allow for a v-gap-only mask.
+#    [ ] When int scaling is naked (no borders, no bezel, no ambilight), it repeats in the borders.

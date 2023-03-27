@@ -39,13 +39,13 @@ void main() {
     gl_Position = global.MVP * Position;
     vIsRotated = float(is_rotated());
     vIn_aspect = get_in_aspect();
-    vTexCoord = get_scaled_coords_aspect(TexCoord,global.FinalViewportSize, vIn_aspect, bool(vIsRotated)) + vec2(0.00001);
+    vTexCoord = get_scaled_coords_aspect(TexCoord,global.FinalViewportSize, vIn_aspect, bool(vIsRotated)) + vec2(0.0001);
 
     //Calculate vTexcoord as fractional or integer scaled?
         if ( !do_integer_scale() )
-            vTexCoord = get_scaled_coords_aspect(TexCoord,global.FinalViewportSize, vIn_aspect, bool(vIsRotated)) + vec2(0.00001);
+            vTexCoord = get_scaled_coords_aspect(TexCoord,global.FinalViewportSize, vIn_aspect, bool(vIsRotated)) + vec2(0.0001);
                 else
-            vTexCoord = integer_scale(TexCoord, vIn_aspect, bool(vIsRotated)) ;
+            vTexCoord = integer_scale(TexCoord, vIn_aspect, bool(vIsRotated)) + vec2(0.0001);
 
         
     //if (DO_GLOBAL_SHZO >0.5)
@@ -312,6 +312,7 @@ float scanline_shape(vec2 coords, bool do_slotmask, float lum) {
     float lum_scaled = lum * SCANLINE_MAX;
           lum_scaled = clamp( lum_scaled, SCANLINE_MIN, SCANLINE_MAX );
 
+
     float angle_base = coords.y * pi * params.OriginalSize.y * period;// + vScanlinePhase;
 
     float lines = 1.0;
@@ -405,7 +406,11 @@ float scanline_shape(vec2 coords, bool do_slotmask, float lum) {
         //lines = pow(clamp(lines + 0.05, 0.0,1.0) , 1/sqrt(lum_scaled));
         //float extra_power_1 = 3.0;
 
+        
+
+        
         float extra_power_1 = max(SCANLINE_MAX/3.0, 1.0);
+
         lines = pow(clamp(lines, SCANLINE_DARK * 2.0, 1.0) , 1/(sqrt(lum_scaled*lum_scaled*extra_power_1) ) );
 
         //lines = pow(clamp(lines + 0.05, 0.0,1.0) , 1/(sqrt(lum_scaled*lum_scaled*extra_power_1) ) ) * extra_power_1/2.0;
