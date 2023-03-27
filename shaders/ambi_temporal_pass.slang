@@ -35,7 +35,13 @@ void main() {
 
    //Scale to the original aspect
     float in_aspect = get_in_aspect();
-    pre_pass_coords = get_scaled_coords_aspect(vTexCoord, global.FinalViewportSize, in_aspect, is_rotated());
+    bool isrotated = is_rotated();
+
+    if ( !do_integer_scale() )
+        pre_pass_coords = get_scaled_coords_aspect(TexCoord,global.FinalViewportSize, in_aspect, isrotated) + vec2(0.00001);
+            else
+        pre_pass_coords = integer_scale(TexCoord, in_aspect, isrotated) ;
+
 
     if (DO_GLOBAL_SHZO >0.5)
         pre_pass_coords = zoom(pre_pass_coords + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM );
@@ -45,7 +51,7 @@ void main() {
 
 
     if (DO_BEZEL > 0.5)
-        pre_pass_coords = zoomout_coords(pre_pass_coords, -BEZEL_INNER_ZOOM , 1.0);
+        pre_pass_coords = zoomout_coords(pre_pass_coords, -get_BEZEL_INNER_ZOOM() , 1.0);
 }
 
 #pragma stage fragment

@@ -41,11 +41,18 @@ void main() {
     vIn_aspect = get_in_aspect();
     vTexCoord = get_scaled_coords_aspect(TexCoord,global.FinalViewportSize, vIn_aspect, bool(vIsRotated)) + vec2(0.00001);
 
+    //Calculate vTexcoord as fractional or integer scaled?
+        if ( !do_integer_scale() )
+            vTexCoord = get_scaled_coords_aspect(TexCoord,global.FinalViewportSize, vIn_aspect, bool(vIsRotated)) + vec2(0.00001);
+                else
+            vTexCoord = integer_scale(TexCoord, vIn_aspect, bool(vIsRotated)) ;
+
+        
     //if (DO_GLOBAL_SHZO >0.5)
     //    vTexCoord = zoom(vTexCoord + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM );
     //..unbranched previous
     vTexCoord = (zoom(vTexCoord + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM ) * DO_GLOBAL_SHZO) + 
-                (vTexCoord * (1-DO_GLOBAL_SHZO)  );
+                (vTexCoord * (1-DO_GLOBAL_SHZO) );
 
     vOutputCoord = TexCoord;
 
@@ -53,7 +60,7 @@ void main() {
                        floor(vOutputCoord.y * params.OutputSize.y));
 
     //Precalc some Curvature/Warp values:
-        float warp_adaption =  1 - BEZEL_INNER_ZOOM * 4.0;
+        float warp_adaption =  1 - get_BEZEL_INNER_ZOOM() * 4.0;
         vec2 geom_warp_adapted = vec2(GEOM_WARP_X, GEOM_WARP_Y) * warp_adaption;
 
         vWarp_vexp = 1.0/ (1 + (vec2(geom_warp_adapted.x, geom_warp_adapted.y) * 0.2)) ;
@@ -868,7 +875,7 @@ vec4 main_wrap(vec2 coords, vec2 outer_frame_offset){
     //Just do pixel_inner_frame() and exit when there is no need to paint border.
     if (!border_needed()) return pixel_inner_frame(coords, false);
 
-    //bezel_coords = zoomout_coords(bezel_coords, -BEZEL_INNER_ZOOM , 1.0);
+    //bezel_coords = zoomout_coords(bezel_coords, -get_BEZEL_INNER_ZOOM() , 1.0);
 
     //From now on, we need a border.
         bool bIs_outer_frame = vTexCoord.x < 0.0 + outer_frame_offset.x || vTexCoord.x > 1.0 - outer_frame_offset.x ||
@@ -924,7 +931,7 @@ void main() {
     vec2 outer_frame_offset = vec2(0.0);
     
     if (DO_BEZEL == 1.0) {
-        coords = zoomout_coords(coords, -BEZEL_INNER_ZOOM , 1.0);
+        coords = zoomout_coords(coords, -get_BEZEL_INNER_ZOOM() , 1.0);
         coords_for_mirror = zoom(coords, 1/BEZEL_REFL_ZOOMOUT_ROOM);
         vec2 coords_for_bezel1 = get_scaled_coords_for_bezel();
         outer_frame_offset = get_scaled_offset(BEZEL_BORDER_SIZE, coords_for_bezel1, vTexCoord);

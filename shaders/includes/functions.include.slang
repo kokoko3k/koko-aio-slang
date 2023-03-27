@@ -341,13 +341,33 @@ float random(float power, vec2 seed) {
 		return scale_coord;
 	}
 	
-/*	vec2 content_aspect_override(vec2 co, float aspect, float in_aspect){
-		float scale_y = aspect/in_aspect;
-		float offset_y = (0.5 * scale_y ) - 0.5 ;
-		co.y = co.y*scale_y - offset_y;
-		return co;
+	vec2 integer_scale(vec2 in_coords, float target_aspect, bool is_rotated) {
+		vec2 izoom;
+
+		float raw_in_aspect = params.OriginalSize.x/params.OriginalSize.y;
+		float adapted_aspect = target_aspect /raw_in_aspect;
+		in_coords.x = zoom1D(in_coords.x, adapted_aspect);
+
+		if (!is_rotated) {
+			//This is 1X integer zoom:
+			izoom = params.OriginalSize.xy / global.FinalViewportSize.xy;
+			//Find the maximum zoom allowed
+			izoom = izoom * floor(global.FinalViewportSize.y / params.OriginalSize.y );
+		} else {
+			izoom = params.OriginalSize.xy / global.FinalViewportSize.yx;
+			izoom = izoom * floor(global.FinalViewportSize.y / (params.OriginalSize.x*adapted_aspect) );
+		}
+		return zoomxy(in_coords, izoom);
 	}
-*/	
+
+	float get_BEZEL_INNER_ZOOM() {
+		return BEZEL_INNER_ZOOM * float( GAME_GEOM_INT_SCALE != 1.0 || DO_GAME_GEOM_OVERRIDE != 1.0  );
+	}
+
+	bool do_integer_scale() {
+		return DO_GAME_GEOM_OVERRIDE == 1.0 && GAME_GEOM_INT_SCALE == 1.0;
+	}
+
 
 	vec2 content_geom_override(vec2 co, float aspect, float in_aspect, float vshift, float hshift, float out_zoom){
 		//Aspect

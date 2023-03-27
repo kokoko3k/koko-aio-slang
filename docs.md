@@ -216,8 +216,9 @@
     
     Straight
         Use a straight bezel instead of a curved one.
-    Image zoom:
+    Inner zoom:
         Allows to shrink or expand the game content to fit the monitor frame.
+        When integer scaling is enabled, this is ignored.
     Frame zoom:
           Allows to shrink or expand the monitor frame to fit the game content.
     Bezel color (red,green,blue) and contrast:
@@ -334,6 +335,9 @@
     Contrary to the global aspect ratio control, this changes only the game geometry.
     Bezel stays the same.
     
+    Integer scale: Game content zoom height is rounded to nearest integer.
+                 * beware: the following options in this group
+                   overrides the integer scale.
     Aspect: Change aspect ratio.
     Vertical/Horizontal position: Shifts the game position
     Zoom: Change the size
