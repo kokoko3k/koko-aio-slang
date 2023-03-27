@@ -24,50 +24,6 @@ layout(set = 0, binding = 2) uniform sampler2D avglum_pass;
 
 #include "includes/functions.include.slang"
 
-float circle_smooth(vec2 coords, vec2 middle, float f_radius, float FALLOFF) {
-   //Draw a circle with smoothed borders:
-   float fdistance=distance(middle, vec2(coords.x, coords.y));
-   float circle = (1-smoothstep(f_radius-FALLOFF, f_radius+FALLOFF, fdistance));
-   return circle;
-}
-
-float square_smooth(vec2 co, vec2 corner, float size, float smoothshade) {
-   //Draws a square with smooth borders:
-   vec4 rect = vec4(corner.x, corner.y, corner.x+size, corner.y+size);
-   vec2 hv = smoothstep(rect.xy - smoothshade, rect.xy, co) * smoothstep(co - smoothshade, co, rect.zw);
-   return  hv.x * hv.y;
-}
-
-float corners_shade(vec2 co, float size, float smoothsize){
-   //Draws 4 smooth squares or circles in the corners.
-   //They are intended to modulate the blur radius and the strength of the reflection.
-   
-   /*
-      vec4 circles;
-      float circle_radius = size; //0.13?
-      float circle_falloff = smoothsize; //0.05?
-      float circle_power =2.0;
-      circles.x = circle_smooth(co, vec2(0.0,0.0), circle_radius, circle_falloff) * circle_power;
-      circles.y = circle_smooth(co, vec2(0.0,1.0), circle_radius, circle_falloff) * circle_power;
-      circles.z = circle_smooth(co, vec2(1.0,0.0), circle_radius, circle_falloff) * circle_power;
-      circles.w = circle_smooth(co, vec2(1.0,1.0), circle_radius, circle_falloff) * circle_power;
-               
-      float circle = max(max(max(circles.x, circles.y), circles.z), circles.w);
-      circle = min(circle, 1.0);
-      circle = 1-circle;
-      
-      return circle;
-   */      
-   vec4 squares;
-   float squaresize = size;
-   float squarefade = smoothsize;
-   //(vec2 co, vec2 corner, float size, float smoothshade) {
-   squares.x = square_smooth(co, vec2(0.0,0.0), squaresize, squarefade);
-   squares.y = square_smooth(co, vec2(1.0 - squaresize, 0.0), squaresize, squarefade);
-   squares.z = square_smooth(co, vec2(0.0, 1-squaresize), squaresize, squarefade);
-   squares.w = square_smooth(co, vec2(1-squaresize, 1-squaresize), squaresize, squarefade);
-   return max(max(max(squares.x, squares.y), squares.z), squares.w);
-}
 
 float borders_gradient(vec2 co, float smoothness) {
    //Draws a square with smooth borders:
@@ -97,8 +53,8 @@ void main() {
 
 
 
-   //Create gradients in the corners to fadeout reflections and to blur more near them:
-      float fcorners_shade = corners_shade(vTexCoord, BEZEL_REFL_CORNER_BLANK_SIZE, BEZEL_REFL_CORNER_BLANK_SHADE);
+   //Create gradients in the corners to blur more more near them:
+      float fcorners_shade = corners_shade(vTexCoord, 0.9);
      
    //Create a gradient near borders to modulate between blurrend and sharp refection.
    //This also goes into output alpha channel to make the next pass aware of it.
@@ -119,7 +75,9 @@ void main() {
    vec3 pixel_out = mix(s1, s2, lodmix);
    
    //multiply the blurred image by the corner shade so that reflections will not be visible in the corners.
-      pixel_out = pixel_out * (1 - fcorners_shade);
+   //This has been moved to final pass because it didn't worked well with curvature
+   //at 0.0 inner zoom level.
+   //pixel_out = pixel_out * (1 - fcorners_shade);
    
    pixel_out = apply_fuzzy_main_pass(pixel_out);
    

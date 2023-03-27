@@ -1,5 +1,51 @@
+//REFLECTION RELATED START
+	float circle_smooth(vec2 coords, vec2 middle, float f_radius, float FALLOFF) {
+	//Draw a circle with smoothed borders:
+	float fdistance=distance(middle, vec2(coords.x, coords.y));
+	float circle = (1-smoothstep(f_radius-FALLOFF, f_radius+FALLOFF, fdistance));
+	return circle;
+	}
 
+	float square_smooth(vec2 co, vec2 corner, float size, float smoothshade) {
+	//Draws a square with smooth borders:
+	vec4 rect = vec4(corner.x, corner.y, corner.x+size, corner.y+size);
+	vec2 hv = smoothstep(rect.xy - smoothshade, rect.xy, co) * smoothstep(co - smoothshade, co, rect.zw);
+	return  hv.x * hv.y;
+	}
 
+	float corners_shade(vec2 co, float size_multiplier){
+	//Draws 4 smooth squares or circles in the corners.
+	//They are intended to modulate the blur radius and the strength of the reflection.
+	
+	/*
+	vec4 circles;
+	float circle_radius = size; //0.13?
+	float circle_falloff = smoothsize; //0.05?
+	float circle_power =2.0;
+	circles.x = circle_smooth(co, vec2(0.0,0.0), circle_radius, circle_falloff) * circle_power;
+	circles.y = circle_smooth(co, vec2(0.0,1.0), circle_radius, circle_falloff) * circle_power;
+	circles.z = circle_smooth(co, vec2(1.0,0.0), circle_radius, circle_falloff) * circle_power;
+	circles.w = circle_smooth(co, vec2(1.0,1.0), circle_radius, circle_falloff) * circle_power;
+		
+	float circle = max(max(max(circles.x, circles.y), circles.z), circles.w);
+	circle = min(circle, 1.0);
+	circle = 1-circle;
+	
+	return circle;
+	*/      
+	vec4 squares;
+	float squaresize = BEZEL_REFL_CORNER_BLANK_SIZE * size_multiplier;
+	float squarefade = BEZEL_REFL_CORNER_BLANK_SHADE * size_multiplier;
+	//(vec2 co, vec2 corner, float size, float smoothshade) {
+	squares.x = square_smooth(co, vec2(0.0,0.0), squaresize, squarefade);
+	squares.y = square_smooth(co, vec2(1.0 - squaresize, 0.0), squaresize, squarefade);
+	squares.z = square_smooth(co, vec2(0.0, 1-squaresize), squaresize, squarefade);
+	squares.w = square_smooth(co, vec2(1-squaresize, 1-squaresize), squaresize, squarefade);
+	return max(max(max(squares.x, squares.y), squares.z), squares.w);
+	}
+//REFLECTION RELATED ENDS
+	
+	
 vec3 pixel_push_luminance(vec3 c, float strength) {
 	//if (strength == 0.0) return c; //lighter without the check.
 	float whiteness = max(max(c.r, c.g), c.b);

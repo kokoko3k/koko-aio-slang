@@ -738,7 +738,9 @@ vec3 compose_bezel_over(vec3 full_viewport, vec2 coords_for_bezel, vec2 coords_f
         
         //Sample the reflection pass with small offset to simulate the roughness
             vec3 pixel_mirrored = texture(reflected_blurred_pass, coords_for_mirror + roughness).rgb; 
-        
+            float fcorners_shade = corners_shade(coords_for_bezel, 1.0);
+            pixel_mirrored*=1-(fcorners_shade);
+            
         //Push it over the specular areas and apply the reflection modifier
             pixel_mirrored = pixel_mirrored * (1 + lut_specular) * reflection_modifier;
 
