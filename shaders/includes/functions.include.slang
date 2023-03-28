@@ -365,7 +365,16 @@ float random(float power, vec2 seed) {
 	}
 
 	float get_BEZEL_INNER_ZOOM() {
-		return BEZEL_INNER_ZOOM * float( GAME_GEOM_INT_SCALE != 1.0 || DO_GAME_GEOM_OVERRIDE != 1.0  );
+		/*if (GAME_GEOM_INT_SCALE == 1.0 && DO_GAME_GEOM_OVERRIDE == 1.0)
+			return 0.0;
+		else
+			return BEZEL_INNER_ZOOM;
+		*/
+		//unbranched versions:
+		return BEZEL_INNER_ZOOM * (1 - DO_GAME_GEOM_OVERRIDE * GAME_GEOM_INT_SCALE);
+		
+		//117.2
+		//return BEZEL_INNER_ZOOM * float( GAME_GEOM_INT_SCALE != 1.0 || DO_GAME_GEOM_OVERRIDE != 1.0  );
 	}
 
 	bool do_integer_scale() {

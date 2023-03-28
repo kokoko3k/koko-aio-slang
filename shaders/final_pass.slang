@@ -32,6 +32,7 @@ layout(location = 4) out float vIsRotated;
 //Vignette, spot:
     layout(location = 11) out float vIn_aspect;
 
+layout(location = 12) out float vBEZEL_INNER_ZOOM_adapted;
 
 #include "includes/functions.include.slang"
 
@@ -59,8 +60,10 @@ void main() {
     vFragCoord = vec2( floor(vOutputCoord.x * params.OutputSize.x),
                        floor(vOutputCoord.y * params.OutputSize.y));
 
+    
+    vBEZEL_INNER_ZOOM_adapted = get_BEZEL_INNER_ZOOM();
     //Precalc some Curvature/Warp values:
-        float warp_adaption =  1 - get_BEZEL_INNER_ZOOM() * 4.0;
+        float warp_adaption =  1 - vBEZEL_INNER_ZOOM_adapted * 4.0;
         vec2 geom_warp_adapted = vec2(GEOM_WARP_X, GEOM_WARP_Y) * warp_adaption;
 
         vWarp_vexp = 1.0/ (1 + (vec2(geom_warp_adapted.x, geom_warp_adapted.y) * 0.2)) ;
@@ -105,6 +108,7 @@ layout(location = 8) in float vFlickeringScanlines;
 layout(location = 9) in float vScanlinePeriod;
 layout(location = 10) in float vScanlinesAlternate;
 layout(location = 11) in float vIn_aspect;
+layout(location = 12) in float vBEZEL_INNER_ZOOM_adapted;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -946,7 +950,7 @@ void main() {
     vec2 outer_frame_offset = vec2(0.0);
     
     if (DO_BEZEL == 1.0) {
-        coords = zoomout_coords(coords, -get_BEZEL_INNER_ZOOM() , 1.0);
+        coords = zoomout_coords(coords, -vBEZEL_INNER_ZOOM_adapted , 1.0);
         coords_for_mirror = zoom(coords, 1/BEZEL_REFL_ZOOMOUT_ROOM);
         vec2 coords_for_bezel1 = get_scaled_coords_for_bezel();
         outer_frame_offset = get_scaled_offset(BEZEL_BORDER_SIZE, coords_for_bezel1, vTexCoord);
@@ -1018,3 +1022,9 @@ void main() {
 
     //FragColor = vec4(random(1.0, vTexCoord * params.FrameCount));
 }
+
+
+/*86bacef42ab09641329518ea0c932e646fbb014f Allow to just draw gaps in vmasks -1fps
+f0b203cd284c74dfc8f252117abd79e1300861cb Implement integer scaling -2.5fps
+5ba8439ec540f4920b39569c24acb3244c655fd0 Allow to set a maximum integer scale level -1fps
+*/
