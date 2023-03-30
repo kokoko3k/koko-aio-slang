@@ -118,8 +118,11 @@
 	//Consider content interlaced if lines are more than this
 #define MIN_LINES_INTERLACED 380
 
-	//Sort of dithering/debanding used in vignette, spot, backlight leds
-#define NOISEPOWER 2.5/192.0
+	//Sort of dithering/debanding used in vignette, spot
+#define NOISEPOWER 1/192.0
+	//When applying over leds, multiply noispower by this
+#define NOISEPOWER_AMBI_MUL 2.5
+	
 
 	//Alternating blanking feature has been disabled by default, you can enable it by
 	//uncommenting the following line:
