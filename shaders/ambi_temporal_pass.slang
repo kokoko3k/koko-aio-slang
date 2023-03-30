@@ -20,6 +20,7 @@ layout(location = 2) out float border_max;
 layout(location = 3) out float fstep;
 layout(location = 4) out float lod;
 layout(location = 5) out vec2 pre_pass_coords;
+layout(location = 6) out float vIs_rotated;
 
 void main() {
     gl_Position = global.MVP * Position;
@@ -35,8 +36,10 @@ void main() {
 
    //Scale to the original aspect
     float in_aspect = get_in_aspect();
+    
     bool isrotated = is_rotated();
-
+    vIs_rotated = float(isrotated);
+    
     if ( !do_integer_scale() )
         pre_pass_coords = get_scaled_coords_aspect(TexCoord,global.FinalViewportSize, in_aspect, isrotated) + vec2(0.00001);
             else
@@ -52,6 +55,8 @@ void main() {
 
     if (DO_BEZEL > 0.5)
         pre_pass_coords = zoomout_coords(pre_pass_coords, -get_BEZEL_INNER_ZOOM() , 1.0);
+    
+    
 }
 
 #pragma stage fragment
@@ -61,6 +66,7 @@ layout(location = 2) in float border_max;
 layout(location = 3) in float fstep;
 layout(location = 4) in float lod;
 layout(location = 5) in vec2 pre_pass_coords;
+layout(location = 6) in float vIs_rotated;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -90,8 +96,11 @@ vec3 circle_smooth(vec2 coords, vec2 middle, float f_radius, float FALLOFF, floa
 #define tol_end   1-tol_start
 
 vec3 ambi_pre_pass(vec2 coords) {
-   
-    //Skip coords in the rect "under the monitor"
+    if (DO_TILT == 1.0)
+        coords = tilt(coords, vIs_rotated, TILT_X, TILT_Y, 1.0);
+    
+    
+    //Skip coords in the rect "under the tube"
     if (coords.x > tol_start &&
         coords.x < tol_end   &&
         coords.y > tol_start &&

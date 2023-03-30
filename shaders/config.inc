@@ -119,7 +119,7 @@
 #define MIN_LINES_INTERLACED 380
 
 	//Sort of dithering/debanding used in vignette, spot, backlight leds
-#define NOISEPOWER 1/192.0
+#define NOISEPOWER 2.5/192.0
 
 	//Alternating blanking feature has been disabled by default, you can enable it by
 	//uncommenting the following line:
@@ -252,6 +252,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 	float GEOM_WARP_X;
 	float GEOM_WARP_Y;
+	float GEOM_CUT_EARS;
 	float GEOM_CORNER_SIZE;
 	float GEOM_CORNER_SMOOTH;
 
@@ -322,6 +323,11 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float GAME_GEOM_VSHIFT;
 	float GAME_GEOM_HSHIFT;
 	float GAME_GEOM_ZOOM;
+	
+	float DO_TILT;
+	float TILT_X;
+	float TILT_Y;
+	float TILT_BEZEL_K;
 	
 } global;
 
@@ -465,6 +471,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter DO_CURVATURE	     "★ Curvature enable? ==>"			0.0   0.0 1.0 1.0
 #pragma parameter GEOM_WARP_X        "        Warp X"				0.3  0.0 6.0 0.025
 #pragma parameter GEOM_WARP_Y        "        Warp Y"				0.0   0.0 6.0 0.025
+#pragma parameter GEOM_CUT_EARS      "        Cut curvature ears"	1.4   1.0 10.0 0.01
 #pragma parameter GEOM_CORNER_SIZE   "        Corner radius"			0.005  0.005 0.1 0.001
 #pragma parameter GEOM_CORNER_SMOOTH "        Corner sharpness"			350.0 15.0 1000.0 1.0
 #pragma parameter BLANK14 " " 0.0 0.0 1.0 1.0
@@ -580,12 +587,20 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter GAME_GEOM_ZOOM	  "        Zoom"					1.0    0.0  2.0  0.01
 #pragma parameter BLANK20 " " 0.0 0.0 1.0 1.0
 
+//Tilt
+#pragma parameter DO_TILT	  	"★ Tilt enable? ==>"				0.0   0.0  1.0 	  1.0
+#pragma parameter TILT_X	  	"        Tilt along X axis"		0.0    -0.5  0.5  0.01
+#pragma parameter TILT_Y	  	"        Tilt along Y axis"		0.0    -0.5  0.5  0.01
+#pragma parameter TILT_BEZEL_K	"        Bezel multiplier"		1.0    0.5  1.5  0.01
+#pragma parameter BLANK_01 " " 0.0 0.0 1.0 1.0
+
+
 // Alternative blanking, needs to be statically enabled, see docs.md.
 #pragma parameter DO_ALT_BLANK       "★ Alternate line blanking enable? ==>"			0.0 0.0 1.0 1.0
 #pragma parameter label_alt_blank    "  !THIS FEATURE IS STATIC, SEE docs.md TO ENABLE"    0.0 0.0 0.0 1.0
 #pragma parameter ALT_BLANK_STRENGTH "        Alternate black frame insertion strength" 	0.5 0.0 1.0 0.1
 #pragma parameter ALT_BLANK_PERIOD   "        Blank lines period" 				4.0 0.0 20.0 1.0
-#pragma parameter BLANK20ì4 " " 0.0 0.0 1.0 1.0
+#pragma parameter BLANK_02 " " 0.0 0.0 1.0 1.0
 
 
 
