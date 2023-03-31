@@ -101,4 +101,8 @@
 #    [ ] copy base presets to overlay repo (after release)
 #    [ ] dynamic contrast, the more the brigher the content, the less the bezel and back/foreground image?
 #    [ ] Allow for a v-gap-only mask.
-
+#    [ ] Does bg_image rotates right?
+#    [ ] Test backdrop
+#    [ ] Backdrop borders should not be shaded with inner tube texture alpha channel
+#    [ ] test nvidia
+#    [ ] Try to write your own curvature function

@@ -637,12 +637,15 @@ vec2 tilt(vec2 co, float is_rotated, float tilt_x, float tilt_y, float adpt) {
 	float tilt_min_y = 1.0 - r_tilt_y;
 	float tilt_max_y = 1.0 + r_tilt_y;
 
+	float fov_x = tilt_x * TILT_FOV;
+	float fov_y = tilt_y * TILT_FOV;
+	
 	co.x = zoom1D(co.x, scale_to_range(co.y, tilt_min_x, tilt_max_x) );	
-	co.y = zoom1D(co.y, scale_to_range(co.y, 1 - tilt_x, 1 + tilt_x)) + tilt_x*0.32;	
+	co.y = zoom1D(co.y, scale_to_range(co.y, 1 - fov_x, 1 + fov_x)) + fov_x*0.32;	
 
 	
 	co.y = zoom1D(co.y, scale_to_range(co.x, tilt_min_y, tilt_max_y) );
-	co.x = zoom1D(co.x, scale_to_range(co.x, 1 - tilt_y, 1 + tilt_y)) + tilt_y*0.32;	
+	co.x = zoom1D(co.x, scale_to_range(co.x, 1 - fov_y, 1 + fov_y)) + tilt_y*0.32;	
 	
 	return co;
 }
