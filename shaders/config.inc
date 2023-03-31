@@ -17,12 +17,17 @@
 	//in the bezel.
 #define BEZEL_BORDER_SIZE vec2(0.07, 0.07)
 
-
 	//This is the blank area or shadow size (one side, in percent) at the sides of the bezel as defined by the bezel texture
 	//BEZEL_SHADOW_SIZE = max shadow or blank side size / bezel_texture_size.
 	//It is used to skip drawing bg/fg or ambient light over the tube, set it to a value that allow for them to be 
 	//shown over the bezel blank/shadowed sides but not on the tube (ie: value too big)
 #define BEZEL_SHADOW_SIZE 0.06
+
+	//to speedup things, bezel rende logic can be completely skipped in the inner tube, if we
+	//already know it is completely transparent.
+	//Set the following to the maximum value that allow you to see 
+	//bezel borders and, if present in the source bezel texture, inner content/border shades
+#define BEZEL_TUBE_BLANK_SIZE 0.88
 
 	//In the second reflection pass, the coordinates are zoomedout by the
 	//BEZEL_REFL_ZOOMOUT_ROOM so that the image is mirrored-repeated by retroarch.
@@ -602,7 +607,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter TILT_X	  	"        Tilt along X axis"		0.0    -0.5  0.5  0.01
 #pragma parameter TILT_Y	  	"        Tilt along Y axis"		0.0    -0.5  0.5  0.01
 #pragma parameter TILT_FOV	  	"        Fov"					1.5    0.1	3.0    0.05
-#pragma parameter TILT_BEZEL_K	"        Bezel multiplier"		1.0    0.5  1.5  0.01
+#pragma parameter TILT_BEZEL_K	"        Bezel multiplier"		1.0    0.0  1.5  0.01
 #pragma parameter BLANK_01 " " 0.0 0.0 1.0 1.0
 
 

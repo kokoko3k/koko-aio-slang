@@ -133,6 +133,8 @@ layout(set = 0, binding = 11) uniform sampler2D in_glow_pass;
 layout(set = 0, binding = 12) uniform sampler2D halo_pass;
 
 
+
+#define RECT01 vec4(0.0, 0.0, 1.0, 1.0)
 #define HALF_PI 1.5707963267949
 #define QUARTER_PI 0.785398163397448
 
@@ -722,8 +724,17 @@ vec3 fn_pixel_content(vec2 coords) {
 
 
 vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror) {
+    
+    //Can we skip Blank outside border and inner blank tube?
+        vec4 inner_blank_rect = vec4(1-BEZEL_TUBE_BLANK_SIZE, 1-BEZEL_TUBE_BLANK_SIZE, BEZEL_TUBE_BLANK_SIZE, BEZEL_TUBE_BLANK_SIZE);
+        if (is_first_outside_rect(coords_for_bezel, RECT01)  ||
+            is_first_inside_rect(coords_for_bezel, inner_blank_rect)
+        ) return vec4(0.0);
+
+
     //Sample main bezel texture:
         vec4 bezel_in;
+    
         #ifdef STATIC_BEZEL_USE_MIPMAP
             vec2 bezel_lut_size = textureSize(monitor_body_curved,0); //no need to branch here if we assume straight and curved textures are the same size. //FIXME?
             float bezel_frame_lod = log2(bezel_lut_size.y * (BEZEL_FRAME_ZOOM+1.0) /global.FinalViewportSize.y);
@@ -740,7 +751,7 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror) {
     
 
     //Exit if the bezel is completely transparent (the tube)
-        if (bezel_in.a == 0.0) return vec4(bezel_in.a);
+        if (bezel_in.a == 0.0) return vec4(0.0);
         
     //Colorize the bezel (bezel.r expresses the luminance)
         vec3 bezel_colored = bezel_color(bezel_in.r);
@@ -782,7 +793,6 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror) {
     return vec4(bezel_out, bezel_in.a);
 }
 
-#define RECT01 vec4(0.0, 0.0, 1.0, 1.0)
 
 void main() {
     vec3 pixel_out = vec3(0.0);
@@ -842,7 +852,7 @@ void main() {
     
     //Draw Bezel
         vec4 pixel_bezel;
-                                                    //FIXME: add logic to skip inner rect by parameters
+        //SKIP LOGIC is inside fn_pixel_bezel
         if (DO_BEZEL == 1.0) {
             pixel_bezel = fn_pixel_bezel(co_bezel, co_mirror);
             //If we used a smooth_border, canvas_busy is it, but since the content is in the bezel,

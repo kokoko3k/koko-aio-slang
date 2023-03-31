@@ -70,6 +70,7 @@
 #        Nope, yay.
 #    [v] scanline minimum height does not work with intscale preset ?
 #        it seems coords needs +vec2(0.0001), don't know why.
+#    [v] Provide a static parameter to skip sampling bezel lut in the inner tube
 #    [.] ambilight leds falloff should use a gamma function/pow
 #        ...technically correct, but it would be required to do this before applying the color
 #        to the circle mask, or color gamma would suffer.
@@ -85,7 +86,7 @@
 #    [ ] check branching conditions in first_pass.slang
 #    [ ] Better debanding?
 #    [ ] Should the flickering be aware of the scanline?
-#        read: does a scanline dark gap increment the flickering or not?
+#        read: does a scanline dark gap increment the flickering or not? i think not.
 #    [ ] deconvergence after glow/halo?
 #    [ ] Glow spread in final pass?
 #    [ ] Find a way to smooth borders without cropping the image
@@ -100,9 +101,9 @@
 #    [ ] allow to stretch background image?
 #    [ ] copy base presets to overlay repo (after release)
 #    [ ] dynamic contrast, the more the brigher the content, the less the bezel and back/foreground image?
-#    [ ] Allow for a v-gap-only mask.
 #    [ ] Does bg_image rotates right?
-#    [ ] Test backdrop
 #    [ ] Backdrop borders should not be shaded with inner tube texture alpha channel
-#    [ ] test nvidia
 #    [ ] Try to write your own curvature function
+
+#    [ ] Is it convenient to add a check for blue channel and skip sampling reflection?
+#    [ ] Think again, maybe after refactoring final_pass, enabling backgrops is doable.
