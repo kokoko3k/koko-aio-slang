@@ -110,21 +110,6 @@
 
 
 
-
-
-// BACKDROP STATIC CONFIG ##########################################################################################
-
-	//Support for backdrops has to be enable by uncommenting:
-//#define STATIC_SUPPORT_BACKDROP 1.0
-#define BACKDROP_OFFX 0.0
-#define BACKDROP_OFFY 0.0
-#define BACKDROP_ZOOM 1.0
-
-
-
-
-
-
 // MISC STATIC CONFIG ##########################################################################################
 	//Consider content interlaced if lines are more than this
 #define MIN_LINES_INTERLACED 380
@@ -147,8 +132,6 @@
 
 
 // STATIC CONFIG ENDS HERE ##########################################################################################
-
-
 
 
 
@@ -344,6 +327,11 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float TILT_BEZEL_K;
 	float TILT_FOV;
 	
+	float DO_BACKDROP; 
+	float BACKDROP_OFFX;
+	float BACKDROP_OFFY;
+	float BACKDROP_ZOOM;
+	
 } global;
 
 // Color correction
@@ -465,7 +453,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter SCANLINE_SM_VOFFSET      "           . Offset (type 1 only)"					45.0 	0.0 158.0 1.0
 #pragma parameter BLANK12 " " 0.0 0.0 1.0 1.0
 
-//p1.20,r2.0
+
 // Bloom
 #pragma parameter DO_BLOOM           "★ Bloom enable? ==>" 						0.0  0.0  1.0  1.0
 #pragma parameter BLOOM_MIX          "        Final mix, (0.0=off)"					0.45 0.0 1.0  0.01
@@ -525,6 +513,12 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BG_IMAGE_WRAP_MODE "            Wrap mode: default, clamp to border, edge, repeat" 0.0  0.0    3.0    1.0
 #pragma parameter BLANK16 " " 0.0 0.0 1.0 1.0
 
+//Backdrop image
+#pragma parameter DO_BACKDROP		"★ Backdrop mirrored image enable? ==>"		 0.0  0.0  1.0     1.0
+#pragma parameter BACKDROP_OFFX		"        Shift backdrop over X axis"				 0.0  -1.0  1.0    0.0005
+#pragma parameter BACKDROP_OFFY 	"        Shift backdrop over X axis"				 0.0  -1.0  1.0    0.0005
+#pragma parameter BACKDROP_ZOOM 	"        Zoom backdrop"					 1.0  -1.0  3.0    0.0005
+#pragma parameter BLANK161 " " 0.0 0.0 1.0 1.0
 
 
 //Back leds

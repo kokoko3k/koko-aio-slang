@@ -201,6 +201,11 @@
 	#define BG_IMAGE_ROTATION	global.BG_IMAGE_ROTATION
 	#define BG_IMAGE_WRAP_MODE	global.BG_IMAGE_WRAP_MODE
 
+#define DO_BACKDROP		global. DO_BACKDROP
+	#define BACKDROP_OFFX		global.BACKDROP_OFFX
+	#define BACKDROP_OFFY		global.BACKDROP_OFFY
+	#define BACKDROP_ZOOM		global.BACKDROP_ZOOM
+	
 
 #define DO_AMBILIGHT		global.DO_AMBILIGHT
 	#define AMBI_STEPS			global.AMBI_STEPS
@@ -218,7 +223,6 @@
 
 #define DO_DYNZOOM		global.DO_DYNZOOM
 	#define DYNZOOM_FACTOR		global.DYNZOOM_FACTOR
-
 
 
 #define DO_ALT_BLANK		global.DO_ALT_BLANK

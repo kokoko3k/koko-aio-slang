@@ -261,6 +261,16 @@
         2  Clamp to edge and means that it repeats the edge color.
         3  Plain repeat without mirroring.
 
+        
+**Backdrop support:**
+    Some old arcades used a mirror trick to overlay the
+    game content over an high definition printed image.<br>
+    The image used by default, picked from the "textures" shader subdirectory,
+    is named: boothill.jpg<br>
+        Shift(Zoom) Backdrop over X(Y) axis:
+            move or zoom the whole background image.
+    
+        
 **Ambient light leds:**
     Emulates the presence of led strips under the monitor that lights the
     surroundings according to the edges of the game content.
@@ -343,6 +353,16 @@
     Vertical/Horizontal position: Shifts the game position
     Zoom: Change the size
 
+**Tilt:**
+    Put the bezel and the game content into perspective.
+    
+    Tilt along X(Y) axis:
+        Rotate the image in space
+    Fov: Modulates the field of view
+    Bezel multiplier:
+        Can be used to adjust the bezel rotation
+        in relation to the game tilt amount
+    
     
 **Alternate line blanking:**
     CRT monitors \*real\* refresh was amazing, today is just "meh" in most cases.
@@ -360,17 +380,7 @@
         You can blank single line or a group of them at once.
         See what performs better on your display.
 
-**Backdrop support:**
-    Some (not so much) old arcades used a mirror trick to overlay the
-    game content over an high definition printed image.<br>
-    koko-aio supports them but you will explicitely need to enable<br>
-    that feature in config.inc file, by uncommenting a string this way:<br>
-    //#define STATIC_SUPPORT_BACKDROP 1.0 <br>
-    becomes: <br>
-    #define STATIC_SUPPORT_BACKDROP 1.0 <br>
-    You can only combine the static backdrop with images <br>
-    that are painted over the screen.<br>
-    If you need to zoom the game content only, use the global zoom controls.
+
 
 
 

@@ -71,6 +71,8 @@
 #    [v] scanline minimum height does not work with intscale preset ?
 #        it seems coords needs +vec2(0.0001), don't know why.
 #    [v] Provide a static parameter to skip sampling bezel lut in the inner tube
+#    [v] Is it convenient to add a check for blue channel and skip sampling reflection?
+#        yes.
 #    [.] ambilight leds falloff should use a gamma function/pow
 #        ...technically correct, but it would be required to do this before applying the color
 #        to the circle mask, or color gamma would suffer.
@@ -105,5 +107,4 @@
 #    [ ] Backdrop borders should not be shaded with inner tube texture alpha channel
 #    [ ] Try to write your own curvature function
 
-#    [ ] Is it convenient to add a check for blue channel and skip sampling reflection?
-#    [ ] Think again, maybe after refactoring final_pass, enabling backgrops is doable.
+

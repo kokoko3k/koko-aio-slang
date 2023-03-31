@@ -115,11 +115,8 @@ layout(location = 12) in float vBEZEL_INNER_ZOOM_adapted;
 layout(location = 0) out vec4 FragColor;
 
 
-#ifdef STATIC_SUPPORT_BACKDROP
-    layout(set = 0, binding = 1) uniform sampler2D backdrop;
-        #else
-    layout(set = 0, binding = 1) uniform sampler2D first_pass;
-#endif
+
+layout(set = 0, binding = 1) uniform sampler2D backdrop;
 layout(set = 0, binding = 2)  uniform sampler2D bloom_pass_final;
 layout(set = 0, binding = 3)  uniform sampler2D reflected_blurred_pass;
 layout(set = 0, binding = 4)  uniform sampler2D ambi_temporal_pass;
@@ -460,23 +457,23 @@ float get_clamped_white_reference(vec3 pixel_in){
 
 float global_noise = 0.0;
 
-#ifdef STATIC_SUPPORT_BACKDROP
-    vec3 pixel_backdrop_image() {
-        vec2 backdrop_offset=vec2(BACKDROP_OFFX,BACKDROP_OFFY);
 
-        vec2 backdrop_tex_size = textureSize(backdrop, 0);
-        float backdrop_lod = log2(backdrop_tex_size.y / global.FinalViewportSize.y);
+vec3 pixel_backdrop_image() {
+    vec2 backdrop_offset=vec2(BACKDROP_OFFX,BACKDROP_OFFY);
 
-        vec2 backdrop_coords =  get_scaled_coords_aspect(
-                                vOutputCoord+backdrop_offset,
-                                global.FinalViewportSize,
-                                backdrop_tex_size.x/backdrop_tex_size.y,
-                                bool(vIsRotated));
+    vec2 backdrop_tex_size = textureSize(backdrop, 0);
+    float backdrop_lod = log2(backdrop_tex_size.y / global.FinalViewportSize.y);
 
-        backdrop_coords=zoom(backdrop_coords, BACKDROP_ZOOM);
-        return textureLod(backdrop, backdrop_coords, backdrop_lod).rgb;
-    }
-#endif
+    vec2 backdrop_coords =  get_scaled_coords_aspect(
+                            vOutputCoord+backdrop_offset,
+                            global.FinalViewportSize,
+                            backdrop_tex_size.x/backdrop_tex_size.y,
+                            bool(vIsRotated));
+
+    backdrop_coords=zoom(backdrop_coords, BACKDROP_ZOOM);
+    return textureLod(backdrop, backdrop_coords, backdrop_lod).rgb;
+}
+
 
 vec4 textureLod_wrap(sampler2D tex, vec2 co, float lod, float wrap_mode) {
     #ifdef ALLOW_BG_IMAGE_TEXTURE_WRAP_IN_SHADER
@@ -731,10 +728,8 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror) {
             is_first_inside_rect(coords_for_bezel, inner_blank_rect)
         ) return vec4(0.0);
 
-
-    //Sample main bezel texture:
-        vec4 bezel_in;
-    
+    vec4 bezel_in;    
+    //Sample main bezel texture, Do we want mipmaps?
         #ifdef STATIC_BEZEL_USE_MIPMAP
             vec2 bezel_lut_size = textureSize(monitor_body_curved,0); //no need to branch here if we assume straight and curved textures are the same size. //FIXME?
             float bezel_frame_lod = log2(bezel_lut_size.y * (BEZEL_FRAME_ZOOM+1.0) /global.FinalViewportSize.y);
@@ -754,26 +749,31 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror) {
         if (bezel_in.a == 0.0) return vec4(0.0);
         
     //Colorize the bezel (bezel.r expresses the luminance)
-        vec3 bezel_colored = bezel_color(bezel_in.r);
+        vec3 bezel_out = bezel_color(bezel_in.r);
     
-    //Calculate the bezel roughness to apply to the reflecting area. (bezel_in.g expresses the specularity)
-        float lut_specular = bezel_in.g * BEZEL_SPCL_STRENGTH;
-        float roughness = random( min(global.FinalViewportSize.z,global.FinalViewportSize.w) * BEZEL_ROUGHNESS, vTexCoord );
-        roughness *=  (1 - min(lut_specular * 10, 1.0)); // <-roughness over specular area looks bad.
-        
-    //Reflections:
-        float reflection_modifier = bezel_in.b * BEZEL_REFL_STRENGTH; //bezel_in.b expresses how much the area is reflective
-        
-        //Sample the reflection pass with small offset to simulate the roughness
-            vec3 pixel_mirrored = texture(reflected_blurred_pass, coords_for_mirror + roughness).rgb; 
-            float fcorners_shade = corners_shade(coords_for_bezel, 1.0);
-            pixel_mirrored*=1-(fcorners_shade);
-            
-        //Push it over the specular areas and apply the reflection modifier
-            pixel_mirrored = pixel_mirrored * (1 + lut_specular) * reflection_modifier;
+    float lut_specular = bezel_in.g * BEZEL_SPCL_STRENGTH;
+    float reflection_modifier = 0.0;
 
-        //Apply reflections
-            vec3 bezel_out = bezel_colored + pixel_mirrored;
+    //Reflections, can be skipped if blue channel is 0:
+        if (bezel_in.b > 0.0) {
+        //Reflections: Calculate the bezel roughness to apply to the reflecting area. (bezel_in.g expresses the specularity)
+            float roughness = random( min(global.FinalViewportSize.z,global.FinalViewportSize.w) * BEZEL_ROUGHNESS, vTexCoord );
+            roughness *=  (1 - min(lut_specular * 10, 1.0)); // <-roughness over specular area looks bad.
+            
+        //Reflections:
+            reflection_modifier = bezel_in.b * BEZEL_REFL_STRENGTH; //bezel_in.b expresses how much the area is reflective
+            
+            //Sample the reflection pass with small offset to simulate the roughness
+                vec3 pixel_mirrored = texture(reflected_blurred_pass, coords_for_mirror + roughness).rgb; 
+                float fcorners_shade = corners_shade(coords_for_bezel, 1.0);
+                pixel_mirrored*=1-(fcorners_shade);
+                
+            //Push it over the specular areas and apply the reflection modifier
+                pixel_mirrored = pixel_mirrored * (1 + lut_specular) * reflection_modifier;
+
+            //Apply reflections
+                bezel_out += pixel_mirrored;
+        }
 
     //Mix ambient light over bezel? (branching this is worse)
         vec3 ambitemporalpass = texture(ambi_temporal_pass, vOutputCoord ).rgb;
@@ -789,13 +789,14 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror) {
             vec4 pixel_avglum = texture(avglum_pass, coords_for_mirror);
             bezel_out = bezel_out + (pixel_avglum.rgb * lut_specular) ;
         }
-        //return vec4(ambitemporalpass, bezel_in.a);
+
     return vec4(bezel_out, bezel_in.a);
 }
 
 
 void main() {
     vec3 pixel_out = vec3(0.0);
+    
     float canvas_busy = 0.0; //<-- this allow for paint over not painted areas (spares gpu cycles)
 
     //Calc a random noise if we need debanding
@@ -841,15 +842,13 @@ void main() {
 
         
     //Draw content only over the alpha mask, spare gpu cycles.
-        if (canvas_busy > 0.0) {
+        if (canvas_busy > 0.0)
             pixel_out = fn_pixel_content(co_content);
-            
-        //Backdrop
-            #ifdef STATIC_SUPPORT_BACKDROP
-                pixel_out += pixel_backdrop_image();
-            #endif
-        }
-    
+              
+    //Backdrop
+        if (DO_BACKDROP == 1.0)
+            pixel_out += pixel_backdrop_image();
+
     //Draw Bezel
         vec4 pixel_bezel;
         //SKIP LOGIC is inside fn_pixel_bezel
@@ -892,7 +891,7 @@ void main() {
         //Smooth the image corners: canvas_busy (the alpha mask) is a white rect with shaded borders.
             pixel_out = mix (pixel_under_content, pixel_out, canvas_busy);
  
-            
+          
         //Foreground image
             if (DO_BG_IMAGE + BG_IMAGE_OVER == 2.0) {
                 vec4 pixel_fg_image = fn_pixel_fg_image();
@@ -908,9 +907,9 @@ void main() {
                 }
             }
   
-        
+     
         
     FragColor = vec4(pixel_out, 1.0);
-    
+   
 }
 
