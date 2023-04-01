@@ -559,25 +559,10 @@ vec2 get_scaled_coords_for_bezel() {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
-vec4 fn_pixel_bg_image() {
-    vec2 bg_image_offset = vec2(BG_IMAGE_OFFX, BG_IMAGE_OFFY);
-    vec2 tex_size = textureSize(bg_under, 0); // * BG_ZOOM;
-    vec2 co_bg_image = get_scaled_coords_aspect(vOutputCoord + bg_image_offset, global.FinalViewportSize, tex_size.x/tex_size.y, bool(vIsRotated));
-    float bg_image_lod = log2(tex_size.y / global.FinalViewportSize.y);
-    
-    if (BG_IMAGE_ROTATION > 0.0) {
-        co_bg_image.xy = co_bg_image.yx;
-        if (BG_IMAGE_ROTATION == 1.0) co_bg_image.y = 1 - co_bg_image.y;
-        if (BG_IMAGE_ROTATION == 2.0) co_bg_image.x = 1 - co_bg_image.x;
-    }
-    co_bg_image = zoom(co_bg_image, BG_IMAGE_ZOOM);
-    return textureLod_wrap(bg_under, co_bg_image, bg_image_lod, BG_IMAGE_WRAP_MODE);
-    return vec4(0.0);
-}
 
-vec4 fn_pixel_fg_image() {
+vec4 fn_pixel_fgbg_image(sampler2D smp) {
     vec2 fg_image_offset=vec2(BG_IMAGE_OFFX,BG_IMAGE_OFFY);
-    vec2 tex_size = textureSize(bg_over, 0); // * BG_ZOOM;
+    vec2 tex_size = textureSize(smp, 0); // * BG_ZOOM;
     float bg_over_lod = log2(tex_size.y / global.FinalViewportSize.y);
 
     if (BG_IMAGE_ROTATION > 0.0  || ( BG_IMAGE_ROTATION < 0.0 && bool(vIsRotated) )  ) tex_size.xy = tex_size.yx;
@@ -595,9 +580,11 @@ vec4 fn_pixel_fg_image() {
         if (BG_IMAGE_ROTATION == 2.0) back_coords.x = 1 - back_coords.x;
     }
     back_coords=zoom(back_coords, BG_IMAGE_ZOOM);
-    vec4 pixel_bgover = textureLod_wrap(bg_over, back_coords, bg_over_lod, BG_IMAGE_WRAP_MODE);
+    vec4 pixel_bgover = textureLod_wrap(smp, back_coords, bg_over_lod, BG_IMAGE_WRAP_MODE);
     return pixel_bgover;
 }
+
+
 
 vec3 ambi_blend_image(vec4 image, vec3 ambi) {
     //mix or add ambient light with image, also allow force colorization in add mode.
@@ -881,7 +868,7 @@ void main() {
             
             //Background image:
                 if (DO_BG_IMAGE == 1.0 && BG_IMAGE_OVER == 0.0) {
-                    vec4 pixel_bg_image = fn_pixel_bg_image();
+                    vec4 pixel_bg_image = fn_pixel_fgbg_image(bg_under);
                     pixel_bg_image.rgb = ambi_blend_image(pixel_bg_image, pixel_ambi);        
                     pixel_under_content = pixel_bg_image.rgb;
                 }
@@ -894,7 +881,7 @@ void main() {
           
         //Foreground image
             if (DO_BG_IMAGE + BG_IMAGE_OVER == 2.0) {
-                vec4 pixel_fg_image = fn_pixel_fg_image();
+                vec4 pixel_fg_image = fn_pixel_fgbg_image(bg_over);
                 pixel_out = mix(pixel_out, pixel_fg_image.rgb, pixel_fg_image.a);
                 
                 if (DO_AMBILIGHT + AMBI_BG_IMAGE_BLEND_MODE == 2.0) { 
