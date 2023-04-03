@@ -311,7 +311,7 @@ vec2 Warp_try(vec2 pos, float warpX, float warpY) {
 		#ifdef STATIC_SUPPORT_BACKDROP
 		return true;
 		#else
-		return (DO_AMBILIGHT + DO_BG_IMAGE > 0.0);
+		return (DO_AMBILIGHT + DO_BG_IMAGE + DO_BACKDROP > 0.0);
 		#endif
 	}
 

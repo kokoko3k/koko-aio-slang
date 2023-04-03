@@ -832,9 +832,6 @@ void main() {
         if (canvas_busy > 0.0)
             pixel_out = fn_pixel_content(co_content);
               
-    //Backdrop
-        if (DO_BACKDROP == 1.0)
-            pixel_out += pixel_backdrop_image();
 
     //Draw Bezel
         vec4 pixel_bezel;
@@ -875,10 +872,17 @@ void main() {
             
         }
 
+        
+
         //Smooth the image corners: canvas_busy (the alpha mask) is a white rect with shaded borders.
             pixel_out = mix (pixel_under_content, pixel_out, canvas_busy);
  
           
+    //Backdrop
+        if (DO_BACKDROP == 1.0)
+            pixel_out += pixel_backdrop_image();
+
+            
         //Foreground image
             if (DO_BG_IMAGE + BG_IMAGE_OVER == 2.0) {
                 vec4 pixel_fg_image = fn_pixel_fgbg_image(bg_over);
