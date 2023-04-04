@@ -1,7 +1,5 @@
 #reference "monitor-Commodore_1084S.slangp"
 
-SCANLINE_MIN = "0.450000"
-
 BEZEL_INNER_ZOOM = "-0.440000"
 BEZEL_FRAME_ZOOM = "-0.140000"
 BEZEL_IMAGE_BORDER = "1.030000"

@@ -106,8 +106,4 @@
 #    [ ] Does bg_image rotates right?
 #    [ ] Backdrop borders should not be shaded with inner tube texture alpha channel
 #    [ ] Try to write your own curvature function
-#    [ ] prima di applicarla o clampi prima? scanline_shape = min(scanline_shape, 1.0);
-meglio applicarla dopo; in tal modo, puoi sfruttare il glow a potenze maggiori di 1.0 per ingrandirla.
-halo applicato male
-perché raggiunge max altezza anche se scanline max é meno di 1, ma pusho tanto il glow?
-la scanlone shape devpessere fatta per fosforo o per pixel finale? il fosforo si espande di per se, giusto? quindi oer fosforo
+#    [ ] §Update bezel presets so that inner zoom matches the bezel, then adjust geometry zoom that is aware of reflections

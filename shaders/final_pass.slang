@@ -406,9 +406,9 @@ float fn_scanline_mask(vec2 coords, bool do_slotmask, float lum, float min_inLum
                     float phase = pi + HALF_PI;
                     float angle_slotmask = angle_base + phase;
                     float slotmask = sin(angle_slotmask);
-                    slotmask = (slotmask*slotmask); slotmask = (slotmask*slotmask);
-                    lines = slotmask;
+                    return slotmask*slotmask;
                 }
+                return lines;
             }
         }
     }
