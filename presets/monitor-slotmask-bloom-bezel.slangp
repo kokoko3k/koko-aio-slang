@@ -1,4 +1,4 @@
-#reference "monitor-bloom-bezel.slangp"
+#reference "monitor-slotmask-bloom.slangp"
 
 DO_BEZEL = "1.0"
         BEZEL_FRAME_ZOOM = "0.04"

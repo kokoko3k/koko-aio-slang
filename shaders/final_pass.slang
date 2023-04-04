@@ -356,9 +356,10 @@ float fn_scanline_mask(vec2 coords, bool do_slotmask, float lum, float min_inLum
         lines = (lines*lines);
     }
 
-    //Draw the slotmask right here if the height is the same as the scanline.
+    //Draw a sort of slotmask right here with the same height as the scanline.
+    //Mitigates moiree and visual artifacts comapred to dumb viewport slotmask.
     if (do_slotmask) {
-        if (do_flicker) {
+        if (is_interlaced) {
             //Fallback to old darklines code to avoid glitches/artifacts.
             lines = lines * pixel_darklines(vec3(1.0),DARKLINES_PERIOD,1-SCANLINE_SM_STRENGTH,1.0, 0.0 ,1.0, coords).r;
 
@@ -397,6 +398,7 @@ float fn_scanline_mask(vec2 coords, bool do_slotmask, float lum, float min_inLum
                 slotmask = slotmask*slotmask; slotmask = slotmask*slotmask; // eleva alla 4 per renderla sottile. valori maggiori producono moiree.
                 slotmask = mix(1.0, slotmask, SCANLINE_SM_STRENGTH); // riduci la forza della slotmask
                 lines = lines * slotmask;
+                //return lines;
             }
 
             else if (SCANLINE_SM_TYPE == 3.0) {
@@ -406,9 +408,9 @@ float fn_scanline_mask(vec2 coords, bool do_slotmask, float lum, float min_inLum
                     float phase = pi + HALF_PI;
                     float angle_slotmask = angle_base + phase;
                     float slotmask = sin(angle_slotmask);
-                    return slotmask*slotmask;
+                    lines = slotmask*slotmask;
                 }
-                return lines;
+                return mix( 1.0, lines * (1-SCANLINE_DARK ) + SCANLINE_DARK, SCANLINE_SM_STRENGTH) ;
             }
         }
     }

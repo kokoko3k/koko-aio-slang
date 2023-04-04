@@ -106,4 +106,5 @@
 #    [ ] Does bg_image rotates right?
 #    [ ] Backdrop borders should not be shaded with inner tube texture alpha channel
 #    [ ] Try to write your own curvature function
-#    [ ] §Update bezel presets so that inner zoom matches the bezel, then adjust geometry zoom that is aware of reflections
+#    [ ] Update bezel presets so that inner zoom matches the bezel, then adjust geometry zoom that is aware of reflections
+#    [ ] Does interlace logic still work for switching from scanline slotmask to darklines one?
