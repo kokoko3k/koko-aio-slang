@@ -341,7 +341,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter CONTRAST       "        Contrast in     (0.0=off)"		0.0	-1.0 1.0 0.01
 #pragma parameter BRIGHTNESS     "        Brightness in   (0.0=off)"		0.0	-1.0 1.0 0.01
 #pragma parameter TEMPERATURE    "        Temperature in (6500=off)"		6500.0	3000 10000.0 50.0
-#pragma parameter GAMMA_OUT      "        Gamma out"				0.69	0.1 	9.0  0.025
+#pragma parameter GAMMA_OUT      "        Gamma out"				0.69	0.1 	4.0  0.01
 #pragma parameter BLANK1 " " 0.0 0.0 1.0 1.0
 
 
