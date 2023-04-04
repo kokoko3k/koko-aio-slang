@@ -187,6 +187,9 @@ float apply_contrast_brightness(float c, float contrast, float brightness) {
    return scale_to_range(c, -contrast, 1+contrast) + brightness;
 }
 
+float round_step(float f, float p) {
+	return floor(f*p)/p;
+}
 #define RND_A 12.9898
 #define RND_B 78.233
 #define RND_C 43758.5453

@@ -150,8 +150,10 @@ vec4 ntscdec(vec2 uv) {
    return vec4(YIQ_result * YIQ2RGB, artifacts_mask);
 }
 
-#define W vec3(0.2125, 0.7154, 0.0721)
 
+
+
+#define W vec3(0.2125, 0.7154, 0.0721)
 vec3 color_tools(vec3 pixel_out) {
 //Apply color corrections to input signal.
 
@@ -166,7 +168,7 @@ vec3 color_tools(vec3 pixel_out) {
 
    //Modify contrast and brightness
    if (CONTRAST != 0.0 || BRIGHTNESS != 0.0)
-      pixel_out.rgb = scale_to_range_vec3(pixel_out.rgb, -CONTRAST, 1+CONTRAST) + BRIGHTNESS;
+      pixel_out.rgb = apply_contrast_brightness(pixel_out.rgb, CONTRAST, BRIGHTNESS);
 
    //Modify color temperature
    if (TEMPERATURE != 6500.0) pixel_out.rgb = pixel_out.rgb * vTemperature_rgb;

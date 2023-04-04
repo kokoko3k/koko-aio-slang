@@ -337,6 +337,8 @@ float fn_scanline_mask(vec2 coords, bool do_slotmask, float lum, float min_inLum
     //scale scanline tickness:
         float lum_scaled = map_range(lum, min_inLum, max_inLum, SCANLINE_MIN, SCANLINE_MAX);
 
+    
+        
     float angle_base = coords.y * pi * params.OriginalSize.y * period;// + vScanlinePhase;
 
     float lines = 1.0;
