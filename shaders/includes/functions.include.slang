@@ -81,13 +81,14 @@ vec3 apply_fuzzy_main_pass(vec3 color) {
    if (DO_HALO == 1.0)
       color += pow(color,vec3(HALO_GAMMA))*HALO_POWER;
    if (DO_SCANLINES == 1.0)
-      color *=  mix(0.5 + (SCANLINE_DARK*0.5), 1.0, SCANLINE_COMPENSATION);
+      color *=  0.5 + (SCANLINE_DARK*0.5);
    if (DO_CCORRECTION == 1.0)
       color = pow(color, vec3(GAMMA_OUT));
    if (DO_VIGNETTE == 1.0)
       color *= 0.8 * (V_POWER);
    return color;
 }
+
 
 
 vec2 offsets_from_float(float in_param, int range){
@@ -170,6 +171,20 @@ vec3 scale_to_range_vec3(vec3 x, float dmin, float dmax) {
 vec2 scale_to_range_vec2(vec2 x, float dmin, float dmax) {
     //Scales 0..1 range to a..b range
     return ( (dmax-dmin) * x ) + dmin;
+}
+
+float map_range(float value, float min_in, float max_in, float min_out, float max_out) {
+	//Scales value in [min_in - max_in] to [min_out - max_out]
+	return min_out + (value - min_in) * (max_out - min_out) / (max_in - min_in);
+}
+
+
+vec3 apply_contrast_brightness(vec3 c, float contrast, float brightness) {
+   return scale_to_range_vec3(c, -contrast, 1+contrast) + brightness;
+}
+
+float apply_contrast_brightness(float c, float contrast, float brightness) {
+   return scale_to_range(c, -contrast, 1+contrast) + brightness;
 }
 
 #define RND_A 12.9898

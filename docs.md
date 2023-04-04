@@ -129,11 +129,10 @@
         controls how "little" they will look pronunced.
         You can even use a negative value to make the scanline more evident,
         but graphical glitches may occour.
-    Scanlines gap brightness:
-        Controls how much the gap between scanlines is dark.
-    Compensate brightness loss:
-        Will make scanlines brighter, where possible, to compensate for the 
-        loss of brightness given by the dark gap between them.
+    Minimum/Maximum height:
+        Control the scanline thickness, can be used to mitigate moiree.
+    Min->Max Inertia
+        The lower, the thinner scanlines will be used for higher brightness.
     Scanlines bleeding:
         Will cause the scanline itself to light the scanline gap (dark) part. 
         You may use it to keep a good picture brightness level.

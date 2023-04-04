@@ -9,7 +9,8 @@ DO_BEZEL = "1.0"
 # Since SCANLINE_SM_TYPE ="1.0" mitigates moiree, 
 # but is not used in this preset, use the following to mitigate, instead:
 	SCANLINE_SM_TYPE = "0.0"
-	SCANLINE_MIN = "0.3"
+	SCANLINE_MIN = "0.35"
+	SCANLINE_MAX = "0.40"
 	SCANLINE_DARK = "0.000000"
 	SCANLINES_BLEEDING = "0.300000"
 

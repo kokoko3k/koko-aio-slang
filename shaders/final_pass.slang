@@ -130,6 +130,9 @@ layout(set = 0, binding = 11) uniform sampler2D in_glow_pass;
 layout(set = 0, binding = 12) uniform sampler2D halo_pass;
 
 
+layout(set = 0, binding = 15) uniform sampler2D first_pass;
+
+
 
 #define RECT01 vec4(0.0, 0.0, 1.0, 1.0)
 #define HALF_PI 1.5707963267949
@@ -308,8 +311,7 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
         return source;
 }
 
-
-float scanline_shape(vec2 coords, bool do_slotmask, float lum) {
+float fn_scanline_mask(vec2 coords, bool do_slotmask, float lum, float min_inLum, float max_inLum) {
     /* Produces a B/W scanline shape to be multiplicated by the source
     * pixel later on to emulate scanline effect.
     * scanlines can be drawn on odd and even fields alternating on odd and
@@ -321,16 +323,12 @@ float scanline_shape(vec2 coords, bool do_slotmask, float lum) {
     bool alternate = bool(vScanlinesAlternate);
     bool do_flicker = bool(vFlickeringScanlines);
 
-    //...to scale scanline tickness:
-    //float lum_scaled = scale_to_range(lum, SCANLINE_MIN, SCANLINE_MAX);
-    float lum_scaled = lum * SCANLINE_MAX;
-          lum_scaled = clamp( lum_scaled, SCANLINE_MIN, SCANLINE_MAX );
-
+    //scale scanline tickness:
+        float lum_scaled = map_range(lum, min_inLum, max_inLum, SCANLINE_MIN, SCANLINE_MAX);
 
     float angle_base = coords.y * pi * params.OriginalSize.y * period;// + vScanlinePhase;
 
     float lines = 1.0;
-
     if (!( is_interlaced && SCANLINE_DISABLE_ON_INTERLACE == 1.0 )) {
 
         /*
@@ -362,7 +360,7 @@ float scanline_shape(vec2 coords, bool do_slotmask, float lum) {
                 // slotmask strength and stagger are configurable.
                 // Acceptable values are with stagger around 79 (pi/4)
                 if (odd_column) {
-                    float phase = pi + SCANLINE_SM_VOFFSET*0.01 * lum_scaled;
+                    float phase = pi + SCANLINE_SM_VOFFSET*0.022 * lum_scaled; //<-- for new scanline code (***)
                     float angle_slotmask = angle_base + phase;
                     float slotmask = sin(angle_slotmask);
                     slotmask = (slotmask*slotmask);
@@ -403,48 +401,32 @@ float scanline_shape(vec2 coords, bool do_slotmask, float lum) {
     }
 
 
-    //Thickness (min):
+    //Morph scanline shape via input luminance
+        float l = lum_scaled; // (already clamped)
+        l = pow(l, SCANLINE_MINMAX_GAMMA);
+        if (lum_scaled <= 0.5) {
+            float l1 = pow(l, 4) * 15;
+            lines = pow(lines, 1/sqrt(l1));
+        } else {
+            float l2 = (l-0.5)*2.0;
+            lines = lines * (1-l2) + l2;
+        }
 
-        //lines = pow(lines, 1/(lum_scaled+eps) );
-        //lines = pow(lines, 1/(sqrt(lum_scaled) ) );
-        //lines = pow(lines, 1/(lum_scaled*lum_scaled+eps) );
-
-        //lines = pow( lines , 1/(lum_scaled ) ) ;
-
-        //0.0125 is an anti-moiree measure.
-
-        //lines = pow(   max(lines, 0.05),   1/lum_scaled) ;
-
-        //lines = pow(lines, 1/(sqrt(lum_scaled) ) );
-
-        //lines = pow(clamp(lines + 0.05, 0.0,1.0) , 1/sqrt(lum_scaled));
-        //float extra_power_1 = 3.0;
-
-        
-
-        
-        float extra_power_1 = max(SCANLINE_MAX/3.0, 1.0);
-
-        lines = pow(clamp(lines, SCANLINE_DARK * 2.0, 1.0) , 1/(sqrt(lum_scaled*lum_scaled*extra_power_1) ) );
-
-        //lines = pow(clamp(lines + 0.05, 0.0,1.0) , 1/(sqrt(lum_scaled*lum_scaled*extra_power_1) ) ) * extra_power_1/2.0;
+        //Above code, unbranched, check if it works.
+        /*    lum_scaled = pow(lum_scaled, SCANLINE_MINMAX_GAMMA);
+            float l = lum_scaled; // (already clamped)
+            float l1 = pow(l, 4.0) * 15.0;
+            float l2 = (l - 0.5) * 2.0;
+            float under_05 = pow(lines, 1.0 / sqrt(l1));
+            float over_05 = lines * (1.0 - l2) + l2;
+            float threshold_05 = step(0.5, l);
+            lines = mix(under_05, over_05, threshold_05);
+        */
 
 
-        //lines = pow(clamp(lines + 0.05, 0.0,1.0) , 1/(lum_scaled*lum_scaled));
+    //Apply min brightness
+        lines = lines * (1-SCANLINE_DARK ) + SCANLINE_DARK ;
 
-        //Thickness (max):
-
-            /*lines = pow(abs(lines), 1/(10*lum_scaled*lum_scaled));
-            float clamp_start=0.5;
-            if (lum_scaled>clamp_start) lines = clamp(lines,(lum_scaled-clamp_start)/(1-clamp_start) ,1.0); //FIXME use step?*/
-
-    //min-max, ma difficile da gestire con la slotmask.
-    //    float extra_power = 2.0;
-    //    float m = mod(angle_base + (vScanlinesAlternate * HALF_PI), pi);
-    //    lines = exp( -pow((m-(HALF_PI)),2) / ( lum*extra_power ) ) * extra_power;
-
-
-    lines = lines * (1-SCANLINE_DARK ) + SCANLINE_DARK ;
     return lines;
 }
 
@@ -602,7 +584,8 @@ vec3 ambi_blend_image(vec4 image, vec3 ambi) {
 vec3 fn_pixel_content(vec2 coords) {
     vec3 pixel_in;
     vec3 pixel_glowed;
-    vec3 pixel_bleed; //pixel_bleed is the color that will bleed over scanline gap
+    vec3 pixel_bleed; //pixel_bleed is the color that will bleed over scanline gap.
+                      //Used for SCANLINES_BLEEDING parameter only
     
     if  (DO_IN_GLOW == 1.0) {
         pixel_glowed = texture(in_glow_pass,coords).rgb;
@@ -645,32 +628,40 @@ vec3 fn_pixel_content(vec2 coords) {
 
         }
 
-    //Halo
-        vec3 pixel_haloed = vec3(0.0);;
-        if (DO_HALO == 1.0 ) {
-            pixel_haloed = texture(halo_pass,coords).rgb;
-            pixel_out += pixel_haloed * (1 - HALO_VS_SCAN);
-        }
 
     //Scanlines (non-flickering)
+        float scanline_mask = 1.0;
         if  ( DO_SCANLINES == 1.0 ) {
-            // Optionally apply a gamma correction to the scanline shape.
-                if (SCANLINE_COMPENSATION > 0.0) {
-                    float mypow = mix(1.0, (0.33 * SCANLINE_DARK + 0.67), SCANLINE_COMPENSATION);
-                    pixel_out = pow(pixel_out,vec3(mypow));
-                }
+            //Obtain a scanlined screen by multiplying the scanline mask and the pixel color.
 
-            //Obtain the scanlines screen by multiplying the scanline shape by the pixel color.
-            //and emulate the bleeding of the color over the dark part of the scanlined screen.
-            //float scanline_shape = scanline_shape(coords, SCANLINE_SM_TYPE > 0.0 );
                 float lum = max(max(pixel_out.r, pixel_out.g), pixel_out.b);
-                float scanline_shape = scanline_shape(coords, SCANLINE_SM_TYPE > 0.0, lum );
-                pixel_out = pixel_out * ( scanline_shape + ( pixel_bleed * SCANLINES_BLEEDING * ( 1 - scanline_shape ) ));
+
+                //Calculate the maximum possible brightness of the input color by taking glow,
+                //contrast and brightness into account. This is needed so that scanline generation
+                //can map the proper input range and strictly obey scanline thickness constraints.
+                //FIXME This calculation could live in vertex shader.
+                    float max_inLum = max( 1.0, DO_CCORRECTION * apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS)) *
+                                      max( 1.0, DO_IN_GLOW * IN_GLOW_POWER);
+                    float min_inLum = 0.0;
+                    max_inLum =  max(1.0, max_inLum);
+                
+                scanline_mask = fn_scanline_mask(coords, SCANLINE_SM_TYPE > 0.0, lum, min_inLum, max_inLum );
+                pixel_out = min(pixel_out, 1.0) * ( scanline_mask + ( pixel_bleed * SCANLINES_BLEEDING * ( 1 - scanline_mask ) ));
         }
 
-    //Add the remaining halo to the scanline gap
-        pixel_out += pixel_haloed * HALO_VS_SCAN;
+        
+    //Halo
+        vec3 pixel_haloed = vec3(0.0);;
 
+        if (DO_HALO == 1.0 ) {
+            pixel_haloed = texture(halo_pass,coords).rgb;
+            //Halo only on scanlines:
+            pixel_out += pixel_haloed * scanline_mask ;
+            //Halo over scanlines gap too:
+            pixel_out += pixel_haloed * (HALO_VS_SCAN) * (1 - scanline_mask) ;
+
+        }
+    
     // Apply gamma out:
         if (DO_CCORRECTION == 1.0) 
             pixel_out = pow(max(pixel_out, vec3(0.0)),vec3(GAMMA_OUT));
@@ -899,6 +890,14 @@ void main() {
             }
   
      
+
+    //For debug purposes:
+    //quad split screen
+        //if ( (vOutputCoord.x < 0.5  && vOutputCoord.y > 0.5) || (vOutputCoord.x > 0.5  && vOutputCoord.y < 0.5)  ) pixel_out = texture(first_pass,vOutputCoord).rgb;
+    //split screen
+        //if (vTexCoord.y < 0.5) pixel_out = texture(first_pass,vTexCoord).rgb;
+        
+        
         
     FragColor = vec4(pixel_out, 1.0);
    
