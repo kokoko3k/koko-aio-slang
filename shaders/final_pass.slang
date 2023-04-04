@@ -28,11 +28,13 @@ layout(location = 4) out float vIsRotated;
     layout(location = 8) out float vFlickeringScanlines;
     layout(location = 9) out float vScanlinePeriod;
     layout(location = 10) out float vScanlinesAlternate;
-
+    layout(location = 11) out float vMax_inLum;
+    
 //Vignette, spot:
-    layout(location = 11) out float vIn_aspect;
+    layout(location = 12) out float vIn_aspect;
 
-layout(location = 12) out float vBEZEL_INNER_ZOOM_adapted;
+layout(location = 13) out float vBEZEL_INNER_ZOOM_adapted;
+
 
 #include "includes/functions.include.slang"
 
@@ -91,6 +93,13 @@ void main() {
                 if (params.OriginalSize.y > MIN_LINES_INTERLACED )  vScanlinePeriod = 0.5;
             }
             
+            //Calculate the maximum possible brightness of the input color by taking glow,
+            //contrast and brightness into account. This is needed so that scanline generation
+            //can map the proper input range and strictly obey scanline thickness constraints.
+                vMax_inLum = max( 1.0, DO_CCORRECTION * apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS)) *
+                            max( 1.0, DO_IN_GLOW * IN_GLOW_POWER);
+
+            
             //vScanlinePhase = 0.0;
             //vScanlinePhase = vScanlinePeriod * pi - pi/4.0; //<-- needed to match scanlines done in first_pass. //FIXME check what happens for highter res.
         }
@@ -109,8 +118,10 @@ layout(location = 7) in float vIsInterlaced;
 layout(location = 8) in float vFlickeringScanlines;
 layout(location = 9) in float vScanlinePeriod;
 layout(location = 10) in float vScanlinesAlternate;
-layout(location = 11) in float vIn_aspect;
-layout(location = 12) in float vBEZEL_INNER_ZOOM_adapted;
+layout(location = 11) in float vMax_inLum;
+layout(location = 12) in float vIn_aspect;
+layout(location = 13) in float vBEZEL_INNER_ZOOM_adapted;
+
 
 layout(location = 0) out vec4 FragColor;
 
@@ -636,15 +647,9 @@ vec3 fn_pixel_content(vec2 coords) {
 
                 float lum = max(max(pixel_out.r, pixel_out.g), pixel_out.b);
 
-                //Calculate the maximum possible brightness of the input color by taking glow,
-                //contrast and brightness into account. This is needed so that scanline generation
-                //can map the proper input range and strictly obey scanline thickness constraints.
-                //FIXME This calculation could live in vertex shader.
-                    float max_inLum = max( 1.0, DO_CCORRECTION * apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS)) *
-                                      max( 1.0, DO_IN_GLOW * IN_GLOW_POWER);
-                    float min_inLum = 0.0;
-                    max_inLum =  max(1.0, max_inLum);
-                
+                //The maximum possible brightness of the input color modified by glow,contrast and brightness.
+                float max_inLum = vMax_inLum;
+                float min_inLum = 0.0;
                 scanline_mask = fn_scanline_mask(coords, SCANLINE_SM_TYPE > 0.0, lum, min_inLum, max_inLum );
                 pixel_out = min(pixel_out, 1.0) * ( scanline_mask + ( pixel_bleed * SCANLINES_BLEEDING * ( 1 - scanline_mask ) ));
         }
