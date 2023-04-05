@@ -27,7 +27,7 @@ layout(location = 4) out float vIsRotated;
     layout(location = 7) out float vIsInterlaced;
     layout(location = 8) out float vFlickeringScanlines;
     layout(location = 9) out float vScanlinePeriod;
-    layout(location = 10) out float vScanlinesAlternate;
+    layout(location = 10) out float vScanlineAlternateOffset;
     layout(location = 11) out float vMax_inLum;
     
 //Vignette, spot:
@@ -38,6 +38,7 @@ layout(location = 13) out float vBEZEL_INNER_ZOOM_adapted;
 
 #include "includes/functions.include.slang"
 
+#define PI_15 4.71238898038469 //pi*1.5
 
 void main() {
     gl_Position = global.MVP * Position;
@@ -87,9 +88,9 @@ void main() {
 
             //Scanline period:
             vScanlinePeriod = 1.0;
-            vScanlinesAlternate = 0.0;
+            vScanlineAlternateOffset = 0.0;
             if (bIs_Interlaced) {
-                if (params.FrameCount % 2 == 0.0) vScanlinesAlternate = 1.0;
+                if (params.FrameCount % 2 == 0.0) vScanlineAlternateOffset = PI_15;
                 if (params.OriginalSize.y > MIN_LINES_INTERLACED )  vScanlinePeriod = 0.5;
             }
             
@@ -117,7 +118,7 @@ layout(location = 6) in vec2 vWarp_arg2;
 layout(location = 7) in float vIsInterlaced;
 layout(location = 8) in float vFlickeringScanlines;
 layout(location = 9) in float vScanlinePeriod;
-layout(location = 10) in float vScanlinesAlternate;
+layout(location = 10) in float vScanlineAlternateOffset;
 layout(location = 11) in float vMax_inLum;
 layout(location = 12) in float vIn_aspect;
 layout(location = 13) in float vBEZEL_INNER_ZOOM_adapted;
@@ -331,89 +332,83 @@ float fn_scanline_mask(vec2 coords, bool do_slotmask, float lum, float min_inLum
 
     float period = vScanlinePeriod;
     bool is_interlaced = bool(vIsInterlaced);
-    bool alternate = bool(vScanlinesAlternate);
     bool do_flicker = bool(vFlickeringScanlines);
-
-    //scale scanline tickness:
+    
+    //since luminosity is used to modulate scanline thickness, we scale it here
+    //to keep tickness in user defined range:
         float lum_scaled = map_range(lum, min_inLum, max_inLum, SCANLINE_MIN, SCANLINE_MAX);
 
     
-        
-    float angle_base = coords.y * pi * params.OriginalSize.y * period;// + vScanlinePhase;
+    float angle_base = coords.y * pi * params.OriginalSize.y * period;
 
     float lines = 1.0;
-    if (!( is_interlaced && SCANLINE_DISABLE_ON_INTERLACE == 1.0 )) {
 
-        /*
-            if (alternate)
-                lines = -sin(angle_base + HALF_PI);
-                    else
-                lines = sin(angle_base);
-        */
-        //Unbranched the previous if/then/else:
-        lines = (2*vScanlinesAlternate -1) * sin(angle_base + (vScanlinesAlternate * HALF_PI)) ;
+    //1 - Generate base scanline.
+    //2 - offset them on odd frames if needed (vScanlineAlternateOffset via vertex shader)
+    //3 - Dont do it when the screen is interlaced and we have to skip drawing scanlines on interlaced screens.
+        if  (!( is_interlaced && SCANLINE_DISABLE_ON_INTERLACE == 1.0 )) {
+            lines = pow( sin(angle_base + vScanlineAlternateOffset), 2.0);
+        }
 
-        lines = (lines*lines);
-    }
-
+    //If we specified to draw slotmasks alongside the scanlines, but the screen
+    //is interlaced, fallback to old darklines code to avoid glitches/artifacts.
+        if ( do_slotmask && is_interlaced ) {
+            lines = lines * pixel_darklines(vec3(1.0),DARKLINES_PERIOD,1-SCANLINE_SM_STRENGTH, 1.0, 0.0 , 1.0, coords).r;
+            return lines;
+        }
+    
     //Draw a sort of slotmask right here with the same height as the scanline.
     //Mitigates moiree and visual artifacts comapred to dumb viewport slotmask.
     if (do_slotmask) {
-        if (is_interlaced) {
-            //Fallback to old darklines code to avoid glitches/artifacts.
-            lines = lines * pixel_darklines(vec3(1.0),DARKLINES_PERIOD,1-SCANLINE_SM_STRENGTH,1.0, 0.0 ,1.0, coords).r;
+        float Darkline_part_w = (3.0 - VMASK_USE_GM + VMASK_GAP) * VMASK_DARKLINE_SCALE;
+        float Darkline_part_w_x2 = Darkline_part_w*2;
+        bool odd_column = mod(vFragCoord.x + Darkline_part_w  , Darkline_part_w_x2) < Darkline_part_w;
 
-        } else {
-            float Darkline_part_w = (3.0 - VMASK_USE_GM + VMASK_GAP) * VMASK_DARKLINE_SCALE;
-            float Darkline_part_w_x2 = Darkline_part_w*2;
-            bool odd_column = mod(vFragCoord.x + Darkline_part_w  , Darkline_part_w_x2) < Darkline_part_w;
-
-            if (SCANLINE_SM_TYPE == 1.0) {
-                // Slotmask is out oh phase every "odd" triple and mixed with
-                // the straight scanline.
-                // slotmask strength and stagger are configurable.
-                // Acceptable values are with stagger around 79 (pi/4)
-                if (odd_column) {
-                    float phase = pi + SCANLINE_SM_VOFFSET*0.022 * lum_scaled; //<-- for new scanline code (***)
-                    float angle_slotmask = angle_base + phase;
-                    float slotmask = sin(angle_slotmask);
-                    slotmask = (slotmask*slotmask);
-                    lines = mix(lines, slotmask, SCANLINE_SM_STRENGTH);
-                }
-            }
-
-            else if (SCANLINE_SM_TYPE == 2.0) {
-                float phase;
-                //Slotmask is always out of phase by QUARTER_PI
-                //Every "odd triple" column, it is also out of phase of HALF_PI
-                //Slotmask is multiplied by original scanline and thinner.
-                //Only strength parameter is taken into account.
-               if (odd_column)
-                    phase = period * pi + QUARTER_PI * lum_scaled;
-                        else
-                    phase = period * HALF_PI + QUARTER_PI;
-
+        if (SCANLINE_SM_TYPE == 1.0) {
+            // Slotmask is out oh phase every "odd" triple and mixed with
+            // the straight scanline.
+            // slotmask strength and stagger are configurable.
+            // Acceptable values are with stagger around 79 (pi/4)
+            if (odd_column) {
+                float phase = pi + SCANLINE_SM_VOFFSET*0.022 * lum_scaled;
                 float angle_slotmask = angle_base + phase;
                 float slotmask = sin(angle_slotmask);
-                slotmask = slotmask*slotmask; slotmask = slotmask*slotmask; // eleva alla 4 per renderla sottile. valori maggiori producono moiree.
-                slotmask = mix(1.0, slotmask, SCANLINE_SM_STRENGTH); // riduci la forza della slotmask
-                lines = lines * slotmask;
-                //return lines;
-            }
-
-            else if (SCANLINE_SM_TYPE == 3.0) {
-                // Thinner slotmask screen, no scanlines.
-                // No parameter taken into account.
-                if (odd_column) {
-                    float phase = pi + HALF_PI;
-                    float angle_slotmask = angle_base + phase;
-                    float slotmask = sin(angle_slotmask);
-                    lines = slotmask*slotmask;
-                }
-                return mix( 1.0, lines * (1-SCANLINE_DARK ) + SCANLINE_DARK, SCANLINE_SM_STRENGTH) ;
+                slotmask = (slotmask*slotmask);
+                lines = mix(lines, slotmask, SCANLINE_SM_STRENGTH);
             }
         }
+
+        else if (SCANLINE_SM_TYPE == 2.0) {
+            float phase;
+            //Slotmask is always out of phase by QUARTER_PI
+            //Every "odd triple" column, it is also out of phase of HALF_PI
+            //Slotmask is multiplied by original scanline and thinner.
+            //Only strength parameter is taken into account.
+            if (odd_column)
+                phase = period * pi + QUARTER_PI * lum_scaled;
+                    else
+                phase = period * HALF_PI + QUARTER_PI;
+
+            float angle_slotmask = angle_base + phase;
+            float slotmask = sin(angle_slotmask);
+            slotmask = slotmask*slotmask; slotmask = slotmask*slotmask; // eleva alla 4 per renderla sottile. valori maggiori producono moiree.
+            slotmask = mix(1.0, slotmask, SCANLINE_SM_STRENGTH); // riduci la forza della slotmask
+            lines = lines * slotmask;
+        }
+
+        else if (SCANLINE_SM_TYPE == 3.0) {
+            // Thinner slotmask screen, no scanlines.
+            // No parameter taken into account.
+            if (odd_column) {
+                float phase = pi + HALF_PI;
+                float angle_slotmask = angle_base + phase;
+                float slotmask = sin(angle_slotmask);
+                lines = slotmask*slotmask;
+            }
+            return mix( 1.0, lines * (1-SCANLINE_DARK ) + SCANLINE_DARK, SCANLINE_SM_STRENGTH) ;
+        }
     }
+
 
 
     //Morph scanline shape via input luminance

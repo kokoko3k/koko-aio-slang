@@ -83,8 +83,8 @@
 #        the correct and final solution to this would be to sample the first reflection pass which
 #        already exports mipmaps and is 100% aware of aspect override, but this would mean sacrificing
 #        another Sampler2D binding in final pass which is already short.
-#        
-#
+#    [..] Update bezel presets so that inner zoom matches the bezel, then adjust geometry zoom that is aware of reflections
+#         Cant, since the reflected black border looks weird.
 #    [ ] check branching conditions in first_pass.slang
 #    [ ] Better debanding?
 #    [ ] Should the flickering be aware of the scanline?
@@ -94,17 +94,12 @@
 #    [ ] Find a way to smooth borders without cropping the image
 #    [ ] Allow to configure new bezel parameters?
 #        corner shape, size and fade?  
-
 #    [ ] bloom should bleed over when forcing geometry aspect
 #    [ ] reflection blurriness should not depend on input resolution
-
 #    [ ] When the mask is scaled, is it right to scale the gap too?
 #        Yes and no, probably it has to scale by half.
 #    [ ] allow to stretch background image?
 #    [ ] copy base presets to overlay repo (after release)
 #    [ ] dynamic contrast, the more the brigher the content, the less the bezel and back/foreground image?
-#    [ ] Does bg_image rotates right?
-#    [ ] Backdrop borders should not be shaded with inner tube texture alpha channel
 #    [ ] Try to write your own curvature function
-#    [ ] Update bezel presets so that inner zoom matches the bezel, then adjust geometry zoom that is aware of reflections
 #    [ ] Does interlace logic still work for switching from scanline slotmask to darklines one?
