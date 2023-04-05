@@ -141,7 +141,7 @@ void main() {
 
    
    if (DO_RF_NOISE > 0.0) {
-      vec3 noise = vec3(random(RF_NOISE_STRENGTH, vTexCoord * params.FrameCount));
+      vec3 noise = vec3(random_slower(RF_NOISE_STRENGTH, vTexCoord * params.FrameCount));
       pixel_out += noise;
    }
    
