@@ -740,7 +740,7 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror) {
     //Reflections, can be skipped if blue channel is 0:
         if (bezel_in.b > 0.0) {
         //Reflections: Calculate the bezel roughness to apply to the reflecting area. (bezel_in.g expresses the specularity)
-            float roughness = random( min(global.FinalViewportSize.z,global.FinalViewportSize.w) * BEZEL_ROUGHNESS, vTexCoord );
+            float roughness = random( 1/1080.0 * BEZEL_ROUGHNESS, vTexCoord );
             roughness *=  (1 - min(lut_specular * 10, 1.0)); // <-roughness over specular area looks bad.
             
         //Reflections:
