@@ -194,7 +194,7 @@ float round_step(float f, float p) {
 #define VEC2_RND_A_B vec2(12.9898, 78.233)
 #define RND_C 43758.5453
 
-float random_slower(float power, vec2 seed) {
+float random(float power, vec2 seed) {
     //From pal-singlepass.slang 
     //https://github.com/svofski/CRT
     //Copyright (c) 2016, Viacheslav Slavinsky
@@ -203,13 +203,13 @@ float random_slower(float power, vec2 seed) {
     float sn = mod(dt,3.14);
 
     float noise_out = fract(sin(sn) * RND_C);
-	
-    //noise_out = clamp(noise_out, -power, power);
+
     noise_out = scale_to_range(noise_out, -power, power);
     return noise_out;
 }
 
-float random(float power, vec2 seed) {
+//The following produces weird results when with dynamic seed like framecount.
+float random_fast(float power, vec2 seed) {
 	float noise_out = fract(sin(dot(seed.xy, VEC2_RND_A_B)) * RND_C);
     noise_out = scale_to_range(noise_out, -power, power);
     return noise_out;
