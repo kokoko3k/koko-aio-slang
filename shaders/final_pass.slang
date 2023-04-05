@@ -448,6 +448,7 @@ float get_clamped_white_reference(vec3 pixel_in){
 
 
 float global_noise = 0.0;
+float global_noise_ambi = 0.0;
 
 
 vec3 pixel_backdrop_image() {
@@ -760,7 +761,7 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror) {
     //Mix ambient light over bezel? (branching this is worse)
         vec3 ambitemporalpass = texture(ambi_temporal_pass, vOutputCoord ).rgb;
         ambitemporalpass = max(ambitemporalpass, 0.0); //<-- antiglitch. Needed to avoid undefined variable on vulkan.
-        vec3 pixel_ambilight = DO_AMBILIGHT * ( ambitemporalpass + global_noise * NOISEPOWER_AMBI_MUL);
+        vec3 pixel_ambilight = DO_AMBILIGHT * ( ambitemporalpass + global_noise_ambi);
             
         //Create a shaded box to apply ambilight on external borders only
             float ambi_colorize_shade = create_ambi_colorize_shade(coords_for_bezel);
@@ -782,8 +783,10 @@ void main() {
     float canvas_busy = 0.0; //<-- this allow for paint over not painted areas (spares gpu cycles)
 
     //Calc a random noise if we need debanding
-        if (DO_VIGNETTE + DO_SPOT + DO_AMBILIGHT >0.0)
+        if (DO_VIGNETTE + DO_SPOT + DO_AMBILIGHT >0.0) {
             global_noise = random(NOISEPOWER, vTexCoord * params.FrameCount);
+            global_noise_ambi = global_noise * NOISEPOWER_AMBI_MUL;
+        }
     
     //Calc initial content coords
         vec2 co_content = vTexCoord;
@@ -854,7 +857,7 @@ void main() {
             //Ambient light
                 if (DO_AMBILIGHT == 1.0) {
                     vec2 co_ambi = vOutputCoord;
-                    pixel_ambi = texture(ambi_temporal_pass, co_ambi).rgb + global_noise * NOISEPOWER_AMBI_MUL;
+                    pixel_ambi = texture(ambi_temporal_pass, co_ambi).rgb + global_noise_ambi;
                     pixel_under_content = pixel_ambi;
                 }
             
@@ -885,7 +888,7 @@ void main() {
                 
                 if (DO_AMBILIGHT + AMBI_BG_IMAGE_BLEND_MODE == 2.0) { 
                     vec3 pixel_ambi_local = texture(ambi_temporal_pass, vOutputCoord ).rgb;
-                    pixel_ambi_local = DO_AMBILIGHT * (pixel_ambi_local + global_noise * NOISEPOWER_AMBI_MUL);
+                    pixel_ambi_local = DO_AMBILIGHT * (pixel_ambi_local + global_noise_ambi);
                     pixel_ambi_local = max(pixel_ambi_local, 0.0); //<-- antiglitch. Needed to avoid undefined variable on vulkan.
                     float ambi_mask = create_ambi_colorize_shade(co_bezel);
                     float fg_image_alpha_adapted = max(pixel_fg_image.a - AMBI_BG_IMAGE_FORCE, 0.0);

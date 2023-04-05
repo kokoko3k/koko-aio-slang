@@ -87,8 +87,6 @@
 #         Cant, since the reflected black border looks weird.
 #    [ ] check branching conditions in first_pass.slang
 #    [ ] Better debanding?
-#    [ ] Should the flickering be aware of the scanline?
-#        read: does a scanline dark gap increment the flickering or not? i think not.
 #    [ ] deconvergence after glow/halo?
 #    [ ] Glow spread in final pass?
 #    [ ] Find a way to smooth borders without cropping the image
@@ -98,8 +96,7 @@
 #    [ ] reflection blurriness should not depend on input resolution
 #    [ ] When the mask is scaled, is it right to scale the gap too?
 #        Yes and no, probably it has to scale by half.
-#    [ ] allow to stretch background image?
 #    [ ] copy base presets to overlay repo (after release)
 #    [ ] dynamic contrast, the more the brigher the content, the less the bezel and back/foreground image?
 #    [ ] Try to write your own curvature function
-#    [ ] Does interlace logic still work for switching from scanline slotmask to darklines one?
+
