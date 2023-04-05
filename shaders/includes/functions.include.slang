@@ -190,23 +190,31 @@ float apply_contrast_brightness(float c, float contrast, float brightness) {
 float round_step(float f, float p) {
 	return floor(f*p)/p;
 }
-#define RND_A 12.9898
-#define RND_B 78.233
+
+#define VEC2_RND_A_B vec2(12.9898, 78.233)
 #define RND_C 43758.5453
 
-float random(float power, vec2 seed) {
+float random_slower(float power, vec2 seed) {
     //From pal-singlepass.slang 
     //https://github.com/svofski/CRT
     //Copyright (c) 2016, Viacheslav Slavinsky
     //All rights reserved.
-    float dt = dot(seed.xy, vec2(RND_A, RND_B));
+    float dt = dot(seed.xy, VEC2_RND_A_B);
     float sn = mod(dt,3.14);
 
     float noise_out = fract(sin(sn) * RND_C);
+	
     //noise_out = clamp(noise_out, -power, power);
     noise_out = scale_to_range(noise_out, -power, power);
     return noise_out;
 }
+
+float random(float power, vec2 seed) {
+	float noise_out = fract(sin(dot(seed.xy, VEC2_RND_A_B)) * RND_C);
+    noise_out = scale_to_range(noise_out, -power, power);
+    return noise_out;
+}
+
 
 
 //CURVATURE

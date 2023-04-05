@@ -101,7 +101,7 @@ void debug() {
          pixel_debug = vec3(1 - step(radius, length(center)));
          pixel_debug *= float((mod(params.FrameCount,blink_time*2) < blink_time));
       */
-      //pixel_debug = colorwheel(vTexCoord);
+      pixel_debug = colorwheel(vTexCoord);
       
       FragColor = vec4(pixel_debug,1.0);
 }

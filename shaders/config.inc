@@ -493,7 +493,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BEZEL_RFL_ZOOM      "        Reflections zoom"			0.0   -1.5 0.5 0.005
 #pragma parameter BEZEL_REFL_STRENGTH "        Reflections strength"			0.5    0.0 1.0 0.01
 #pragma parameter BEZEL_RFL_BLR_SHD   "        Reflections sharpness"			-0.0  -0.5 1.0 0.01
-#pragma parameter BEZEL_ROUGHNESS     "        Reflections roughness"			1.5    0.0 5.0 0.1
+#pragma parameter BEZEL_ROUGHNESS     "        Reflections roughness"			1.0    0.0 5.0 0.1
 #pragma parameter BEZEL_SPCL_STRENGTH "        Specularity strength"			0.5    0.0 3.0 0.05
 
 
