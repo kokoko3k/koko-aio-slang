@@ -492,16 +492,41 @@ vec4 textureLod_wrap(sampler2D tex, vec2 co, float lod, float wrap_mode) {
 }
 
 
-vec3 pixel_alternate(vec3 source, float whiteness) {
+vec3 pixel_alternate(vec3 source, float strength) {
+    /*
+             vec3 pixel_strobe = pixel_out.rgb * mod(params.FrameCount, 2);
+                float max_c = max(pixel_out.r, max(pixel_out.g, pixel_out.b));
+                float max_c_adpt = 1 - (max_c * 0.5);
+                pixel_out.rgb = mix (pixel_out.rgb, pixel_strobe, ALT_BLANK_STRENGTH *    max_c_adpt       )   ;
+    */
+    
     // Emulate the low crt persistance by only drawing odd/even lines
     // on odd/even frames
+    
+
+    
     float line = vTexCoord.y * params.OutputSize.y;
-    vec3 pixel_out = source;
+    vec3 pixel_out = clamp(source, 0.0, 1.0);
     float l_period_half = ALT_BLANK_PERIOD / 2;
+    
+    
+    //Use another alg that affects less dark colors for negative strength values.
+    if (strength < 0.0) {
+        strength *= -1;
+        float max_c = max(pixel_out.r, max(pixel_out.g, pixel_out.b));
+        float max_c_adpt = 1 - (max_c * 0.5);
+        strength *= max_c_adpt;
+    }
+
+    
+    
+    
+  
+    
     if  (mod(float(params.FrameCount),2.0  ) == 1) {
-        if  (mod(line,ALT_BLANK_PERIOD) > l_period_half) pixel_out=mix(source,vec3(0), whiteness) ;
+        if  (mod(line,ALT_BLANK_PERIOD) > l_period_half) pixel_out=mix(source,vec3(0), strength) ;
     } else {
-        if  (mod(line,ALT_BLANK_PERIOD) <= l_period_half) pixel_out=mix(source,vec3(0), whiteness) ;
+        if  (mod(line,ALT_BLANK_PERIOD) <= l_period_half) pixel_out=mix(source,vec3(0), strength) ;
     }
     return pixel_out;
 }
@@ -675,13 +700,6 @@ vec3 fn_pixel_content(vec2 coords) {
             pixel_out = bloomed + float(BLOOM_BYPASS < 0.5) * pixel_out;
         }
         
-    //Black frame insertion, made static, enable it in config.inc.
-        #ifdef ALLOW_ALT_BLANK
-            if (DO_ALT_BLANK == 1.0 ) {
-                pixel_out.rgb = pixel_alternate(pixel_out.rgb, ALT_BLANK_STRENGTH );
-            }
-        #endif
-        
     //Vignette
         if (DO_VIGNETTE == 1.0) {
             float dist = length(vec2((coords.x-0.5)*vIn_aspect, coords.y-0.5));
@@ -696,7 +714,14 @@ vec3 fn_pixel_content(vec2 coords) {
                 pixel_out = pixel_out + spot + (global_noise_static * (1 - DO_VIGNETTE));
         }
     
-    
+    //Black frame insertion, made static, enable it in config.inc.
+        #ifdef ALLOW_ALT_BLANK
+            if (DO_ALT_BLANK == 1.0 ) {
+                pixel_out.rgb = pixel_alternate(pixel_out.rgb, ALT_BLANK_STRENGTH );
+                //pixel_out.rgb +=  vec3(random_fast(ALT_BLANK_STRENGTH, vTexCoord * mod(params.FrameCount, 2)   ));
+            }
+        #endif
+        
     return pixel_out;
 }
 
