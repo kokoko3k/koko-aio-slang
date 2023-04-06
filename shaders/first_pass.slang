@@ -86,45 +86,48 @@ vec3 colorwheel(vec2 uv){
 void debug() {
 //Just test patterns here
    vec3 pixel_debug;
-   //Use one of the following to debug:
-      //pixel_debug=vec3(abs(sin(params.FrameCount/3.14/5.0))); //white fade
-      //pixel_debug=vec3(abs(sin(params.FrameCount/3.14/20)),0.0,0.0); //red fade
-      pixel_debug=vec3(0.2);
-      //pixel_debug=vec3(0.0,1.0,0.0);
-      //pixel_debug=vec3(0.38,0.0,1.0)*vTexCoord.x;
-      //pixel_debug=vec3(vTexCoord.x); //H bw gradient
-      //pixel_debug=vec3(floor(vTexCoord.x*16)/16); //H bw gradient 16gray
-      //pixel_debug=vec3(floor(vTexCoord.x*64)/64); //H bw gradient 64gray
-      //pixel_debug=vec3(floor(vTexCoord.x*128)/128); //H bw gradient 128gray
-      //pixel_debug=vec3(floor(vTexCoord.x*256)/256); //H bw gradient 256gray
-      //pixel_debug=vec3(1,0,0)*floor(vTexCoord.x*64)/64; //H red gradient 64
-      //   float blink_time = 20;
-      //      if  (mod(params.FrameCount,blink_time*2) < blink_time) pixel_debug=vec3(0.2) ; else pixel_debug=vec3(1.0);
-      //FragColor = vec4(color_tools(pixel_debug).rgb,1.0);
-      //White circle, blinking
-      /*   float blink_time = 20;
-         vec2 center = vTexCoord - vec2(0.5,0.5);
-         float radius = 0.1;
-         pixel_debug = vec3(1 - step(radius, length(center)));
-         pixel_debug *= float((mod(params.FrameCount,blink_time*2) < blink_time));
-      */
-      pixel_debug = colorwheel(vTexCoord);
-      
-      FragColor = vec4(pixel_debug,1.0);
+   //pixel_debug=vec3(abs(sin(params.FrameCount/3.14/5.0))); //white fade
+   
+   //pixel_debug=vec3(abs(sin(params.FrameCount/3.14/20)),0.0,0.0); //red fade
+   
+   pixel_debug=vec3(0.5);
+   
+   //pixel_debug=vec3(0.0,1.0,0.0);
+   
+   //pixel_debug=vec3(0.38,0.0,1.0)*vTexCoord.x;
+   
+   //pixel_debug=vec3(vTexCoord.x); //H bw gradient
+   
+   //pixel_debug=vec3(floor(vTexCoord.x*16)/16); //H bw gradient 16gray
+   
+   //pixel_debug=vec3(floor(vTexCoord.x*64)/64); //H bw gradient 64gray
+   
+   //pixel_debug=vec3(floor(vTexCoord.x*128)/128); //H bw gradient 128gray
+   
+   //pixel_debug=vec3(floor(vTexCoord.x*256)/256); //H bw gradient 256gray
+   
+   //pixel_debug=vec3(1,0,0)*floor(vTexCoord.x*64)/64; //H red gradient 64
+   
+   //   float blink_time = 20;
+   //      if  (mod(params.FrameCount,blink_time*2) < blink_time) pixel_debug=vec3(0.2) ; else pixel_debug=vec3(1.0);
+   
+   //White circle, blinking
+   /*   float blink_time = 20;
+      vec2 center = vTexCoord - vec2(0.5,0.5);
+      float radius = 0.1;
+      pixel_debug = vec3(1 - step(radius, length(center)));
+      pixel_debug *= float((mod(params.FrameCount,blink_time*2) < blink_time));
+   */
+   
+   //pixel_debug = colorwheel(vTexCoord);
+   
+   FragColor = vec4(pixel_debug,1.0);
 }
 
 
 void main() {
    
-      /*vec4 pixel_debug=texture(Source,vTexCoord);
-      float mymod = int(mod(vTexCoord.y * params.OutputSize.y , 2.0 )) ;
-      pixel_debug.a *= float(   (mymod != 0.0)   ) ;
-      FragColor = pixel_debug;
-      return;
-      */
-   
-   
-   //debug(); return;
+   debug(); return;
 
    /* since flickering code needs
       luminosity difference between 2 vertical lines
@@ -134,8 +137,6 @@ void main() {
       and outside id when we dont.
    */
 
-   
-   
    vec3 pixel_out;
    if (DO_SCANLINES == 0.0)
       pixel_out = texture(Source, vTexCoord).rgb;
