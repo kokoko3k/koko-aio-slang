@@ -4,7 +4,9 @@
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
+
 layout(location = 0) out vec2 vTexCoord;
+layout(location = 1) out float vDynamicSeed;
 
 #include "includes/functions.include.slang"
 
@@ -12,11 +14,16 @@ layout(location = 0) out vec2 vTexCoord;
 void main() {
    gl_Position = global.MVP * Position;
    vTexCoord = TexCoord;
+   
+   //Generate a seed that changes over time for temporal random noise
+      vDynamicSeed = mod(params.FrameCount, 600.0001);
 }
 
 
 #pragma stage fragment
 layout(location = 0) in vec2 vTexCoord;
+layout(location = 1) in float vDynamicSeed;
+
 layout(location = 0) out vec4 FragColor;  
 
 layout(set = 0, binding = 2) uniform sampler2D Source;
@@ -141,7 +148,7 @@ void main() {
 
    
    if (DO_RF_NOISE > 0.0) {
-      vec3 noise = vec3(random(RF_NOISE_STRENGTH, vTexCoord * params.FrameCount));
+      vec3 noise = vec3(random_fast(RF_NOISE_STRENGTH, vTexCoord * vDynamicSeed));
       pixel_out += noise;
    }
    

@@ -32,8 +32,9 @@ layout(location = 4) out float vIsRotated;
     
 //Vignette, spot:
     layout(location = 12) out float vIn_aspect;
-
-layout(location = 13) out float vBEZEL_INNER_ZOOM_adapted;
+    
+layout(location = 13) out float vDynamicSeed;
+layout(location = 14) out float vBEZEL_INNER_ZOOM_adapted;
 
 
 #include "includes/functions.include.slang"
@@ -45,22 +46,17 @@ void main() {
     vIsRotated = float(is_rotated());
     vIn_aspect = get_in_aspect();
     
-
-    
-    
     //Calculate vTexcoord as fractional or integer scaled?
         if ( !do_integer_scale() )
             vTexCoord = get_scaled_coords_aspect(TexCoord,global.FinalViewportSize, vIn_aspect, bool(vIsRotated)) + vec2(0.0001);
                 else
             vTexCoord = integer_scale(TexCoord, vIn_aspect, bool(vIsRotated)) + vec2(0.0001); //<- without the offset, SCANLINE_MIN doesn't work.
 
-                        
-        
     //if (DO_GLOBAL_SHZO >0.5)
     //    vTexCoord = zoom(vTexCoord + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM );
     //..unbranched previous
-    vTexCoord = (zoom(vTexCoord + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM ) * DO_GLOBAL_SHZO) + 
-                (vTexCoord * (1-DO_GLOBAL_SHZO) );
+        vTexCoord = (zoom(vTexCoord + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM ) * DO_GLOBAL_SHZO) + 
+                    (vTexCoord * (1-DO_GLOBAL_SHZO) );
 
     vOutputCoord = TexCoord;
 
@@ -69,6 +65,7 @@ void main() {
 
     
     vBEZEL_INNER_ZOOM_adapted = get_BEZEL_INNER_ZOOM() * DO_BEZEL;
+    
     //Precalc some Curvature/Warp values:
         float warp_adaption =  1 - vBEZEL_INNER_ZOOM_adapted * 4.0;
         vec2 geom_warp_adapted = vec2(GEOM_WARP_X, GEOM_WARP_Y) * warp_adaption;
@@ -99,11 +96,11 @@ void main() {
             //can map the proper input range and strictly obey scanline thickness constraints.
                 vMax_inLum = max( 1.0, DO_CCORRECTION * apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS)) *
                             max( 1.0, DO_IN_GLOW * IN_GLOW_POWER);
-
-            
-            //vScanlinePhase = 0.0;
-            //vScanlinePhase = vScanlinePeriod * pi - pi/4.0; //<-- needed to match scanlines done in first_pass. //FIXME check what happens for highter res.
         }
+        
+        //Generate a seed that changes over time for temporal random noise
+            vDynamicSeed = mod(params.FrameCount, 60.0001);
+        
 }
 
 
@@ -121,7 +118,8 @@ layout(location = 9) in float vScanlinePeriod;
 layout(location = 10) in float vScanlineAlternateOffset;
 layout(location = 11) in float vMax_inLum;
 layout(location = 12) in float vIn_aspect;
-layout(location = 13) in float vBEZEL_INNER_ZOOM_adapted;
+layout(location = 13) in float vDynamicSeed;
+layout(location = 14) in float vBEZEL_INNER_ZOOM_adapted;
 
 
 layout(location = 0) out vec4 FragColor;
@@ -447,7 +445,7 @@ float get_clamped_white_reference(vec3 pixel_in){
 }
 
 
-float global_noise = 0.0;
+float global_noise_static = 0.0;
 float global_noise_ambi = 0.0;
 
 
@@ -688,14 +686,14 @@ vec3 fn_pixel_content(vec2 coords) {
         if (DO_VIGNETTE == 1.0) {
             float dist = length(vec2((coords.x-0.5)*vIn_aspect, coords.y-0.5));
             float vignette = smoothstep(V_SIZE,0.0,dist)*V_POWER;
-            pixel_out = pixel_out * vignette + global_noise;
+            pixel_out = pixel_out * vignette + global_noise_static;
         }
         
     //Spot
         if (DO_SPOT == 1.0) {
                 float dist = length(vec2((coords.x-0.5)*vIn_aspect, coords.y-0.5)+spot_offset);
                 float spot = smoothstep(S_SIZE,0.0,dist)*S_POWER;
-                pixel_out = pixel_out + spot + (global_noise* (1 - DO_VIGNETTE));
+                pixel_out = pixel_out + spot + (global_noise_static * (1 - DO_VIGNETTE));
         }
     
     
@@ -740,7 +738,7 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror) {
     //Reflections, can be skipped if blue channel is 0:
         if (bezel_in.b > 0.0) {
         //Reflections: Calculate the bezel roughness to apply to the reflecting area. (bezel_in.g expresses the specularity)
-            float roughness = random( 1/1080.0 * BEZEL_ROUGHNESS, vTexCoord );
+            float roughness = random_fast( 1/1080.0 * BEZEL_ROUGHNESS, vTexCoord );
             roughness *=  (1 - min(lut_specular * 10, 1.0)); // <-roughness over specular area looks bad.
             
         //Reflections:
@@ -784,8 +782,14 @@ void main() {
 
     //Calc a random noise if we need debanding
         if (DO_VIGNETTE + DO_SPOT + DO_AMBILIGHT >0.0) {
-            global_noise = random(NOISEPOWER, vTexCoord * params.FrameCount);
-            global_noise_ambi = global_noise * NOISEPOWER_AMBI_MUL;
+            //Generate random noise.
+                //global_noise = random(NOISEPOWER, vTexCoord * vDynamicSeed);
+                //global_noise_ambi = global_noise * NOISEPOWER_AMBI_MUL;
+            
+                //The following are faster versions, the dynamic one needs a seed that changes over time
+                //Calculated in Vertex shader for speed.
+                    global_noise_ambi = random_fast(NOISEPOWER * NOISEPOWER_AMBI_MUL, vTexCoord * vDynamicSeed  );
+                    global_noise_static = random_fast(NOISEPOWER, vTexCoord);
         }
     
     //Calc initial content coords
