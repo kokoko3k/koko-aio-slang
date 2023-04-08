@@ -73,8 +73,13 @@ void main() {
    
    //Next simulate a diffused light
       float pixel_diffused = texture( avglum_pass, vec2(0.5,0.5)).a; // * BEZEL_DIFFUSION_STR;
+      pixel_diffused = scale_to_range(pixel_diffused, 0.0, BEZEL_DIFFUSION_STR);
 
-      pixel_out = pixel_out + pixel_diffused * BEZEL_DIFFUSION_STR;
+      //We can invert the logic to light up the bezel when there is no light coming from it (?)
+      if (BEZEL_DIFFUSION_STR < 0.0)
+         pixel_out = pixel_out + pixel_diffused;
+            else
+         pixel_out = pixel_out + (BEZEL_DIFFUSION_STR - pixel_diffused);
 
    //multiply the blurred image by the corner shade so that reflections will not be visible in the corners.
    //This has been moved to final pass because it didn't worked well with curvature

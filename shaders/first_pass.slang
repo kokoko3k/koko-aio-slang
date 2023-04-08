@@ -108,8 +108,8 @@ void debug() {
    
    //pixel_debug=vec3(1,0,0)*floor(vTexCoord.x*64)/64; //H red gradient 64
    
-   //   float blink_time = 20;
-   //      if  (mod(params.FrameCount,blink_time*2) < blink_time) pixel_debug=vec3(0.2) ; else pixel_debug=vec3(1.0);
+      float blink_time = 20;
+         if  (mod(params.FrameCount,blink_time*2) < blink_time) pixel_debug=vec3(0.2) ; else pixel_debug=vec3(1.0);
    
    //White circle, blinking
    /*   float blink_time = 20;
@@ -119,7 +119,7 @@ void debug() {
       pixel_debug *= float((mod(params.FrameCount,blink_time*2) < blink_time));
    */
    
-   pixel_debug = colorwheel(vTexCoord);
+   //pixel_debug = colorwheel(vTexCoord);
    
    FragColor = vec4(pixel_debug,1.0);
 }
@@ -127,7 +127,7 @@ void debug() {
 
 void main() {
    
-   //debug(); return;
+   debug(); return;
 
    /* since flickering code needs
       luminosity difference between 2 vertical lines
