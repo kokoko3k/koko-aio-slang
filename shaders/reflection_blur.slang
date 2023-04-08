@@ -73,7 +73,7 @@ void main() {
    
    //Next simulate a diffused light
       float pixel_diffused = texture( avglum_pass, vec2(0.5,0.5)).a; // * BEZEL_DIFFUSION_STR;
-      pixel_diffused = pow(pixel_diffused, 0.5);
+      //pixel_diffused = pow(pixel_diffused, 0.5);
       pixel_diffused = scale_to_range(pixel_diffused, 0.0, BEZEL_DIFFUSION_STR);
 
 

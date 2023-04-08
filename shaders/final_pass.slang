@@ -157,31 +157,15 @@ vec2 get_vOutputCoord_adapted() {
 }
 
 
-vec3 nightify(vec3 color_in, float strength) {
-/*    vec3 color_hsv_in = rgb2hsv(color_in);
-    vec3 color_hsv_out = color_hsv_in;
-    
-    //Sat
-    color_hsv_out.y = color_hsv_out.y * strength;
-    
-    //Val
-    float m = min(-strength , 1 - strength);
-    float M = max(-strength , 1 - strength);
-    color_hsv_out.z = color_hsv_out.z = scale_to_range( color_hsv_out.z , m , M );
+vec3 fn_pixel_nightify(vec3 color_in, float strength) {
 
-    
-    return hsv2rgb( color_hsv_out );
-  */  
     color_in = clamp(color_in, 0.0, 1.0);
     vec3 color_hsv_in = rgb2hsv(color_in);
     strength = scale_to_range(strength, 0.0, 1.0); 
     
     vec3 color_hsv_min=color_hsv_in;
     color_hsv_min.yz = scale_to_range_vec2(color_hsv_min.yz, -0.1, 0.1); 
-    
-    
-    
-    
+
     vec3 color_rgb_min = hsv2rgb(color_hsv_min);
     return mix(color_in, color_rgb_min, strength);
 }
@@ -788,7 +772,7 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
         
     //Colorize the bezel (bezel.r expresses the luminance)
         vec3 bezel_out = bezel_color(bezel_in.r);
-        bezel_out.rgb = nightify(bezel_out.rgb, nightify_str );   
+        bezel_out.rgb = fn_pixel_nightify(bezel_out.rgb, nightify_str );
     
     float lut_specular = bezel_in.g * BEZEL_SPCL_STRENGTH;
     float reflection_modifier = 0.0;
@@ -949,7 +933,7 @@ void main() {
         //Foreground image
             if (DO_BG_IMAGE + BG_IMAGE_OVER == 2.0) {
                 vec4 pixel_fg_image = fn_pixel_fgbg_image(bg_over);
-                pixel_fg_image.rgb = nightify(pixel_fg_image.rgb, BG_IMAGE_NIGHTIFY );
+                pixel_fg_image.rgb = fn_pixel_nightify(pixel_fg_image.rgb, BG_IMAGE_NIGHTIFY );
                 
                 pixel_out = mix(pixel_out, pixel_fg_image.rgb, pixel_fg_image.a);
                 
