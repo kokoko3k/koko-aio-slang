@@ -298,6 +298,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float BG_IMAGE_OFFX;
 	float BG_IMAGE_ZOOM;
 	float BG_IMAGE_ROTATION;
+	float BG_IMAGE_NIGHTIFY;
 	float BG_IMAGE_WRAP_MODE;
 
 	float DO_SHIFT_RGB;
@@ -511,6 +512,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BG_IMAGE_OFFY	     "        Shift Image over Y axis"				 0.0  -1.0  1.0    0.0005
 #pragma parameter BG_IMAGE_ZOOM	     "        Zoom Image"					 1.0  -1.0  3.0    0.0005
 #pragma parameter BG_IMAGE_ROTATION  "        Rotate image mode (-1 for auto)"	     		 -1.0  -1.0  2.0    1.0
+#pragma parameter BG_IMAGE_NIGHTIFY  "        	"                                 0.0   0.0  1.0    0.1
 #pragma parameter LABEL_0101         "        !NEXT FEATURE IS STATIC, SEE docs.md TO ENABLE"    0.0 0.0 1.0 1.0
 #pragma parameter BG_IMAGE_WRAP_MODE "            Wrap mode: default, clamp to border, edge, repeat" 0.0  0.0    3.0    1.0
 #pragma parameter BLANK16 " " 0.0 0.0 1.0 1.0
