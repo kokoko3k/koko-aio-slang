@@ -90,13 +90,13 @@ void debug() {
    
    //pixel_debug=vec3(abs(sin(params.FrameCount/3.14/20)),0.0,0.0); //red fade
    
-   pixel_debug=vec3(0.5);
+   //pixel_debug=vec3(0.5);
    
    //pixel_debug=vec3(0.0,1.0,0.0);
    
    //pixel_debug=vec3(0.38,0.0,1.0)*vTexCoord.x;
    
-   pixel_debug=vec3(vTexCoord.x); //H bw gradient
+   //pixel_debug=vec3(vTexCoord.x); //H bw gradient
    
    //pixel_debug=vec3(floor(vTexCoord.x*16)/16); //H bw gradient 16gray
    
@@ -119,7 +119,7 @@ void debug() {
       pixel_debug *= float((mod(params.FrameCount,blink_time*2) < blink_time));
    */
    
-   //pixel_debug = colorwheel(vTexCoord);
+   pixel_debug = colorwheel(vTexCoord);
    
    FragColor = vec4(pixel_debug,1.0);
 }

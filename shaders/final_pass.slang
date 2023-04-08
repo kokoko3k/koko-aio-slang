@@ -767,7 +767,7 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror) {
             roughness *=  (1 - min(lut_specular * 10, 1.0)); // <-roughness over specular area looks bad.
             
         //Reflections:
-            reflection_modifier = bezel_in.b * BEZEL_REFL_STRENGTH; //bezel_in.b expresses how much the area is reflective
+            reflection_modifier = bezel_in.b; //bezel_in.b expresses how much the area is reflective
             
             //Sample the reflection pass with small offset to simulate the roughness
                 vec3 pixel_mirrored = texture(reflected_blurred_pass, coords_for_mirror + roughness).rgb; 
@@ -928,11 +928,11 @@ void main() {
      
 
     //For debug purposes:
-    //quad split screen
+        //quad split screen
         //if ( (vOutputCoord.x < 0.5  && vOutputCoord.y > 0.5) || (vOutputCoord.x > 0.5  && vOutputCoord.y < 0.5)  ) pixel_out = texture(first_pass,vOutputCoord).rgb;
-    //split screen
+        //split screen
         //if (vTexCoord.y < 0.5) pixel_out = texture(first_pass,vTexCoord).rgb;
-        
+        //pixel_out = texture(reflected_blurred_pass, vTexCoord).rgb;
         
         
     FragColor = vec4(pixel_out, 1.0);

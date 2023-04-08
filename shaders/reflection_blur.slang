@@ -41,44 +41,46 @@ void main() {
    //Zoom out the image coordinates by the bezel border size to make room for reflections:
       vec2 coords = zoom(vTexCoord, BEZEL_REFL_ZOOMOUT_ROOM);
    
-   float skip_border = BEZEL_REFL_SKIP_SIZE;
-   if (coords.x > skip_border && coords.x < 1.0 - skip_border &&
-       coords.y > skip_border && coords.y < 1.0 - skip_border ) {
-      FragColor = vec4(0.0);
-      return;
-   }   
+   //Skip unuseful pixels
+      float skip_border = BEZEL_REFL_SKIP_SIZE;
+      if (coords.x > skip_border && coords.x < 1.0 - skip_border &&
+         coords.y > skip_border && coords.y < 1.0 - skip_border ) {
+         FragColor = vec4(0.0);
+         return;
+      }
 
 
-   
 
 
-
-   //Create gradients in the corners to blur more more near them:
-      float fcorners_shade = corners_shade(vTexCoord, 0.9);
-     
    //Create a gradient near borders to modulate between blurrend and sharp refection.
-   //This also goes into output alpha channel to make the next pass aware of it.
-   float smoothness = 0.11;
-   float shade_sharp_blur = borders_gradient(vTexCoord, smoothness);
-   shade_sharp_blur = 1 - (shade_sharp_blur + BEZEL_RFL_BLR_SHD); //Modulates between sharp and blur via user parameter
+      float smoothness = 0.11;
+      float shade_sharp_blur = borders_gradient(vTexCoord, smoothness);
+      shade_sharp_blur = 1 - (shade_sharp_blur + BEZEL_RFL_BLR_SHD); //Modulates between sharp and blur via user parameter
 
-   //Also modulate in the corners via fcorners_shade (fcorners_shade 
+   //Create gradients in the corners to blur more more near corners:
+      float fcorners_shade = corners_shade(vTexCoord, 0.9);
       shade_sharp_blur = max(fcorners_shade, shade_sharp_blur);
       
-   float shade_sharp_blur_adapted = shade_sharp_blur * 5.5;      
-   float lod0 = floor(shade_sharp_blur_adapted);
-   float lod1 = lod0 + 1;
-   vec3 s1 = textureLod( Source, coords, lod0).rgb;
-   vec3 s2 = textureLod( Source, coords, lod1).rgb;
-   float lodmix = fract(shade_sharp_blur_adapted);
+   //Sample a lod and the next integer one, then do a linear smapling between them
+   //to blur the reflections as they goes far from the tube.
+      float shade_sharp_blur_adapted = shade_sharp_blur * 5.5;
+      float lod0 = floor(shade_sharp_blur_adapted);
+      float lod1 = lod0 + 1;
+      vec3 s1 = textureLod( Source, coords, lod0).rgb;
+      vec3 s2 = textureLod( Source, coords, lod1).rgb;
+      float lodmix = fract(shade_sharp_blur_adapted);
+      vec3 pixel_out = mix(s1, s2, lodmix) * BEZEL_REFL_STRENGTH;
    
-   vec3 pixel_out = mix(s1, s2, lodmix);
-   
+   //Next simulate a diffused light
+      float pixel_diffused = texture( avglum_pass, vec2(0.5,0.5)).a; // * BEZEL_DIFFUSION_STR;
+
+      pixel_out = pixel_out + pixel_diffused * BEZEL_DIFFUSION_STR;
+
    //multiply the blurred image by the corner shade so that reflections will not be visible in the corners.
    //This has been moved to final pass because it didn't worked well with curvature
    //at 0.0 inner zoom level.
-   //pixel_out = pixel_out * (1 - fcorners_shade);
-   
+      //pixel_out = pixel_out * (1 - fcorners_shade);
+
    pixel_out = apply_fuzzy_main_pass(pixel_out);
    
    
