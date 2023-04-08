@@ -40,12 +40,12 @@
      
                 bg_under = "textures/background_under.png"
          bg_under_linear = "true"
-      bg_under_wrap_mode = "mirrored_repeat"
+      bg_under_wrap_mode = "clamp_to_border"
          bg_under_mipmap = "true"
          
                  bg_over = "textures/background_over.png"
           bg_over_linear = "true"
-       bg_over_wrap_mode = "mirrored_repeat"
+        bg_over_wrap_mode = "clamp_to_border"
           bg_over_mipmap = "true"
 
         #This is for support for arcade backdrop pictures, enable it in config.inc.
