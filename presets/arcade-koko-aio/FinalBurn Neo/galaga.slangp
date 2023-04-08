@@ -1,0 +1,20 @@
+#reference "../../shaders/shaders_slang/bezel/koko-aio/monitor-slotmask-bloom-bezel.slangp"
+HALO_POWER = "0.405000"
+BEZEL_R = "-0.220000"
+BEZEL_G = "-0.220000"
+BEZEL_B = "-0.220000"
+BEZEL_INNER_ZOOM = "-0.215000"
+BEZEL_FRAME_ZOOM = "0.020000"
+DO_BG_IMAGE = "1.000000"
+BG_IMAGE_OFFY = "0.001000"
+BG_IMAGE_ROTATION = "2.000000"
+DO_AMBILIGHT = "0.000000"
+S_POWER = "0.150000"
+DO_GAME_GEOM_OVERRIDE = "1.000000"
+GAME_GEOM_ASPECT = "1.323333"
+bg_under = "../../shaders/shaders_slang/bezel/koko-aio/textures/arcade_textures/galaga.png"
+
+// Credits
+// shader by kokoko3k - https://github.com/kokoko3k/koko-aio-slang
+// artwork by John Merrit
+// preset and artwork adjustments by estefan3112 - https://github.com/estefan3112/koko-aio-slang

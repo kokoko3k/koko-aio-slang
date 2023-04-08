@@ -1,0 +1,15 @@
+#reference "../../shaders/shaders_slang/bezel/koko-aio/monitor-slotmask-bloom-bezel.slangp"
+BEZEL_INNER_ZOOM = "-0.495000"
+BEZEL_FRAME_ZOOM = "-0.180000"
+BEZEL_R = "-0.220000"
+BEZEL_G = "-0.220000"
+BEZEL_B = "-0.220000"
+DO_BG_IMAGE = "1.000000"
+BG_IMAGE_OFFY = "-0.002500"
+DO_AMBILIGHT = "0.000000"
+bg_under = "../../shaders/shaders_slang/bezel/koko-aio/textures/arcade_textures/aliens.png"
+
+// Credits
+// shader by kokoko3k - https://github.com/kokoko3k/koko-aio-slang
+// artwork by nmva
+// preset and artwork adjustments by estefan3112 - https://github.com/estefan3112/koko-aio-slang

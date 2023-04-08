@@ -1,0 +1,14 @@
+#reference "../../shaders/shaders_slang/bezel/koko-aio/monitor-slotmask-bloom-bezel.slangp"
+BEZEL_INNER_ZOOM = "-0.172500"
+BEZEL_FRAME_ZOOM = "0.050000"
+BEZEL_R = "-0.220000"
+BEZEL_G = "-0.220000"
+BEZEL_B = "-0.220000"
+DO_BG_IMAGE = "1.000000"
+DO_AMBILIGHT = "0.000000"
+bg_under = "../../shaders/shaders_slang/bezel/koko-aio/textures/arcade_textures/3wonders.png"
+
+// Credits
+// shader by kokoko3k - https://github.com/kokoko3k/koko-aio-slang
+// artwork by AlexDC22
+// preset and artwork adjustments by estefan3112 - https://github.com/estefan3112/koko-aio-slang

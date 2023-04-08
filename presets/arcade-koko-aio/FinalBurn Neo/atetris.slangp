@@ -1,0 +1,16 @@
+#reference "../../shaders/shaders_slang/bezel/koko-aio/monitor-slotmask-bloom-bezel.slangp"
+GEOM_CORNER_SIZE = "0.020000"
+BEZEL_INNER_ZOOM = "-0.530000"
+BEZEL_FRAME_ZOOM = "-0.210000"
+BEZEL_R = "-0.220000"
+BEZEL_G = "-0.220000"
+BEZEL_B = "-0.220000"
+DO_BG_IMAGE = "1.000000"
+BG_IMAGE_OFFX = "-0.009000"
+DO_AMBILIGHT = "0.000000"
+bg_under = "../../shaders/shaders_slang/bezel/koko-aio/textures/arcade_textures/atetris.png"
+
+// Credits
+// shader by kokoko3k - https://github.com/kokoko3k/koko-aio-slang
+// artwork by nmva
+// preset and artwork adjustments by estefan3112 - https://github.com/estefan3112/koko-aio-slang

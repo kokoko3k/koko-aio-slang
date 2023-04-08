@@ -1,0 +1,20 @@
+#reference "../../shaders/shaders_slang/bezel/koko-aio/monitor-slotmask-bloom-bezel.slangp"
+GEOM_CORNER_SIZE = "0.020000"
+BEZEL_INNER_ZOOM = "-0.492500"
+BEZEL_FRAME_ZOOM = "-0.350000"
+BEZEL_R = "-0.220000"
+BEZEL_G = "-0.220000"
+BEZEL_B = "-0.220000"
+DO_BG_IMAGE = "1.000000"
+DO_AMBILIGHT = "0.000000"
+DO_GLOBAL_SHZO = "1.000000"
+GLOBAL_OFFX = "0.002500"
+GLOBAL_OFFY = "0.025500"
+GLOBAL_ZOOM = "1.015500"
+GAME_GEOM_VSHIFT = "0.560000"
+bg_under = "../../shaders/shaders_slang/bezel/koko-aio/textures/arcade_textures/rtype.png"
+
+// Credits
+// shader by kokoko3k - https://github.com/kokoko3k/koko-aio-slang
+// artwork by ArsInvictus (?)
+// preset and artwork adjustments by estefan3112 - https://github.com/estefan3112/koko-aio-slang
