@@ -10,6 +10,7 @@ DO_BG_IMAGE = "1.000000"
 BG_IMAGE_ROTATION = "1.000000"
 DO_AMBILIGHT = "0.000000"
 bg_under = "../../shaders/shaders_slang/bezel/koko-aio/textures/arcade_textures/1943.png"
+bg_over = "../../shaders/shaders_slang/bezel/koko-aio/textures/arcade_textures/1943.png"
 
 // Credits
 // shader by kokoko3k - https://github.com/kokoko3k/koko-aio-slang
