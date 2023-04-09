@@ -18,7 +18,7 @@ GLOBAL_OFFX = "0.020000"
 GLOBAL_ZOOM = "1.000000"
 bg_under = "../../shaders/shaders_slang/bezel/koko-aio/textures/arcade_textures/amidar.png"
 bg_over = "../../shaders/shaders_slang/bezel/koko-aio/textures/arcade_textures/amidar.png"
-
+ 
 // Credits
 // shader by kokoko3k - https://github.com/kokoko3k/koko-aio-slang
 // artwork by Mr. RetroLust

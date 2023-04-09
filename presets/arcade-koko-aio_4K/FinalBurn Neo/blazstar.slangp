@@ -10,6 +10,7 @@ BG_IMAGE_OFFY = "-0.016500"
 BG_IMAGE_ZOOM = "1.006999"
 DO_AMBILIGHT = "0.000000"
 bg_under = "../../shaders/shaders_slang/bezel/koko-aio/textures/arcade_textures/blazstar.png"
+bg_over = "../../shaders/shaders_slang/bezel/koko-aio/textures/arcade_textures/blazstar.png"
 
 // Credits
 // shader by kokoko3k - https://github.com/kokoko3k/koko-aio-slang

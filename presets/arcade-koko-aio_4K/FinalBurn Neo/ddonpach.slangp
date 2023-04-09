@@ -13,6 +13,7 @@ GLOBAL_OFFX = "-0.029000"
 GLOBAL_OFFY = "-0.004000"
 GLOBAL_ZOOM = "0.932497"
 bg_under = "../../shaders/shaders_slang/bezel/koko-aio/textures/arcade_textures/ddonpach.png"
+bg_over = "../../shaders/shaders_slang/bezel/koko-aio/textures/arcade_textures/ddonpach.png"
 
 // Credits
 // shader by kokoko3k - https://github.com/kokoko3k/koko-aio-slang

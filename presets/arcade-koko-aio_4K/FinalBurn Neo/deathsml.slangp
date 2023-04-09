@@ -12,6 +12,7 @@ DO_GLOBAL_SHZO = "1.000000"
 GLOBAL_OFFY = "0.017000"
 GLOBAL_ZOOM = "1.000000"
 bg_under = "../../shaders/shaders_slang/bezel/koko-aio/textures/arcade_textures/deathsml.png"
+bg_over = "../../shaders/shaders_slang/bezel/koko-aio/textures/arcade_textures/deathsml.png"
 
 // Credits
 // shader by kokoko3k - https://github.com/kokoko3k/koko-aio-slang
