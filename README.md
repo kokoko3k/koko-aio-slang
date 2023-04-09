@@ -14,7 +14,14 @@ Please see the list of game presets in the Release Notes.
 # Screenshots
 Screenshots are taken under MacOS with HDR enabled.
 
-Shots from v 0.2:<br>
+In the works: Some nightyfied artwork by Mr. Retrolust
+
+<img width="750" alt="Bildschirmfoto 2023-04-08 um 21 03 47" src="https://user-images.githubusercontent.com/24915559/230785582-e364fa18-e0ea-4908-a912-c3de18bfe70c.png">
+
+<img width="750" alt="Bildschirmfoto 2023-04-09 um 17 59 40" src="https://user-images.githubusercontent.com/24915559/230785603-ef7b0491-3081-4075-b29d-3b6dc62a9aed.png">
+
+
+Shots from v 0.2 and 0.3:<br>
 
 <img width="851" alt="Bildschirm­foto 2023-03-25 um 22 34 39" src="https://user-images.githubusercontent.com/24915559/227745111-e03e33dc-adc4-400f-ab1e-195c959a7565.png">
 <img width="851" alt="Bildschirm­foto 2023-03-25 um 22 32 36" src="https://user-images.githubusercontent.com/24915559/227745132-69501af9-19c0-4990-9e9c-c0e59276b073.png">
