@@ -61,9 +61,13 @@ With latest Github (30 March 2023) and Release 0.3, backdrop support landed in k
 # Technical Information
 
 This fork will remain as closely as possible in line with the main repository, as I frequently update from Upstream. Here is a list of deviations from Upstream:
+- koko-aio.slangp - line 43:  bg_under_wrap_mode = "clamp_to_border" (instead of "mirrored_repeat")
+- koko-aio.slangp - line 48:  bg_over_wrap_mode = "clamp_to_border" (instead of "mirrored_repeat")
+These changes are beneficial for this repository, as a mirrored repeat looks very strange for realistic cabinet backgrounds/foregrounds.
+
+LEGACY no longer required as of April 2023, just for documentation: 
 /shaders/config.inc - line 130: ALLOW_BG_IMAGE_TEXTURE_WRAP_IN_SHADER is enabled so as to allow a different texture wrap for the arcade artwork
 /shaders/config.globals.inc - line 200: BG_IMAGE_WRAP_MODE is hardcoded to	1.0 (wrap to edge) because that's how it should be with this arcade artwork (ending with a black border)
-LEGACY no longer required as of 30 March 2023: koko-aio-backdrops release only:
 /shaders/config.inc - line 107: STATIC_SUPPORT_BACKDROP hardcoded to 1.0 (this is why backdrops require a separate koko-aio-backdrops instance) 
 
 
