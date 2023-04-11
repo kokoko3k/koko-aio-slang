@@ -126,7 +126,7 @@ void debug() {
 
 void main() {
    
-   //debug(); return;
+   debug(); return;
 
    /* since flickering code needs
       luminosity difference between 2 vertical lines

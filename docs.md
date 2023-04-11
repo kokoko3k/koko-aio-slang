@@ -229,11 +229,16 @@
         The amount of reflections
     Reflections sharpness
         Modulates from totally blurred to totally sharp reflection appearance.
-    Specularity strength
-        The amount of specular reflection
     Reflections roughness
         The amount of material roughness in reflection area
-          
+    Diffusion strength
+        Mix an amount of high blurred reflection to simulate light diffusion
+    Specularity strength
+        The amount of specular reflection
+    Darken corners
+        How much the bezel corners should be darkened
+    
+
 **Backgound image:**
     Draws an image on screen picked from the "textures" shader subdirectory,
     named: background.png<br>
