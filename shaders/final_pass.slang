@@ -160,10 +160,12 @@ vec2 get_vOutputCoord_adapted() {
 vec3 fn_pixel_nightify(vec3 color_in, float strength) {
 
     color_in = clamp(color_in, 0.0, 1.0);
+   //return color_in * (1 - strength);
+    
     vec3 color_hsv_in = rgb2hsv(color_in);
     strength = scale_to_range(strength, 0.0, 1.0); 
     
-    vec3 color_hsv_min=color_hsv_in;
+    vec3 color_hsv_min = color_hsv_in;
     color_hsv_min.yz = scale_to_range_vec2(color_hsv_min.yz, -0.1, 0.1); 
 
     vec3 color_rgb_min = hsv2rgb(color_hsv_min);
@@ -913,6 +915,7 @@ void main() {
             //Background image:
                 if (DO_BG_IMAGE == 1.0 && BG_IMAGE_OVER == 0.0) {
                     vec4 pixel_bg_image = fn_pixel_fgbg_image(bg_under);
+                    pixel_bg_image.rgb = fn_pixel_nightify(pixel_bg_image.rgb, BG_IMAGE_NIGHTIFY );
                     pixel_bg_image.rgb = ambi_blend_image(pixel_bg_image, pixel_ambi);        
                     pixel_under_content = pixel_bg_image.rgb;
                 }

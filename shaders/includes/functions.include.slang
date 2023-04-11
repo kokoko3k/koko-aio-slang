@@ -638,15 +638,6 @@ float get_dyn_zoom(sampler2D tex) {
 	return 1.0 + (texture(tex, vec2(0.75,0.75)    ).a/ DYNZOOM_FACTOR) ;
 }
 
-vec3 pixel_darken(vec3 color_in, float lum) {
-	//simulates a darker image by scaling brightness, saturation and contrast
-	vec3 color_hsv_in = rgb2hsv(color_in);
-	lum = scale_to_range(lum, 0.0, 1.0); 
-	vec3 color_hsv_min=color_hsv_in;
-	color_hsv_min.yz = scale_to_range_vec2(color_hsv_min.yz, -0.1, 0.1); 
-	vec3 color_rgb_min = hsv2rgb(color_hsv_min);
-	return mix(color_in, color_rgb_min, lum);
-}
 
 
 
