@@ -158,9 +158,9 @@ vec2 get_vOutputCoord_adapted() {
 
 
 vec3 fn_pixel_nightify(vec3 color_in, float strength) {
-
+    if (strength == 0.0) return color_in;
+    
     color_in = clamp(color_in, 0.0, 1.0);
-   //return color_in * (1 - strength);
     
     vec3 color_hsv_in = rgb2hsv(color_in);
     strength = scale_to_range(strength, 0.0, 1.0); 
