@@ -628,9 +628,8 @@ vec3 ambi_blend_image(vec4 image, vec3 ambi) {
     // So that we can use the same code used for alpha blend.
     // Also multiply AMBI_BG_IMAGE_FORCE * AMBI_BG_IMAGE_BLEND_MODE to skip
     // force colorization when mode blend mode is not "ADD".
-        float image_alpha_adapted = max(image.a - (AMBI_BG_IMAGE_FORCE * AMBI_BG_IMAGE_BLEND_MODE),
-                                        0.0);
-    
+        float image_alpha_adapted = image.a - (AMBI_BG_IMAGE_FORCE * AMBI_BG_IMAGE_BLEND_MODE);
+
     image.rgb = (AMBI_BG_IMAGE_BLEND_MODE == 0.0) ? 
         mix(ambi.rgb, image.rgb, image_alpha_adapted) 
             : 
