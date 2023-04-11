@@ -796,8 +796,8 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
             
             //Sample the reflection pass with small offset to simulate the roughness
                 vec4 pixel_mirrored = texture(reflected_blurred_pass, coords_for_mirror + roughness);
-                float fcorners_shade = 1 - corners_shade(coords_for_bezel, 1.0);
-
+                float fcorners_shade = 1 - corners_shade(coords_for_bezel, 1.0) * BEZEL_CORNER_DARK;
+                
                 //fcorners_shade = 1.0;
                 pixel_mirrored.rgb *= fcorners_shade;
 

@@ -267,7 +267,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float BEZEL_DIFFUSION_STR;
 	float BEZEL_SPCL_STRENGTH;
 	float BEZEL_ROUGHNESS;
-
+	float BEZEL_CORNER_DARK;
+	
 	float DO_SPOT;
 	float S_POSITION; 
 	float S_SIZE;
@@ -498,6 +499,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BEZEL_ROUGHNESS     "        Reflections roughness"			1.0    0.0 5.0 0.1
 #pragma parameter BEZEL_DIFFUSION_STR "        Diffusion strength"             0.0     0.0 1.0 0.01
 #pragma parameter BEZEL_SPCL_STRENGTH "        Specularity strength"			0.5    0.0 3.0 0.05
+#pragma parameter BEZEL_CORNER_DARK   "        Darken corners"					1.0    0.0 1.0 0.05
 
 
 #pragma parameter BLANK15 " " 0.0 0.0 1.0 1.0

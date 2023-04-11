@@ -49,9 +49,6 @@ void main() {
          return;
       }
 
-
-
-
    //Create a gradient near borders to modulate between blurrend and sharp refection.
       float smoothness = 0.11;
       float shade_sharp_blur = borders_gradient(vTexCoord, smoothness);
@@ -85,9 +82,7 @@ void main() {
    pixel_out = apply_fuzzy_main_pass(pixel_out);
       
    FragColor = vec4(pixel_out, 1.0); 
-   
-   //FragColor = vec4(shade_sharp_blur_adapted);
-   
+
 }
  
  
