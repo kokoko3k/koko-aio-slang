@@ -20,7 +20,7 @@ layout(location = 0) in vec2 vTexCoord;
 layout(location = 0) out vec4 FragColor;
 
 layout(set = 0, binding = 1) uniform sampler2D Source;
-layout(set = 0, binding = 2) uniform sampler2D avglum_pass;
+layout(set = 0, binding = 2) uniform sampler2D first_pass;
 
 #include "includes/functions.include.slang"
 
@@ -58,7 +58,8 @@ void main() {
       shade_sharp_blur = 1 - (shade_sharp_blur + BEZEL_RFL_BLR_SHD); //Modulates between sharp and blur via user parameter
 
    //Create gradients in the corners to blur more more near corners:
-      float fcorners_shade = corners_shade(vTexCoord, 0.9);
+      #define CORNER_BLURRINESS 0.6
+      float fcorners_shade = corners_shade(vTexCoord, 0.9) * CORNER_BLURRINESS;
       shade_sharp_blur = max(fcorners_shade, shade_sharp_blur);
       
    //Sample a lod and the next integer one, then do a linear smapling between them
@@ -72,26 +73,18 @@ void main() {
       vec3 pixel_out = mix(s1, s2, lodmix) * BEZEL_REFL_STRENGTH;
    
    //Next simulate a diffused light
-      float pixel_diffused = texture( avglum_pass, vec2(0.5,0.5)).a; // * BEZEL_DIFFUSION_STR;
-      //pixel_diffused = pow(pixel_diffused, 0.5);
-      pixel_diffused = scale_to_range(pixel_diffused, 0.0, BEZEL_DIFFUSION_STR);
-
-
-      //We can invert the logic to light up the bezel when there is no light coming from it (?)
-      if (BEZEL_DIFFUSION_STR < 0.0)
-         pixel_diffused = (-BEZEL_DIFFUSION_STR + pixel_diffused);
-
-
+      vec3 pixel_diffused = textureLod( first_pass, coords, 6.0).rgb;
+      pixel_out = mix( pixel_out, pixel_diffused, BEZEL_DIFFUSION_STR);
+      
+   
    //multiply the blurred image by the corner shade so that reflections will not be visible in the corners.
    //This has been moved to final pass because it didn't worked well with curvature
    //at 0.0 inner zoom level.
       //pixel_out = pixel_out * (1 - fcorners_shade);
 
    pixel_out = apply_fuzzy_main_pass(pixel_out);
-   
-
-
-   FragColor = vec4(pixel_out, pixel_diffused);
+      
+   FragColor = vec4(pixel_out, 1.0); 
    
    //FragColor = vec4(shade_sharp_blur_adapted);
    

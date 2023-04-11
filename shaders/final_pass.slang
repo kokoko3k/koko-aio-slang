@@ -796,14 +796,13 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
             
             //Sample the reflection pass with small offset to simulate the roughness
                 vec4 pixel_mirrored = texture(reflected_blurred_pass, coords_for_mirror + roughness);
-                float fcorners_shade = corners_shade(coords_for_bezel, 1.0);
-                pixel_mirrored.rgb *= 1-(fcorners_shade);
+                float fcorners_shade = 1 - corners_shade(coords_for_bezel, 1.0);
+
+                //fcorners_shade = 1.0;
+                pixel_mirrored.rgb *= fcorners_shade;
 
             //Push it over the specular areas and apply the reflection modifier
                 pixel_mirrored.rgb = pixel_mirrored.rgb * (1 + lut_specular) * reflection_modifier;
-
-            //Apply light diffusion here to light corners too.
-                pixel_mirrored.rgb += pixel_mirrored.a * reflection_modifier;
 
             //Apply reflections
                 bezel_out += pixel_mirrored.rgb;
@@ -968,5 +967,7 @@ void main() {
         
     FragColor = vec4(pixel_out, 1.0);
    
+    //FragColor = vec4(texture( reflected_blurred_pass, co_mirror).a);
+    
 }
 
