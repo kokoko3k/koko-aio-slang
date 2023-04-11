@@ -623,11 +623,18 @@ vec4 fn_pixel_fgbg_image(sampler2D smp) {
 vec3 ambi_blend_image(vec4 image, vec3 ambi) {
     //mix or add ambient light with image, also allow force colorization in add mode.
     if (DO_AMBILIGHT == 0.0) return image.rgb;
-        
+    
+    // Fake a transparent image when force colorization is requested
+    // So that we can use the same code used for alpha blend.
+    // Also multiply AMBI_BG_IMAGE_FORCE * AMBI_BG_IMAGE_BLEND_MODE to skip
+    // force colorization when mode blend mode is not "ADD".
+        float image_alpha_adapted = max(image.a - (AMBI_BG_IMAGE_FORCE * AMBI_BG_IMAGE_BLEND_MODE),
+                                        0.0);
+    
     image.rgb = (AMBI_BG_IMAGE_BLEND_MODE == 0.0) ? 
-        mix(ambi.rgb, image.rgb, image.a) 
+        mix(ambi.rgb, image.rgb, image_alpha_adapted) 
             : 
-        image.rgb + (ambi.rgb * (1 - image.a)); 
+        image.rgb + (ambi.rgb * (1 - image_alpha_adapted)); 
         
     return image.rgb;
 }

@@ -535,7 +535,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter AMBI_OVER_BEZEL           "        Colorize Bezel"					0.5  0.0  5.0     0.05
 #pragma parameter AMBI_OVER_BEZEL_SIZE      "        Colorization size"					0.15  0.0  0.5    0.001
 #pragma parameter AMBI_BG_IMAGE_BLEND_MODE  "        Back/Foreground image alpha blend (0=mix, 1/check=add)"	0.0   0.0  1.0    1.0
-#pragma parameter AMBI_BG_IMAGE_FORCE       "        Always colorize foreground image (add mode only) "		0.0   0.0  1.0    0.1
+#pragma parameter AMBI_BG_IMAGE_FORCE       "        Always colorize Back/Foreground image (add mode only) "		0.0   0.0  1.0    0.1
 #pragma parameter BLANK17 " " 0.0 0.0 1.0 1.0
 
 
