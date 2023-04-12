@@ -639,34 +639,11 @@ float get_dyn_zoom(sampler2D tex) {
 }
 
 
-vec2 rotateTexture(vec2 texCoord, float angleX, float angleY) {
-    // Translate texture coordinates to pivot point
-    vec2 texCoordPivoted = texCoord - vec2(0.5);
-    
-    // Create rotation matrices for X and Y axes
-    mat3 rotX = mat3(1.0,               0.0,              0.0,
-                     0.0,  cos(angleX), -sin(angleX),
-                     0.0,  sin(angleX),  cos(angleX));
-                     
-    mat3 rotY = mat3( cos(angleY), 0.0, sin(angleY),
-                                0.0, 1.0,          0.0,
-                     -sin(angleY), 0.0, cos(angleY));
-    
-    // Apply rotation matrices to pivoted texture coordinates
-    vec3 rotatedCoord = vec3(texCoordPivoted, 1.0) * rotX * rotY;
-    
-    // Convert back to texture coordinate range of [0, 1] and apply pivot point
-    vec2 rotatedTexCoord = (rotatedCoord.xy + 1.0) / 2.0 + vec2(0.5);
-    
-    return rotatedTexCoord;
-}
-
-
 vec2 tilt(vec2 co, float is_rotated, vec2 tilt) {
 
 	vec2 r_tilt = vec2( mix_step(tilt.x, tilt.y, is_rotated),
 	                    mix_step(tilt.y, -tilt.x, is_rotated)
-				  );
+);
 	
 	vec2 tilt_min = 1 - r_tilt;
 	vec2 tilt_max = 1 + r_tilt;
