@@ -608,7 +608,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter DO_TILT	  	"★ Tilt enable? ==>"				0.0   0.0  1.0 	  1.0
 #pragma parameter TILT_X	  	"        Tilt along X axis"		0.0    -0.5  0.5  0.01
 #pragma parameter TILT_Y	  	"        Tilt along Y axis"		0.0    -0.5  0.5  0.01
-#pragma parameter TILT_FOV	  	"        Fov"					1.5    0.1	3.0    0.05
+#pragma parameter TILT_FOV	  	"        Fov"					0.7    0.1	1.5   0.05
 #pragma parameter TILT_BEZEL_K	"        Bezel multiplier"		1.0    0.0  1.5  0.01
 #pragma parameter BLANK_01 " " 0.0 0.0 1.0 1.0
 

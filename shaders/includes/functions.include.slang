@@ -639,36 +639,58 @@ float get_dyn_zoom(sampler2D tex) {
 }
 
 
+vec2 rotateTexture(vec2 texCoord, float angleX, float angleY) {
+    // Translate texture coordinates to pivot point
+    vec2 texCoordPivoted = texCoord - vec2(0.5);
+    
+    // Create rotation matrices for X and Y axes
+    mat3 rotX = mat3(1.0,               0.0,              0.0,
+                     0.0,  cos(angleX), -sin(angleX),
+                     0.0,  sin(angleX),  cos(angleX));
+                     
+    mat3 rotY = mat3( cos(angleY), 0.0, sin(angleY),
+                                0.0, 1.0,          0.0,
+                     -sin(angleY), 0.0, cos(angleY));
+    
+    // Apply rotation matrices to pivoted texture coordinates
+    vec3 rotatedCoord = vec3(texCoordPivoted, 1.0) * rotX * rotY;
+    
+    // Convert back to texture coordinate range of [0, 1] and apply pivot point
+    vec2 rotatedTexCoord = (rotatedCoord.xy + 1.0) / 2.0 + vec2(0.5);
+    
+    return rotatedTexCoord;
+}
 
 
+vec2 tilt(vec2 co, float is_rotated, vec2 tilt) {
 
-vec2 tilt(vec2 co, float is_rotated, float tilt_x, float tilt_y, float adpt) {
+	vec2 r_tilt = vec2( mix_step(tilt.x, tilt.y, is_rotated),
+	                    mix_step(tilt.y, -tilt.x, is_rotated)
+				  );
 	
+	vec2 tilt_min = 1 - r_tilt;
+	vec2 tilt_max = 1 + r_tilt;
+	
+	// X Tilt
+		float tilt_x_range = scale_to_range(co.y, tilt_min.x, tilt_max.x);
+		co = vec2( zoom1D(co.x, tilt_x_range),
+		           zoom1D(co.y, tilt_x_range)
+			);
 
+	// Y Tilt
+		float tilt_y_range = scale_to_range(co.x, tilt_min.y, tilt_max.y);
+		co = vec2( zoom1D(co.x, tilt_y_range),
+		           zoom1D(co.y, tilt_y_range)
+			);
 	
-	tilt_x *= adpt;
-	tilt_y *= adpt;
-	
-	float r_tilt_x = mix_step(tilt_x, tilt_y, is_rotated);
-	float r_tilt_y = mix_step(tilt_y, -tilt_x, is_rotated);
-	
-	float tilt_min_x = 1.0 - r_tilt_x;
-	float tilt_max_x = 1.0 + r_tilt_x;
+	// Aply FOV;
+		vec2 fov = mix(vec2(1.0), vec2(TILT_FOV), abs(vec2(tilt.x, tilt.y)));
+		co = zoomxy(co, fov.yx);
 
-	float tilt_min_y = 1.0 - r_tilt_y;
-	float tilt_max_y = 1.0 + r_tilt_y;
-
-	float fov_x = tilt_x * TILT_FOV;
-	float fov_y = tilt_y * TILT_FOV;
-	
-	co.x = zoom1D(co.x, scale_to_range(co.y, tilt_min_x, tilt_max_x) );	
-	co.y = zoom1D(co.y, scale_to_range(co.y, 1 - fov_x, 1 + fov_x)) + fov_x*0.32;	
-
-	
-	co.y = zoom1D(co.y, scale_to_range(co.x, tilt_min_y, tilt_max_y) );
-	co.x = zoom1D(co.x, scale_to_range(co.x, 1 - fov_y, 1 + fov_y)) + tilt_y*0.32;	
-	
+		co.xy += tilt.yx*0.4;
+		
 	return co;
+
 }
 	
 bool is_first_outside_rect(vec2 point, vec4 rect) {

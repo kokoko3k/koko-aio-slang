@@ -548,7 +548,7 @@ vec2 get_scaled_coords_for_bezel() {
     vec2 co = zoomout_coords(vTexCoord,-BEZEL_FRAME_ZOOM,1.0);
     
     if (DO_TILT == 1.0) 
-        return tilt(co, vIsRotated, TILT_X, TILT_Y, TILT_BEZEL_K);
+        return tilt(co, vIsRotated, vec2(TILT_X, TILT_Y) * TILT_BEZEL_K);
             else
         return co;
 }
@@ -816,7 +816,7 @@ void main() {
 
     //Tilt?
         if (DO_TILT == 1.0)
-            co_content = tilt(co_content, vIsRotated, TILT_X, TILT_Y, 1.0);
+            co_content = tilt(co_content, vIsRotated, vec2(TILT_X, TILT_Y));
 
 
     //Precalc Bezel coords, since it modifies content coords.
