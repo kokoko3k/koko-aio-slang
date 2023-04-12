@@ -35,7 +35,7 @@ layout(location = 4) out float vIsRotated;
     
 layout(location = 13) out float vDynamicSeed;
 layout(location = 14) out float vBEZEL_INNER_ZOOM_adapted;
-
+layout(location = 15) out float vVmask_gap;
 
 #include "includes/functions.include.slang"
 
@@ -101,6 +101,13 @@ void main() {
         //Generate a seed that changes over time for temporal random noise
             vDynamicSeed = mod(params.FrameCount, 60.0001);
         
+        //slotmask/vmask gap size:
+            //Gap size in pixel for 1X to 4X mask scaling:
+            // vec4 GAP_SIZE_PER_SCALE = vec4(1.0, 1.0, 2.0, 2.0);  <--- moved in config.inc
+            vec4 vgap_size_per_scale = GAP_SIZE_PER_SCALE / VMASK_DARKLINE_SCALE;
+            vVmask_gap = vgap_size_per_scale[int(VMASK_DARKLINE_SCALE-1)];
+            
+            
 }
 
 
@@ -120,6 +127,7 @@ layout(location = 11) in float vMax_inLum;
 layout(location = 12) in float vIn_aspect;
 layout(location = 13) in float vDynamicSeed;
 layout(location = 14) in float vBEZEL_INNER_ZOOM_adapted;
+layout(location = 15) in float vVmask_gap;
 
 
 layout(location = 0) out vec4 FragColor;
@@ -172,8 +180,6 @@ vec3 fn_pixel_nightify(vec3 color_in, float strength) {
     return mix(color_in, color_rgb_min, strength);
 }
 
-
-
 vec3 pixel_vmask(vec3 source, float white_reference, float over_white) {
     // Simple RGB mask emulation with or without horizontal gap
     float ggg = 1.0 - RGB_MASK_STRENGTH;
@@ -187,8 +193,10 @@ vec3 pixel_vmask(vec3 source, float white_reference, float over_white) {
 
     vec3 pixel_out;
     vec3 vmasked;
-    vec4 vec_mod=(vec4(3,1,2,3) + vec4(VMASK_GAP,0.0,0.0,0.0))* VMASK_DARKLINE_SCALE ;
 
+    vec4 vec_mod=(vec4(3,1,2,3) + vec4(VMASK_GAP * vVmask_gap,0.0,0.0,0.0))* VMASK_DARKLINE_SCALE;
+    vec_mod = ceil(vec_mod);
+    
     float fcol = vOutputCoord.x * params.OutputSize.x;
     float mod_compare = mod(fcol, vec_mod.x);
     
@@ -236,7 +244,7 @@ vec3 pixel_vmask_gm(vec3 source, float white_reference, float over_white) {
     float fcol = vOutputCoord.s * params.OutputSize.x;
     vec3 pixel_out;
     vec3 vmasked;
-    vec3 vec_mod=(vec3(2,1,2) + vec3(VMASK_GAP,0.0,0.0))* VMASK_DARKLINE_SCALE ;
+    vec3 vec_mod=(vec3(2,1,2) + vec3(VMASK_GAP * vVmask_gap,0.0,0.0))* VMASK_DARKLINE_SCALE ;
 
     float mod_compare = mod(fcol, vec_mod.x);
     
@@ -267,55 +275,10 @@ vec3 pixel_vmask_gm(vec3 source, float white_reference, float over_white) {
 }
 
 
-/*vec3 pixel_vmask_and_gm(vec3 source, float white_reference, float over_white) {
-    // Simple RGB mask emulation with or without horizontal gap
-    float ooo = 1.0 - RGB_MASK_STRENGTH;
-
-    // RGB mask:     R     G     B
-    vec3 m1_rgb =  vec3( 1.0 , ooo , ooo );  //col 1
-    vec3 m2_rgb =  vec3( ooo , 1.0 , ooo );  //col 2
-    vec3 m3_rgb =  vec3( ooo , ooo , 1.0 );  //col 3
-    vec3 gap = vec3( ooo );
-
-    vec3 m1_gm = vec3( ooo , 1.0 , ooo );    //col 1
-    vec3 m2_gm = vec3( 1.0 , ooo , 1.0 );    //col 2
-
-    vec3 m1 = (m1_gm * VMASK_USE_GM) + (m1_rgb * (1-VMASK_USE_GM));
-    vec3 m2 = (m2_gm * VMASK_USE_GM) + (m2_rgb * (1-VMASK_USE_GM));
-    vec3 m3 = m3_rgb;
-
-    vec3 pixel_out;
-    vec3 vmasked;
-    vec4 vec_mod_rgb = vec4(3,1,2,3);
-    vec4 vec_mod_gm =  vec4(2,1,2,0.0);
-    vec4 vec_mod = (vec_mod_gm * VMASK_USE_GM) + (vec_mod_rgb* (1-VMASK_USE_GM));
-    vec_mod=(vec_mod + vec4(VMASK_GAP,0.0,0.0,0.0))* VMASK_DARKLINE_SCALE ;
-
-
-    float fcol = vOutputCoord.s * params.OutputSize.x;
-    if (mod(fcol, vec_mod.x) < vec_mod.y)
-        vmasked = m1 * source;
-    else if (mod(fcol, vec_mod.x) < vec_mod.z)
-        vmasked = m2 * source;
-    else if (    mod(fcol, vec_mod.x) <  vec_mod.w && VMASK_USE_GM < 1.0  )
-        vmasked = m3 * source;
-    else vmasked = gap * source;
-
-    if (over_white == 1.0) pixel_out = vmasked;
-        else {
-            white_reference-= over_white;
-            white_reference=  clamp(white_reference,0.0,1.0);
-            pixel_out=  mix(vmasked,source,white_reference);
-        }
-   return pixel_out;
-
-}*/
-
-
 vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
                      float do_offset, float white_reference,float over_white, vec2 coords) {
 
-    float period_x = (3.0 - VMASK_USE_GM + VMASK_GAP) * VMASK_DARKLINE_SCALE;
+    float period_x = (3.0 - VMASK_USE_GM + VMASK_GAP * vVmask_gap) * VMASK_DARKLINE_SCALE;
     float period_y = darkline_every * VMASK_DARKLINE_SCALE;
 
     vec2 FragCoord = vFragCoord;
@@ -333,7 +296,7 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
 
     float row = int(floor(mod(FragCoord.y, period_y)));
 
-    if (row < VMASK_DARKLINE_SCALE)
+    if (row < VMASK_DARKLINE_SCALE * vVmask_gap)
         return source * darkline_trans;
             else
         return source;

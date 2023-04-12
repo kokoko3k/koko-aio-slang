@@ -160,7 +160,7 @@
                Works best with scanline heights in range [0.5..0.7] 
         Type 3 is fixed and produces heavier and thinner slotmasks without visible scanlines.
     Slotmask strength
-        The strenght of the slotmask (available on type 1 and 2 only)
+        The strength of the slotmask
     . Offset
         This is the slotmask offset/stagger, (available on type 1 only)
         Keep it around 79 or all the way to max

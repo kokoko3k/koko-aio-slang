@@ -129,8 +129,10 @@
 //#define ALLOW_BG_IMAGE_TEXTURE_WRAP_IN_SHADER
 
 
+	//Gap size in pixel for 1X to 4X mask scaling:
+#define GAP_SIZE_PER_SCALE vec4(1.0, 1.0, 2.0, 2.0)
 
-
+  
 // STATIC CONFIG ENDS HERE ##########################################################################################
 
 
@@ -422,7 +424,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 #pragma parameter DARKLINES_STRENGTH     "        Darklines strength (0.0 to disable)"				0.65 	0.0 1.0   0.05
 #pragma parameter DARKLINES_VOFFSET      "           . Offset"							1.0 	0.0 1.0   1.0
-#pragma parameter DARKLINES_PERIOD       "           . Height"							2.0 	2.0 16.0  2.0
+#pragma parameter DARKLINES_PERIOD       "           . Height"							2.0 	2.0 16.0  1.0
 #pragma parameter DRKLN_OVERWHITE        "           . Affect bright colors"					1.0 	0.0 1.0   0.05
 #pragma parameter BLANK9 " " 0.0 0.0 1.0 1.0
 
@@ -452,7 +454,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BLANK11 " " 0.0 0.0 1.0 1.0
 
 #pragma parameter SCANLINE_SM_TYPE         "        Slotmask type (disable (0) with darklines!)"		0.0 	0.0 3.0 1.0
-#pragma parameter SCANLINE_SM_STRENGTH     "           . Slotmask strength (type 1 and 2 only)"			1.0 	0.0 1.0 0.05
+#pragma parameter SCANLINE_SM_STRENGTH     "           . Slotmask strength"						1.0 	0.0 1.0 0.05
 #pragma parameter SCANLINE_SM_VOFFSET      "           . Offset (type 1 only)"					45.0 	0.0 158.0 1.0
 #pragma parameter BLANK12 " " 0.0 0.0 1.0 1.0
 
