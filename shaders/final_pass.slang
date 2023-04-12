@@ -106,8 +106,6 @@ void main() {
             // vec4 GAP_SIZE_PER_SCALE = vec4(1.0, 1.0, 2.0, 2.0);  <--- moved in config.inc
             vec4 vgap_size_per_scale = GAP_SIZE_PER_SCALE / VMASK_DARKLINE_SCALE;
             vVmask_gap = vgap_size_per_scale[int(VMASK_DARKLINE_SCALE-1)];
-            
-            
 }
 
 
@@ -245,7 +243,8 @@ vec3 pixel_vmask_gm(vec3 source, float white_reference, float over_white) {
     vec3 pixel_out;
     vec3 vmasked;
     vec3 vec_mod=(vec3(2,1,2) + vec3(VMASK_GAP * vVmask_gap,0.0,0.0))* VMASK_DARKLINE_SCALE ;
-
+    vec_mod = ceil(vec_mod);
+    
     float mod_compare = mod(fcol, vec_mod.x);
     
    /* 
