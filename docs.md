@@ -26,7 +26,7 @@
     It can be used with RGB shifting and image blurring to give the picture
     an ntsc look without dealing with specific encoding/decoding stuffs. 
 
-**RGB deconvergence:**
+**Deconvergence:**
     Shift R,G,B components separately to mimic channel deconvergence.
     By varying Red, Green and Blue offsets, the relative component will be
     shifted column by column, row by row.
@@ -63,7 +63,7 @@
         This will help you to set the previous 2 values as it will show only
         the artifacts that will modify the blur.
     
-**RGB Masks and/or Darklines:**
+**Masks and/or Darklines:**
     Emulates CRT RGB phosphors (RGB Mask),
     slotmasks and aperturegrille (Darklines).
     

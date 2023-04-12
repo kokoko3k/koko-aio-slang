@@ -388,7 +388,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 
 //Offset RGB
-#pragma parameter DO_SHIFT_RGB       "★ RGB deconvergence enable? ==>"	0.0	 0.0 1.0 1.0
+#pragma parameter DO_SHIFT_RGB       "★ Deconvergence enable? ==>"	0.0	 0.0 1.0 1.0
 #pragma parameter OFFSET_STRENGTH "        Strength"			0.6 	 0.0 1.0 0.05
 #pragma parameter SHIFT_R         "        Red offset"			-40.0 	-210.0 189.0 1
 #pragma parameter SHIFT_G         "        Green offset"		2.0 	-210.0 189.0 1
@@ -413,7 +413,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 
 // Mask
-#pragma parameter DO_VMASK_AND_DARKLINES "★  RGB Masks and/or Darklines enable? ==>"         		0.0 	0.0 1.0 1.0
+#pragma parameter DO_VMASK_AND_DARKLINES "★  Masks and/or Darklines enable? ==>"         		0.0 	0.0 1.0 1.0
 #pragma parameter MASK_COMPENSATION      "        Compensate for brightness loss"			0.0 	0.0 1.0 0.05
 #pragma parameter VMASK_DARKLINE_SCALE   "        (HiDPI) Vmask and Darklines multiplier"		1.0  	1.0 4.0 1.0
 #pragma parameter RGB_MASK_STRENGTH      "        RGB Mask Strength (0.0 to disable)"			0.75  	0.0 1.0 0.05

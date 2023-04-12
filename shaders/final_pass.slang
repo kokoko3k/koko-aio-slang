@@ -86,9 +86,10 @@ void main() {
             //Scanline period:
             vScanlinePeriod = 1.0;
             vScanlineAlternateOffset = 0.0;
+            
             if (bIs_Interlaced) {
                 if (params.FrameCount % 2 == 0.0) vScanlineAlternateOffset = PI_15;
-                if (params.OriginalSize.y > MIN_LINES_INTERLACED )  vScanlinePeriod = 0.5;
+                vScanlinePeriod = 0.5;
             }
             
             //Calculate the maximum possible brightness of the input color by taking glow,
