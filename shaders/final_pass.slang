@@ -876,7 +876,8 @@ void main() {
             //Ambient light
                 if (DO_AMBILIGHT == 1.0) {
                     vec2 co_ambi = vOutputCoord;
-                    pixel_ambi = texture(ambi_temporal_pass, co_ambi).rgb + global_noise_ambi;
+                    pixel_ambi = texture(ambi_temporal_pass, co_ambi).rgb;
+                    pixel_ambi += global_noise_ambi * (20 * (3.0-(pixel_ambi.r+pixel_ambi.g+pixel_ambi.b))) ;
                     pixel_under_content = pixel_ambi;
                 }
             

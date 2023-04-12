@@ -661,10 +661,10 @@ vec2 tilt(vec2 co, float is_rotated, vec2 tilt) {
 			);
 	
 	// Aply FOV;
-		vec2 fov = mix(vec2(1.0), vec2(TILT_FOV), abs(vec2(tilt.x, tilt.y)));
-		co = zoomxy(co, fov.yx);
+		vec2 fov = mix(vec2(1.0), vec2(TILT_FOV), abs( tilt.xy ));
+		co = zoomxy(co, mix_step(fov.yx, fov.xy, is_rotated));
 
-		co.xy += tilt.yx*0.4;
+		co.xy += mix_step(tilt.yx, -tilt.xy, is_rotated) * 0.4;
 		
 	return co;
 
