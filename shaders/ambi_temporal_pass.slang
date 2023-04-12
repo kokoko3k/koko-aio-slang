@@ -97,7 +97,7 @@ vec3 circle_smooth(vec2 coords, vec2 middle, float f_radius, float FALLOFF, floa
 
 vec3 ambi_pre_pass(vec2 coords) {
     if (DO_TILT == 1.0)
-        coords = tilt(coords, vIs_rotated, TILT_X, TILT_Y, 1.0);
+        coords = tilt(coords, vIs_rotated, vec2(TILT_X, TILT_Y));
     
     
     //Skip coords in the rect "under the tube"

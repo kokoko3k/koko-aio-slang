@@ -638,46 +638,36 @@ float get_dyn_zoom(sampler2D tex) {
 	return 1.0 + (texture(tex, vec2(0.75,0.75)    ).a/ DYNZOOM_FACTOR) ;
 }
 
-vec3 pixel_darken(vec3 color_in, float lum) {
-	//simulates a darker image by scaling brightness, saturation and contrast
-	vec3 color_hsv_in = rgb2hsv(color_in);
-	lum = scale_to_range(lum, 0.0, 1.0); 
-	vec3 color_hsv_min=color_hsv_in;
-	color_hsv_min.yz = scale_to_range_vec2(color_hsv_min.yz, -0.1, 0.1); 
-	vec3 color_rgb_min = hsv2rgb(color_hsv_min);
-	return mix(color_in, color_rgb_min, lum);
-}
 
+vec2 tilt(vec2 co, float is_rotated, vec2 tilt) {
 
-
-
-vec2 tilt(vec2 co, float is_rotated, float tilt_x, float tilt_y, float adpt) {
+	vec2 r_tilt = vec2( mix_step(tilt.x, tilt.y, is_rotated),
+	                    mix_step(tilt.y, -tilt.x, is_rotated)
+);
 	
+	vec2 tilt_min = 1 - r_tilt;
+	vec2 tilt_max = 1 + r_tilt;
+	
+	// X Tilt
+		float tilt_x_range = scale_to_range(co.y, tilt_min.x, tilt_max.x);
+		co = vec2( zoom1D(co.x, tilt_x_range),
+		           zoom1D(co.y, tilt_x_range)
+			);
 
+	// Y Tilt
+		float tilt_y_range = scale_to_range(co.x, tilt_min.y, tilt_max.y);
+		co = vec2( zoom1D(co.x, tilt_y_range),
+		           zoom1D(co.y, tilt_y_range)
+			);
 	
-	tilt_x *= adpt;
-	tilt_y *= adpt;
-	
-	float r_tilt_x = mix_step(tilt_x, tilt_y, is_rotated);
-	float r_tilt_y = mix_step(tilt_y, -tilt_x, is_rotated);
-	
-	float tilt_min_x = 1.0 - r_tilt_x;
-	float tilt_max_x = 1.0 + r_tilt_x;
+	// Aply FOV;
+		vec2 fov = mix(vec2(1.0), vec2(TILT_FOV), abs( tilt.xy ));
+		co = zoomxy(co, mix_step(fov.yx, fov.xy, is_rotated));
 
-	float tilt_min_y = 1.0 - r_tilt_y;
-	float tilt_max_y = 1.0 + r_tilt_y;
-
-	float fov_x = tilt_x * TILT_FOV;
-	float fov_y = tilt_y * TILT_FOV;
-	
-	co.x = zoom1D(co.x, scale_to_range(co.y, tilt_min_x, tilt_max_x) );	
-	co.y = zoom1D(co.y, scale_to_range(co.y, 1 - fov_x, 1 + fov_x)) + fov_x*0.32;	
-
-	
-	co.y = zoom1D(co.y, scale_to_range(co.x, tilt_min_y, tilt_max_y) );
-	co.x = zoom1D(co.x, scale_to_range(co.x, 1 - fov_y, 1 + fov_y)) + tilt_y*0.32;	
-	
+		co.xy += mix_step(tilt.yx, -tilt.xy, is_rotated) * 0.4;
+		
 	return co;
+
 }
 	
 bool is_first_outside_rect(vec2 point, vec4 rect) {

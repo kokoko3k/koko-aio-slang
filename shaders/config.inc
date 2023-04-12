@@ -129,8 +129,10 @@
 //#define ALLOW_BG_IMAGE_TEXTURE_WRAP_IN_SHADER
 
 
+	//Gap size in pixel for 1X to 4X mask scaling:
+#define GAP_SIZE_PER_SCALE vec4(1.0, 1.0, 2.0, 2.0)
 
-
+  
 // STATIC CONFIG ENDS HERE ##########################################################################################
 
 
@@ -267,7 +269,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float BEZEL_DIFFUSION_STR;
 	float BEZEL_SPCL_STRENGTH;
 	float BEZEL_ROUGHNESS;
-
+	float BEZEL_CORNER_DARK;
+	
 	float DO_SPOT;
 	float S_POSITION; 
 	float S_SIZE;
@@ -385,7 +388,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 
 //Offset RGB
-#pragma parameter DO_SHIFT_RGB       "★ RGB deconvergence enable? ==>"	0.0	 0.0 1.0 1.0
+#pragma parameter DO_SHIFT_RGB       "★ Deconvergence enable? ==>"	0.0	 0.0 1.0 1.0
 #pragma parameter OFFSET_STRENGTH "        Strength"			0.6 	 0.0 1.0 0.05
 #pragma parameter SHIFT_R         "        Red offset"			-40.0 	-210.0 189.0 1
 #pragma parameter SHIFT_G         "        Green offset"		2.0 	-210.0 189.0 1
@@ -410,7 +413,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 
 // Mask
-#pragma parameter DO_VMASK_AND_DARKLINES "★  RGB Masks and/or Darklines enable? ==>"         		0.0 	0.0 1.0 1.0
+#pragma parameter DO_VMASK_AND_DARKLINES "★  Masks and/or Darklines enable? ==>"         		0.0 	0.0 1.0 1.0
 #pragma parameter MASK_COMPENSATION      "        Compensate for brightness loss"			0.0 	0.0 1.0 0.05
 #pragma parameter VMASK_DARKLINE_SCALE   "        (HiDPI) Vmask and Darklines multiplier"		1.0  	1.0 4.0 1.0
 #pragma parameter RGB_MASK_STRENGTH      "        RGB Mask Strength (0.0 to disable)"			0.75  	0.0 1.0 0.05
@@ -421,7 +424,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 #pragma parameter DARKLINES_STRENGTH     "        Darklines strength (0.0 to disable)"				0.65 	0.0 1.0   0.05
 #pragma parameter DARKLINES_VOFFSET      "           . Offset"							1.0 	0.0 1.0   1.0
-#pragma parameter DARKLINES_PERIOD       "           . Height"							2.0 	2.0 16.0  2.0
+#pragma parameter DARKLINES_PERIOD       "           . Height"							2.0 	2.0 16.0  1.0
 #pragma parameter DRKLN_OVERWHITE        "           . Affect bright colors"					1.0 	0.0 1.0   0.05
 #pragma parameter BLANK9 " " 0.0 0.0 1.0 1.0
 
@@ -451,7 +454,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BLANK11 " " 0.0 0.0 1.0 1.0
 
 #pragma parameter SCANLINE_SM_TYPE         "        Slotmask type (disable (0) with darklines!)"		0.0 	0.0 3.0 1.0
-#pragma parameter SCANLINE_SM_STRENGTH     "           . Slotmask strength (type 1 and 2 only)"			1.0 	0.0 1.0 0.05
+#pragma parameter SCANLINE_SM_STRENGTH     "           . Slotmask strength"						1.0 	0.0 1.0 0.05
 #pragma parameter SCANLINE_SM_VOFFSET      "           . Offset (type 1 only)"					45.0 	0.0 158.0 1.0
 #pragma parameter BLANK12 " " 0.0 0.0 1.0 1.0
 
@@ -496,8 +499,9 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BEZEL_REFL_STRENGTH "        Reflections strength"			0.5    0.0 1.0 0.01
 #pragma parameter BEZEL_RFL_BLR_SHD   "        Reflections sharpness"			-0.0  -0.5 1.0 0.01
 #pragma parameter BEZEL_ROUGHNESS     "        Reflections roughness"			1.0    0.0 5.0 0.1
-#pragma parameter BEZEL_DIFFUSION_STR "        Diffusion strength"             0.0    -1.0 1.0 0.01
+#pragma parameter BEZEL_DIFFUSION_STR "        Diffusion strength"             0.0     0.0 1.0 0.01
 #pragma parameter BEZEL_SPCL_STRENGTH "        Specularity strength"			0.5    0.0 3.0 0.05
+#pragma parameter BEZEL_CORNER_DARK   "        Darken corners"					1.0    0.0 1.0 0.05
 
 
 #pragma parameter BLANK15 " " 0.0 0.0 1.0 1.0
@@ -535,7 +539,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter AMBI_OVER_BEZEL           "        Colorize Bezel"					0.5  0.0  5.0     0.05
 #pragma parameter AMBI_OVER_BEZEL_SIZE      "        Colorization size"					0.15  0.0  0.5    0.001
 #pragma parameter AMBI_BG_IMAGE_BLEND_MODE  "        Back/Foreground image alpha blend (0=mix, 1/check=add)"	0.0   0.0  1.0    1.0
-#pragma parameter AMBI_BG_IMAGE_FORCE       "        Always colorize foreground image (add mode only) "		0.0   0.0  1.0    0.1
+#pragma parameter AMBI_BG_IMAGE_FORCE       "        Always colorize Back/Foreground image (add mode only) "		0.0   0.0  1.0    0.1
 #pragma parameter BLANK17 " " 0.0 0.0 1.0 1.0
 
 
@@ -604,7 +608,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter DO_TILT	  	"★ Tilt enable? ==>"				0.0   0.0  1.0 	  1.0
 #pragma parameter TILT_X	  	"        Tilt along X axis"		0.0    -0.5  0.5  0.01
 #pragma parameter TILT_Y	  	"        Tilt along Y axis"		0.0    -0.5  0.5  0.01
-#pragma parameter TILT_FOV	  	"        Fov"					1.5    0.1	3.0    0.05
+#pragma parameter TILT_FOV	  	"        Fov"					0.7    0.1	1.5   0.05
 #pragma parameter TILT_BEZEL_K	"        Bezel multiplier"		1.0    0.0  1.5  0.01
 #pragma parameter BLANK_01 " " 0.0 0.0 1.0 1.0
 

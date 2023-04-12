@@ -35,7 +35,7 @@ layout(location = 4) out float vIsRotated;
     
 layout(location = 13) out float vDynamicSeed;
 layout(location = 14) out float vBEZEL_INNER_ZOOM_adapted;
-
+layout(location = 15) out float vVmask_gap;
 
 #include "includes/functions.include.slang"
 
@@ -86,9 +86,10 @@ void main() {
             //Scanline period:
             vScanlinePeriod = 1.0;
             vScanlineAlternateOffset = 0.0;
+            
             if (bIs_Interlaced) {
                 if (params.FrameCount % 2 == 0.0) vScanlineAlternateOffset = PI_15;
-                if (params.OriginalSize.y > MIN_LINES_INTERLACED )  vScanlinePeriod = 0.5;
+                vScanlinePeriod = 0.5;
             }
             
             //Calculate the maximum possible brightness of the input color by taking glow,
@@ -101,6 +102,11 @@ void main() {
         //Generate a seed that changes over time for temporal random noise
             vDynamicSeed = mod(params.FrameCount, 60.0001);
         
+        //slotmask/vmask gap size:
+            //Gap size in pixel for 1X to 4X mask scaling:
+            // vec4 GAP_SIZE_PER_SCALE = vec4(1.0, 1.0, 2.0, 2.0);  <--- moved in config.inc
+            vec4 vgap_size_per_scale = GAP_SIZE_PER_SCALE / VMASK_DARKLINE_SCALE;
+            vVmask_gap = vgap_size_per_scale[int(VMASK_DARKLINE_SCALE-1)];
 }
 
 
@@ -120,6 +126,7 @@ layout(location = 11) in float vMax_inLum;
 layout(location = 12) in float vIn_aspect;
 layout(location = 13) in float vDynamicSeed;
 layout(location = 14) in float vBEZEL_INNER_ZOOM_adapted;
+layout(location = 15) in float vVmask_gap;
 
 
 layout(location = 0) out vec4 FragColor;
@@ -158,19 +165,19 @@ vec2 get_vOutputCoord_adapted() {
 
 
 vec3 fn_pixel_nightify(vec3 color_in, float strength) {
-
+    if (strength == 0.0) return color_in;
+    
     color_in = clamp(color_in, 0.0, 1.0);
+    
     vec3 color_hsv_in = rgb2hsv(color_in);
     strength = scale_to_range(strength, 0.0, 1.0); 
     
-    vec3 color_hsv_min=color_hsv_in;
+    vec3 color_hsv_min = color_hsv_in;
     color_hsv_min.yz = scale_to_range_vec2(color_hsv_min.yz, -0.1, 0.1); 
 
     vec3 color_rgb_min = hsv2rgb(color_hsv_min);
     return mix(color_in, color_rgb_min, strength);
 }
-
-
 
 vec3 pixel_vmask(vec3 source, float white_reference, float over_white) {
     // Simple RGB mask emulation with or without horizontal gap
@@ -185,8 +192,10 @@ vec3 pixel_vmask(vec3 source, float white_reference, float over_white) {
 
     vec3 pixel_out;
     vec3 vmasked;
-    vec4 vec_mod=(vec4(3,1,2,3) + vec4(VMASK_GAP,0.0,0.0,0.0))* VMASK_DARKLINE_SCALE ;
 
+    vec4 vec_mod=(vec4(3,1,2,3) + vec4(VMASK_GAP * vVmask_gap,0.0,0.0,0.0))* VMASK_DARKLINE_SCALE;
+    vec_mod = ceil(vec_mod);
+    
     float fcol = vOutputCoord.x * params.OutputSize.x;
     float mod_compare = mod(fcol, vec_mod.x);
     
@@ -234,8 +243,9 @@ vec3 pixel_vmask_gm(vec3 source, float white_reference, float over_white) {
     float fcol = vOutputCoord.s * params.OutputSize.x;
     vec3 pixel_out;
     vec3 vmasked;
-    vec3 vec_mod=(vec3(2,1,2) + vec3(VMASK_GAP,0.0,0.0))* VMASK_DARKLINE_SCALE ;
-
+    vec3 vec_mod=(vec3(2,1,2) + vec3(VMASK_GAP * vVmask_gap,0.0,0.0))* VMASK_DARKLINE_SCALE ;
+    vec_mod = ceil(vec_mod);
+    
     float mod_compare = mod(fcol, vec_mod.x);
     
    /* 
@@ -265,55 +275,10 @@ vec3 pixel_vmask_gm(vec3 source, float white_reference, float over_white) {
 }
 
 
-/*vec3 pixel_vmask_and_gm(vec3 source, float white_reference, float over_white) {
-    // Simple RGB mask emulation with or without horizontal gap
-    float ooo = 1.0 - RGB_MASK_STRENGTH;
-
-    // RGB mask:     R     G     B
-    vec3 m1_rgb =  vec3( 1.0 , ooo , ooo );  //col 1
-    vec3 m2_rgb =  vec3( ooo , 1.0 , ooo );  //col 2
-    vec3 m3_rgb =  vec3( ooo , ooo , 1.0 );  //col 3
-    vec3 gap = vec3( ooo );
-
-    vec3 m1_gm = vec3( ooo , 1.0 , ooo );    //col 1
-    vec3 m2_gm = vec3( 1.0 , ooo , 1.0 );    //col 2
-
-    vec3 m1 = (m1_gm * VMASK_USE_GM) + (m1_rgb * (1-VMASK_USE_GM));
-    vec3 m2 = (m2_gm * VMASK_USE_GM) + (m2_rgb * (1-VMASK_USE_GM));
-    vec3 m3 = m3_rgb;
-
-    vec3 pixel_out;
-    vec3 vmasked;
-    vec4 vec_mod_rgb = vec4(3,1,2,3);
-    vec4 vec_mod_gm =  vec4(2,1,2,0.0);
-    vec4 vec_mod = (vec_mod_gm * VMASK_USE_GM) + (vec_mod_rgb* (1-VMASK_USE_GM));
-    vec_mod=(vec_mod + vec4(VMASK_GAP,0.0,0.0,0.0))* VMASK_DARKLINE_SCALE ;
-
-
-    float fcol = vOutputCoord.s * params.OutputSize.x;
-    if (mod(fcol, vec_mod.x) < vec_mod.y)
-        vmasked = m1 * source;
-    else if (mod(fcol, vec_mod.x) < vec_mod.z)
-        vmasked = m2 * source;
-    else if (    mod(fcol, vec_mod.x) <  vec_mod.w && VMASK_USE_GM < 1.0  )
-        vmasked = m3 * source;
-    else vmasked = gap * source;
-
-    if (over_white == 1.0) pixel_out = vmasked;
-        else {
-            white_reference-= over_white;
-            white_reference=  clamp(white_reference,0.0,1.0);
-            pixel_out=  mix(vmasked,source,white_reference);
-        }
-   return pixel_out;
-
-}*/
-
-
 vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
                      float do_offset, float white_reference,float over_white, vec2 coords) {
 
-    float period_x = (3.0 - VMASK_USE_GM + VMASK_GAP) * VMASK_DARKLINE_SCALE;
+    float period_x = (3.0 - VMASK_USE_GM + VMASK_GAP * vVmask_gap) * VMASK_DARKLINE_SCALE;
     float period_y = darkline_every * VMASK_DARKLINE_SCALE;
 
     vec2 FragCoord = vFragCoord;
@@ -331,7 +296,7 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
 
     float row = int(floor(mod(FragCoord.y, period_y)));
 
-    if (row < VMASK_DARKLINE_SCALE)
+    if (row < VMASK_DARKLINE_SCALE * vVmask_gap)
         return source * darkline_trans;
             else
         return source;
@@ -583,7 +548,7 @@ vec2 get_scaled_coords_for_bezel() {
     vec2 co = zoomout_coords(vTexCoord,-BEZEL_FRAME_ZOOM,1.0);
     
     if (DO_TILT == 1.0) 
-        return tilt(co, vIsRotated, TILT_X, TILT_Y, TILT_BEZEL_K);
+        return tilt(co, vIsRotated, vec2(TILT_X, TILT_Y) * TILT_BEZEL_K);
             else
         return co;
 }
@@ -621,11 +586,17 @@ vec4 fn_pixel_fgbg_image(sampler2D smp) {
 vec3 ambi_blend_image(vec4 image, vec3 ambi) {
     //mix or add ambient light with image, also allow force colorization in add mode.
     if (DO_AMBILIGHT == 0.0) return image.rgb;
-        
+    
+    // Fake a transparent image when force colorization is requested
+    // So that we can use the same code used for alpha blend.
+    // Also multiply AMBI_BG_IMAGE_FORCE * AMBI_BG_IMAGE_BLEND_MODE to skip
+    // force colorization when mode blend mode is not "ADD".
+        float image_alpha_adapted = image.a - (AMBI_BG_IMAGE_FORCE * AMBI_BG_IMAGE_BLEND_MODE);
+
     image.rgb = (AMBI_BG_IMAGE_BLEND_MODE == 0.0) ? 
-        mix(ambi.rgb, image.rgb, image.a) 
+        mix(ambi.rgb, image.rgb, image_alpha_adapted) 
             : 
-        image.rgb + (ambi.rgb * (1 - image.a)); 
+        image.rgb + (ambi.rgb * (1 - image_alpha_adapted)); 
         
     return image.rgb;
 }
@@ -788,14 +759,13 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
             
             //Sample the reflection pass with small offset to simulate the roughness
                 vec4 pixel_mirrored = texture(reflected_blurred_pass, coords_for_mirror + roughness);
-                float fcorners_shade = corners_shade(coords_for_bezel, 1.0);
-                pixel_mirrored.rgb *= 1-(fcorners_shade);
+                float fcorners_shade = 1 - corners_shade(coords_for_bezel, 1.0) * BEZEL_CORNER_DARK;
+                
+                //fcorners_shade = 1.0;
+                pixel_mirrored.rgb *= fcorners_shade;
 
             //Push it over the specular areas and apply the reflection modifier
                 pixel_mirrored.rgb = pixel_mirrored.rgb * (1 + lut_specular) * reflection_modifier;
-
-            //Apply light diffusion here to light corners too.
-                pixel_mirrored.rgb += pixel_mirrored.a * reflection_modifier;
 
             //Apply reflections
                 bezel_out += pixel_mirrored.rgb;
@@ -846,7 +816,7 @@ void main() {
 
     //Tilt?
         if (DO_TILT == 1.0)
-            co_content = tilt(co_content, vIsRotated, TILT_X, TILT_Y, 1.0);
+            co_content = tilt(co_content, vIsRotated, vec2(TILT_X, TILT_Y));
 
 
     //Precalc Bezel coords, since it modifies content coords.
@@ -906,13 +876,15 @@ void main() {
             //Ambient light
                 if (DO_AMBILIGHT == 1.0) {
                     vec2 co_ambi = vOutputCoord;
-                    pixel_ambi = texture(ambi_temporal_pass, co_ambi).rgb + global_noise_ambi;
+                    pixel_ambi = texture(ambi_temporal_pass, co_ambi).rgb;
+                    pixel_ambi += global_noise_ambi * (20 * (3.0-(pixel_ambi.r+pixel_ambi.g+pixel_ambi.b))) ;
                     pixel_under_content = pixel_ambi;
                 }
             
             //Background image:
                 if (DO_BG_IMAGE == 1.0 && BG_IMAGE_OVER == 0.0) {
                     vec4 pixel_bg_image = fn_pixel_fgbg_image(bg_under);
+                    pixel_bg_image.rgb = fn_pixel_nightify(pixel_bg_image.rgb, BG_IMAGE_NIGHTIFY );
                     pixel_bg_image.rgb = ambi_blend_image(pixel_bg_image, pixel_ambi);        
                     pixel_under_content = pixel_bg_image.rgb;
                 }
@@ -959,5 +931,7 @@ void main() {
         
     FragColor = vec4(pixel_out, 1.0);
    
+    //FragColor = vec4(texture( reflected_blurred_pass, co_mirror).a);
+    
 }
 

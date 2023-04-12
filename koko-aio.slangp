@@ -114,7 +114,9 @@ shaders = 17
        scale_type2 = source
             scale2 = 1.0
      mipmap_input2 = true
-        wrap_mode2 = "clamp_to border"
+      //This *has* to be mirrored_repeat reflection_blur uses high lods
+      //from first_pass to emulate light diffusion 
+        wrap_mode2 = "mirrored_repeat"
 
         
 

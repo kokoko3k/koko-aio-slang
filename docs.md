@@ -26,7 +26,7 @@
     It can be used with RGB shifting and image blurring to give the picture
     an ntsc look without dealing with specific encoding/decoding stuffs. 
 
-**RGB deconvergence:**
+**Deconvergence:**
     Shift R,G,B components separately to mimic channel deconvergence.
     By varying Red, Green and Blue offsets, the relative component will be
     shifted column by column, row by row.
@@ -63,7 +63,7 @@
         This will help you to set the previous 2 values as it will show only
         the artifacts that will modify the blur.
     
-**RGB Masks and/or Darklines:**
+**Masks and/or Darklines:**
     Emulates CRT RGB phosphors (RGB Mask),
     slotmasks and aperturegrille (Darklines).
     
@@ -160,7 +160,7 @@
                Works best with scanline heights in range [0.5..0.7] 
         Type 3 is fixed and produces heavier and thinner slotmasks without visible scanlines.
     Slotmask strength
-        The strenght of the slotmask (available on type 1 and 2 only)
+        The strength of the slotmask
     . Offset
         This is the slotmask offset/stagger, (available on type 1 only)
         Keep it around 79 or all the way to max
@@ -229,11 +229,16 @@
         The amount of reflections
     Reflections sharpness
         Modulates from totally blurred to totally sharp reflection appearance.
-    Specularity strength
-        The amount of specular reflection
     Reflections roughness
         The amount of material roughness in reflection area
-          
+    Diffusion strength
+        Mix an amount of high blurred reflection to simulate light diffusion
+    Specularity strength
+        The amount of specular reflection
+    Darken corners
+        How much the bezel corners should be darkened
+    
+
 **Backgound image:**
     Draws an image on screen picked from the "textures" shader subdirectory,
     named: background.png<br>
@@ -301,7 +306,7 @@
         shown on their transparent areas (alpha channel)
         Switching this you can choose if you want to emulate leds:
         under the image (0/mix) or over the image (1/add)
-    Always colorize Foreground image (add mode only)
+    Always colorize Back/Foreground image (add mode only)
         When "Back/Foreground image alpha blend" is set to 1/add,
         you can choose to always colorize the foreground image by a certain amount.
         This can be used to produce big haloes all around the tube.
