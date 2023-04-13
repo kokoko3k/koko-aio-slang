@@ -203,6 +203,8 @@
         control how much the display is curved along its axes.
     Corner radius, Corner sharpness:
         Control the "smoothness" of the display corners.
+    Cut curvature ears;
+        If you see weird image repetition try this.
         
 **Bezel:**
     Draws a monitor frame with simulated reflections from the game content.
@@ -362,6 +364,9 @@
 
 **Tilt:**
     Put the bezel and the game content into perspective.
+    The implementation is basic, you can expect correct
+    results when tilting alongside a single axis or when
+    using both, but with small values.
     
     Tilt along X(Y) axis:
         Rotate the image in space

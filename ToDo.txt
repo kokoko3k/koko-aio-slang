@@ -78,6 +78,9 @@
 #        to the circle mask, or color gamma would suffer.
 #        Unfortunately this is not possible, because ambi_temporal_pass
 #        runs at loooow resolution and lowering gamma there leads to visual artifacts.
+#    [v] When the mask is scaled, is it right to scale the gap too?
+#        Yes and no, probably it has to scale by half, done.
+#    [v] Better debanding?
 #    [.] specular reflections does not 100% follow the image when overriding aspect
 #        This is because in compose_bezel_over we sample avglum_pass which is not 100% aware of them.
 #        the correct and final solution to this would be to sample the first reflection pass which
@@ -86,7 +89,6 @@
 #    [..] Update bezel presets so that inner zoom matches the bezel, then adjust geometry zoom that is aware of reflections
 #         Cant, since the reflected black border looks weird.
 #    [ ] check branching conditions in first_pass.slang
-#    [ ] Better debanding?
 #    [ ] deconvergence after glow/halo?
 #    [ ] Glow spread in final pass?
 #    [ ] Find a way to smooth borders without cropping the image
@@ -94,8 +96,6 @@
 #        corner shape, size and fade?  
 #    [ ] bloom should bleed over when forcing geometry aspect
 #    [ ] reflection blurriness should not depend on input resolution
-#    [ ] When the mask is scaled, is it right to scale the gap too?
-#        Yes and no, probably it has to scale by half.
 #    [ ] copy base presets to overlay repo (after release)
 #    [ ] dynamic contrast, the more the brigher the content, the less the bezel and back/foreground image?
 #    [ ] Try to write your own curvature function

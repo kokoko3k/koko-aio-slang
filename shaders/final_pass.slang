@@ -761,14 +761,14 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
                 vec4 pixel_mirrored = texture(reflected_blurred_pass, coords_for_mirror + roughness);
                 float fcorners_shade = 1 - corners_shade(coords_for_bezel, 1.0) * BEZEL_CORNER_DARK;
                 
-                //fcorners_shade = 1.0;
+            //Show less reflections in the corners
                 pixel_mirrored.rgb *= fcorners_shade;
 
             //Push it over the specular areas and apply the reflection modifier
-                pixel_mirrored.rgb = pixel_mirrored.rgb * (1 + lut_specular) * reflection_modifier;
+                pixel_mirrored.rgb = pixel_mirrored.rgb * (1 + lut_specular);
 
             //Apply reflections
-                bezel_out += pixel_mirrored.rgb;
+                bezel_out += (pixel_mirrored.rgb * reflection_modifier);
         }
 
     //Mix ambient light over bezel? (branching this is worse)
@@ -807,6 +807,7 @@ void main() {
                     global_noise_static = random_fast(NOISEPOWER, vTexCoord);
         }
     
+    
     //Calc initial content coords
         vec2 co_content = vTexCoord;
         if (DO_CURVATURE == 1.0  &&  ((GEOM_WARP_X != 0.0) || (GEOM_WARP_Y != 0.0))) {
@@ -814,6 +815,7 @@ void main() {
             //co_content = Warp(co_content, GEOM_WARP_X, GEOM_WARP_Y);
         }
 
+        
     //Tilt?
         if (DO_TILT == 1.0)
             co_content = tilt(co_content, vIsRotated, vec2(TILT_X, TILT_Y));
@@ -847,7 +849,7 @@ void main() {
 
     //Draw content only over the alpha mask, spare gpu cycles.
         if (canvas_busy > 0.0)
-            pixel_out = fn_pixel_content(co_content);
+            pixel_out = fn_pixel_content(co_content) * canvas_busy;
               
 
     //Draw Bezel
@@ -868,6 +870,7 @@ void main() {
                 //FragColor = vec4(canvas_busy); return; // <- uncomment to debug BEZEL_SHADOW_SIZE
         }
 
+        
     //The following funcs have to paint in the outer border
         vec3 pixel_ambi = vec3(0.0);
         vec3 pixel_under_content = vec3(0.0);
@@ -892,14 +895,13 @@ void main() {
         }
 
         
-
         //Smooth the image corners: canvas_busy (the alpha mask) is a white rect with shaded borders.
             pixel_out = mix (pixel_under_content, pixel_out, canvas_busy);
  
           
-    //Backdrop
-        if (DO_BACKDROP == 1.0)
-            pixel_out += pixel_backdrop_image();
+        //Backdrop
+            if (DO_BACKDROP == 1.0)
+                pixel_out += pixel_backdrop_image();
 
             
         //Foreground image
