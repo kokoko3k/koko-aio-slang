@@ -761,14 +761,14 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
                 vec4 pixel_mirrored = texture(reflected_blurred_pass, coords_for_mirror + roughness);
                 float fcorners_shade = 1 - corners_shade(coords_for_bezel, 1.0) * BEZEL_CORNER_DARK;
                 
-                //fcorners_shade = 1.0;
+            //Show less reflections in the corners
                 pixel_mirrored.rgb *= fcorners_shade;
 
             //Push it over the specular areas and apply the reflection modifier
-                pixel_mirrored.rgb = pixel_mirrored.rgb * (1 + lut_specular) * reflection_modifier;
+                pixel_mirrored.rgb = pixel_mirrored.rgb * (1 + lut_specular);
 
             //Apply reflections
-                bezel_out += pixel_mirrored.rgb;
+                bezel_out += (pixel_mirrored.rgb * reflection_modifier);
         }
 
     //Mix ambient light over bezel? (branching this is worse)
