@@ -1,5 +1,9 @@
-#bulk save presets and rename them.
-#set retroarch input to X11 or it will not work.
+# bulk save presets and rename them.
+# first argument is the rom/content name to load
+
+# * set retroarch input to X11 or it will not work.
+# * Set simple preset off
+
 
 function SendString {
     STRING=$1
@@ -48,6 +52,7 @@ function xdosavepreset {
 
 	SendKey 1
 	SendKey "Return"
+	sleep 5
 	SendKey "Escape"
 	SendKey "Escape"
 	SendKey "Escape"
@@ -59,7 +64,7 @@ for preset in $(ls -1 /koko/koko-aio-slang/presets/* | grep slangp) ; do
 	presetname=$(basename "$preset")
 	echo $presetname
 	xdosavepreset 5 &
-	retroarch  -L /koko/.config/retroarch/cores/mame2003_plus_libretro.so romname.zip \
+	retroarch  -L /koko/.config/retroarch/cores/mame2003_plus_libretro.so $1 \
 	--set-shader $preset  2>&1|grep -i error 
 	mv /koko/.config/retroarch/shaders/1.slangp /koko/.config/retroarch/shaders/$presetname
 done
