@@ -16,7 +16,7 @@ void main() {
    vTexCoord = TexCoord;
    
    //Generate a seed that changes over time for temporal random noise
-      vDynamicSeed = mod(params.FrameCount, 600.0001);
+      vDynamicSeed = mod(params.FrameCount, 120.0001);
 }
 
 

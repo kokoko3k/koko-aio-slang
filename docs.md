@@ -203,6 +203,8 @@
         control how much the display is curved along its axes.
     Corner radius, Corner sharpness:
         Control the "smoothness" of the display corners.
+    Cut curvature ears;
+        If you see weird image repetition try this.
         
 **Bezel:**
     Draws a monitor frame with simulated reflections from the game content.

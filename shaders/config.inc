@@ -476,7 +476,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 
 //Curvature parameters:
-#pragma parameter DO_CURVATURE	     "★ Curvature enable? ==>"			0.0   0.0 1.0 1.0
+#pragma parameter DO_CURVATURE	     "★ Curvature/Border enable? ==>"			0.0   0.0 1.0 1.0
 #pragma parameter GEOM_WARP_X        "        Warp X"				0.3  0.0 6.0 0.025
 #pragma parameter GEOM_WARP_Y        "        Warp Y"				0.0   0.0 6.0 0.025
 #pragma parameter GEOM_CUT_EARS      "        Cut curvature ears"	1.4   1.0 10.0 0.01
