@@ -252,3 +252,5 @@
 	#define TILT_Y			global.TILT_Y
 	#define TILT_FOV		global.TILT_FOV
 	#define TILT_BEZEL_K	global.TILT_BEZEL_K
+
+#define TATE	global.TATE

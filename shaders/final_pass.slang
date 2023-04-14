@@ -5,6 +5,7 @@
  * Does masks, spot, bezel, vignette, background image (anything else?)
  */
 
+
 #include "config.inc"
 
 #pragma stage vertex
@@ -15,7 +16,7 @@ layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
 layout(location = 1) out vec2 vOutputCoord;
 layout(location = 2) out vec2 spot_offset;
-layout(location = 3) out vec2 vFragCoord;
+layout(location = 3) out vec2 vFragCoord_Tated;
 layout(location = 4) out float vIsRotated;
 
 
@@ -36,6 +37,9 @@ layout(location = 4) out float vIsRotated;
 layout(location = 13) out float vDynamicSeed;
 layout(location = 14) out float vBEZEL_INNER_ZOOM_adapted;
 layout(location = 15) out float vVmask_gap;
+layout(location = 16) out float vFcol_Tated;
+layout(location = 17) out float vDo_Tate;
+
 
 #include "includes/functions.include.slang"
 
@@ -60,10 +64,13 @@ void main() {
 
     vOutputCoord = TexCoord;
 
-    vFragCoord = vec2( floor(vOutputCoord.x * params.OutputSize.x),
+
+    vec2 vFragCoord = vec2( floor(vOutputCoord.x * params.OutputSize.x),
                        floor(vOutputCoord.y * params.OutputSize.y));
 
-    
+    vDo_Tate = float(TATE+vIsRotated > 1.001);
+    vFragCoord_Tated = mix_step(vFragCoord.xy, vFragCoord.yx, vDo_Tate );
+
     vBEZEL_INNER_ZOOM_adapted = get_BEZEL_INNER_ZOOM() * DO_BEZEL;
     
     //Precalc some Curvature/Warp values:
@@ -107,6 +114,8 @@ void main() {
             // vec4 GAP_SIZE_PER_SCALE = vec4(1.0, 1.0, 2.0, 2.0);  <--- moved in config.inc
             vec4 vgap_size_per_scale = GAP_SIZE_PER_SCALE / VMASK_DARKLINE_SCALE;
             vVmask_gap = vgap_size_per_scale[int(VMASK_DARKLINE_SCALE-1)];
+
+            vFcol_Tated = mix_step(vOutputCoord.x * params.OutputSize.x, vOutputCoord.y * params.OutputSize.y, vDo_Tate);
 }
 
 
@@ -114,7 +123,7 @@ void main() {
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in vec2 vOutputCoord;
 layout(location = 2) in vec2 spot_offset;
-layout(location = 3) in vec2 vFragCoord;
+layout(location = 3) in vec2 vFragCoord_Tated;
 layout(location = 4) in float vIsRotated;
 layout(location = 5) in vec2 vWarp_vexp;
 layout(location = 6) in vec2 vWarp_arg2;
@@ -127,7 +136,8 @@ layout(location = 12) in float vIn_aspect;
 layout(location = 13) in float vDynamicSeed;
 layout(location = 14) in float vBEZEL_INNER_ZOOM_adapted;
 layout(location = 15) in float vVmask_gap;
-
+layout(location = 16) in float vFcol_Tated;
+layout(location = 17) in float vDo_Tate;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -196,8 +206,8 @@ vec3 pixel_vmask(vec3 source, float white_reference, float over_white) {
     vec4 vec_mod=(vec4(3,1,2,3) + vec4(VMASK_GAP * vVmask_gap,0.0,0.0,0.0))* VMASK_DARKLINE_SCALE;
     vec_mod = ceil(vec_mod);
     
-    float fcol = vOutputCoord.x * params.OutputSize.x;
-    float mod_compare = mod(fcol, vec_mod.x);
+
+    float mod_compare = mod(vFcol_Tated, vec_mod.x);
     
     if (mod_compare < vec_mod.y)
         vmasked = m1;
@@ -240,13 +250,12 @@ vec3 pixel_vmask_gm(vec3 source, float white_reference, float over_white) {
     vec3 m2 =  vec3( 1.0 , ooo , 1.0 );    //col 2
     vec3 gap = vec3( ggg );
 
-    float fcol = vOutputCoord.s * params.OutputSize.x;
     vec3 pixel_out;
     vec3 vmasked;
     vec3 vec_mod=(vec3(2,1,2) + vec3(VMASK_GAP * vVmask_gap,0.0,0.0))* VMASK_DARKLINE_SCALE ;
     vec_mod = ceil(vec_mod);
     
-    float mod_compare = mod(fcol, vec_mod.x);
+    float mod_compare = mod(vFcol_Tated, vec_mod.x);
     
    /* 
     if (mod_compare < vec_mod.y)
@@ -281,7 +290,7 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
     float period_x = (3.0 - VMASK_USE_GM + VMASK_GAP * vVmask_gap) * VMASK_DARKLINE_SCALE;
     float period_y = darkline_every * VMASK_DARKLINE_SCALE;
 
-    vec2 FragCoord = vFragCoord;
+    vec2 FragCoord = vFragCoord_Tated;
 
     if (over_white != 1.0) {
         //less effect on bright colors.
@@ -302,7 +311,7 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
         return source;
 }
 
-float fn_scanline_mask(vec2 coords, bool do_slotmask, float lum, float min_inLum, float max_inLum) {
+float fn_scanline_mask(vec2 coords, bool do_slotmask, float lum, float min_inLum, float max_inLum, float tate) {
     /* Produces a B/W scanline shape to be multiplicated by the source
     * pixel later on to emulate scanline effect.
     * scanlines can be drawn on odd and even fields alternating on odd and
@@ -318,13 +327,15 @@ float fn_scanline_mask(vec2 coords, bool do_slotmask, float lum, float min_inLum
         float lum_scaled = map_range(lum, min_inLum, max_inLum, SCANLINE_MIN, SCANLINE_MAX);
 
     
-    float angle_base = coords.y * pi * params.OriginalSize.y * period;
-
     float lines = 1.0;
 
-    //1 - Generate base scanline.
+    //0 - Generate base scanline.
+    //1 - The base coords is switched from coords.y to coords.x if tate mode is requested.
     //2 - offset them on odd frames if needed (vScanlineAlternateOffset via vertex shader)
     //3 - Dont do it when the screen is interlaced and we have to skip drawing scanlines on interlaced screens.
+        coords = mix_step(coords.xy, coords.yx, tate);
+        float angle_base = coords.y * pi * params.OriginalSize.y * period;
+
         if  (!( is_interlaced && SCANLINE_DISABLE_ON_INTERLACE == 1.0 )) {
             lines = pow( sin(angle_base + vScanlineAlternateOffset), 2.0);
         }
@@ -341,7 +352,7 @@ float fn_scanline_mask(vec2 coords, bool do_slotmask, float lum, float min_inLum
     if (do_slotmask) {
         float Darkline_part_w = (3.0 - VMASK_USE_GM + VMASK_GAP) * VMASK_DARKLINE_SCALE;
         float Darkline_part_w_x2 = Darkline_part_w*2;
-        bool odd_column = mod(vFragCoord.x + Darkline_part_w  , Darkline_part_w_x2) < Darkline_part_w;
+        bool odd_column = mod(vFragCoord_Tated.x + Darkline_part_w  , Darkline_part_w_x2) < Darkline_part_w;
 
         if (SCANLINE_SM_TYPE == 1.0) {
             // Slotmask is out oh phase every "odd" triple and mixed with
@@ -660,7 +671,7 @@ vec3 fn_pixel_content(vec2 coords) {
                 //The maximum possible brightness of the input color modified by glow,contrast and brightness.
                 float max_inLum = vMax_inLum;
                 float min_inLum = 0.0;
-                scanline_mask = fn_scanline_mask(coords, SCANLINE_SM_TYPE > 0.0, lum, min_inLum, max_inLum );
+                scanline_mask = fn_scanline_mask(coords, SCANLINE_SM_TYPE > 0.0, lum, min_inLum, max_inLum, vDo_Tate );
                 pixel_out = min(pixel_out, 1.0) * ( scanline_mask + ( pixel_bleed * SCANLINES_BLEEDING * ( 1 - scanline_mask ) ));
         }
 
