@@ -14,7 +14,7 @@ Please see the list of game presets in the Release Notes.
 # Screenshots
 Screenshots are taken under MacOS with HDR enabled.
 
-In the works: Some nightyfied artwork by Mr. Retrolust
+In the works: Some nightyfied artwork by Mr. Retrolust - I started nightyfying all presets, the previous ones without the new nightify option will be saved under 'classic'.
 
 <img width="750" alt="Bildschirmfoto 2023-04-08 um 21 03 47" src="https://user-images.githubusercontent.com/24915559/230785582-e364fa18-e0ea-4908-a912-c3de18bfe70c.png">
 
