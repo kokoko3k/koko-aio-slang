@@ -332,9 +332,15 @@ float fn_scanline_mask(vec2 coords, bool do_slotmask, float lum, float min_inLum
     //0 - Generate base scanline.
     //1 - The base coords is switched from coords.y to coords.x if tate mode is requested.
     //2 - offset them on odd frames if needed (vScanlineAlternateOffset via vertex shader)
-    //3 - Dont do it when the screen is interlaced and we have to skip drawing scanlines on interlaced screens.
+    //3 - Dont do it when the screen is interlaced and we have to skip drawing scanlines on interlaced screens
+
+        //coords += params.OriginalSize.zw*0.5; //<-- this seems needed when using integer scalinf
+        //due to linear filtering in earlier pass FIXME don't forget me!
         coords = mix_step(coords.xy, coords.yx, tate);
-        float angle_base = coords.y * pi * params.OriginalSize.y * period;
+        float originalsize = mix_step(params.OriginalSize.y, params.OriginalSize.x, tate);
+
+        float angle_base = coords.y * pi * originalsize * period;
+
 
         if  (!( is_interlaced && SCANLINE_DISABLE_ON_INTERLACE == 1.0 )) {
             lines = pow( sin(angle_base + vScanlineAlternateOffset), 2.0);
@@ -427,12 +433,14 @@ float fn_scanline_mask(vec2 coords, bool do_slotmask, float lum, float min_inLum
     //Apply min brightness
         lines = lines * (1-SCANLINE_DARK ) + SCANLINE_DARK ;
 
+
+
     return lines;
 }
 
 float get_clamped_white_reference(vec3 pixel_in){
     float white_reference = max(max(pixel_in.r,pixel_in.g),pixel_in.b);
-    white_reference = min(white_reference,1.0); //Clamp here for both vmask and darklines.
+//     white_reference = min(white_reference,1.0); //Clamp here for both vmask and darklines.
     return white_reference;
 }
 
@@ -672,6 +680,11 @@ vec3 fn_pixel_content(vec2 coords) {
                 float max_inLum = vMax_inLum;
                 float min_inLum = 0.0;
                 scanline_mask = fn_scanline_mask(coords, SCANLINE_SM_TYPE > 0.0, lum, min_inLum, max_inLum, vDo_Tate );
+
+                //scanline_mask = fn_scanline_mask(coords, SCANLINE_SM_TYPE > 0.0, lum, min_inLum, max_inLum, 0.0 );
+                //scanline_mask *= fn_scanline_mask(coords, SCANLINE_SM_TYPE > 0.0, lum, min_inLum, max_inLum, 1.0 );
+
+
                 pixel_out = min(pixel_out, 1.0) * ( scanline_mask + ( pixel_bleed * SCANLINES_BLEEDING * ( 1 - scanline_mask ) ));
         }
 
