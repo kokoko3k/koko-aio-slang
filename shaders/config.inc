@@ -127,7 +127,7 @@
 
 	//Should texture wrapping be allowed as a shader parameter?
 	//since it causes branching, better set it as a static value.
-//#define ALLOW_BG_IMAGE_TEXTURE_WRAP_IN_SHADER
+#define ALLOW_BG_IMAGE_TEXTURE_WRAP_IN_SHADER
 
 
 	//Gap size in pixel for 1X to 4X mask scaling:
