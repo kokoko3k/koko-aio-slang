@@ -1,9 +1,10 @@
 
 // BEZEL STATIC CONFIG ##############################################################################################
-
-	// Uncomment this to improve bezel downscaling.
-	// If you are using standard bezel, leave commented to gain performance.
-//#define STATIC_BEZEL_USE_MIPMAP 1.0
+	//The following defines the monitor frame resolution in textures/monitor_body_[curved/straight].png
+	//and are used to calculate the sampling lod.
+	//Change if you change the texture resolution or
+	//you can comment it to let the shader calculates them at runtime (heavier).
+#define BEZEL_RES vec2(2923, 2178)
 
 	//This is used to skip calculations in the reflection blur code.
 	//set it to minimum value that allows you to see reflection entirely

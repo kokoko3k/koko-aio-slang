@@ -746,20 +746,19 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
         ) return vec4(0.0);
 
     vec4 bezel_in;    
-    //Sample main bezel texture, Do we want mipmaps?
-        #ifdef STATIC_BEZEL_USE_MIPMAP
-            vec2 bezel_lut_size = textureSize(monitor_body_curved,0); //no need to branch here if we assume straight and curved textures are the same size. //FIXME?
-            float bezel_frame_lod = log2(bezel_lut_size.y * (BEZEL_FRAME_ZOOM+1.0) /global.FinalViewportSize.y);
-            if (BEZEL_USE_STRAIGHT < 0.5)
-                bezel_in = textureLod(monitor_body_curved,coords_for_bezel,bezel_frame_lod);
-                    else
-                bezel_in = textureLod(monitor_body_straight,coords_for_bezel,bezel_frame_lod);
+    
+    //Sample main bezel texture:
+        #ifndef BEZEL_RES
+            vec2 bezel_lut_size = textureSize(monitor_body_curved, 0); //no need to branch here if we assume straight and curved textures are the same size. //FIXME?
         #else
-            if (BEZEL_USE_STRAIGHT < 0.5)
-                bezel_in = texture(monitor_body_curved,coords_for_bezel);
-                    else
-                bezel_in = texture(monitor_body_straight,coords_for_bezel);
+            vec2 bezel_lut_size = BEZEL_RES;
         #endif
+        float bezel_frame_lod = log2(bezel_lut_size.y * (BEZEL_FRAME_ZOOM+1.0) /global.FinalViewportSize.y);
+        
+        if (BEZEL_USE_STRAIGHT < 0.5)
+            bezel_in = textureLod(monitor_body_curved,coords_for_bezel,bezel_frame_lod);
+                else
+            bezel_in = textureLod(monitor_body_straight,coords_for_bezel,bezel_frame_lod);
     
 
     //Exit if the bezel is completely transparent (the tube)
