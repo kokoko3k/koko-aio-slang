@@ -413,8 +413,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter IN_GLOW_SHOW_ARTF_MASK   "        Show NTSC artifacts mask (debug)"				0.0	0.0 1.0 1.0
 #pragma parameter BLANK7 " " 0.0 0.0 1.0 1.0
 
-#pragma parameter TATE                     "★ Tate mode (1:auto 2:forced)"		0.0 	0.0 2.0 1.0
-#pragma parameter BLANK7a " " 0.0 0.0 1.0 1.0
 
 // Mask
 #pragma parameter DO_VMASK_AND_DARKLINES "★  Masks and/or Darklines enable? ==>"         		0.0 	0.0 1.0 1.0
@@ -432,18 +430,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter DRKLN_OVERWHITE        "           . Affect bright colors"					1.0 	0.0 1.0   0.05
 #pragma parameter BLANK9 " " 0.0 0.0 1.0 1.0
 
-
-
-// Halo
-#pragma parameter DO_HALO       "★ Halo enable? ==>" 						0.0	0.0 1.0 1.0
-#pragma parameter HALO_POWER    "        Strength"						0.9 	0.0  5.0 0.025
-#pragma parameter HALO_W        "        Sharpness, horizontal"					1.75	0.35  7.0 0.05
-#pragma parameter HALO_H        "        Sharpness, Vertical"					1.75	0.35  7.0 0.05
-#pragma parameter HALO_GAMMA    "        Gamma, the higher, the less the halo on dark colors"	2.0 	1.0  10.0 0.1
-#pragma parameter HALO_VS_SCAN  "        Light up scanlines gaps too"				0.0	0.0  1.0  0.1
-#pragma parameter BLANK10 " " 0.0 0.0 1.0 1.0
-
-
+#pragma parameter TATE                     "★ Tate mode (1:auto 2:forced)"		0.0 	0.0 2.0 1.0
+#pragma parameter BLANK7a " " 0.0 0.0 1.0 1.0
 
 // Scanlines
 #pragma parameter DO_SCANLINES	         "★ Scanlines enable? ==>"						0.0 	0.0  1.0 1.0
@@ -460,6 +448,18 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter SCANLINE_SM_STRENGTH     "           . Slotmask strength"						1.0 	0.0 1.0 0.05
 #pragma parameter SCANLINE_SM_VOFFSET      "           . Offset (type 1 only)"					45.0 	0.0 158.0 1.0
 #pragma parameter BLANK12 " " 0.0 0.0 1.0 1.0
+
+
+
+// Halo
+#pragma parameter DO_HALO       "★ Halo enable? ==>" 						0.0	0.0 1.0 1.0
+#pragma parameter HALO_POWER    "        Strength"						0.9 	0.0  5.0 0.025
+#pragma parameter HALO_W        "        Sharpness, horizontal"					1.75	0.35  7.0 0.05
+#pragma parameter HALO_H        "        Sharpness, Vertical"					1.75	0.35  7.0 0.05
+#pragma parameter HALO_GAMMA    "        Gamma, the higher, the less the halo on dark colors"	2.0 	1.0  10.0 0.1
+#pragma parameter HALO_VS_SCAN  "        Light up scanlines gaps too"				0.0	0.0  1.0  0.1
+#pragma parameter BLANK10 " " 0.0 0.0 1.0 1.0
+
 
 
 // Bloom
@@ -598,8 +598,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 //Content geomerty overrides
 #pragma parameter DO_GAME_GEOM_OVERRIDE	  "★ Override content geometry enable? ==>"	0.0   0.0  1.0 	  1.0
-#pragma parameter GAME_GEOM_INT_SCALE     "        Integer scale (disables inner zoom)"	0.0   0.0  1.0    1.0
-#pragma parameter GAME_GEOM_INT_SCALE_MAX "        Maximum integer scale" 		10.0  1.0  100.0  1.0
+#pragma parameter GAME_GEOM_INT_SCALE     "        Integer scale (disables inner zoom) 2=No keep aspect"	0.0   0.0  2.0    1.0
+#pragma parameter GAME_GEOM_INT_SCALE_MAX "        Maximum integer scale" 				10.0  1.0  100.0  1.0
 #pragma parameter LABEL_WARNING4          "    ⚠ The following will override integer scale ⚠"	1.0  1.0  1.0     1.0
 #pragma parameter GAME_GEOM_ASPECT	  "        Aspect (0 = unchanged)"		0.0    0.0  3.0	  0.005
 #pragma parameter GAME_GEOM_VSHIFT	  "        Vertical position"			0.0   -10.0 10.0  0.01

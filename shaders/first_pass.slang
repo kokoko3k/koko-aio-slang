@@ -98,6 +98,8 @@ void debug() {
    
    //pixel_debug=vec3(vTexCoord.x); //H bw gradient
    
+   pixel_debug=vec3(1.0); //H bw gradient
+   
    //pixel_debug=vec3(floor(vTexCoord.x*16)/16); //H bw gradient 16gray
    
    //pixel_debug=vec3(floor(vTexCoord.x*64)/64); //H bw gradient 64gray

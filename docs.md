@@ -1,40 +1,40 @@
 **koko-aio-slang parameters documentation**
 
-**Color corrections:**
-    Modify luminance, saturation, contrast, brightness and color temperature of the
-    signal, at "input" stage.
+**Color corrections:**<br>
+    Modify luminance, saturation, contrast, brightness and color temperature
+    of the signal, at "input" stage.<br>
     Gamma correction is applied to the final processed picture.
     
-**FXAA:**
-    Apply the well known antialiasing effect by Nvidia.
-    Use it if you don't want to blur the image and you still don't like
-    jagged or too much pixelated images.
+**FXAA:**<br>
+    Apply the well known antialiasing effect by Nvidia.<br>
+    Use it if you don't want to blur the image and you still don't like<br>
+    jagged or too much pixelated images.<br>
 
-**CVBS: NTSC color artifacts: **
-    Tries to emulate typical NTSC color artifacting without emulating
-    full NTSC coding/decoding pipeline.
-    While it improves the look of NTSC content, don't expect it to be
-    an accurate emulation (yet?)
-    As today, it is enough to emulate rainbowing effects on genesis.
+**CVBS: NTSC color artifacts: **<br>
+    Tries to emulate typical NTSC color artifacting without emulating<br>
+    full NTSC coding/decoding pipeline.<br>
+    While it improves the look of NTSC content, don't expect it to be<br>
+    an accurate emulation (yet?)<br>
+    As today, it is enough to emulate rainbowing effects on genesis.<br>
     
-** RF Noise: **
-    Emulates radio frequency noise with a given strength
+** RF Noise: **<br>
+    Emulates radio frequency noise with a given strength<br>
     
-**CVBS: Bandwidth limited chroma:**
-    Will cause an horizontal chroma bleed which cheaply mimics the effect of
-    poor composite video signals.
-    It can be used with RGB shifting and image blurring to give the picture
-    an ntsc look without dealing with specific encoding/decoding stuffs. 
+**CVBS: Bandwidth limited chroma:**<br>
+    Will cause an horizontal chroma bleed which cheaply mimics the effect of<br>
+    poor composite video signals.<br>
+    It can be used with RGB shifting and image blurring to give the picture<br>
+    an ntsc look without dealing with specific encoding/decoding stuffs. <br>
 
-**Deconvergence:**
-    Shift R,G,B components separately to mimic channel deconvergence.
-    By varying Red, Green and Blue offsets, the relative component will be
-    shifted column by column, row by row.
+**Deconvergence:**<br>
+    Shift R,G,B components separately to mimic channel deconvergence.<br>
+    By varying Red, Green and Blue offsets, the relative component will be<br>
+    shifted column by column, row by row.<br>
     
-**Glow/Blur:**
-    Emulate the CRT glowing "feature", so that the brighter areas of
-    the image will light their surroundings,
-    with options to switch to classic blur.
+**Glow/Blur:**<br>
+    Emulate the CRT glowing "feature", so that the brighter areas of<br>
+    the image will light their surroundings,<br>
+    with options to switch to classic blur.<br>
     
     Input signal strength:
         The input signal gain
@@ -63,8 +63,8 @@
         This will help you to set the previous 2 values as it will show only
         the artifacts that will modify the blur.
     
-**Masks and/or Darklines:**
-    Emulates CRT RGB phosphors (RGB Mask),
+**Masks and/or Darklines:**<br>
+    Emulates CRT RGB phosphors (RGB Mask),<br>
     slotmasks and aperturegrille (Darklines).
     
     (HiDPI) Vmask and Darklines multiplier:
@@ -104,26 +104,11 @@
     Darklines: affect bright colors:
         See "RGB Mask: affect bright colors"
 
-**Halo:**
-    Emulates the effect of the brighter pixels reflected by the CRT glass
-    that lights nearby zones (a sort of tight bloom).
-    The light is meant to be spreaded in a way that it nulls the effect of the
-    dark scanline parts, darklines and the RGB masks.
-    So you can use this to restore the brightness and color saturation
-    loss when using features like scanlines, darklines or RGB masks.
+**Tate mode:**<br>
+    Rotates mask and scanlines by 90°<br>
     
-	Light up scanlines too:
-		Theoretically Halo have to be applied 
-		"over" everything, because that is the way it works in nature.
-		But you can choose to cheat and instead apply scanlines over the halo
-		instead.
-		Do this if you like much more pronunced scanlines, even at the
-		price of some graphical artifacts visible on high contrasted areas. 
-
-    Refer to "Glowing Input/power" for other parameters meaning.
-
-**Scanlines:**
-    Emulate CRT scanlines.
+**Scanlines:**<br>
+    Emulate CRT scanlines.<br>
     
     Scanlines gap brightness:
         controls how "little" they will look pronunced.
@@ -164,11 +149,29 @@
     . Offset
         This is the slotmask offset/stagger, (available on type 1 only)
         Keep it around 79 or all the way to max
-        
-**Bloom:**
-    Acts like Halo, but affects a much wider area and is more configurable.
-    By using this effect and playing with its parameters, you can achieve funny
-    or even artistic results.
+
+**Halo:**<br>
+    Emulates the effect of the brighter pixels reflected by the CRT glass<br>
+    that lights nearby zones (a sort of tight bloom).<br>
+    The light is meant to be spreaded in a way that it nulls the effect of the<br>
+    dark scanline parts, darklines and the RGB masks.<br>
+    So you can use this to restore the brightness and color saturation<br>
+    loss when using features like scanlines, darklines or RGB masks.<br>
+    
+	Light up scanlines too:
+		Theoretically Halo have to be applied 
+		"over" everything, because that is the way it works in nature.
+		But you can choose to cheat and instead apply scanlines over the halo
+		instead.
+		Do this if you like much more pronunced scanlines, even at the
+		price of some graphical artifacts visible on high contrasted areas. 
+
+    Refer to "Glowing Input/power" for other parameters meaning.
+    
+**Bloom:**<br>
+    Acts like Halo, but affects a much wider area and is more configurable.<br>
+    By using this effect and playing with its parameters, you can achieve funny<br>
+    or even artistic results.<br>
     
     Final mix:
         Modulates between the original images and the bloomed one.
@@ -196,8 +199,8 @@
         Use 1.0 to see naked bloom without any modulation applied
         Use 2.0 to see naked bloom with modulation applied 
 
-**Curvature:**
-    Emulates a curved CRT display.
+**Curvature:**<br>
+    Emulates a curved CRT display.<br>
     
     WARP X, WARP Y:
         control how much the display is curved along its axes.
@@ -206,17 +209,17 @@
     Cut curvature ears;
         If you see weird image repetition try this.
         
-**Bezel:**
-    Draws a monitor frame with simulated reflections from the game content.
-    The monitor frame is an image loaded by the shader and is shipped
-    in the "textures" shader subdirectory, named "monitor\_body.png"
-    It has been made with the following rules that may come handy
-    only if you want to edit it; otherwise go on.
-    - The red channel represents the luminance information
-    - The green channel represents the highlights
-    - The alpha channel in the inner frame represents the part of the bezel
-      that will be filled by the game content
-    - The blue channel represents the part of the bezel that will be filled by the game reflection.
+**Bezel:**<br>
+    Draws a monitor frame with simulated reflections from the game content.<br>
+    The monitor frame is an image loaded by the shader and is shipped<br>
+    in the "textures" shader subdirectory, named "monitor\_body.png"<br>
+    It has been made with the following rules that may come handy<br>
+    only if you want to edit it; otherwise go on.<br>
+    - The red channel represents the luminance information<br>
+    - The green channel represents the highlights<br>
+    - The alpha channel in the inner frame represents the part of the bezel<br>
+      that will be filled by the game content<br>
+    - The blue channel represents the part of the bezel that will be filled by the game reflection.<br>
     
     Straight
         Use a straight bezel instead of a curved one.
@@ -241,13 +244,13 @@
         How much the bezel corners should be darkened
     
 
-**Backgound image:**
-    Draws an image on screen picked from the "textures" shader subdirectory,
-    named: background.png<br>
-    **-> It is needed that you set retroarch aspect to "Full" <-**
-    ( Settings, Video, Scaling, Aspect Ratio = Full )
-    The image is painted "under" the game content and under the monitor frame by
-    default, and his alpha channel will let you see ambient lighs (see next).
+**Backgound image:**<br>
+    Draws an image on screen picked from the "textures" shader subdirectory,<br>
+    named: background.png<br><br>
+    **-> It is needed that you set retroarch aspect to "Full" <-**<br>
+    ( Settings, Video, Scaling, Aspect Ratio = Full )<br>
+    The image is painted "under" the game content and under the monitor frame by<br>
+    default, and his alpha channel will let you see ambient lighs (see next).<br>
 
     Image over content (alpha channel driven)?:
         ...however you can paint the image over the game content and over the
@@ -271,20 +274,21 @@
         3  Plain repeat without mirroring.
 
         
-**Backdrop support:**
-    Some old arcades used a mirror trick to overlay the
+**Backdrop support:**<br>
+    Some old arcades used a mirror trick to overlay the<br>
     game content over an high definition printed image.<br>
-    The image used by default, picked from the "textures" shader subdirectory,
+    The image used by default, picked from the "textures" shader subdirectory,<br>
     is named: boothill.jpg<br>
+    
         Shift(Zoom) Backdrop over X(Y) axis:
             move or zoom the whole background image.
     
         
-**Ambient light leds:**
-    Emulates the presence of led strips under the monitor that lights the
-    surroundings according to the edges of the game content.
-    **-> It is needed that you set retroarch aspect to "Full" <-**
-    ( Settings, Video, Scaling, Aspect Ratio = Full )
+**Ambient light leds:**<br>
+    Emulates the presence of led strips under the monitor that lights the<br>
+    surroundings according to the edges of the game content.<br>
+    **-> It is needed that you set retroarch aspect to "Full" <-**<br>
+    ( Settings, Video, Scaling, Aspect Ratio = Full )<br>
     
     Slowness: 
         How much will the leds will take to reflect the game content.
@@ -315,23 +319,23 @@
         This internally works by adding the amount of your choice to the alpha channel
         of the foreground image.
         
-**Luminosity dependant zoom:**
-    On older CRT monitors, the picture gets bigger when the image was brighter.
+**Luminosity dependant zoom:**<br>
+    On older CRT monitors, the picture gets bigger when the image was brighter.<br>
 
-**Vignette:**
-    Will cause uneven brightness of the image, more at the center,
-    less at the edges.
+**Vignette:**<br>
+    Will cause uneven brightness of the image, more at the center,<br>
+    less at the edges.<br>
     
-**Spot:**
-    Simulates external light reflected by the monitor glass.
+**Spot:**<br>
+    Simulates external light reflected by the monitor glass.<br>
             
-**Aspect Ratio:**
-    When using effects that need Retroarch aspect ratio option
-    to be set to "full", you have to provide the source aspect
-    ratio to the shader.
-    Use -6 for MAME cores that pre-rotates the game (TATE mode)
-    With Mame 2003 plus and fbneo cores, koko-aio detects if the
-    game is rotated or not without any user intervention.
+**Aspect Ratio:**<br>
+    When using effects that need Retroarch aspect ratio option<br>
+    to be set to "full", you have to provide the source aspect<br>
+    ratio to the shader.<br>
+    Use -6 for MAME cores that pre-rotates the game (TATE mode)<br>
+    With Mame 2003 plus and fbneo cores, koko-aio detects if the<br>
+    game is rotated or not without any user intervention.<br>
     
     Aspect Ratio Numerator:
         Setting non positive value here will switch to a predefined
@@ -347,12 +351,12 @@
         As long as Aspect Ratio Numerator is positive, this will
         be used as the denominator of the fraction.
 
-**Global shift/zoom image:**
-    Zoom and shift everything on screen, but background pictures.
+**Global shift/zoom image:**<br>
+    Zoom and shift everything on screen, but background pictures.<br>
 
-**Override content geometry:**
-    Contrary to the global aspect ratio control, this changes only the game geometry.
-    Bezel stays the same.
+**Override content geometry:**<br>
+    Contrary to the global aspect ratio control, this changes only the game geometry.<br>
+    Bezel stays the same.<br>
     
     Integer scale: Game content zoom height is rounded to nearest integer.
     Maximum integer scale: Dont allow integer scaling more than this
@@ -362,11 +366,11 @@
     Vertical/Horizontal position: Shifts the game position
     Zoom: Change the size
 
-**Tilt:**
-    Put the bezel and the game content into perspective.
-    The implementation is basic, you can expect correct
-    results when tilting alongside a single axis or when
-    using both, but with small values.
+**Tilt:**<br>
+    Put the bezel and the game content into perspective.<br>
+    The implementation is basic, you can expect correct<br>
+    results when tilting alongside a single axis or when<br>
+    using both, but with small values.<br>
     
     Tilt along X(Y) axis:
         Rotate the image in space
@@ -376,11 +380,11 @@
         in relation to the game tilt amount
     
     
-**Alternate line blanking:**
-    CRT monitors \*real\* refresh was amazing, today is just "meh" in most cases.
-    This emulates the low pixel persistance of CRT monitors 
-    and reduces the motion blur, typical of LCD displays, by blanking even/odd
-    screen lines on even/odd frames, by sacrificing image brightness, ofc.
+**Alternate line blanking:**<br>
+    CRT monitors \*real\* refresh was amazing, today is just "meh" in most cases.<br>
+    This emulates the low pixel persistance of CRT monitors <br>
+    and reduces the motion blur, typical of LCD displays, by blanking even/odd<br>
+    screen lines on even/odd frames, by sacrificing image brightness, ofc.<br>
     
     This feature is static, to use it 
     you have to manually enable it by removing the leading: "//"

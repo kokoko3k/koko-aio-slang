@@ -420,13 +420,16 @@ vec2 Warp_try(vec2 pos, float warpX, float warpY) {
 		return scale_coord;
 	}
 	
-	vec2 integer_scale(vec2 in_coords, float target_aspect, bool is_rotated) {
-		vec2 izoom;
-
+	vec2 integer_scale(vec2 in_coords, float target_aspect, bool is_rotated, float uncorrected_aspect) {
+		
 		float raw_in_aspect = params.OriginalSize.x/params.OriginalSize.y;
-		float adapted_aspect = target_aspect /raw_in_aspect;
-		in_coords.x = zoom1D(in_coords.x, adapted_aspect);
+		float adapted_aspect = target_aspect / raw_in_aspect;
+		
+		//Keep aspect?
+			adapted_aspect = mix_step(adapted_aspect, 1.0, uncorrected_aspect);
+			in_coords.x = zoom1D(in_coords.x, adapted_aspect);
 
+		vec2 izoom;
 		if (!is_rotated) {
 			//This is 1X integer zoom:
 			izoom = params.OriginalSize.xy / global.FinalViewportSize.xy;
@@ -436,7 +439,7 @@ vec2 Warp_try(vec2 pos, float warpX, float warpY) {
 			izoom *= int_zoom;
 		} else {
 			izoom = params.OriginalSize.xy / global.FinalViewportSize.yx;
-			float int_zoom = floor(global.FinalViewportSize.y / (params.OriginalSize.x*adapted_aspect) );
+			float int_zoom = floor(global.FinalViewportSize.y / (params.OriginalSize.x * adapted_aspect) );
 			int_zoom = clamp(int_zoom, 1.0, GAME_GEOM_INT_SCALE_MAX);
 			izoom *= int_zoom;
 		}
@@ -457,7 +460,7 @@ vec2 Warp_try(vec2 pos, float warpX, float warpY) {
 	}
 
 	bool do_integer_scale() {
-		return DO_GAME_GEOM_OVERRIDE == 1.0 && GAME_GEOM_INT_SCALE == 1.0;
+		return DO_GAME_GEOM_OVERRIDE == 1.0 && GAME_GEOM_INT_SCALE > 0.01;
 	}
 
 

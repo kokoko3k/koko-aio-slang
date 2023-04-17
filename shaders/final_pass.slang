@@ -54,7 +54,7 @@ void main() {
         if ( !do_integer_scale() )
             vTexCoord = get_scaled_coords_aspect(TexCoord,global.FinalViewportSize, vIn_aspect, bool(vIsRotated)) + vec2(0.0001);
                 else
-            vTexCoord = integer_scale(TexCoord, vIn_aspect, bool(vIsRotated)) + vec2(0.0001); //<- without the offset, SCANLINE_MIN doesn't work.
+            vTexCoord = integer_scale(TexCoord, vIn_aspect, bool(vIsRotated), GAME_GEOM_INT_SCALE-1.0 ) + vec2(0.0001); //<- without the offset, SCANLINE_MIN doesn't work.
 
     //if (DO_GLOBAL_SHZO >0.5)
     //    vTexCoord = zoom(vTexCoord + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM );
@@ -310,6 +310,47 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
             else
         return source;
 }
+
+
+float fn_scanline_mask_grid(vec2 coords, float lum, float min_inLum, float max_inLum) {
+    /* This is more or less a stripped down fn_scanline_mask()
+     * But this will draw horizontal and vertical scanlines to emulate a sort of dot matrix mask
+    */
+
+      
+    float period = vScanlinePeriod;
+    
+    //since luminosity is used to modulate scanline thickness, we scale it here
+    //to keep tickness in user defined range:
+        float lum_scaled = map_range(lum, min_inLum, max_inLum, SCANLINE_MIN, SCANLINE_MAX);
+
+    //Generate base grid
+        vec2 angle_base = coords * pi * params.OriginalSize.xy;
+        vec2 lines = pow( sin(angle_base), vec2(2.0) );
+
+    
+    //Morph scanline shape via input luminance
+        float l = lum_scaled; // (already clamped)
+        l = pow(l, SCANLINE_MINMAX_GAMMA);
+        if (lum_scaled <= 0.5) {
+            float l1 = pow(l, 4) * 15;
+            lines = pow(lines, vec2(1.0/sqrt(l1))     );
+        } else {
+            float l2 = (l-0.5)*2.0;
+            lines = lines * (1-l2) + l2;
+        }
+
+        
+    //make them sharped?
+//        lines = smoothstep(SCANLINE_MIN, SCANLINE_MAX, lines);
+        
+    //Apply min brightness
+        lines = lines * (1-SCANLINE_DARK ) + SCANLINE_DARK ;
+
+
+    return min(lines.x, lines.y);
+}
+
 
 float fn_scanline_mask(vec2 coords, bool do_slotmask, float lum, float min_inLum, float max_inLum, float tate) {
     /* Produces a B/W scanline shape to be multiplicated by the source
@@ -681,10 +722,7 @@ vec3 fn_pixel_content(vec2 coords) {
                 float min_inLum = 0.0;
                 scanline_mask = fn_scanline_mask(coords, SCANLINE_SM_TYPE > 0.0, lum, min_inLum, max_inLum, vDo_Tate );
 
-                //scanline_mask = fn_scanline_mask(coords, SCANLINE_SM_TYPE > 0.0, lum, min_inLum, max_inLum, 0.0 );
-                //scanline_mask *= fn_scanline_mask(coords, SCANLINE_SM_TYPE > 0.0, lum, min_inLum, max_inLum, 1.0 );
-
-
+                //scanline_mask = fn_scanline_mask_grid(coords, lum, min_inLum, max_inLum);
                 pixel_out = min(pixel_out, 1.0) * ( scanline_mask + ( pixel_bleed * SCANLINES_BLEEDING * ( 1 - scanline_mask ) ));
         }
 
