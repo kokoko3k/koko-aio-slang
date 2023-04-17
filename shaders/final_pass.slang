@@ -311,24 +311,71 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
         return source;
 }
 
+vec3 fn_pixel_grid_mask(vec2 coords) {
+  
+    //Base angle, depends on original size:
+        vec2 angle_base = coords * pi * params.OriginalSize.xy;
+        
+    //Zoom to debug:
+        angle_base/=1.0;
 
-float fn_scanline_mask_grid(vec2 coords, float lum, float min_inLum, float max_inLum) {
+    //Set the rgb and grid sharpness:
+        vec3 s_rgb = vec3(DOT_M_RGB_SHARP);
+        float s_grid = DOT_M_G_SHARP;
+        
+    //Generate bw grid:     
+        vec2 grid = cos(angle_base);
+        grid = grid * grid;
+        grid = pow(grid, vec2(s_grid));
+        grid = 1 - grid;
+        
+    //Generate rgb mask
+        float wideness_k = DOT_M_RGB_WID;
+        float rgb_wideness = (pi/3.0) * wideness_k;
+        
+        //Generates 3 sines with 1/3 pi offset
+            vec3 angle_rgb = vec3( angle_base.x + rgb_wideness,
+                                   angle_base.x - pi,
+                                   angle_base.x - rgb_wideness );
+        
+            vec3 mask_rgb = sin(angle_rgb);
+            mask_rgb *= mask_rgb;
+            mask_rgb = pow(mask_rgb, s_rgb);
+ 
+        
+    float fgrid = min(grid.x, grid.y);
+    fgrid = scale_to_range(fgrid, DOT_M_G_BRGHT, 1.0);
+    
+    //make them sharper?
+        //fgrid = smoothstep(0.0, 0.5, fgrid);
+    
+    //Adjust green gain and global gain
+    mask_rgb *= vec3(1.0, DOT_M_G_GAIN, 1.0) * DOT_M_RGB_GAIN;
+    
+    return mask_rgb * fgrid;
+
+}
+
+vec3 fn_pixel_grid_mask_t1(vec2 coords, float lum, float min_inLum, float max_inLum) {
     /* This is more or less a stripped down fn_scanline_mask()
      * But this will draw horizontal and vertical scanlines to emulate a sort of dot matrix mask
     */
 
       
-    float period = vScanlinePeriod;
-    
     //since luminosity is used to modulate scanline thickness, we scale it here
     //to keep tickness in user defined range:
         float lum_scaled = map_range(lum, min_inLum, max_inLum, SCANLINE_MIN, SCANLINE_MAX);
 
     //Generate base grid
         vec2 angle_base = coords * pi * params.OriginalSize.xy;
+        
+        angle_base /= 1.0;
+        
         vec2 lines = pow( sin(angle_base), vec2(2.0) );
 
     
+        
+        
     //Morph scanline shape via input luminance
         float l = lum_scaled; // (already clamped)
         l = pow(l, SCANLINE_MINMAX_GAMMA);
@@ -348,7 +395,43 @@ float fn_scanline_mask_grid(vec2 coords, float lum, float min_inLum, float max_i
         lines = lines * (1-SCANLINE_DARK ) + SCANLINE_DARK ;
 
 
-    return min(lines.x, lines.y);
+    float grid = min(lines.x, lines.y);
+    
+    /*float mina;
+    float maxa;
+    mina=0.0;
+    maxa=pi;
+    if (angle_base.x > mina && angle_base.x < maxa)
+        grid = 0.0;
+    */
+    
+    float wcol = fract(angle_base.x / pi);
+
+    
+    //grrggbbg = 8 parti
+    
+    float pstep = pi/24.0;
+    
+    float r_point = pstep*2;
+    float g_point = pstep*4;
+    float b_point = pstep*6;
+    
+    float dist_r = 1-abs(wcol - r_point);
+    float dist_g = 1-abs(wcol - g_point);
+    float dist_b = 1-abs(wcol - b_point);
+    
+    float po = 4.0;
+    dist_r = pow(dist_r, po*0.5);
+    dist_g = pow(dist_g, po);
+    dist_b = pow(dist_b, po*0.5);
+    
+    vec3 pixel_out = vec3(0.0);
+    
+    pixel_out = vec3(1.0,0.0,0.0) * dist_r;
+    pixel_out += vec3(0.0,1.0,0.0) * dist_g;
+    pixel_out += vec3(0.0,0.0,1.0) * dist_b;
+    
+    return pixel_out * vec3(grid);
 }
 
 
@@ -710,8 +793,15 @@ vec3 fn_pixel_content(vec2 coords) {
         }
 
 
+    vec3 scanline_dot_mask = vec3(1.0);
+    
+    //Dot mask
+        if (DO_DOT_MATRIX == 1.0) {
+           scanline_dot_mask = fn_pixel_grid_mask(coords); 
+           pixel_out*=scanline_dot_mask;
+        }
+        
     //Scanlines (non-flickering)
-        float scanline_mask = 1.0;
         if  ( DO_SCANLINES == 1.0 ) {
             //Obtain a scanlined screen by multiplying the scanline mask and the pixel color.
 
@@ -720,10 +810,10 @@ vec3 fn_pixel_content(vec2 coords) {
                 //The maximum possible brightness of the input color modified by glow,contrast and brightness.
                 float max_inLum = vMax_inLum;
                 float min_inLum = 0.0;
-                scanline_mask = fn_scanline_mask(coords, SCANLINE_SM_TYPE > 0.0, lum, min_inLum, max_inLum, vDo_Tate );
-
-                //scanline_mask = fn_scanline_mask_grid(coords, lum, min_inLum, max_inLum);
+                float scanline_mask = fn_scanline_mask(coords, SCANLINE_SM_TYPE > 0.0, lum, min_inLum, max_inLum, vDo_Tate );
                 pixel_out = min(pixel_out, 1.0) * ( scanline_mask + ( pixel_bleed * SCANLINES_BLEEDING * ( 1 - scanline_mask ) ));
+                //Since scanlines and dot matrix are alternative and halo can white both, just use a single var for both:
+                scanline_dot_mask = vec3(scanline_mask);
         }
 
         
@@ -733,9 +823,9 @@ vec3 fn_pixel_content(vec2 coords) {
         if (DO_HALO == 1.0 ) {
             pixel_haloed = texture(halo_pass,coords).rgb;
             //Halo only on scanlines:
-            pixel_out += pixel_haloed * scanline_mask ;
+            pixel_out += pixel_haloed * scanline_dot_mask ;
             //Halo over scanlines gap too:
-            pixel_out += pixel_haloed * (HALO_VS_SCAN) * (1 - scanline_mask) ;
+            pixel_out += pixel_haloed * (HALO_VS_SCAN) * (1 - scanline_dot_mask) ;
 
         }
     

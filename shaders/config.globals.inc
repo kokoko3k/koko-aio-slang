@@ -254,3 +254,11 @@
 	#define TILT_BEZEL_K	global.TILT_BEZEL_K
 
 #define TATE	global.TATE
+
+#define DO_DOT_MATRIX	global.DO_DOT_MATRIX
+	#define DOT_M_G_SHARP	global.DOT_M_G_SHARP
+	#define DOT_M_RGB_SHARP	global.DOT_M_RGB_SHARP
+	#define DOT_M_RGB_WID 	global.DOT_M_RGB_WID
+	#define DOT_M_RGB_GAIN	global.DOT_M_RGB_GAIN
+	#define DOT_M_G_GAIN	global.DOT_M_G_GAIN
+	#define DOT_M_G_BRGHT	global.DOT_M_G_BRGHT

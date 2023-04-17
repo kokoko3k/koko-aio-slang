@@ -340,6 +340,14 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	
 	float TATE;
 
+	float DO_DOT_MATRIX;
+	float DOT_M_G_SHARP;
+	float DOT_M_G_BRGHT;
+	float DOT_M_RGB_SHARP;
+	float DOT_M_RGB_WID;
+	float DOT_M_RGB_GAIN;
+	float DOT_M_G_GAIN;
+	
 } global;
 
 // Color correction
@@ -434,7 +442,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BLANK7a " " 0.0 0.0 1.0 1.0
 
 // Scanlines
-#pragma parameter DO_SCANLINES	         "★ Scanlines enable? ==>"						0.0 	0.0  1.0 1.0
+#pragma parameter DO_SCANLINES	         "★ Scanlines enable? (NOT with dot matrix!) ==>"						0.0 	0.0  1.0 1.0
 #pragma parameter SCANLINE_MIN          "        Minimum height"			  		1.0 	0.01 1.0 0.01
 #pragma parameter SCANLINE_MAX          "        Maximum height"			  		0.5 	0.05 1.0 0.01
 #pragma parameter SCANLINE_MINMAX_GAMMA "        Min->Max inertia"					1.0		0.0 4.0 0.1
@@ -449,7 +457,15 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter SCANLINE_SM_VOFFSET      "           . Offset (type 1 only)"					45.0 	0.0 158.0 1.0
 #pragma parameter BLANK12 " " 0.0 0.0 1.0 1.0
 
-
+// Dot matrix emulation
+#pragma parameter DO_DOT_MATRIX		"★  Dot matrix emulation enable? (NOT with scanlines!) ==>"	0.0 0.0 1.0 1.0
+#pragma parameter DOT_M_G_SHARP		"        Gap sharpness"					1.0 0.1 16.0 0.01
+#pragma parameter DOT_M_G_BRGHT		"        Gap brightness"				0.4 0.0 1.0 0.01
+#pragma parameter DOT_M_RGB_SHARP	"        RGB sharpness"					2.0 0.1 16.0 0.01
+#pragma parameter DOT_M_RGB_WID 	"        RGB wideness"					0.8 0.1 1.0 0.01
+#pragma parameter DOT_M_RGB_GAIN	"        RGB gain"						2.0 0.0 5.0 0.01
+#pragma parameter DOT_M_G_GAIN  	"        Green gain correction"			0.75 0.1 1.0 0.01
+#pragma parameter BLANK12c " " 0.0 0.0 1.0 1.0
 
 // Halo
 #pragma parameter DO_HALO       "★ Halo enable? ==>" 						0.0	0.0 1.0 1.0
@@ -457,7 +473,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter HALO_W        "        Sharpness, horizontal"					1.75	0.35  7.0 0.05
 #pragma parameter HALO_H        "        Sharpness, Vertical"					1.75	0.35  7.0 0.05
 #pragma parameter HALO_GAMMA    "        Gamma, the higher, the less the halo on dark colors"	2.0 	1.0  10.0 0.1
-#pragma parameter HALO_VS_SCAN  "        Light up scanlines gaps too"				0.0	0.0  1.0  0.1
+#pragma parameter HALO_VS_SCAN  "        Light up scanlines and dot grid gaps too"				0.0	0.0  1.0  0.1
 #pragma parameter BLANK10 " " 0.0 0.0 1.0 1.0
 
 
