@@ -4,7 +4,7 @@
 	//and are used to calculate the sampling lod.
 	//Change if you change the texture resolution or
 	//you can comment it to let the shader calculates them at runtime (heavier).
-#define BEZEL_RES vec2(2923, 2178)
+#define BEZEL_RES vec2(2913, 2178)
 
 	//This is used to skip calculations in the reflection blur code.
 	//set it to minimum value that allows you to see reflection entirely
@@ -508,8 +508,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 //Bezel related
 #pragma parameter DO_BEZEL	      "★ Bezel enable? ==>"				0.0   0.0 1.0 1.0
 #pragma parameter BEZEL_USE_STRAIGHT  "        Straight"				0.0	0.0 1.0  1.0 
-#pragma parameter BEZEL_INNER_ZOOM    "        Inner zoom (ignored if integer scaled)"	-0.18   -1.5 0.5 0.005
-#pragma parameter BEZEL_FRAME_ZOOM    "        Frame zoom"				0.0   -1.5 0.5 0.005
+#pragma parameter BEZEL_INNER_ZOOM    "        Inner zoom (ignored if integer scaled)"	-0.18   -1.5 0.5 0.001
+#pragma parameter BEZEL_FRAME_ZOOM    "        Frame zoom"				0.0   -1.5 0.5 0.001
 #pragma parameter BEZEL_R             "        Color: Red"				-0.3   -1.0 1.0  0.005
 #pragma parameter BEZEL_G             "        Color: Green"				-0.3   -1.0 1.0  0.005
 #pragma parameter BEZEL_B             "        Color: Blue"				-0.3   -1.0 1.0  0.005
