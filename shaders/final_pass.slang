@@ -341,7 +341,7 @@ vec3 fn_pixel_grid_mask(vec2 coords) {
  
         
     float fgrid = min(grid.x, grid.y);
-    fgrid = scale_to_range(fgrid, DOT_M_G_BRGHT, 1.0);
+    fgrid = scale_to_range(fgrid, DOT_M_G_STR, 1.0);
     
     //make them sharper?
         //fgrid = smoothstep(0.0, 0.5, fgrid);

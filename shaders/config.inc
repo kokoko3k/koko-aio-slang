@@ -345,7 +345,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 	float DO_DOT_MATRIX;
 	float DOT_M_G_SHARP;
-	float DOT_M_G_BRGHT;
+	float DOT_M_G_STR;
 	float DOT_M_RGB_SHARP;
 	float DOT_M_RGB_WID;
 	float DOT_M_RGB_GAIN;
@@ -463,7 +463,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 // Dot matrix emulation
 #pragma parameter DO_DOT_MATRIX		"★  Dot matrix emulation enable? (NOT with scanlines!) ==>"	0.0 0.0 1.0 1.0
 #pragma parameter DOT_M_G_SHARP		"        Gap sharpness"					1.0 0.1 16.0 0.01
-#pragma parameter DOT_M_G_BRGHT		"        Gap brightness"				0.4 0.0 1.0 0.01
+#pragma parameter DOT_M_G_STR		"        Gap strength"					0.4 0.0 1.0 0.01
 #pragma parameter DOT_M_RGB_SHARP	"        RGB sharpness"					2.0 0.1 16.0 0.01
 #pragma parameter DOT_M_RGB_WID 	"        RGB wideness"					0.8 0.1 1.0 0.01
 #pragma parameter DOT_M_RGB_GAIN	"        RGB gain"						2.0 0.0 5.0 0.01
