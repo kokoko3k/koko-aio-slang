@@ -263,6 +263,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float BEZEL_CON;
 	float BEZEL_INNER_ZOOM;
 	float BEZEL_FRAME_ZOOM;
+	float BEZEL_FRAME_ASPECT;
 	float BEZEL_USE_STRAIGHT;
 	float BEZEL_RFL_BLR_SHD;
 	float BEZEL_RFL_ZOOM;
@@ -496,8 +497,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 //Curvature parameters:
 #pragma parameter DO_CURVATURE	     "★ Curvature/Border enable? ==>"			0.0   0.0 1.0 1.0
-#pragma parameter GEOM_WARP_X        "        Warp X"				0.3  0.0 6.0 0.025
-#pragma parameter GEOM_WARP_Y        "        Warp Y"				0.0   0.0 6.0 0.025
+#pragma parameter GEOM_WARP_X        "        Warp X"				0.425  0.0 6.0 0.01
+#pragma parameter GEOM_WARP_Y        "        Warp Y"				0.5   0.0 6.0 0.01
 #pragma parameter GEOM_CUT_EARS      "        Cut curvature ears"	1.4   1.0 10.0 0.01
 #pragma parameter GEOM_CORNER_SIZE   "        Corner radius"			0.005  0.005 0.1 0.001
 #pragma parameter GEOM_CORNER_SMOOTH "        Corner sharpness"			350.0 15.0 1000.0 1.0
@@ -509,7 +510,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter DO_BEZEL	      "★ Bezel enable? ==>"				0.0   0.0 1.0 1.0
 #pragma parameter BEZEL_USE_STRAIGHT  "        Straight"				0.0	0.0 1.0  1.0 
 #pragma parameter BEZEL_INNER_ZOOM    "        Inner zoom (ignored if integer scaled)"	-0.18   -1.5 0.5 0.001
-#pragma parameter BEZEL_FRAME_ZOOM    "        Frame zoom"				0.0   -1.5 0.5 0.001
+#pragma parameter BEZEL_FRAME_ZOOM    "        Frame zoom"					0.0   -1.5 0.5 0.001
+#pragma parameter BEZEL_FRAME_ASPECT  "        Frame aspect correction "	1.0   0.0 2.0 0.001
 #pragma parameter BEZEL_R             "        Color: Red"				-0.3   -1.0 1.0  0.005
 #pragma parameter BEZEL_G             "        Color: Green"				-0.3   -1.0 1.0  0.005
 #pragma parameter BEZEL_B             "        Color: Blue"				-0.3   -1.0 1.0  0.005
