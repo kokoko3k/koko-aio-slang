@@ -308,7 +308,7 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
         return source;
 }
 
-vec3 fn_pixel_grid_mask(vec2 coords) {
+vec4 fn_pixel_grid(vec2 coords, vec3 pixel_in) {
   
     //Base angle, depends on original size:
         vec2 angle_base = coords * pi * params.OriginalSize.xy;
@@ -341,16 +341,36 @@ vec3 fn_pixel_grid_mask(vec2 coords) {
  
         
     float fgrid = min(grid.x, grid.y);
-    fgrid = scale_to_range(fgrid, DOT_M_G_STR, 1.0);
+    //fgrid = scale_to_range(fgrid, DOT_M_G_STR, 1.0);
     
     //make them sharper?
         //fgrid = smoothstep(0.0, 0.5, fgrid);
     
+        
     //Adjust green gain and global gain
     mask_rgb *= vec3(1.0, DOT_M_G_GAIN, 1.0) * DOT_M_RGB_GAIN;
     
-    return mask_rgb * fgrid;
+    
+    vec3 gap_color=vec3(0.0,0.0,0.0);
+    vec4 pixel_out;
+    
+    float fgrid_adpt = mix(1.0, fgrid, DOT_M_G_STR);
+    
+    pixel_out.rgb = mix(gap_color, pixel_in*mask_rgb ,fgrid_adpt  );
+    
+    pixel_out.a = fgrid;
+    
+    
+    
 
+    
+    return pixel_out;
+    
+
+
+    
+
+    
 }
 
 vec3 fn_pixel_grid_mask_t1(vec2 coords, float lum, float min_inLum, float max_inLum) {
@@ -793,12 +813,15 @@ vec3 fn_pixel_content(vec2 coords) {
         }
 
 
-    vec3 scanline_dot_mask = vec3(1.0);
+    float scanline_or_dot_mask = 1.0;
     
     //Dot mask
         if (DO_DOT_MATRIX == 1.0) {
-           scanline_dot_mask = fn_pixel_grid_mask(coords); 
-           pixel_out*=scanline_dot_mask;
+            vec4 pixel_grid_mask = fn_pixel_grid(coords, pixel_out);
+            //grid mask only is needed by halo to selectively light the grid.
+                scanline_or_dot_mask = pixel_grid_mask.a;
+            //rgb channel goes to pixel_out
+            pixel_out = pixel_grid_mask.rgb;
         }
         
     //Scanlines (non-flickering)
@@ -813,7 +836,7 @@ vec3 fn_pixel_content(vec2 coords) {
                 float scanline_mask = fn_scanline_mask(coords, SCANLINE_SM_TYPE > 0.0, lum, min_inLum, max_inLum, vDo_Tate );
                 pixel_out = min(pixel_out, 1.0) * ( scanline_mask + ( pixel_bleed * SCANLINES_BLEEDING * ( 1 - scanline_mask ) ));
                 //Since scanlines and dot matrix are alternative and halo can white both, just use a single var for both:
-                scanline_dot_mask = vec3(scanline_mask);
+                scanline_or_dot_mask = scanline_mask;
         }
 
         
@@ -823,9 +846,9 @@ vec3 fn_pixel_content(vec2 coords) {
         if (DO_HALO == 1.0 ) {
             pixel_haloed = texture(halo_pass,coords).rgb;
             //Halo only on scanlines:
-            pixel_out += pixel_haloed * scanline_dot_mask ;
+            pixel_out += pixel_haloed * scanline_or_dot_mask ;
             //Halo over scanlines gap too:
-            pixel_out += pixel_haloed * (HALO_VS_SCAN) * (1 - scanline_dot_mask) ;
+            pixel_out += pixel_haloed * (HALO_VS_SCAN) * (1 - scanline_or_dot_mask) ;
 
         }
     
