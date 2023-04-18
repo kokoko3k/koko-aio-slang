@@ -350,6 +350,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float DOT_M_RGB_WID;
 	float DOT_M_RGB_GAIN;
 	float DOT_M_G_GAIN;
+	float DOT_M_MBLUR;
 	
 } global;
 
@@ -468,6 +469,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter DOT_M_RGB_WID 	"        RGB wideness"					0.8 0.1 1.0 0.01
 #pragma parameter DOT_M_RGB_GAIN	"        RGB gain"						2.0 0.0 5.0 0.01
 #pragma parameter DOT_M_G_GAIN  	"        Green gain correction"			0.75 0.1 1.0 0.01
+#pragma parameter DOT_M_MBLUR		"        Motion blur strength"			0.6  0.0 0.9 0.1
 #pragma parameter BLANK12c " " 0.0 0.0 1.0 1.0
 
 // Halo

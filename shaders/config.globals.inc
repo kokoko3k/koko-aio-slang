@@ -262,3 +262,4 @@
 	#define DOT_M_RGB_GAIN	global.DOT_M_RGB_GAIN
 	#define DOT_M_G_GAIN	global.DOT_M_G_GAIN
 	#define DOT_M_G_STR		global.DOT_M_G_STR
+	#define DOT_M_MBLUR		global.DOT_M_MBLUR
