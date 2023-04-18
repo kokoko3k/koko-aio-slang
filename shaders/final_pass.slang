@@ -688,7 +688,7 @@ vec2 get_scaled_coords_for_bezel() {
     //But still, i need to access it twice in the code.
     //So this is a function that ensures me that i always calc it the same way.
     
-    vec2 co = zoomout_coords(vTexCoord,-BEZEL_FRAME_ZOOM, BEZEL_FRAME_ASPECT);
+    vec2 co = zoomout_coords(vTexCoord,-BEZEL_FRAME_ZOOM,1.0);
     
     if (DO_TILT == 1.0) 
         return tilt(co, vIsRotated, vec2(TILT_X, TILT_Y) * TILT_BEZEL_K);
