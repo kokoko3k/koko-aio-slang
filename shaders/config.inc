@@ -6,6 +6,9 @@
 	//you can comment it to let the shader calculates them at runtime (heavier).
 #define BEZEL_RES vec2(2923, 2178)
 
+	//The following can slightly correct bezel aspect
+#define BEZEL_ASPECT_CORRECTION (1.0 - 0.004)
+
 	//This is used to skip calculations in the reflection blur code.
 	//set it to minimum value that allows you to see reflection entirely
 #define BEZEL_REFL_SKIP_SIZE 0.08
@@ -496,8 +499,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 //Curvature parameters:
 #pragma parameter DO_CURVATURE	     "★ Curvature/Border enable? ==>"			0.0   0.0 1.0 1.0
-#pragma parameter GEOM_WARP_X        "        Warp X"				0.3  0.0 6.0 0.025
-#pragma parameter GEOM_WARP_Y        "        Warp Y"				0.0   0.0 6.0 0.025
+#pragma parameter GEOM_WARP_X        "        Warp X"				0.430  	0.0 6.0 0.01
+#pragma parameter GEOM_WARP_Y        "        Warp Y"				0.49   0.0 6.0 0.01
 #pragma parameter GEOM_CUT_EARS      "        Cut curvature ears"	1.4   1.0 10.0 0.01
 #pragma parameter GEOM_CORNER_SIZE   "        Corner radius"			0.005  0.005 0.1 0.001
 #pragma parameter GEOM_CORNER_SMOOTH "        Corner sharpness"			350.0 15.0 1000.0 1.0
@@ -508,8 +511,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 //Bezel related
 #pragma parameter DO_BEZEL	      "★ Bezel enable? ==>"				0.0   0.0 1.0 1.0
 #pragma parameter BEZEL_USE_STRAIGHT  "        Straight"				0.0	0.0 1.0  1.0 
-#pragma parameter BEZEL_INNER_ZOOM    "        Inner zoom (ignored if integer scaled)"	-0.18   -1.5 0.5 0.005
-#pragma parameter BEZEL_FRAME_ZOOM    "        Frame zoom"				0.0   -1.5 0.5 0.005
+#pragma parameter BEZEL_INNER_ZOOM    "        Inner zoom (ignored if integer scaled)"	-0.18   -1.5 0.5 0.001
+#pragma parameter BEZEL_FRAME_ZOOM    "        Frame zoom"				0.0   -1.5 0.5 0.001
 #pragma parameter BEZEL_R             "        Color: Red"				-0.3   -1.0 1.0  0.005
 #pragma parameter BEZEL_G             "        Color: Green"				-0.3   -1.0 1.0  0.005
 #pragma parameter BEZEL_B             "        Color: Blue"				-0.3   -1.0 1.0  0.005

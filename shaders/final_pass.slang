@@ -74,10 +74,7 @@ void main() {
     vBEZEL_INNER_ZOOM_adapted = get_BEZEL_INNER_ZOOM() * DO_BEZEL;
     
     //Precalc some Curvature/Warp values:
-        float warp_adaption =  1 - vBEZEL_INNER_ZOOM_adapted * 4.0;
-        vec2 geom_warp_adapted = vec2(GEOM_WARP_X, GEOM_WARP_Y) * warp_adaption;
-
-        vWarp_vexp = 1.0/ (1 + (vec2(geom_warp_adapted.x, geom_warp_adapted.y) * 0.2)) ;
+        vWarp_vexp = 1.0/ (1 + (vec2(GEOM_WARP_X, GEOM_WARP_Y) * 0.2)) ;
         vWarp_arg2 = 1.0 - pow(vec2(0.29289321881345247559915563789515), vWarp_vexp );
 
     //SPOT
@@ -688,7 +685,10 @@ vec2 get_scaled_coords_for_bezel() {
     //But still, i need to access it twice in the code.
     //So this is a function that ensures me that i always calc it the same way.
     
-    vec2 co = zoomout_coords(vTexCoord,-BEZEL_FRAME_ZOOM,1.0);
+    vec2 co = vTexCoord;
+
+    co = zoomout_coords(co, -BEZEL_FRAME_ZOOM, 1.0);
+    co.y = zoom1D(co.y, BEZEL_ASPECT_CORRECTION);
     
     if (DO_TILT == 1.0) 
         return tilt(co, vIsRotated, vec2(TILT_X, TILT_Y) * TILT_BEZEL_K);
@@ -959,13 +959,8 @@ void main() {
         }
     
     
-    //Calc initial content coords
+    //Initial content coords
         vec2 co_content = vTexCoord;
-        if (DO_CURVATURE == 1.0  &&  ((GEOM_WARP_X != 0.0) || (GEOM_WARP_Y != 0.0))) {
-            co_content = Warp_fast(co_content, vWarp_vexp, vWarp_arg2, GEOM_CUT_EARS);
-            //co_content = Warp(co_content, GEOM_WARP_X, GEOM_WARP_Y);
-        }
-
         
     //Tilt?
         if (DO_TILT == 1.0)
@@ -974,13 +969,20 @@ void main() {
 
     //Precalc Bezel coords, since it modifies content coords.
         vec2 co_bezel = vec2(0.0);
-        vec2 co_mirror;
         if (DO_BEZEL == 1.0) {
             co_content = zoomout_coords(co_content, -vBEZEL_INNER_ZOOM_adapted , 1.0);
-            co_mirror = zoom(co_content, 1/BEZEL_REFL_ZOOMOUT_ROOM);
             co_bezel = get_scaled_coords_for_bezel();
         }
 
+        
+    //Curvature 
+        //Curvature has to come after inner zoom or bezel curved border will not match content
+        //curved border when inner zoom changes.
+        vec2 co_mirror = co_content;
+        if (DO_CURVATURE == 1.0  &&  ((GEOM_WARP_X != 0.0) || (GEOM_WARP_Y != 0.0))) {
+            co_content = Warp_fast(co_content, vWarp_vexp, vWarp_arg2, GEOM_CUT_EARS);
+            co_mirror = zoom(co_content, 1/BEZEL_REFL_ZOOMOUT_ROOM);
+        }
         
     //Apply other content coords modifiers
         if (DO_GAME_GEOM_OVERRIDE == 1.0)
