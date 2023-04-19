@@ -178,6 +178,10 @@ float map_range(float value, float min_in, float max_in, float min_out, float ma
 	return min_out + (value - min_in) * (max_out - min_out) / (max_in - min_in);
 }
 
+float normalize_range(float value, float min_in, float max_in) {
+	//Scales value in [min_in - max_in] to 0..1
+	return (value - min_in)  / (max_in - min_in);
+}
 
 vec3 apply_contrast_brightness(vec3 c, float contrast, float brightness) {
    return scale_to_range_vec3(c, -contrast, 1+contrast) + brightness;

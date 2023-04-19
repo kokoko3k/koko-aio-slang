@@ -52,9 +52,9 @@ void main() {
     
     //Calculate vTexcoord as fractional or integer scaled?
         if ( !do_integer_scale() )
-            vTexCoord = get_scaled_coords_aspect(TexCoord,global.FinalViewportSize, vIn_aspect, bool(vIsRotated)) + vec2(0.0001);
+            vTexCoord = get_scaled_coords_aspect(TexCoord,global.FinalViewportSize, vIn_aspect, bool(vIsRotated)) + vec2(0.0000);
                 else
-            vTexCoord = integer_scale(TexCoord, vIn_aspect, bool(vIsRotated), GAME_GEOM_INT_SCALE-1.0 ) + vec2(0.0001); //<- without the offset, SCANLINE_MIN doesn't work.
+            vTexCoord = integer_scale(TexCoord, vIn_aspect, bool(vIsRotated), GAME_GEOM_INT_SCALE-1.0 ) + vec2(0.0000); //<- without the offset, SCANLINE_MIN doesn't work.
 
     //if (DO_GLOBAL_SHZO >0.5)
     //    vTexCoord = zoom(vTexCoord + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM );
@@ -308,13 +308,27 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
         return source;
 }
 
-vec4 fn_pixel_grid(vec2 coords, vec3 pixel_in) {
+
+
+float fn_morph_shape(float shape_in, float l) {
+    //Morph shape via input luminance
+        if (l <= 0.5) {
+            
+            float l1 = pow(l, 4) * 15;
+            return pow(shape_in, 1/sqrt(l1));
+        } else {
+            float l2 = (l-0.5)*2.0;
+            return shape_in * (1-l2) + l2;
+        }
+}
+
+vec4 fn_pixel_dotmat(vec2 coords, vec3 pixel_in) {
   
     //Base angle, depends on original size:
-        vec2 angle_base = coords * pi * params.OriginalSize.xy;
-        
+        vec2 angle_base = coords * pi * params.OriginalSize.xy; //FIXME here we want .yy to make integer scaling
+
     //Zoom to debug:
-        angle_base/=1.0;
+        angle_base/=DOT_M_MULTIPLY;
 
     //Set the rgb and grid sharpness:
         vec3 s_rgb = vec3(DOT_M_RGB_SHARP);
@@ -325,132 +339,48 @@ vec4 fn_pixel_grid(vec2 coords, vec3 pixel_in) {
         grid = grid * grid;
         grid = pow(grid, vec2(s_grid));
         grid = 1 - grid;
-        
-    //Generate rgb mask
-        float wideness_k = DOT_M_RGB_WID;
-        float rgb_wideness = (pi/3.0) * wideness_k;
+
+    //Generate rgb mask 
+    vec3 mask_rgb=vec3(1.0);
+    if (DOT_M_RGB_STR > 0.0) {
+        //float wideness_k = DOT_M_RGB_WID;
+        float rgb_wideness = (pi/4.0); // * wideness_k;
         
         //Generates 3 sines with 1/3 pi offset
             vec3 angle_rgb = vec3( angle_base.x + rgb_wideness,
                                    angle_base.x - pi,
                                    angle_base.x - rgb_wideness );
         
-            vec3 mask_rgb = sin(angle_rgb);
+            mask_rgb = sin(angle_rgb);
             mask_rgb *= mask_rgb;
             mask_rgb = pow(mask_rgb, s_rgb);
- 
-        
-    float fgrid = min(grid.x, grid.y);
-    //fgrid = scale_to_range(fgrid, DOT_M_G_STR, 1.0);
+            
+        //Adjust green gain
+            mask_rgb.g *= DOT_M_G_GAIN;
+            
+        //Apply strength
+            mask_rgb=mix(vec3(1.0), mask_rgb, DOT_M_RGB_STR);
+    }
     
-    //make them sharper?
-        //fgrid = smoothstep(0.0, 0.5, fgrid);
-    
-        
-    //Adjust green gain and global gain
-    mask_rgb *= vec3(1.0, DOT_M_G_GAIN, 1.0) * DOT_M_RGB_GAIN;
-    
-    
+
+    //Combine gridx and gridy into a single one
+        //float fgrid = min(grid.x, grid.y);
+        float fgrid = grid.x* grid.y;
+
+       
+     
     vec3 gap_color=vec3(0.0,0.0,0.0);
     vec4 pixel_out;
-    
+
     float fgrid_adpt = mix(1.0, fgrid, DOT_M_G_STR);
     
     pixel_out.rgb = mix(gap_color, pixel_in*mask_rgb ,fgrid_adpt  );
     
     pixel_out.a = fgrid;
     
-    
-    
-
-    
     return pixel_out;
     
-
-
-    
-
-    
 }
-
-vec3 fn_pixel_grid_mask_t1(vec2 coords, float lum, float min_inLum, float max_inLum) {
-    /* This is more or less a stripped down fn_scanline_mask()
-     * But this will draw horizontal and vertical scanlines to emulate a sort of dot matrix mask
-    */
-
-      
-    //since luminosity is used to modulate scanline thickness, we scale it here
-    //to keep tickness in user defined range:
-        float lum_scaled = map_range(lum, min_inLum, max_inLum, SCANLINE_MIN, SCANLINE_MAX);
-
-    //Generate base grid
-        vec2 angle_base = coords * pi * params.OriginalSize.xy;
-        
-        angle_base /= 1.0;
-        
-        vec2 lines = pow( sin(angle_base), vec2(2.0) );
-
-    
-        
-        
-    //Morph scanline shape via input luminance
-        float l = lum_scaled; // (already clamped)
-        l = pow(l, SCANLINE_MINMAX_GAMMA);
-        if (lum_scaled <= 0.5) {
-            float l1 = pow(l, 4) * 15;
-            lines = pow(lines, vec2(1.0/sqrt(l1))     );
-        } else {
-            float l2 = (l-0.5)*2.0;
-            lines = lines * (1-l2) + l2;
-        }
-
-        
-    //make them sharped?
-//        lines = smoothstep(SCANLINE_MIN, SCANLINE_MAX, lines);
-        
-    //Apply min brightness
-        lines = lines * (1-SCANLINE_DARK ) + SCANLINE_DARK ;
-
-
-    float grid = min(lines.x, lines.y);
-    
-    /*float mina;
-    float maxa;
-    mina=0.0;
-    maxa=pi;
-    if (angle_base.x > mina && angle_base.x < maxa)
-        grid = 0.0;
-    */
-    
-    float wcol = fract(angle_base.x / pi);
-
-    
-    //grrggbbg = 8 parti
-    
-    float pstep = pi/24.0;
-    
-    float r_point = pstep*2;
-    float g_point = pstep*4;
-    float b_point = pstep*6;
-    
-    float dist_r = 1-abs(wcol - r_point);
-    float dist_g = 1-abs(wcol - g_point);
-    float dist_b = 1-abs(wcol - b_point);
-    
-    float po = 4.0;
-    dist_r = pow(dist_r, po*0.5);
-    dist_g = pow(dist_g, po);
-    dist_b = pow(dist_b, po*0.5);
-    
-    vec3 pixel_out = vec3(0.0);
-    
-    pixel_out = vec3(1.0,0.0,0.0) * dist_r;
-    pixel_out += vec3(0.0,1.0,0.0) * dist_g;
-    pixel_out += vec3(0.0,0.0,1.0) * dist_b;
-    
-    return pixel_out * vec3(grid);
-}
-
 
 float fn_scanline_mask(vec2 coords, bool do_slotmask, float lum, float min_inLum, float max_inLum, float tate) {
     /* Produces a B/W scanline shape to be multiplicated by the source
@@ -764,6 +694,60 @@ vec3 ambi_blend_image(vec4 image, vec3 ambi) {
     return image.rgb;
 }
 
+float gaussian_coefficient(float x, float sigma) {
+    //restituisce un coefficiente gaussiano per x compreso tra 0 ed 1
+    float coefficient = 1.0 / sqrt(2.0 * 3.14159265358979323846 * sigma);
+    float exponent = -((x * x) / (2.0 * sigma));
+    return coefficient * exp(exponent);
+}
+
+vec3 boxed_blur_x(sampler2D tex, vec2 co, float box_size, vec4 output_size) {
+    /* blur tex in boxes of width box_size.
+       eg: box_size=4:
+       in: [abcd][edgh][ijkl]...
+       out [AVG1][AVG2][AVG3]
+       were AVG is a gaussian blur applied to each 4 elements separately.
+    */
+  
+    //The current pixel, x:
+        float x = co.x/output_size.z;
+    //The group x belongs to, g:
+        float g = ceil(x/box_size);
+    //The first element of the group, x0
+        float x0 = box_size * (g-1);            
+    
+    //Init output color:
+        vec3 c = vec3(0.0);
+    
+    //We want a dumb arithmetic average?
+        #define BOXB_DUMB 0.0
+    //blurriness of output 
+        #define BOXB_SIGMA 0.5
+        
+    //Iterate for every pixel in group:
+        for (float xn = x0; xn < x0 + box_size; xn++) {
+            //Normalize interval to 0..1 to get gauss coefficients afterwards
+                float xn_normalizzato = normalize_range(xn, x0, x0 + (box_size-1));
+            
+            //Get gauss coefficient
+                float coefficient = 1.0;
+                if (BOXB_DUMB == 0.0)    
+                    coefficient = gaussian_coefficient(xn_normalizzato, BOXB_SIGMA);
+                        else 
+                    coefficient = 1.0;
+
+            //Translate integer element to offset in 0..1 range:
+                float off = params.OutputSize.z*xn;
+            c = c + texture(tex, vec2(off,co.y) ).rgb * coefficient ;
+        }
+    //reduce gain (why on earth is needed for gauss?): 
+        if (BOXB_DUMB == 1.0) 
+            c = c/box_size;
+                else
+            c = c/(box_size * 0.4);
+    return c;
+}
+
 
 vec3 fn_pixel_content(vec2 coords) {
     vec3 pixel_in;
@@ -777,6 +761,10 @@ vec3 fn_pixel_content(vec2 coords) {
     } else {
         pixel_in = texture(shift_and_bleed_pass,coords).rgb ;
     }
+    
+    
+    //pixel_in = boxed_blur_x(shift_and_bleed_pass, coords,  params.OutputSize.x / params.OriginalSize.y, params.OutputSize);
+                                                                            
     pixel_bleed = pixel_in;
     
     vec3 pixel_out = pixel_in;
@@ -817,7 +805,7 @@ vec3 fn_pixel_content(vec2 coords) {
     
     //Dot mask
         if (DO_DOT_MATRIX == 1.0) {
-            vec4 pixel_grid_mask = fn_pixel_grid(coords, pixel_out);
+            vec4 pixel_grid_mask = fn_pixel_dotmat(coords, pixel_out);
             //grid mask only is needed by halo to selectively light the grid.
                 scanline_or_dot_mask = pixel_grid_mask.a;
             //rgb channel goes to pixel_out

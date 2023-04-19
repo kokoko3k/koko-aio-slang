@@ -150,6 +150,28 @@
         This is the slotmask offset/stagger, (available on type 1 only)
         Keep it around 79 or all the way to max
 
+**Dot matrix emulation:**<br>
+    Emulates low refresh "boxed" screens used in old handheld consoles.<br>
+    
+    Gap sharpness: 
+        Modulates the thickness of the grid around cells.
+    Gap strength:
+        How much the grid is visible.
+    RGB strength:
+        Emulate rgb subpixels (Set 0.0 for BW display)
+    RGB sharpness:
+        Low values will gradually blend subpixels.<br>
+        You may want to lower this value to cancel vertical artifacts.<br>
+    Green gain correction:
+        R and B cnahhels could be partially cancelled by the grid around.<br>
+        Lower this if the image looks green.<br>
+    Refresh inertia:
+        Emulates a low refresh screen, set the power of the effect.<br>
+    Inertia on:
+        0: display is always slow to refresh
+        1: display is slow to refresh bright pixels
+        2: display is slow to refresh dark pixels
+        
 **Halo:**<br>
     Emulates the effect of the brighter pixels reflected by the CRT glass<br>
     that lights nearby zones (a sort of tight bloom).<br>

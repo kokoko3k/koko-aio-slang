@@ -221,10 +221,19 @@ void main() {
 
    
    
-   
-   if (DO_DOT_MATRIX + DOT_M_MBLUR > 1.0) {
+   if (DO_DOT_MATRIX + DOT_M_MBLUR_STR > 1.0) {
       vec3 feedback = texture(ntsc_passFeedback, vTexCoord).rgb;
-      pixel_out = mix(pixel_out, feedback, DOT_M_MBLUR  );
+      
+      vec3 m_blur_adapted = vec3(DOT_M_MBLUR_STR);
+      if (DOT_M_MBLUR_MODE > 0.0) {
+         vec3 adaption = mix_step (pixel_out - feedback,
+                                   feedback - pixel_out,
+                                   DOT_M_MBLUR_MODE -1);
+         //adaption = mix_step(adaption, -adaption, DOT_M_MBLUR_MODE -1);
+         m_blur_adapted *= clamp( adaption, 0.0, 1.0 );
+         m_blur_adapted = pow(m_blur_adapted, vec3(0.25));
+      }
+      pixel_out = mix(pixel_out, feedback,          m_blur_adapted  );
    }
    
    
