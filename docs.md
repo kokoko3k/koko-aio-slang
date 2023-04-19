@@ -157,6 +157,8 @@
         Modulates the thickness of the grid around cells.
     Gap strength:
         How much the grid is visible.
+    Gap brightness:
+        You may want to use a white grid eg: for gameboy mono emulation.
     RGB strength:
         Emulate rgb subpixels (Set 0.0 for BW display)
     RGB sharpness:

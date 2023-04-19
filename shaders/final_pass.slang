@@ -368,8 +368,7 @@ vec4 fn_pixel_dotmat(vec2 coords, vec3 pixel_in) {
         float fgrid = grid.x* grid.y;
 
        
-     
-    vec3 gap_color=vec3(0.0,0.0,0.0);
+    vec3 gap_color = vec3(DOT_M_G_BRT);
     vec4 pixel_out;
 
     float fgrid_adpt = mix(1.0, fgrid, DOT_M_G_STR);
