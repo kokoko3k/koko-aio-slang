@@ -190,6 +190,11 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	vec4 first_passSize;
 	vec4 ntsc_passSize;
 
+	float COLOR_MONO_COLORIZE;
+	float COLOR_MONO_HUE1;
+	float COLOR_MONO_HUE2;
+	float COLOR_MONO_HUE_BIAS;
+	
 	float DO_SCANLINES;
 	float DO_IN_GLOW;
 	float DO_VMASK_AND_DARKLINES ;
@@ -359,10 +364,14 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 // Color correction
 #pragma parameter DO_CCORRECTION "★ Color corrections enable? ==>" 		0.0 	0.0 1.0 1.0
+#pragma parameter COLOR_MONO_COLORIZE	"        Monochrome screen colorization"	0.0  0.0 1.0 0.1
+#pragma parameter COLOR_MONO_HUE1        "           . Hue bright"					0.25 0.0 1.0 0.01
+#pragma parameter COLOR_MONO_HUE2        "           . Hue dark"						0.3  0.0 1.0 0.01
+#pragma parameter COLOR_MONO_HUE_BIAS    "           . Hue bright-dark bias"		0.0	-2.0 2.0 0.01
 #pragma parameter LUMINANCE       "        Luminance push (>1.0=clip)"		0.0	 0.0 1.5 0.05
-#pragma parameter SATURATION     "        Saturation in   (1.0=off)"		1.0	0.0  2.0 0.01
-#pragma parameter CONTRAST       "        Contrast in     (0.0=off)"		0.0	-1.0 1.0 0.01
 #pragma parameter BRIGHTNESS     "        Brightness in   (0.0=off)"		0.0	-1.0 1.0 0.01
+#pragma parameter CONTRAST       "        Contrast in     (0.0=off)"		0.0	-1.0 1.0 0.01
+#pragma parameter SATURATION     "        Saturation in   (1.0=off)"		1.0	0.0  2.0 0.01
 #pragma parameter TEMPERATURE    "        Temperature in (6500=off)"		6500.0	3000 10000.0 50.0
 #pragma parameter GAMMA_OUT      "        Gamma out"				0.69	0.1 	4.0  0.01
 #pragma parameter BLANK1 " " 0.0 0.0 1.0 1.0
@@ -475,6 +484,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter DOT_M_G_GAIN  	"           . RGB Green gain correction"		0.85 0.1 1.0 0.01
 #pragma parameter DOT_M_MBLUR_STR	"        Refresh inertia"				0.6  0.0 0.9 0.1
 #pragma parameter DOT_M_MBLUR_MODE  "           . Inertia on: both,white,black"	0.0  0.0 2.0 1.0
+
 #pragma parameter DOT_M_MULTIPLY	"        Multiply factor (debug)"		1.0  1.0 50.0 1.0
 #pragma parameter BLANK12c " " 0.0 0.0 1.0 1.0
 

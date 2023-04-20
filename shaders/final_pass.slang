@@ -312,28 +312,7 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
 
 vec4 fn_pixel_dotmat(vec2 coords, vec3 pixel_in) {
   
-        //pixel in brightness:
-           float lum_scaled = min(1.0, dot(pixel_in, vec3(0.33333) ) );
-    
-/*
-   //pixel_in = scale_to_range_vec3(pixel_in, 0.1, 0.5);
- 
-     vec3 pixel_in_hsv = rgb2hsv(pixel_in);
-    pixel_in_hsv.y=1.0; //sat
-    
-    float hue_bright = 0.25; //yellowish
-    float hue_dark = 0.3; //greenish 
-    
-    pixel_in_hsv.x = mix(hue_dark, hue_bright, lum_scaled);
-    pixel_in_hsv.z=scale_to_range(pixel_in_hsv.z, 0.1, 0.5); //value
-    
-pixel_in = hsv2rgb(pixel_in_hsv);
-        
-*/
-   
-    //pixel_in=pow(pixel_in,  vec3(1.0,0.7,1.0  )   );
-    //pixel_in*= vec3(0.5,1.0,0.0);
-    
+       
     //Base angle, depends on original size:
         vec2 angle_base = coords * pi * params.OriginalSize.xy; //FIXME here we want .yy to make integer scaling
 
@@ -385,14 +364,16 @@ pixel_in = hsv2rgb(pixel_in_hsv);
             
             //We invert the smooth logic if threshold is negative. this allow to fadeout
             //the grid on bright or dark backgrounds.
-                lum_scaled = max(0.0, lum_scaled);
+                float lum_scaled = dot(pixel_in, vec3(0.33333));
+                lum_scaled = clamp(lum_scaled, 0.0, 1.0);
                 lum_scaled = mix_step(1-lum_scaled, lum_scaled, float(DOT_M_G_TRESH > 0.0));
                 
             float smooth_threshold = abs(DOT_M_G_TRESH);
             vec2 smooth_range  = vec2(smooth_threshold, smooth_threshold+fade_size);
             float grid_smoothstep = 1- smoothstep(smooth_range.x, smooth_range.y, lum_scaled);    
 
-           
+
+            
     //Adapt grid strength
         float grid_str = DOT_M_G_STR * grid_smoothstep;    
     //Apply strength modifier

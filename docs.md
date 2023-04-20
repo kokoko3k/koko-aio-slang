@@ -3,7 +3,15 @@
 **Color corrections:**<br>
     Modify luminance, saturation, contrast, brightness and color temperature
     of the signal, at "input" stage.<br>
-    Gamma correction is applied to the final processed picture.
+    Gamma correction is applied to the final processed picture.<br>
+    It is also possible to emulate a monochrome display with custom colors:
+    
+        Monochrome screen colorization:
+            The amount of (de) colorization applied.
+        Hue bright, Hue dark:
+            Set the hue for bright and dark colors.
+        Hue bright-dark bias:
+            Controls the distribution of dark and bright hues.
     
 **FXAA:**<br>
     Apply the well known antialiasing effect by Nvidia.<br>

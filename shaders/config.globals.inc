@@ -55,7 +55,10 @@
 	#define CONTRAST	global.CONTRAST
 	#define BRIGHTNESS	global.BRIGHTNESS
 	#define TEMPERATURE	global.TEMPERATURE
-
+	#define COLOR_MONO_COLORIZE 	global.COLOR_MONO_COLORIZE
+	#define COLOR_MONO_HUE1		global.COLOR_MONO_HUE1
+	#define COLOR_MONO_HUE2		global.COLOR_MONO_HUE2
+	#define COLOR_MONO_HUE_BIAS global.COLOR_MONO_HUE_BIAS
 
 
 	#define DO_FXAA	global.DO_FXAA
@@ -266,3 +269,4 @@
 	#define DOT_M_MBLUR_STR		global.DOT_M_MBLUR_STR
 	#define DOT_M_MBLUR_MODE	global.DOT_M_MBLUR_MODE
 	#define DOT_M_MULTIPLY  global.DOT_M_MULTIPLY
+
