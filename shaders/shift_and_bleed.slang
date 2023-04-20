@@ -76,13 +76,10 @@ vec3 pixel_offset(vec3 pixel_cur,vec2 coord, sampler2D in_texture, vec4 sourcesi
       pixel_offset.g=texture(in_texture,coord + g_offset * d).g;
       pixel_offset.b=texture(in_texture,coord + b_offset * d).b;
       return mix(pixel_cur,pixel_offset,OFFSET_STRENGTH);
-      /* why did i make this? commit message : https://github.com/kokoko3k/koko-aio-slang/commit/843d71af40d32c2e2b088a71bf3ad18683812a98
-       * does not help...
-      vec3 color_difformity = vec3(pixel_offset.r-pixel_cur.r, +pixel_offset.g-pixel_cur.g, pixel_offset.b - pixel_cur.b);
-      vec3 pixel_offset_to_add = pixel_offset * color_difformity;
-      return pixel_cur + (pixel_offset_to_add *OFFSET_STRENGTH);
-      //return pixel_cur + (pixel_offset *OFFSET_STRENGTH*color_difformity);
-      */
+      
+      //Shadow mode:
+      //return  pixel_cur - 
+      //       max( (pixel_cur - pixel_offset), vec3(0.0) ) * OFFSET_STRENGTH;
 }
 
 

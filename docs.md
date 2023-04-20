@@ -153,10 +153,14 @@
 **Dot matrix emulation:**<br>
     Emulates low refresh "boxed" screens used in old handheld consoles.<br>
     
-    Gap sharpness: 
-        Modulates the thickness of the grid around cells.
-    Gap strength:
+    Grid strength:
         How much the grid is visible.
+    Grid sharpness: 
+        Modulates the thickness of the grid around cells.
+    Strength on background:
+        How much should the grid be visible on background?
+        More positive values -> more grid on bright
+        More negative values -> more grid on dark
     Gap brightness:
         You may want to use a white grid eg: for gameboy mono emulation.
     RGB strength:
