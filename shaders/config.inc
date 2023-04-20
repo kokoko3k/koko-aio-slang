@@ -1,9 +1,13 @@
 
 // BEZEL STATIC CONFIG ##############################################################################################
+	//The following defines the monitor frame resolution in textures/monitor_body_[curved/straight].png
+	//and are used to calculate the sampling lod.
+	//Change if you change the texture resolution or
+	//you can comment it to let the shader calculates them at runtime (heavier).
+#define BEZEL_RES vec2(2923, 2178)
 
-	// Uncomment this to improve bezel downscaling.
-	// If you are using standard bezel, leave commented to gain performance.
-//#define STATIC_BEZEL_USE_MIPMAP 1.0
+	//The following can slightly correct bezel aspect
+#define BEZEL_ASPECT_CORRECTION (1.0 - 0.004)
 
 	//This is used to skip calculations in the reflection blur code.
 	//set it to minimum value that allows you to see reflection entirely
@@ -126,7 +130,7 @@
 
 	//Should texture wrapping be allowed as a shader parameter?
 	//since it causes branching, better set it as a static value.
-//#define ALLOW_BG_IMAGE_TEXTURE_WRAP_IN_SHADER
+#define ALLOW_BG_IMAGE_TEXTURE_WRAP_IN_SHADER
 
 
 	//Gap size in pixel for 1X to 4X mask scaling:
@@ -337,6 +341,19 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float BACKDROP_OFFY;
 	float BACKDROP_ZOOM;
 	
+	float TATE;
+
+	float DO_DOT_MATRIX;
+	float DOT_M_G_SHARP;
+	float DOT_M_G_STR;
+	float DOT_M_G_BRT;
+	float DOT_M_RGB_SHARP;
+	float DOT_M_RGB_STR;
+	float DOT_M_G_GAIN;
+	float DOT_M_MBLUR_STR;
+	float DOT_M_MBLUR_MODE;
+	float DOT_M_MULTIPLY;
+	
 } global;
 
 // Color correction
@@ -411,7 +428,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BLANK7 " " 0.0 0.0 1.0 1.0
 
 
-
 // Mask
 #pragma parameter DO_VMASK_AND_DARKLINES "★  Masks and/or Darklines enable? ==>"         		0.0 	0.0 1.0 1.0
 #pragma parameter MASK_COMPENSATION      "        Compensate for brightness loss"			0.0 	0.0 1.0 0.05
@@ -428,21 +444,11 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter DRKLN_OVERWHITE        "           . Affect bright colors"					1.0 	0.0 1.0   0.05
 #pragma parameter BLANK9 " " 0.0 0.0 1.0 1.0
 
-
-
-// Halo
-#pragma parameter DO_HALO       "★ Halo enable? ==>" 						0.0	0.0 1.0 1.0
-#pragma parameter HALO_POWER    "        Strength"						0.9 	0.0  5.0 0.025
-#pragma parameter HALO_W        "        Sharpness, horizontal"					1.75	0.35  7.0 0.05
-#pragma parameter HALO_H        "        Sharpness, Vertical"					1.75	0.35  7.0 0.05
-#pragma parameter HALO_GAMMA    "        Gamma, the higher, the less the halo on dark colors"	2.0 	1.0  10.0 0.1
-#pragma parameter HALO_VS_SCAN  "        Light up scanlines gaps too"				0.0	0.0  1.0  0.1
-#pragma parameter BLANK10 " " 0.0 0.0 1.0 1.0
-
-
+#pragma parameter TATE                     "★ Tate mode (1:auto 2:forced)"		0.0 	0.0 2.0 1.0
+#pragma parameter BLANK7a " " 0.0 0.0 1.0 1.0
 
 // Scanlines
-#pragma parameter DO_SCANLINES	         "★ Scanlines enable? ==>"						0.0 	0.0  1.0 1.0
+#pragma parameter DO_SCANLINES	         "★ Scanlines enable? (NOT with dot matrix!) ==>"						0.0 	0.0  1.0 1.0
 #pragma parameter SCANLINE_MIN          "        Minimum height"			  		1.0 	0.01 1.0 0.01
 #pragma parameter SCANLINE_MAX          "        Maximum height"			  		0.5 	0.05 1.0 0.01
 #pragma parameter SCANLINE_MINMAX_GAMMA "        Min->Max inertia"					1.0		0.0 4.0 0.1
@@ -452,11 +458,33 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter SCANLINE_FLICKERING_POWER     "        Interlace Flicker power"		  		0.25 	0.0 8.0 0.01
 #pragma parameter SCANLINE_DISABLE_ON_INTERLACE "        Disable on interlaced screen"			  	0.0 	0.0 1.0 1.0
 #pragma parameter BLANK11 " " 0.0 0.0 1.0 1.0
-
 #pragma parameter SCANLINE_SM_TYPE         "        Slotmask type (disable (0) with darklines!)"		0.0 	0.0 3.0 1.0
 #pragma parameter SCANLINE_SM_STRENGTH     "           . Slotmask strength"						1.0 	0.0 1.0 0.05
 #pragma parameter SCANLINE_SM_VOFFSET      "           . Offset (type 1 only)"					45.0 	0.0 158.0 1.0
 #pragma parameter BLANK12 " " 0.0 0.0 1.0 1.0
+
+// Dot matrix emulation
+#pragma parameter DO_DOT_MATRIX		"★  Dot matrix emulation enable? (NOT with scanlines!) ==>"	0.0 0.0 1.0 1.0
+#pragma parameter DOT_M_G_STR		"        Gap strength"					0.0 0.0 1.0 0.01
+#pragma parameter DOT_M_G_BRT		"           . Gap brightness"			0.0 0.0 1.0 0.01
+#pragma parameter DOT_M_G_SHARP		"           . Gap sharpness"					2.0 0.0 20.0 0.25
+#pragma parameter DOT_M_RGB_STR		"        RGB strength"					1.0 0.0 1.0 0.01
+#pragma parameter DOT_M_RGB_SHARP	"           . RGB sharpness"					2.0 0.1 16.0 0.01
+#pragma parameter DOT_M_G_GAIN  	"           . RGB Green gain correction"		0.85 0.1 1.0 0.01
+#pragma parameter DOT_M_MBLUR_STR	"        Refresh inertia"				0.6  0.0 0.9 0.1
+#pragma parameter DOT_M_MBLUR_MODE  "           . Inertia on: both,white,black"	0.0  0.0 2.0 1.0
+#pragma parameter DOT_M_MULTIPLY	"        Multiply factor (debug)"		1.0  1.0 50.0 1.0
+#pragma parameter BLANK12c " " 0.0 0.0 1.0 1.0
+
+// Halo
+#pragma parameter DO_HALO       "★ Halo enable? ==>" 						0.0	0.0 1.0 1.0
+#pragma parameter HALO_POWER    "        Strength"						0.9 	0.0  5.0 0.025
+#pragma parameter HALO_W        "        Sharpness, horizontal"					1.75	0.35  7.0 0.05
+#pragma parameter HALO_H        "        Sharpness, Vertical"					1.75	0.35  7.0 0.05
+#pragma parameter HALO_GAMMA    "        Gamma, the higher, the less the halo on dark colors"	2.0 	1.0  10.0 0.1
+#pragma parameter HALO_VS_SCAN  "        Light up scanlines and dot grid gaps too"				0.0	0.0  1.0  0.1
+#pragma parameter BLANK10 " " 0.0 0.0 1.0 1.0
+
 
 
 // Bloom
@@ -477,8 +505,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 //Curvature parameters:
 #pragma parameter DO_CURVATURE	     "★ Curvature/Border enable? ==>"			0.0   0.0 1.0 1.0
-#pragma parameter GEOM_WARP_X        "        Warp X"				0.3  0.0 6.0 0.025
-#pragma parameter GEOM_WARP_Y        "        Warp Y"				0.0   0.0 6.0 0.025
+#pragma parameter GEOM_WARP_X        "        Warp X"				0.430  	0.0 6.0 0.01
+#pragma parameter GEOM_WARP_Y        "        Warp Y"				0.49   0.0 6.0 0.01
 #pragma parameter GEOM_CUT_EARS      "        Cut curvature ears"	1.4   1.0 10.0 0.01
 #pragma parameter GEOM_CORNER_SIZE   "        Corner radius"			0.005  0.005 0.1 0.001
 #pragma parameter GEOM_CORNER_SMOOTH "        Corner sharpness"			350.0 15.0 1000.0 1.0
@@ -489,8 +517,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 //Bezel related
 #pragma parameter DO_BEZEL	      "★ Bezel enable? ==>"				0.0   0.0 1.0 1.0
 #pragma parameter BEZEL_USE_STRAIGHT  "        Straight"				0.0	0.0 1.0  1.0 
-#pragma parameter BEZEL_INNER_ZOOM    "        Inner zoom (ignored if integer scaled)"	-0.18   -1.5 0.5 0.005
-#pragma parameter BEZEL_FRAME_ZOOM    "        Frame zoom"				0.0   -1.5 0.5 0.005
+#pragma parameter BEZEL_INNER_ZOOM    "        Inner zoom (ignored if integer scaled)"	-0.18   -1.5 0.5 0.001
+#pragma parameter BEZEL_FRAME_ZOOM    "        Frame zoom"				0.0   -1.5 0.5 0.001
 #pragma parameter BEZEL_R             "        Color: Red"				-0.3   -1.0 1.0  0.005
 #pragma parameter BEZEL_G             "        Color: Green"				-0.3   -1.0 1.0  0.005
 #pragma parameter BEZEL_B             "        Color: Blue"				-0.3   -1.0 1.0  0.005
@@ -595,8 +623,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 //Content geomerty overrides
 #pragma parameter DO_GAME_GEOM_OVERRIDE	  "★ Override content geometry enable? ==>"	0.0   0.0  1.0 	  1.0
-#pragma parameter GAME_GEOM_INT_SCALE     "        Integer scale (disables inner zoom)"	0.0   0.0  1.0    1.0
-#pragma parameter GAME_GEOM_INT_SCALE_MAX "        Maximum integer scale" 		10.0  1.0  100.0  1.0
+#pragma parameter GAME_GEOM_INT_SCALE     "        Integer scale (disables inner zoom) 2=No keep aspect"	0.0   0.0  2.0    1.0
+#pragma parameter GAME_GEOM_INT_SCALE_MAX "        Maximum integer scale" 				10.0  1.0  100.0  1.0
 #pragma parameter LABEL_WARNING4          "    ⚠ The following will override integer scale ⚠"	1.0  1.0  1.0     1.0
 #pragma parameter GAME_GEOM_ASPECT	  "        Aspect (0 = unchanged)"		0.0    0.0  3.0	  0.005
 #pragma parameter GAME_GEOM_VSHIFT	  "        Vertical position"			0.0   -10.0 10.0  0.01

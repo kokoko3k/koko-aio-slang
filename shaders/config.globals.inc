@@ -252,3 +252,16 @@
 	#define TILT_Y			global.TILT_Y
 	#define TILT_FOV		global.TILT_FOV
 	#define TILT_BEZEL_K	global.TILT_BEZEL_K
+
+#define TATE	global.TATE
+
+#define DO_DOT_MATRIX	global.DO_DOT_MATRIX
+	#define DOT_M_G_SHARP	global.DOT_M_G_SHARP
+	#define DOT_M_RGB_SHARP	global.DOT_M_RGB_SHARP
+	#define DOT_M_RGB_STR	global.DOT_M_RGB_STR
+	#define DOT_M_G_BRT		global.DOT_M_G_BRT
+	#define DOT_M_G_GAIN	global.DOT_M_G_GAIN
+	#define DOT_M_G_STR		global.DOT_M_G_STR
+	#define DOT_M_MBLUR_STR		global.DOT_M_MBLUR_STR
+	#define DOT_M_MBLUR_MODE	global.DOT_M_MBLUR_MODE
+	#define DOT_M_MULTIPLY  global.DOT_M_MULTIPLY

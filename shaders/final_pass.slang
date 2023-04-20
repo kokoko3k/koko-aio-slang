@@ -5,6 +5,7 @@
  * Does masks, spot, bezel, vignette, background image (anything else?)
  */
 
+
 #include "config.inc"
 
 #pragma stage vertex
@@ -15,7 +16,7 @@ layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
 layout(location = 1) out vec2 vOutputCoord;
 layout(location = 2) out vec2 spot_offset;
-layout(location = 3) out vec2 vFragCoord;
+layout(location = 3) out vec2 vFragCoord_Tated;
 layout(location = 4) out float vIsRotated;
 
 
@@ -36,6 +37,9 @@ layout(location = 4) out float vIsRotated;
 layout(location = 13) out float vDynamicSeed;
 layout(location = 14) out float vBEZEL_INNER_ZOOM_adapted;
 layout(location = 15) out float vVmask_gap;
+layout(location = 16) out float vFcol_Tated;
+layout(location = 17) out float vDo_Tate;
+
 
 #include "includes/functions.include.slang"
 
@@ -48,9 +52,9 @@ void main() {
     
     //Calculate vTexcoord as fractional or integer scaled?
         if ( !do_integer_scale() )
-            vTexCoord = get_scaled_coords_aspect(TexCoord,global.FinalViewportSize, vIn_aspect, bool(vIsRotated)) + vec2(0.0001);
+            vTexCoord = get_scaled_coords_aspect(TexCoord,global.FinalViewportSize, vIn_aspect, bool(vIsRotated)) + vec2(0.0000);
                 else
-            vTexCoord = integer_scale(TexCoord, vIn_aspect, bool(vIsRotated)) + vec2(0.0001); //<- without the offset, SCANLINE_MIN doesn't work.
+            vTexCoord = integer_scale(TexCoord, vIn_aspect, bool(vIsRotated), GAME_GEOM_INT_SCALE-1.0 ) + vec2(0.0000); //<- without the offset, SCANLINE_MIN doesn't work.
 
     //if (DO_GLOBAL_SHZO >0.5)
     //    vTexCoord = zoom(vTexCoord + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM );
@@ -60,17 +64,17 @@ void main() {
 
     vOutputCoord = TexCoord;
 
-    vFragCoord = vec2( floor(vOutputCoord.x * params.OutputSize.x),
+
+    vec2 vFragCoord = vec2( floor(vOutputCoord.x * params.OutputSize.x),
                        floor(vOutputCoord.y * params.OutputSize.y));
 
-    
+    vDo_Tate = float(TATE+vIsRotated > 1.001);
+    vFragCoord_Tated = mix_step(vFragCoord.xy, vFragCoord.yx, vDo_Tate );
+
     vBEZEL_INNER_ZOOM_adapted = get_BEZEL_INNER_ZOOM() * DO_BEZEL;
     
     //Precalc some Curvature/Warp values:
-        float warp_adaption =  1 - vBEZEL_INNER_ZOOM_adapted * 4.0;
-        vec2 geom_warp_adapted = vec2(GEOM_WARP_X, GEOM_WARP_Y) * warp_adaption;
-
-        vWarp_vexp = 1.0/ (1 + (vec2(geom_warp_adapted.x, geom_warp_adapted.y) * 0.2)) ;
+        vWarp_vexp = 1.0/ (1 + (vec2(GEOM_WARP_X, GEOM_WARP_Y) * 0.2)) ;
         vWarp_arg2 = 1.0 - pow(vec2(0.29289321881345247559915563789515), vWarp_vexp );
 
     //SPOT
@@ -107,6 +111,8 @@ void main() {
             // vec4 GAP_SIZE_PER_SCALE = vec4(1.0, 1.0, 2.0, 2.0);  <--- moved in config.inc
             vec4 vgap_size_per_scale = GAP_SIZE_PER_SCALE / VMASK_DARKLINE_SCALE;
             vVmask_gap = vgap_size_per_scale[int(VMASK_DARKLINE_SCALE-1)];
+
+            vFcol_Tated = mix_step(vOutputCoord.x * params.OutputSize.x, vOutputCoord.y * params.OutputSize.y, vDo_Tate);
 }
 
 
@@ -114,7 +120,7 @@ void main() {
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in vec2 vOutputCoord;
 layout(location = 2) in vec2 spot_offset;
-layout(location = 3) in vec2 vFragCoord;
+layout(location = 3) in vec2 vFragCoord_Tated;
 layout(location = 4) in float vIsRotated;
 layout(location = 5) in vec2 vWarp_vexp;
 layout(location = 6) in vec2 vWarp_arg2;
@@ -127,7 +133,8 @@ layout(location = 12) in float vIn_aspect;
 layout(location = 13) in float vDynamicSeed;
 layout(location = 14) in float vBEZEL_INNER_ZOOM_adapted;
 layout(location = 15) in float vVmask_gap;
-
+layout(location = 16) in float vFcol_Tated;
+layout(location = 17) in float vDo_Tate;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -196,8 +203,8 @@ vec3 pixel_vmask(vec3 source, float white_reference, float over_white) {
     vec4 vec_mod=(vec4(3,1,2,3) + vec4(VMASK_GAP * vVmask_gap,0.0,0.0,0.0))* VMASK_DARKLINE_SCALE;
     vec_mod = ceil(vec_mod);
     
-    float fcol = vOutputCoord.x * params.OutputSize.x;
-    float mod_compare = mod(fcol, vec_mod.x);
+
+    float mod_compare = mod(vFcol_Tated, vec_mod.x);
     
     if (mod_compare < vec_mod.y)
         vmasked = m1;
@@ -240,13 +247,12 @@ vec3 pixel_vmask_gm(vec3 source, float white_reference, float over_white) {
     vec3 m2 =  vec3( 1.0 , ooo , 1.0 );    //col 2
     vec3 gap = vec3( ggg );
 
-    float fcol = vOutputCoord.s * params.OutputSize.x;
     vec3 pixel_out;
     vec3 vmasked;
     vec3 vec_mod=(vec3(2,1,2) + vec3(VMASK_GAP * vVmask_gap,0.0,0.0))* VMASK_DARKLINE_SCALE ;
     vec_mod = ceil(vec_mod);
     
-    float mod_compare = mod(fcol, vec_mod.x);
+    float mod_compare = mod(vFcol_Tated, vec_mod.x);
     
    /* 
     if (mod_compare < vec_mod.y)
@@ -281,7 +287,7 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
     float period_x = (3.0 - VMASK_USE_GM + VMASK_GAP * vVmask_gap) * VMASK_DARKLINE_SCALE;
     float period_y = darkline_every * VMASK_DARKLINE_SCALE;
 
-    vec2 FragCoord = vFragCoord;
+    vec2 FragCoord = vFragCoord_Tated;
 
     if (over_white != 1.0) {
         //less effect on bright colors.
@@ -302,7 +308,80 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
         return source;
 }
 
-float fn_scanline_mask(vec2 coords, bool do_slotmask, float lum, float min_inLum, float max_inLum) {
+
+
+float fn_morph_shape(float shape_in, float l) {
+    //Morph shape via input luminance
+        if (l <= 0.5) {
+            
+            float l1 = pow(l, 4) * 15;
+            return pow(shape_in, 1/sqrt(l1));
+        } else {
+            float l2 = (l-0.5)*2.0;
+            return shape_in * (1-l2) + l2;
+        }
+}
+
+vec4 fn_pixel_dotmat(vec2 coords, vec3 pixel_in) {
+  
+    //Base angle, depends on original size:
+        vec2 angle_base = coords * pi * params.OriginalSize.xy; //FIXME here we want .yy to make integer scaling
+
+    //Zoom to debug:
+        angle_base/=DOT_M_MULTIPLY;
+
+    //Set the rgb and grid sharpness:
+        vec3 s_rgb = vec3(DOT_M_RGB_SHARP);
+        float s_grid = DOT_M_G_SHARP;
+        
+    //Generate bw grid:     
+        vec2 grid = cos(angle_base);
+        grid = grid * grid;
+        grid = pow(grid, vec2(s_grid));
+        grid = 1 - grid;
+
+    //Generate rgb mask 
+    vec3 mask_rgb=vec3(1.0);
+    if (DOT_M_RGB_STR > 0.0) {
+        //float wideness_k = DOT_M_RGB_WID;
+        float rgb_wideness = (pi/4.0); // * wideness_k;
+        
+        //Generates 3 sines with 1/3 pi offset
+            vec3 angle_rgb = vec3( angle_base.x + rgb_wideness,
+                                   angle_base.x - pi,
+                                   angle_base.x - rgb_wideness );
+        
+            mask_rgb = sin(angle_rgb);
+            mask_rgb *= mask_rgb;
+            mask_rgb = pow(mask_rgb, s_rgb);
+            
+        //Adjust green gain
+            mask_rgb.g *= DOT_M_G_GAIN;
+            
+        //Apply strength
+            mask_rgb=mix(vec3(1.0), mask_rgb, DOT_M_RGB_STR);
+    }
+    
+
+    //Combine gridx and gridy into a single one
+        //float fgrid = min(grid.x, grid.y);
+        float fgrid = grid.x* grid.y;
+
+       
+    vec3 gap_color = vec3(DOT_M_G_BRT);
+    vec4 pixel_out;
+
+    float fgrid_adpt = mix(1.0, fgrid, DOT_M_G_STR);
+    
+    pixel_out.rgb = mix(gap_color, pixel_in*mask_rgb ,fgrid_adpt  );
+    
+    pixel_out.a = fgrid;
+    
+    return pixel_out;
+    
+}
+
+float fn_scanline_mask(vec2 coords, bool do_slotmask, float lum, float min_inLum, float max_inLum, float tate) {
     /* Produces a B/W scanline shape to be multiplicated by the source
     * pixel later on to emulate scanline effect.
     * scanlines can be drawn on odd and even fields alternating on odd and
@@ -318,13 +397,21 @@ float fn_scanline_mask(vec2 coords, bool do_slotmask, float lum, float min_inLum
         float lum_scaled = map_range(lum, min_inLum, max_inLum, SCANLINE_MIN, SCANLINE_MAX);
 
     
-    float angle_base = coords.y * pi * params.OriginalSize.y * period;
-
     float lines = 1.0;
 
-    //1 - Generate base scanline.
+    //0 - Generate base scanline.
+    //1 - The base coords is switched from coords.y to coords.x if tate mode is requested.
     //2 - offset them on odd frames if needed (vScanlineAlternateOffset via vertex shader)
-    //3 - Dont do it when the screen is interlaced and we have to skip drawing scanlines on interlaced screens.
+    //3 - Dont do it when the screen is interlaced and we have to skip drawing scanlines on interlaced screens
+
+        //coords += params.OriginalSize.zw*0.5; //<-- this seems needed when using integer scalinf
+        //due to linear filtering in earlier pass FIXME don't forget me!
+        coords = mix_step(coords.xy, coords.yx, tate);
+        float originalsize = mix_step(params.OriginalSize.y, params.OriginalSize.x, tate);
+
+        float angle_base = coords.y * pi * originalsize * period;
+
+
         if  (!( is_interlaced && SCANLINE_DISABLE_ON_INTERLACE == 1.0 )) {
             lines = pow( sin(angle_base + vScanlineAlternateOffset), 2.0);
         }
@@ -341,7 +428,7 @@ float fn_scanline_mask(vec2 coords, bool do_slotmask, float lum, float min_inLum
     if (do_slotmask) {
         float Darkline_part_w = (3.0 - VMASK_USE_GM + VMASK_GAP) * VMASK_DARKLINE_SCALE;
         float Darkline_part_w_x2 = Darkline_part_w*2;
-        bool odd_column = mod(vFragCoord.x + Darkline_part_w  , Darkline_part_w_x2) < Darkline_part_w;
+        bool odd_column = mod(vFragCoord_Tated.x + Darkline_part_w  , Darkline_part_w_x2) < Darkline_part_w;
 
         if (SCANLINE_SM_TYPE == 1.0) {
             // Slotmask is out oh phase every "odd" triple and mixed with
@@ -416,12 +503,14 @@ float fn_scanline_mask(vec2 coords, bool do_slotmask, float lum, float min_inLum
     //Apply min brightness
         lines = lines * (1-SCANLINE_DARK ) + SCANLINE_DARK ;
 
+
+
     return lines;
 }
 
 float get_clamped_white_reference(vec3 pixel_in){
     float white_reference = max(max(pixel_in.r,pixel_in.g),pixel_in.b);
-    white_reference = min(white_reference,1.0); //Clamp here for both vmask and darklines.
+//     white_reference = min(white_reference,1.0); //Clamp here for both vmask and darklines.
     return white_reference;
 }
 
@@ -545,7 +634,10 @@ vec2 get_scaled_coords_for_bezel() {
     //But still, i need to access it twice in the code.
     //So this is a function that ensures me that i always calc it the same way.
     
-    vec2 co = zoomout_coords(vTexCoord,-BEZEL_FRAME_ZOOM,1.0);
+    vec2 co = vTexCoord;
+
+    co = zoomout_coords(co, -BEZEL_FRAME_ZOOM, 1.0);
+    co.y = zoom1D(co.y, BEZEL_ASPECT_CORRECTION);
     
     if (DO_TILT == 1.0) 
         return tilt(co, vIsRotated, vec2(TILT_X, TILT_Y) * TILT_BEZEL_K);
@@ -601,6 +693,60 @@ vec3 ambi_blend_image(vec4 image, vec3 ambi) {
     return image.rgb;
 }
 
+float gaussian_coefficient(float x, float sigma) {
+    //restituisce un coefficiente gaussiano per x compreso tra 0 ed 1
+    float coefficient = 1.0 / sqrt(2.0 * 3.14159265358979323846 * sigma);
+    float exponent = -((x * x) / (2.0 * sigma));
+    return coefficient * exp(exponent);
+}
+
+vec3 boxed_blur_x(sampler2D tex, vec2 co, float box_size, vec4 output_size) {
+    /* blur tex in boxes of width box_size.
+       eg: box_size=4:
+       in: [abcd][edgh][ijkl]...
+       out [AVG1][AVG2][AVG3]
+       were AVG is a gaussian blur applied to each 4 elements separately.
+    */
+  
+    //The current pixel, x:
+        float x = co.x/output_size.z;
+    //The group x belongs to, g:
+        float g = ceil(x/box_size);
+    //The first element of the group, x0
+        float x0 = box_size * (g-1);            
+    
+    //Init output color:
+        vec3 c = vec3(0.0);
+    
+    //We want a dumb arithmetic average?
+        #define BOXB_DUMB 0.0
+    //blurriness of output 
+        #define BOXB_SIGMA 0.5
+        
+    //Iterate for every pixel in group:
+        for (float xn = x0; xn < x0 + box_size; xn++) {
+            //Normalize interval to 0..1 to get gauss coefficients afterwards
+                float xn_normalizzato = normalize_range(xn, x0, x0 + (box_size-1));
+            
+            //Get gauss coefficient
+                float coefficient = 1.0;
+                if (BOXB_DUMB == 0.0)    
+                    coefficient = gaussian_coefficient(xn_normalizzato, BOXB_SIGMA);
+                        else 
+                    coefficient = 1.0;
+
+            //Translate integer element to offset in 0..1 range:
+                float off = params.OutputSize.z*xn;
+            c = c + texture(tex, vec2(off,co.y) ).rgb * coefficient ;
+        }
+    //reduce gain (why on earth is needed for gauss?): 
+        if (BOXB_DUMB == 1.0) 
+            c = c/box_size;
+                else
+            c = c/(box_size * 0.4);
+    return c;
+}
+
 
 vec3 fn_pixel_content(vec2 coords) {
     vec3 pixel_in;
@@ -614,6 +760,10 @@ vec3 fn_pixel_content(vec2 coords) {
     } else {
         pixel_in = texture(shift_and_bleed_pass,coords).rgb ;
     }
+    
+    
+    //pixel_in = boxed_blur_x(shift_and_bleed_pass, coords,  params.OutputSize.x / params.OriginalSize.y, params.OutputSize);
+                                                                            
     pixel_bleed = pixel_in;
     
     vec3 pixel_out = pixel_in;
@@ -650,8 +800,18 @@ vec3 fn_pixel_content(vec2 coords) {
         }
 
 
+    float scanline_or_dot_mask = 1.0;
+    
+    //Dot mask
+        if (DO_DOT_MATRIX == 1.0) {
+            vec4 pixel_grid_mask = fn_pixel_dotmat(coords, pixel_out);
+            //grid mask only is needed by halo to selectively light the grid.
+                scanline_or_dot_mask = pixel_grid_mask.a;
+            //rgb channel goes to pixel_out
+            pixel_out = pixel_grid_mask.rgb;
+        }
+        
     //Scanlines (non-flickering)
-        float scanline_mask = 1.0;
         if  ( DO_SCANLINES == 1.0 ) {
             //Obtain a scanlined screen by multiplying the scanline mask and the pixel color.
 
@@ -660,8 +820,10 @@ vec3 fn_pixel_content(vec2 coords) {
                 //The maximum possible brightness of the input color modified by glow,contrast and brightness.
                 float max_inLum = vMax_inLum;
                 float min_inLum = 0.0;
-                scanline_mask = fn_scanline_mask(coords, SCANLINE_SM_TYPE > 0.0, lum, min_inLum, max_inLum );
+                float scanline_mask = fn_scanline_mask(coords, SCANLINE_SM_TYPE > 0.0, lum, min_inLum, max_inLum, vDo_Tate );
                 pixel_out = min(pixel_out, 1.0) * ( scanline_mask + ( pixel_bleed * SCANLINES_BLEEDING * ( 1 - scanline_mask ) ));
+                //Since scanlines and dot matrix are alternative and halo can white both, just use a single var for both:
+                scanline_or_dot_mask = scanline_mask;
         }
 
         
@@ -671,9 +833,9 @@ vec3 fn_pixel_content(vec2 coords) {
         if (DO_HALO == 1.0 ) {
             pixel_haloed = texture(halo_pass,coords).rgb;
             //Halo only on scanlines:
-            pixel_out += pixel_haloed * scanline_mask ;
+            pixel_out += pixel_haloed * scanline_or_dot_mask ;
             //Halo over scanlines gap too:
-            pixel_out += pixel_haloed * (HALO_VS_SCAN) * (1 - scanline_mask) ;
+            pixel_out += pixel_haloed * (HALO_VS_SCAN) * (1 - scanline_or_dot_mask) ;
 
         }
     
@@ -722,20 +884,19 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
         ) return vec4(0.0);
 
     vec4 bezel_in;    
-    //Sample main bezel texture, Do we want mipmaps?
-        #ifdef STATIC_BEZEL_USE_MIPMAP
-            vec2 bezel_lut_size = textureSize(monitor_body_curved,0); //no need to branch here if we assume straight and curved textures are the same size. //FIXME?
-            float bezel_frame_lod = log2(bezel_lut_size.y * (BEZEL_FRAME_ZOOM+1.0) /global.FinalViewportSize.y);
-            if (BEZEL_USE_STRAIGHT < 0.5)
-                bezel_in = textureLod(monitor_body_curved,coords_for_bezel,bezel_frame_lod);
-                    else
-                bezel_in = textureLod(monitor_body_straight,coords_for_bezel,bezel_frame_lod);
+    
+    //Sample main bezel texture:
+        #ifndef BEZEL_RES
+            vec2 bezel_lut_size = textureSize(monitor_body_curved, 0); //no need to branch here if we assume straight and curved textures are the same size. //FIXME?
         #else
-            if (BEZEL_USE_STRAIGHT < 0.5)
-                bezel_in = texture(monitor_body_curved,coords_for_bezel);
-                    else
-                bezel_in = texture(monitor_body_straight,coords_for_bezel);
+            vec2 bezel_lut_size = BEZEL_RES;
         #endif
+        float bezel_frame_lod = log2(bezel_lut_size.y * (BEZEL_FRAME_ZOOM+1.0) /global.FinalViewportSize.y);
+        
+        if (BEZEL_USE_STRAIGHT < 0.5)
+            bezel_in = textureLod(monitor_body_curved,coords_for_bezel,bezel_frame_lod);
+                else
+            bezel_in = textureLod(monitor_body_straight,coords_for_bezel,bezel_frame_lod);
     
 
     //Exit if the bezel is completely transparent (the tube)
@@ -808,13 +969,8 @@ void main() {
         }
     
     
-    //Calc initial content coords
+    //Initial content coords
         vec2 co_content = vTexCoord;
-        if (DO_CURVATURE == 1.0  &&  ((GEOM_WARP_X != 0.0) || (GEOM_WARP_Y != 0.0))) {
-            co_content = Warp_fast(co_content, vWarp_vexp, vWarp_arg2, GEOM_CUT_EARS);
-            //co_content = Warp(co_content, GEOM_WARP_X, GEOM_WARP_Y);
-        }
-
         
     //Tilt?
         if (DO_TILT == 1.0)
@@ -823,13 +979,20 @@ void main() {
 
     //Precalc Bezel coords, since it modifies content coords.
         vec2 co_bezel = vec2(0.0);
-        vec2 co_mirror;
         if (DO_BEZEL == 1.0) {
             co_content = zoomout_coords(co_content, -vBEZEL_INNER_ZOOM_adapted , 1.0);
-            co_mirror = zoom(co_content, 1/BEZEL_REFL_ZOOMOUT_ROOM);
             co_bezel = get_scaled_coords_for_bezel();
         }
 
+        
+    //Curvature 
+        //Curvature has to come after inner zoom or bezel curved border will not match content
+        //curved border when inner zoom changes.
+        vec2 co_mirror = co_content;
+        if (DO_CURVATURE == 1.0  &&  ((GEOM_WARP_X != 0.0) || (GEOM_WARP_Y != 0.0))) {
+            co_content = Warp_fast(co_content, vWarp_vexp, vWarp_arg2, GEOM_CUT_EARS);
+            co_mirror = zoom(co_content, 1/BEZEL_REFL_ZOOMOUT_ROOM);
+        }
         
     //Apply other content coords modifiers
         if (DO_GAME_GEOM_OVERRIDE == 1.0)
