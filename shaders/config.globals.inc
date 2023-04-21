@@ -268,5 +268,6 @@
 	#define DOT_M_G_STR		global.DOT_M_G_STR
 	#define DOT_M_MBLUR_STR		global.DOT_M_MBLUR_STR
 	#define DOT_M_MBLUR_MODE	global.DOT_M_MBLUR_MODE
-	#define DOT_M_MULTIPLY  global.DOT_M_MULTIPLY
-
+	#define DOT_M_MULTIPLY  	global.DOT_M_MULTIPLY
+	#define DOT_M_SHADOW_STR	global.DOT_M_SHADOW_STR
+	#define DOT_M_SHADOW_OFF	global.DOT_M_SHADOW_OFF

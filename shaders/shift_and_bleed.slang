@@ -7,9 +7,10 @@
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
-layout(location = 1) out vec2 r_offset;
-layout(location = 2) out vec2 g_offset;
-layout(location = 3) out vec2 b_offset;
+layout(location = 1) out vec2 vR_offset;
+layout(location = 2) out vec2 vG_offset;
+layout(location = 3) out vec2 vB_offset;
+layout(location = 4) out float vDo_shadow_mode;
 
 #include "includes/functions.include.slang"
 
@@ -17,20 +18,30 @@ void main()
 {
    gl_Position = global.MVP * Position;
    vTexCoord = TexCoord ;  
-   if (DO_SHIFT_RGB == 1.0) {
-      r_offset=offsets_from_float(SHIFT_R+210.0,RGB_SHIFT_RANGE);
-      g_offset=offsets_from_float(SHIFT_G+210.0,RGB_SHIFT_RANGE);
-      b_offset=offsets_from_float(SHIFT_B+210.0,RGB_SHIFT_RANGE);
+   
+   //...to tell fragment shader if dot matrix feature requests shadows.
+      vDo_shadow_mode = ceil(DOT_M_SHADOW_STR);
+   
+   //Shadow mode disables deconvergence, they do not coexist in real life.
+   if (vDo_shadow_mode == 1.0) {
+      vR_offset = vec2(DOT_M_SHADOW_OFF, abs(DOT_M_SHADOW_OFF));
+      vG_offset = vR_offset;
+      vB_offset = vR_offset;
+   } else if (DO_SHIFT_RGB == 1.0) {
+      vR_offset=offsets_from_float(SHIFT_R+210.0,RGB_SHIFT_RANGE);
+      vG_offset=offsets_from_float(SHIFT_G+210.0,RGB_SHIFT_RANGE);
+      vB_offset=offsets_from_float(SHIFT_B+210.0,RGB_SHIFT_RANGE);
    }
 }
 
 
 #pragma stage fragment
-
+#include "includes/functions.include.slang"
 layout(location = 0) in vec2 vTexCoord;
-layout(location = 1) in vec2 r_offset;
-layout(location = 2) in vec2 g_offset;
-layout(location = 3) in vec2 b_offset;
+layout(location = 1) in vec2 vR_offset;
+layout(location = 2) in vec2 vG_offset;
+layout(location = 3) in vec2 vB_offset;
+layout(location = 4) in float vDo_shadow_mode;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -70,12 +81,24 @@ const mat3 mat3_YUV2RGB = mat3(
 
 
 vec3 deconvergence_shadow(vec3 pixel_cur,vec2 coord, sampler2D in_texture, vec4 sourcesize2) {
+      //Emulates deconvergence or shadowing for dot matrix screens like Gameboy.
+      //Since both effects should not coexist in real life, we use a singe function for both.
+      //The function stays more or less the same, but rgb offsets calculated in vertex shader
+      //will be the same for shadow mode. Hopefully shader texture cache will take care of
+      //multiple sampling for the same tex coords.
+   
       vec2 d = -vec2(sourcesize2.z, sourcesize2.w)*0.5;
       vec3 pixel_offset;
-      pixel_offset.r=texture(in_texture,coord + r_offset * d).r;
-      pixel_offset.g=texture(in_texture,coord + g_offset * d).g;
-      pixel_offset.b=texture(in_texture,coord + b_offset * d).b;
-      return mix(pixel_cur,pixel_offset,OFFSET_STRENGTH);
+      
+      pixel_offset.r=texture(in_texture,coord + vR_offset * d).r;
+      pixel_offset.g=texture(in_texture,coord + vG_offset * d).g;
+      pixel_offset.b=texture(in_texture,coord + vB_offset * d).b;
+      
+      vec3 deconvergence_mode = mix(pixel_cur, pixel_offset, OFFSET_STRENGTH);
+      vec3 shadow_mode = pixel_cur - max( (pixel_cur - pixel_offset), vec3(0.0) ) * DOT_M_SHADOW_STR;
+      
+      return mix_step(deconvergence_mode, shadow_mode, vDo_shadow_mode);
+      
       
       //Shadow mode:
       //return  pixel_cur - 
@@ -151,7 +174,7 @@ void main() {
    vec3 pixel_out;
    //Handle case where both are needed:
    //First shift the right source, then pass it to bleed function.
-   if (DO_SHIFT_RGB + DO_SAT_BLEED > 1.0) {
+   if (DO_SHIFT_RGB + DO_SAT_BLEED > 1.0 || DOT_M_SHADOW_STR > 0.0 )  {
       pixel_out = deconvergence_shadow_wrap(vTexCoord);
       if (DO_SAT_BLEED > 0.0) {      
          if ( DO_FXAA == 1.0)  {
@@ -164,7 +187,7 @@ void main() {
       }
    } else
       //Handle case where only color shifting is requested
-      if (DO_SHIFT_RGB > 0.0) {
+      if (DO_SHIFT_RGB > 0.0 || DOT_M_SHADOW_STR > 0.0) {
          pixel_out = deconvergence_shadow_wrap(vTexCoord);
    } else 
       if (DO_SAT_BLEED > 0.0) {      
