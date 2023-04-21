@@ -69,7 +69,7 @@ const mat3 mat3_YUV2RGB = mat3(
 
 
 
-vec3 pixel_offset(vec3 pixel_cur,vec2 coord, sampler2D in_texture, vec4 sourcesize2) {
+vec3 deconvergence_shadow(vec3 pixel_cur,vec2 coord, sampler2D in_texture, vec4 sourcesize2) {
       vec2 d = -vec2(sourcesize2.z, sourcesize2.w)*0.5;
       vec3 pixel_offset;
       pixel_offset.r=texture(in_texture,coord + r_offset * d).r;
@@ -83,11 +83,11 @@ vec3 pixel_offset(vec3 pixel_cur,vec2 coord, sampler2D in_texture, vec4 sourcesi
 }
 
 
-vec3 pixel_offset_wrap (vec2 coord) {
+vec3 deconvergence_shadow_wrap (vec2 coord) {
    if ( DO_FXAA == 1.0)  {
-      return pixel_offset(texture(FXAA_pass, vTexCoord).rgb,  vTexCoord, FXAA_pass, global.FXAA_passSize);
+      return deconvergence_shadow(texture(FXAA_pass, vTexCoord).rgb,  vTexCoord, FXAA_pass, global.FXAA_passSize);
    } else {
-      return pixel_offset(texture(first_pass, vTexCoord).rgb, vTexCoord, first_pass, global.first_passSize);
+      return deconvergence_shadow(texture(first_pass, vTexCoord).rgb, vTexCoord, first_pass, global.first_passSize);
    }
 }
 
@@ -152,7 +152,7 @@ void main() {
    //Handle case where both are needed:
    //First shift the right source, then pass it to bleed function.
    if (DO_SHIFT_RGB + DO_SAT_BLEED > 1.0) {
-      pixel_out = pixel_offset_wrap(vTexCoord);
+      pixel_out = deconvergence_shadow_wrap(vTexCoord);
       if (DO_SAT_BLEED > 0.0) {      
          if ( DO_FXAA == 1.0)  {
             pixel_out = pixel_bleed(pixel_out, vTexCoord, FXAA_pass, global.FXAA_passSize);
@@ -165,7 +165,7 @@ void main() {
    } else
       //Handle case where only color shifting is requested
       if (DO_SHIFT_RGB > 0.0) {
-         pixel_out = pixel_offset_wrap(vTexCoord);
+         pixel_out = deconvergence_shadow_wrap(vTexCoord);
    } else 
       if (DO_SAT_BLEED > 0.0) {      
          //Handle case where only chroma bleed is requested
