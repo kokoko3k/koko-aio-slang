@@ -1,0 +1,26 @@
+#reference "../../shaders/shaders_slang/bezel/koko-aio/monitor-slotmask-bloom-bezel.slangp"
+LUMINANCE = "0.050000"
+GAMMA_OUT = "0.520000"
+IN_GLOW_POWER = "1.600000"
+HALO_POWER = "0.330000"
+GEOM_CORNER_SIZE = "0.020000"
+BEZEL_INNER_ZOOM = "-0.392500"
+BEZEL_FRAME_ZOOM = "-0.115000"
+BEZEL_R = "-0.220000"
+BEZEL_G = "-0.220000"
+BEZEL_B = "-0.220000"
+DO_BG_IMAGE = "1.000000"
+BG_IMAGE_OVER = "1.000000"
+BG_IMAGE_ZOOM = "1.015499"
+AMBI_STEPS = "5.000000"
+AMBI_POWER = "2.000000"
+AMBI_OVER_BEZEL = "0.150000"
+AMBI_BG_IMAGE_BLEND_MODE = "1.000000"
+AMBI_BG_IMAGE_FORCE = "0.400000"
+bg_under = "../../shaders/shaders_slang/bezel/koko-aio/textures/arcade_textures/wbml.png"
+bg_over = "../../shaders/shaders_slang/bezel/koko-aio/textures/arcade_textures/wbml.png"
+
+// Credits
+// shader by kokoko3k - https://github.com/kokoko3k/koko-aio-slang
+// artwork by Mr. RetroLust
+// preset and artwork adjustments by estefan3112 - https://github.com/estefan3112/koko-aio-slang
