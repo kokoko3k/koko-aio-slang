@@ -54,7 +54,7 @@ void main() {
         if ( !do_integer_scale() )
             vTexCoord = get_scaled_coords_aspect(TexCoord,global.FinalViewportSize, vIn_aspect, bool(vIsRotated)) + vec2(0.0000);
                 else
-            vTexCoord = integer_scale(TexCoord, vIn_aspect, bool(vIsRotated), GAME_GEOM_INT_SCALE-1.0 ) + vec2(0.0000); //<- without the offset, SCANLINE_MIN doesn't work.
+            vTexCoord = integer_scale(TexCoord, vIn_aspect, bool(vIsRotated), GAME_GEOM_INT_SCALE-1.0 ) + vec2(0.0001); //<- without the offset, SCANLINE_MIN doesn't work.
 
     //if (DO_GLOBAL_SHZO >0.5)
     //    vTexCoord = zoom(vTexCoord + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM );
