@@ -20,7 +20,7 @@ void main()
    vTexCoord = TexCoord ;  
    
    //...to tell fragment shader if dot matrix feature requests shadows.
-      vDo_shadow_mode = ceil(DOT_M_SHADOW_STR);
+      vDo_shadow_mode = float(DOT_M_SHADOW_STR + DO_DOT_MATRIX > 1 + eps);
    
    //Shadow mode disables deconvergence, they do not coexist in real life.
    if (vDo_shadow_mode == 1.0) {
