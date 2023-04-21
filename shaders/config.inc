@@ -364,16 +364,16 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 // Color correction
 #pragma parameter DO_CCORRECTION "★ Color corrections enable? ==>" 		0.0 	0.0 1.0 1.0
+#pragma parameter LUMINANCE       "        Luminance push (>1.0=clip)"		0.0	 0.0 1.5 0.05
+#pragma parameter BRIGHTNESS     "        Brightness in   (0.0=off)"		0.0	-1.0 1.0 0.01
+#pragma parameter CONTRAST       "        Contrast in     (0.0=off)"		0.0	-1.0 1.0 0.01
+#pragma parameter TEMPERATURE    "        Temperature in (6500=off)"		6500.0	3000 10000.0 50.0
+#pragma parameter GAMMA_OUT      "        Gamma out"				0.69	0.1 	4.0  0.01
 #pragma parameter COLOR_MONO_COLORIZE	"        Monochrome screen colorization"	0.0  0.0 1.0 0.1
 #pragma parameter COLOR_MONO_HUE1        "           . Hue bright"					0.25 0.0 1.0 0.01
 #pragma parameter COLOR_MONO_HUE2        "           . Hue dark"						0.3  0.0 1.0 0.01
 #pragma parameter COLOR_MONO_HUE_BIAS    "           . Hue bright-dark bias"		0.0	-2.0 2.0 0.01
-#pragma parameter LUMINANCE       "        Luminance push (>1.0=clip)"		0.0	 0.0 1.5 0.05
-#pragma parameter BRIGHTNESS     "        Brightness in   (0.0=off)"		0.0	-1.0 1.0 0.01
-#pragma parameter CONTRAST       "        Contrast in     (0.0=off)"		0.0	-1.0 1.0 0.01
 #pragma parameter SATURATION     "        Saturation in   (1.0=off)"		1.0	0.0  2.0 0.01
-#pragma parameter TEMPERATURE    "        Temperature in (6500=off)"		6500.0	3000 10000.0 50.0
-#pragma parameter GAMMA_OUT      "        Gamma out"				0.69	0.1 	4.0  0.01
 #pragma parameter BLANK1 " " 0.0 0.0 1.0 1.0
 
 
