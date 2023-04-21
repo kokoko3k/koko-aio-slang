@@ -482,7 +482,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter DOT_M_RGB_STR		"        RGB strength"					1.0 0.0 1.0 0.01
 #pragma parameter DOT_M_RGB_SHARP	"           . RGB sharpness"					2.0 0.1 16.0 0.01
 #pragma parameter DOT_M_G_GAIN  	"           . RGB Green gain correction"		0.85 0.1 1.0 0.01
-#pragma parameter DOT_M_MBLUR_STR	"        Refresh inertia"				0.6  0.0 0.9 0.1
+#pragma parameter DOT_M_MBLUR_STR	"        Refresh inertia"				0.45  0.0 0.9 0.05
 #pragma parameter DOT_M_MBLUR_MODE  "           . Inertia on: both,white,black"	0.0  0.0 2.0 1.0
 
 #pragma parameter DOT_M_MULTIPLY	"        Multiply factor (debug)"		1.0  1.0 50.0 1.0
