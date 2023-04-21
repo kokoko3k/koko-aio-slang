@@ -8,6 +8,10 @@
 			return (a * (1 - mix)) + 
 				(b * mix) ;
 		}
+		vec3 mix_step3(vec3 a, vec3 b, float mix){
+			return (a * (1 - mix)) + 
+				(b * mix) ;
+		}
 		vec4 mix_step(vec4 a, vec4 b, float mix){
 			return (a * (1 - mix)) + 
 				(b * mix) ;

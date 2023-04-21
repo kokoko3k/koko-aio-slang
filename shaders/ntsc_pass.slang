@@ -158,20 +158,49 @@ vec3 color_tools(vec3 pixel_out) {
 //Apply color corrections to input signal.
 
    //Push luminance without clipping
-   pixel_out = pixel_push_luminance(pixel_out,LUMINANCE);
-
-   //Modify saturation
-   if (!(SATURATION == 1.0)) {
-      vec3 intensity = vec3(dot(pixel_out.rgb, W));
-      pixel_out.rgb = mix(intensity, pixel_out.rgb, SATURATION);
-   }
-
+      pixel_out = pixel_push_luminance(pixel_out,LUMINANCE);
+   
    //Modify contrast and brightness
-   if (CONTRAST != 0.0 || BRIGHTNESS != 0.0)
-      pixel_out.rgb = apply_contrast_brightness(pixel_out.rgb, CONTRAST, BRIGHTNESS);
+      if (CONTRAST != 0.0 || BRIGHTNESS != 0.0)
+         pixel_out.rgb = apply_contrast_brightness(pixel_out.rgb, CONTRAST, BRIGHTNESS);
 
+
+
+      
    //Modify color temperature
-   if (TEMPERATURE != 6500.0) pixel_out.rgb = pixel_out.rgb * vTemperature_rgb;
+      if (TEMPERATURE != 6500.0) pixel_out.rgb = pixel_out.rgb * vTemperature_rgb;
+
+      
+    //Colorization for monochrome display on hsv colorspace.
+    //Select different hues for dark and bright pixels and mix them depending on the brightness
+      if (COLOR_MONO_COLORIZE > 0.01) {
+         vec3 pixel_grayscale = vec3(dot(pixel_out.rgb, W));
+         vec3 pixel_in_hsv = rgb2hsv(pixel_grayscale); //FIXME needed? yes, checked.
+         float lum = pixel_in_hsv.z * pixel_in_hsv.z; //<-- looks way better!
+         vec2 bias = mix_step( vec2(0.0, COLOR_MONO_HUE_BIAS), vec2(COLOR_MONO_HUE_BIAS, 0.0), float(COLOR_MONO_HUE_BIAS > 0.0));
+         bias = abs(bias);
+         
+         lum=scale_to_range(lum, 0.0-bias.x, 1.0+bias.y);
+         pixel_in_hsv.y=1.0; //sat
+         
+                           //Mix hues in rgb colorspace:
+                              vec3 pixel_rgb_hue1 = hsv2rgb( vec3(COLOR_MONO_HUE1, 1.0, pixel_in_hsv.z ) );
+                              vec3 pixel_rgb_hue2 = hsv2rgb( vec3(COLOR_MONO_HUE2, 1.0, pixel_in_hsv.z ) );
+                              vec3 pixel_rgb_hue12 = mix(pixel_rgb_hue2, pixel_rgb_hue1, vec3(lum));
+                           //Mix original and colorized with a specified strength
+                              pixel_out = mix(pixel_out, pixel_rgb_hue12, COLOR_MONO_COLORIZE);
+
+                              
+         //pixel_in_hsv.x = mix(COLOR_MONO_HUE2, COLOR_MONO_HUE1, lum); //hue
+         //pixel_out = mix(pixel_out, hsv2rgb(pixel_in_hsv), COLOR_MONO_COLORIZE);pk
+      }
+      
+   //Modify saturation
+      if (!(SATURATION == 1.0)) {
+         vec3 intensity = vec3(dot(pixel_out.rgb, W));
+         pixel_out.rgb = mix(intensity, pixel_out.rgb, SATURATION);
+      }
+      
    return pixel_out;
 }
 

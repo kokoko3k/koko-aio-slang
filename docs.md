@@ -3,7 +3,15 @@
 **Color corrections:**<br>
     Modify luminance, saturation, contrast, brightness and color temperature
     of the signal, at "input" stage.<br>
-    Gamma correction is applied to the final processed picture.
+    Gamma correction is applied to the final processed picture.<br>
+    It is also possible to emulate a monochrome display with custom colors:
+    
+        Monochrome screen colorization:
+            The amount of (de) colorization applied.
+        Hue bright, Hue dark:
+            Set the hue for bright and dark colors.
+        Hue bright-dark bias:
+            Controls the distribution of dark and bright hues.
     
 **FXAA:**<br>
     Apply the well known antialiasing effect by Nvidia.<br>
@@ -153,10 +161,14 @@
 **Dot matrix emulation:**<br>
     Emulates low refresh "boxed" screens used in old handheld consoles.<br>
     
-    Gap sharpness: 
-        Modulates the thickness of the grid around cells.
-    Gap strength:
+    Grid strength:
         How much the grid is visible.
+    Grid sharpness: 
+        Modulates the thickness of the grid around cells.
+    Strength on background:
+        How much should the grid be visible on background?
+        More positive values -> more grid on bright
+        More negative values -> more grid on dark
     Gap brightness:
         You may want to use a white grid eg: for gameboy mono emulation.
     RGB strength:

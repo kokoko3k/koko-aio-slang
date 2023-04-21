@@ -54,7 +54,7 @@ void main() {
         if ( !do_integer_scale() )
             vTexCoord = get_scaled_coords_aspect(TexCoord,global.FinalViewportSize, vIn_aspect, bool(vIsRotated)) + vec2(0.0000);
                 else
-            vTexCoord = integer_scale(TexCoord, vIn_aspect, bool(vIsRotated), GAME_GEOM_INT_SCALE-1.0 ) + vec2(0.0000); //<- without the offset, SCANLINE_MIN doesn't work.
+            vTexCoord = integer_scale(TexCoord, vIn_aspect, bool(vIsRotated), GAME_GEOM_INT_SCALE-1.0 ) + vec2(0.0001); //<- without the offset, SCANLINE_MIN doesn't work.
 
     //if (DO_GLOBAL_SHZO >0.5)
     //    vTexCoord = zoom(vTexCoord + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM );
@@ -100,7 +100,7 @@ void main() {
             //contrast and brightness into account. This is needed so that scanline generation
             //can map the proper input range and strictly obey scanline thickness constraints.
                 vMax_inLum = max( 1.0, DO_CCORRECTION * apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS)) *
-                            max( 1.0, DO_IN_GLOW * IN_GLOW_POWER);
+                             max( 1.0, DO_IN_GLOW * IN_GLOW_POWER);
         }
         
         //Generate a seed that changes over time for temporal random noise
@@ -310,20 +310,9 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
 
 
 
-float fn_morph_shape(float shape_in, float l) {
-    //Morph shape via input luminance
-        if (l <= 0.5) {
-            
-            float l1 = pow(l, 4) * 15;
-            return pow(shape_in, 1/sqrt(l1));
-        } else {
-            float l2 = (l-0.5)*2.0;
-            return shape_in * (1-l2) + l2;
-        }
-}
-
 vec4 fn_pixel_dotmat(vec2 coords, vec3 pixel_in) {
   
+       
     //Base angle, depends on original size:
         vec2 angle_base = coords * pi * params.OriginalSize.xy; //FIXME here we want .yy to make integer scaling
 
@@ -367,18 +356,37 @@ vec4 fn_pixel_dotmat(vec2 coords, vec3 pixel_in) {
         //float fgrid = min(grid.x, grid.y);
         float fgrid = grid.x* grid.y;
 
-       
-    vec3 gap_color = vec3(DOT_M_G_BRT);
-    vec4 pixel_out;
+    //Modify strength for "paint on background" option
 
-    float fgrid_adpt = mix(1.0, fgrid, DOT_M_G_STR);
+        //Smoothly fadeout grid on background
+            //The fadeout size:
+                float fade_size = 0.3;
+            
+            //We invert the smooth logic if threshold is negative. this allow to fadeout
+            //the grid on bright or dark backgrounds.
+                float lum_scaled = dot(pixel_in, vec3(0.33333));
+                lum_scaled = clamp(lum_scaled, 0.0, 1.0);
+                lum_scaled = mix_step(1-lum_scaled, lum_scaled, float(DOT_M_G_TRESH > 0.0));
+                
+            float smooth_threshold = abs(DOT_M_G_TRESH);
+            vec2 smooth_range  = vec2(smooth_threshold, smooth_threshold+fade_size);
+            float grid_smoothstep = 1- smoothstep(smooth_range.x, smooth_range.y, lum_scaled);    
+
+
+            
+    //Adapt grid strength
+        float grid_str = DOT_M_G_STR * grid_smoothstep;    
+    //Apply strength modifier
+        float fgrid_adpt = mix(1.0, fgrid, grid_str);
     
-    pixel_out.rgb = mix(gap_color, pixel_in*mask_rgb ,fgrid_adpt  );
-    
-    pixel_out.a = fgrid;
-    
-    return pixel_out;
-    
+
+    //Output is the mix of the gap and the rgb masked pixel in.
+    //In the alpha channel we put the grid because it could be used by halo
+    return vec4( 
+                 mix(vec3(DOT_M_G_BRT), pixel_in * mask_rgb ,fgrid_adpt),
+                 fgrid_adpt
+               );
+
 }
 
 float fn_scanline_mask(vec2 coords, bool do_slotmask, float lum, float min_inLum, float max_inLum, float tate) {
@@ -799,14 +807,14 @@ vec3 fn_pixel_content(vec2 coords) {
 
         }
 
-
-    float scanline_or_dot_mask = 1.0;
+    
+    float scanline_or_dot_mat = 1.0; //init dot grid or scanline mask to 1.0
     
     //Dot mask
         if (DO_DOT_MATRIX == 1.0) {
             vec4 pixel_grid_mask = fn_pixel_dotmat(coords, pixel_out);
             //grid mask only is needed by halo to selectively light the grid.
-                scanline_or_dot_mask = pixel_grid_mask.a;
+                scanline_or_dot_mat = pixel_grid_mask.a;
             //rgb channel goes to pixel_out
             pixel_out = pixel_grid_mask.rgb;
         }
@@ -818,12 +826,10 @@ vec3 fn_pixel_content(vec2 coords) {
                 float lum = max(max(pixel_out.r, pixel_out.g), pixel_out.b);
 
                 //The maximum possible brightness of the input color modified by glow,contrast and brightness.
-                float max_inLum = vMax_inLum;
-                float min_inLum = 0.0;
-                float scanline_mask = fn_scanline_mask(coords, SCANLINE_SM_TYPE > 0.0, lum, min_inLum, max_inLum, vDo_Tate );
+                float scanline_mask = fn_scanline_mask(coords, SCANLINE_SM_TYPE > 0.0, lum, 0.0, vMax_inLum, vDo_Tate );
                 pixel_out = min(pixel_out, 1.0) * ( scanline_mask + ( pixel_bleed * SCANLINES_BLEEDING * ( 1 - scanline_mask ) ));
                 //Since scanlines and dot matrix are alternative and halo can white both, just use a single var for both:
-                scanline_or_dot_mask = scanline_mask;
+                scanline_or_dot_mat = scanline_mask;
         }
 
         
@@ -833,9 +839,9 @@ vec3 fn_pixel_content(vec2 coords) {
         if (DO_HALO == 1.0 ) {
             pixel_haloed = texture(halo_pass,coords).rgb;
             //Halo only on scanlines:
-            pixel_out += pixel_haloed * scanline_or_dot_mask ;
+            pixel_out += pixel_haloed * scanline_or_dot_mat ;
             //Halo over scanlines gap too:
-            pixel_out += pixel_haloed * (HALO_VS_SCAN) * (1 - scanline_or_dot_mask) ;
+            pixel_out += pixel_haloed * (HALO_VS_SCAN) * (1 - scanline_or_dot_mat) ;
 
         }
     
