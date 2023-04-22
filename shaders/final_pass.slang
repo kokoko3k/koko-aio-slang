@@ -39,7 +39,7 @@ layout(location = 14) out float vBEZEL_INNER_ZOOM_adapted;
 layout(location = 15) out float vVmask_gap;
 layout(location = 16) out float vFcol_Tated;
 layout(location = 17) out float vDo_Tate;
-
+layout(location = 18) out vec3 vDotMat_Grid_Color;
 
 #include "includes/functions.include.slang"
 
@@ -113,6 +113,14 @@ void main() {
             vVmask_gap = vgap_size_per_scale[int(VMASK_DARKLINE_SCALE-1)];
 
             vFcol_Tated = mix_step(vOutputCoord.x * params.OutputSize.x, vOutputCoord.y * params.OutputSize.y, vDo_Tate);
+
+        //Calc dotmat grid color
+            vDotMat_Grid_Color = vec3(DOT_M_G_BRT);
+            if (DO_DOT_MATRIX + DO_CCORRECTION > 1.1) {
+                vDotMat_Grid_Color = color_tools(vec3(DOT_M_G_BRT), kelvin2rgb(TEMPERATURE));
+                //Since we modify grid brightness via a specific use parameter, explicitely multiply it by that:
+                    vDotMat_Grid_Color *= DOT_M_G_BRT ;
+            }
 }
 
 
@@ -135,6 +143,7 @@ layout(location = 14) in float vBEZEL_INNER_ZOOM_adapted;
 layout(location = 15) in float vVmask_gap;
 layout(location = 16) in float vFcol_Tated;
 layout(location = 17) in float vDo_Tate;
+layout(location = 18) in vec3 vDotMat_Grid_Color;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -381,9 +390,9 @@ vec4 fn_pixel_dotmat(vec2 coords, vec3 pixel_in) {
     
 
     //Output is the mix of the gap and the rgb masked pixel in.
-    //In the alpha channel we put the grid because it could be used by halo
+    //In the alpha channel we put the grid because it could be selectiveli brightened by halo
     return vec4( 
-                 mix(vec3(DOT_M_G_BRT), pixel_in * mask_rgb ,fgrid_adpt),
+                 mix(vDotMat_Grid_Color, pixel_in * mask_rgb ,fgrid_adpt),
                  fgrid_adpt
                );
 

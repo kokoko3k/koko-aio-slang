@@ -127,11 +127,6 @@ vec4 ntscdec(vec2 uv) {
 }
 
 
-
-
-
-
-
 vec3 debug() {
    vec3 pixel_debug;
    float blink_time = 120;
@@ -145,7 +140,6 @@ vec3 debug() {
 void main() {
 
    //FragColor = vec4(debug(), 1.0); return;
-
 
    //This will go into alpha channel to make glow aware of it and blur more.
    //It could be configurable.
