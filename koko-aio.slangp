@@ -61,10 +61,10 @@ shaders = 17
 # Being a fast single pass process, don't expect it to be 100% accurate
 # It is able to drag rainbows as seen in Megadrive games with an option
 # To make it oblique.
-# It also does input colot corrections to the input signal (saturation,brightness,contrast...)
+# It also does input color corrections to the input signal (saturation,brightness,contrast...)
 # It also does motion blur for dot matrix.
-           shader0 = shaders/ntsc_pass.slang
-            alias0 = "ntsc_pass"
+           shader0 = shaders/colortools_and_ntsc_pass.slang
+            alias0 = "colortools_and_ntsc_pass"
     filter_linear0 = false
        scale_type0 = source
             scale0 = 1.0
