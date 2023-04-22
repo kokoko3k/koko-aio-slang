@@ -454,8 +454,13 @@ vec2 Warp_try(vec2 pos, float warpX, float warpY) {
 		return zoomxy(in_coords, izoom);
 	}
 
+	bool need_NO_integer_scale() {
+		//returns if no integer scaling is requested.
+		return DO_GAME_GEOM_OVERRIDE * GAME_GEOM_INT_SCALE == 0.0;
+	}
 
 	bool need_integer_scale() {
+		//return if integer scaling is requested.
 		//return DO_GAME_GEOM_OVERRIDE == 1.0 && GAME_GEOM_INT_SCALE > 0.01;
 		return DO_GAME_GEOM_OVERRIDE * GAME_GEOM_INT_SCALE != 0.0;
 	}

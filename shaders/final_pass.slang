@@ -51,7 +51,7 @@ void main() {
     vIn_aspect = get_in_aspect();
     
     //Calculate vTexcoord as fractional or integer scaled?
-        if ( !need_integer_scale() )
+        if ( need_NO_integer_scale() )
             vTexCoord = get_scaled_coords_aspect(TexCoord,global.FinalViewportSize, vIn_aspect, bool(vIsRotated)) + vec2(0.0000);
                 else
             vTexCoord = integer_scale(TexCoord, vIn_aspect, bool(vIsRotated), GAME_GEOM_INT_SCALE-1.0 ) + vec2(0.0001); //<- without the offset, SCANLINE_MIN doesn't work.
