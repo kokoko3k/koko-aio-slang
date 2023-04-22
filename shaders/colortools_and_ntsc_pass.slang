@@ -17,30 +17,6 @@ layout(location = 4) out float vNTSC_weights[NTSC_FILTER_WIDTH_MAX];
 #include "includes/functions.include.slang"
 
 
-vec3 kelvin2rgb(float k) {
-   //Convert kelvin temperature to rgb factors
-   k = clamp(k,1000,40000);
-   k=k/100.0;
-   float tmpCalc;
-    vec3 pixel_out;
-   if (k<=66) {
-      pixel_out.r = 255;
-      pixel_out.g = 99.47080258612 * log(k) - 161.11956816610;
-   } else {
-      pixel_out.r = 329.6987274461 * pow(k - 60 ,-0.13320475922);
-      pixel_out.g = 288.12216952833 * pow(k-60, -0.07551484921);
-   }
-
-   if (k >= 66)
-      pixel_out.b = 255;
-   else if (k<=19)
-      pixel_out.b = 0;
-   else
-      pixel_out.b = 138.51773122311 * log(k - 10) - 305.04479273072;
-
-   return pixel_out/255.0;
-}
-
 /* hann() sinc() functions by xot:
  * copyright (c) 2017-2018, John Leffingwell
  * license CC BY-SA Attribution-ShareAlike
@@ -153,56 +129,7 @@ vec4 ntscdec(vec2 uv) {
 
 
 
-#define W vec3(0.2125, 0.7154, 0.0721)
-vec3 color_tools(vec3 pixel_out) {
-//Apply color corrections to input signal.
 
-   //Push luminance without clipping
-      pixel_out = pixel_push_luminance(pixel_out,LUMINANCE);
-   
-   //Modify contrast and brightness
-      if (CONTRAST != 0.0 || BRIGHTNESS != 0.0)
-         pixel_out.rgb = apply_contrast_brightness(pixel_out.rgb, CONTRAST, BRIGHTNESS);
-
-
-
-      
-   //Modify color temperature
-      if (TEMPERATURE != 6500.0) pixel_out.rgb = pixel_out.rgb * vTemperature_rgb;
-
-      
-    //Colorization for monochrome display on hsv colorspace.
-    //Select different hues for dark and bright pixels and mix them depending on the brightness
-      if (COLOR_MONO_COLORIZE > 0.01) {
-         vec3 pixel_grayscale = vec3(dot(pixel_out.rgb, W));
-         vec3 pixel_in_hsv = rgb2hsv(pixel_grayscale); //FIXME needed? yes, checked.
-         float lum = pixel_in_hsv.z * pixel_in_hsv.z; //<-- looks way better!
-         vec2 bias = mix_step( vec2(0.0, COLOR_MONO_HUE_BIAS), vec2(COLOR_MONO_HUE_BIAS, 0.0), float(COLOR_MONO_HUE_BIAS > 0.0));
-         bias = abs(bias);
-         
-         lum=scale_to_range(lum, 0.0-bias.x, 1.0+bias.y);
-         pixel_in_hsv.y=1.0; //sat
-         
-                           //Mix hues in rgb colorspace:
-                              vec3 pixel_rgb_hue1 = hsv2rgb( vec3(COLOR_MONO_HUE1, 1.0, pixel_in_hsv.z ) );
-                              vec3 pixel_rgb_hue2 = hsv2rgb( vec3(COLOR_MONO_HUE2, 1.0, pixel_in_hsv.z ) );
-                              vec3 pixel_rgb_hue12 = mix(pixel_rgb_hue2, pixel_rgb_hue1, vec3(lum));
-                           //Mix original and colorized with a specified strength
-                              pixel_out = mix(pixel_out, pixel_rgb_hue12, COLOR_MONO_COLORIZE);
-
-                              
-         //pixel_in_hsv.x = mix(COLOR_MONO_HUE2, COLOR_MONO_HUE1, lum); //hue
-         //pixel_out = mix(pixel_out, hsv2rgb(pixel_in_hsv), COLOR_MONO_COLORIZE);pk
-      }
-      
-   //Modify saturation
-      if (!(SATURATION == 1.0)) {
-         vec3 intensity = vec3(dot(pixel_out.rgb, W));
-         pixel_out.rgb = mix(intensity, pixel_out.rgb, SATURATION);
-      }
-      
-   return pixel_out;
-}
 
 
 vec3 debug() {
@@ -246,7 +173,7 @@ void main() {
    }
 
    if (DO_CCORRECTION == 1.0)
-      pixel_out = color_tools(pixel_out);
+      pixel_out = color_tools(pixel_out, vTemperature_rgb);
 
    
    
