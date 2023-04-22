@@ -412,7 +412,7 @@ float fn_scanline_mask(vec2 coords, bool do_slotmask, float lum, float min_inLum
     //2 - offset them on odd frames if needed (vScanlineAlternateOffset via vertex shader)
     //3 - Dont do it when the screen is interlaced and we have to skip drawing scanlines on interlaced screens
 
-        //coords += params.OriginalSize.zw*0.5; //<-- this seems needed when using integer scalinf
+        //coords += params.OriginalSize.zw*0.5; //<-- this seems needed when using integer scaling
         //due to linear filtering in earlier pass FIXME don't forget me!
         coords = mix_step(coords.xy, coords.yx, tate);
         float originalsize = mix_step(params.OriginalSize.y, params.OriginalSize.x, tate);

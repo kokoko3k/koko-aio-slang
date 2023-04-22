@@ -454,23 +454,16 @@ vec2 Warp_try(vec2 pos, float warpX, float warpY) {
 		return zoomxy(in_coords, izoom);
 	}
 
-	float get_BEZEL_INNER_ZOOM() {
-		/*if (GAME_GEOM_INT_SCALE == 1.0 && DO_GAME_GEOM_OVERRIDE == 1.0)
-			return 0.0;
-		else
-			return BEZEL_INNER_ZOOM;
-		*/
-		//unbranched versions:
-		return BEZEL_INNER_ZOOM * (1 - DO_GAME_GEOM_OVERRIDE * GAME_GEOM_INT_SCALE);
-		
-		//117.2
-		//return BEZEL_INNER_ZOOM * float( GAME_GEOM_INT_SCALE != 1.0 || DO_GAME_GEOM_OVERRIDE != 1.0  );
-	}
 
 	bool do_integer_scale() {
 		return DO_GAME_GEOM_OVERRIDE == 1.0 && GAME_GEOM_INT_SCALE > 0.01;
+		//DO_GAME_GEOM_OVERRIDE * GAME_GEOM_INT_SCALE != 0.0;
 	}
 
+	float get_BEZEL_INNER_ZOOM() {
+		//Disables bezel inner zoom when using integer scaling
+		return BEZEL_INNER_ZOOM * float( !do_integer_scale() );
+	}
 
 	vec2 content_geom_override(vec2 co, float aspect, float in_aspect, float vshift, float hshift, float out_zoom){
 		//Aspect
