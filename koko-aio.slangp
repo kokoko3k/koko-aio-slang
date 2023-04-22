@@ -72,8 +72,7 @@ shaders = 17
 
 
         
-# This pass, wrongly named first pass, since we prepended the ntsc pass
-# and emulates the flickering observed on crts when the input signal is interlaced
+# This pass, emulates the flickering observed on crts when the input signal is interlaced
 # and there is high brightness difference between adiacent scanlines.
 # This pass is able to generate mipmaps because the next pass has mipmap_input true.
 #
@@ -92,8 +91,8 @@ shaders = 17
 # and only scale_y1 = 2.0 is needed.
 # As an alternative option you can configure P-UAE to always output to low resolution for x and y
 # But this way you loose the emulation for hires content (not much games uses it anyway).
-           shader1 = shaders/first_pass.slang
-            alias1 = "first_pass"
+           shader1 = shaders/flicker_and_noise.slang
+            alias1 = "flick_and_noise_pass"
     filter_linear1 = false
        scale_type1 = source
           scale_x1 = 2.0

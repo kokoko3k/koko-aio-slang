@@ -154,7 +154,7 @@ layout(set = 0, binding = 11) uniform sampler2D in_glow_pass;
 layout(set = 0, binding = 12) uniform sampler2D halo_pass;
 
 
-layout(set = 0, binding = 15) uniform sampler2D first_pass;
+layout(set = 0, binding = 15) uniform sampler2D flick_and_noise_pass;
 
 
 
@@ -1093,9 +1093,9 @@ void main() {
 
     //For debug purposes:
         //quad split screen
-        //if ( (vOutputCoord.x < 0.5  && vOutputCoord.y > 0.5) || (vOutputCoord.x > 0.5  && vOutputCoord.y < 0.5)  ) pixel_out = texture(first_pass,vOutputCoord).rgb;
+        //if ( (vOutputCoord.x < 0.5  && vOutputCoord.y > 0.5) || (vOutputCoord.x > 0.5  && vOutputCoord.y < 0.5)  ) pixel_out = texture(flick_and_noise_pass,vOutputCoord).rgb;
         //split screen
-        //if (vTexCoord.y < 0.5) pixel_out = texture(first_pass,vTexCoord).rgb;
+        //if (vTexCoord.y < 0.5) pixel_out = texture(flick_and_noise_pass,vTexCoord).rgb;
         //pixel_out = texture(reflected_blurred_pass, vTexCoord).rgb;
         
         

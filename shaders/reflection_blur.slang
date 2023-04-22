@@ -20,7 +20,7 @@ layout(location = 0) in vec2 vTexCoord;
 layout(location = 0) out vec4 FragColor;
 
 layout(set = 0, binding = 1) uniform sampler2D Source;
-layout(set = 0, binding = 2) uniform sampler2D first_pass;
+layout(set = 0, binding = 2) uniform sampler2D flick_and_noise_pass;
 
 #include "includes/functions.include.slang"
 
@@ -70,7 +70,7 @@ void main() {
       vec3 pixel_out = mix(s1, s2, lodmix) * BEZEL_REFL_STRENGTH;
    
    //Next simulate a diffused light
-      vec3 pixel_diffused = textureLod( first_pass, coords, 6.0).rgb;
+      vec3 pixel_diffused = textureLod( flick_and_noise_pass, coords, 6.0).rgb;
       pixel_out = mix( pixel_out, pixel_diffused, BEZEL_DIFFUSION_STR);
       
    

@@ -187,7 +187,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	//vec4 monitor_bodySize;
 	//vec4 bgSize;
 	vec4 avglum_passSize;
-	vec4 first_passSize;
+	vec4 flick_and_noise_passSize;
 	vec4 ntsc_passSize;
 
 	float COLOR_MONO_COLORIZE;

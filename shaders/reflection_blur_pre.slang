@@ -27,7 +27,7 @@ layout(location = 1) in vec2 vCoordsAdapted;
 
 layout(location = 0) out vec4 FragColor;
 
-layout(set = 0, binding = 1) uniform sampler2D first_pass;
+layout(set = 0, binding = 1) uniform sampler2D flick_and_noise_pass;
 layout(set = 0, binding = 2) uniform sampler2D avglum_pass;
 
 #include "includes/functions.include.slang"
@@ -54,7 +54,7 @@ void main() {
    }
 
    
-   FragColor = texture(first_pass, coords);
+   FragColor = texture(flick_and_noise_pass, coords);
 }
  
  

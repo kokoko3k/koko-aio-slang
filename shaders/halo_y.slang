@@ -34,7 +34,7 @@ void main() {
       return;
    }
 
-    pixel_haloed = blur9_y(Source, vTexCoord, global.first_passSize.xy, vHALO_H) * HALO_POWER;
+    pixel_haloed = blur9_y(Source, vTexCoord, global.flick_and_noise_passSize.xy, vHALO_H) * HALO_POWER;
     FragColor = vec4(pixel_haloed.rgb,1.0);
     
     

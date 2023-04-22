@@ -31,7 +31,7 @@ void main() {
     fstep = (border_max - border_min)  / (leds_per_strip-1);
     
     //Calc a lod for a texture sized led_strip x led_strip
-        lod = log2(global.first_passSize.y / leds_per_strip);
+        lod = log2(global.flick_and_noise_passSize.y / leds_per_strip);
     
 
    //Scale to the original aspect
@@ -73,13 +73,13 @@ layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 1) uniform sampler2D PastSampler;
 layout(set = 0, binding = 2) uniform sampler2D avglum_pass;
 layout(set = 0, binding = 3) uniform sampler2D avglum_passFeedback;
-layout(set = 0, binding = 4) uniform sampler2D first_pass;
+layout(set = 0, binding = 4) uniform sampler2D flick_and_noise_pass;
 
 
 
 
 vec3 ambi_push_pass(vec2 coords, float f_lod) {
-   vec3 pixel_out = textureLod(first_pass, coords, f_lod).rgb;
+   vec3 pixel_out = textureLod(flick_and_noise_pass, coords, f_lod).rgb;
    pixel_out = apply_fuzzy_main_pass(pixel_out);
    pixel_out = pixel_push_luminance(pixel_out, AMBI_POWER-1);
    return pixel_out;
