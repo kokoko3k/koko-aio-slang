@@ -456,9 +456,10 @@ vec2 Warp_try(vec2 pos, float warpX, float warpY) {
 
 
 	bool do_integer_scale() {
-		return DO_GAME_GEOM_OVERRIDE == 1.0 && GAME_GEOM_INT_SCALE > 0.01;
-		//DO_GAME_GEOM_OVERRIDE * GAME_GEOM_INT_SCALE != 0.0;
+		//return DO_GAME_GEOM_OVERRIDE == 1.0 && GAME_GEOM_INT_SCALE > 0.01;
+		return DO_GAME_GEOM_OVERRIDE * GAME_GEOM_INT_SCALE != 0.0;
 	}
+
 
 	float get_BEZEL_INNER_ZOOM() {
 		//Disables bezel inner zoom when using integer scaling
