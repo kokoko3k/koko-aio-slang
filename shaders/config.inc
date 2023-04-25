@@ -362,6 +362,12 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float DOT_M_SHADOW_STR;
 	float DOT_M_SHADOW_OFF;
 	
+	float DO_PIXELGRID;
+	float PIXELGRID_MIN_H;
+	float PIXELGRID_MIN_W;
+	float PIXELGRID_MAX_H;
+	float PIXELGRID_MAX_W;
+	float PIXELGRID_SIZE;
 } global;
 
 // Color correction
@@ -481,16 +487,21 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter DOT_M_G_TRESH		"           . Paint on bright (<0 on black)"	1.1 -1.1 1.1 0.01
 #pragma parameter DOT_M_G_BRT		"           . Grid brightness"			0.0 0.0 1.0 0.01
 #pragma parameter DOT_M_G_SHARP		"           . Grid sharpness"			2.0 0.0 20.0 0.25
-#pragma parameter DOT_M_RGB_STR		"        RGB strength"					1.0 0.0 1.0 0.01
-#pragma parameter DOT_M_RGB_SHARP	"           . RGB sharpness"					2.0 0.1 16.0 0.01
-#pragma parameter DOT_M_G_GAIN  	"           . RGB Green gain correction"		0.85 0.1 1.0 0.01
 #pragma parameter DOT_M_MBLUR_STR	"        Refresh inertia"				0.45  0.0 0.9 0.05
 #pragma parameter DOT_M_MBLUR_MODE  "           . Inertia on: both,white,black"	0.0  0.0 2.0 1.0
 #pragma parameter DOT_M_SHADOW_STR  "        Shadow strength (disables deconvergence)"	0.0  0.0 1.0 0.01
 #pragma parameter DOT_M_SHADOW_OFF  "        Shadow offset"								0.0  -1.0 1.0 0.01
-
 #pragma parameter DOT_M_MULTIPLY	"        Multiply factor (debug)"		1.0  1.0 50.0 1.0
 #pragma parameter BLANK12c " " 0.0 0.0 1.0 1.0
+
+// pixel Grid
+#pragma parameter DO_PIXELGRID		"★  Pixel grid emulation (NOT with scanlines or masks) ==>"	0.0 0.0 1.0 1.0
+#pragma parameter PIXELGRID_MIN_H	"        Min pixel height"			0.1 0.0 1.0 0.05
+#pragma parameter PIXELGRID_MAX_H   "        Max pixel height"			0.5 0.0 1.0 0.05
+#pragma parameter PIXELGRID_MIN_W   "        Min pixel width"			0.2 0.0 1.0 0.05
+#pragma parameter PIXELGRID_MAX_W   "        Max pixel width"			0.5 0.0 1.0 0.05
+#pragma parameter PIXELGRID_SIZE    "        Cell size (core,screen)"	0.0 0.0 1.0 1.0
+#pragma parameter BLANK12d " " 0.0 0.0 1.0 1.0
 
 // Halo
 #pragma parameter DO_HALO       "★ Halo enable? ==>" 						0.0	0.0 1.0 1.0

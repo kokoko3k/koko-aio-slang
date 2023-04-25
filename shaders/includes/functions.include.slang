@@ -182,6 +182,11 @@ float map_range(float value, float min_in, float max_in, float min_out, float ma
 	return min_out + (value - min_in) * (max_out - min_out) / (max_in - min_in);
 }
 
+vec3 map_range(vec3 value, float min_in, float max_in, float min_out, float max_out) {
+	//Scales value in [min_in - max_in] to [min_out - max_out]
+	return min_out + (value - min_in) * (max_out - min_out) / (max_in - min_in);
+}
+
 float normalize_range(float value, float min_in, float max_in) {
 	//Scales value in [min_in - max_in] to 0..1
 	return (value - min_in)  / (max_in - min_in);
