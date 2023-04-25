@@ -368,6 +368,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float PIXELGRID_MAX_H;
 	float PIXELGRID_MAX_W;
 	float PIXELGRID_SIZE;
+	float PIXELGRID_SMOOTH_H;
+	float PIXELGRID_SMOOTH_W;
 } global;
 
 // Color correction
@@ -496,10 +498,12 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 // pixel Grid
 #pragma parameter DO_PIXELGRID		"★  Pixel grid emulation (NOT with scanlines or masks) ==>"	0.0 0.0 1.0 1.0
-#pragma parameter PIXELGRID_MIN_H	"        Min pixel height"			0.1 0.0 1.0 0.05
-#pragma parameter PIXELGRID_MAX_H   "        Max pixel height"			0.5 0.0 1.0 0.05
 #pragma parameter PIXELGRID_MIN_W   "        Min pixel width"			0.2 0.0 1.0 0.05
 #pragma parameter PIXELGRID_MAX_W   "        Max pixel width"			0.5 0.0 1.0 0.05
+#pragma parameter PIXELGRID_SMOOTH_W "       Pixel width smoothness"   0.1 0.01 1.0 0.01
+#pragma parameter PIXELGRID_MIN_H	"        Min pixel height"			0.1 0.0 1.0 0.05
+#pragma parameter PIXELGRID_MAX_H   "        Max pixel height"			0.5 0.0 1.0 0.05
+#pragma parameter PIXELGRID_SMOOTH_H "       Pixel height smoothness"   0.1 0.01 1.0 0.01
 #pragma parameter PIXELGRID_SIZE    "        Cell size (core,screen)"	0.0 0.0 1.0 1.0
 #pragma parameter BLANK12d " " 0.0 0.0 1.0 1.0
 

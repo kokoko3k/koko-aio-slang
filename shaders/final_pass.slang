@@ -354,6 +354,7 @@ vec3 morph_shape(vec3 shape, vec3 power ) {
 }
 
 
+
 vec3 fn_pixel_grid(vec2 coords, vec3 pixel_in) {
 
     //La densità della maschera
@@ -426,6 +427,84 @@ vec3 fn_pixel_grid(vec2 coords, vec3 pixel_in) {
 
     //Applico gap, maschera rgp al pixel in ingresso.
         vec3 pixel_out = mask_rgb * gap  * pixel_in ;
+
+    return pixel_out;
+
+}
+
+
+vec3 fn_pixel_grid_take_2(vec2 coords, vec3 pixel_in) {
+
+    vec3 pout;
+
+    //Aggiusta la gamma in ingresso ad uso luminosità
+        vec3 pixel_in_gammed = pow(pixel_in, vec3(0.5)); //FIXME, questo dev'essere configurabile.
+            //pixel_in_gammed = pixel_in;
+    //antiglitch
+        coords+=vec2(0.0000001);
+
+
+    //La densità della maschera
+        vec2 mask_size = mix_step(params.OriginalSize.xy, params.OutputSize.xy*0.333, PIXELGRID_SIZE);
+
+    float angle_multiply = 1.0;
+    angle_multiply = 1.0;
+    vec2 frequency;
+    //ricavo il periodo della triade
+        frequency.x = coords.x * mask_size.x;
+
+    //ricavo il periodo delle linee orizzontali
+        frequency.y = coords.y * mask_size.y; // * ph_aspect;
+
+    //Zoom to debug:
+        frequency/=angle_multiply;
+
+
+        frequency +=vec2(0.5);
+
+    vec3 mask_rgb=vec3(1.0);
+
+    float phosphor_offset = (0.333333);
+
+    //ricavo i 3 periodi e offset per i 3 seni verticali
+        vec3 frequency_rgb = vec3( frequency.x + phosphor_offset,
+                                   frequency.x,
+                                   frequency.x - phosphor_offset );
+
+    //ricavo i 3 seni in bianco e nero
+        mask_rgb = 2*abs(frequency_rgb - floor(frequency_rgb+0.5));
+
+
+
+    //mi salvo la maschera prima di allargarla, perchè puòservire per ricavare l'altezza del fosforo.
+        vec3 mask_rgb11 = mask_rgb;
+
+    //modulo la larghezza della triade in base alla luminosità del pixel in ingresso
+        vec3 larghezza_fosforo = map_range(pixel_in_gammed, 0.0, 1.0, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
+        //larghezza_fosforo = clamp(larghezza_fosforo,PIXELGRID_MIN_W, PIXELGRID_MAX_W );
+        //Quanto sono sfocati i margini:
+
+        //Antiglitch per linee verticali quando al massimo della luminosità
+            //larghezza_fosforo += PIXELGRID_SMOOTH_W;
+        //"Clampo" via smoothstep al min e al max
+            mask_rgb = smoothstep(larghezza_fosforo + PIXELGRID_SMOOTH_W, larghezza_fosforo - PIXELGRID_SMOOTH_W, mask_rgb);
+
+    //Gap orizzontale
+        float gap = 2*abs(frequency.y - floor(frequency.y+0.5));
+
+
+    //modulo l'altezza del gap in base al canale in ingresso
+    //(ci sono riuscito per caso, intuizione non cosciente.)
+        vec3 lum_h_scaled = map_range(pixel_in_gammed, 0.0, 1.0, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
+        //float altezza_gap *= (mask_rgb11.r * pixel_in.r + mask_rgb11.g * pixel_in.g + mask_rgb11.b * pixel_in.b);
+        float altezza_gap = dot(mask_rgb11, lum_h_scaled*0.3333); //mask_rgb11 o mask_rgb?
+        //altezza_gap = clamp(altezza_gap,PIXELGRID_MIN_H, PIXELGRID_MAX_H );
+        //altezza_gap += PIXELGRID_SMOOTH_H;
+        gap = smoothstep(altezza_gap + PIXELGRID_SMOOTH_H, altezza_gap - PIXELGRID_SMOOTH_H, gap);
+
+    //Applico gap, maschera rgp al pixel in ingresso.
+        vec3 pixel_out = mask_rgb * gap  * pixel_in ;
+
 
     return pixel_out;
 
