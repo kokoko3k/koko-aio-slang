@@ -18,7 +18,7 @@ void main() {
 
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 0) out vec4 FragColor;
-layout(set = 0, binding = 1) uniform sampler2D ntsc_pass;
+layout(set = 0, binding = 1) uniform sampler2D colortools_and_ntsc_pass;
 
 #include "includes/functions.include.slang"
 #include "includes/blooms.include.slang"
@@ -28,7 +28,7 @@ void main() {
     
     
     vec3 bloomed = bloom_gamma_power(
-        ntsc_pass,
+        colortools_and_ntsc_pass,
         vTexCoord,
         params.OriginalSize,
         vec2(BLOOM_SIZE),

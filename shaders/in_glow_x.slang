@@ -57,7 +57,7 @@ void main() {
    //Make it resolution independent.
       IN_GLOW_W_ADAPTED = IN_GLOW_W_ADAPTED / NEW_SCALEMOD_X;
 
-   FragColor = vec4( blur9_x(shift_and_bleed_pass, vTexCoord, global.first_passSize.xy, IN_GLOW_W_ADAPTED), 1.0);
+   FragColor = vec4( blur9_x(shift_and_bleed_pass, vTexCoord, global.flick_and_noise_passSize.xy, IN_GLOW_W_ADAPTED), 1.0);
 
    //To debug ntsc artifacts mask:
    if (IN_GLOW_SHOW_ARTF_MASK > 0.5)

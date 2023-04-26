@@ -31,7 +31,7 @@ void main() {
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in float lod;
 layout(location = 0) out vec4 FragColor;
-layout(set = 0, binding = 2) uniform sampler2D first_pass;
+layout(set = 0, binding = 2) uniform sampler2D flick_and_noise_pass;
 layout(set = 0, binding = 3) uniform sampler2D avglum_passFeedback;
 
 /* The following will allow to sample at reduced interval
@@ -45,7 +45,7 @@ layout(set = 0, binding = 3) uniform sampler2D avglum_passFeedback;
 
 #define RGB_TO_GRAYSCALE = vec3(0.299, 0.587, 0.114)
 float get_avg_lum_from_mip() {
-    vec3 mip = textureLod(first_pass, vec2(0.5,0.5),20.0).rgb;
+    vec3 mip = textureLod(flick_and_noise_pass, vec2(0.5,0.5),20.0).rgb;
     mip = apply_fuzzy_main_pass(mip);
     //return (mip.r+mip.g+mip.b)/3.0;
     return rgb_to_gray(mip);
@@ -92,7 +92,7 @@ float get_avglum() {
 }
 
 void main() {
-    /*Grab a mipmap from the first pass.
+    /*Grab a mipmap from the flick_and_noise_pass.
       Calculate the average luminance from the smallest mipmap and put into the alpha channel
       So that can be used:
       1 - continuously at coordinate 0.5,0.5
@@ -109,11 +109,11 @@ void main() {
     if (DO_BEZEL + DO_BLOOM > 0.0) {
         //Create a small mipmap to be used to light the bezel corners
         //and by the bloom pass to identify bright areas.
-        pixel_out.rgb = textureLod(first_pass, vTexCoord, mip_lod).rgb;
+        pixel_out.rgb = textureLod(flick_and_noise_pass, vTexCoord, mip_lod).rgb;
     }
 
     FragColor = pixel_out;
 
-    //FragColor = texture(first_pass, vTexCoord);
+    //FragColor = texture(flick_and_noise_pass, vTexCoord);
     
 }

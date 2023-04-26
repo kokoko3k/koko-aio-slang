@@ -46,7 +46,7 @@ layout(location = 4) in float vDo_shadow_mode;
 layout(location = 0) out vec4 FragColor;
 
 layout(set = 0, binding = 3) uniform sampler2D FXAA_pass;
-layout(set = 0, binding = 4) uniform sampler2D first_pass;
+layout(set = 0, binding = 4) uniform sampler2D flick_and_noise_pass;
 
 
 #define bandwidth_mhz_Y_ntsc 4.2
@@ -110,7 +110,7 @@ vec3 deconvergence_shadow_wrap (vec2 coord) {
    if ( DO_FXAA == 1.0)  {
       return deconvergence_shadow(texture(FXAA_pass, vTexCoord).rgb,  vTexCoord, FXAA_pass, global.FXAA_passSize);
    } else {
-      return deconvergence_shadow(texture(first_pass, vTexCoord).rgb, vTexCoord, first_pass, global.first_passSize);
+      return deconvergence_shadow(texture(flick_and_noise_pass, vTexCoord).rgb, vTexCoord, flick_and_noise_pass, global.flick_and_noise_passSize);
    }
 }
 
@@ -123,7 +123,7 @@ vec3 pixel_bleed_side_NTSC(vec3 pixel_in, vec2 co, float size, float side, sampl
        w=w/SAT_BLEED_FALLOFF;
       //w = w * exp(i*i*(1-SAT_BLEED_FALLOFF)*0.1);
       //w=clamp(w,0.0,1.0);
-      vec3 smp_YIQ = texture(first_pass, co - side * vec2(sourcesize2.z*i,0.0)).rgb * mat3_RGB2YIQ;
+      vec3 smp_YIQ = texture(flick_and_noise_pass, co - side * vec2(sourcesize2.z*i,0.0)).rgb * mat3_RGB2YIQ;
       blur_YIQ.x = mix(blur_YIQ.x, smp_YIQ.x, w/bandwidth_mhz_Y_ntsc);   // Blur Y
       blur_YIQ.y = mix(blur_YIQ.y, smp_YIQ.y, w/bandwidth_mhz_I     );   // Blur I
       blur_YIQ.z = mix(blur_YIQ.z, smp_YIQ.z, w/bandwidth_mhz_Q     );   //  BlurQ
@@ -142,7 +142,7 @@ vec3 pixel_bleed_side_PAL(vec3 pixel_in, vec2 co, float size, float side, sample
    for ( i=1 ; i <= size ; i++ ){
       w=w/SAT_BLEED_FALLOFF;
       //w=clamp(w,0.0,1.0);
-      vec3 smp_YUV = texture(first_pass, co - side * vec2(sourcesize2.z*i,0.0)).rgb * mat3_RGB2YUV;
+      vec3 smp_YUV = texture(flick_and_noise_pass, co - side * vec2(sourcesize2.z*i,0.0)).rgb * mat3_RGB2YUV;
       blur_YUV.x = mix(blur_YUV.x, smp_YUV.x, w/bandwidth_mhz_Y_pal);    // Blur Y
       blur_YUV.y = mix(blur_YUV.y, smp_YUV.y, w/bandwidth_mhz_U     );   // Blur U
       blur_YUV.z = mix(blur_YUV.z, smp_YUV.z, w/bandwidth_mhz_V     );   // Blur V
@@ -181,8 +181,8 @@ void main() {
             pixel_out = pixel_bleed(pixel_out, vTexCoord, FXAA_pass, global.FXAA_passSize);
             pixel_alpha_ntsc_artifacts = texture(FXAA_pass, vTexCoord).a;
          } else {
-            pixel_out = pixel_bleed(pixel_out, vTexCoord, first_pass, global.first_passSize);
-            pixel_alpha_ntsc_artifacts = texture(first_pass, vTexCoord).a;
+            pixel_out = pixel_bleed(pixel_out, vTexCoord, flick_and_noise_pass, global.flick_and_noise_passSize);
+            pixel_alpha_ntsc_artifacts = texture(flick_and_noise_pass, vTexCoord).a;
          }
       }
    } else
@@ -198,9 +198,9 @@ void main() {
             pixel_out = pixel_bleed(pixel_out, vTexCoord, FXAA_pass, global.FXAA_passSize);
             
          } else {
-            pixel_out = texture(first_pass, vTexCoord).rgb;
-            pixel_alpha_ntsc_artifacts = texture(first_pass, vTexCoord).a;
-            pixel_out = pixel_bleed(pixel_out, vTexCoord, first_pass, global.first_passSize);
+            pixel_out = texture(flick_and_noise_pass, vTexCoord).rgb;
+            pixel_alpha_ntsc_artifacts = texture(flick_and_noise_pass, vTexCoord).a;
+            pixel_out = pixel_bleed(pixel_out, vTexCoord, flick_and_noise_pass, global.flick_and_noise_passSize);
          }
    } else
       //Passthrough
@@ -208,8 +208,8 @@ void main() {
          pixel_out = texture(FXAA_pass, vTexCoord).rgb;
          pixel_alpha_ntsc_artifacts = texture(FXAA_pass, vTexCoord).a;
       } else {
-         pixel_out = texture(first_pass, vTexCoord).rgb;
-         pixel_alpha_ntsc_artifacts = texture(first_pass, vTexCoord).a;
+         pixel_out = texture(flick_and_noise_pass, vTexCoord).rgb;
+         pixel_alpha_ntsc_artifacts = texture(flick_and_noise_pass, vTexCoord).a;
       }
 
    //pre-gamma if needed by glow.

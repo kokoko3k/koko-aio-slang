@@ -182,6 +182,11 @@ float map_range(float value, float min_in, float max_in, float min_out, float ma
 	return min_out + (value - min_in) * (max_out - min_out) / (max_in - min_in);
 }
 
+vec3 map_range(vec3 value, float min_in, float max_in, float min_out, float max_out) {
+	//Scales value in [min_in - max_in] to [min_out - max_out]
+	return min_out + (value - min_in) * (max_out - min_out) / (max_in - min_in);
+}
+
 float normalize_range(float value, float min_in, float max_in) {
 	//Scales value in [min_in - max_in] to 0..1
 	return (value - min_in)  / (max_in - min_in);
@@ -454,23 +459,22 @@ vec2 Warp_try(vec2 pos, float warpX, float warpY) {
 		return zoomxy(in_coords, izoom);
 	}
 
+	bool need_NO_integer_scale() {
+		//returns if no integer scaling is requested.
+		return DO_GAME_GEOM_OVERRIDE * GAME_GEOM_INT_SCALE == 0.0;
+	}
+
+	bool need_integer_scale() {
+		//return if integer scaling is requested.
+		//return DO_GAME_GEOM_OVERRIDE == 1.0 && GAME_GEOM_INT_SCALE > 0.01;
+		return DO_GAME_GEOM_OVERRIDE * GAME_GEOM_INT_SCALE != 0.0;
+	}
+
+
 	float get_BEZEL_INNER_ZOOM() {
-		/*if (GAME_GEOM_INT_SCALE == 1.0 && DO_GAME_GEOM_OVERRIDE == 1.0)
-			return 0.0;
-		else
-			return BEZEL_INNER_ZOOM;
-		*/
-		//unbranched versions:
-		return BEZEL_INNER_ZOOM * (1 - DO_GAME_GEOM_OVERRIDE * GAME_GEOM_INT_SCALE);
-		
-		//117.2
-		//return BEZEL_INNER_ZOOM * float( GAME_GEOM_INT_SCALE != 1.0 || DO_GAME_GEOM_OVERRIDE != 1.0  );
+		//Disables bezel inner zoom when using integer scaling
+		return BEZEL_INNER_ZOOM * float( !need_integer_scale() );
 	}
-
-	bool do_integer_scale() {
-		return DO_GAME_GEOM_OVERRIDE == 1.0 && GAME_GEOM_INT_SCALE > 0.01;
-	}
-
 
 	vec2 content_geom_override(vec2 co, float aspect, float in_aspect, float vshift, float hshift, float out_zoom){
 		//Aspect
@@ -690,3 +694,75 @@ bool is_first_inside_rect(vec2 point, vec4 rect) {
 	return (point.x >= rect.x && point.x < rect.z &&
 			point.y >= rect.y && point.y < rect.w) ;
 }
+
+// COLOR TOOLS
+	vec3 kelvin2rgb(float k) {
+	//Convert kelvin temperature to rgb factors
+	k = clamp(k,1000,40000);
+	k=k/100.0;
+	float tmpCalc;
+		vec3 pixel_out;
+	if (k<=66) {
+		pixel_out.r = 255;
+		pixel_out.g = 99.47080258612 * log(k) - 161.11956816610;
+	} else {
+		pixel_out.r = 329.6987274461 * pow(k - 60 ,-0.13320475922);
+		pixel_out.g = 288.12216952833 * pow(k-60, -0.07551484921);
+	}
+
+	if (k >= 66)
+		pixel_out.b = 255;
+	else if (k<=19)
+		pixel_out.b = 0;
+	else
+		pixel_out.b = 138.51773122311 * log(k - 10) - 305.04479273072;
+
+	return pixel_out/255.0;
+	}
+
+	#define W vec3(0.2125, 0.7154, 0.0721)
+	vec3 color_tools(vec3 pixel_out, vec3 Temperature_rgb) {
+	//Apply color corrections to input signal.
+
+	//Push luminance without clipping
+		pixel_out = pixel_push_luminance(pixel_out,LUMINANCE);
+
+	//Modify contrast and brightness
+		if (CONTRAST != 0.0 || BRIGHTNESS != 0.0)
+			pixel_out.rgb = apply_contrast_brightness(pixel_out.rgb, CONTRAST, BRIGHTNESS);
+
+	//Modify color temperature
+		if (TEMPERATURE != 6500.0) pixel_out.rgb = pixel_out.rgb * Temperature_rgb;
+
+		//Colorization for monochrome display on hsv colorspace.
+		//Select different hues for dark and bright pixels and mix them depending on the brightness
+		if (COLOR_MONO_COLORIZE > 0.01) {
+			vec3 pixel_grayscale = vec3(dot(pixel_out.rgb, W));
+			vec3 pixel_in_hsv = rgb2hsv(pixel_grayscale); //FIXME needed? yes, checked.
+			float lum = pixel_in_hsv.z * pixel_in_hsv.z; //<-- looks way better!
+			vec2 bias = mix_step( vec2(0.0, COLOR_MONO_HUE_BIAS), vec2(COLOR_MONO_HUE_BIAS, 0.0), float(COLOR_MONO_HUE_BIAS > 0.0));
+			bias = abs(bias);
+
+			lum=scale_to_range(lum, 0.0-bias.x, 1.0+bias.y);
+			pixel_in_hsv.y=1.0; //sat
+
+							//Mix hues in rgb colorspace:
+								vec3 pixel_rgb_hue1 = hsv2rgb( vec3(COLOR_MONO_HUE1, 1.0, pixel_in_hsv.z ) );
+								vec3 pixel_rgb_hue2 = hsv2rgb( vec3(COLOR_MONO_HUE2, 1.0, pixel_in_hsv.z ) );
+								vec3 pixel_rgb_hue12 = mix(pixel_rgb_hue2, pixel_rgb_hue1, vec3(lum));
+							//Mix original and colorized with a specified strength
+								pixel_out = mix(pixel_out, pixel_rgb_hue12, COLOR_MONO_COLORIZE);
+
+
+			//pixel_in_hsv.x = mix(COLOR_MONO_HUE2, COLOR_MONO_HUE1, lum); //hue
+			//pixel_out = mix(pixel_out, hsv2rgb(pixel_in_hsv), COLOR_MONO_COLORIZE);pk
+		}
+
+	//Modify saturation
+		if (!(SATURATION == 1.0)) {
+			vec3 intensity = vec3(dot(pixel_out.rgb, W));
+			pixel_out.rgb = mix(intensity, pixel_out.rgb, SATURATION);
+		}
+
+	return pixel_out;
+	}

@@ -39,7 +39,7 @@ layout(location = 14) out float vBEZEL_INNER_ZOOM_adapted;
 layout(location = 15) out float vVmask_gap;
 layout(location = 16) out float vFcol_Tated;
 layout(location = 17) out float vDo_Tate;
-
+layout(location = 18) out vec3 vDotMat_Grid_Color;
 
 #include "includes/functions.include.slang"
 
@@ -51,10 +51,10 @@ void main() {
     vIn_aspect = get_in_aspect();
     
     //Calculate vTexcoord as fractional or integer scaled?
-        if ( !do_integer_scale() )
+        if ( need_NO_integer_scale() )
             vTexCoord = get_scaled_coords_aspect(TexCoord,global.FinalViewportSize, vIn_aspect, bool(vIsRotated)) + vec2(0.0000);
                 else
-            vTexCoord = integer_scale(TexCoord, vIn_aspect, bool(vIsRotated), GAME_GEOM_INT_SCALE-1.0 ) + vec2(0.0001); //<- without the offset, SCANLINE_MIN doesn't work.
+            vTexCoord = integer_scale(TexCoord, vIn_aspect, bool(vIsRotated), GAME_GEOM_INT_SCALE-1.0 ) + vec2(0.0000, 0.0001); //<- without the offset, SCANLINE_MIN doesn't work.
 
     //if (DO_GLOBAL_SHZO >0.5)
     //    vTexCoord = zoom(vTexCoord + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM );
@@ -113,6 +113,14 @@ void main() {
             vVmask_gap = vgap_size_per_scale[int(VMASK_DARKLINE_SCALE-1)];
 
             vFcol_Tated = mix_step(vOutputCoord.x * params.OutputSize.x, vOutputCoord.y * params.OutputSize.y, vDo_Tate);
+
+        //Calc dotmat grid color
+            vDotMat_Grid_Color = vec3(DOT_M_G_BRT);
+            if (DO_DOT_MATRIX + DO_CCORRECTION > 1.1) {
+                vDotMat_Grid_Color = color_tools(vec3(DOT_M_G_BRT), kelvin2rgb(TEMPERATURE));
+                //Since we modify grid brightness via a specific use parameter, explicitely multiply it by that:
+                    vDotMat_Grid_Color *= DOT_M_G_BRT ;
+            }
 }
 
 
@@ -135,6 +143,7 @@ layout(location = 14) in float vBEZEL_INNER_ZOOM_adapted;
 layout(location = 15) in float vVmask_gap;
 layout(location = 16) in float vFcol_Tated;
 layout(location = 17) in float vDo_Tate;
+layout(location = 18) in vec3 vDotMat_Grid_Color;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -154,7 +163,7 @@ layout(set = 0, binding = 11) uniform sampler2D in_glow_pass;
 layout(set = 0, binding = 12) uniform sampler2D halo_pass;
 
 
-layout(set = 0, binding = 15) uniform sampler2D first_pass;
+layout(set = 0, binding = 15) uniform sampler2D flick_and_noise_pass;
 
 
 
@@ -309,10 +318,200 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
 }
 
 
+float morph_shape_easy(float shape, float power ) {
+    return pow(shape, 1/(power*2.0));
+}
+
+
+float morph_shape(float shape, float power ) {
+    float lum_scaled = power;
+    float l = lum_scaled; // (already clamped)
+    float l1 = pow(l, 3) * 10;
+    shape = pow(shape, 1/l1);
+    return shape;
+}
+
+
+float morph_shape_full(float shape, float power ) {
+    float lum_scaled = power;
+    float l = lum_scaled; // (already clamped)
+    if (lum_scaled <= 0.5) {
+        float l1 = pow(l, 4) * 15;
+        shape = pow(shape, 1/sqrt(l1));
+    } else {
+        float l2 = (l-0.5)*2.0;
+        shape = shape * (1-l2) + l2;
+    }
+    return shape;
+}
+
+vec3 morph_shape(vec3 shape, vec3 power ) {
+    return vec3(
+      morph_shape_easy(shape.x, power.x),
+      morph_shape_easy(shape.y, power.y),
+      morph_shape_easy(shape.z, power.z)
+    );
+}
+
+
+
+vec3 fn_pixel_grid(vec2 coords, vec3 pixel_in) {
+
+    //La densità della maschera
+        vec2 mask_size = mix_step(params.OriginalSize.xy, params.OutputSize.xy*0.333, PIXELGRID_SIZE);
+
+    //dev'essere densa 1/3 dato che sino triadi:
+       // mask_size /= 3.0;
+
+    //Che rapporto d'aspetto ha il fosforo?
+        //float ph_aspect = 1.0/1.0;
+
+    //applico il rapporto d'aspetto per la y?
+        //mask_size.y*=ph_aspect;
+
+    //...oppure la maschera è in sync con i pixel originali:
+       // mask_size = params.OriginalSize.xy;
+       // mask_size.y *= 1.0;
+
+    float angle_multiply = 1.0;
+
+    vec2 angle_base;
+    //ricavo il periodo della triade
+        angle_base.x = coords.x * pi * mask_size.x;
+
+    //ricavo il periodo delle linee orizzontali
+        angle_base.y = coords.y * pi * mask_size.y; // * ph_aspect;
+
+    //Zoom to debug:
+        angle_base/=angle_multiply;
+
+
+    vec3 mask_rgb=vec3(1.0);
+
+    float sin_offset_x = (pi/3.0);
+
+    //ricavo i 3 periodi e offset per i 3 seni verticali
+        vec3 angle_rgb = vec3( angle_base.x + sin_offset_x,
+                            angle_base.x,
+                            angle_base.x - sin_offset_x );
+
+    //ricavo i 3 seni in bianco e nero
+        mask_rgb = cos(angle_rgb);
+
+    //li rendo sempre positivi
+        mask_rgb*=mask_rgb;
+
+        mask_rgb = 1-mask_rgb;
+
+    //mi salvo la maschera prima di allargarla, perchè puòservire per ricavare l'altezza del fosforo.
+        vec3 mask_rgb11 = mask_rgb;
+
+    //modulo la larghezza della triade in base alla luminosità del pixel in ingresso
+        vec3 larghezza_fosforo = map_range(pixel_in, 0.0, 1.0, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
+        mask_rgb = morph_shape(mask_rgb, larghezza_fosforo);
+
+    //Gap orizzontale
+        float gap = cos(angle_base.y);
+
+    //lo rendo positivo
+        gap = gap * gap;
+
+        gap=1-gap;
+
+    //modulo l'altezza del gap in base al canale in ingresso
+    //(ci sono riuscito per caso, intuizione non cosciente.)
+        vec3 lum_h_scaled = map_range(pixel_in, 0.0, 1.0, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
+        //float altezza_gap *= (mask_rgb11.r * pixel_in.r + mask_rgb11.g * pixel_in.g + mask_rgb11.b * pixel_in.b);
+        float altezza_gap = dot(mask_rgb, lum_h_scaled); //mask_rgb11 o mask_rgb?
+        gap = morph_shape_easy(gap, altezza_gap);
+
+    //Applico gap, maschera rgp al pixel in ingresso.
+        vec3 pixel_out = mask_rgb * gap  * pixel_in ;
+
+    return pixel_out;
+
+}
+
+
+vec3 fn_pixel_grid_take_2(vec2 coords, vec3 pixel_in) {
+
+    vec3 pout;
+
+    //Aggiusta la gamma in ingresso ad uso luminosità
+        vec3 pixel_in_gammed = pow(pixel_in, vec3(0.5)); //FIXME, questo dev'essere configurabile.
+            //pixel_in_gammed = pixel_in;
+    //antiglitch
+        coords+=vec2(0.0000001);
+
+
+    //La densità della maschera
+        vec2 mask_size = mix_step(params.OriginalSize.xy, params.OutputSize.xy*0.333, PIXELGRID_SIZE);
+
+    float angle_multiply = 1.0;
+    angle_multiply = 1.0;
+    vec2 frequency;
+    //ricavo il periodo della triade
+        frequency.x = coords.x * mask_size.x;
+
+    //ricavo il periodo delle linee orizzontali
+        frequency.y = coords.y * mask_size.y; // * ph_aspect;
+
+    //Zoom to debug:
+        frequency/=angle_multiply;
+
+
+        frequency +=vec2(0.5);
+
+    vec3 mask_rgb=vec3(1.0);
+
+    float phosphor_offset = (0.333333);
+
+    //ricavo i 3 periodi e offset per i 3 seni verticali
+        vec3 frequency_rgb = vec3( frequency.x + phosphor_offset,
+                                   frequency.x,
+                                   frequency.x - phosphor_offset );
+
+    //ricavo i 3 seni in bianco e nero
+        mask_rgb = 2*abs(frequency_rgb - floor(frequency_rgb+0.5));
+
+
+
+    //mi salvo la maschera prima di allargarla, perchè puòservire per ricavare l'altezza del fosforo.
+        vec3 mask_rgb11 = mask_rgb;
+
+    //modulo la larghezza della triade in base alla luminosità del pixel in ingresso
+        vec3 larghezza_fosforo = map_range(pixel_in_gammed, 0.0, 1.0, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
+        //larghezza_fosforo = clamp(larghezza_fosforo,PIXELGRID_MIN_W, PIXELGRID_MAX_W );
+        //Quanto sono sfocati i margini:
+
+        //Antiglitch per linee verticali quando al massimo della luminosità
+            //larghezza_fosforo += PIXELGRID_SMOOTH_W;
+        //"Clampo" via smoothstep al min e al max
+            mask_rgb = smoothstep(larghezza_fosforo + PIXELGRID_SMOOTH_W, larghezza_fosforo - PIXELGRID_SMOOTH_W, mask_rgb);
+
+    //Gap orizzontale
+        float gap = 2*abs(frequency.y - floor(frequency.y+0.5));
+
+
+    //modulo l'altezza del gap in base al canale in ingresso
+    //(ci sono riuscito per caso, intuizione non cosciente.)
+        vec3 lum_h_scaled = map_range(pixel_in_gammed, 0.0, 1.0, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
+        //float altezza_gap *= (mask_rgb11.r * pixel_in.r + mask_rgb11.g * pixel_in.g + mask_rgb11.b * pixel_in.b);
+        float altezza_gap = dot(mask_rgb11, lum_h_scaled*0.3333); //mask_rgb11 o mask_rgb?
+        //altezza_gap = clamp(altezza_gap,PIXELGRID_MIN_H, PIXELGRID_MAX_H );
+        //altezza_gap += PIXELGRID_SMOOTH_H;
+        gap = smoothstep(altezza_gap + PIXELGRID_SMOOTH_H, altezza_gap - PIXELGRID_SMOOTH_H, gap);
+
+    //Applico gap, maschera rgp al pixel in ingresso.
+        vec3 pixel_out = mask_rgb * gap  * pixel_in ;
+
+
+    return pixel_out;
+
+}
 
 vec4 fn_pixel_dotmat(vec2 coords, vec3 pixel_in) {
-  
-       
+
     //Base angle, depends on original size:
         vec2 angle_base = coords * pi * params.OriginalSize.xy; //FIXME here we want .yy to make integer scaling
 
@@ -320,7 +519,6 @@ vec4 fn_pixel_dotmat(vec2 coords, vec3 pixel_in) {
         angle_base/=DOT_M_MULTIPLY;
 
     //Set the rgb and grid sharpness:
-        vec3 s_rgb = vec3(DOT_M_RGB_SHARP);
         float s_grid = DOT_M_G_SHARP;
         
     //Generate bw grid:     
@@ -329,28 +527,6 @@ vec4 fn_pixel_dotmat(vec2 coords, vec3 pixel_in) {
         grid = pow(grid, vec2(s_grid));
         grid = 1 - grid;
 
-    //Generate rgb mask 
-    vec3 mask_rgb=vec3(1.0);
-    if (DOT_M_RGB_STR > 0.0) {
-        //float wideness_k = DOT_M_RGB_WID;
-        float rgb_wideness = (pi/4.0); // * wideness_k;
-        
-        //Generates 3 sines with 1/3 pi offset
-            vec3 angle_rgb = vec3( angle_base.x + rgb_wideness,
-                                   angle_base.x - pi,
-                                   angle_base.x - rgb_wideness );
-        
-            mask_rgb = sin(angle_rgb);
-            mask_rgb *= mask_rgb;
-            mask_rgb = pow(mask_rgb, s_rgb);
-            
-        //Adjust green gain
-            mask_rgb.g *= DOT_M_G_GAIN;
-            
-        //Apply strength
-            mask_rgb=mix(vec3(1.0), mask_rgb, DOT_M_RGB_STR);
-    }
-    
 
     //Combine gridx and gridy into a single one
         //float fgrid = min(grid.x, grid.y);
@@ -372,18 +548,15 @@ vec4 fn_pixel_dotmat(vec2 coords, vec3 pixel_in) {
             vec2 smooth_range  = vec2(smooth_threshold, smooth_threshold+fade_size);
             float grid_smoothstep = 1- smoothstep(smooth_range.x, smooth_range.y, lum_scaled);    
 
-
-            
     //Adapt grid strength
         float grid_str = DOT_M_G_STR * grid_smoothstep;    
     //Apply strength modifier
         float fgrid_adpt = mix(1.0, fgrid, grid_str);
     
-
     //Output is the mix of the gap and the rgb masked pixel in.
-    //In the alpha channel we put the grid because it could be used by halo
+    //In the alpha channel we put the grid because it could be selectiveli brightened by halo
     return vec4( 
-                 mix(vec3(DOT_M_G_BRT), pixel_in * mask_rgb ,fgrid_adpt),
+                 mix(vDotMat_Grid_Color, pixel_in, fgrid_adpt),
                  fgrid_adpt
                );
 
@@ -412,7 +585,7 @@ float fn_scanline_mask(vec2 coords, bool do_slotmask, float lum, float min_inLum
     //2 - offset them on odd frames if needed (vScanlineAlternateOffset via vertex shader)
     //3 - Dont do it when the screen is interlaced and we have to skip drawing scanlines on interlaced screens
 
-        //coords += params.OriginalSize.zw*0.5; //<-- this seems needed when using integer scalinf
+        //coords += params.OriginalSize.zw*0.5; //<-- this seems needed when using integer scaling
         //due to linear filtering in earlier pass FIXME don't forget me!
         coords = mix_step(coords.xy, coords.yx, tate);
         float originalsize = mix_step(params.OriginalSize.y, params.OriginalSize.x, tate);
@@ -810,6 +983,10 @@ vec3 fn_pixel_content(vec2 coords) {
     
     float scanline_or_dot_mat = 1.0; //init dot grid or scanline mask to 1.0
     
+    //Pixel grid
+        if (DO_PIXELGRID == 1.0)
+            pixel_out = fn_pixel_grid(coords, pixel_out);
+
     //Dot mask
         if (DO_DOT_MATRIX == 1.0) {
             vec4 pixel_grid_mask = fn_pixel_dotmat(coords, pixel_out);
@@ -994,10 +1171,8 @@ void main() {
     //Curvature 
         //Curvature has to come after inner zoom or bezel curved border will not match content
         //curved border when inner zoom changes.
-        vec2 co_mirror = co_content;
         if (DO_CURVATURE == 1.0  &&  ((GEOM_WARP_X != 0.0) || (GEOM_WARP_Y != 0.0))) {
             co_content = Warp_fast(co_content, vWarp_vexp, vWarp_arg2, GEOM_CUT_EARS);
-            co_mirror = zoom(co_content, 1/BEZEL_REFL_ZOOMOUT_ROOM);
         }
         
     //Apply other content coords modifiers
@@ -1025,6 +1200,7 @@ void main() {
         vec4 pixel_bezel;
         //SKIP LOGIC is inside fn_pixel_bezel
         if (DO_BEZEL == 1.0) {
+            vec2 co_mirror = zoom(co_content, 1/BEZEL_REFL_ZOOMOUT_ROOM);
             pixel_bezel = fn_pixel_bezel(co_bezel, co_mirror, BG_IMAGE_NIGHTIFY);
             //If we used a smooth_border, canvas_busy is it, but since the content is in the bezel,
             //we can safely use it to smooth/darken the game border
@@ -1094,9 +1270,9 @@ void main() {
 
     //For debug purposes:
         //quad split screen
-        //if ( (vOutputCoord.x < 0.5  && vOutputCoord.y > 0.5) || (vOutputCoord.x > 0.5  && vOutputCoord.y < 0.5)  ) pixel_out = texture(first_pass,vOutputCoord).rgb;
+        //if ( (vOutputCoord.x < 0.5  && vOutputCoord.y > 0.5) || (vOutputCoord.x > 0.5  && vOutputCoord.y < 0.5)  ) pixel_out = texture(flick_and_noise_pass,vOutputCoord).rgb;
         //split screen
-        //if (vTexCoord.y < 0.5) pixel_out = texture(first_pass,vTexCoord).rgb;
+        //if (vTexCoord.y < 0.5) pixel_out = texture(flick_and_noise_pass,vTexCoord).rgb;
         //pixel_out = texture(reflected_blurred_pass, vTexCoord).rgb;
         
         

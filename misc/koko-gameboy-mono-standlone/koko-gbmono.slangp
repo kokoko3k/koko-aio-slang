@@ -1,0 +1,59 @@
+#    Koko-aio shader is meant to be an all-in one crt shader.
+#    It can be configured with many parameters, so that can be
+#    scaled to run on even on modest gpus while still developed to
+#    run with heavier presets on at least Haswell+ iGpus.
+#    It is not meant to simulate the internal behaviour of CRT displays,
+#    but to give users the parameters to make their monitors to look similar.
+#    Several presets are included.
+
+#    Actually it provides emulation for:
+#        scanlines, screenlines, RGB vertical masks, horizontal slot masks,
+#        glowing, haloing, blooming, gamma and SATURATION correction,pixel_outi        
+#        black frame insertions, interlace emulation, antialiasing.
+
+#    External code by:
+#    * Nvidia (FXAA)
+
+
+
+    
+# Bezel texture contains the following infomations:
+#   - The red channel represents the luminance information
+#   - The green channel represents the highlights
+#   - The alpha channel in the inner frame represents the part of the bezel that will be filled by the game content
+#   - The blue channel represents the part of the bezel that will be filled by the game reflection.
+
+
+
+
+shaders = 3
+
+# NTSC Color artifacts pass:
+# The very first pass emulates ntsc color artifacting.
+# Being a fast single pass process, don't expect it to be 100% accurate
+# It is able to drag rainbows as seen in Megadrive games with an option
+# To make it oblique.
+# It also does input color corrections to the input signal (saturation,brightness,contrast...)
+# It also does motion blur for dot matrix.
+           shader0 = shaders/color_pass.slang
+            alias0 = "color_pass"
+    filter_linear0 = false
+       scale_type0 = source
+            scale0 = 2.0
+
+           shader1 = shaders/shadow_pass.slang
+            alias1 = "shadow_pass"
+    #Soft shadows
+    filter_linear1 = true
+       scale_type1 = source
+            scale1 = 1.0
+
+
+           shader2 = shaders/vp_pass.slang
+            alias2 = "vp_pass"
+    filter_linear2 = true
+       scale_type2 = viewport
+            scale2 = 1.0
+
+        
+
