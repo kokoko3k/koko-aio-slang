@@ -63,7 +63,7 @@ void main() {
         vTexCoord = (zoom(vTexCoord + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM ) * DO_GLOBAL_SHZO) + 
                     (vTexCoord * (1-DO_GLOBAL_SHZO) );
 
-    vOutputCoord = TexCoord + vec2( GAME_GEOM_OFF_FIX /10000);
+    vOutputCoord = TexCoord ;
 
 
     vec2 vFragCoord = vec2( floor(vOutputCoord.x * params.OutputSize.x),
