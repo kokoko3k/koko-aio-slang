@@ -334,6 +334,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float GAME_GEOM_VSHIFT;
 	float GAME_GEOM_HSHIFT;
 	float GAME_GEOM_ZOOM;
+	float GAME_GEOM_OFF_FIX; 
 	
 	float DO_TILT;
 	float TILT_X;
@@ -674,6 +675,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter GAME_GEOM_VSHIFT	  "        Vertical position"			0.0   -10.0 10.0  0.01
 #pragma parameter GAME_GEOM_HSHIFT	  "        Horizontal position"			0.0   -10.0 10.0  0.01
 #pragma parameter GAME_GEOM_ZOOM	  "        Zoom"					1.0    0.0  2.0  0.01
+#pragma parameter GAME_GEOM_OFF_FIX	  "        Sharp hack through offset (0.0=disable)"	0.0    0.0  100.0  1
 #pragma parameter BLANK20 " " 0.0 0.0 1.0 1.0
 
 //Tilt

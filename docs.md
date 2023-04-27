@@ -394,13 +394,24 @@
     Contrary to the global aspect ratio control, this changes only the game geometry.<br>
     Bezel stays the same.<br>
     
-    Integer scale: Game content zoom height is rounded to nearest integer.
-    Maximum integer scale: Dont allow integer scaling more than this
-                     * beware: the following options in this group
-                       overrides the integer scale.
-    Aspect: Change aspect ratio.
-    Vertical/Horizontal position: Shifts the game position
-    Zoom: Change the size
+    Integer scale:
+        Game content zoom height is rounded to nearest integer.
+    Maximum integer scale: 
+        Dont allow integer scaling more than this
+        * beware: the following options in this group overrides the integer scale.
+    Aspect:
+        Change aspect ratio.
+    Vertical/Horizontal position:
+        Shifts the game position
+    Zoom: 
+        Change the size
+    Sharp fix through offset:
+        When using integer scaling, it may be not possible to
+        draw sharp rounded lines.
+        This hack add a small (the higher, the smaller) offset
+        to the image that allow for sharp lines at the cost of a slightly
+        lower draw precision. Use 0.0 to disable the hack.
+    
 
 **Tilt:**<br>
     Put the bezel and the game content into perspective.<br>

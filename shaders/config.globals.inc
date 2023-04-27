@@ -249,6 +249,7 @@
 	#define GAME_GEOM_VSHIFT 	global.GAME_GEOM_VSHIFT
 	#define GAME_GEOM_HSHIFT 	global.GAME_GEOM_HSHIFT
 	#define GAME_GEOM_ZOOM		global.GAME_GEOM_ZOOM
+	#define GAME_GEOM_OFF_FIX   global.GAME_GEOM_OFF_FIX
 	
 	#define DO_TILT			global.DO_TILT
 	#define TILT_X			global.TILT_X
