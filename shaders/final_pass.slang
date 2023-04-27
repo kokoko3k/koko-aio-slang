@@ -54,7 +54,7 @@ void main() {
         if ( need_NO_integer_scale() )
             vTexCoord = get_scaled_coords_aspect(TexCoord,global.FinalViewportSize, vIn_aspect, bool(vIsRotated)) + vec2(0.0000);
                 else
-            vTexCoord = integer_scale(TexCoord, vIn_aspect, bool(vIsRotated), GAME_GEOM_INT_SCALE-1.0 ) + vec2(0.0000, 0.000); //<- without the offset, SCANLINE_MIN doesn't work.
+            vTexCoord = integer_scale(TexCoord, vIn_aspect, bool(vIsRotated), GAME_GEOM_INT_SCALE-1.0 ) + vec2(0.0000, 0.0000); //<- without the offset, SCANLINE_MIN doesn't work.
 
     //if (DO_GLOBAL_SHZO >0.5)
     //    vTexCoord = zoom(vTexCoord + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM );
@@ -326,11 +326,11 @@ float morph_shape_easy(float shape, float power ) {
 }
 
 
-float morph_shape(float shape, float power ) {
+float morph_shape_05(float shape, float power ) {
     float lum_scaled = power;
     float l = lum_scaled; // (already clamped)
     float l1 = pow(l, 3) * 10;
-    shape = pow(shape, 1/l1);
+    shape = pow(shape, 1/sqrt(l1));
     return shape;
 }
 
@@ -350,30 +350,54 @@ float morph_shape_full(float shape, float power ) {
 
 vec3 morph_shape(vec3 shape, vec3 power ) {
     return vec3(
-      morph_shape_easy(shape.x, power.x),
-      morph_shape_easy(shape.y, power.y),
-      morph_shape_easy(shape.z, power.z)
+      morph_shape_full(shape.x, power.x),
+      morph_shape_full(shape.y, power.y),
+      morph_shape_full(shape.z, power.z)
     );
 }
 
+float morph_shape(float shape, float power ) {
+    return morph_shape_easy(shape, power);
+}
 
+float smoothstep_fast(float edge0, float edge1, float x) {
+  return smoothstep(edge0,edge1,x);
+  float t = clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);
+  //return cos(t * 3.14159265358979323846) * -0.5 + 0.5;
+  return mix(0.0, 1.0, t);
+}
 
-vec3 fn_pixel_grid(vec2 coords, vec3 pixel_in, float min_inLum, float max_inLum) {
-    //La densità della maschera
-        vec2 mask_size = mix_step(params.OriginalSize.xy, params.OutputSize.xy*0.333, PIXELGRID_SIZE);
+vec3 smoothstep_fast(vec3 edge0, vec3 edge1, vec3 x) {
+  return smoothstep(edge0,edge1,x);
+  vec3 t = clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);
+  //return cos(t * 3.14159265358979323846) * -0.5 + 0.5;
+  return mix(vec3(0.0), vec3(1.0), t);
+}
 
-    float period_multiply = 1.0;
+vec4 fn_pixel_grid(vec2 coords, vec3 pixel_in, float min_inLum, float max_inLum) {
+    //La densità della maschera //FIXME mettimi nel vertex shader
+        vec4 coords_and_size_core = vec4(coords.xy, params.OriginalSize.xy);
+        vec4 coords_and_size_screen = vec4(vOutputCoord.xy, params.OutputSize.xy*0.3333);
+        
+        vec4 coords_and_size = vec4( mix_step(coords_and_size_core.xz, coords_and_size_screen.xz, PIXELGRID_SIZE_W),
+                                     mix_step(coords_and_size_core.yw, coords_and_size_screen.yw, PIXELGRID_SIZE_H) );
 
+ 
+        coords = coords_and_size.xz;
+        vec2 mask_size = coords_and_size.yw;
+        
+    vec2 period_multiply = vec2(PIXELGRID_MUL_X, PIXELGRID_MUL_Y);
+    if (period_multiply.x < 0.0) period_multiply.x = 1/-period_multiply.x;  //goes FIXME in vertex shader
+    if (period_multiply.y < 0.0) period_multiply.y = 1/-period_multiply.y;
+
+    
     vec2 freq_base;
     //ricavo il periodo della triade e delle linee orizzontali
         freq_base = pi * coords * mask_size;
 
-
     //Zoom to debug:
         freq_base /= period_multiply;
 
-
-    vec3 mask_rgb=vec3(1.0);
 
     float triad_spacing = (pi / PIXELGRID_SPACING);
 
@@ -381,61 +405,55 @@ vec3 fn_pixel_grid(vec2 coords, vec3 pixel_in, float min_inLum, float max_inLum)
         vec3 freq_rgb = vec3(freq_base.x) + vec3(triad_spacing, 0.0, -triad_spacing);
 
     //ricavo i 3 seni in bianco e nero
-        mask_rgb = sin(freq_rgb);
+        vec3 rgb_w = sin(freq_rgb);
 
     //li rendo sempre positivi
-        mask_rgb = (mask_rgb * mask_rgb);
+        rgb_w = (rgb_w * rgb_w);
 
     //modulo la larghezza della triade in base alla luminosità del pixel in ingresso
         vec3 larghezza_fosforo = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
-        mask_rgb = morph_shape(mask_rgb, larghezza_fosforo);
+        rgb_w = morph_shape(rgb_w, larghezza_fosforo);
 
-    //Gap orizzontale
-        float gap = sin(freq_base.y);
+    //modulo le altezza di ogni elemento della triade in base alla luminosità del pixel in ingresso
+        vec3 altezza_fosforo = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
+        vec3 rgb_h = vec3(sin(freq_base.y));
+        rgb_h = (rgb_h * rgb_h);
+        rgb_h = morph_shape(rgb_h, altezza_fosforo);
+        
+        
+    //ricavo una maschera completa:
+        vec3 mask = rgb_w * rgb_h;
+        
+    //out, nell'alfa ci va la maschera ad uso selettivo halo
+        return vec4(mask * pixel_in, dot(mask, vec3(0.3333)) ) ;
 
-    //lo rendo positivo
-        gap = (gap * gap);
-
-    //modulo l'altezza del gap in base al canale in ingresso
-    //(ci sono riuscito per caso, intuizione non cosciente.)
-        vec3 lum_h_scaled = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
-        
-        //float altezza_gap = dot(mask_rgb, lum_h_scaled); 
-        
-        //vec3 mask_rgbh = mask_rgb * lum_h_scaled;
-        //float altezza_gap = max(max(mask_rgbh.r, mask_rgbh.g), mask_rgbh.b);
-        
-        vec3 mask_rgbh = mask_rgb * lum_h_scaled;
-        float altezza_gap = mask_rgbh.r + mask_rgbh.g + mask_rgbh.b;
-        
-        
-        gap = morph_shape_easy(gap, altezza_gap);
-
-    //Applico gap, maschera rgp al pixel in ingresso.
-        vec3 pixel_out = mask_rgb * gap  * pixel_in ;
-
-        
-        
-    return pixel_out;
 
 }
 
 
-vec3 fn_pixel_grid_sstep(vec2 coords, vec3 pixel_in) {
+/*vec3 fn_pixel_grid_sstep(vec2 coords, vec3 pixel_in, float min_inLum, float max_inLum) {
 
+        
     vec3 pout;
 
     //Aggiusta la gamma in ingresso ad uso luminosità
-                                                            vec3 pixel_in_gammed = pixel_in; //pow(pixel_in, vec3(0.5)); //FIXME, questo dev'essere configurabile. 2fps
+        //float pin_gamma = mix_step(1.0, IN_GLOW_GAMMA, DO_IN_GLOW);
+        //vec3 pixel_in_gammed = vec3(pin_gamma); //FIXME, questo dev'essere configurabile. 2fps
             //pixel_in_gammed = pixel_in;
+    vec3 pixel_in_gammed = pixel_in;
     //antiglitch
         coords+=vec2(0.0000001);
 
 
-    //La densità della maschera
-        vec2 mask_size = mix_step(params.OriginalSize.xy, params.OutputSize.xy*0.333, PIXELGRID_SIZE);
+    //La densità della maschera //FIXME mettimi nel vertex shader
+        vec4 coords_and_size_core = vec4(coords.xy, params.OriginalSize.xy);
+        vec4 coords_and_size_screen = vec4(vOutputCoord.xy, params.OutputSize.xy*0.3333);
+        vec4 coords_and_size = mix_step(coords_and_size_core, coords_and_size_screen, PIXELGRID_SIZE);
 
-    float angle_multiply = 16.0;
+        coords = coords_and_size.xy;
+        vec2 mask_size = coords_and_size.zw;
+
+    float angle_multiply = 1.0;
     //angle_multiply = 16.0;
     vec2 frequency;
     //ricavo il periodo della triade e delle linee orizzontali.
@@ -449,7 +467,7 @@ vec3 fn_pixel_grid_sstep(vec2 coords, vec3 pixel_in) {
 
     vec3 mask_rgb=vec3(1.0);
 
-    float phosphor_offset = 0.25; //0.333333;
+    float phosphor_offset = 1.0/PIXELGRID_SPACING; //0.333333;
 
     //ricavo i 3 periodi e offset per i 3 seni verticali
         vec3 frequency_rgb = vec3(frequency.x) + 
@@ -463,14 +481,14 @@ vec3 fn_pixel_grid_sstep(vec2 coords, vec3 pixel_in) {
 
 
     //modulo la larghezza della triade in base alla luminosità del pixel in ingresso
-        vec3 larghezza_fosforo = map_range(pixel_in_gammed, 0.0, 1.0, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
+        vec3 larghezza_fosforo = map_range(pixel_in_gammed, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
         //larghezza_fosforo = clamp(larghezza_fosforo,PIXELGRID_MIN_W, PIXELGRID_MAX_W );
         //Quanto sono sfocati i margini:
 
         //Antiglitch per linee verticali quando al massimo della luminosità
             //larghezza_fosforo += PIXELGRID_SMOOTH_W;
         //"Clampo" via smoothstep al min e al max
-            mask_rgb = smoothstep(larghezza_fosforo + PIXELGRID_SMOOTH_W, larghezza_fosforo - PIXELGRID_SMOOTH_W, mask_rgb);
+            mask_rgb = smoothstep_fast(larghezza_fosforo + PIXELGRID_SMOOTH_W, larghezza_fosforo - PIXELGRID_SMOOTH_W, mask_rgb);
         //mask_rgb=morph_shape(mask_rgb, larghezza_fosforo);
 
     //Gap orizzontale
@@ -479,20 +497,31 @@ vec3 fn_pixel_grid_sstep(vec2 coords, vec3 pixel_in) {
 
     //modulo l'altezza del gap in base al canale in ingresso
     //(ci sono riuscito per caso, intuizione non cosciente.)
-        vec3 lum_h_scaled = map_range(pixel_in_gammed, 0.0, 1.0, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
+        vec3 lum_h_scaled = map_range(pixel_in_gammed, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
         //float altezza_gap *= (mask_rgb11.r * pixel_in.r + mask_rgb11.g * pixel_in.g + mask_rgb11.b * pixel_in.b);
-        float altezza_gap = dot(mask_rgb, lum_h_scaled*0.3333); //mask_rgb11 o mask_rgb?
+        float altezza_gap = dot(mask_rgb, lum_h_scaled); //mask_rgb11 o mask_rgb?
         //altezza_gap = clamp(altezza_gap,PIXELGRID_MIN_H, PIXELGRID_MAX_H );
         //altezza_gap += PIXELGRID_SMOOTH_H;
-        gap = smoothstep(altezza_gap + PIXELGRID_SMOOTH_H, altezza_gap - PIXELGRID_SMOOTH_H, gap);
+        
+        
+        //vec3 mask_rgbh = mask_rgb * lum_h_scaled;
+        //float altezza_gap = max(max(mask_rgbh.r, mask_rgbh.g), mask_rgbh.b);
+        
+        //vec3 mask_rgbh = mask_rgb * lum_h_scaled;
+        //float altezza_gap = mask_rgbh.r + mask_rgbh.g + mask_rgbh.b;
+        
+        
+        
+        gap = smoothstep_fast(altezza_gap + PIXELGRID_SMOOTH_H, altezza_gap - PIXELGRID_SMOOTH_H, gap);
 
     //Applico gap, maschera rgp al pixel in ingresso.
-        vec3 pixel_out = mask_rgb * gap  * pixel_in ;
+        vec3 pixel_out = mask_rgb * gap * pixel_in ;
 
 
     return pixel_out;
 
 }
+*/
 
 vec4 fn_pixel_dotmat(vec2 coords, vec3 pixel_in) {
 
@@ -965,19 +994,23 @@ vec3 fn_pixel_content(vec2 coords) {
         }
 
     
-    float scanline_or_dot_mat = 1.0; //init dot grid or scanline mask to 1.0
+    float scanline_or_dot_mat_or_pixelgrid = 1.0; //init dot grid or scanline mask to 1.0
     
     //Pixel grid
-        if (DO_PIXELGRID == 1.0)
-            pixel_out = fn_pixel_grid(coords, pixel_out, 0.0, vMax_inLum);
-
+        if (DO_PIXELGRID == 1.0) {
+            vec4 pixel_grid = fn_pixel_grid(coords, pixel_out, 0.0, vMax_inLum);
+            //grid mask only is needed by halo to selectively light the grid.
+                scanline_or_dot_mat_or_pixelgrid = pixel_grid.a;
+                pixel_out = pixel_grid.rgb;
+        }
     //Dot mask
         if (DO_DOT_MATRIX == 1.0) {
-            vec4 pixel_grid_mask = fn_pixel_dotmat(coords, pixel_out);
+            vec4 pixel_dotmat = fn_pixel_dotmat(coords, pixel_out);
             //grid mask only is needed by halo to selectively light the grid.
-                scanline_or_dot_mat = pixel_grid_mask.a;
+                scanline_or_dot_mat_or_pixelgrid = pixel_dotmat.a;
             //rgb channel goes to pixel_out
-            pixel_out = pixel_grid_mask.rgb;
+            pixel_out = pixel_dotmat.rgb;
+            
         }
         
     //Scanlines (non-flickering)
@@ -990,7 +1023,7 @@ vec3 fn_pixel_content(vec2 coords) {
                 float scanline_mask = fn_scanline_mask(coords, SCANLINE_SM_TYPE > 0.0, lum, 0.0, vMax_inLum, vDo_Tate );
                 pixel_out = min(pixel_out, 1.0) * ( scanline_mask + ( pixel_bleed * SCANLINES_BLEEDING * ( 1 - scanline_mask ) ));
                 //Since scanlines and dot matrix are alternative and halo can white both, just use a single var for both:
-                scanline_or_dot_mat = scanline_mask;
+                scanline_or_dot_mat_or_pixelgrid = scanline_mask;
         }
 
         
@@ -1000,10 +1033,9 @@ vec3 fn_pixel_content(vec2 coords) {
         if (DO_HALO == 1.0 ) {
             pixel_haloed = texture(halo_pass,coords).rgb;
             //Halo only on scanlines:
-            pixel_out += pixel_haloed * scanline_or_dot_mat ;
+            pixel_out += pixel_haloed * scanline_or_dot_mat_or_pixelgrid ;
             //Halo over scanlines gap too:
-            pixel_out += pixel_haloed * (HALO_VS_SCAN) * (1 - scanline_or_dot_mat) ;
-
+            pixel_out += pixel_haloed * (HALO_VS_SCAN) * (1 - scanline_or_dot_mat_or_pixelgrid) ;            
         }
     
     // Apply gamma out:

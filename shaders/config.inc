@@ -367,10 +367,13 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float PIXELGRID_MIN_W;
 	float PIXELGRID_MAX_H;
 	float PIXELGRID_MAX_W;
-	float PIXELGRID_SIZE;
+	float PIXELGRID_SIZE_W;
+	float PIXELGRID_SIZE_H;
 	float PIXELGRID_SMOOTH_H;
 	float PIXELGRID_SMOOTH_W;
 	float PIXELGRID_SPACING;
+	float PIXELGRID_MUL_X;
+	float PIXELGRID_MUL_Y;
 } global;
 
 // Color correction
@@ -484,6 +487,23 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter SCANLINE_SM_VOFFSET      "           . Offset (type 1 only)"					45.0 	0.0 158.0 1.0
 #pragma parameter BLANK12 " " 0.0 0.0 1.0 1.0
 
+
+// pixel Grid
+#pragma parameter DO_PIXELGRID		"★  Low level Phosphor grid (NOT with scanlines or masks) ==>"	0.0 0.0 1.0 1.0
+#pragma parameter PIXELGRID_SIZE_W  "        X resolution: (core or screen)"	0.0 0.0 1.0 1.0
+#pragma parameter PIXELGRID_MIN_W   "           . Phosphors width Min"			0.1 0.05 1.0 0.05
+#pragma parameter PIXELGRID_MAX_W   "           . Phosphors width Max"			0.3 0.05 2.0 0.05
+#pragma parameter PIXELGRID_SPACING "           . RGB spacing (tightness)"      3.0 2.0 50.0 1.0
+#pragma parameter PIXELGRID_MUL_X   "           . Size x multiplier (neg=divider):"	1.0 -4.0 4.0 1.0
+#pragma parameter PIXELGRID_SIZE_H     "        X resolution: (core or screen)"	0.0 0.0 1.0 1.0
+#pragma parameter PIXELGRID_MIN_H	"           . Phosphors height Min"			0.2 0.0 1.0 0.05
+#pragma parameter PIXELGRID_MAX_H   "           . Phosphors height Max"			0.6 0.0 2.0 0.05
+#pragma parameter PIXELGRID_MUL_Y   "           . Size y multiplier (neg=divider):"	1.0 -4.0 4.0 1.0
+#pragma parameter BLANK12d " " 0.0 0.0 1.0 1.0
+
+//#pragma parameter PIXELGRID_SMOOTH_W "       Phosphors width smoothness"   0.1 0.01 1.0 0.01
+//#pragma parameter PIXELGRID_SMOOTH_H "       Phosphors height smoothness"   0.1 0.01 1.0 0.01
+
 // Dot matrix emulation
 #pragma parameter DO_DOT_MATRIX		"★  Dot matrix emulation enable? (NOT with scanlines!) ==>"	0.0 0.0 1.0 1.0
 #pragma parameter DOT_M_G_STR		"        Grid strength"					0.0 0.0 1.0 0.01
@@ -497,28 +517,16 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter DOT_M_MULTIPLY	"        Multiply factor (debug)"		1.0  1.0 50.0 1.0
 #pragma parameter BLANK12c " " 0.0 0.0 1.0 1.0
 
-// pixel Grid
-#pragma parameter DO_PIXELGRID		"★  Pixel grid emulation (NOT with scanlines or masks) ==>"	0.0 0.0 1.0 1.0
-#pragma parameter PIXELGRID_MIN_W   "        Min phosphor width"			0.2 0.0 1.0 0.05
-#pragma parameter PIXELGRID_MAX_W   "        Max phosphor width"			0.5 0.0 1.0 0.05
-#pragma parameter PIXELGRID_SPACING "        Phosphors H spacing"             3.0 1.0 10.0 1.0
-#pragma parameter PIXELGRID_MIN_H	"        Min phosphor height"			0.1 0.0 1.0 0.05
-#pragma parameter PIXELGRID_MAX_H   "        Max phosphor height"			0.5 0.0 1.0 0.05
-
-#pragma parameter PIXELGRID_SIZE    "        Cell size (core,screen)"	0.0 0.0 1.0 1.0
-#pragma parameter BLANK12d " " 0.0 0.0 1.0 1.0
 
 
-//#pragma parameter PIXELGRID_SMOOTH_W "       Pixel width smoothness"   0.1 0.01 1.0 0.01
-//#pragma parameter PIXELGRID_SMOOTH_H "       Pixel height smoothness"   0.1 0.01 1.0 0.01
 
 // Halo
 #pragma parameter DO_HALO       "★ Halo enable? ==>" 						0.0	0.0 1.0 1.0
-#pragma parameter HALO_POWER    "        Strength"						0.9 	0.0  5.0 0.025
+#pragma parameter HALO_POWER    "        Strength"						0.9 	0.0  5.0 0.01
 #pragma parameter HALO_W        "        Sharpness, horizontal"					1.75	0.35  7.0 0.05
 #pragma parameter HALO_H        "        Sharpness, Vertical"					1.75	0.35  7.0 0.05
 #pragma parameter HALO_GAMMA    "        Gamma, the higher, the less the halo on dark colors"	2.0 	1.0  10.0 0.1
-#pragma parameter HALO_VS_SCAN  "        Light up scanlines and dot grid gaps too"				0.0	0.0  1.0  0.1
+#pragma parameter HALO_VS_SCAN  "        Light up scanlines and dot grid gaps too"				0.0	0.0  1.0  0.01
 #pragma parameter BLANK10 " " 0.0 0.0 1.0 1.0
 
 
