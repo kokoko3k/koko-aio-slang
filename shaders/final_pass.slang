@@ -63,7 +63,7 @@ void main() {
         vTexCoord = (zoom(vTexCoord + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM ) * DO_GLOBAL_SHZO) + 
                     (vTexCoord * (1-DO_GLOBAL_SHZO) );
 
-    vOutputCoord = TexCoord;
+    vOutputCoord = TexCoord + vec2( GAME_GEOM_OFF_FIX /10000);
 
 
     vec2 vFragCoord = vec2( floor(vOutputCoord.x * params.OutputSize.x),
@@ -322,12 +322,12 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
 }
 
 
-float morph_shape_easy(float shape, float power ) {
+float morph_shape_easy(float shape, float power, float steep ) {
     return pow(shape, 1/(power*2.0));
 }
 
 
-float morph_shape_05(float shape, float power ) {
+float morph_shape_05(float shape, float power, float steep ) {
     float lum_scaled = power;
     float l = lum_scaled; // (already clamped)
     float l1 = pow(l, 3) * 10;
@@ -336,10 +336,10 @@ float morph_shape_05(float shape, float power ) {
 }
 
 
-float morph_shape_full(float shape, float power ) {
+float morph_shape_full(float shape, float power, float steep ) {
     float lum_scaled = power;
     float l = lum_scaled; // (already clamped)
-    if (lum_scaled <= 0.5) {
+    if (lum_scaled <= 0.5 + steep) {
         float l1 = pow(l, 4) * 15;
         shape = pow(shape, 1/sqrt(l1));
     } else {
@@ -349,16 +349,16 @@ float morph_shape_full(float shape, float power ) {
     return shape;
 }
 
-vec3 morph_shape(vec3 shape, vec3 power ) {
+vec3 morph_shape(vec3 shape, vec3 power, float steep ) {
     return vec3(
-      morph_shape_full(shape.x, power.x),
-      morph_shape_full(shape.y, power.y),
-      morph_shape_full(shape.z, power.z)
+      morph_shape_full(shape.x, power.x, steep),
+      morph_shape_full(shape.y, power.y, steep),
+      morph_shape_full(shape.z, power.z, steep)
     );
 }
 
-float morph_shape(float shape, float power ) {
-    return morph_shape_easy(shape, power);
+float morph_shape(float shape, float power, float steep ) {
+    return morph_shape_full(shape, power, steep);
 }
 
 float smoothstep_fast(float edge0, float edge1, float x) {
@@ -413,13 +413,13 @@ vec4 fn_pixel_grid(vec2 coords, vec3 pixel_in, float min_inLum, float max_inLum)
 
     //modulo la larghezza della triade in base alla luminosità del pixel in ingresso
         vec3 larghezza_fosforo = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
-        rgb_w = morph_shape(rgb_w, larghezza_fosforo);
+        rgb_w = morph_shape(rgb_w, larghezza_fosforo, PIXELGRID_STEEP);
 
     //modulo le altezza di ogni elemento della triade in base alla luminosità del pixel in ingresso
         vec3 altezza_fosforo = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
         vec3 rgb_h = vec3(sin(freq_base.y));
         rgb_h = (rgb_h * rgb_h);
-        rgb_h = morph_shape(rgb_h, altezza_fosforo);
+        rgb_h = morph_shape(rgb_h, altezza_fosforo, PIXELGRID_STEEP);
         
         
     //ricavo una maschera completa:

@@ -375,6 +375,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float PIXELGRID_SPACING;
 	float PIXELGRID_MUL_X;
 	float PIXELGRID_MUL_Y;
+	float PIXELGRID_STEEP;
 } global;
 
 // Color correction
@@ -493,13 +494,14 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter DO_PIXELGRID		"★  Low level Phosphor grid (NOT with scanlines or masks) ==>"	0.0 0.0 1.0 1.0
 #pragma parameter PIXELGRID_SIZE_W  "        X resolution: (core or screen)"	0.0 0.0 1.0 1.0
 #pragma parameter PIXELGRID_MIN_W   "           . Phosphors width Min"			0.1 0.05 1.0 0.05
-#pragma parameter PIXELGRID_MAX_W   "           . Phosphors width Max"			0.3 0.05 2.0 0.05
+#pragma parameter PIXELGRID_MAX_W   "           . Phosphors width Max"			0.3 0.05 1.0 0.05
 #pragma parameter PIXELGRID_SPACING "           . RGB spacing (tightness)"      3.0 2.0 50.0 1.0
 #pragma parameter PIXELGRID_MUL_X   "           . Size x multiplier (neg=divider):"	1.0 -4.0 4.0 1.0
 #pragma parameter PIXELGRID_SIZE_H     "        X resolution: (core or screen)"	0.0 0.0 1.0 1.0
 #pragma parameter PIXELGRID_MIN_H	"           . Phosphors height Min"			0.2 0.0 1.0 0.05
-#pragma parameter PIXELGRID_MAX_H   "           . Phosphors height Max"			0.6 0.0 2.0 0.05
+#pragma parameter PIXELGRID_MAX_H   "           . Phosphors height Max"			0.6 0.0 1.0 0.05
 #pragma parameter PIXELGRID_MUL_Y   "           . Size y multiplier (neg=divider):"	1.0 -4.0 4.0 1.0
+#pragma parameter PIXELGRID_STEEP	"        Use steep curves"					0.0 0.0 100.0 100.0
 #pragma parameter BLANK12d " " 0.0 0.0 1.0 1.0
 
 //#pragma parameter PIXELGRID_SMOOTH_W "       Phosphors width smoothness"   0.1 0.01 1.0 0.01
