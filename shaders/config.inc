@@ -375,7 +375,12 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float PIXELGRID_SPACING;
 	float PIXELGRID_MUL_X;
 	float PIXELGRID_MUL_Y;
-	float PIXELGRID_STEEP;
+	float PIXELGRID_NO_INTERBLEED;
+	float PIXELGRID_Y_MASK;
+	float PIXELGRID_Y_MASK_HEIGHT;
+	float PIXELGRID_Y_MASK_OFFSET;
+	float PIXELGRID_Y_MASK_STEEP;
+	float PIXELGRID_Y_MASK_COORDS;
 } global;
 
 // Color correction
@@ -493,15 +498,25 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 // pixel Grid
 #pragma parameter DO_PIXELGRID		"★  Low level Phosphor grid (NOT with scanlines or masks) ==>"	0.0 0.0 1.0 1.0
 #pragma parameter PIXELGRID_SIZE_W  "        X resolution: (core or screen)"	0.0 0.0 1.0 1.0
+#pragma parameter PIXELGRID_MUL_X   "           . Cell size multiplier x (neg=divider):"	1.0 -4.0 4.0 1.0
 #pragma parameter PIXELGRID_MIN_W   "           . Phosphors width Min"			0.1 0.05 1.0 0.05
 #pragma parameter PIXELGRID_MAX_W   "           . Phosphors width Max"			0.3 0.05 1.0 0.05
 #pragma parameter PIXELGRID_SPACING "           . RGB spacing (tightness)"      3.0 2.0 50.0 1.0
-#pragma parameter PIXELGRID_MUL_X   "           . Size x multiplier (neg=divider):"	1.0 -4.0 4.0 1.0
-#pragma parameter PIXELGRID_SIZE_H     "        X resolution: (core or screen)"	0.0 0.0 1.0 1.0
+
+#pragma parameter PIXELGRID_SIZE_H     "        Y resolution: (core for scanlines or screen)"	0.0 0.0 1.0 1.0
+#pragma parameter PIXELGRID_MUL_Y   "           . Cell size multiplier y (neg=divider):"	1.0 -4.0 4.0 1.0
 #pragma parameter PIXELGRID_MIN_H	"           . Phosphors height Min"			0.2 0.0 1.0 0.05
 #pragma parameter PIXELGRID_MAX_H   "           . Phosphors height Max"			0.6 0.0 1.0 0.05
-#pragma parameter PIXELGRID_MUL_Y   "           . Size y multiplier (neg=divider):"	1.0 -4.0 4.0 1.0
-#pragma parameter PIXELGRID_STEEP	"        Use steep curves"					0.0 0.0 100.0 100.0
+#pragma parameter PIXELGRID_NO_INTERBLEED	"        Avoid inter-cell bleeding"					0.0 0.0 100.0 100.0
+
+#pragma parameter BLANK12e " " 0.0 0.0 1.0 1.0
+
+#pragma parameter PIXELGRID_Y_MASK           "        Vertical cell Mask"	0.0 0.0 1.0 0.05
+#pragma parameter PIXELGRID_Y_MASK_COORDS    "           . Resolution: (core or screen)"	0.0 0.0 1.0 1.0
+#pragma parameter PIXELGRID_Y_MASK_HEIGHT    "           . Height (inverted)"	0.75 0.0 3.0 0.01
+#pragma parameter PIXELGRID_Y_MASK_OFFSET    "           . Even/odd offset"	1.0 0.0 1.0 1.0
+#pragma parameter PIXELGRID_Y_MASK_STEEP     "           . Steepness"	2.0 1.0 30.0 1.0
+
 #pragma parameter BLANK12d " " 0.0 0.0 1.0 1.0
 
 //#pragma parameter PIXELGRID_SMOOTH_W "       Phosphors width smoothness"   0.1 0.01 1.0 0.01

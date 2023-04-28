@@ -375,28 +375,26 @@ vec3 smoothstep_fast(vec3 edge0, vec3 edge1, vec3 x) {
   return mix(vec3(0.0), vec3(1.0), t);
 }
 
-vec4 fn_pixel_grid(vec2 coords, vec3 pixel_in, float min_inLum, float max_inLum) {
+vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inLum) {
     //La densità della maschera //FIXME mettimi nel vertex shader
-        vec4 coords_and_size_core = vec4(coords.xy, params.OriginalSize.xy);
-        vec4 coords_and_size_screen = vec4(vOutputCoord.xy, params.OutputSize.xy*0.3333);
+  
+    //Calcolo le frequenze da usare pe la x e per la x a seconda del parametri utente PIXELGRID_SIZE_W e PIXELGRID_SIZE_H
+        vec2 freq_base_core   = pi * in_coords.xy    * params.OriginalSize.xy;
+        vec2 freq_base_screen = pi * vOutputCoord.xy * params.OutputSize.xy * 0.3333;    
         
-        vec4 coords_and_size = vec4( mix_step(coords_and_size_core.xz, coords_and_size_screen.xz, PIXELGRID_SIZE_W),
-                                     mix_step(coords_and_size_core.yw, coords_and_size_screen.yw, PIXELGRID_SIZE_H) );
-
- 
-        coords = coords_and_size.xz;
-        vec2 mask_size = coords_and_size.yw;
+        vec2 freq_base;
+            freq_base.x = mix_step(freq_base_core.x, freq_base_screen.x, PIXELGRID_SIZE_W);
+            freq_base.y = mix_step(freq_base_core.y, freq_base_screen.y, PIXELGRID_SIZE_H);
         
-    vec2 period_multiply = vec2(PIXELGRID_MUL_X, PIXELGRID_MUL_Y);
-    if (period_multiply.x < 0.0) period_multiply.x = 1/-period_multiply.x;  //goes FIXME in vertex shader
-    if (period_multiply.y < 0.0) period_multiply.y = 1/-period_multiply.y;
+        vec2 mask_size;
+            mask_size.x = mix_step(params.OriginalSize.x, params.OutputSize.x, PIXELGRID_SIZE_W);
+            mask_size.y = mix_step(params.OriginalSize.y, params.OutputSize.y, PIXELGRID_SIZE_H);
 
-    
-    vec2 freq_base;
-    //ricavo il periodo della triade e delle linee orizzontali
-        freq_base = pi * coords * mask_size;
 
     //Zoom to debug:
+        vec2 period_multiply = vec2(PIXELGRID_MUL_X, PIXELGRID_MUL_Y);
+        if (period_multiply.x < 0.0) period_multiply.x = 1/-period_multiply.x;  //goes FIXME in vertex shader
+        if (period_multiply.y < 0.0) period_multiply.y = 1/-period_multiply.y;
         freq_base /= period_multiply;
 
 
@@ -413,17 +411,51 @@ vec4 fn_pixel_grid(vec2 coords, vec3 pixel_in, float min_inLum, float max_inLum)
 
     //modulo la larghezza della triade in base alla luminosità del pixel in ingresso
         vec3 larghezza_fosforo = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
-        rgb_w = morph_shape(rgb_w, larghezza_fosforo, PIXELGRID_STEEP);
+        rgb_w = morph_shape(rgb_w, larghezza_fosforo, PIXELGRID_NO_INTERBLEED);
 
     //modulo le altezza di ogni elemento della triade in base alla luminosità del pixel in ingresso
         vec3 altezza_fosforo = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
         vec3 rgb_h = vec3(sin(freq_base.y));
         rgb_h = (rgb_h * rgb_h);
-        rgb_h = morph_shape(rgb_h, altezza_fosforo, PIXELGRID_STEEP);
+        rgb_h = morph_shape(rgb_h, altezza_fosforo, PIXELGRID_NO_INTERBLEED);
         
         
+
+        
+        
+    //Calcolo una maschera per la separazione dei fosfori
+        
+        //per capire se siamo nella triade pari o dispari, possiamo usare il segno del seno
+        //di periodo freq_base con uno step per avere 1 o 0.
+        
+            float sin_check_offset = sin(freq_base.x);
+            float is_even = step(sin_check_offset, 0.0);
+            //return vec4(sin_check_offset*rgb_w.rgb, 1.0);
+            
+        //Ricavo la frequenza da usare per la y (core o screen) a seconda del parametro PIXELGRID_Y_MASK_COORDS
+            float freq_cell_y = mix_step(freq_base_core.y, freq_base_screen.y, PIXELGRID_Y_MASK_COORDS);
+            
+        //Altezza fosfori nella maschera
+            #define PH_MASK_HEIGHT (freq_cell_y * PIXELGRID_Y_MASK_HEIGHT)
+        //stagger fosfori nella maschera
+            #define PH_MASH_OFFSET  (PIXELGRID_Y_MASK_OFFSET * pi *0.5  )
+            
+        float sin_mask_height = sin(PH_MASK_HEIGHT  + (PH_MASH_OFFSET * is_even));
+        sin_mask_height *= sin_mask_height;
+        
+        //Make a steep mask with tanh
+        float stagger_mask = mix( 1.0, tanh(sin_mask_height * PIXELGRID_Y_MASK_STEEP ), PIXELGRID_Y_MASK) ;
+        
+
+        //return vec4(sin_mask_height);
+        
+        
+        //return vec4(vec3(stagger_mask), 1.0);
+        
+     
     //ricavo una maschera completa:
-        vec3 mask = rgb_w * rgb_h;
+        vec3 mask = rgb_w * rgb_h * stagger_mask;
+        
         
     //out, nell'alfa ci va la maschera ad uso selettivo halo
         return vec4(mask * pixel_in, dot(mask, vec3(0.3333)) ) ;
