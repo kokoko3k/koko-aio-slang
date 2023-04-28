@@ -415,7 +415,14 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
 
     //modulo le altezza di ogni elemento della triade in base alla luminosità del pixel in ingresso
         vec3 altezza_fosforo = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
-        vec3 rgb_h = vec3(sin(freq_base.y));
+        
+            //PROVA: provo a ofsettare le triadi per emulare una slotmask a livello core
+                float sin_check_offset2 = sin(freq_base.x);
+                float is_even2 = step(sin_check_offset2, 0.0);
+                float core_offset =  is_even2 * pi * PIXELGRID_OFFSET_CORE;
+        
+        
+        vec3 rgb_h = vec3(sin(freq_base.y + core_offset   ));
         rgb_h = (rgb_h * rgb_h);
         rgb_h = morph_shape(rgb_h, altezza_fosforo, PIXELGRID_NO_INTERBLEED);
         
@@ -427,7 +434,6 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         
         //per capire se siamo nella triade pari o dispari, possiamo usare il segno del seno
         //di periodo freq_base con uno step per avere 1 o 0.
-        
             float sin_check_offset = sin(freq_base.x);
             float is_even = step(sin_check_offset, 0.0);
             //return vec4(sin_check_offset*rgb_w.rgb, 1.0);

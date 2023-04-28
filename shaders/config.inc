@@ -375,6 +375,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float PIXELGRID_SPACING;
 	float PIXELGRID_MUL_X;
 	float PIXELGRID_MUL_Y;
+	float PIXELGRID_OFFSET_CORE;
 	float PIXELGRID_NO_INTERBLEED;
 	float PIXELGRID_Y_MASK;
 	float PIXELGRID_Y_MASK_HEIGHT;
@@ -506,8 +507,10 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter PIXELGRID_SIZE_H     "        Y resolution: (core for scanlines or screen)"	0.0 0.0 1.0 1.0
 #pragma parameter PIXELGRID_MUL_Y   "           . Cell size multiplier y (neg=divider):"	1.0 -4.0 4.0 1.0
 #pragma parameter PIXELGRID_MIN_H	"           . Phosphors height Min"			0.2 0.0 1.0 0.05
-#pragma parameter PIXELGRID_MAX_H   "           . Phosphors height Max"			0.6 0.0 1.0 0.05
+#pragma parameter PIXELGRID_MAX_H         "           . Phosphors height Max"			0.6 0.0 1.0 0.05
+#pragma parameter PIXELGRID_OFFSET_CORE   "           . Core slotmask offset (0.25 ok)"	0.0 0.0 1.0 0.01
 #pragma parameter PIXELGRID_NO_INTERBLEED	"        Avoid inter-cell bleeding"					0.0 0.0 100.0 100.0
+
 
 #pragma parameter BLANK12e " " 0.0 0.0 1.0 1.0
 
