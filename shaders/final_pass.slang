@@ -1060,7 +1060,7 @@ vec3 fn_pixel_content(vec2 coords) {
 
                 //The maximum possible brightness of the input color modified by glow,contrast and brightness.
                 float scanline_mask = fn_scanline_mask(coords, SCANLINE_SM_TYPE > 0.0, lum, 0.0, vMax_inLum, vDo_Tate );
-                pixel_out = min(pixel_out, 1.0) * ( scanline_mask + ( pixel_bleed * SCANLINES_BLEEDING * ( 1 - scanline_mask ) ));
+                pixel_out = pixel_out * ( scanline_mask + ( pixel_bleed * SCANLINES_BLEEDING * ( 1 - scanline_mask ) ));
                 //Since scanlines and dot matrix are alternative and halo can white both, just use a single var for both:
                 scanline_or_dot_mat_or_pixelgrid = scanline_mask;
         }
