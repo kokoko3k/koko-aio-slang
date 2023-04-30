@@ -436,7 +436,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 
 
-//Offset RGB
+//Deconvergence
 #pragma parameter DO_SHIFT_RGB       "★ Deconvergence enable? ==>"	0.0	 0.0 1.0 1.0
 #pragma parameter OFFSET_STRENGTH "        Strength"			0.6 	 0.0 1.0 0.05
 #pragma parameter SHIFT_R         "        Red offset"			-40.0 	-210.0 189.0 1
@@ -476,25 +476,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter DRKLN_OVERWHITE        "           . Affect bright colors"					1.0 	0.0 1.0   0.05
 #pragma parameter BLANK9 " " 0.0 0.0 1.0 1.0
 
-#pragma parameter TATE                     "★ Tate mode (1:auto 2:forced)"		0.0 	0.0 2.0 1.0
-#pragma parameter BLANK7a " " 0.0 0.0 1.0 1.0
-
-// Scanlines
-#pragma parameter DO_SCANLINES	         "★ Scanlines enable? (NOT with dot matrix!) ==>"						0.0 	0.0  1.0 1.0
-#pragma parameter SCANLINE_MIN          "        Minimum height"			  		1.0 	0.01 1.0 0.01
-#pragma parameter SCANLINE_MAX          "        Maximum height"			  		0.5 	0.05 1.0 0.01
-#pragma parameter SCANLINE_MINMAX_GAMMA "        Min->Max inertia"					1.0		0.0 4.0 0.1
-#pragma parameter SCANLINE_DARK          "        Gap brightness"			  		0.0 	-0.5 1.0 0.05
-#pragma parameter SCANLINES_BLEEDING     "        Scanlines bleeding"						0.0 	0.0 3.0 0.05
-#pragma parameter SCANLINE_FLICKERING    "        Interlace Flicker (0=off,1=on,2=if interlaced)"		2.0 	0.0 2.0 1.0
-#pragma parameter SCANLINE_FLICKERING_POWER     "        Interlace Flicker power"		  		0.25 	0.0 8.0 0.01
-#pragma parameter SCANLINE_DISABLE_ON_INTERLACE "        Disable on interlaced screen"			  	0.0 	0.0 1.0 1.0
-#pragma parameter BLANK11 " " 0.0 0.0 1.0 1.0
-#pragma parameter SCANLINE_SM_TYPE         "        Slotmask type (disable (0) with darklines!)"		0.0 	0.0 3.0 1.0
-#pragma parameter SCANLINE_SM_STRENGTH     "           . Slotmask strength"						1.0 	0.0 1.0 0.05
-#pragma parameter SCANLINE_SM_VOFFSET      "           . Offset (type 1 only)"					45.0 	0.0 158.0 1.0
-#pragma parameter BLANK12 " " 0.0 0.0 1.0 1.0
-
 
 // pixel Grid
 #pragma parameter DO_PIXELGRID		"★  Low level Phosphor grid (NOT with scanlines or masks) ==>"	0.0 0.0 1.0 1.0
@@ -524,6 +505,29 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 //#pragma parameter PIXELGRID_SMOOTH_W "       Phosphors width smoothness"   0.1 0.01 1.0 0.01
 //#pragma parameter PIXELGRID_SMOOTH_H "       Phosphors height smoothness"   0.1 0.01 1.0 0.01
+
+
+#pragma parameter TATE                     "★ Tate mode (1:auto 2:forced)"		0.0 	0.0 2.0 1.0
+#pragma parameter BLANK7a " " 0.0 0.0 1.0 1.0
+
+// Scanlines
+#pragma parameter DO_SCANLINES	         "★ Scanlines enable? (NOT with dot matrix!) ==>"						0.0 	0.0  1.0 1.0
+#pragma parameter SCANLINE_MIN          "        Minimum height"			  		1.0 	0.01 1.0 0.01
+#pragma parameter SCANLINE_MAX          "        Maximum height"			  		0.5 	0.05 1.0 0.01
+#pragma parameter SCANLINE_MINMAX_GAMMA "        Min->Max inertia"					1.0		0.0 4.0 0.1
+#pragma parameter SCANLINE_DARK          "        Gap brightness"			  		0.0 	-0.5 1.0 0.05
+#pragma parameter SCANLINES_BLEEDING     "        Scanlines bleeding"						0.0 	0.0 3.0 0.05
+#pragma parameter SCANLINE_FLICKERING    "        Interlace Flicker (0=off,1=on,2=if interlaced)"		2.0 	0.0 2.0 1.0
+#pragma parameter SCANLINE_FLICKERING_POWER     "        Interlace Flicker power"		  		0.25 	0.0 8.0 0.01
+#pragma parameter SCANLINE_DISABLE_ON_INTERLACE "        Disable on interlaced screen"			  	0.0 	0.0 1.0 1.0
+#pragma parameter BLANK11 " " 0.0 0.0 1.0 1.0
+#pragma parameter SCANLINE_SM_TYPE         "        Slotmask type (disable (0) with darklines!)"		0.0 	0.0 3.0 1.0
+#pragma parameter SCANLINE_SM_STRENGTH     "           . Slotmask strength"						1.0 	0.0 1.0 0.05
+#pragma parameter SCANLINE_SM_VOFFSET      "           . Offset (type 1 only)"					45.0 	0.0 158.0 1.0
+#pragma parameter BLANK12 " " 0.0 0.0 1.0 1.0
+
+
+
 
 // Dot matrix emulation
 #pragma parameter DO_DOT_MATRIX		"★  Dot matrix emulation enable? (NOT with scanlines!) ==>"	0.0 0.0 1.0 1.0
