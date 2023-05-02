@@ -380,7 +380,10 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
   
     //Calcolo le frequenze da usare pe la x e per la x a seconda del parametri utente PIXELGRID_SIZE_W e PIXELGRID_SIZE_H
         vec2 freq_base_core   = pi * in_coords.xy    * params.OriginalSize.xy;
-        vec2 freq_base_screen = pi * vOutputCoord.xy * params.OutputSize.xy * 0.3333;    
+        vec2 freq_base_screen = pi * vec2(0.3333333, 0.5);
+        freq_base_screen *= vec2( vOutputCoord.x * params.OutputSize.x,
+                                  floor(vOutputCoord.y * params.OutputSize.y) ); //why it wants floor on y, but not on x? //FIXME EEE UNDERSTAND ME!!!!
+
         
         vec2 freq_base;
             freq_base.x = mix_step(freq_base_core.x, freq_base_screen.x, PIXELGRID_SIZE_W);
@@ -424,6 +427,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         
         vec3 rgb_h = vec3(sin(freq_base.y + core_offset   ));
         rgb_h = (rgb_h * rgb_h);
+                
         rgb_h = morph_shape(rgb_h, altezza_fosforo, PIXELGRID_NO_INTERBLEED);
         
         
@@ -444,13 +448,23 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         //Altezza fosfori nella maschera
             #define PH_MASK_HEIGHT (freq_cell_y * PIXELGRID_Y_MASK_HEIGHT)
         //stagger fosfori nella maschera
-            #define PH_MASH_OFFSET  (PIXELGRID_Y_MASK_OFFSET * pi *0.5  )
+            #define PH_MASH_OFFSET  (PIXELGRID_Y_MASK_OFFSET * pi * 0.5  )
             
         float sin_mask_height = sin(PH_MASK_HEIGHT  + (PH_MASH_OFFSET * is_even));
         sin_mask_height *= sin_mask_height;
         
+        /*vec3 rgb_h_prova = vec3(sin(freq_cell_y + core_offset   ));
+        rgb_h_prova = (rgb_h_prova * rgb_h_prova);
+        return vec4(rgb_h_prova, 1.0);
+        */
+        //return vec4(sin_mask_height);
+        
+        float in_lum = max(max(pixel_in.r, pixel_in.g),pixel_in.b) ;
+        in_lum = clamp(in_lum, 0.0, 1.0) * PIXELGRID_Y_MASK_ON_WHITE;;
+        float do_vertical_cell_mask = PIXELGRID_Y_MASK - in_lum;
+        
         //Make a steep mask with tanh
-        float stagger_mask = mix( 1.0, tanh(sin_mask_height * PIXELGRID_Y_MASK_STEEP ), PIXELGRID_Y_MASK) ;
+        float stagger_mask = mix( 1.0, tanh(sin_mask_height * PIXELGRID_Y_MASK_STEEP ), do_vertical_cell_mask) ;
         
 
         //return vec4(sin_mask_height);
@@ -462,9 +476,20 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
     //ricavo una maschera completa:
         vec3 mask = rgb_w * rgb_h * stagger_mask;
         
+    //La maschera può modificare la gamma dell'output, aumentandola a dismisura.
+    //Possiamo bilanciare?
+        //mask=pow(mask, vec3(2.0));
         
+    
+        
+
+        
+        
+    vec3 pixel_masked = mask * pixel_in;
+    vec3 pixel_out = mix(pixel_masked, mask, 0.0);
+    
     //out, nell'alfa ci va la maschera ad uso selettivo halo
-        return vec4(mask * pixel_in, dot(mask, vec3(0.3333)) ) ;
+    return vec4(pixel_out, dot(mask, vec3(0.3333) )) ;
 
 
 }

@@ -378,6 +378,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float PIXELGRID_OFFSET_CORE;
 	float PIXELGRID_NO_INTERBLEED;
 	float PIXELGRID_Y_MASK;
+	float PIXELGRID_Y_MASK_ON_WHITE;
 	float PIXELGRID_Y_MASK_HEIGHT;
 	float PIXELGRID_Y_MASK_OFFSET;
 	float PIXELGRID_Y_MASK_STEEP;
@@ -499,6 +500,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter PIXELGRID_Y_MASK_COORDS    "           . Resolution: (core or screen)"	0.0 0.0 1.0 1.0
 #pragma parameter PIXELGRID_Y_MASK_HEIGHT    "           . Height (inverted)"	0.75 0.0 3.0 0.01
 #pragma parameter PIXELGRID_Y_MASK_OFFSET    "           . Even/odd offset"	1.0 0.0 1.0 1.0
+#pragma parameter PIXELGRID_Y_MASK_ON_WHITE  "           . Fadeout under light"	0.5 0.0 1.0 0.01
 #pragma parameter PIXELGRID_Y_MASK_STEEP     "           . Steepness"	2.0 1.0 30.0 1.0
 
 #pragma parameter BLANK12d " " 0.0 0.0 1.0 1.0
