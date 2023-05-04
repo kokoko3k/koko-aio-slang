@@ -463,7 +463,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         //apply visibility to the mask
             vec3 darklines_mask=1-(mask_shape*V);
         
-     return vec4(darklines_mask, 1.0);
+     //return vec4(darklines_mask, 1.0);
      
      
         
