@@ -479,11 +479,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
     //La maschera può modificare la gamma dell'output, aumentandola a dismisura.
     //Possiamo bilanciare?
         //mask=pow(mask, vec3(2.0));
-        
-    
-        
 
-        
         
     vec3 pixel_masked = mask * pixel_in;
     vec3 pixel_out = mix(pixel_masked, mask, 0.0);
@@ -671,7 +667,8 @@ float fn_scanline_mask(vec2 coords, bool do_slotmask, float lum, float min_inLum
 
 
         if  (!( is_interlaced && SCANLINE_DISABLE_ON_INTERLACE == 1.0 )) {
-            lines = pow( sin(angle_base + vScanlineAlternateOffset), 2.0);
+            lines = sin(angle_base + vScanlineAlternateOffset);
+            lines *= lines; 
         }
 
     //If we specified to draw slotmasks alongside the scanlines, but the screen
