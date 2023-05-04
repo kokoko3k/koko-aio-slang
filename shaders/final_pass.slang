@@ -450,31 +450,19 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         //stagger fosfori nella maschera
             #define PH_MASH_OFFSET  (PIXELGRID_Y_MASK_OFFSET * pi * 0.5  )
             
-        float sin_mask_height = sin(PH_MASK_HEIGHT  + (PH_MASH_OFFSET * is_even));
-        sin_mask_height *= sin_mask_height;
+       //Calcola luminosità per modulare la visibilità dei gap orzzontali
+            float in_lum = max(max(pixel_in.r, pixel_in.g),pixel_in.b) ;
+            in_lum = clamp(in_lum, 0.0, 1.0) * PIXELGRID_Y_MASK_ON_WHITE;;
+            float do_vertical_cell_mask = PIXELGRID_Y_MASK - in_lum;
         
-        /*vec3 rgb_h_prova = vec3(sin(freq_cell_y + core_offset   ));
-        rgb_h_prova = (rgb_h_prova * rgb_h_prova);
-        return vec4(rgb_h_prova, 1.0);
-        */
-        //return vec4(sin_mask_height);
-        
-        float in_lum = max(max(pixel_in.r, pixel_in.g),pixel_in.b) ;
-        in_lum = clamp(in_lum, 0.0, 1.0) * PIXELGRID_Y_MASK_ON_WHITE;;
-        float do_vertical_cell_mask = PIXELGRID_Y_MASK - in_lum;
-        
-        //Make a steep mask with tanh
-        float stagger_mask = mix( 1.0, tanh(sin_mask_height * PIXELGRID_Y_MASK_STEEP ), do_vertical_cell_mask) ;
-        
-
-        //return vec4(sin_mask_height);
-        
-        
-        //return vec4(vec3(stagger_mask), 1.0);
+       
+            float darklines = sin(PH_MASK_HEIGHT  + (PH_MASH_OFFSET * is_even)) ;
+            darklines = 1-pow(darklines, PIXELGRID_Y_MASK_STEEP);
+            darklines = mix(1.0, darklines, do_vertical_cell_mask);
         
      
     //ricavo una maschera completa:
-        vec3 mask = rgb_w * rgb_h * stagger_mask;
+        vec3 mask = rgb_w * rgb_h * darklines;
         
     //La maschera può modificare la gamma dell'output, aumentandola a dismisura.
     //Possiamo bilanciare?
