@@ -1,24 +1,35 @@
 // mix_step returns a or b, depending on the mix value.
 // mix is supposed to have just 2 values, 1.0 or 0.0; //FIXME: mix argument could be vec.
-		vec2 mix_step(vec2 a, vec2 b, float mix){
-			return (a * (1 - mix)) + 
-				(b * mix) ;
+
+		vec2 mix_step(vec2 a, vec2 b, float m){
+			return mix(a,b,m);  //114
+			//return ( b-a )* m + a; //113.5
+			//if (m==0.0) return a ; return b; //113.5
+			//return (a * (1 - m)) + (b * m) ; //112
 		}
-		vec3 mix_step(vec3 a, vec3 b, float mix){
-			return (a * (1 - mix)) + 
-				(b * mix) ;
+		vec3 mix_step(vec3 a, vec3 b, float m){
+			return mix(a,b,m);
+			//return ( b-a )* m + a;
+			//if (m==0.0) return a ; return b;
+			//return (a * (1 - m)) + (b * m) ;
 		}
-		vec3 mix_step3(vec3 a, vec3 b, float mix){
-			return (a * (1 - mix)) + 
-				(b * mix) ;
+		vec3 mix_step3(vec3 a, vec3 b, float m){
+			return mix(a,b,m);
+			//return ( b-a )* m + a;
+			//if (m==0.0) return a ; return b;
+			//return (a * (1 - m)) + (b * m) ;
 		}
-		vec4 mix_step(vec4 a, vec4 b, float mix){
-			return (a * (1 - mix)) + 
-				(b * mix) ;
+		vec4 mix_step(vec4 a, vec4 b, float m){
+			return mix(a,b,m);
+			//return ( b-a )* m + a;
+			//if (m==0.0) return a ; return b;
+			//return (a * (1 - m)) + (b * m) ;
 		}
-		float mix_step(float a, float b, float mix){
-			return (a * (1 - mix)) + 
-				(b * mix) ;
+		float mix_step(float a, float b, float m){
+			return mix(a,b,m);
+			//return ( b-a )* m + a;
+			//if (m==0.0) return a ; return b;
+			//return (a * (1 - m)) + (b * m) ;
 		}
 
 
