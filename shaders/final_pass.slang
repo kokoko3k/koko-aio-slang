@@ -450,19 +450,21 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         //stagger fosfori nella maschera
             #define PH_MASH_OFFSET  (PIXELGRID_Y_MASK_OFFSET * pi * 0.5  )
             
-       //Calcola luminosità per modulare la visibilità dei gap orzzontali
-            float in_lum = max(max(pixel_in.r, pixel_in.g),pixel_in.b) ;
-            in_lum = clamp(in_lum, 0.0, 1.0) * PIXELGRID_Y_MASK_ON_WHITE;;
-            float do_vertical_cell_mask = PIXELGRID_Y_MASK - in_lum;
-        
-       
-            float darklines = sin(PH_MASK_HEIGHT  + (PH_MASH_OFFSET * is_even)) ;
-            darklines = 1-pow(darklines, PIXELGRID_Y_MASK_STEEP);
-            darklines = mix(1.0, darklines, do_vertical_cell_mask);
-        
-     
+        //Ricava i gap orizzontali tramite 1-seni elevati a potenza per renderli "ripidi" sui fianchi
+            float mask_shape = sin(PH_MASK_HEIGHT  + (PH_MASH_OFFSET * is_even)) ;
+            mask_shape = pow(mask_shape, PIXELGRID_Y_MASK_STEEP);
+            
+        //Get per channel input luminance by clamping pixel_in
+            vec3 lum = clamp(pixel_in, 0.0, 1.0);
+        //Adapt the luminance effect via input parameter
+            vec3 lum_adapted = (1-pixel_in)*PIXELGRID_Y_MASK_ON_WHITE;
+        //Calc final mask visibility as the minimum between tha configured visibility and luminosity effect
+            vec3 V = min(lum_adapted,vec3(PIXELGRID_Y_MASK));
+        //apply visibility to the mask
+            vec3 darklines_mask = 1-(mask_shape*V);     
+    
     //ricavo una maschera completa:
-        vec3 mask = rgb_w * rgb_h * darklines;
+        vec3 mask = rgb_w * rgb_h * darklines_mask;
         
     //La maschera può modificare la gamma dell'output, aumentandola a dismisura.
     //Possiamo bilanciare?
