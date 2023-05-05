@@ -56,7 +56,7 @@ void main() {
         else
             vTexCoord = integer_scale(TexCoord, vIn_aspect, bool(vIsRotated), GAME_GEOM_INT_SCALE-1.0 ) + vec2( GAME_GEOM_OFF_FIX /10000);
 
-
+    
     //if (DO_GLOBAL_SHZO >0.5)
     //    vTexCoord = zoom(vTexCoord + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM );
     //..unbranched previous
@@ -339,7 +339,7 @@ float morph_shape_05(float shape, float power, float steep ) {
 float morph_shape_full(float shape, float power, float steep ) {
     float lum_scaled = power;
     float l = lum_scaled; // (already clamped)
-    if (lum_scaled <= 0.5) {
+    if (lum_scaled <= 0.5+steep) {
         float l1 = pow(l, 4) * 15;
         shape = pow(shape, 1/sqrt(l1));
     } else {
@@ -383,7 +383,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         vec2 freq_base_core   = pi * in_coords.xy    * params.OriginalSize.xy;
         vec2 freq_base_screen = pi * vec2(0.3333333, 0.5);
         freq_base_screen *= vec2( vOutputCoord.x * params.OutputSize.x,
-                                  floor(vOutputCoord.y * params.OutputSize.y) ); //why it wants floor on y, but not on x? //FIXME EEE UNDERSTAND ME!!!!
+                                  floor(vOutputCoord.y * params.OutputSize.y) ); //why it wants floor on y, but not on x? //FIXME UNDERSTAND THIS
 
         
         vec2 freq_base;
@@ -394,13 +394,18 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             mask_size.x = mix_step(params.OriginalSize.x, params.OutputSize.x, PIXELGRID_SIZE_W);
             mask_size.y = mix_step(params.OriginalSize.y, params.OutputSize.y, PIXELGRID_SIZE_H);
 
-
+   
+            
     //Zoom to debug:
         vec2 period_multiply = vec2(PIXELGRID_MUL_X, PIXELGRID_MUL_Y);
         if (period_multiply.x < 0.0) period_multiply.x = 1/-period_multiply.x;  //goes FIXME in vertex shader
         if (period_multiply.y < 0.0) period_multiply.y = 1/-period_multiply.y;
         freq_base /= period_multiply;
 
+    //TATE TEST
+    //   freq_base.xy = freq_base.yx;
+    //    mask_size.xy = mask_size.yx;
+    
 
     float triad_spacing = (pi / PIXELGRID_SPACING);
 
