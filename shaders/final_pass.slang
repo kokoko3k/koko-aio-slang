@@ -378,18 +378,20 @@ vec3 smoothstep_fast(vec3 edge0, vec3 edge1, vec3 x) {
 
 vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inLum) {
     //Tate ?
-        vec2 l_OutputSize = params.OutputSize.xy;
+        vec2 l_OutputSize   = params.OutputSize.xy;
         vec2 l_vOutputCoord = vOutputCoord.xy;
+        vec2 l_OriginalSize = params.OriginalSize.xy;
         
         if (vDo_Tate == 1.0) {
-            l_OutputSize = params.OutputSize.yx;
+            l_OutputSize   = params.OutputSize.yx;
             l_vOutputCoord = vOutputCoord.yx;
-            in_coords.xy = in_coords.yx;
+            in_coords.xy   = in_coords.yx;
+            l_OriginalSize = params.OriginalSize.yx;
         }
         
       
     //Calcolo le frequenze da usare pe la x e per la y.
-        vec2 freq_base_core   = pi * in_coords.xy    * params.OriginalSize.xy;
+        vec2 freq_base_core   = pi * in_coords * l_OriginalSize ;
         vec2 freq_base_screen = pi * vec2(0.3333333, 0.5);
         freq_base_screen *= vec2( floor(l_vOutputCoord.x * l_OutputSize.x*3)/3.0,
                                   floor(l_vOutputCoord.y * l_OutputSize.y) );
@@ -424,16 +426,17 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
     //modulo le altezza di ogni elemento della triade in base alla luminosità del pixel in ingresso
         vec3 altezza_fosforo = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
         
-    //ofset trias to emulate core level slotmask
+    //offset trias to emulate core level slotmask
         float sin_check_offset2 = sin(freq_base.x);
         float is_even2 = step(sin_check_offset2, 0.0);
         float core_offset =  is_even2 * pi * PIXELGRID_OFFSET_CORE;
         
         
         float rgb_h_sin = sin(freq_base.y + core_offset   );
-
+        
         rgb_h_sin = (rgb_h_sin * rgb_h_sin);
         vec3 rgb_h = vec3(rgb_h_sin);
+        //return vec4(rgb_h_sin* pixel_in, 1.0);
         
         rgb_h = morph_shape(rgb_h, altezza_fosforo, PIXELGRID_NO_INTERBLEED);
         
