@@ -377,27 +377,28 @@ vec3 smoothstep_fast(vec3 edge0, vec3 edge1, vec3 x) {
 }
 
 vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inLum) {
-    //La densità della maschera //FIXME mettimi nel vertex shader
-  
-    //Calcolo le frequenze da usare pe la x e per la x a seconda del parametri utente PIXELGRID_SIZE_W e PIXELGRID_SIZE_H
+    //Tate ?
+        vec2 l_OutputSize = params.OutputSize.xy;
+        vec2 l_vOutputCoord = vOutputCoord.xy;
+        
+        if (vDo_Tate == 1.0) {
+            l_OutputSize = params.OutputSize.yx;
+            l_vOutputCoord = vOutputCoord.yx;
+            in_coords.xy = in_coords.yx;
+        }
+        
+      
+    //Calcolo le frequenze da usare pe la x e per la y.
         vec2 freq_base_core   = pi * in_coords.xy    * params.OriginalSize.xy;
         vec2 freq_base_screen = pi * vec2(0.3333333, 0.5);
-        freq_base_screen *= vec2( vOutputCoord.x * params.OutputSize.x,
-                                  floor(vOutputCoord.y * params.OutputSize.y) ); //why it wants floor on y, but not on x? //FIXME UNDERSTAND THIS
+        freq_base_screen *= vec2( floor(l_vOutputCoord.x * l_OutputSize.x*3)/3.0,
+                                  floor(l_vOutputCoord.y * l_OutputSize.y) );
 
-        vec2 freq_base;
-            freq_base.x = mix_step(freq_base_core.x, freq_base_screen.x, PIXELGRID_SIZE_W);
-            freq_base.y = mix_step(freq_base_core.y, freq_base_screen.y, PIXELGRID_SIZE_H);
+    //Switch between core and screen sizes (x and y)
+        vec2 freq_base = mix(freq_base_core, freq_base_screen, vec2(PIXELGRID_SIZE_W, PIXELGRID_SIZE_H));
+        vec2 mask_size = mix(params.OriginalSize.xy, l_OutputSize, vec2(PIXELGRID_SIZE_W,PIXELGRID_SIZE_H)); 
         
-        vec2 mask_size;
-            mask_size.x = mix_step(params.OriginalSize.x, params.OutputSize.x, PIXELGRID_SIZE_W);
-            mask_size.y = mix_step(params.OriginalSize.y, params.OutputSize.y, PIXELGRID_SIZE_H);
 
-    //TATE TEST
-        //freq_base.xy = freq_base.yx;
-        //mask_size.xy = mask_size.yx;
-   
-            
     //Zoom to debug:
         vec2 period_multiply = vec2(PIXELGRID_MUL_X, PIXELGRID_MUL_Y);
         if (period_multiply.x < 0.0) period_multiply.x = 1/-period_multiply.x;  //goes FIXME in vertex shader
