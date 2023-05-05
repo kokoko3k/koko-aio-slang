@@ -40,9 +40,6 @@ layout(location = 15) out float vVmask_gap;
 layout(location = 16) out float vFcol_Tated;
 layout(location = 17) out float vDo_Tate;
 layout(location = 18) out vec3 vDotMat_Grid_Color;
-layout(location = 19) out vec2 vPG_freq_base_screen;
-layout(location = 20) out vec2 vPG_freq_base_core_k;
-layout(location = 21) out vec2 vPG_mask_size;
 
 #include "includes/functions.include.slang"
 
@@ -128,17 +125,6 @@ void main() {
                 //Since we modify grid brightness via a specific use parameter, explicitely multiply it by that:
                     vDotMat_Grid_Color *= DOT_M_G_BRT ;
             }
-        //Pixel grid helper
-            if (DO_PIXELGRID == 1.0) {
-                vPG_freq_base_screen  = pi * vec2(0.3333333, 0.5);
-                vPG_freq_base_screen *= vec2( vOutputCoord.x * params.OutputSize.x,
-                                        floor(vOutputCoord.y * params.OutputSize.y) ); //why it wants floor on y, but not on x? //FIXME UNDERSTAND THIS
-                                        
-                vPG_freq_base_core_k = pi * params.OriginalSize.xy;
-                
-		        vPG_mask_size =  vec2(mix_step(params.OriginalSize.x, params.OutputSize.x, PIXELGRID_SIZE_W), 
-                                      mix_step(params.OriginalSize.y, params.OutputSize.y, PIXELGRID_SIZE_H) );
-            }
 }
 
 
@@ -162,9 +148,6 @@ layout(location = 15) in float vVmask_gap;
 layout(location = 16) in float vFcol_Tated;
 layout(location = 17) in float vDo_Tate;
 layout(location = 18) in vec3 vDotMat_Grid_Color;
-layout(location = 19) in vec2 vPG_freq_base_screen;
-layout(location = 20) in vec2 vPG_freq_base_core_k;
-layout(location = 21) in vec2 vPG_mask_size;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -393,17 +376,26 @@ vec3 smoothstep_fast(vec3 edge0, vec3 edge1, vec3 x) {
   return mix(vec3(0.0), vec3(1.0), t);
 }
 
-vec4 fn_pixelgrid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inLum) {
+vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inLum) {
+    //La densità della maschera //FIXME mettimi nel vertex shader
+  
     //Calcolo le frequenze da usare pe la x e per la x a seconda del parametri utente PIXELGRID_SIZE_W e PIXELGRID_SIZE_H
-        vec2 freq_base_core = in_coords.xy * vPG_freq_base_core_k;
-        vec2 freq_base_screen = vPG_freq_base_screen;
-        vec2 freq_base = vec2( mix_step(freq_base_core.x, freq_base_screen.x, PIXELGRID_SIZE_W),
-                             mix_step(freq_base_core.y, freq_base_screen.y, PIXELGRID_SIZE_H) );
+        vec2 freq_base_core   = pi * in_coords.xy    * params.OriginalSize.xy;
+        vec2 freq_base_screen = pi * vec2(0.3333333, 0.5);
+        freq_base_screen *= vec2( vOutputCoord.x * params.OutputSize.x,
+                                  floor(vOutputCoord.y * params.OutputSize.y) ); //why it wants floor on y, but not on x? //FIXME UNDERSTAND THIS
+
+        vec2 freq_base;
+            freq_base.x = mix_step(freq_base_core.x, freq_base_screen.x, PIXELGRID_SIZE_W);
+            freq_base.y = mix_step(freq_base_core.y, freq_base_screen.y, PIXELGRID_SIZE_H);
         
-    //Mask density:
-        vec2 mask_size = vPG_mask_size;
+        vec2 mask_size;
+            mask_size.x = mix_step(params.OriginalSize.x, params.OutputSize.x, PIXELGRID_SIZE_W);
+            mask_size.y = mix_step(params.OriginalSize.y, params.OutputSize.y, PIXELGRID_SIZE_H);
 
-
+    //TATE TEST
+        //freq_base.xy = freq_base.yx;
+        //mask_size.xy = mask_size.yx;
    
             
     //Zoom to debug:
@@ -412,10 +404,6 @@ vec4 fn_pixelgrid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inLu
         if (period_multiply.y < 0.0) period_multiply.y = 1/-period_multiply.y;
         freq_base /= period_multiply;
 
-    //TATE TEST
-    //   freq_base.xy = freq_base.yx;
-    //    mask_size.xy = mask_size.yx;
-    
 
     float triad_spacing = (pi / PIXELGRID_SPACING);
 
@@ -977,7 +965,7 @@ vec3 fn_pixel_content(vec2 coords) {
     
     //Pixel grid
         if (DO_PIXELGRID == 1.0) {
-            vec4 pixel_grid = fn_pixelgrid(coords, pixel_out, 0.0, vMax_inLum);
+            vec4 pixel_grid = fn_pixel_grid(coords, pixel_out, 0.0, vMax_inLum);
             //grid mask only is needed by halo to selectively light the grid.
                 scanline_or_dot_mat_or_pixelgrid = pixel_grid.a;
                 pixel_out = pixel_grid.rgb;
