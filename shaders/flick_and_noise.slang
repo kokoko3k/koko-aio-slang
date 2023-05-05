@@ -102,7 +102,7 @@ void debug() {
    
    //pixel_debug=vec3(0,1,0); //green
    //pixel_debug=vec3(1,0,0); //red
-   //pixel_debug=vec3(1,0.5,1); //purple
+   pixel_debug=vec3(1,0.5,1); //purple
    
    //pixel_debug=vec3(floor(vTexCoord.x*16)/16); //H bw gradient 16gray
    
@@ -132,7 +132,7 @@ void debug() {
 
 void main() {
    
-   //debug(); return;
+   debug(); return;
 
    /* since flickering code needs
       luminosity difference between 2 vertical lines

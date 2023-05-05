@@ -425,9 +425,11 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 float core_offset =  is_even2 * pi * PIXELGRID_OFFSET_CORE;
         
         
-        vec3 rgb_h = vec3(sin(freq_base.y + core_offset   ));
-        rgb_h = (rgb_h * rgb_h);
-                
+        float rgb_h_sin = sin(freq_base.y + core_offset   );
+
+        rgb_h_sin = (rgb_h_sin * rgb_h_sin);
+        vec3 rgb_h = vec3(rgb_h_sin);
+        
         rgb_h = morph_shape(rgb_h, altezza_fosforo, PIXELGRID_NO_INTERBLEED);
         
         
