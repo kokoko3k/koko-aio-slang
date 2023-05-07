@@ -379,7 +379,7 @@ vec3 smoothstep_fast(vec3 edge0, vec3 edge1, vec3 x) {
 vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inLum) {
     //Tate ?
         vec2 l_OutputSize   = params.OutputSize.xy;
-        vec2 l_vOutputCoord = vOutputCoord.xy;
+        vec2 l_vOutputCoord = vOutputCoord.xy + vec2(0.00001);
         vec2 l_OriginalSize = params.OriginalSize.xy;
         
         if (vDo_Tate == 1.0) {
@@ -390,11 +390,61 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         }
         
       
-    //Calcolo le frequenze da usare pe la x e per la y.
+    //Set preset mask or fallback to manual one.
+        /* Common masks:
+            * 1 gm   : mask size = 2 | offsets=1,0,1  | width=0.3
+            * 2 gmx  : mask size = 3 | offsets=1,0,1  | width=0.25
+            * 3 rgb  : mask size = 3 | offsets=0,1,2  | width=0.25
+            * 4 rgbx : mask size = 4 | offsets=0,1,2  | width=0.20
+            * 3 rbg  : mask size = 3 | offsets=0,1,2  | width=0.25
+            * 4 rbgx : mask size = 4 | offsets=0,1,2  | width=0.20
+        */
+        float vPG_h_count = PIXELGRID_H_COUNT;
+        vec3 vPG_offsets = vec3(PIXELGRID_R_SHIFT,PIXELGRID_G_SHIFT,PIXELGRID_B_SHIFT);
+
+        if (PIXELGRID_H_PRST == 1.0) {
+            vPG_offsets = vec3(1,0,1); //gm
+            vPG_h_count = 2;
+        }
+
+        if (PIXELGRID_H_PRST == 2.0) {
+            vPG_offsets = vec3(1,0,1); //gmx
+            vPG_h_count = 3;
+        }
+
+        if (PIXELGRID_H_PRST == 3.0) {
+            vPG_offsets = vec3(0,1,2); //rgb
+            vPG_h_count = 3;
+        }
+
+        if (PIXELGRID_H_PRST == 4.0) {
+            vPG_offsets = vec3(0,1,2); //rgbx
+            vPG_h_count = 4;
+        }
+
+        if (PIXELGRID_H_PRST == 5.0) {
+            vPG_offsets = vec3(0,2,1); //rbg
+            vPG_h_count = 3;
+        }
+
+        if (PIXELGRID_H_PRST == 6.0) {
+            vPG_offsets = vec3(0,2,1); //rbgx
+            vPG_h_count = 4;
+        }
+
+    //ricavo i 3 periodi e offset per i 3 seni verticali
+        vPG_offsets = vPG_offsets * (pi / vPG_h_count);
+    //modulo la tightness
+        //vPG_offsets *= PIXELGRID_SPACING;
+
+
+
         vec2 freq_base_core   = pi * in_coords * l_OriginalSize ;
-        vec2 freq_base_screen = pi * vec2(0.3333333, 0.5);
-        freq_base_screen *= vec2( floor(l_vOutputCoord.x * l_OutputSize.x*3)/3.0,
-                                  floor(l_vOutputCoord.y * l_OutputSize.y) );
+        vec2 freq_base_screen = pi * vec2(1/vPG_h_count, 0.5);
+        //ho bisogno di una "densità" di precisione per il seno uguale al numero di fosfori da emulare
+        //per cui dipenderà dalla maschera per la x e per la y posso lasciare 1.0
+        freq_base_screen *= vec2( floor(l_vOutputCoord.x * l_OutputSize.x * 1.0) / 1.0,
+                                  floor(l_vOutputCoord.y * l_OutputSize.y * 1.0 ) /1.0 );
 
     //Switch between core and screen sizes (x and y)
         vec2 freq_base = mix(freq_base_core, freq_base_screen, vec2(PIXELGRID_SIZE_W, PIXELGRID_SIZE_H));
@@ -405,16 +455,15 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         vec2 period_multiply = vec2(PIXELGRID_MUL_X, PIXELGRID_MUL_Y);
         if (period_multiply.x < 0.0) period_multiply.x = 1/-period_multiply.x;  //goes FIXME in vertex shader
         if (period_multiply.y < 0.0) period_multiply.y = 1/-period_multiply.y;
-        freq_base /= period_multiply;
+        freq_base /= period_multiply;//*10;
 
 
-    float triad_spacing = (pi / PIXELGRID_SPACING);
 
-    //ricavo i 3 periodi e offset per i 3 seni verticali
-        vec3 freq_rgb = vec3(freq_base.x) + vec3(triad_spacing, 0.0, -triad_spacing);
+
+        vec3 freq_rgb = vec3(freq_base.x) - vPG_offsets;
 
     //ricavo i 3 seni in bianco e nero
-        vec3 rgb_w = sin(freq_rgb);
+        vec3 rgb_w = cos(freq_rgb);
 
     //li rendo sempre positivi
         rgb_w = (rgb_w * rgb_w);
@@ -422,6 +471,8 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
     //modulo la larghezza della triade in base alla luminosità del pixel in ingresso
         vec3 larghezza_fosforo = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
         rgb_w = morph_shape(rgb_w, larghezza_fosforo, PIXELGRID_NO_INTERBLEED);
+
+        //return vec4(rgb_w, 1.0);
 
     //modulo le altezza di ogni elemento della triade in base alla luminosità del pixel in ingresso
         vec3 altezza_fosforo = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
