@@ -611,7 +611,7 @@ float fn_scanline_mask(vec2 coords, bool do_slotmask, float lum, float min_inLum
 
     float period = vScanlinePeriod;
     bool is_interlaced = bool(vIsInterlaced);
-    bool do_flicker = bool(vFlickeringScanlines);
+    //bool do_flicker = bool(vFlickeringScanlines);
     
     //since luminosity is used to modulate scanline thickness, we scale it here
     //to keep tickness in user defined range:
