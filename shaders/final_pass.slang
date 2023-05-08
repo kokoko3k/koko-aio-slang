@@ -26,7 +26,6 @@ layout(location = 4) out float vIsRotated;
 
 //Scanlines:
     layout(location = 7) out float vIsInterlaced;
-    
     layout(location = 9) out float vScanlinePeriod;
     layout(location = 10) out float vScanlineAlternateOffset;
     layout(location = 11) out float vMax_inLum;
@@ -487,8 +486,10 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         float is_even2 = step(sin_check_offset2, 0.0);
         float core_offset =  is_even2 * pi * PIXELGRID_OFFSET_CORE;
         
+        float interlacing_adapt_period = vScanlinePeriod;
+        float interlacing_adapt_offset = vScanlineAlternateOffset;
         
-        float rgb_h_sin = sin(freq_base.y + core_offset   );
+        float rgb_h_sin = sin(freq_base.y * interlacing_adapt_period + core_offset + interlacing_adapt_offset );
         
         rgb_h_sin = (rgb_h_sin * rgb_h_sin);
         vec3 rgb_h = vec3(rgb_h_sin);

@@ -168,7 +168,11 @@ vec2 zoomout_coords(vec2 in_coords, float zoom_out, float aspect) {
 }
 
 bool scanline_have_to_flicker(bool is_interlaced) {
-    return ((SCANLINE_FLICKERING == 1.0) || ((SCANLINE_FLICKERING==2.0) && is_interlaced ));
+    //Since, by now,  scanlines and pixelgrid provides flickering "directives", handle both here.
+	float scanline_flickering = max( DO_SCANLINES * SCANLINE_FLICKERING, 
+									 DO_PIXELGRID * PIXELGRID_INTR_FLICK_MODE);
+	
+    return ((scanline_flickering == 1.0) || ((scanline_flickering==2.0) && is_interlaced ));
 }
 
 bool is_interlaced() {

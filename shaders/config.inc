@@ -116,7 +116,7 @@
 
 // MISC STATIC CONFIG ##########################################################################################
 	//Consider content interlaced if lines are more than this
-#define MIN_LINES_INTERLACED 380
+#define MIN_LINES_INTERLACED 0.380
 
 	//Static dithering applied over vignette and spot
 #define NOISEPOWER 5/1000.0
@@ -377,6 +377,11 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float PIXELGRID_MUL_Y;
 	float PIXELGRID_OFFSET_CORE;
 	float PIXELGRID_NO_INTERBLEED;
+	
+	float PIXELGRID_INTR_FLICK_MODE;
+	float PIXELGRID_INTR_FLICK_POWR;
+	float PIXELGRID_INTR_DISABLE_Y;
+	
 	float PIXELGRID_Y_MASK;
 	float PIXELGRID_Y_MASK_ON_WHITE;
 	float PIXELGRID_Y_MASK_HEIGHT;
@@ -483,6 +488,9 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BLANK9 " " 0.0 0.0 1.0 1.0
 
 
+#pragma parameter TATE                     "★ Tate mode (1:auto 2:forced)"		0.0 	0.0 2.0 1.0
+#pragma parameter BLANK7a " " 0.0 0.0 1.0 1.0
+
 // pixel Grid
 #pragma parameter DO_PIXELGRID		"★  Low level Phosphor grid (NOT with scanlines or masks) ==>"	0.0 0.0 1.0 1.0
 #pragma parameter PIXELGRID_SIZE_W  "        X resolution: (core or screen)"	1.0 0.0 1.0 1.0
@@ -498,13 +506,18 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter PIXELGRID_MUL_X   "           . Cell size multiplier x (neg=divider):"	1.0 -4.0 4.0 1.0
 
 
-#pragma parameter PIXELGRID_SIZE_H     "        Y resolution: (core for scanlines or screen)"	0.0 0.0 1.0 1.0
-#pragma parameter PIXELGRID_MUL_Y   "           . Cell size multiplier y (neg=divider):"	1.0 -4.0 4.0 1.0
-#pragma parameter PIXELGRID_MIN_H	"           . Phosphors height Min"			0.2 0.0 1.0 0.05
-#pragma parameter PIXELGRID_MAX_H         "           . Phosphors height Max"			0.6 0.0 1.0 0.05
-#pragma parameter PIXELGRID_OFFSET_CORE   "           . Core slotmask offset (0.25 ok)"	0.0 0.0 1.0 0.01
+#pragma parameter PIXELGRID_SIZE_H          "        Y resolution: (core for scanlines or screen)"	0.0 0.0 1.0 1.0
+#pragma parameter PIXELGRID_MUL_Y           "           . Cell size multiplier y (neg=divider):"	1.0 -4.0 4.0 1.0
+#pragma parameter PIXELGRID_MIN_H	        "           . Phosphors height Min"			0.2 0.0 1.0 0.05
+#pragma parameter PIXELGRID_MAX_H           "           . Phosphors height Max"			0.6 0.0 1.0 0.05
+#pragma parameter PIXELGRID_OFFSET_CORE     "           . Core slotmask offset (0.25 ok)"	0.0 0.0 1.0 0.01
 #pragma parameter PIXELGRID_NO_INTERBLEED	"        Avoid inter-cell bleeding"					0.0 0.0 100.0 100.0
 
+#pragma parameter BLANK12f " " 0.0 0.0 1.0 1.0
+
+#pragma parameter PIXELGRID_INTR_FLICK_MODE "        Interlace Flicker (0=off,1=on,2=if interlaced)"		2.0 	0.0 2.0 1.0
+#pragma parameter PIXELGRID_INTR_FLICK_POWR "           . Interlace Flicker power"		  		0.25 	0.0 8.0 0.01
+#pragma parameter PIXELGRID_INTR_DISABLE_Y  "           . Disable on interlaced screen"			  	0.0 	0.0 1.0 1.0
 
 #pragma parameter BLANK12e " " 0.0 0.0 1.0 1.0
 
@@ -521,8 +534,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 //#pragma parameter PIXELGRID_SMOOTH_H "       Phosphors height smoothness"   0.1 0.01 1.0 0.01
 
 
-#pragma parameter TATE                     "★ Tate mode (1:auto 2:forced)"		0.0 	0.0 2.0 1.0
-#pragma parameter BLANK7a " " 0.0 0.0 1.0 1.0
 
 // Scanlines
 #pragma parameter DO_SCANLINES	         "★ Scanlines enable? (NOT with dot matrix!) ==>"						0.0 	0.0  1.0 1.0

@@ -7,6 +7,8 @@ layout(location = 1) in vec2 TexCoord;
 
 layout(location = 0) out vec2 vTexCoord;
 layout(location = 1) out float vDynamicSeed;
+layout(location = 2) out float vFlickering_power;
+layout(location = 3) out float vDo_flickering;
 
 #include "includes/functions.include.slang"
 
@@ -17,12 +19,21 @@ void main() {
    
    //Generate a seed that changes over time for temporal random noise
       vDynamicSeed = mod(params.FrameCount, 120.0001);
+      
+   //Since, by now, scanlines and pixelgrid provides flickering "directives", handle both here.
+      vFlickering_power = SCANLINE_FLICKERING_POWER;
+      vFlickering_power = max( DO_SCANLINES * SCANLINE_FLICKERING_POWER, 
+                               DO_PIXELGRID * PIXELGRID_INTR_FLICK_POWR );
+   
+    vDo_flickering  = float ( scanline_have_to_flicker(is_interlaced()) ) ; 
 }
 
 
 #pragma stage fragment
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in float vDynamicSeed;
+layout(location = 2) in float vFlickering_power;
+layout(location = 3) in float vDo_flickering;
 
 layout(location = 0) out vec4 FragColor;  
 
@@ -66,7 +77,7 @@ vec3 pixel_flickering() {
 
    float lumdiff = abs(flickline.r + flickline.g + flickline.b - pixel_cur.r - pixel_cur.g - pixel_cur.b);
 
-   lumdiff = min(lumdiff * SCANLINE_FLICKERING_POWER, 1.0);
+   lumdiff = min(lumdiff * vFlickering_power, 1.0);
    return mix(pixel_cur,flickline,lumdiff);
    
 
@@ -143,10 +154,10 @@ void main() {
    */
 
    vec3 pixel_out;
-   if (DO_SCANLINES == 0.0)
+   if (DO_SCANLINES + DO_PIXELGRID == 0.0)
       pixel_out = texture(Source, vTexCoord).rgb;
    
-   else if (scanline_have_to_flicker(is_interlaced()))
+   else if (vDo_flickering==1.0) 
       pixel_out = pixel_flickering();
    else
    //Implicit else: DO_SCANLINES == 1.0 but no flickering needed.
