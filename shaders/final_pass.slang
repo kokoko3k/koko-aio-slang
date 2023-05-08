@@ -39,6 +39,7 @@ layout(location = 15) out float vVmask_gap;
 layout(location = 16) out float vFcol_Tated;
 layout(location = 17) out float vDo_Tate;
 layout(location = 18) out vec3 vDotMat_Grid_Color;
+layout(location = 19) out vec4 vPG_mask_type;
 
 #include "includes/functions.include.slang"
 
@@ -66,7 +67,7 @@ void main() {
 
 
     vec2 vFragCoord = vec2( floor(vOutputCoord.x * params.OutputSize.x),
-                       floor(vOutputCoord.y * params.OutputSize.y));
+                            floor(vOutputCoord.y * params.OutputSize.y));
 
     vDo_Tate = float(TATE+vIsRotated > 1.001);
     vFragCoord_Tated = mix_step(vFragCoord.xy, vFragCoord.yx, vDo_Tate );
@@ -124,6 +125,9 @@ void main() {
                 //Since we modify grid brightness via a specific use parameter, explicitely multiply it by that:
                     vDotMat_Grid_Color *= DOT_M_G_BRT ;
             }
+            
+        //pixelgrid, mask type
+            vPG_mask_type = PG_get_hmask_preset();
 }
 
 
@@ -147,6 +151,7 @@ layout(location = 15) in float vVmask_gap;
 layout(location = 16) in float vFcol_Tated;
 layout(location = 17) in float vDo_Tate;
 layout(location = 18) in vec3 vDotMat_Grid_Color;
+layout(location = 19) in vec4 vPG_mask_type;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -375,6 +380,8 @@ vec3 smoothstep_fast(vec3 edge0, vec3 edge1, vec3 x) {
   return mix(vec3(0.0), vec3(1.0), t);
 }
 
+
+
 vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inLum) {
                                                                                             //FIXME: a lot of this gan go in vertex shader.
     
@@ -393,56 +400,18 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         
       
     //Set preset mask or fallback to manual one.
-        /* Common masks:
-            * 1 gm   : mask size = 2 | offsets=1,0,1  | width=0.3
-            * 2 gmx  : mask size = 3 | offsets=1,0,1  | width=0.25
-            * 3 rgb  : mask size = 3 | offsets=0,1,2  | width=0.25
-            * 4 rgbx : mask size = 4 | offsets=0,1,2  | width=0.20
-            * 3 rbg  : mask size = 3 | offsets=0,1,2  | width=0.25
-            * 4 rbgx : mask size = 4 | offsets=0,1,2  | width=0.20
-        */
-        float vPG_h_count = PIXELGRID_H_COUNT;
-        vec3 vPG_offsets = vec3(PIXELGRID_R_SHIFT,PIXELGRID_G_SHIFT,PIXELGRID_B_SHIFT);
+        //vec4 mask_preset = PG_get_hmask_preset();
+        float PG_h_count = vPG_mask_type.a;// mask_preset.a;
+        vec3  PG_offsets =  vPG_mask_type.rgb;// mask_preset.rgb;
 
-        if (PIXELGRID_H_PRST == 1.0) {
-            vPG_offsets = vec3(0,1,0); //gm
-            vPG_h_count = 2;
-        }
-
-        if (PIXELGRID_H_PRST == 2.0) {
-            vPG_offsets = vec3(1,0,1); //gmx
-            vPG_h_count = 3;
-        }
-
-        if (PIXELGRID_H_PRST == 3.0) {
-            vPG_offsets = vec3(0,1,2); //rgb
-            vPG_h_count = 3;
-        }
-
-        if (PIXELGRID_H_PRST == 4.0) {
-            vPG_offsets = vec3(0,1,2); //rgbx
-            vPG_h_count = 4;
-        }
-
-        if (PIXELGRID_H_PRST == 5.0) {
-            vPG_offsets = vec3(0,2,1); //rbg
-            vPG_h_count = 3;
-        }
-
-        if (PIXELGRID_H_PRST == 6.0) {
-            vPG_offsets = vec3(0,2,1); //rbgx
-            vPG_h_count = 4;
-        }
-
-        
     //ricavo i 3 periodi e offset per i 3 seni verticali
-        vPG_offsets = vPG_offsets.rgb * (pi / vPG_h_count);
+        PG_offsets = PG_offsets.rgb * (pi / PG_h_count);
 
         vec2 freq_base_core   = pi * in_coords * l_OriginalSize ;
-        vec2 freq_base_screen = pi * vec2(1/vPG_h_count, 0.5);
-        freq_base_screen = pi * vec2(1/vPG_h_count, 0.5) * floor(l_vOutputCoord * l_OutputSize);
+        vec2 freq_base_screen = pi * vec2(1/PG_h_count, 0.5);
+        freq_base_screen = pi * vec2(1/PG_h_count, 0.5) * floor(l_vOutputCoord * l_OutputSize);
         //the following is needed by sin/cos later to understand if we are on an even or odd mask
-        vec2 freq_base_screen_unfloored = pi * vec2(1/vPG_h_count, 0.5) * (l_vOutputCoord * l_OutputSize);   //FIXME: ho bisogno della sola x unfloored.
+        vec2 freq_base_screen_unfloored = pi * vec2(1/PG_h_count, 0.5) * (l_vOutputCoord * l_OutputSize);   //FIXME: ho bisogno della sola x unfloored.
 
 
     //Switch between core and screen sizes (x and y)
@@ -460,7 +429,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
 
 
 
-        vec3 freq_rgb = vec3(freq_base.x) - vPG_offsets;
+        vec3 freq_rgb = vec3(freq_base.x) - PG_offsets;
 
     //ricavo i 3 seni in bianco e nero
         vec3 rgb_w = cos(freq_rgb);

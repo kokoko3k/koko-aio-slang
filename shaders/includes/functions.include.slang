@@ -783,3 +783,36 @@ bool is_first_inside_rect(vec2 point, vec4 rect) {
 
 	return pixel_out;
 	}
+
+vec4 PG_get_hmask_preset() {
+    /* Common masks:
+    * 1 gm   : mask size = 2 | offsets=1,0,1  | width=0.3
+    * 2 gmx  : mask size = 3 | offsets=1,0,1  | width=0.25
+    * 3 rgb  : mask size = 3 | offsets=0,1,2  | width=0.25
+    * 4 rgbx : mask size = 4 | offsets=0,1,2  | width=0.20
+    * 3 rbg  : mask size = 3 | offsets=0,1,2  | width=0.25
+    * 4 rbgx : mask size = 4 | offsets=0,1,2  | width=0.20
+    */
+    if (PIXELGRID_H_PRST == 1.0) // manual mask and size
+        return vec4( PIXELGRID_R_SHIFT, PIXELGRID_G_SHIFT, PIXELGRID_B_SHIFT, PIXELGRID_H_COUNT);
+    
+    if (PIXELGRID_H_PRST == 1.0)
+        return vec4( vec3(0,1,0), 2); // gm, mask size 2
+
+    if (PIXELGRID_H_PRST == 2.0)
+        return vec4( vec3(1,0,1), 3); //gmx, mask size 3
+
+    if (PIXELGRID_H_PRST == 3.0)
+        return vec4( vec3(0,1,2), 3); //rgb, mask size 3
+
+    if (PIXELGRID_H_PRST == 4.0)
+        return vec4( vec3(0,1,2), 4); //rgbx, mask size 4
+
+    if (PIXELGRID_H_PRST == 5.0)
+        return vec4( vec3(0,2,1), 3); //rbg, mask size 3
+
+    if (PIXELGRID_H_PRST == 6.0)
+        return vec4( vec3(0,2,1), 4); //rbgx, mask size 4
+
+        
+}
