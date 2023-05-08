@@ -793,7 +793,7 @@ vec4 PG_get_hmask_preset() {
     * 3 rbg  : mask size = 3 | offsets=0,1,2  | width=0.25
     * 4 rbgx : mask size = 4 | offsets=0,1,2  | width=0.20
     */
-    if (PIXELGRID_H_PRST == 1.0) // manual mask and size
+    if (PIXELGRID_H_PRST == 0.0) // manual mask and size
         return vec4( PIXELGRID_R_SHIFT, PIXELGRID_G_SHIFT, PIXELGRID_B_SHIFT, PIXELGRID_H_COUNT);
     
     if (PIXELGRID_H_PRST == 1.0)
