@@ -229,7 +229,9 @@
                 When you set maximum width/height to anything > 0.5, the phosphor light will bleed over
                 the adiacent (left/right up/down) one so that they will start to blend togheter.
                 This option will avoid the bleeding.
-                You may want them to merge or not, depending on your preference to see a visible "grid"/lines
+                You may want them to merge or not, depending on your preference to see a visible "grid"/lines.
+                This function is useful when you want to emulate handhelds screens, 
+                where cells are well separated.
                 
             Interlace Flicker (0=off,1=on,2=if interlaced):
                 Since we can emulate scanline appearence, here we deal with interlaced content too.
