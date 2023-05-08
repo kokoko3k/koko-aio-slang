@@ -156,7 +156,6 @@ layout(location = 19) in vec4 vPG_mask_type;
 layout(location = 0) out vec4 FragColor;
 
 
-
 layout(set = 0, binding = 1) uniform sampler2D backdrop;
 layout(set = 0, binding = 2)  uniform sampler2D bloom_pass_final;
 layout(set = 0, binding = 3)  uniform sampler2D reflected_blurred_pass;
