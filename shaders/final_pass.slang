@@ -26,7 +26,7 @@ layout(location = 4) out float vIsRotated;
 
 //Scanlines:
     layout(location = 7) out float vIsInterlaced;
-    layout(location = 8) out float vFlickeringScanlines;
+    
     layout(location = 9) out float vScanlinePeriod;
     layout(location = 10) out float vScanlineAlternateOffset;
     layout(location = 11) out float vMax_inLum;
@@ -86,7 +86,7 @@ void main() {
         if (DO_SCANLINES > 0.5) {
             bool bIs_Interlaced = is_interlaced();
             vIsInterlaced = float(bIs_Interlaced);
-            vFlickeringScanlines = float((DO_SCANLINES == 1.0) && scanline_have_to_flicker(bIs_Interlaced)) ;
+            
 
             //Scanline period:
             vScanlinePeriod = 1.0;
@@ -137,7 +137,7 @@ layout(location = 4) in float vIsRotated;
 layout(location = 5) in vec2 vWarp_vexp;
 layout(location = 6) in vec2 vWarp_arg2;
 layout(location = 7) in float vIsInterlaced;
-layout(location = 8) in float vFlickeringScanlines;
+
 layout(location = 9) in float vScanlinePeriod;
 layout(location = 10) in float vScanlineAlternateOffset;
 layout(location = 11) in float vMax_inLum;
@@ -611,7 +611,7 @@ float fn_scanline_mask(vec2 coords, bool do_slotmask, float lum, float min_inLum
 
     float period = vScanlinePeriod;
     bool is_interlaced = bool(vIsInterlaced);
-    //bool do_flicker = bool(vFlickeringScanlines);
+    
     
     //since luminosity is used to modulate scanline thickness, we scale it here
     //to keep tickness in user defined range:
