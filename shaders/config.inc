@@ -116,7 +116,7 @@
 
 // MISC STATIC CONFIG ##########################################################################################
 	//Consider content interlaced if lines are more than this
-#define MIN_LINES_INTERLACED 0.380
+#define MIN_LINES_INTERLACED 380
 
 	//Static dithering applied over vignette and spot
 #define NOISEPOWER 5/1000.0
