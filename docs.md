@@ -70,7 +70,10 @@
     Show NTSC artifacts mask (debug)
         This will help you to set the previous 2 values as it will show only
         the artifacts that will modify the blur.
-    
+
+**Tate mode:**<br>
+    Rotates mask and scanlines by 90°<br>
+        
 **Masks and/or Darklines:**<br>
     Emulates CRT RGB phosphors (RGB Mask),<br>
     slotmasks and aperturegrille (Darklines).
@@ -112,9 +115,6 @@
     Darklines: affect bright colors:
         See "RGB Mask: affect bright colors"
 
-**Tate mode:**<br>
-    Rotates mask and scanlines by 90°<br>
-    
 **Scanlines:**<br>
     Emulate CRT scanlines.<br>
     
@@ -158,6 +158,108 @@
         This is the slotmask offset/stagger, (available on type 1 only)
         Keep it around 79 or all the way to max
 
+**Low level phosphor grid**<br>
+    Being hhis is another way to produce horizontal masks, scanlines and aperturegrille/slotmasks,<br>
+    you should not enable this with any of the other functions that do the same thing.<br>
+    Parameters are trickier to setup, but possibilities are much more and while achievable quality can be<br>
+    higher even at 1080p, it should be great at higher resolutions.<br>
+    By reading the following explanaitions, you will realize that this section can also be used to emulate<br>
+    handhelds screens, where pixels you see on screen have to be sized proportionally to the game one.<br>
+    
+    X resolution: (core or screen) (**):
+        0: Phosphors width will be relative to the pixel width of the core (game).
+        1: Phosphors width will be relative to the pixel width of the screen.
+        Phosphors width Min, Max:
+            The width of each phosphor can grow or whrink, depending on the
+            luminosity of the underlying pixel luminance.
+            Use Mix and Max parameter to limit the minimum and maximum size
+            they can reach.
+        Mask type preset:
+            You can have the shader generate a preconfigured mask for you:
+            1:gm 2:gmx 3:rgb 4:rgbx 5:rbg 6:rbgx
+            ...or with 0, you can draft your own by using the following knobs:
+                Phosphors+gap count (mask size):
+                    How much phosphors or blank spaces the final mask will have.
+                R,G,B, Shift:
+                    The position of every phosphor.
+                Example 1: Phosphors+gap count=4 and R=0 G=1 B=2
+                ...will give you a mask with red,green,blue and a blank space.
+                Example 2: Phosphors+gap count=2 and R=1 G=0 B=1
+                ...will give a mask with green + a mix of blue and red (magenta)
+                Example 3: Phosphors+gap count=3 and R=1 G=1 B=1
+                ...will give a mask with a blank space, the neutral white color and another blank space
+                Example 4: Phosphors+gap count=1 and R=0 G=0 B=0
+                ...like the previous one, but without any blank spaces.
+            Cell size multiplier x (neg=divider):
+                Multiply (or divide if the parameter is < 0) the mask (cell) size by a factor.
+                As stated(**), the size may be relative to screen or core, this allow you to
+                "zoom" the cell horizontally and can be useful if you have an HiDPI screen.
+                For example, you may choose to use screen sized masks and zoom them by a factor
+                of 2 or 3 to make room for phosphors and see them visually grow in width.
+                Likewise, you can use core/game(**) sized masks and divide them by a factor
+                if they appears too big.
+                
+            Y resolution: (core for scanlines or screen), height min/max:
+                See X resolution parameter just explained (**),  all similarly named parameters
+                will refer to the phosphors height instead od the width.
+                
+                The core setting here assumes a particular meaning tho, because setting it so along
+                with a multiplier = 1 allows you to emulate scanlines.
+                This works because the phosphors will grow in height no more than the size
+                of a source (game) row, so that if you set the maximum height to something lower
+                than 1.0, the remaining blank part will actually acts like a scanline gap.
+                
+                Slotmask offset(*):
+                    This will cause every cell to be vertically shifted by the configured amount to
+                    emulate a slotmask phosphors layout.
+                    It is true that for accurate reproduction of them, slotmasks are commonly emulated
+                    at screen size, but this causes, on low resolution displays, weird artifacts,
+                    primarily when using curvature and when you try to draw scanlines -and- slotmasks.
+                    Here there is an added value given by the fact that the shift itself
+                    can be relative to not only to the screen pixel height, but to game pixel height. (**)
+                    By selecting Y resolution=0 (so core coordinates**) and enabling this slotmask offset,
+                    you will have a staggered scanline.
+                    This allows you to not drawing a scanline -and- a slotmask, but to draw a "slotmasked"
+                    scanline.
+                    While this does not exist at all in crt technology, it greatly mitigates the artifacts
+                    just explained while producing a fairly convincing effect, very similar to a screen
+                    with visible scanlines and visible slotmask.
+                
+            Avoid intercell bleeding:
+                When you set maximum width/height to anything > 0.5, the phosphor light will bleed over
+                the adiacent (left/right up/down) one so that they will start to blend togheter.
+                This option will avoid the bleeding.
+                You may want them to merge or not, depending on your preference to see a visible "grid"/lines
+                
+            Interlace Flicker (0=off,1=on,2=if interlaced):
+                Since we can emulate scanline appearence, here we deal with interlaced content too.
+                This setting emulates the flickering issues present on crt interlaced screens
+                where the brighter lines flickers when they are near dark ones.
+                You can choose to produce the flickering: never, always or only 
+                when the input picture is considered interlaced.
+                The threshold for that is defined in config.inc with the parameter: MIN\_LINES\_INTERLACED.
+            Interlace Flicker power: The strength of the effect.
+            Disable on interlaced screen:
+                You may want to avoid drawing scanlines gaps when interlaced content is found (currently unimplemented)
+            
+            Vertical cell Mask:
+                Phosphor masks are usually vertically delimited by thin lines.
+                This parameter will set the visibility of them.
+                
+                Resolution: (core or screen)
+                    Should the vertical interval (height) between those likes be relative to screen or core pixel size?
+                Height (inverted): The more, the less that intervall will be.
+                Fadeout under light: How much they will be visible over bright pixels.
+                Steepness: 
+                    The more, the thinner they will be.
+                    Setting this to very high values, may make them disappear unevenly.
+                Even/odd offset:
+                    If you not used, the previous section to emulate scanlines(*), but still want to emulate
+                    slotmasks layouts, you can set this to 1.0.
+                    You can draw slotmasks at screen coordinates to emulate real crts or choose to paint
+                    them at core coordinates to have a more defined slotmask
+                    ...if you like slotmasks so much :-)
+        
 **Dot matrix emulation:**<br>
     Emulates low refresh "boxed" screens used in old handheld consoles.<br>
     
