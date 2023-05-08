@@ -372,7 +372,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float PIXELGRID_SIZE_H;
 	float PIXELGRID_SMOOTH_H;
 	float PIXELGRID_SMOOTH_W;
-	float PIXELGRID_SPACING;
+	//float PIXELGRID_SPACING;
 	float PIXELGRID_MUL_X;
 	float PIXELGRID_MUL_Y;
 	float PIXELGRID_OFFSET_CORE;
@@ -502,7 +502,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter PIXELGRID_R_SHIFT "           .     0: R shift"      0.0  0.0 4.0 0.1
 #pragma parameter PIXELGRID_G_SHIFT "           .     0: G shift"      1.0  0.0 4.0 0.1
 #pragma parameter PIXELGRID_B_SHIFT "           .     0: B shift"      2.0  0.0 4.0 0.1
-#pragma parameter PIXELGRID_SPACING "           . RGB spacing"      1.0 0.0 2.0 0.01
+//#pragma parameter PIXELGRID_SPACING "           . RGB spacing"      1.0 0.0 2.0 0.01
 #pragma parameter PIXELGRID_MUL_X   "           . Cell size multiplier x (neg=divider):"	1.0 -4.0 4.0 1.0
 
 

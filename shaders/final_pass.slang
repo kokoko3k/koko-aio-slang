@@ -437,10 +437,6 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         
     //ricavo i 3 periodi e offset per i 3 seni verticali
         vPG_offsets = vPG_offsets.rgb * (pi / vPG_h_count);
-    //modulo la tightness
-        //vPG_offsets *= PIXELGRID_SPACING;
-
-
 
         vec2 freq_base_core   = pi * in_coords * l_OriginalSize ;
         vec2 freq_base_screen = pi * vec2(1/vPG_h_count, 0.5);
