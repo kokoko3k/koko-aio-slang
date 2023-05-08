@@ -485,10 +485,10 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 // pixel Grid
 #pragma parameter DO_PIXELGRID		"★  Low level Phosphor grid (NOT with scanlines or masks) ==>"	0.0 0.0 1.0 1.0
-#pragma parameter PIXELGRID_SIZE_W  "        X resolution: (core or screen)"	0.0 0.0 1.0 1.0
-#pragma parameter PIXELGRID_MIN_W   "           . Phosphors width Min"			0.1 0.05 1.0 0.01
-#pragma parameter PIXELGRID_MAX_W   "           . Phosphors width Max"			0.3 0.05 1.0 0.01
-#pragma parameter PIXELGRID_H_PRST  "           . Mask type preset (0: for manual)"  1.0 0.0 6.0 1.0
+#pragma parameter PIXELGRID_SIZE_W  "        X resolution: (core or screen)"	1.0 0.0 1.0 1.0
+#pragma parameter PIXELGRID_MIN_W   "           . Phosphors width Min"			0.25 0.05 1.0 0.01
+#pragma parameter PIXELGRID_MAX_W   "           . Phosphors width Max"			0.25 0.05 1.0 0.01
+#pragma parameter PIXELGRID_H_PRST  "           . Mask type preset (0: for manual)"  3.0 0.0 6.0 1.0
 #pragma parameter PG_LABEL1         "           . (1:gm 2:gmx 3:rgb 4:rgbx 5:rbg 6:rbgx)"  0.0 0.0 0.0 0.0
 #pragma parameter PIXELGRID_H_COUNT "           .     0: Phosphors+gap count (mask size)"	3.0 1.0 4.0  1.0
 #pragma parameter PIXELGRID_R_SHIFT "           .     0: R shift"      0.0  0.0 4.0 0.1
@@ -509,11 +509,11 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BLANK12e " " 0.0 0.0 1.0 1.0
 
 #pragma parameter PIXELGRID_Y_MASK           "        Vertical cell Mask"	0.0 0.0 1.0 0.05
-#pragma parameter PIXELGRID_Y_MASK_COORDS    "           . Resolution: (core or screen)"	0.0 0.0 1.0 1.0
+#pragma parameter PIXELGRID_Y_MASK_COORDS    "           . Resolution: (core or screen)"	1.0 0.0 1.0 1.0
 #pragma parameter PIXELGRID_Y_MASK_HEIGHT    "           . Height (inverted)"	0.75 0.0 3.0 0.01
 #pragma parameter PIXELGRID_Y_MASK_OFFSET    "           . Even/odd offset"	1.0 0.0 1.0 1.0
-#pragma parameter PIXELGRID_Y_MASK_ON_WHITE  "           . Fadeout under light"	0.5 0.0 1.0 0.01
-#pragma parameter PIXELGRID_Y_MASK_STEEP     "           . Steepness"	2.0 1.0 30.0 1.0
+#pragma parameter PIXELGRID_Y_MASK_ON_WHITE  "           . Fadeout under light"	0.0 0.0 1.0 0.01
+#pragma parameter PIXELGRID_Y_MASK_STEEP     "           . Steepness"	30.0 1.0 30.0 1.0
 
 #pragma parameter BLANK12d " " 0.0 0.0 1.0 1.0
 

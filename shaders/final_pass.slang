@@ -377,6 +377,9 @@ vec3 smoothstep_fast(vec3 edge0, vec3 edge1, vec3 x) {
 }
 
 vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inLum) {
+                                                                                            //FIXME: a lot of this gan go in vertex shader.
+    
+    
     //Tate ?
         vec2 l_OutputSize   = params.OutputSize.xy;
         vec2 l_vOutputCoord = vOutputCoord.xy + vec2(0.00001);
@@ -403,7 +406,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         vec3 vPG_offsets = vec3(PIXELGRID_R_SHIFT,PIXELGRID_G_SHIFT,PIXELGRID_B_SHIFT);
 
         if (PIXELGRID_H_PRST == 1.0) {
-            vPG_offsets = vec3(1,0,1); //gm
+            vPG_offsets = vec3(0,1,0); //gm
             vPG_h_count = 2;
         }
 
@@ -432,8 +435,9 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             vPG_h_count = 4;
         }
 
+        
     //ricavo i 3 periodi e offset per i 3 seni verticali
-        vPG_offsets = vPG_offsets * (pi / vPG_h_count);
+        vPG_offsets = vPG_offsets.rgb * (pi / vPG_h_count);
     //modulo la tightness
         //vPG_offsets *= PIXELGRID_SPACING;
 
@@ -441,13 +445,14 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
 
         vec2 freq_base_core   = pi * in_coords * l_OriginalSize ;
         vec2 freq_base_screen = pi * vec2(1/vPG_h_count, 0.5);
-        //ho bisogno di una "densità" di precisione per il seno uguale al numero di fosfori da emulare
-        //per cui dipenderà dalla maschera per la x e per la y posso lasciare 1.0
-        freq_base_screen *= vec2( floor(l_vOutputCoord.x * l_OutputSize.x * 1.0) / 1.0,
-                                  floor(l_vOutputCoord.y * l_OutputSize.y * 1.0 ) /1.0 );
+        freq_base_screen = pi * vec2(1/vPG_h_count, 0.5) * floor(l_vOutputCoord * l_OutputSize);
+        //the following is needed by sin/cos later to understand if we are on an even or odd mask
+        vec2 freq_base_screen_unfloored = pi * vec2(1/vPG_h_count, 0.5) * (l_vOutputCoord * l_OutputSize);   //FIXME: ho bisogno della sola x unfloored.
+
 
     //Switch between core and screen sizes (x and y)
-        vec2 freq_base = mix(freq_base_core, freq_base_screen, vec2(PIXELGRID_SIZE_W, PIXELGRID_SIZE_H));
+        vec2 freq_base           = mix(freq_base_core, freq_base_screen, vec2(PIXELGRID_SIZE_W, PIXELGRID_SIZE_H));
+        vec2 freq_base_unfloored = mix(freq_base_core, freq_base_screen_unfloored, vec2(PIXELGRID_SIZE_W, PIXELGRID_SIZE_H));
         vec2 mask_size = mix(params.OriginalSize.xy, l_OutputSize, vec2(PIXELGRID_SIZE_W,PIXELGRID_SIZE_H)); 
         
 
@@ -456,7 +461,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         if (period_multiply.x < 0.0) period_multiply.x = 1/-period_multiply.x;  //goes FIXME in vertex shader
         if (period_multiply.y < 0.0) period_multiply.y = 1/-period_multiply.y;
         freq_base /= period_multiply;//*10;
-
+        freq_base_unfloored /= period_multiply;
 
 
 
@@ -478,7 +483,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         vec3 altezza_fosforo = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
         
     //offset trias to emulate core level slotmask
-        float sin_check_offset2 = sin(freq_base.x);
+        float sin_check_offset2 = sin(freq_base_unfloored.x);
         float is_even2 = step(sin_check_offset2, 0.0);
         float core_offset =  is_even2 * pi * PIXELGRID_OFFSET_CORE;
         
@@ -493,12 +498,13 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         
 
         
-    //Calcolo una maschera per la separazione dei fosfori
+    //Calcolo una maschera per la separazione verticale dei fosfori
         
         //per capire se siamo nella triade pari o dispari, possiamo usare il segno del seno
         //di periodo freq_base con uno step per avere 1 o 0.
-            float sin_check_offset = sin(freq_base.x);
+            float sin_check_offset = sin(freq_base_unfloored.x);
             float is_even = step(sin_check_offset, 0.0);
+            //return vec4(is_even);
             //return vec4(sin_check_offset*rgb_w.rgb, 1.0);
             
         //Ricavo la frequenza da usare per la y (core o screen) a seconda del parametro PIXELGRID_Y_MASK_COORDS
@@ -510,7 +516,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             #define PH_MASH_OFFSET  (PIXELGRID_Y_MASK_OFFSET * pi * 0.5  )
             
         //Ricava i gap orizzontali tramite 1-seni elevati a potenza per renderli "ripidi" sui fianchi
-            float mask_shape = sin(PH_MASK_HEIGHT  + (PH_MASH_OFFSET * is_even)) ;
+            float mask_shape = abs(sin(PH_MASK_HEIGHT  + (PH_MASH_OFFSET * is_even))) ;
             mask_shape = pow(mask_shape, PIXELGRID_Y_MASK_STEEP);
             
         //Get per channel input luminance by clamping pixel_in
@@ -518,11 +524,11 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         //Adapt the luminance effect via input parameter
             vec3 lum_adapted = (1-lum*PIXELGRID_Y_MASK_ON_WHITE);
         //Calc final mask visibility as the minimum between tha configured visibility and luminosity effect
-            vec3 V= min( lum_adapted, vec3(PIXELGRID_Y_MASK) );
+            vec3 V=min( lum_adapted, vec3(PIXELGRID_Y_MASK) );
         //apply visibility to the mask
             vec3 darklines_mask=1-(mask_shape*V);
         
-     //return vec4(darklines_mask, 1.0);
+        //return vec4(vec3(darklines_mask), 1.0);
      
      
         
@@ -538,7 +544,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
     vec3 pixel_out = mix(pixel_masked, mask, 0.0);
     
     //out, nell'alfa ci va la maschera ad uso selettivo halo
-    return vec4(pixel_out, dot(mask, vec3(0.3333) )) ;
+    return vec4(pixel_out, dot(mask, vec3(0.3333) ));
 
 
 }
