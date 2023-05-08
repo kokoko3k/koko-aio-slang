@@ -529,7 +529,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter PIXELGRID_MIN_H	        "           . Phosphors height Min"			0.2 0.0 1.0 0.05
 #pragma parameter PIXELGRID_MAX_H           "           . Phosphors height Max"			0.6 0.0 1.0 0.05
 #pragma parameter PIXELGRID_OFFSET_CORE     "           . Slotmask offset (0.25 ok)"	0.0 0.0 1.0 0.01
-#pragma parameter PIXELGRID_NO_INTERBLEED	"        Avoid inter-cell bleeding"					0.0 0.0 100.0 100.0
+#pragma parameter PIXELGRID_NO_INTERBLEED	"        Avoid inter-cell bleeding (handhelds emulation)"		0.0 0.0 100.0 100.0
 
 #pragma parameter BLANK12f " " 0.0 0.0 1.0 1.0
 
