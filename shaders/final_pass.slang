@@ -408,23 +408,32 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
 
         vec2 freq_base_core   = pi * in_coords * l_OriginalSize ;
         vec2 freq_base_screen = pi * vec2(1/PG_h_count, 0.5);
-        freq_base_screen = pi * vec2(1/PG_h_count, 0.5) * floor(l_vOutputCoord * l_OutputSize);
-        //the following is needed by sin/cos later to understand if we are on an even or odd mask
-        vec2 freq_base_screen_unfloored = pi * vec2(1/PG_h_count, 0.5) * (l_vOutputCoord * l_OutputSize);   //FIXME: ho bisogno della sola x unfloored.
 
+
+
+        
+        //Screen coords:
+            freq_base_screen = pi * vec2(1/PG_h_count, 0.5);
+            // screen coords needs flooring:
+            vec2 period_multiply = vec2(PIXELGRID_MUL_X, PIXELGRID_MUL_Y);
+            freq_base_screen *= floor(l_vOutputCoord * l_OutputSize * period_multiply ) / period_multiply;
+        //the following unfloored coords are needed by sin/cos later to understand if we are on an even or odd mask
+            vec2 freq_base_screen_unfloored = pi * vec2(1/PG_h_count, 0.5) * (l_vOutputCoord * l_OutputSize);  
+        //We don't need floor, even at screen coordinates, if the size is expanded:
+            //freq_base_screen.x = mix(freq_base_screen.x, freq_base_screen_unfloored.x, float(PIXELGRID_MUL_X > 1.0)  );
 
     //Switch between core and screen sizes (x and y)
         vec2 freq_base           = mix(freq_base_core, freq_base_screen, vec2(PIXELGRID_SIZE_W, PIXELGRID_SIZE_H));
         vec2 freq_base_unfloored = mix(freq_base_core, freq_base_screen_unfloored, vec2(PIXELGRID_SIZE_W, PIXELGRID_SIZE_H));
         vec2 mask_size = mix(params.OriginalSize.xy, l_OutputSize, vec2(PIXELGRID_SIZE_W,PIXELGRID_SIZE_H)); 
         
-
-    //Zoom to debug:
-        vec2 period_multiply = vec2(PIXELGRID_MUL_X, PIXELGRID_MUL_Y);
+    //multiplier:
+        //vec2 period_multiply = vec2(PIXELGRID_MUL_X, PIXELGRID_MUL_Y);
         if (period_multiply.x < 0.0) period_multiply.x = 1/-period_multiply.x;  //goes FIXME in vertex shader
         if (period_multiply.y < 0.0) period_multiply.y = 1/-period_multiply.y;
         freq_base /= period_multiply;//*10;
         freq_base_unfloored /= period_multiply;
+
 
 
 
