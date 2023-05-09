@@ -115,8 +115,6 @@
 
 
 // MISC STATIC CONFIG ##########################################################################################
-	//Consider content interlaced if lines are more than this
-#define MIN_LINES_INTERLACED 380
 
 	//Static dithering applied over vignette and spot
 #define NOISEPOWER 5/1000.0
@@ -346,6 +344,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float DOT_M_SHADOW_STR;
 	float DOT_M_SHADOW_OFF;
 	
+	float MIN_LINES_INTERLACED;
 	float DO_PIXELGRID;
 	float DO_PIXELGRID_W;
 	float DO_PIXELGRID_H;
@@ -488,17 +487,19 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 #pragma parameter BLANK12f " " 0.0 0.0 1.0 1.0
 
+#pragma parameter MIN_LINES_INTERLACED      "        Is interlaced above # lines:"		380.0 	1.0 1024 1.0
+#pragma parameter PIXELGRID_INTR_DISABLE_Y  "        Disable scanlines on interlaced screen"			  	0.0 	0.0 1.0 1.0
 #pragma parameter PIXELGRID_INTR_FLICK_MODE "        Interlace Flicker (0=off,1=on,2=if interlaced)"		2.0 	0.0 2.0 1.0
 #pragma parameter PIXELGRID_INTR_FLICK_POWR "           . Interlace Flicker power"		  		0.25 	0.0 8.0 0.01
-#pragma parameter PIXELGRID_INTR_DISABLE_Y  "           . Disable on interlaced screen"			  	0.0 	0.0 1.0 1.0
+
 
 #pragma parameter BLANK12e " " 0.0 0.0 1.0 1.0
 
-#pragma parameter PIXELGRID_Y_MASK           "        Vertical cell Mask 2 (0.0 to disable)"	0.0 0.0 1.0 0.05
-#pragma parameter PIXELGRID_Y_MASK_COORDS    "           . Resolution: (core or screen)"	1.0 0.0 1.0 1.0
-#pragma parameter PIXELGRID_Y_MASK_HEIGHT    "           . Height (inverted)"	0.75 0.0 3.0 0.01
-#pragma parameter PIXELGRID_Y_MASK_ON_WHITE  "           . Fadeout under light"	0.0 0.0 1.0 0.01
-#pragma parameter PIXELGRID_Y_MASK_STEEP     "           . Steepness"	30.0 1.0 30.0 1.0
+#pragma parameter PIXELGRID_Y_MASK           "        Vertical cell Mask 2 (0.0 to disable)"	1.0 0.0 1.0 0.05
+#pragma parameter PIXELGRID_Y_MASK_COORDS    "           . Resolution: (core or screen)"	2.0 0.0 1.0 1.0
+#pragma parameter PIXELGRID_Y_MASK_HEIGHT    "           . Height (inverted)"	0.5 0.0 3.0 0.01
+#pragma parameter PIXELGRID_Y_MASK_ON_WHITE  "           . Fadeout under light"	0.5 0.0 1.0 0.01
+#pragma parameter PIXELGRID_Y_MASK_STEEP     "           . Steepness"	2.0 1.0 30.0 1.0
 #pragma parameter PIXELGRID_Y_MASK_OFFSET    "           . Even/odd offset"	1.0 0.0 1.0 1.0
 
 

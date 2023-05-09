@@ -158,7 +158,7 @@
                 The threshold for that is defined in config.inc with the parameter: MIN\_LINES\_INTERLACED.
             Interlace Flicker power: The strength of the effect.
             Disable on interlaced screen:
-                You may want to avoid drawing scanlines gaps when interlaced content is found (currently unimplemented)
+                You may want to avoid drawing scanlines gaps when interlaced content is found
             
             Vertical cell Mask:
                 Phosphor masks are usually vertically delimited by thin lines.
