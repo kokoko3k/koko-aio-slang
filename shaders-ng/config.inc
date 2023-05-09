@@ -347,6 +347,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float DOT_M_SHADOW_OFF;
 	
 	float DO_PIXELGRID;
+	float DO_PIXELGRID_W;
+	float DO_PIXELGRID_H;
 	float PIXELGRID_MIN_H;
 	float PIXELGRID_MIN_W;
 	float PIXELGRID_MAX_H;
@@ -359,7 +361,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float PIXELGRID_MUL_X;
 	float PIXELGRID_MUL_Y;
 	float PIXELGRID_OFFSET_CORE;
-	float PIXELGRID_NO_INTERBLEED;
+	float PIXELGRID_NO_INTERBLEED_W;
+	float PIXELGRID_NO_INTERBLEED_H;
 	
 	float PIXELGRID_INTR_FLICK_MODE;
 	float PIXELGRID_INTR_FLICK_POWR;
@@ -459,25 +462,29 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 // pixel Grid
 #pragma parameter DO_PIXELGRID		"★  Low level Phosphor grid (NOT with scanlines or masks) ==>"	0.0 0.0 1.0 1.0
-#pragma parameter PIXELGRID_SIZE_W  "        X resolution: (core or screen)"	1.0 0.0 1.0 1.0
+
+#pragma parameter DO_PIXELGRID_W    "      ★ Enable Horizontal mask "    	1.0 0.0 1.0 1.0
+#pragma parameter PIXELGRID_SIZE_W  "           . Resolution: (core or screen)"	1.0 0.0 1.0 1.0
 #pragma parameter PIXELGRID_MIN_W   "           . Phosphors width Min"			0.25 0.05 1.0 0.01
 #pragma parameter PIXELGRID_MAX_W   "           . Phosphors width Max"			0.25 0.05 1.0 0.01
 #pragma parameter PIXELGRID_H_PRST  "           . Mask type preset (0: for manual)"  3.0 0.0 6.0 1.0
-#pragma parameter PG_LABEL1         "           . (1:gm 2:gmx 3:rgb 4:rgbx 5:rbg 6:rbgx)"  0.0 0.0 0.0 0.0
-#pragma parameter PIXELGRID_H_COUNT "           .     0: Phosphors+gap count (mask size)"	3.0 1.0 4.0  1.0
-#pragma parameter PIXELGRID_R_SHIFT "           .     0: R shift"      0.0  0.0 4.0 0.1
-#pragma parameter PIXELGRID_G_SHIFT "           .     0: G shift"      1.0  0.0 4.0 0.1
-#pragma parameter PIXELGRID_B_SHIFT "           .     0: B shift"      2.0  0.0 4.0 0.1
-//#pragma parameter PIXELGRID_SPACING "           . RGB spacing"      1.0 0.0 2.0 0.01
+#pragma parameter PG_LABEL1         "             (1:gm 2:gmx 3:rgb 4:rgbx 5:rbg 6:rbgx)"  0.0 0.0 0.0 0.0
+#pragma parameter PIXELGRID_H_COUNT "                . 0: Phosphors+gap count (mask size)"	3.0 1.0 4.0  1.0
+#pragma parameter PIXELGRID_R_SHIFT "                . 0: R shift"      0.0  0.0 4.0 0.1
+#pragma parameter PIXELGRID_G_SHIFT "                . 0: G shift"      1.0  0.0 4.0 0.1
+#pragma parameter PIXELGRID_B_SHIFT "                . 0: B shift"      2.0  0.0 4.0 0.1
 #pragma parameter PIXELGRID_MUL_X   "           . Cell size multiplier x (neg=divider):"	1.0 -4.0 4.0 1.0
+#pragma parameter PIXELGRID_NO_INTERBLEED_W	"           . Avoid inter-cell bleeding (handhelds)"		0.0 0.0 100.0 100.0
 
+#pragma parameter BLANK12fs " " 0.0 0.0 1.0 1.0
 
-#pragma parameter PIXELGRID_SIZE_H          "        Y resolution: (core for scanlines or screen)"	0.0 0.0 1.0 1.0
-#pragma parameter PIXELGRID_MUL_Y           "           . Cell size multiplier y (neg=divider):"	1.0 -4.0 4.0 1.0
+#pragma parameter DO_PIXELGRID_H            "      ★ Enable scanlines or vertical mask 1 "    	1.0 0.0 1.0 1.0
+#pragma parameter PIXELGRID_SIZE_H          "           . Resolution: (core for scanlines or screen)"	0.0 0.0 1.0 1.0
 #pragma parameter PIXELGRID_MIN_H	        "           . Phosphors height Min"			0.2 0.0 1.0 0.05
 #pragma parameter PIXELGRID_MAX_H           "           . Phosphors height Max"			0.6 0.0 1.0 0.05
 #pragma parameter PIXELGRID_OFFSET_CORE     "           . Slotmask offset (0.25 ok)"	0.0 0.0 1.0 0.01
-#pragma parameter PIXELGRID_NO_INTERBLEED	"        Avoid inter-cell bleeding (handhelds emulation)"		0.0 0.0 100.0 100.0
+#pragma parameter PIXELGRID_MUL_Y           "           . Cell size multiplier y (neg=divider):"	1.0 -4.0 4.0 1.0
+#pragma parameter PIXELGRID_NO_INTERBLEED_H	"           . Avoid inter-cell bleeding (handhelds)"		0.0 0.0 100.0 100.0
 
 #pragma parameter BLANK12f " " 0.0 0.0 1.0 1.0
 
@@ -487,7 +494,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 #pragma parameter BLANK12e " " 0.0 0.0 1.0 1.0
 
-#pragma parameter PIXELGRID_Y_MASK           "        Vertical cell Mask"	0.0 0.0 1.0 0.05
+#pragma parameter PIXELGRID_Y_MASK           "        Vertical cell Mask 2 (0.0 to disable)"	0.0 0.0 1.0 0.05
 #pragma parameter PIXELGRID_Y_MASK_COORDS    "           . Resolution: (core or screen)"	1.0 0.0 1.0 1.0
 #pragma parameter PIXELGRID_Y_MASK_HEIGHT    "           . Height (inverted)"	0.75 0.0 3.0 0.01
 #pragma parameter PIXELGRID_Y_MASK_ON_WHITE  "           . Fadeout under light"	0.0 0.0 1.0 0.01

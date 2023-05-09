@@ -323,69 +323,77 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         vec3 freq_rgb = vec3(freq_base.x) - PG_offsets;
 
     //Width phosphor mask:
-        //get 3 sines in black/white
-            vec3 rgb_w = cos(freq_rgb);
+        vec3 rgb_w = vec3(1.0);
+        if (DO_PIXELGRID_W == 1.0) {
+            //get 3 sines in black/white
+                rgb_w = cos(freq_rgb);
 
-        //make them always positive and double frequency:
-            rgb_w = (rgb_w * rgb_w);
+            //make them always positive and double frequency:
+                rgb_w = (rgb_w * rgb_w);
 
-        //modulate each phosphor width according to input luminance
-            vec3 larghezza_fosforo = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
-            rgb_w = morph_shape(rgb_w, larghezza_fosforo, PIXELGRID_NO_INTERBLEED);
-
+            //modulate each phosphor width according to input luminance
+                vec3 larghezza_fosforo = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
+                rgb_w = morph_shape(rgb_w, larghezza_fosforo, PIXELGRID_NO_INTERBLEED_W);
+        }
+    
     //Height phosphor mask (can be used for scanlines, slotmask, aperturegrille):
-        //calculate each phosphor eight according to input luminance 
-            vec3 altezza_fosforo = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
-            
-        //offset trias to emulate core level slotmask, calc right offset here:
-            //sin() tell use if the current cell falls is odd or even:
-                float sin_check_offset2 = sin(freq_base_unfloored.x);
-                float is_even2 = step(sin_check_offset2, 0.0);
-            
-            //Then we can apply the optional offset to emulate the slotmask on even cells
-                float core_offset =  is_even2 * pi * PIXELGRID_OFFSET_CORE;
-            
-            //Since we can emulate scanlines, take into account current scanline phase:
-                float interlacing_adapt_period = vScanlinePeriod;
-                float interlacing_adapt_offset = vScanlineAlternateOffset;
-            
-        //get a single sine in black/white with applied the optional staggered offset for slotmask:
-            float rgb_h_sin = sin(freq_base.y * interlacing_adapt_period + core_offset + interlacing_adapt_offset );
-        //make it positve with doubled frequency:
-            rgb_h_sin = (rgb_h_sin * rgb_h_sin);
-            
-        //Finally get 3 sines out of the previous one by applying height modifiers
-            vec3 rgb_h = vec3(rgb_h_sin);
-            rgb_h = morph_shape(rgb_h, altezza_fosforo, PIXELGRID_NO_INTERBLEED);
+        vec3 rgb_h = vec3(1.0);
+        if (DO_PIXELGRID_H == 1.0) {
+            //calculate each phosphor eight according to input luminance 
+                vec3 altezza_fosforo = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
                 
+            //offset trias to emulate core level slotmask, calc right offset here:
+                //sin() tell use if the current cell falls is odd or even:
+                    float sin_check_offset2 = sin(freq_base_unfloored.x);
+                    float is_even2 = step(sin_check_offset2, 0.0);
+                
+                //Then we can apply the optional offset to emulate the slotmask on even cells
+                    float core_offset =  is_even2 * pi * PIXELGRID_OFFSET_CORE;
+                
+                //Since we can emulate scanlines, take into account current scanline phase:
+                    float interlacing_adapt_period = vScanlinePeriod;
+                    float interlacing_adapt_offset = vScanlineAlternateOffset;
+                
+            //get a single sine in black/white with applied the optional staggered offset for slotmask:
+                float rgb_h_sin = sin(freq_base.y * interlacing_adapt_period + core_offset + interlacing_adapt_offset );
+            //make it positve with doubled frequency:
+                rgb_h_sin = (rgb_h_sin * rgb_h_sin);
+                
+            //Finally get 3 sines out of the previous one by applying height modifiers
+                rgb_h = vec3(rgb_h_sin);
+                rgb_h = morph_shape(rgb_h, altezza_fosforo, PIXELGRID_NO_INTERBLEED_H);
+        }
+
     //Height phosphor mask number 2, can be used for slotmask,aperturegrille, not scanlines.
-        
-        //offset trias to emulate core level slotmask, calc right offset here:
-        //sin() tell use if the current cell falls is odd or even:
-            float sin_check_offset = sin(freq_base_unfloored.x);
-            float is_even = step(sin_check_offset, 0.0);
-            
-        //Switch reference coords according to use pref: 
-            float freq_cell_y = mix_step(freq_base_core.y, freq_base_screen.y, PIXELGRID_Y_MASK_COORDS);
-            
-        //Altezza fosfori nella maschera
-            #define PH_MASK_HEIGHT (freq_cell_y * PIXELGRID_Y_MASK_HEIGHT)
-        //stagger fosfori nella maschera
-            #define PH_MASH_OFFSET  (PIXELGRID_Y_MASK_OFFSET * pi * 0.5  )
-            
-        //Use abs(sin) (later 1-abs(sin) to get orizontal gaps, use pow to make them steep.
-            float mask_shape = abs(sin(PH_MASK_HEIGHT  + (PH_MASH_OFFSET * is_even))) ;
-            mask_shape = pow(mask_shape, PIXELGRID_Y_MASK_STEEP);
-            
-        //Get per channel input luminance by clamping pixel_in
-            vec3 lum=clamp(pixel_in, 0.0, 1.0);
-        //Adapt the luminance effect via input parameter
-            vec3 lum_adapted = (1-lum*PIXELGRID_Y_MASK_ON_WHITE);
-        //Calc final mask visibility as the minimum between tha configured visibility and luminosity effect
-            vec3 V=min( lum_adapted, vec3(PIXELGRID_Y_MASK) );
-        //apply visibility to the mask
-            vec3 darklines_mask=1-(mask_shape*V);
-        
+        vec3 darklines_mask=vec3(1.0);
+        if (PIXELGRID_Y_MASK > 0.0) {
+            //offset trias to emulate core level slotmask, calc right offset here:
+            //sin() tell use if the current cell falls is odd or even:
+                float sin_check_offset = sin(freq_base_unfloored.x);
+                float is_even = step(sin_check_offset, 0.0);
+                
+            //Switch reference coords according to use pref: 
+                float freq_cell_y = mix_step(freq_base_core.y, freq_base_screen.y, PIXELGRID_Y_MASK_COORDS);
+                
+            //Altezza fosfori nella maschera
+                #define PH_MASK_HEIGHT (freq_cell_y * PIXELGRID_Y_MASK_HEIGHT)
+            //stagger fosfori nella maschera
+                #define PH_MASH_OFFSET  (PIXELGRID_Y_MASK_OFFSET * pi * 0.5  )
+                
+            //Use abs(sin) (later 1-abs(sin) to get orizontal gaps, use pow to make them steep.
+                float mask_shape = abs(sin(PH_MASK_HEIGHT  + (PH_MASH_OFFSET * is_even))) ;
+                mask_shape = pow(mask_shape, PIXELGRID_Y_MASK_STEEP);
+                
+            //Get per channel input luminance by clamping pixel_in
+                vec3 lum=clamp(pixel_in, 0.0, 1.0);
+            //Adapt the luminance effect via input parameter
+                vec3 lum_adapted = (1-lum*PIXELGRID_Y_MASK_ON_WHITE);
+            //Calc final mask visibility as the minimum between tha configured visibility and luminosity effect
+                vec3 V=min( lum_adapted, vec3(PIXELGRID_Y_MASK) );
+            //apply visibility to the mask
+                darklines_mask=1-(mask_shape*V);
+        }
+     
     //Finally put width,height1 and height2 masks togheter:
         vec3 mask = rgb_w * rgb_h * darklines_mask;
         
