@@ -89,23 +89,58 @@ vec3 pixel_push_luminance(vec3 c, float strength) {
 }
 
 vec3 apply_fuzzy_main_pass(vec3 color) {
-   if (DO_IN_GLOW == 1.0)
-      color = pow(color,vec3(IN_GLOW_GAMMA))*IN_GLOW_POWER;
-   //if (DO_VMASK_AND_DARKLINES == 1.0)
-   //   color *= mix (  (1.0 -  ((RGB_MASK_STRENGTH*0.5)+(DARKLINES_STRENGTH*0.2))), 1.0, MASK_COMPENSATION) ;
-   if (DO_HALO == 1.0)
-      color += pow(color,vec3(HALO_GAMMA))*HALO_POWER;
-   //if (DO_SCANLINES == 1.0)
-   //   color *=  0.5 + (SCANLINE_DARK*0.5);
-   if (DO_PIXELGRID == 1.0)
-	   color = color * color;
-   if (DO_CCORRECTION == 1.0)
-      color = pow(color, vec3(GAMMA_OUT));
-   if (DO_VIGNETTE == 1.0)
-      color *= 0.8 * (V_POWER);
-   return color;
+	
+	if (DO_IN_GLOW == 1.0) {
+		color = pow(color,vec3(IN_GLOW_GAMMA))*IN_GLOW_POWER;
+	}
+	if (DO_PIXELGRID == 1.0) {
+		float m = 1.0;
+		m = mix(m, PIXELGRID_MAX_W, DO_PIXELGRID_W);
+		m = mix(m, PIXELGRID_MAX_H, DO_PIXELGRID_H);
+		m =  m * (1 - PIXELGRID_Y_MASK);
+		color *= 0.5 + (m*0.5);		
+	}
+
+	if (DO_HALO == 1.0)
+		color += pow(color,vec3(HALO_GAMMA))*HALO_POWER;
+
+	if (DO_CCORRECTION == 1.0)
+		color = pow(color, vec3(GAMMA_OUT));
+	
+	if (DO_VIGNETTE == 1.0)
+		color *= 0.8 * (V_POWER);
+	return color;
 }
 
+vec3 apply_fuzzy_main_pass_new(vec3 color) {
+	float p = 1.0;
+	float m = 1.0;
+	float h = 0.0;
+	
+	if (DO_IN_GLOW == 1.0) {
+		p = p * IN_GLOW_GAMMA;
+		m = m + IN_GLOW_POWER;
+	    //color = pow(color,vec3(IN_GLOW_GAMMA))*IN_GLOW_POWER;
+	}
+	if (DO_PIXELGRID == 1.0) {
+		float w_mask_strength  = (1 - PIXELGRID_MAX_W) * DO_PIXELGRID_W; //0.75
+		float h1_mask_strength = (1 - PIXELGRID_MAX_H) * DO_PIXELGRID_H; //0.4
+		float h2_mask_strength = PIXELGRID_Y_MASK*0.5; // 0.5
+		float pixelgrid_mask_strength = 1 - clamp (w_mask_strength + h1_mask_strength + h2_mask_strength, 0.0, 1.0);
+		m = m - (0.5 + (pixelgrid_mask_strength*0.5));
+	}
+
+	if (DO_HALO == 1.0) {
+		p = p * HALO_GAMMA;
+		h = HALO_POWER/p;
+	}
+	if (DO_CCORRECTION == 1.0) {
+		p = p * GAMMA_OUT;
+	}
+
+	return (pow(color, vec3(p)) * m ) + h;
+
+}
 
 
 vec2 offsets_from_float(float in_param, int range){

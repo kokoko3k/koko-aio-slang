@@ -460,7 +460,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 
 // pixel Grid
-#pragma parameter DO_PIXELGRID		"★  Low level Phosphor grid (NOT with scanlines or masks) ==>"	0.0 0.0 1.0 1.0
+#pragma parameter DO_PIXELGRID		"★  Low level Phosphor grid enable? ==>"	0.0 0.0 1.0 1.0
 
 #pragma parameter DO_PIXELGRID_W    "      ★ Enable Horizontal mask "    	1.0 0.0 1.0 1.0
 #pragma parameter PIXELGRID_SIZE_W  "           . Resolution: (core or screen)"	1.0 0.0 1.0 1.0
@@ -518,7 +518,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter DOT_M_MBLUR_STR	"        Refresh inertia"				0.45  0.0 0.9 0.05
 #pragma parameter DOT_M_MBLUR_MODE  "           . Inertia on: both,white,black"	0.0  0.0 2.0 1.0
 #pragma parameter DOT_M_SHADOW_STR  "        Shadow strength (disables deconvergence)"	0.0  0.0 1.0 0.01
-#pragma parameter DOT_M_SHADOW_OFF  "        Shadow offset"								0.0  -1.0 1.0 0.01
+#pragma parameter DOT_M_SHADOW_OFF  "           . Shadow offset"								0.0  -1.0 1.0 0.01
 #pragma parameter DOT_M_MULTIPLY	"        Multiply factor (debug)"		1.0  1.0 50.0 1.0
 #pragma parameter BLANK12c " " 0.0 0.0 1.0 1.0
 

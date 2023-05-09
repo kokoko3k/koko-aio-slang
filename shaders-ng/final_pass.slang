@@ -381,7 +381,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 #define PH_MASH_OFFSET  (PIXELGRID_Y_MASK_OFFSET * pi * 0.5  )
                 
             //Use abs(sin) (later 1-abs(sin) to get orizontal gaps, use pow to make them steep.
-                float mask_shape = abs(sin(PH_MASK_HEIGHT  + (PH_MASH_OFFSET * is_even))) ;
+                float mask_shape = abs(cos(PH_MASK_HEIGHT  + (PH_MASH_OFFSET * is_even))) ;
                 mask_shape = pow(mask_shape, PIXELGRID_Y_MASK_STEEP);
                 
             //Get per channel input luminance by clamping pixel_in
