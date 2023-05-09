@@ -1,0 +1,17 @@
+#reference "monitor-slotmask.slangp"
+
+DO_BEZEL = "1.0"
+BEZEL_FRAME_ZOOM = "0.17"
+BEZEL_INNER_ZOOM = "-0.013"
+BEZEL_IMAGE_BORDER = "1.02"
+
+AMBI_FALLOFF = "0.4"
+AMBI_POWER = "5.0"
+
+DO_BLOOM = "1.0"
+
+DO_SPOT = "1.0"
+DO_VIGNETTE = "1.0"
+
+GEOM_CORNER_SIZE = 0.005
+GEOM_CORNER_SMOOTH = "400"
