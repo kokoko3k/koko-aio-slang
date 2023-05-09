@@ -103,4 +103,5 @@
 #    [ ] convert presets to pixelgrids
 #    [ ] make presets for handhelds
 #    [ ] apply fuzzy main pass: take pixelgrid in consideration
-
+#    [ ] Make handheld presets
+#    [ ] max inlum not working for phosphors width?
