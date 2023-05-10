@@ -21,6 +21,7 @@ layout(location = 3) out float fstep;
 layout(location = 4) out float lod;
 layout(location = 5) out vec2 pre_pass_coords;
 layout(location = 6) out float vIs_rotated;
+layout(location = 7) out vec2 vFuzzy_main_pass_stage_1;
 
 void main() {
     gl_Position = global.MVP * Position;
@@ -56,6 +57,8 @@ void main() {
     if (DO_BEZEL > 0.5)
         pre_pass_coords = zoomout_coords(pre_pass_coords, -get_BEZEL_INNER_ZOOM() , 1.0);
     
+    //Get fuzzy mul and pow factor
+        vFuzzy_main_pass_stage_1 = apply_fuzzy_main_pass_stage_1();
     
 }
 
@@ -67,6 +70,7 @@ layout(location = 3) in float fstep;
 layout(location = 4) in float lod;
 layout(location = 5) in vec2 pre_pass_coords;
 layout(location = 6) in float vIs_rotated;
+layout(location = 7) in vec2 vFuzzy_main_pass_stage_1;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -80,7 +84,8 @@ layout(set = 0, binding = 4) uniform sampler2D flick_and_noise_pass;
 
 vec3 ambi_push_pass(vec2 coords, float f_lod) {
    vec3 pixel_out = textureLod(flick_and_noise_pass, coords, f_lod).rgb;
-   pixel_out = apply_fuzzy_main_pass(pixel_out);
+   
+   pixel_out = apply_fuzzy_main_pass_stage_2(pixel_out, vFuzzy_main_pass_stage_1);
    pixel_out = pixel_push_luminance(pixel_out, AMBI_POWER-1);
    return pixel_out;
 }

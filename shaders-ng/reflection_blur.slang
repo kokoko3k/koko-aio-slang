@@ -6,16 +6,21 @@ layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 
 layout(location = 0) out vec2 vTexCoord;
+layout(location = 1) out vec2 vFuzzy_main_pass_stage_1;
 
 #include "includes/functions.include.slang"
 
 void main() {
    gl_Position = global.MVP * Position;
    vTexCoord = TexCoord;
+
+   //Get fuzzy mul and pow factor
+      vFuzzy_main_pass_stage_1 = apply_fuzzy_main_pass_stage_1();   
 }
 
 #pragma stage fragment
 layout(location = 0) in vec2 vTexCoord;
+layout(location = 1) in vec2 vFuzzy_main_pass_stage_1;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -79,7 +84,7 @@ void main() {
    //at 0.0 inner zoom level.
       //pixel_out = pixel_out * (1 - fcorners_shade);
 
-   pixel_out = apply_fuzzy_main_pass(pixel_out);
+   pixel_out = apply_fuzzy_main_pass_stage_2(pixel_out, vFuzzy_main_pass_stage_1);
       
    FragColor = vec4(pixel_out, 1.0); 
 

@@ -14,6 +14,7 @@ layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
 layout(location = 1) out float lod;
+layout(location = 2) out vec2 vFuzzy_main_pass_stage_1;
 
 #include "includes/functions.include.slang"
 
@@ -25,11 +26,17 @@ void main() {
 
     if (DO_GAME_GEOM_OVERRIDE > 0.5)
         vTexCoord = content_geom_override(vTexCoord, GAME_GEOM_ASPECT, get_in_aspect(), GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
+
+	//Get fuzzy mul and pow factor
+		vFuzzy_main_pass_stage_1 = apply_fuzzy_main_pass_stage_1();    
+
 }
 
 #pragma stage fragment
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in float lod;
+layout(location = 2) in vec2 vFuzzy_main_pass_stage_1;
+
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D flick_and_noise_pass;
 layout(set = 0, binding = 3) uniform sampler2D avglum_passFeedback;
@@ -46,7 +53,7 @@ layout(set = 0, binding = 3) uniform sampler2D avglum_passFeedback;
 #define RGB_TO_GRAYSCALE = vec3(0.299, 0.587, 0.114)
 float get_avg_lum_from_mip() {
     vec3 mip = textureLod(flick_and_noise_pass, vec2(0.5,0.5),20.0).rgb;
-    mip = apply_fuzzy_main_pass(mip);
+    mip = apply_fuzzy_main_pass_stage_2(mip, vFuzzy_main_pass_stage_1);
     //return (mip.r+mip.g+mip.b)/3.0;
     return rgb_to_gray(mip);
 }

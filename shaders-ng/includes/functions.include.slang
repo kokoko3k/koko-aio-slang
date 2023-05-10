@@ -119,36 +119,55 @@ vec3 apply_fuzzy_main_pass(vec3 color_in) {
 	return color_out;
 }
 
-vec3 apply_fuzzy_main_pass_new(vec3 color) {
-	float p = 1.0;
-	float m = 1.0;
-	float h = 0.0;
+
+
+vec2 apply_fuzzy_main_pass_stage_1() {
+	//This simulates the final pass pixel processing so that previous passes like 
+	//reflections, full screen luminance zoom and ambient light 
+	//can react accordingly without doing the same thing twice.
+	//For speed reasons, this lives in vertex shader and will output
+	//a vec2(mul factor, pow factor)
+	//in fragment shader one will pow(pow factor)*multiply factor;
+	
+	float color_in = 1.0;
+	float color_out = 1.0;
+	
+	if (DO_CCORRECTION == 1.0)
+		color_out = pow(color_in, GAMMA_OUT);
 	
 	if (DO_IN_GLOW == 1.0) {
-		p = p * IN_GLOW_GAMMA;
-		m = m + IN_GLOW_POWER;
-	    //color = pow(color,vec3(IN_GLOW_GAMMA))*IN_GLOW_POWER;
+		color_out = pow(color_out,IN_GLOW_GAMMA)*IN_GLOW_POWER;
 	}
+	
 	if (DO_PIXELGRID == 1.0) {
-		float w_mask_strength  = (1 - PIXELGRID_MAX_W) * DO_PIXELGRID_W; //0.75
-		float h1_mask_strength = (1 - PIXELGRID_MAX_H) * DO_PIXELGRID_H; //0.4
-		float h2_mask_strength = PIXELGRID_Y_MASK*0.5; // 0.5
-		float pixelgrid_mask_strength = 1 - clamp (w_mask_strength + h1_mask_strength + h2_mask_strength, 0.0, 1.0);
-		m = m - (0.5 + (pixelgrid_mask_strength*0.5));
+		float m1 = (PIXELGRID_MAX_W + PIXELGRID_MIN_W) * 0.5;
+		m1 = mix(1.0, m1, DO_PIXELGRID_W);
+		
+		float m2 = (PIXELGRID_MAX_H + PIXELGRID_MIN_H) * 0.5;
+		m2 = mix(1.0, m2, DO_PIXELGRID_H);
+		
+		float m3 = mix(1.0, 0.75, PIXELGRID_Y_MASK);
+	
+		color_out = (color_out * m1) * (m2 * m3);
 	}
 
-	if (DO_HALO == 1.0) {
-		p = p * HALO_GAMMA;
-		h = HALO_POWER/p;
-	}
-	if (DO_CCORRECTION == 1.0) {
-		p = p * GAMMA_OUT;
-	}
+	if (DO_HALO == 1.0)
+		color_out += pow(color_in,HALO_GAMMA)*HALO_POWER;
 
-	return (pow(color, vec3(p)) * m ) + h;
+	
+	if (DO_VIGNETTE == 1.0)
+		color_out *= 0.8 * (V_POWER);
+	
 
+	
+	return vec2(color_out/color_in,
+				GAMMA_OUT * IN_GLOW_GAMMA * mix(1.0, HALO_GAMMA, HALO_POWER) );
 }
 
+vec3 apply_fuzzy_main_pass_stage_2(vec3 pixel_in, vec2 stage1 ) {
+	//This gets the output of stage_1 to apply its pow and mul.
+	return pow(pixel_in, vec3(stage1.y)) * stage1.x;
+}
 
 vec2 offsets_from_float(float in_param, int range){
     return vec2(  

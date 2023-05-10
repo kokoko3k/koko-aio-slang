@@ -3,28 +3,37 @@
 // This is one of several passes needed to cheaply emulate the bloom effect.
 
 #include "config.inc"
+#include "includes/functions.include.slang"
 
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
+
 layout(location = 0) out vec2 vTexCoord;
+layout(location = 1) out vec2 vFuzzy_main_pass_stage_1;
 
 void main() {
-   gl_Position = global.MVP * Position;
-   vTexCoord = TexCoord;
+    gl_Position = global.MVP * Position;
+    vTexCoord = TexCoord;
+    
+    //Get fuzzy mul and pow factor
+        vFuzzy_main_pass_stage_1 = apply_fuzzy_main_pass_stage_1();
 }
 
 #pragma stage fragment
 
 layout(location = 0) in vec2 vTexCoord;
+layout(location = 1) in vec2 vFuzzy_main_pass_stage_1;
+
 layout(location = 0) out vec4 FragColor;
+
 layout(set = 0, binding = 1) uniform sampler2D Source;
 layout(set = 0, binding = 2) uniform sampler2D avglum_pass;
 layout(set = 0, binding = 3) uniform sampler2D flick_and_noise_pass;
 layout(set = 0, binding = 4) uniform sampler2D bloom_pass_finalFeedback;
 
 
-#include "includes/functions.include.slang"
+//#include "includes/functions.include.slang"
 #include "includes/blooms.include.slang"
 
 #define offset 0.5890486225480862 // TAU/8.0/4.0*3.0
@@ -41,7 +50,7 @@ layout(set = 0, binding = 4) uniform sampler2D bloom_pass_finalFeedback;
 
 float get_avg_lum_from_mip(sampler2D tex, vec2 co, float lod) {
     vec3 mip = textureLod(flick_and_noise_pass, co, lod).rgb;
-    mip = apply_fuzzy_main_pass(mip);
+    mip = apply_fuzzy_main_pass_stage_2(mip, vFuzzy_main_pass_stage_1);
     //return (mip.r+mip.g+mip.b)/3.0;
     float luminance_from_feedback = rgb_to_gray(mip);
     float luminance_first_pass = texture(bloom_pass_finalFeedback,vTexCoord).a;
