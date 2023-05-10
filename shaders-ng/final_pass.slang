@@ -293,12 +293,9 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         if (vDo_Tate == 1.0) in_coords.xy = in_coords.yx;
 
       
-    //Get preset masks on rgb and mask size on a, mask and period for every phosphor done in vertex shader.
+    //Get preset masks on ".rgb" and mask size on ".a" , mask and period for every phosphor done in vertex shader.
         float PG_h_count = vPG_offsets_and_size.a; 
         vec3  PG_offsets = vPG_offsets_and_size.rgb;
-
-    //ricavo i 3 periodi e offset per i 3 seni verticali
-        //PG_offsets = PG_offsets.rgb * (pi / PG_h_count);
 
         vec2 freq_base_core   = pi * in_coords * vPG_OriginalSize_tated ;
 
@@ -308,7 +305,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 vec2 freq_base_screen = vPG_freq_base_screen * floor(vPG_OutputCoord_tated * vPG_OutputSize_tated * period_multiply ) / period_multiply;
             //the following unfloored coords are needed by sin/cos later to understand if we are on an even or odd mask
                 //vec2 freq_base_screen_unfloored = pi * vec2(1/PG_h_count, 0.5) * (vPG_OutputCoord_tated * vPG_OutputSize_tated);  
-                vec2 freq_base_screen_unfloored = vPG_freq_base_screen_unfloored; //<-- moved to vertex shader.
+                vec2 freq_base_screen_unfloored = vPG_freq_base_screen_unfloored; //<-- missing muls because done to vertex shader.
 
             
     //Switch between core and screen sizes (x and y)
@@ -332,18 +329,18 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 rgb_w = (rgb_w * rgb_w);
 
             //modulate each phosphor width according to input luminance
-                vec3 larghezza_fosforo = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
-                rgb_w = morph_shape(rgb_w, larghezza_fosforo, PIXELGRID_NO_INTERBLEED_W);
+                vec3 phosphor_width = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
+                rgb_w = morph_shape(rgb_w, phosphor_width, PIXELGRID_NO_INTERBLEED_W);
         }
     
     //Height phosphor mask (can be used for scanlines, slotmask, aperturegrille):
         vec3 rgb_h = vec3(1.0);
         if (DO_PIXELGRID_H == 1.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0)) {
             //calculate each phosphor eight according to input luminance 
-                vec3 altezza_fosforo = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
+                vec3 phosphor_height = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
                 
             //offset trias to emulate core level slotmask, calc right offset here:
-                //sin() tell use if the current cell falls is odd or even:
+                //sin() tell use if the current cell position is odd or even:
                     float sin_check_offset2 = sin(freq_base_unfloored.x);
                     float is_even2 = step(sin_check_offset2, 0.0);
                 
@@ -361,23 +358,24 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 
             //Finally get 3 sines out of the previous one by applying height modifiers
                 rgb_h = vec3(rgb_h_sin);
-                rgb_h = morph_shape(rgb_h, altezza_fosforo, PIXELGRID_NO_INTERBLEED_H);
+                rgb_h = morph_shape(rgb_h, phosphor_height, PIXELGRID_NO_INTERBLEED_H);
         }
 
     //Height phosphor mask number 2, can be used for slotmask,aperturegrille, not scanlines.
+    //...well technically yes, but they would have a boxed shape.
         vec3 darklines_mask=vec3(1.0);
         if (PIXELGRID_Y_MASK > 0.0) {
             //offset trias to emulate core level slotmask, calc right offset here:
-            //sin() tell use if the current cell falls is odd or even:
+            //sin() tell use if the current cell position is odd or even:
                 float sin_check_offset = sin(freq_base_unfloored.x);
                 float is_even = step(sin_check_offset, 0.0);
                 
-            //Switch reference coords according to use pref: 
+            //Switch reference coords according to user pref: 
                 float freq_cell_y = mix_step(freq_base_core.y, freq_base_screen.y, PIXELGRID_Y_MASK_COORDS);
                 
-            //Altezza fosfori nella maschera
+            //mask phosphors heigth
                 #define PH_MASK_HEIGHT (freq_cell_y * PIXELGRID_Y_MASK_HEIGHT)
-            //stagger fosfori nella maschera
+            //phosphors mask stagger
                 #define PH_MASH_OFFSET  (PIXELGRID_Y_MASK_OFFSET * pi * 0.5  )
                 
             //Use abs(sin) (later 1-abs(sin) to get orizontal gaps, use pow to make them steep.
@@ -390,7 +388,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 vec3 lum_adapted = (1-lum*PIXELGRID_Y_MASK_ON_WHITE);
             //Calc final mask visibility as the minimum between tha configured visibility and luminosity effect
                 vec3 V=min( lum_adapted, vec3(PIXELGRID_Y_MASK) );
-            //apply visibility to the mask
+            //apply user visibility modifier to the mask
                 darklines_mask=1-(mask_shape*V);
         }
      
@@ -401,7 +399,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         vec3 pixel_masked = mask * pixel_in;
         vec3 pixel_out = mix(pixel_masked, mask, 0.0);
     
-    //And return it with the alpha channel containing the mask itself, so that halo cah selectively light it.
+    //And return it with the alpha channel containing the mask itself, so that halo can selectively light it.
         return vec4(pixel_out, dot(mask, vec3(0.3333) ));
 }
 

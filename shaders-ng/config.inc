@@ -455,7 +455,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter IN_GLOW_SHOW_ARTF_MASK   "        Show NTSC artifacts mask (debug)"				0.0	0.0 1.0 1.0
 #pragma parameter BLANK7 " " 0.0 0.0 1.0 1.0
 
-#pragma parameter TATE                     "★ Tate mode (1:auto 2:forced)"		0.0 	0.0 2.0 1.0
+#pragma parameter TATE                     "★ Tate mode (0:disabled 1:auto 2:forced)"		0.0 	0.0 2.0 1.0
 #pragma parameter BLANK7a " " 0.0 0.0 1.0 1.0
 
 
