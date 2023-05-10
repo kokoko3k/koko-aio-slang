@@ -1,6 +1,6 @@
 # TODO:
 #    [v] Guess more aspect ratios:
-#			nope: Guessing is impossible..
+#            nope: Guessing is impossible..
 #    [v] Use gauss blur for composite color bleeding?
 #    	    Tried, does not produce great visible improvements
 #    [v] Vignette and spot could be done earlier at lower res?
@@ -87,6 +87,7 @@
 #        already exports mipmaps and is 100% aware of aspect override, but this would mean sacrificing
 #        another Sampler2D binding in final pass which is already short.
 #    [v] Remove scanline and vmask code
+#    [v] apply fuzzy main pass: take pixelgrid in consideration
 #    [..] Update bezel presets so that inner zoom matches the bezel, then adjust geometry zoom that is aware of reflections
 #         Cant, since the reflected black border looks weird.
 #    [ ] check branching conditions in first_pass.slang
@@ -102,6 +103,13 @@
 #    [ ] Try to write your own curvature function
 #    [ ] convert presets to pixelgrids
 #    [ ] make presets for handhelds
-#    [ ] apply fuzzy main pass: take pixelgrid in consideration
+
 #    [ ] Make handheld presets
 #    [ ] max inlum not working for phosphors width?
+#    [ ] apply_fuzzy_main_pass can be splitted between vertex and fragment shader
+#        the idea in vertex shader is something like:
+#            vec2 vFuzzy = get_fuzzy(float grey color);
+#            which returns in .x a multiplying factor
+#            in .y a powing factor.
+#            so in fragment you will do:
+#            color corrected = pow(color, vFuzzy.y)*vFuzzy.x;

@@ -88,28 +88,35 @@ vec3 pixel_push_luminance(vec3 c, float strength) {
 	return c * (1+vec3((1-whiteness) * strength));
 }
 
-vec3 apply_fuzzy_main_pass(vec3 color) {
+vec3 apply_fuzzy_main_pass(vec3 color_in) {
+	vec3 color_out;
+
+	if (DO_CCORRECTION == 1.0)
+		color_out = pow(color_in, vec3(GAMMA_OUT));
 	
 	if (DO_IN_GLOW == 1.0) {
-		color = pow(color,vec3(IN_GLOW_GAMMA))*IN_GLOW_POWER;
+		color_out = pow(color_out,vec3(IN_GLOW_GAMMA))*IN_GLOW_POWER;
 	}
+	
 	if (DO_PIXELGRID == 1.0) {
-		float m = 1.0;
-		m = mix(m, PIXELGRID_MAX_W, DO_PIXELGRID_W);
-		m = mix(m, PIXELGRID_MAX_H, DO_PIXELGRID_H);
-		m =  m * (1 - PIXELGRID_Y_MASK);
-		color *= 0.5 + (m*0.5);		
+		float m1 = (PIXELGRID_MAX_W + PIXELGRID_MIN_W) * 0.5;
+		m1 = mix(1.0, m1, DO_PIXELGRID_W);
+		
+		float m2 = (PIXELGRID_MAX_H + PIXELGRID_MIN_H) * 0.5;
+		m2 = mix(1.0, m2, DO_PIXELGRID_H);
+		
+		float m3 = mix(1.0, 0.75, PIXELGRID_Y_MASK);
+	
+		color_out = (color_out * m1) * (m2 * m3);
 	}
 
 	if (DO_HALO == 1.0)
-		color += pow(color,vec3(HALO_GAMMA))*HALO_POWER;
+		color_out += pow(color_in,vec3(HALO_GAMMA))*HALO_POWER;
 
-	if (DO_CCORRECTION == 1.0)
-		color = pow(color, vec3(GAMMA_OUT));
 	
 	if (DO_VIGNETTE == 1.0)
-		color *= 0.8 * (V_POWER);
-	return color;
+		color_out *= 0.8 * (V_POWER);
+	return color_out;
 }
 
 vec3 apply_fuzzy_main_pass_new(vec3 color) {
