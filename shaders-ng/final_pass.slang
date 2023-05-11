@@ -125,9 +125,7 @@ void main() {
         vPG_offsets_and_size = PG_get_hmask_preset() ;
         //scale offsets to be used by sin/cos:
             vPG_offsets_and_size.rgb *= (pi / PG_H_COUNT);
-        //offset to help even/odd detection code through sin or cos later on (slot mask stagger)
-            vPG_offsets_and_size.rgb = vPG_offsets_and_size.rgb + (pi/(PG_H_COUNT*2.0));            
-            
+
     //Pixelgrid: Calc freq_base_screen
         //Tate ?
             vPG_OutputSize_tated   = params.OutputSize.xy;
@@ -305,6 +303,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //screen coords needs flooring:
                 vec2 period_multiply = vec2(PIXELGRID_MUL_X, PIXELGRID_MUL_Y);
                 vec2 freq_base_screen = vPG_freq_base_screen * floor(vPG_OutputCoord_tated * vPG_OutputSize_tated * period_multiply ) / period_multiply;
+
             //the following unfloored coords are needed by sin/cos later to understand if we are on an even or odd mask
                 //vec2 freq_base_screen_unfloored = pi * vec2(1/PG_h_count, 0.5) * (vPG_OutputCoord_tated * vPG_OutputSize_tated);  
                 vec2 freq_base_screen_unfloored = vPG_freq_base_screen_unfloored; //<-- missing muls because done to vertex shader.
@@ -340,14 +339,14 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         if (DO_PIXELGRID_H == 1.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0)) {
             //calculate each phosphor eight according to input luminance 
                 vec3 phosphor_height = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
-                
             //offset trias to emulate core level slotmask, calc right offset here:
                 //sin() tell use if the current cell position is odd or even:
-                    float sin_check_offset2 = sin(freq_base_unfloored.x);
-                    float is_even2 = step(sin_check_offset2, 0.0);
+                    float o =  (pi/(PG_h_count*2.0));  
+                    float sin_check_offset = sin(freq_base_unfloored.x + o);
+                    float is_even = step(sin_check_offset, 0.0);
                 
                 //Then we can apply the optional offset to emulate the slotmask on even cells
-                    float core_offset =  is_even2 * pi * PIXELGRID_OFFSET_CORE;
+                    float core_offset =  is_even * pi * PIXELGRID_OFFSET_CORE;
                 
                 //Since we can emulate scanlines, take into account current scanline phase:
                     float interlacing_adapt_period = vScanlinePeriod;
@@ -369,10 +368,9 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         if (PIXELGRID_Y_MASK > 0.0) {
             //offset trias to emulate core level slotmask, calc right offset here:
             //sin() tell use if the current cell position is odd or even:
-            //più sposta il viola a sinistra
-                //float sin_check_offset = sin(freq_base_unfloored.x  + (pi/(PG_h_count*2.0)  ));
-                float sin_check_offset = sin(freq_base_unfloored.x);
-                float is_even = step(sin_check_offset, 0.0);
+                float o =  (pi/(PG_h_count*2.0));  
+                float sin_check_offset2 = sin(freq_base_unfloored.x + o);
+                float is_even2 = step(sin_check_offset2, 0.0);
 
             //Switch reference coords according to user pref: 
                 float freq_cell_y = mix_step(freq_base_core.y, freq_base_screen.y, PIXELGRID_Y_MASK_COORDS);
@@ -383,7 +381,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 #define PH_MASH_OFFSET  (PIXELGRID_Y_MASK_OFFSET * pi * 0.5  )
                 
             //Use abs(sin) (later 1-abs(sin) to get orizontal gaps, use pow to make them steep.
-                float mask_shape = abs(cos(PH_MASK_HEIGHT  + (PH_MASH_OFFSET * is_even))) ;
+                float mask_shape = abs(cos(PH_MASK_HEIGHT  + (PH_MASH_OFFSET * is_even2))) ;
                 mask_shape = pow(mask_shape, PIXELGRID_Y_MASK_STEEP);
                 
             //Get per channel input luminance by clamping pixel_in
@@ -403,7 +401,6 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         vec3 pixel_masked = mask * pixel_in;
         vec3 pixel_out = mix(pixel_masked, mask, 0.0);
     //And return it with the alpha channel containing the mask itself, so that halo can selectively light it.
-        //if (is_even == 1.0) pixel_out = mix(pixel_out, vec3(1.0,0.0,1.0), 0.3);
         return vec4(pixel_out, dot(mask, vec3(0.3333) ));
 }
 

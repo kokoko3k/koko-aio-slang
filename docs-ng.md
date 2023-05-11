@@ -95,6 +95,8 @@
         Mask type preset:
             You can have the shader generate a preconfigured mask for you:
             1:gm 2:gmx 3:rgb 4:rgbx 5:rbg 6:rbgx
+            beware that due to limitations of the actual implementation, masks ending in "x"
+            works reliable when emulating slotmasks only at screen coordinates with multiplier = 1.0
             ...or with 0, you can draft your own by using the following knobs:
                 Phosphors+gap count (mask size):
                     How much phosphors or blank spaces the final mask will have.
