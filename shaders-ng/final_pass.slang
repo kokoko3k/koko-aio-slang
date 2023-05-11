@@ -341,7 +341,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 
             //offset trias to emulate core level slotmask, calc right offset here:
                 //sin() tell use if the current cell position is odd or even:
-                    float sin_check_offset2 = sin(freq_base_unfloored.x);
+                    float sin_check_offset2 = cos(freq_base_unfloored.x);
                     float is_even2 = step(sin_check_offset2, 0.0);
                 
                 //Then we can apply the optional offset to emulate the slotmask on even cells
@@ -367,7 +367,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         if (PIXELGRID_Y_MASK > 0.0) {
             //offset trias to emulate core level slotmask, calc right offset here:
             //sin() tell use if the current cell position is odd or even:
-                float sin_check_offset = sin(freq_base_unfloored.x);
+                float sin_check_offset = cos(freq_base_unfloored.x);
                 float is_even = step(sin_check_offset, 0.0);
                 
             //Switch reference coords according to user pref: 
