@@ -122,9 +122,11 @@ void main() {
             
     //Pixelgrid: get mask type; .rgb contains layout, .a contains the size.
         #define PG_H_COUNT vPG_offsets_and_size.a
-        vPG_offsets_and_size = PG_get_hmask_preset();
+        vPG_offsets_and_size = PG_get_hmask_preset() ;
         //scale offsets to be used by sin/cos:
             vPG_offsets_and_size.rgb *= (pi / PG_H_COUNT);
+        //offset to help even/odd detection code through sin or cos later on (slot mask stagger)
+            vPG_offsets_and_size.rgb = vPG_offsets_and_size.rgb + (pi/(PG_H_COUNT*2.0));            
             
     //Pixelgrid: Calc freq_base_screen
         //Tate ?
@@ -341,7 +343,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 
             //offset trias to emulate core level slotmask, calc right offset here:
                 //sin() tell use if the current cell position is odd or even:
-                    float sin_check_offset2 = cos(freq_base_unfloored.x);
+                    float sin_check_offset2 = sin(freq_base_unfloored.x);
                     float is_even2 = step(sin_check_offset2, 0.0);
                 
                 //Then we can apply the optional offset to emulate the slotmask on even cells
@@ -367,9 +369,11 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         if (PIXELGRID_Y_MASK > 0.0) {
             //offset trias to emulate core level slotmask, calc right offset here:
             //sin() tell use if the current cell position is odd or even:
-                float sin_check_offset = cos(freq_base_unfloored.x);
+            //più sposta il viola a sinistra
+                //float sin_check_offset = sin(freq_base_unfloored.x  + (pi/(PG_h_count*2.0)  ));
+                float sin_check_offset = sin(freq_base_unfloored.x);
                 float is_even = step(sin_check_offset, 0.0);
-                
+
             //Switch reference coords according to user pref: 
                 float freq_cell_y = mix_step(freq_base_core.y, freq_base_screen.y, PIXELGRID_Y_MASK_COORDS);
                 
@@ -398,8 +402,8 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
     //Also apply mask to input pixel:
         vec3 pixel_masked = mask * pixel_in;
         vec3 pixel_out = mix(pixel_masked, mask, 0.0);
-    
     //And return it with the alpha channel containing the mask itself, so that halo can selectively light it.
+        //if (is_even == 1.0) pixel_out = mix(pixel_out, vec3(1.0,0.0,1.0), 0.3);
         return vec4(pixel_out, dot(mask, vec3(0.3333) ));
 }
 
