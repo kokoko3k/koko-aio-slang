@@ -654,7 +654,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 
 //Aspect Ratio
-#pragma parameter label_ar	 "★ Aspect Ratio "							0.0  0.0  1.0     1.0
+#pragma parameter label_ar	 "★ Aspect Ratio "							0.0  0.0  0.0     1.0
 #pragma parameter ASPECT_X       "        Aspect Ratio Numerator (<=0 for a preset)"   		0.0  -6.0 256. 1.0
 #pragma parameter ASPECT_Y       "        Aspect Ratio Denominator"	  				3.0   0.0 256. 1.0
 #pragma parameter BLANK22 " " 0.0 0.0 1.0 1.0
