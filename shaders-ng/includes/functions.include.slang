@@ -148,7 +148,12 @@ vec2 apply_fuzzy_main_pass_stage_1() {
 		
 		float m3 = mix(1.0, 0.75, PIXELGRID_Y_MASK);
 	
-		color_out = (color_out * m1) * (m2 * m3);
+		float mout = mix(m1 * m2 * m3, 1.0, 0.25);
+		
+		
+		color_out = color_out * mout;
+
+		
 	}
 
 	if (DO_HALO == 1.0)
