@@ -304,7 +304,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //screen coords needs flooring:
                 vec2 period_multiply = vec2(PIXELGRID_MUL_X, PIXELGRID_MUL_Y);
                 vec2 freq_base_screen = vPG_freq_base_screen * floor(vPG_OutputCoord_tated * vPG_OutputSize_tated * period_multiply ) / period_multiply;
-
+//freq_base_screen = vPG_freq_base_screen * vPG_OutputCoord_tated * vPG_OutputSize_tated ;
             //the following unfloored coords are needed by sin/cos later to understand if we are on an even or odd mask
                 //vec2 freq_base_screen_unfloored = pi * vec2(1/PG_h_count, 0.5) * (vPG_OutputCoord_tated * vPG_OutputSize_tated);  
                 vec2 freq_base_screen_unfloored = vPG_freq_base_screen_unfloored; //<-- missing muls because done to vertex shader.
