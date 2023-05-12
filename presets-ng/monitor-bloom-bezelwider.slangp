@@ -1,7 +1,7 @@
 #reference "monitor-bloom-bezel.slangp"
 
 
-SCANLINE_MIN = "0.2"
+PIXELGRID_MIN_H = "0.200000"
 
 BEZEL_FRAME_ZOOM = "0.17"
 BEZEL_INNER_ZOOM = "-0.014"
