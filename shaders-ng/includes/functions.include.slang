@@ -132,11 +132,16 @@ vec2 apply_fuzzy_main_pass_stage_1() {
 	float color_in = 1.0;
 	float color_out = 1.0;
 	
-	if (DO_CCORRECTION == 1.0)
+	float gamma_out = 1.0;
+	
+	if (DO_CCORRECTION == 1.0) {
 		color_out = pow(color_in, GAMMA_OUT);
+		gamma_out = gamma_out * GAMMA_OUT;
+	}
 	
 	if (DO_IN_GLOW == 1.0) {
 		color_out = pow(color_out,IN_GLOW_GAMMA)*IN_GLOW_POWER;
+		gamma_out = gamma_out * IN_GLOW_GAMMA;
 	}
 	
 	if (DO_PIXELGRID == 1.0) {
@@ -156,17 +161,17 @@ vec2 apply_fuzzy_main_pass_stage_1() {
 		
 	}
 
-	if (DO_HALO == 1.0)
+	if (DO_HALO == 1.0) {
 		color_out += pow(color_in,HALO_GAMMA)*HALO_POWER;
-
+		gamma_out = gamma_out * mix(1.0, HALO_GAMMA, HALO_POWER) ;
+	}
 	
 	if (DO_VIGNETTE == 1.0)
 		color_out *= 0.8 * (V_POWER);
 	
 
 	
-	return vec2(color_out/color_in,
-				GAMMA_OUT * IN_GLOW_GAMMA * mix(1.0, HALO_GAMMA, HALO_POWER) );
+	return vec2(color_out/color_in, gamma_out * 1.5);
 }
 
 vec3 apply_fuzzy_main_pass_stage_2(vec3 pixel_in, vec2 stage1 ) {
