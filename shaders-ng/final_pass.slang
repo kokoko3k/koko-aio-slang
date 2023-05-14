@@ -339,7 +339,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         vec3 rgb_h = vec3(1.0);
         if (DO_PIXELGRID_H == 1.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0)) {
             //calculate each phosphor eight according to input luminance 
-                vec3 phosphor_height = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
+                vec3 phosphor_height = map_range(pixel_in * rgb_w, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
             //offset trias to emulate core level slotmask, calc right offset here:
                 //sin() tell use if the current cell position is odd or even:
                     float o =  (pi/(PG_h_count*2.0));  
