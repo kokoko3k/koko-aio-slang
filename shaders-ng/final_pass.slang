@@ -385,8 +385,8 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 float mask_shape = abs(cos(PH_MASK_HEIGHT  + (PH_MASH_OFFSET * is_even2))) ;
                 mask_shape = pow(mask_shape, PIXELGRID_Y_MASK_STEEP);
                 
-            //Get per channel input luminance by clamping pixel_in
-                vec3 lum=clamp(pixel_in, 0.0, 1.0);
+            //Get per channel input luminance by clamping pixel_in and aplplying hmask
+                vec3 lum=clamp(pixel_in * rgb_w, 0.0, 1.0);
             //Adapt the luminance effect via input parameter
                 vec3 lum_adapted = (1-lum*PIXELGRID_Y_MASK_ON_WHITE);
             //Calc final mask visibility as the minimum between tha configured visibility and luminosity effect

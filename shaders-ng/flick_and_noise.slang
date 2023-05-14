@@ -104,9 +104,9 @@ void debug() {
    
    //pixel_debug=vec3(0.7,0.2,1.0)*vTexCoord.x;
    
-   //pixel_debug=vec3(vTexCoord.x); //H bw gradient
+   pixel_debug=vec3(vTexCoord.x); //H bw gradient
    
-   pixel_debug=vec3(1.0); //white
+   //pixel_debug=vec3(1.0); //white
    
    //pixel_debug=vec3(0,1,0); //green
    //pixel_debug=vec3(1,0,0); //red
