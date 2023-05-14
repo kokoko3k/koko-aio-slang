@@ -145,25 +145,15 @@ vec2 apply_fuzzy_main_pass_stage_1() {
 	}
 	
 	if (DO_PIXELGRID == 1.0) {
-		float m1 = (PIXELGRID_MAX_W + PIXELGRID_MIN_W) * 0.5;
-		m1 = mix(1.0, m1, DO_PIXELGRID_W);
-		
-		float m2 = (PIXELGRID_MAX_H + PIXELGRID_MIN_H) * 0.5;
-		m2 = mix(1.0, m2, DO_PIXELGRID_H);
-		
-		float m3 = mix(1.0, 0.75, PIXELGRID_Y_MASK);
-	
-		float mout = mix(m1 * m2 * m3, 1.0, 0.25);
-		
-		
-		color_out = color_out * mout;
-
-		
+		color_out *= 1- DO_PIXELGRID_H * 0.5   ; //Half color if scanline.
+		color_out *= 1- DO_PIXELGRID_W * 0.5   ; //Half color if Hmask.
+		color_out *= 1- PIXELGRID_Y_MASK * 0.2 ; //Strip at most 20% if level 2 ymask.
 	}
 
+
 	if (DO_HALO == 1.0) {
-		color_out += pow(color_in,HALO_GAMMA)*HALO_POWER;
-		gamma_out = gamma_out * mix(1.0, HALO_GAMMA, HALO_POWER) ;
+		color_out += color_in*HALO_POWER;
+		gamma_out = gamma_out * mix(1.0, HALO_GAMMA, HALO_POWER*0.25) ;
 	}
 	
 	if (DO_VIGNETTE == 1.0)
@@ -171,7 +161,7 @@ vec2 apply_fuzzy_main_pass_stage_1() {
 	
 
 	
-	return vec2(color_out/color_in, gamma_out * 1.5);
+	return vec2(color_out/color_in, gamma_out );
 }
 
 vec3 apply_fuzzy_main_pass_stage_2(vec3 pixel_in, vec2 stage1 ) {
