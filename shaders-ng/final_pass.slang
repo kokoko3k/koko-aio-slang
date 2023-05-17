@@ -841,11 +841,9 @@ void main() {
 
     //Precalc Bezel coords, since it modifies content coords.
         vec2 co_bezel = vec2(0.0);
-        vec2 co_mirror = co_content;
         if (DO_BEZEL == 1.0) {
             co_content = zoomout_coords(co_content, -vBEZEL_INNER_ZOOM_adapted , 1.0);
             co_bezel = get_scaled_coords_for_bezel();
-            co_mirror = zoom(co_content, 1/BEZEL_REFL_ZOOMOUT_ROOM);
         }
 
         
@@ -855,6 +853,10 @@ void main() {
         if (DO_CURVATURE == 1.0  &&  ((GEOM_WARP_X != 0.0) || (GEOM_WARP_Y != 0.0))) {
             co_content = Warp_fast(co_content, vWarp_vexp, vWarp_arg2, GEOM_CUT_EARS);
         }
+        
+    //Mirror coords needs to be calculated here, before geom override, but after curvature.
+    //It is still not perfect but a reasonable tradeoff by now.
+        vec2 co_mirror = zoom(co_content, 1/BEZEL_REFL_ZOOMOUT_ROOM);
         
     //Apply other content coords modifiers
         if (DO_GAME_GEOM_OVERRIDE == 1.0)
