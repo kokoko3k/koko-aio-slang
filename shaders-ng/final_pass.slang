@@ -841,9 +841,11 @@ void main() {
 
     //Precalc Bezel coords, since it modifies content coords.
         vec2 co_bezel = vec2(0.0);
+        vec2 co_mirror = co_content;
         if (DO_BEZEL == 1.0) {
             co_content = zoomout_coords(co_content, -vBEZEL_INNER_ZOOM_adapted , 1.0);
             co_bezel = get_scaled_coords_for_bezel();
+            co_mirror = zoom(co_content, 1/BEZEL_REFL_ZOOMOUT_ROOM);
         }
 
         
@@ -879,7 +881,6 @@ void main() {
         vec4 pixel_bezel;
         //SKIP LOGIC is inside fn_pixel_bezel
         if (DO_BEZEL == 1.0) {
-            vec2 co_mirror = zoom(co_content, 1/BEZEL_REFL_ZOOMOUT_ROOM);
             pixel_bezel = fn_pixel_bezel(co_bezel, co_mirror, BG_IMAGE_NIGHTIFY);
             //If we used a smooth_border, canvas_busy is it, but since the content is in the bezel,
             //we can safely use it to smooth/darken the game border
