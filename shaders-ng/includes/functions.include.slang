@@ -480,8 +480,13 @@ vec2 Warp_try(vec2 pos, float warpX, float warpY) {
 			scale_y = destsize.x/(destsize.y / in_aspect );
 			offset_y = (0.5 * scale_y ) - 0.5 ;
 		} else {
-			scale_x = destsize.x/(destsize.y * in_aspect);
-			offset_x = (0.5 * scale_x ) - 0.5 ;
+			//to fit width, use this:
+				scale_x = destsize.x/(destsize.y * in_aspect);
+				offset_x = (0.5 * scale_x ) - 0.5 ;
+				
+			//to fit height, use this:
+				//scale_y = destsize.y/(destsize.x / in_aspect);
+				//offset_y = (0.5 * scale_y ) - 0.5 ;
 		}
 
 		vec2 scale_coord=vec2(pTexCoord.x*scale_x - offset_x , pTexCoord.y*scale_y - offset_y);
