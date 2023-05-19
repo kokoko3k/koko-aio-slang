@@ -514,8 +514,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter DO_DOT_MATRIX		"★  Dot matrix emulation enable? (NOT with scanlines!) ==>"	0.0 0.0 1.0 1.0
 #pragma parameter DOT_M_G_STR		"        Grid strength"					0.0 0.0 1.0 0.01
 #pragma parameter DOT_M_G_TRESH		"           . Paint on bright (<0 on black)"	1.1 -1.1 1.1 0.01
-#pragma parameter DOT_M_G_BRT		"           . Grid brightness"			0.0 0.0 1.0 0.01
-#pragma parameter DOT_M_G_SHARP		"           . Grid sharpness"			2.0 0.0 20.0 0.25
+#pragma parameter DOT_M_G_BRT		"           . Grid brightness"					0.0 0.0 1.0 0.01
+#pragma parameter DOT_M_G_SHARP		"           . Grid sharpness (0.0 for auto)"	0.0 0.0 20.0 0.25
 #pragma parameter DOT_M_MBLUR_STR	"        Refresh inertia"				0.45  0.0 0.9 0.05
 #pragma parameter DOT_M_MBLUR_MODE  "           . Inertia on: both,white,black"	0.0  0.0 2.0 1.0
 #pragma parameter DOT_M_SHADOW_STR  "        Shadow strength (disables deconvergence)"	0.0  0.0 1.0 0.01

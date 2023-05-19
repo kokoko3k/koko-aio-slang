@@ -1,6 +1,26 @@
 #version 450
-#include "config.inc"
 
+#define CWHITE  vec3(1.0)
+#define CGRAY   vec3(0.5)
+#define CBLACK  vec3(0.0)
+#define CPURPLE vec3(1.0,0.0,1.0)
+#define CCUSTOM vec3(1.0,0.5,0.1)
+
+#define DEBUG_COLOR CPURPLE
+#define DEBUG_BLINK_TIME 20
+#define DEBUG_GRADIENT_STEPS 16
+
+//#define DEBUG
+   //#define DEBUG_TIME_FADE
+   //#define DEBUG_SOLID_COLOR
+   //#define DEBUG_GRADIENT
+   //#define DEBUG_STEP_GRADIENT
+   //#define DEBUG_BLINK
+   //#define DEBUG_BLINK_CIRCLE
+   #define DEBUG_COLORWHEEL
+   
+   
+#include "config.inc"
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
@@ -94,53 +114,47 @@ vec3 colorwheel(vec2 uv){
 void debug() {
 //Just test patterns here
    vec3 pixel_debug;
-   //pixel_debug=vec3(abs(sin(params.FrameCount/3.14/5.0))); //white fade
    
-   //pixel_debug=vec3(abs(sin(params.FrameCount/3.14/20)),0.0,0.0); //red fade
+   #ifdef DEBUG_TIME_FADE
+      float time_fade = abs(sin(params.FrameCount/3.14/20));
+      vec3 color_fade = DEBUG_COLOR * time_fade;
+      pixel_debug = color_fade;
+      
+   #elif defined DEBUG_SOLID_COLOR   
+      pixel_debug = DEBUG_COLOR;
+      
+   #elif defined DEBUG_GRADIENT
+      pixel_debug = DEBUG_COLOR * vTexCoord.x;
+      
+   #elif defined DEBUG_STEP_GRADIENT
+      pixel_debug = DEBUG_COLOR * floor(vTexCoord.x* DEBUG_STEPS )/ DEBUG_GRADIENT_STEPS ;
+      
+   #elif defined DEBUG_BLINK
+      if (mod(params.FrameCount, DEBUG_BLINK_TIME*2) < DEBUG_BLINK_TIME) 
+         pixel_debug = vec3(0.2) ;
+      else 
+         pixel_debug = DEBUG_COLOR;
    
-   
-   
-   //pixel_debug=vec3(0.0,1.0,1.0);
-   
-   pixel_debug=vec3(0.5,0.2,1.0)*vTexCoord.x;
-   
-   //pixel_debug=vec3(vTexCoord.x); //H bw gradient
-   
-   //pixel_debug=vec3(1.0); //white
-   
-   //pixel_debug=vec3(0,1,0); //green
-   //pixel_debug=vec3(1,0,0); //red
-   //pixel_debug=vec3(1,0.5,1); //purple
-   
-   //pixel_debug=vec3(floor(vTexCoord.x*16)/16); //H bw gradient 16gray
-   
-   //pixel_debug=vec3(floor(vTexCoord.x*64)/64); //H bw gradient 64gray
-   
-   //pixel_debug=vec3(floor(vTexCoord.x*128)/128); //H bw gradient 128gray
-   
-   //pixel_debug=vec3(floor(vTexCoord.x*256)/256); //H bw gradient 256gray
-   
-   //pixel_debug=vec3(1,0,0)*floor(vTexCoord.x*64)/64; //H red gradient 64
-   
-  //    float blink_time = 20;
-  //       if  (mod(params.FrameCount,blink_time*2) < blink_time) pixel_debug=vec3(0.2) ; else pixel_debug=vec3(1.0);
-   
-   //White circle, blinking
-   /*   float blink_time = 20;
+   #elif defined DEBUG_BLINK_CIRCLE
       vec2 center = vTexCoord - vec2(0.5,0.5);
       float radius = 0.1;
       pixel_debug = vec3(1 - step(radius, length(center)));
-      pixel_debug *= float((mod(params.FrameCount,blink_time*2) < blink_time));
-   */
+      pixel_debug *= float( ( mod(params.FrameCount, DEBUG_BLINK_TIME * 2) < DEBUG_BLINK_TIME));
+      pixel_debug *= DEBUG_COLOR;
+      
+   #elif defined DEBUG_COLORWHEEL   
+      pixel_debug = colorwheel(vTexCoord);   
+   #endif
    
-   //pixel_debug = colorwheel(vTexCoord);   
    FragColor = vec4(pixel_debug,1.0);
 }
 
 
 void main() {
    
-   //debug(); return;
+   #ifdef DEBUG
+      debug(); return;
+   #endif
 
    /* since flickering code needs
       luminosity difference between 2 vertical lines

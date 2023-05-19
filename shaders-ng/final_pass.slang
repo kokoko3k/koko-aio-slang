@@ -6,6 +6,10 @@
  */
 
 
+#define DEBUG_PRINT_VALUE 1.0
+//#define DEBUG_QUAD_SPLIT  1.0
+//#define DEBUG_DUAL_SPLIT  1.0
+
 #include "config.inc"
 
 #pragma stage vertex
@@ -47,10 +51,54 @@ layout(location = 23) out vec2 vPG_test_floor;
 layout(location = 24) out vec2 vPG_OriginalSize_tated;
 layout(location = 25) out vec2 vPG_OutputSize_tated;
 layout(location = 26) out vec2 vPG_OutputCoord_tated;
+layout(location = 27) out float vDotMat_Grid_Sharpness;
+layout(location = 28) out float vfprintvalue;
 
 #include "includes/functions.include.slang"
 
 #define PI_15 4.71238898038469 //pi*1.5
+
+
+vec2 get_zooms_modifier() {
+    // This function is meant to live in vertex shader; its purpose is to
+    // give the final scale factor by taking in consideration various zoom modifiers.
+    //It works by calculating the new 0.0 and 1.0 coords then measuring the new distance between them
+
+    // WARNING: This has to be in sync with the code, so everytime a scaling flow is modified, this needs to be updated. WARNING
+    // WARNING: This has to be in sync with the code, so everytime a scaling flow is modified, this needs to be updated. WARNING
+    // WARNING: This has to be in sync with the code, so everytime a scaling flow is modified, this needs to be updated. WARNING
+    
+    vec2 co_scaled_min = vec2(0.0);
+    vec2 co_scaled_max = vec2(1.0);
+        
+    if ( need_NO_integer_scale() ) {
+        co_scaled_min = get_scaled_coords_aspect(co_scaled_min, global.FinalViewportSize, vIn_aspect, bool(vIsRotated));
+        co_scaled_max = get_scaled_coords_aspect(co_scaled_max, global.FinalViewportSize, vIn_aspect, bool(vIsRotated));
+    } else {
+        co_scaled_min = integer_scale(co_scaled_min, vIn_aspect, bool(vIsRotated), GAME_GEOM_INT_SCALE-1.0 ) + vec2( GAME_GEOM_OFF_FIX /10000);
+        co_scaled_max = integer_scale(co_scaled_max, vIn_aspect, bool(vIsRotated), GAME_GEOM_INT_SCALE-1.0 ) + vec2( GAME_GEOM_OFF_FIX /10000);
+    }
+    
+    
+    co_scaled_min = (zoom(co_scaled_min + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM ) * DO_GLOBAL_SHZO) + 
+                (co_scaled_min * (1-DO_GLOBAL_SHZO) );
+    co_scaled_max = (zoom(co_scaled_max + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM ) * DO_GLOBAL_SHZO) + 
+                (co_scaled_max * (1-DO_GLOBAL_SHZO) );
+    
+    if (DO_BEZEL == 1.0) {
+        co_scaled_min = zoomout_coords(co_scaled_min, -vBEZEL_INNER_ZOOM_adapted , 1.0);
+        co_scaled_max = zoomout_coords(co_scaled_max, -vBEZEL_INNER_ZOOM_adapted , 1.0);
+    }
+ 	if (DO_GAME_GEOM_OVERRIDE == 1.0) {
+		co_scaled_min = content_geom_override(co_scaled_min, GAME_GEOM_ASPECT, vIn_aspect, GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
+        co_scaled_max = content_geom_override(co_scaled_max, GAME_GEOM_ASPECT, vIn_aspect, GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
+    }
+ 
+    //vfprintvalue = 1/(co_scaled_max.y - co_scaled_min.y);
+    return 1 / vec2(co_scaled_max.x - co_scaled_min.x,
+                co_scaled_max.y - co_scaled_min.y );
+    
+}
 
 void main() {
     gl_Position = global.MVP * Position;
@@ -106,7 +154,7 @@ void main() {
         //contrast and brightness into account. This is needed so that scanline generation
         //can map the proper input range and strictly obey scanline thickness constraints.
         vMax_inLum = max( 1.0, DO_CCORRECTION * apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS)) *
-                        max( 1.0, DO_IN_GLOW * IN_GLOW_POWER);
+                     max( 1.0, DO_IN_GLOW * IN_GLOW_POWER);
 
         
     //Generate a seed that changes over time for temporal random noise
@@ -149,7 +197,22 @@ void main() {
     //Pixelgrid: adapt period multiplier
         if (vPG_period_multiplier.x < 0.0) vPG_period_multiplier.x = 1/-vPG_period_multiplier.x;  
         if (vPG_period_multiplier.y < 0.0) vPG_period_multiplier.y = 1/-vPG_period_multiplier.y;            
-    }
+    
+    
+    //Dot matrix: measure the final picture size to choose a right sharpness level
+    //For simplicity and (my) mental health, take only y into account.
+        vDotMat_Grid_Sharpness = DOT_M_G_SHARP;
+        if (DOT_M_G_SHARP == 0.0) {
+            float zooms_modifier  = get_zooms_modifier().y;
+            float dotmat_insize  = global.flick_and_noise_passSize.y;
+            float dotmat_outsize = global.FinalViewportSize.y  * zooms_modifier;
+            vfprintvalue = dotmat_outsize / dotmat_insize;
+            vDotMat_Grid_Sharpness = (dotmat_outsize / dotmat_insize);
+            vDotMat_Grid_Sharpness = vDotMat_Grid_Sharpness * 2.5 - 1.5;     
+           
+        }
+}
+
 
 
 #pragma stage fragment
@@ -180,7 +243,8 @@ layout(location = 23) in vec2 vPG_test_floor;
 layout(location = 24) in vec2 vPG_OriginalSize_tated;
 layout(location = 25) in vec2 vPG_OutputSize_tated;
 layout(location = 26) in vec2 vPG_OutputCoord_tated;
-
+layout(location = 27) in float vDotMat_Grid_Sharpness;
+layout(location = 28) in float vfprintvalue;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -414,8 +478,9 @@ vec4 fn_pixel_dotmat(vec2 coords, vec3 pixel_in) {
     //Zoom to debug:
         angle_base/=DOT_M_MULTIPLY;
 
-    //Set the rgb and grid sharpness:
-        float s_grid = DOT_M_G_SHARP;
+    //Set the grid sharpness from vertex shader:
+        float s_grid = vDotMat_Grid_Sharpness;
+  
         
     //Generate bw grid:     
         vec2 grid = cos(angle_base);
@@ -950,18 +1015,27 @@ void main() {
   
      
 
-    //For debug purposes:
-        //quad split screen
-        //if ( (vOutputCoord.x < 0.5  && vOutputCoord.y > 0.5) || (vOutputCoord.x > 0.5  && vOutputCoord.y < 0.5)  ) pixel_out = texture(flick_and_noise_pass,vOutputCoord).rgb;
-        //split screen
-        //if (vTexCoord.y < 0.5) pixel_out = texture(flick_and_noise_pass,vTexCoord).rgb;
-        //pixel_out = texture(reflected_blurred_pass, vTexCoord).rgb;
+    //Debug functions: 
+        #ifdef DEBUG_QUAD_SPLIT
+            if ( vOutputCoord.x < 0.5  && vOutputCoord.y > 0.5 || vOutputCoord.x > 0.5  && vOutputCoord.y < 0.5 )
+            pixel_out = texture(flick_and_noise_pass,vOutputCoord).rgb;
+        #endif
+    
+        #ifdef DEBUG_DUAL_SPLIT
+            if (vTexCoord.y < 0.5) pixel_out = texture(flick_and_noise_pass,vTexCoord).rgb;
+        #endif
+            
+        #ifdef PRINT_VALUE
+            float maxdigits = 10.0;
+            float decimalplaces = 2.0;
+            float fvalue = vfprintvalue;
+            vec2 vFragCoord = vec2( floor(vOutputCoord.x * params.OutputSize.x),
+                                floor(vOutputCoord.y * params.OutputSize.y));
+            pixel_out += PrintValueVec3( vTexCoord, vFragCoord, fvalue, maxdigits, decimalplaces );
+        #endif
         
-        
+ 
     FragColor = vec4(pixel_out, 1.0);
    
-    //FragColor = vec4(texture( reflected_blurred_pass, co_mirror).a);
     
 }
-
-//NEW
