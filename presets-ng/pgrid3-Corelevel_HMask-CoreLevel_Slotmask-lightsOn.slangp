@@ -1,7 +1,7 @@
 #reference "../koko-aio-ng.slangp"
 
 DO_CCORRECTION = "1.000000"
-	LUMINANCE = "0.600000"
+	LUMINANCE = "0.400000"
 	GAMMA_OUT = "0.500000"
 
 DO_SHIFT_RGB = "1.000000"
