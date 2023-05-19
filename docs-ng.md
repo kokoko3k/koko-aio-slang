@@ -286,7 +286,10 @@
         Use a straight bezel instead of a curved one.
     Inner zoom:
         Allows to shrink or expand the game content to fit the monitor frame.
-        When integer scaling is enabled, this is ignored.
+        "Fitting the monitor frame" is the ONLY scope of this option.
+        To have a smaller or larger than bezel screen, please use "Override content geometry"
+        options, or the reflections on the bezel will be misaligned.p
+
     Frame zoom:
           Allows to shrink or expand the monitor frame to fit the game content.
     Bezel color (red,green,blue) and contrast:
