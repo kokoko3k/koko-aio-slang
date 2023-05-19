@@ -208,7 +208,8 @@ void main() {
             float dotmat_outsize = global.FinalViewportSize.y  * zooms_modifier;
             vfprintvalue = dotmat_outsize / dotmat_insize;
             vDotMat_Grid_Sharpness = (dotmat_outsize / dotmat_insize);
-            vDotMat_Grid_Sharpness = vDotMat_Grid_Sharpness * 2.5 - 1.5;     
+            vDotMat_Grid_Sharpness = vDotMat_Grid_Sharpness * 3.6 - 3.1;
+            vDotMat_Grid_Sharpness = clamp(vDotMat_Grid_Sharpness, 0.5, 20.0);
            
         }
 }
@@ -1025,7 +1026,7 @@ void main() {
             if (vTexCoord.y < 0.5) pixel_out = texture(flick_and_noise_pass,vTexCoord).rgb;
         #endif
             
-        #ifdef PRINT_VALUE
+        #ifdef DEBUG_PRINT_VALUE
             float maxdigits = 10.0;
             float decimalplaces = 2.0;
             float fvalue = vfprintvalue;
