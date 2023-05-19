@@ -6,9 +6,9 @@
  */
 
 
-#define DEBUG_PRINT_VALUE 1.0
-//#define DEBUG_QUAD_SPLIT  1.0
-//#define DEBUG_DUAL_SPLIT  1.0
+//#define DEBUG_PRINT_VALUE
+//#define DEBUG_QUAD_SPLIT
+//#define DEBUG_DUAL_SPLIT
 
 #include "config.inc"
 
