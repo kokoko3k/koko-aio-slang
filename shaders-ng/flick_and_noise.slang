@@ -4,22 +4,23 @@
 #define CGRAY   vec3(0.5)
 #define CBLACK  vec3(0.0)
 #define CPURPLE vec3(1.0,0.0,1.0)
+#define CRED    vec3(1.0,0.0,0.0)
 #define CCUSTOM vec3(1.0,0.5,0.1)
 
-#define DEBUG_COLOR CPURPLE
+#define DEBUG_COLOR CWHITE
 #define DEBUG_BLINK_TIME 20
-#define DEBUG_GRADIENT_STEPS 16
+#define DEBUG_GRADIENT_STEPS 128
 
 //#define DEBUG
    //#define DEBUG_TIME_FADE
-   //#define DEBUG_SOLID_COLOR
+   #define DEBUG_SOLID_COLOR
    //#define DEBUG_GRADIENT
    //#define DEBUG_STEP_GRADIENT
    //#define DEBUG_BLINK
    //#define DEBUG_BLINK_CIRCLE
-   #define DEBUG_COLORWHEEL
+   //#define DEBUG_COLORWHEEL
    
-   
+
 #include "config.inc"
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
@@ -127,7 +128,7 @@ void debug() {
       pixel_debug = DEBUG_COLOR * vTexCoord.x;
       
    #elif defined DEBUG_STEP_GRADIENT
-      pixel_debug = DEBUG_COLOR * floor(vTexCoord.x* DEBUG_STEPS )/ DEBUG_GRADIENT_STEPS ;
+      pixel_debug = DEBUG_COLOR * floor(vTexCoord.x* DEBUG_GRADIENT_STEPS )/ DEBUG_GRADIENT_STEPS ;
       
    #elif defined DEBUG_BLINK
       if (mod(params.FrameCount, DEBUG_BLINK_TIME*2) < DEBUG_BLINK_TIME) 

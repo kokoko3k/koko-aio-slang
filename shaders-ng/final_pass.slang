@@ -187,7 +187,7 @@ void main() {
                 vPG_OriginalSize_tated = params.OriginalSize.yx;
             }
                 
-            // screen coords needs flooring, but unfortunately floor() does not work well in vertex shader, so calc as mnuch as possible without floor()
+            // screen coords needs flooring, but unfortunately floor() does not work well in vertex shader, so calc as much as possible without floor()
                 vPG_period_multiplier = vec2(PIXELGRID_MUL_X, PIXELGRID_MUL_Y);
                 vPG_freq_base_screen = pi * vec2(1/PG_H_COUNT, 0.5);
 
