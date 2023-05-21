@@ -81,6 +81,12 @@
     By reading the following explanaitions, you will realize that this section can also be used to emulate<br>
     handhelds screens, where pixels you see on screen have to be sized proportionally to the game one.<br>
     
+    Allow use of fuzzy screen coords
+        If you want perfect mask triads matching between content and screen,
+        disable this option.
+        Enabling it may allow to have a better representation of color
+        shades in some cases.
+
     Horizontal mask
         X resolution: (core or screen) (**):
             0: Phosphors width will be relative to the pixel width of the core (game).
