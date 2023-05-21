@@ -370,14 +370,18 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         vec2 freq_base_core   = pi * in_coords * vPG_OriginalSize_tated ;
 
         //Screen coords:
-            //screen coords needs flooring:
-                vec2 period_multiply = vec2(PIXELGRID_MUL_X, PIXELGRID_MUL_Y);
-                vec2 freq_base_screen = vPG_freq_base_screen * floor(vPG_OutputCoord_tated * vPG_OutputSize_tated * period_multiply ) / period_multiply;
-//freq_base_screen = vPG_freq_base_screen * vPG_OutputCoord_tated * vPG_OutputSize_tated ;
-            //the following unfloored coords are needed by sin/cos later to understand if we are on an even or odd mask
-                //vec2 freq_base_screen_unfloored = pi * vec2(1/PG_h_count, 0.5) * (vPG_OutputCoord_tated * vPG_OutputSize_tated);  
+            vec2 period_multiply = vec2(PIXELGRID_MUL_X, PIXELGRID_MUL_Y);
+
+            //The following unfloored coords are needed by sin/cos later to understand if we are on an even or odd mask
+                //vec2 freq_base_screen_unfloored = pi * vec2(1/PG_h_count, 0.5) * (vPG_OutputCoord_tated * vPG_OutputSize_tated);
                 vec2 freq_base_screen_unfloored = vPG_freq_base_screen_unfloored; //<-- missing muls because done to vertex shader.
 
+            //Screen coords may need flooring for 1:1 sizes, not sure if needed even for y coord:
+                vec2 freq_base_screen = vPG_freq_base_screen * floor(vPG_OutputCoord_tated * vPG_OutputSize_tated * period_multiply ) / period_multiply;
+
+            //Disable flooring when not using 1:1 scaling
+                freq_base_screen = mix(freq_base_screen_unfloored, freq_base_screen,
+                                   vec2( float(PIXELGRID_MUL_X == 1.0), float(PIXELGRID_MUL_Y == 1.0) ) );
             
     //Switch between core and screen sizes (x and y)
         vec2 freq_base           = mix( freq_base_core, freq_base_screen,           vec2(PIXELGRID_SIZE_W, PIXELGRID_SIZE_H));
