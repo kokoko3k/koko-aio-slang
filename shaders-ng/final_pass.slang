@@ -406,7 +406,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
     
     //Height phosphor mask (can be used for scanlines, slotmask, aperturegrille):
         vec3 rgb_h = vec3(1.0);
-        if (DO_PIXELGRID_H == 1.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0)) {
+        if (DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0)) {
             //calculate each phosphor eight according to input luminance 
                 vec3 phosphor_height = map_range(pixel_in * rgb_w, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
             //offset trias to emulate core level slotmask, calc right offset here:
@@ -430,6 +430,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //Finally get 3 sines out of the previous one by applying height modifiers
                 rgb_h = vec3(rgb_h_sin);
                 rgb_h = morph_shape(rgb_h, phosphor_height, PIXELGRID_NO_INTERBLEED_H);
+                rgb_h = mix(vec3(1.0), rgb_h, DO_PIXELGRID_H);
         }
 
     //Height phosphor mask number 2, can be used for slotmask,aperturegrille, not scanlines.
