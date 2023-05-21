@@ -53,6 +53,7 @@ layout(location = 25) out vec2 vPG_OutputSize_tated;
 layout(location = 26) out vec2 vPG_OutputCoord_tated;
 layout(location = 27) out float vDotMat_Grid_Sharpness;
 layout(location = 28) out float vfprintvalue;
+layout(location = 29) out float vPG_mask_height;
 
 #include "includes/functions.include.slang"
 
@@ -197,7 +198,9 @@ void main() {
     //Pixelgrid: adapt period multiplier
         if (vPG_period_multiplier.x < 0.0) vPG_period_multiplier.x = 1/-vPG_period_multiplier.x;  
         if (vPG_period_multiplier.y < 0.0) vPG_period_multiplier.y = 1/-vPG_period_multiplier.y;            
-    
+    //Pixelgrid: adapt mask height
+        vPG_mask_height = PIXELGRID_Y_MASK_HEIGHT;
+        if (vPG_mask_height < 0.0) vPG_mask_height = 1/-vPG_mask_height;
     
     //Dot matrix: measure the final picture size to choose a right sharpness level
     //For simplicity and (my) mental health, take only y into account.
@@ -246,6 +249,7 @@ layout(location = 25) in vec2 vPG_OutputSize_tated;
 layout(location = 26) in vec2 vPG_OutputCoord_tated;
 layout(location = 27) in float vDotMat_Grid_Sharpness;
 layout(location = 28) in float vfprintvalue;
+layout(location = 29) in float vPG_mask_height;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -442,7 +446,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 float freq_cell_y = mix_step(freq_base_core.y, freq_base_screen.y, PIXELGRID_Y_MASK_COORDS);
                 
             //mask phosphors heigth
-                #define PH_MASK_HEIGHT (freq_cell_y * PIXELGRID_Y_MASK_HEIGHT)
+                #define PH_MASK_HEIGHT (freq_cell_y * vPG_mask_height)
             //phosphors mask stagger
                 #define PH_MASH_OFFSET  (PIXELGRID_Y_MASK_OFFSET * pi * 0.5  )
                 

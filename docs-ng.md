@@ -173,7 +173,7 @@
 
                 Resolution: (core or screen)
                     Should the vertical interval (height) between those likes be relative to screen or core pixel size?
-                Height (inverted):
+                Height divider (neg=multiplier):
                     The more, the less that intervall will be.
                     Interesting values for screen resolution: 1.0, 0.75, 0.5
                 Fadeout under light: How much they will be visible over bright pixels.
