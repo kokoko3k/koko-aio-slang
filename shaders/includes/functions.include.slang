@@ -1,24 +1,35 @@
 // mix_step returns a or b, depending on the mix value.
-// mix is supposed to have just 2 values, 1.0 or 0.0;
-		vec2 mix_step(vec2 a, vec2 b, float mix){
-			return (a * (1 - mix)) + 
-				(b * mix) ;
+// mix is supposed to have just 2 values, 1.0 or 0.0; //FIXME: mix argument could be vec.
+
+		vec2 mix_step(vec2 a, vec2 b, float m){
+			return mix(a,b,m);  //114
+			//return ( b-a )* m + a; //113.5
+			//if (m==0.0) return a ; return b; //113.5
+			//return (a * (1 - m)) + (b * m) ; //112
 		}
-		vec3 mix_step(vec3 a, vec3 b, float mix){
-			return (a * (1 - mix)) + 
-				(b * mix) ;
+		vec3 mix_step(vec3 a, vec3 b, float m){
+			return mix(a,b,m);
+			//return ( b-a )* m + a;
+			//if (m==0.0) return a ; return b;
+			//return (a * (1 - m)) + (b * m) ;
 		}
-		vec3 mix_step3(vec3 a, vec3 b, float mix){
-			return (a * (1 - mix)) + 
-				(b * mix) ;
+		vec3 mix_step3(vec3 a, vec3 b, float m){
+			return mix(a,b,m);
+			//return ( b-a )* m + a;
+			//if (m==0.0) return a ; return b;
+			//return (a * (1 - m)) + (b * m) ;
 		}
-		vec4 mix_step(vec4 a, vec4 b, float mix){
-			return (a * (1 - mix)) + 
-				(b * mix) ;
+		vec4 mix_step(vec4 a, vec4 b, float m){
+			return mix(a,b,m);
+			//return ( b-a )* m + a;
+			//if (m==0.0) return a ; return b;
+			//return (a * (1 - m)) + (b * m) ;
 		}
-		float mix_step(float a, float b, float mix){
-			return (a * (1 - mix)) + 
-				(b * mix) ;
+		float mix_step(float a, float b, float m){
+			return mix(a,b,m);
+			//return ( b-a )* m + a;
+			//if (m==0.0) return a ; return b;
+			//return (a * (1 - m)) + (b * m) ;
 		}
 
 
@@ -81,11 +92,13 @@ vec3 apply_fuzzy_main_pass(vec3 color) {
    if (DO_IN_GLOW == 1.0)
       color = pow(color,vec3(IN_GLOW_GAMMA))*IN_GLOW_POWER;
    if (DO_VMASK_AND_DARKLINES == 1.0)
-      color *= mix (  (1.0 -  ((RGB_MASK_STRENGTH*0.5)+(DARKLINES_STRENGTH*0.2))), 1.0, MASK_COMPENSATION)                  ;
+      color *= mix (  (1.0 -  ((RGB_MASK_STRENGTH*0.5)+(DARKLINES_STRENGTH*0.2))), 1.0, MASK_COMPENSATION) ;
    if (DO_HALO == 1.0)
       color += pow(color,vec3(HALO_GAMMA))*HALO_POWER;
    if (DO_SCANLINES == 1.0)
       color *=  0.5 + (SCANLINE_DARK*0.5);
+   if (DO_PIXELGRID == 1.0)
+	   color = color * color;
    if (DO_CCORRECTION == 1.0)
       color = pow(color, vec3(GAMMA_OUT));
    if (DO_VIGNETTE == 1.0)
@@ -155,7 +168,11 @@ vec2 zoomout_coords(vec2 in_coords, float zoom_out, float aspect) {
 }
 
 bool scanline_have_to_flicker(bool is_interlaced) {
-    return ((SCANLINE_FLICKERING == 1.0) || ((SCANLINE_FLICKERING==2.0) && is_interlaced ));
+    //Since, by now,  scanlines and pixelgrid provides flickering "directives", handle both here.
+	float scanline_flickering = max( DO_SCANLINES * SCANLINE_FLICKERING, 
+									 DO_PIXELGRID * PIXELGRID_INTR_FLICK_MODE);
+	
+    return ((scanline_flickering == 1.0) || ((scanline_flickering==2.0) && is_interlaced ));
 }
 
 bool is_interlaced() {
@@ -766,3 +783,36 @@ bool is_first_inside_rect(vec2 point, vec4 rect) {
 
 	return pixel_out;
 	}
+
+vec4 PG_get_hmask_preset() {
+    /* Common masks:
+    * 1 gm   : mask size = 2 | offsets=1,0,1  | width=0.3
+    * 2 gmx  : mask size = 3 | offsets=1,0,1  | width=0.25
+    * 3 rgb  : mask size = 3 | offsets=0,1,2  | width=0.25
+    * 4 rgbx : mask size = 4 | offsets=0,1,2  | width=0.20
+    * 3 rbg  : mask size = 3 | offsets=0,1,2  | width=0.25
+    * 4 rbgx : mask size = 4 | offsets=0,1,2  | width=0.20
+    */
+    if (PIXELGRID_H_PRST == 0.0) // manual mask and size
+        return vec4( PIXELGRID_R_SHIFT, PIXELGRID_G_SHIFT, PIXELGRID_B_SHIFT, PIXELGRID_H_COUNT);
+    
+    if (PIXELGRID_H_PRST == 1.0)
+        return vec4( vec3(0,1,0), 2); // gm, mask size 2
+
+    if (PIXELGRID_H_PRST == 2.0)
+        return vec4( vec3(1,0,1), 3); //gmx, mask size 3
+
+    if (PIXELGRID_H_PRST == 3.0)
+        return vec4( vec3(0,1,2), 3); //rgb, mask size 3
+
+    if (PIXELGRID_H_PRST == 4.0)
+        return vec4( vec3(0,1,2), 4); //rgbx, mask size 4
+
+    if (PIXELGRID_H_PRST == 5.0)
+        return vec4( vec3(0,2,1), 3); //rbg, mask size 3
+
+    if (PIXELGRID_H_PRST == 6.0)
+        return vec4( vec3(0,2,1), 4); //rbgx, mask size 4
+
+        
+}

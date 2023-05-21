@@ -1,0 +1,3 @@
+#reference "tv-NTSC-1.slangp"
+
+	NTSC_PHASE_SHIFT = "1.0"

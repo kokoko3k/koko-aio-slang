@@ -26,7 +26,6 @@ layout(location = 4) out float vIsRotated;
 
 //Scanlines:
     layout(location = 7) out float vIsInterlaced;
-    layout(location = 8) out float vFlickeringScanlines;
     layout(location = 9) out float vScanlinePeriod;
     layout(location = 10) out float vScanlineAlternateOffset;
     layout(location = 11) out float vMax_inLum;
@@ -40,6 +39,7 @@ layout(location = 15) out float vVmask_gap;
 layout(location = 16) out float vFcol_Tated;
 layout(location = 17) out float vDo_Tate;
 layout(location = 18) out vec3 vDotMat_Grid_Color;
+layout(location = 19) out vec4 vPG_mask_type;
 
 #include "includes/functions.include.slang"
 
@@ -52,21 +52,22 @@ void main() {
     
     //Calculate vTexcoord as fractional or integer scaled?
         if ( need_NO_integer_scale() )
-            vTexCoord = get_scaled_coords_aspect(TexCoord,global.FinalViewportSize, vIn_aspect, bool(vIsRotated)) + vec2(0.0000);
-                else
-            vTexCoord = integer_scale(TexCoord, vIn_aspect, bool(vIsRotated), GAME_GEOM_INT_SCALE-1.0 ) + vec2(0.0000, 0.0001); //<- without the offset, SCANLINE_MIN doesn't work.
+            vTexCoord = get_scaled_coords_aspect(TexCoord,global.FinalViewportSize, vIn_aspect, bool(vIsRotated));
+        else
+            vTexCoord = integer_scale(TexCoord, vIn_aspect, bool(vIsRotated), GAME_GEOM_INT_SCALE-1.0 ) + vec2( GAME_GEOM_OFF_FIX /10000);
 
+    
     //if (DO_GLOBAL_SHZO >0.5)
     //    vTexCoord = zoom(vTexCoord + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM );
     //..unbranched previous
         vTexCoord = (zoom(vTexCoord + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM ) * DO_GLOBAL_SHZO) + 
                     (vTexCoord * (1-DO_GLOBAL_SHZO) );
 
-    vOutputCoord = TexCoord;
+    vOutputCoord = TexCoord ;
 
 
     vec2 vFragCoord = vec2( floor(vOutputCoord.x * params.OutputSize.x),
-                       floor(vOutputCoord.y * params.OutputSize.y));
+                            floor(vOutputCoord.y * params.OutputSize.y));
 
     vDo_Tate = float(TATE+vIsRotated > 1.001);
     vFragCoord_Tated = mix_step(vFragCoord.xy, vFragCoord.yx, vDo_Tate );
@@ -85,7 +86,7 @@ void main() {
         if (DO_SCANLINES > 0.5) {
             bool bIs_Interlaced = is_interlaced();
             vIsInterlaced = float(bIs_Interlaced);
-            vFlickeringScanlines = float((DO_SCANLINES == 1.0) && scanline_have_to_flicker(bIs_Interlaced)) ;
+            
 
             //Scanline period:
             vScanlinePeriod = 1.0;
@@ -96,6 +97,9 @@ void main() {
                 vScanlinePeriod = 0.5;
             }
             
+        }
+        
+        if (DO_SCANLINES + DO_PIXELGRID > 0.5) {
             //Calculate the maximum possible brightness of the input color by taking glow,
             //contrast and brightness into account. This is needed so that scanline generation
             //can map the proper input range and strictly obey scanline thickness constraints.
@@ -121,6 +125,9 @@ void main() {
                 //Since we modify grid brightness via a specific use parameter, explicitely multiply it by that:
                     vDotMat_Grid_Color *= DOT_M_G_BRT ;
             }
+            
+        //pixelgrid, mask type
+            vPG_mask_type = PG_get_hmask_preset();
 }
 
 
@@ -133,7 +140,7 @@ layout(location = 4) in float vIsRotated;
 layout(location = 5) in vec2 vWarp_vexp;
 layout(location = 6) in vec2 vWarp_arg2;
 layout(location = 7) in float vIsInterlaced;
-layout(location = 8) in float vFlickeringScanlines;
+
 layout(location = 9) in float vScanlinePeriod;
 layout(location = 10) in float vScanlineAlternateOffset;
 layout(location = 11) in float vMax_inLum;
@@ -144,9 +151,9 @@ layout(location = 15) in float vVmask_gap;
 layout(location = 16) in float vFcol_Tated;
 layout(location = 17) in float vDo_Tate;
 layout(location = 18) in vec3 vDotMat_Grid_Color;
+layout(location = 19) in vec4 vPG_mask_type;
 
 layout(location = 0) out vec4 FragColor;
-
 
 
 layout(set = 0, binding = 1) uniform sampler2D backdrop;
@@ -318,197 +325,204 @@ vec3 pixel_darklines(vec3 source,float darkline_every, float darkline_trans,
 }
 
 
-float morph_shape_easy(float shape, float power ) {
+float morph_shape_easy(float shape, float power, float steep ) {
     return pow(shape, 1/(power*2.0));
 }
 
 
-float morph_shape(float shape, float power ) {
+float morph_shape_05(float shape, float power, float steep ) {
     float lum_scaled = power;
     float l = lum_scaled; // (already clamped)
     float l1 = pow(l, 3) * 10;
-    shape = pow(shape, 1/l1);
+    shape = pow(shape, 1/sqrt(l1));
     return shape;
 }
 
 
-float morph_shape_full(float shape, float power ) {
+float morph_shape_full(float shape, float power, float steep ) {
     float lum_scaled = power;
     float l = lum_scaled; // (already clamped)
-    if (lum_scaled <= 0.5) {
+    if (lum_scaled <= 0.5+steep) {
         float l1 = pow(l, 4) * 15;
         shape = pow(shape, 1/sqrt(l1));
     } else {
         float l2 = (l-0.5)*2.0;
-        shape = shape * (1-l2) + l2;
+        shape = mix(shape, 1.0, l2);    //shape = shape * (1-l2) + l2;
     }
     return shape;
 }
 
-vec3 morph_shape(vec3 shape, vec3 power ) {
+
+vec3 morph_shape(vec3 shape, vec3 power, float steep ) {
     return vec3(
-      morph_shape_easy(shape.x, power.x),
-      morph_shape_easy(shape.y, power.y),
-      morph_shape_easy(shape.z, power.z)
+      morph_shape_full(shape.x, power.x, steep),
+      morph_shape_full(shape.y, power.y, steep),
+      morph_shape_full(shape.z, power.z, steep)
     );
 }
 
+float morph_shape(float shape, float power, float steep ) {
+    return morph_shape_full(shape, power, steep);
+}
+
+float smoothstep_fast(float edge0, float edge1, float x) {
+  return smoothstep(edge0,edge1,x);
+  float t = clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);
+  //return cos(t * 3.14159265358979323846) * -0.5 + 0.5;
+  return mix(0.0, 1.0, t);
+}
+
+vec3 smoothstep_fast(vec3 edge0, vec3 edge1, vec3 x) {
+  return smoothstep(edge0,edge1,x);
+  vec3 t = clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);
+  //return cos(t * 3.14159265358979323846) * -0.5 + 0.5;
+  return mix(vec3(0.0), vec3(1.0), t);
+}
 
 
-vec3 fn_pixel_grid(vec2 coords, vec3 pixel_in) {
 
-    //La densità della maschera
-        vec2 mask_size = mix_step(params.OriginalSize.xy, params.OutputSize.xy*0.333, PIXELGRID_SIZE);
-
-    //dev'essere densa 1/3 dato che sino triadi:
-       // mask_size /= 3.0;
-
-    //Che rapporto d'aspetto ha il fosforo?
-        //float ph_aspect = 1.0/1.0;
-
-    //applico il rapporto d'aspetto per la y?
-        //mask_size.y*=ph_aspect;
-
-    //...oppure la maschera è in sync con i pixel originali:
-       // mask_size = params.OriginalSize.xy;
-       // mask_size.y *= 1.0;
-
-    float angle_multiply = 1.0;
-
-    vec2 angle_base;
-    //ricavo il periodo della triade
-        angle_base.x = coords.x * pi * mask_size.x;
-
-    //ricavo il periodo delle linee orizzontali
-        angle_base.y = coords.y * pi * mask_size.y; // * ph_aspect;
-
-    //Zoom to debug:
-        angle_base/=angle_multiply;
-
-
-    vec3 mask_rgb=vec3(1.0);
-
-    float sin_offset_x = (pi/3.0);
+vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inLum) {
+                                                                                            //FIXME: a lot of this gan go in vertex shader.
+    
+    
+    //Tate ?
+        vec2 l_OutputSize   = params.OutputSize.xy;
+        vec2 l_vOutputCoord = vOutputCoord.xy + vec2(0.00001);
+        vec2 l_OriginalSize = params.OriginalSize.xy;
+        
+        if (vDo_Tate == 1.0) {
+            l_OutputSize   = params.OutputSize.yx;
+            l_vOutputCoord = vOutputCoord.yx;
+            in_coords.xy   = in_coords.yx;
+            l_OriginalSize = params.OriginalSize.yx;
+        }
+        
+      
+    //Set preset mask or fallback to manual one.
+        //vec4 mask_preset = PG_get_hmask_preset();
+        float PG_h_count = vPG_mask_type.a;// mask_preset.a;
+        vec3  PG_offsets =  vPG_mask_type.rgb;// mask_preset.rgb;
 
     //ricavo i 3 periodi e offset per i 3 seni verticali
-        vec3 angle_rgb = vec3( angle_base.x + sin_offset_x,
-                            angle_base.x,
-                            angle_base.x - sin_offset_x );
+        PG_offsets = PG_offsets.rgb * (pi / PG_h_count);
+
+        vec2 freq_base_core   = pi * in_coords * l_OriginalSize ;
+        vec2 freq_base_screen = pi * vec2(1/PG_h_count, 0.5);
+
+
+
+        
+        //Screen coords:
+            freq_base_screen = pi * vec2(1/PG_h_count, 0.5);
+            // screen coords needs flooring:
+            vec2 period_multiply = vec2(PIXELGRID_MUL_X, PIXELGRID_MUL_Y);
+            freq_base_screen *= floor(l_vOutputCoord * l_OutputSize * period_multiply ) / period_multiply;
+        //the following unfloored coords are needed by sin/cos later to understand if we are on an even or odd mask
+            vec2 freq_base_screen_unfloored = pi * vec2(1/PG_h_count, 0.5) * (l_vOutputCoord * l_OutputSize);  
+        //We don't need floor, even at screen coordinates, if the size is expanded:
+            //freq_base_screen.x = mix(freq_base_screen.x, freq_base_screen_unfloored.x, float(PIXELGRID_MUL_X > 1.0)  );
+
+    //Switch between core and screen sizes (x and y)
+        vec2 freq_base           = mix(freq_base_core, freq_base_screen, vec2(PIXELGRID_SIZE_W, PIXELGRID_SIZE_H));
+        vec2 freq_base_unfloored = mix(freq_base_core, freq_base_screen_unfloored, vec2(PIXELGRID_SIZE_W, PIXELGRID_SIZE_H));
+        vec2 mask_size = mix(params.OriginalSize.xy, l_OutputSize, vec2(PIXELGRID_SIZE_W,PIXELGRID_SIZE_H)); 
+        
+    //multiplier:
+        //vec2 period_multiply = vec2(PIXELGRID_MUL_X, PIXELGRID_MUL_Y);
+        if (period_multiply.x < 0.0) period_multiply.x = 1/-period_multiply.x;  //goes FIXME in vertex shader
+        if (period_multiply.y < 0.0) period_multiply.y = 1/-period_multiply.y;
+        freq_base /= period_multiply;//*10;
+        freq_base_unfloored /= period_multiply;
+
+
+
+
+        vec3 freq_rgb = vec3(freq_base.x) - PG_offsets;
 
     //ricavo i 3 seni in bianco e nero
-        mask_rgb = cos(angle_rgb);
+        vec3 rgb_w = cos(freq_rgb);
 
     //li rendo sempre positivi
-        mask_rgb*=mask_rgb;
-
-        mask_rgb = 1-mask_rgb;
-
-    //mi salvo la maschera prima di allargarla, perchè puòservire per ricavare l'altezza del fosforo.
-        vec3 mask_rgb11 = mask_rgb;
+        rgb_w = (rgb_w * rgb_w);
 
     //modulo la larghezza della triade in base alla luminosità del pixel in ingresso
-        vec3 larghezza_fosforo = map_range(pixel_in, 0.0, 1.0, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
-        mask_rgb = morph_shape(mask_rgb, larghezza_fosforo);
+        vec3 larghezza_fosforo = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
+        rgb_w = morph_shape(rgb_w, larghezza_fosforo, PIXELGRID_NO_INTERBLEED);
 
-    //Gap orizzontale
-        float gap = cos(angle_base.y);
+        //return vec4(rgb_w, 1.0);
 
-    //lo rendo positivo
-        gap = gap * gap;
+    //modulo le altezza di ogni elemento della triade in base alla luminosità del pixel in ingresso
+        vec3 altezza_fosforo = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
+        
+    //offset trias to emulate core level slotmask
+        float sin_check_offset2 = sin(freq_base_unfloored.x);
+        float is_even2 = step(sin_check_offset2, 0.0);
+        float core_offset =  is_even2 * pi * PIXELGRID_OFFSET_CORE;
+        
+        float interlacing_adapt_period = vScanlinePeriod;
+        float interlacing_adapt_offset = vScanlineAlternateOffset;
+        
+        float rgb_h_sin = sin(freq_base.y * interlacing_adapt_period + core_offset + interlacing_adapt_offset );
+        
+        rgb_h_sin = (rgb_h_sin * rgb_h_sin);
+        vec3 rgb_h = vec3(rgb_h_sin);
+        //return vec4(rgb_h_sin* pixel_in, 1.0);
+        
+        rgb_h = morph_shape(rgb_h, altezza_fosforo, PIXELGRID_NO_INTERBLEED);
+        
 
-        gap=1-gap;
+        
+    //Calcolo una maschera per la separazione verticale dei fosfori
+        
+        //per capire se siamo nella triade pari o dispari, possiamo usare il segno del seno
+        //di periodo freq_base con uno step per avere 1 o 0.
+            float sin_check_offset = sin(freq_base_unfloored.x);
+            float is_even = step(sin_check_offset, 0.0);
+            //return vec4(is_even);
+            //return vec4(sin_check_offset*rgb_w.rgb, 1.0);
+            
+        //Ricavo la frequenza da usare per la y (core o screen) a seconda del parametro PIXELGRID_Y_MASK_COORDS
+            float freq_cell_y = mix_step(freq_base_core.y, freq_base_screen.y, PIXELGRID_Y_MASK_COORDS);
+            
+        //Altezza fosfori nella maschera
+            #define PH_MASK_HEIGHT (freq_cell_y * PIXELGRID_Y_MASK_HEIGHT)
+        //stagger fosfori nella maschera
+            #define PH_MASH_OFFSET  (PIXELGRID_Y_MASK_OFFSET * pi * 0.5  )
+            
+        //Ricava i gap orizzontali tramite 1-seni elevati a potenza per renderli "ripidi" sui fianchi
+            float mask_shape = abs(sin(PH_MASK_HEIGHT  + (PH_MASH_OFFSET * is_even))) ;
+            mask_shape = pow(mask_shape, PIXELGRID_Y_MASK_STEEP);
+            
+        //Get per channel input luminance by clamping pixel_in
+            vec3 lum=clamp(pixel_in, 0.0, 1.0);
+        //Adapt the luminance effect via input parameter
+            vec3 lum_adapted = (1-lum*PIXELGRID_Y_MASK_ON_WHITE);
+        //Calc final mask visibility as the minimum between tha configured visibility and luminosity effect
+            vec3 V=min( lum_adapted, vec3(PIXELGRID_Y_MASK) );
+        //apply visibility to the mask
+            vec3 darklines_mask=1-(mask_shape*V);
+        
+        //return vec4(vec3(darklines_mask), 1.0);
+     
+     
+        
+    //ricavo una maschera completa:
+        vec3 mask = rgb_w * rgb_h * darklines_mask;
+        
+    //La maschera può modificare la gamma dell'output, aumentandola a dismisura.
+    //Possiamo bilanciare?
+        //mask=pow(mask, vec3(2.0));
 
-    //modulo l'altezza del gap in base al canale in ingresso
-    //(ci sono riuscito per caso, intuizione non cosciente.)
-        vec3 lum_h_scaled = map_range(pixel_in, 0.0, 1.0, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
-        //float altezza_gap *= (mask_rgb11.r * pixel_in.r + mask_rgb11.g * pixel_in.g + mask_rgb11.b * pixel_in.b);
-        float altezza_gap = dot(mask_rgb, lum_h_scaled); //mask_rgb11 o mask_rgb?
-        gap = morph_shape_easy(gap, altezza_gap);
+        
+    vec3 pixel_masked = mask * pixel_in;
+    vec3 pixel_out = mix(pixel_masked, mask, 0.0);
+    
+    //out, nell'alfa ci va la maschera ad uso selettivo halo
+    return vec4(pixel_out, dot(mask, vec3(0.3333) ));
 
-    //Applico gap, maschera rgp al pixel in ingresso.
-        vec3 pixel_out = mask_rgb * gap  * pixel_in ;
-
-    return pixel_out;
 
 }
 
-
-vec3 fn_pixel_grid_take_2(vec2 coords, vec3 pixel_in) {
-
-    vec3 pout;
-
-    //Aggiusta la gamma in ingresso ad uso luminosità
-        vec3 pixel_in_gammed = pow(pixel_in, vec3(0.5)); //FIXME, questo dev'essere configurabile.
-            //pixel_in_gammed = pixel_in;
-    //antiglitch
-        coords+=vec2(0.0000001);
-
-
-    //La densità della maschera
-        vec2 mask_size = mix_step(params.OriginalSize.xy, params.OutputSize.xy*0.333, PIXELGRID_SIZE);
-
-    float angle_multiply = 1.0;
-    angle_multiply = 1.0;
-    vec2 frequency;
-    //ricavo il periodo della triade
-        frequency.x = coords.x * mask_size.x;
-
-    //ricavo il periodo delle linee orizzontali
-        frequency.y = coords.y * mask_size.y; // * ph_aspect;
-
-    //Zoom to debug:
-        frequency/=angle_multiply;
-
-
-        frequency +=vec2(0.5);
-
-    vec3 mask_rgb=vec3(1.0);
-
-    float phosphor_offset = (0.333333);
-
-    //ricavo i 3 periodi e offset per i 3 seni verticali
-        vec3 frequency_rgb = vec3( frequency.x + phosphor_offset,
-                                   frequency.x,
-                                   frequency.x - phosphor_offset );
-
-    //ricavo i 3 seni in bianco e nero
-        mask_rgb = 2*abs(frequency_rgb - floor(frequency_rgb+0.5));
-
-
-
-    //mi salvo la maschera prima di allargarla, perchè puòservire per ricavare l'altezza del fosforo.
-        vec3 mask_rgb11 = mask_rgb;
-
-    //modulo la larghezza della triade in base alla luminosità del pixel in ingresso
-        vec3 larghezza_fosforo = map_range(pixel_in_gammed, 0.0, 1.0, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
-        //larghezza_fosforo = clamp(larghezza_fosforo,PIXELGRID_MIN_W, PIXELGRID_MAX_W );
-        //Quanto sono sfocati i margini:
-
-        //Antiglitch per linee verticali quando al massimo della luminosità
-            //larghezza_fosforo += PIXELGRID_SMOOTH_W;
-        //"Clampo" via smoothstep al min e al max
-            mask_rgb = smoothstep(larghezza_fosforo + PIXELGRID_SMOOTH_W, larghezza_fosforo - PIXELGRID_SMOOTH_W, mask_rgb);
-
-    //Gap orizzontale
-        float gap = 2*abs(frequency.y - floor(frequency.y+0.5));
-
-
-    //modulo l'altezza del gap in base al canale in ingresso
-    //(ci sono riuscito per caso, intuizione non cosciente.)
-        vec3 lum_h_scaled = map_range(pixel_in_gammed, 0.0, 1.0, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
-        //float altezza_gap *= (mask_rgb11.r * pixel_in.r + mask_rgb11.g * pixel_in.g + mask_rgb11.b * pixel_in.b);
-        float altezza_gap = dot(mask_rgb11, lum_h_scaled*0.3333); //mask_rgb11 o mask_rgb?
-        //altezza_gap = clamp(altezza_gap,PIXELGRID_MIN_H, PIXELGRID_MAX_H );
-        //altezza_gap += PIXELGRID_SMOOTH_H;
-        gap = smoothstep(altezza_gap + PIXELGRID_SMOOTH_H, altezza_gap - PIXELGRID_SMOOTH_H, gap);
-
-    //Applico gap, maschera rgp al pixel in ingresso.
-        vec3 pixel_out = mask_rgb * gap  * pixel_in ;
-
-
-    return pixel_out;
-
-}
 
 vec4 fn_pixel_dotmat(vec2 coords, vec3 pixel_in) {
 
@@ -571,7 +585,7 @@ float fn_scanline_mask(vec2 coords, bool do_slotmask, float lum, float min_inLum
 
     float period = vScanlinePeriod;
     bool is_interlaced = bool(vIsInterlaced);
-    bool do_flicker = bool(vFlickeringScanlines);
+    
     
     //since luminosity is used to modulate scanline thickness, we scale it here
     //to keep tickness in user defined range:
@@ -594,7 +608,8 @@ float fn_scanline_mask(vec2 coords, bool do_slotmask, float lum, float min_inLum
 
 
         if  (!( is_interlaced && SCANLINE_DISABLE_ON_INTERLACE == 1.0 )) {
-            lines = pow( sin(angle_base + vScanlineAlternateOffset), 2.0);
+            lines = sin(angle_base + vScanlineAlternateOffset);
+            lines *= lines; 
         }
 
     //If we specified to draw slotmasks alongside the scanlines, but the screen
@@ -981,19 +996,23 @@ vec3 fn_pixel_content(vec2 coords) {
         }
 
     
-    float scanline_or_dot_mat = 1.0; //init dot grid or scanline mask to 1.0
+    float scanline_or_dot_mat_or_pixelgrid = 1.0; //init dot grid or scanline mask to 1.0
     
     //Pixel grid
-        if (DO_PIXELGRID == 1.0)
-            pixel_out = fn_pixel_grid(coords, pixel_out);
-
+        if (DO_PIXELGRID == 1.0) {
+            vec4 pixel_grid = fn_pixel_grid(coords, pixel_out, 0.0, vMax_inLum);
+            //grid mask only is needed by halo to selectively light the grid.
+                scanline_or_dot_mat_or_pixelgrid = pixel_grid.a;
+                pixel_out = pixel_grid.rgb;
+        }
     //Dot mask
         if (DO_DOT_MATRIX == 1.0) {
-            vec4 pixel_grid_mask = fn_pixel_dotmat(coords, pixel_out);
+            vec4 pixel_dotmat = fn_pixel_dotmat(coords, pixel_out);
             //grid mask only is needed by halo to selectively light the grid.
-                scanline_or_dot_mat = pixel_grid_mask.a;
+                scanline_or_dot_mat_or_pixelgrid = pixel_dotmat.a;
             //rgb channel goes to pixel_out
-            pixel_out = pixel_grid_mask.rgb;
+            pixel_out = pixel_dotmat.rgb;
+            
         }
         
     //Scanlines (non-flickering)
@@ -1004,9 +1023,9 @@ vec3 fn_pixel_content(vec2 coords) {
 
                 //The maximum possible brightness of the input color modified by glow,contrast and brightness.
                 float scanline_mask = fn_scanline_mask(coords, SCANLINE_SM_TYPE > 0.0, lum, 0.0, vMax_inLum, vDo_Tate );
-                pixel_out = min(pixel_out, 1.0) * ( scanline_mask + ( pixel_bleed * SCANLINES_BLEEDING * ( 1 - scanline_mask ) ));
+                pixel_out = pixel_out * ( scanline_mask + ( pixel_bleed * SCANLINES_BLEEDING * ( 1 - scanline_mask ) ));
                 //Since scanlines and dot matrix are alternative and halo can white both, just use a single var for both:
-                scanline_or_dot_mat = scanline_mask;
+                scanline_or_dot_mat_or_pixelgrid = scanline_mask;
         }
 
         
@@ -1016,10 +1035,9 @@ vec3 fn_pixel_content(vec2 coords) {
         if (DO_HALO == 1.0 ) {
             pixel_haloed = texture(halo_pass,coords).rgb;
             //Halo only on scanlines:
-            pixel_out += pixel_haloed * scanline_or_dot_mat ;
+            pixel_out += pixel_haloed * scanline_or_dot_mat_or_pixelgrid ;
             //Halo over scanlines gap too:
-            pixel_out += pixel_haloed * (HALO_VS_SCAN) * (1 - scanline_or_dot_mat) ;
-
+            pixel_out += pixel_haloed * (HALO_VS_SCAN) * (1 - scanline_or_dot_mat_or_pixelgrid) ;            
         }
     
     // Apply gamma out:
@@ -1167,14 +1185,17 @@ void main() {
             co_bezel = get_scaled_coords_for_bezel();
         }
 
-        
     //Curvature 
         //Curvature has to come after inner zoom or bezel curved border will not match content
         //curved border when inner zoom changes.
         if (DO_CURVATURE == 1.0  &&  ((GEOM_WARP_X != 0.0) || (GEOM_WARP_Y != 0.0))) {
             co_content = Warp_fast(co_content, vWarp_vexp, vWarp_arg2, GEOM_CUT_EARS);
         }
-        
+
+    //Mirror coords needs to be calculated here, before geom override, but after curvature.
+    //It is still not perfect but a reasonable tradeoff by now.
+        vec2 co_mirror = zoom(co_content, 1/BEZEL_REFL_ZOOMOUT_ROOM);
+    
     //Apply other content coords modifiers
         if (DO_GAME_GEOM_OVERRIDE == 1.0)
             co_content = content_geom_override(co_content, GAME_GEOM_ASPECT, vIn_aspect, GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
@@ -1200,7 +1221,6 @@ void main() {
         vec4 pixel_bezel;
         //SKIP LOGIC is inside fn_pixel_bezel
         if (DO_BEZEL == 1.0) {
-            vec2 co_mirror = zoom(co_content, 1/BEZEL_REFL_ZOOMOUT_ROOM);
             pixel_bezel = fn_pixel_bezel(co_bezel, co_mirror, BG_IMAGE_NIGHTIFY);
             //If we used a smooth_border, canvas_busy is it, but since the content is in the bezel,
             //we can safely use it to smooth/darken the game border

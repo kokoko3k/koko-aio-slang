@@ -334,6 +334,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float GAME_GEOM_VSHIFT;
 	float GAME_GEOM_HSHIFT;
 	float GAME_GEOM_ZOOM;
+	float GAME_GEOM_OFF_FIX; 
 	
 	float DO_TILT;
 	float TILT_X;
@@ -367,9 +368,31 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float PIXELGRID_MIN_W;
 	float PIXELGRID_MAX_H;
 	float PIXELGRID_MAX_W;
-	float PIXELGRID_SIZE;
+	float PIXELGRID_SIZE_W;
+	float PIXELGRID_SIZE_H;
 	float PIXELGRID_SMOOTH_H;
 	float PIXELGRID_SMOOTH_W;
+	//float PIXELGRID_SPACING;
+	float PIXELGRID_MUL_X;
+	float PIXELGRID_MUL_Y;
+	float PIXELGRID_OFFSET_CORE;
+	float PIXELGRID_NO_INTERBLEED;
+	
+	float PIXELGRID_INTR_FLICK_MODE;
+	float PIXELGRID_INTR_FLICK_POWR;
+	float PIXELGRID_INTR_DISABLE_Y;
+	
+	float PIXELGRID_Y_MASK;
+	float PIXELGRID_Y_MASK_ON_WHITE;
+	float PIXELGRID_Y_MASK_HEIGHT;
+	float PIXELGRID_Y_MASK_OFFSET;
+	float PIXELGRID_Y_MASK_STEEP;
+	float PIXELGRID_Y_MASK_COORDS;
+	float PIXELGRID_R_SHIFT;
+	float PIXELGRID_G_SHIFT;
+	float PIXELGRID_B_SHIFT;
+	float PIXELGRID_H_COUNT;
+	float PIXELGRID_H_PRST;
 } global;
 
 // Color correction
@@ -424,7 +447,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 
 
-//Offset RGB
+//Deconvergence
 #pragma parameter DO_SHIFT_RGB       "★ Deconvergence enable? ==>"	0.0	 0.0 1.0 1.0
 #pragma parameter OFFSET_STRENGTH "        Strength"			0.6 	 0.0 1.0 0.05
 #pragma parameter SHIFT_R         "        Red offset"			-40.0 	-210.0 189.0 1
@@ -447,6 +470,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter IN_GLOW_SHOW_ARTF_MASK   "        Show NTSC artifacts mask (debug)"				0.0	0.0 1.0 1.0
 #pragma parameter BLANK7 " " 0.0 0.0 1.0 1.0
 
+#pragma parameter TATE                     "★ Tate mode (1:auto 2:forced)"		0.0 	0.0 2.0 1.0
+#pragma parameter BLANK7a " " 0.0 0.0 1.0 1.0
 
 // Mask
 #pragma parameter DO_VMASK_AND_DARKLINES "★  Masks and/or Darklines enable? ==>"         		0.0 	0.0 1.0 1.0
@@ -464,8 +489,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter DRKLN_OVERWHITE        "           . Affect bright colors"					1.0 	0.0 1.0   0.05
 #pragma parameter BLANK9 " " 0.0 0.0 1.0 1.0
 
-#pragma parameter TATE                     "★ Tate mode (1:auto 2:forced)"		0.0 	0.0 2.0 1.0
-#pragma parameter BLANK7a " " 0.0 0.0 1.0 1.0
+
 
 // Scanlines
 #pragma parameter DO_SCANLINES	         "★ Scanlines enable? (NOT with dot matrix!) ==>"						0.0 	0.0  1.0 1.0
@@ -483,6 +507,55 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter SCANLINE_SM_VOFFSET      "           . Offset (type 1 only)"					45.0 	0.0 158.0 1.0
 #pragma parameter BLANK12 " " 0.0 0.0 1.0 1.0
 
+
+
+// pixel Grid
+#pragma parameter DO_PIXELGRID		"★  Low level Phosphor grid (NOT with scanlines or masks) ==>"	0.0 0.0 1.0 1.0
+#pragma parameter PIXELGRID_SIZE_W  "        X resolution: (core or screen)"	1.0 0.0 1.0 1.0
+#pragma parameter PIXELGRID_MIN_W   "           . Phosphors width Min"			0.25 0.05 1.0 0.01
+#pragma parameter PIXELGRID_MAX_W   "           . Phosphors width Max"			0.25 0.05 1.0 0.01
+#pragma parameter PIXELGRID_H_PRST  "           . Mask type preset (0: for manual)"  3.0 0.0 6.0 1.0
+#pragma parameter PG_LABEL1         "           . (1:gm 2:gmx 3:rgb 4:rgbx 5:rbg 6:rbgx)"  0.0 0.0 0.0 0.0
+#pragma parameter PIXELGRID_H_COUNT "           .     0: Phosphors+gap count (mask size)"	3.0 1.0 4.0  1.0
+#pragma parameter PIXELGRID_R_SHIFT "           .     0: R shift"      0.0  0.0 4.0 0.1
+#pragma parameter PIXELGRID_G_SHIFT "           .     0: G shift"      1.0  0.0 4.0 0.1
+#pragma parameter PIXELGRID_B_SHIFT "           .     0: B shift"      2.0  0.0 4.0 0.1
+//#pragma parameter PIXELGRID_SPACING "           . RGB spacing"      1.0 0.0 2.0 0.01
+#pragma parameter PIXELGRID_MUL_X   "           . Cell size multiplier x (neg=divider):"	1.0 -4.0 4.0 1.0
+
+
+#pragma parameter PIXELGRID_SIZE_H          "        Y resolution: (core for scanlines or screen)"	0.0 0.0 1.0 1.0
+#pragma parameter PIXELGRID_MUL_Y           "           . Cell size multiplier y (neg=divider):"	1.0 -4.0 4.0 1.0
+#pragma parameter PIXELGRID_MIN_H	        "           . Phosphors height Min"			0.2 0.0 1.0 0.05
+#pragma parameter PIXELGRID_MAX_H           "           . Phosphors height Max"			0.6 0.0 1.0 0.05
+#pragma parameter PIXELGRID_OFFSET_CORE     "           . Slotmask offset (0.25 ok)"	0.0 0.0 1.0 0.01
+#pragma parameter PIXELGRID_NO_INTERBLEED	"        Avoid inter-cell bleeding (handhelds emulation)"		0.0 0.0 100.0 100.0
+
+#pragma parameter BLANK12f " " 0.0 0.0 1.0 1.0
+
+#pragma parameter PIXELGRID_INTR_FLICK_MODE "        Interlace Flicker (0=off,1=on,2=if interlaced)"		2.0 	0.0 2.0 1.0
+#pragma parameter PIXELGRID_INTR_FLICK_POWR "           . Interlace Flicker power"		  		0.25 	0.0 8.0 0.01
+#pragma parameter PIXELGRID_INTR_DISABLE_Y  "           . Disable on interlaced screen"			  	0.0 	0.0 1.0 1.0
+
+#pragma parameter BLANK12e " " 0.0 0.0 1.0 1.0
+
+#pragma parameter PIXELGRID_Y_MASK           "        Vertical cell Mask"	0.0 0.0 1.0 0.05
+#pragma parameter PIXELGRID_Y_MASK_COORDS    "           . Resolution: (core or screen)"	1.0 0.0 1.0 1.0
+#pragma parameter PIXELGRID_Y_MASK_HEIGHT    "           . Height (inverted)"	0.75 0.0 3.0 0.01
+#pragma parameter PIXELGRID_Y_MASK_ON_WHITE  "           . Fadeout under light"	0.0 0.0 1.0 0.01
+#pragma parameter PIXELGRID_Y_MASK_STEEP     "           . Steepness"	30.0 1.0 30.0 1.0
+#pragma parameter PIXELGRID_Y_MASK_OFFSET    "           . Even/odd offset"	1.0 0.0 1.0 1.0
+
+
+
+#pragma parameter BLANK12d " " 0.0 0.0 1.0 1.0
+
+//#pragma parameter PIXELGRID_SMOOTH_W "       Phosphors width smoothness"   0.1 0.01 1.0 0.01
+//#pragma parameter PIXELGRID_SMOOTH_H "       Phosphors height smoothness"   0.1 0.01 1.0 0.01
+
+
+
+
 // Dot matrix emulation
 #pragma parameter DO_DOT_MATRIX		"★  Dot matrix emulation enable? (NOT with scanlines!) ==>"	0.0 0.0 1.0 1.0
 #pragma parameter DOT_M_G_STR		"        Grid strength"					0.0 0.0 1.0 0.01
@@ -496,24 +569,16 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter DOT_M_MULTIPLY	"        Multiply factor (debug)"		1.0  1.0 50.0 1.0
 #pragma parameter BLANK12c " " 0.0 0.0 1.0 1.0
 
-// pixel Grid
-#pragma parameter DO_PIXELGRID		"★  Pixel grid emulation (NOT with scanlines or masks) ==>"	0.0 0.0 1.0 1.0
-#pragma parameter PIXELGRID_MIN_W   "        Min pixel width"			0.2 0.0 1.0 0.05
-#pragma parameter PIXELGRID_MAX_W   "        Max pixel width"			0.5 0.0 1.0 0.05
-#pragma parameter PIXELGRID_SMOOTH_W "       Pixel width smoothness"   0.1 0.01 1.0 0.01
-#pragma parameter PIXELGRID_MIN_H	"        Min pixel height"			0.1 0.0 1.0 0.05
-#pragma parameter PIXELGRID_MAX_H   "        Max pixel height"			0.5 0.0 1.0 0.05
-#pragma parameter PIXELGRID_SMOOTH_H "       Pixel height smoothness"   0.1 0.01 1.0 0.01
-#pragma parameter PIXELGRID_SIZE    "        Cell size (core,screen)"	0.0 0.0 1.0 1.0
-#pragma parameter BLANK12d " " 0.0 0.0 1.0 1.0
+
+
 
 // Halo
 #pragma parameter DO_HALO       "★ Halo enable? ==>" 						0.0	0.0 1.0 1.0
-#pragma parameter HALO_POWER    "        Strength"						0.9 	0.0  5.0 0.025
+#pragma parameter HALO_POWER    "        Strength"						0.9 	0.0  5.0 0.01
 #pragma parameter HALO_W        "        Sharpness, horizontal"					1.75	0.35  7.0 0.05
 #pragma parameter HALO_H        "        Sharpness, Vertical"					1.75	0.35  7.0 0.05
 #pragma parameter HALO_GAMMA    "        Gamma, the higher, the less the halo on dark colors"	2.0 	1.0  10.0 0.1
-#pragma parameter HALO_VS_SCAN  "        Light up scanlines and dot grid gaps too"				0.0	0.0  1.0  0.1
+#pragma parameter HALO_VS_SCAN  "        Light up scanlines and dot grid gaps too"				0.0	0.0  1.0  0.01
 #pragma parameter BLANK10 " " 0.0 0.0 1.0 1.0
 
 
@@ -661,6 +726,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter GAME_GEOM_VSHIFT	  "        Vertical position"			0.0   -10.0 10.0  0.01
 #pragma parameter GAME_GEOM_HSHIFT	  "        Horizontal position"			0.0   -10.0 10.0  0.01
 #pragma parameter GAME_GEOM_ZOOM	  "        Zoom"					1.0    0.0  2.0  0.01
+#pragma parameter GAME_GEOM_OFF_FIX	  "        Sharp hack through offset (0.0=disable)"	0.0    0.0  100.0  1
 #pragma parameter BLANK20 " " 0.0 0.0 1.0 1.0
 
 //Tilt
