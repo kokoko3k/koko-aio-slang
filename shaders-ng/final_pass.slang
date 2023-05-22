@@ -452,10 +452,10 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //mask phosphors heigth
                 #define PH_MASK_HEIGHT (freq_cell_y * vPG_mask_height)
             //phosphors mask stagger
-                #define PH_MASH_OFFSET  (PIXELGRID_Y_MASK_OFFSET * pi * 0.5  )
+                #define PH_MASH_OFFSET  (PIXELGRID_Y_MASK_OFFSET * pi * 0.5 )
                 
             //Use abs(sin) (later 1-abs(sin) to get orizontal gaps, use pow to make them steep.
-                float mask_shape = abs(cos(PH_MASK_HEIGHT  + (PH_MASH_OFFSET * is_even2))) ;
+                float mask_shape = abs(cos(  PIXELGRID_Y_MASK_SHIFT*pi +   PH_MASK_HEIGHT  + (PH_MASH_OFFSET * is_even2))              ) ;
                 mask_shape = pow(mask_shape, PIXELGRID_Y_MASK_STEEP);
                 
             //Get per channel input luminance by clamping pixel_in and aplplying hmask
@@ -472,7 +472,11 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         vec3 mask = rgb_w * rgb_h * darklines_mask;
         
     //Also apply mask to input pixel:
-        vec3 pixel_masked = mask * pixel_in;
+        vec3 pixel_masked = (rgb_w * mix(vec3(1.0), pixel_in, 0.9)) *
+                            (rgb_h * darklines_mask) ;
+        
+        
+        //vec3 pixel_masked = mask * pixel_in;
         vec3 pixel_out = mix(pixel_masked, mask, 0.0);
     //And return it with the alpha channel containing the mask itself, so that halo can selectively light it.
         return vec4(pixel_out, dot(mask, vec3(0.3333) ));

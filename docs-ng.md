@@ -125,7 +125,7 @@
                 Likewise, you can use core/game(**) sized masks and divide them by a factor
                 if they appears too big.
             
-            Scanlines or vertical mask 1
+            Scanlines or vertical mask 1: (*4)
                 Y resolution: (core for scanlines or screen), height min/max:
                     See X resolution parameter just explained (**),  all similarly named parameters
                     will refer to the phosphors height instead od the width.
@@ -177,21 +177,25 @@
                 Phosphor masks are usually vertically delimited by thin lines.
                 This parameter will set the visibility of them.
 
-                Resolution: (core or screen)
+                Resolution: (core or screen) (*1)
                     Should the vertical interval (height) between those likes be relative to screen or core pixel size?
-                Height divider (neg=multiplier):
+                Height divider (neg=multiplier) (*2):
                     The more, the less that intervall will be.
                     Interesting values for screen resolution: 1.0, 0.75, 0.5
                 Fadeout under light: How much they will be visible over bright pixels.
-                Steepness: 
-                    The more, the thinner they will be.
-                    Setting this to very high values, may make them disappear unevenly.
-                Even/odd offset:
+                Even/odd offset (slotmask) (*3):
                     If you not used, the previous section to emulate scanlines(*), but still want to emulate
                     slotmasks layouts, you can set this to 1.0.
                     You can draw slotmasks at screen coordinates to emulate real crts or choose to paint
                     them at core coordinates to have a more defined slotmask
                     ...if you like slotmasks so much :-)
+                Vertical shift (for use with core resolution):
+                    This parameter allows you to move the whole vertical mask along the Y axis.
+                    It is intended to be used with core resolution(*1) and integer divider/multiplier(*2)
+                    to clear weird patterns from the screen when using slotmasks (*3) alongside scanline emulation (*4).
+                Steepness: 
+                    The more, the thinner they will be.
+                    Setting this to very high values, may make them disappear unevenly.
         
 **Dot matrix emulation:**<br>
     Emulates low refresh "boxed" screens used in old handheld consoles.<br>
