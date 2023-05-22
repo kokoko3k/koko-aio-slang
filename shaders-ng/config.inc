@@ -381,6 +381,11 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float PIXELGRID_H_PRST;
 
 	float PIXELGRID_NO_FLOOR;
+	
+	float SERVICE1;
+	float SERVICE2;
+	float SERVICE3;
+	
 
 } global;
 
@@ -703,6 +708,10 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter ALT_BLANK_PERIOD   "        Blank lines period" 				4.0 1.0 30.0 1.0
 #pragma parameter BLANK_02 " " 0.0 0.0 1.0 1.0
 
+
+#pragma parameter SERVICE1 "Don't use me, for debug purposes only" 	0.5 -1.0 1.0 0.1
+#pragma parameter SERVICE2 "Don't use me, for debug purposes only" 	0.5 -1.0 1.0 0.1
+#pragma parameter SERVICE3 "Don't use me, for debug purposes only" 	0.5 -1.0 1.0 0.1
 
 
 #include "config.globals.inc"
