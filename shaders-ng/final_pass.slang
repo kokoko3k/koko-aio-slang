@@ -212,8 +212,8 @@ void main() {
             vfprintvalue = dotmat_outsize / dotmat_insize;
             vDotMat_Grid_Sharpness = (dotmat_outsize / dotmat_insize);
             vDotMat_Grid_Sharpness = vDotMat_Grid_Sharpness * 3.6 - 3.1;
-            vDotMat_Grid_Sharpness = clamp(vDotMat_Grid_Sharpness, 0.5, 20.0);
-           
+            vDotMat_Grid_Sharpness = clamp(vDotMat_Grid_Sharpness, 0.1, 20.0);
+            //vfprintvalue = vDotMat_Grid_Sharpness;
         }
 }
 
