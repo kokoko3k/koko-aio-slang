@@ -472,11 +472,11 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         vec3 mask = rgb_w * rgb_h * darklines_mask;
         
     //Also apply mask to input pixel:
-        vec3 pixel_masked = (rgb_w * mix(vec3(1.0), pixel_in, 0.9)) *
+        //vec3 pixel_masked = (rgb_w * mix(vec3(1.0), pixel_in, )) *
                             (rgb_h * darklines_mask) ;
         
         
-        //vec3 pixel_masked = mask * pixel_in;
+        vec3 pixel_masked = mask * pixel_in;
         vec3 pixel_out = mix(pixel_masked, mask, 0.0);
     //And return it with the alpha channel containing the mask itself, so that halo can selectively light it.
         return vec4(pixel_out, dot(mask, vec3(0.3333) ));
