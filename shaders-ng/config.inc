@@ -471,7 +471,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 // pixel Grid
 #pragma parameter DO_PIXELGRID		 "★  Low level Phosphor grid enable? ==>"	0.0 0.0 1.0 1.0
-#pragma parameter PIXELGRID_NO_FLOOR "        Allow use of fuzzy screen coords"   0.0 0.0 1.0 1.0
+#pragma parameter PIXELGRID_NO_FLOOR "      ★ Fuzzy screen coords (1=no)"   1.0 1.0 10000.0 10000.0
 #pragma parameter DO_PIXELGRID_W     "      ★ Enable Horizontal mask "    	1.0 0.0 1.0 1.0
 #pragma parameter PIXELGRID_SIZE_W   "           . Resolution: (core or screen)"	1.0 0.0 1.0 1.0
 #pragma parameter PIXELGRID_MIN_W    "           . Phosphors width Min"			0.25 0.05 1.0 0.01
