@@ -9,6 +9,8 @@
 //#define DEBUG_PRINT_VALUE
 //#define DEBUG_QUAD_SPLIT
 //#define DEBUG_DUAL_SPLIT
+//#define DEBUG_DUAL_SPLIT_MIRROR
+
 
 #include "config.inc"
 
@@ -1040,6 +1042,11 @@ void main() {
         #ifdef DEBUG_DUAL_SPLIT
             if (vTexCoord.y < 0.5) pixel_out = texture(flick_and_noise_pass,vTexCoord).rgb;
         #endif
+
+        #ifdef DEBUG_DUAL_SPLIT_MIRROR
+            if (vTexCoord.x > 0.5) pixel_out = texture(flick_and_noise_pass,vec2(1-vTexCoord.x, vTexCoord.y) ).rgb;
+        #endif
+
             
         #ifdef DEBUG_PRINT_VALUE
             float maxdigits = 10.0;
