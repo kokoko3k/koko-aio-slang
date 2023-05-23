@@ -474,11 +474,14 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         }
      
     //Finally put width,height1 and height2 masks togheter:
-        vec3 mask = rgb_w * rgb_h * darklines_mask;
+        //vec3 mask = rgb_w * rgb_h * darklines_mask;
+        vec3 mask = min((rgb_w * rgb_h), darklines_mask * rgb_h); //<- this way it does not interfree with scanline height!
+        //FIXME: test with coore or fuzzy coords how it works when using variable width phosphors, maybe 
+        //it would need to be: vec3 mask = min((rgb_w * rgb_h), darklines_mask * rgb_h * rgb_w); =
         
     //Also apply mask to input pixel:
         //vec3 pixel_masked = (rgb_w * mix(vec3(1.0), pixel_in, )) *
-                            (rgb_h * darklines_mask) ;
+        //                    (rgb_h * darklines_mask) ;
         
         
         vec3 pixel_masked = mask * pixel_in;
