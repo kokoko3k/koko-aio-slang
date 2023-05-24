@@ -488,7 +488,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 #pragma parameter BLANK12fs " " 0.0 0.0 1.0 1.0
 
-#pragma parameter DO_PIXELGRID_H            "      ★ Enable scanlines or vertical mask 1 "    	1.0 0.0 1.0 0.1
+#pragma parameter DO_PIXELGRID_H            "      ★ Scanlines or vertical mask 1 (0 to disable)"    	1.0 0.0 1.0 0.1
 #pragma parameter PIXELGRID_SIZE_H          "           . Resolution: (core for scanlines or screen)"	0.0 0.0 1.0 1.0
 #pragma parameter PIXELGRID_MIN_H	        "           . Phosphors height Min"			0.2 0.0 1.0 0.05
 #pragma parameter PIXELGRID_MAX_H           "           . Phosphors height Max"			0.6 0.0 1.0 0.05
@@ -506,7 +506,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 #pragma parameter BLANK12e " " 0.0 0.0 1.0 1.0
 
-#pragma parameter PIXELGRID_Y_MASK           "        Vertical cell Mask 2 (0.0 to disable)"	0.5 0.0 1.0 0.05
+#pragma parameter PIXELGRID_Y_MASK           "      ★ Vertical cell Mask 2 (0 to disable)"	0.5 0.0 1.0 0.05
 #pragma parameter PIXELGRID_Y_MASK_COORDS    "           . Resolution: (core or screen)"	1.0 0.0 1.0 1.0
 #pragma parameter PIXELGRID_Y_MASK_HEIGHT    "           . Height divider (neg=multiplier):"	0.5 -8.0 8.0 0.125
 #pragma parameter PIXELGRID_Y_MASK_ON_WHITE  "           . Fadeout under light"	0.5 0.0 1.0 0.01

@@ -478,7 +478,8 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
     //effect (sub) and pushing the source color, useful for slotmasks.
         float spark = mix(0.0, PIXELGRID_Y_SPARK, PIXELGRID_Y_MASK);
         darklines_mask-=spark;
-        pixel_in *= spark*4+1;
+        rgb_h -=spark;
+        pixel_in *= spark*8+1;
      
     //Finally put width,height1 and height2 masks togheter:
         //vec3 mask = rgb_w * rgb_h * darklines_mask;

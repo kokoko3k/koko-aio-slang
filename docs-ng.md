@@ -199,6 +199,7 @@
                 Sparkling look punch:
                     Makes the "Vertical cell Mask 2" effect more pronunced and 
                     "pinchy/Sparky" by highering its contrast.
+                    Beware, that this may produce moiree.
                     
 **Dot matrix emulation:**<br>
     Emulates low refresh "boxed" screens used in old handheld consoles.<br>
