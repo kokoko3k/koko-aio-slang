@@ -196,7 +196,10 @@
                 Steepness: 
                     The more, the thinner they will be.
                     Setting this to very high values, may make them disappear unevenly.
-        
+                Sparkling look punch:
+                    Makes the "Vertical cell Mask 2" effect more pronunced and 
+                    "pinchy/Sparky" by highering its contrast.
+                    
 **Dot matrix emulation:**<br>
     Emulates low refresh "boxed" screens used in old handheld consoles.<br>
     
