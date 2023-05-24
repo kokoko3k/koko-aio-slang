@@ -375,6 +375,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float PIXELGRID_Y_MASK_STEEP;
 	float PIXELGRID_Y_MASK_COORDS;
 	float PIXELGRID_Y_MASK_SHIFT;
+	float PIXELGRID_Y_SPARK;
 	float PIXELGRID_R_SHIFT;
 	float PIXELGRID_G_SHIFT;
 	float PIXELGRID_B_SHIFT;
@@ -512,7 +513,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter PIXELGRID_Y_MASK_OFFSET    "           . Even/odd offset"	1.0 0.0 1.0 1.0
 #pragma parameter PIXELGRID_Y_MASK_SHIFT     "             . Vertical shift (for use with core resolution)"	0.0 0.0 1.0 0.01
 #pragma parameter PIXELGRID_Y_MASK_STEEP     "           . Steepness"	2.0 1.0 30.0 1.0
-
+#pragma parameter PIXELGRID_Y_SPARK          "           . Sparkling look punch"	0.0 0.0 1.0 0.01
 
 #pragma parameter BLANK12d " " 0.0 0.0 1.0 1.0
 
