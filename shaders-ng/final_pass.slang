@@ -49,13 +49,13 @@ layout(location = 19) out vec4 vPG_offsets_and_size;
 layout(location = 20) out vec2 vPG_freq_base_screen;
 layout(location = 21) out vec2 vPG_freq_base_screen_unfloored;
 layout(location = 22) out vec2 vPG_period_multiplier;
-layout(location = 23) out vec2 vPG_test_floor;
 layout(location = 24) out vec2 vPG_OriginalSize_tated;
 layout(location = 25) out vec2 vPG_OutputSize_tated;
 layout(location = 26) out vec2 vPG_OutputCoord_tated;
 layout(location = 27) out float vDotMat_Grid_Sharpness;
 layout(location = 28) out float vfprintvalue;
 layout(location = 29) out float vPG_mask_height;
+layout(location = 30) out float vPG_spark;
 
 #include "includes/functions.include.slang"
 
@@ -204,6 +204,8 @@ void main() {
         vPG_mask_height = PIXELGRID_Y_MASK_HEIGHT;
         if (vPG_mask_height < 0.0) vPG_mask_height = 1/-vPG_mask_height;
     
+        //vPG_spark = PIXELGRID_Y_SPARK * PIXELGRID_Y_MASK; <--vertex shader collapses here.
+        
     //Dot matrix: measure the final picture size to choose a right sharpness level
     //For simplicity and (my) mental health, take only y into account.
         vDotMat_Grid_Sharpness = DOT_M_G_SHARP;
@@ -245,13 +247,13 @@ layout(location = 19) in vec4 vPG_offsets_and_size;
 layout(location = 20) in vec2 vPG_freq_base_screen;
 layout(location = 21) in vec2 vPG_freq_base_screen_unfloored;
 layout(location = 22) in vec2 vPG_period_multiplier;
-layout(location = 23) in vec2 vPG_test_floor;
 layout(location = 24) in vec2 vPG_OriginalSize_tated;
 layout(location = 25) in vec2 vPG_OutputSize_tated;
 layout(location = 26) in vec2 vPG_OutputCoord_tated;
 layout(location = 27) in float vDotMat_Grid_Sharpness;
 layout(location = 28) in float vfprintvalue;
 layout(location = 29) in float vPG_mask_height;
+layout(location = 30) in float vPG_spark;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -369,7 +371,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         float PG_h_count = vPG_offsets_and_size.a; 
         vec3  PG_offsets = vPG_offsets_and_size.rgb;
 
-        vec2 freq_base_core   = pi * in_coords * vPG_OriginalSize_tated ;
+        vec2 freq_base_core = pi * in_coords * vPG_OriginalSize_tated ;
 
         //Screen coords:
             vec2 period_multiply = vec2(PIXELGRID_MUL_X, PIXELGRID_MUL_Y);
@@ -414,21 +416,24 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
     
     //Height phosphor mask (can be used for scanlines, slotmask, aperturegrille):
         vec3 rgb_h = vec3(1.0);
+        
+        //The following is needed by vertical mask level1 and 2
+        //sin() tell us if the current cell position is odd or even:        
+            float o =  (pi/(PG_h_count*2.0));  
+            float sin_check_offset = sin(freq_base_unfloored.x + o);
+            float is_even = step(sin_check_offset, 0.0);
+        
+        
         if (DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0)) {
-            //calculate each phosphor eight according to input luminance 
+            //calculate each phosphor height according to input luminance 
                 vec3 phosphor_height = map_range(pixel_in * rgb_w, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
-            //offset trias to emulate core level slotmask, calc right offset here:
-                //sin() tell use if the current cell position is odd or even:
-                    float o =  (pi/(PG_h_count*2.0));  
-                    float sin_check_offset = sin(freq_base_unfloored.x + o);
-                    float is_even = step(sin_check_offset, 0.0);
                 
-                //Then we can apply the optional offset to emulate the slotmask on even cells
-                    float core_offset =  is_even * pi * PIXELGRID_OFFSET_CORE;
+            //offset trias to emulate core level slotmask by applying the optional offset to emulate the slotmask on even cells
+                float core_offset =  is_even * pi * PIXELGRID_OFFSET_CORE;
                 
-                //Since we can emulate scanlines, take into account current scanline phase:
-                    float interlacing_adapt_period = vScanlinePeriod;
-                    float interlacing_adapt_offset = vScanlineAlternateOffset;
+            //Since we can emulate scanlines, take into account current scanline phase:
+                float interlacing_adapt_period = vScanlinePeriod;
+                float interlacing_adapt_offset = vScanlineAlternateOffset;
                 
             //get a single sine in black/white with applied the optional staggered offset for slotmask:
                 float rgb_h_sin = sin(freq_base.y * interlacing_adapt_period + core_offset + interlacing_adapt_offset );
@@ -445,11 +450,6 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
     //...well technically yes, but they would have a boxed shape.
         vec3 darklines_mask=vec3(1.0);
         if (PIXELGRID_Y_MASK > 0.0) {
-            //offset trias to emulate core level slotmask, calc right offset here:
-            //sin() tell use if the current cell position is odd or even:
-                float o =  (pi/(PG_h_count*2.0));  
-                float sin_check_offset2 = sin(freq_base_unfloored.x + o);
-                float is_even2 = step(sin_check_offset2, 0.0);
 
             //Switch reference coords according to user pref: 
                 float freq_cell_y = mix_step(freq_base_core.y, freq_base_screen.y, PIXELGRID_Y_MASK_COORDS);
@@ -459,8 +459,9 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //phosphors mask stagger
                 #define PH_MASH_OFFSET  (PIXELGRID_Y_MASK_OFFSET * pi * 0.5 )
                 
-            //Use abs(sin) (later 1-abs(sin) to get orizontal gaps, use pow to make them steep.
-                float mask_shape = abs(cos(  PIXELGRID_Y_MASK_SHIFT*pi +   PH_MASK_HEIGHT  + (PH_MASH_OFFSET * is_even2))              ) ;
+            //Use abs(cos) (later 1-abs(cos) to get orizontal gaps, use pow to make them steep.
+            //Stagger them by PH_MASH_OFFSET on even triads
+                float mask_shape = abs(cos(  PIXELGRID_Y_MASK_SHIFT*pi +   PH_MASK_HEIGHT  + (PH_MASH_OFFSET * is_even))              ) ;
                 mask_shape = pow(mask_shape, PIXELGRID_Y_MASK_STEEP);
                 
             //Get per channel input luminance by clamping pixel_in and aplplying hmask
@@ -476,10 +477,9 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
      
     //Try to get a more brillant/sparkling look by highering the darklines
     //effect (sub) and pushing the source color, useful for slotmasks.
-        float spark = mix(0.0, PIXELGRID_Y_SPARK, PIXELGRID_Y_MASK);
-        darklines_mask-=spark;
-        rgb_h -=spark;
-        pixel_in *= spark*8+1;
+        float vPG_spark = PIXELGRID_Y_SPARK * PIXELGRID_Y_MASK;
+        darklines_mask -= vPG_spark;
+        pixel_in *= vPG_spark*4 + 1;
      
     //Finally put width,height1 and height2 masks togheter:
         //vec3 mask = rgb_w * rgb_h * darklines_mask;

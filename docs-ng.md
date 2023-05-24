@@ -197,9 +197,8 @@
                     The more, the thinner they will be.
                     Setting this to very high values, may make them disappear unevenly.
                 Sparkling look punch:
-                    Makes the "Vertical cell Mask 2" effect more pronunced and 
-                    "pinchy/Sparky" by highering its contrast.
-                    Beware, that this may produce moiree.
+                    Makes the "Vertical cell Mask 2" effect more pronunced and "pinchy/Sparky" by highering its contrast.
+                    Beware, this may produce moiree.
                     
 **Dot matrix emulation:**<br>
     Emulates low refresh "boxed" screens used in old handheld consoles.<br>
