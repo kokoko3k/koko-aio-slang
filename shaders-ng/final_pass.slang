@@ -297,7 +297,7 @@ vec3 fn_pixel_nightify(vec3 color_in, float strength, vec3 ambilight) {
     vec3 color_hsv_in = rgb2hsv(color_in);
     
     //If there is an ambientlight, then the strangth has to be lowered:
-        vec3 strength_vec3 = vec3(strength - ambilight); //strength_vec3 = vec3(strength);
+        vec3 strength_vec3 = vec3(strength - ambilight);
     
     strength_vec3 = scale_to_range_vec3(strength_vec3, 0.0, 1.0); 
     
@@ -946,11 +946,12 @@ void main() {
         if (DO_GAME_GEOM_OVERRIDE == 1.0)
             co_content = content_geom_override(co_content, GAME_GEOM_ASPECT, vIn_aspect, GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
 
+    //Dynamic lum dependant full screen zoom?
         if (DO_DYNZOOM == 1.0)
             co_content = zoom(co_content, get_dyn_zoom(avglum_pass) );
 
     
-    //Create an alpha mask to write content into, it holds opacity info that will be used to compose.:
+    //Create an alpha mask to write content into, it holds opacity info that will be used to compose:
         if (DO_CURVATURE == 1.0)  {
             canvas_busy = fn_border(co_content);
         } else {
@@ -958,7 +959,7 @@ void main() {
         }
 
         
-    //Calc a random noise for vignette or spot
+    //Calc a random noise for vignette or spot (this seems a sweet spot in the code to not lose speed)
         if (DO_VIGNETTE + DO_SPOT > 0.0) {
             global_noise_static = random_fast(NOISEPOWER, vTexCoord);
         }
@@ -997,10 +998,7 @@ void main() {
         }
 
 
-    
-    //The following funcs have to paint in the outer border
-
-        //Background image:
+        //Background image have, no need to paint if not in the outer border:
             if (DO_BG_IMAGE == 1.0 && BG_IMAGE_OVER == 0.0 && canvas_busy < 1.0) {
                 vec4 pixel_bg_image = fn_pixel_fgbg_image(bg_under);
                 vec3 anti_nightify_ambi = (pixel_ambi * AMBI_BG_IMAGE_BLEND_MODE) *
