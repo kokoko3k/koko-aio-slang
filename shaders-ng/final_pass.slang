@@ -295,7 +295,6 @@ vec3 fn_pixel_nightify(vec3 color_in, float strength) {
     color_in = clamp(color_in, 0.0, 1.0);
     
     vec3 color_hsv_in = rgb2hsv(color_in);
-    strength = scale_to_range(strength, 0.0, 1.0); 
     
     vec3 color_hsv_min = color_hsv_in;
     color_hsv_min.yz = scale_to_range_vec2(color_hsv_min.yz, -0.1, 0.1); 
