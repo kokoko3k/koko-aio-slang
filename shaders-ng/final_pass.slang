@@ -553,8 +553,6 @@ float get_clamped_white_reference(vec3 pixel_in){
 
 
 float global_noise_static = 0.0;
-float global_noise_ambi = 0.0;
-
 
 vec3 pixel_backdrop_image() {
     vec2 backdrop_offset=vec2(BACKDROP_OFFX,BACKDROP_OFFY);
@@ -824,7 +822,7 @@ vec3 fn_pixel_content(vec2 coords) {
 }
 
 
-vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightify_str) {
+vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightify_str, vec3 pixel_ambilight) {
     
     //Can we skip Blank outside border and inner blank tube?
         vec4 inner_blank_rect = vec4(1-BEZEL_TUBE_BLANK_SIZE, 1-BEZEL_TUBE_BLANK_SIZE, BEZEL_TUBE_BLANK_SIZE, BEZEL_TUBE_BLANK_SIZE);
@@ -881,10 +879,6 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
                 bezel_out += (pixel_mirrored.rgb * reflection_modifier);
         }
 
-    //Mix ambient light over bezel? (branching this is worse)
-        vec3 ambitemporalpass = texture(ambi_temporal_pass, vOutputCoord ).rgb;
-        ambitemporalpass = max(ambitemporalpass, 0.0); //<-- antiglitch. Needed to avoid undefined variable on vulkan.
-        vec3 pixel_ambilight = DO_AMBILIGHT * ( ambitemporalpass + global_noise_ambi);
             
         //Create a shaded box to apply ambilight on external borders only
             float ambi_colorize_shade = create_ambi_colorize_shade(coords_for_bezel);
@@ -905,19 +899,6 @@ void main() {
     
     float canvas_busy = 0.0; //<-- this allow for paint over not painted areas (spares gpu cycles)
 
-    //Calc a random noise if we need debanding
-        if (DO_VIGNETTE + DO_SPOT + DO_AMBILIGHT >0.0) {
-            //Generate random noise.
-                //global_noise = random(NOISEPOWER, vTexCoord * vDynamicSeed);
-                //global_noise_ambi = global_noise * NOISEPOWER_AMBI_MUL;
-            
-                //The following are faster versions, the dynamic one needs a seed that changes over time
-                //Calculated in Vertex shader for speed.
-                    global_noise_ambi = random_fast(NOISEPOWER * NOISEPOWER_AMBI_MUL, vTexCoord * vDynamicSeed  );
-                    global_noise_static = random_fast(NOISEPOWER, vTexCoord);
-        }
-    
-    
     //Initial content coords
         vec2 co_content = vTexCoord;
         
@@ -960,17 +941,31 @@ void main() {
             canvas_busy = float(is_first_inside_rect(co_content, RECT01)); //FIXME: is step() faster?
         }
 
+        
+    //Calc a random noise for vignette or spot
+        if (DO_VIGNETTE + DO_SPOT > 0.0) {
+            global_noise_static = random_fast(NOISEPOWER, vTexCoord);
+        }
 
+                vec3 pixel_ambi = vec3(0.0);
+                vec3 pixel_under_content = vec3(0.0);        
     //Draw content only over the alpha mask, spare gpu cycles.
-        if (canvas_busy > 0.0)
+        if (canvas_busy > 0.0) {
             pixel_out = fn_pixel_content(co_content) * canvas_busy;
-              
-
+        } else {
+            //Ambient light
+                if (DO_AMBILIGHT == 1.0) {
+                    pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb;
+                    pixel_ambi += random_fast(NOISEPOWER * NOISEPOWER_AMBI_MUL, vTexCoord * vDynamicSeed  ) * (20 * (3.0-(pixel_ambi.r+pixel_ambi.g+pixel_ambi.b))) ;
+                    pixel_under_content = pixel_ambi;
+                }
+        }
+    
     //Draw Bezel
         vec4 pixel_bezel;
         //SKIP LOGIC is inside fn_pixel_bezel
         if (DO_BEZEL == 1.0) {
-            pixel_bezel = fn_pixel_bezel(co_bezel, co_mirror, BG_IMAGE_NIGHTIFY);
+            pixel_bezel = fn_pixel_bezel(co_bezel, co_mirror, BG_IMAGE_NIGHTIFY, pixel_ambi);
             //If we used a smooth_border, canvas_busy is it, but since the content is in the bezel,
             //we can safely use it to smooth/darken the game border
             pixel_out *= canvas_busy; 
@@ -984,31 +979,19 @@ void main() {
                 //FragColor = vec4(canvas_busy); return; // <- uncomment to debug BEZEL_SHADOW_SIZE
         }
 
-        
+
+    
     //The following funcs have to paint in the outer border
-        vec3 pixel_ambi = vec3(0.0);
-        vec3 pixel_under_content = vec3(0.0);
-        if ( canvas_busy < 1.0) {
 
-            //Ambient light
-                if (DO_AMBILIGHT == 1.0) {
-                    vec2 co_ambi = vOutputCoord;
-                    pixel_ambi = texture(ambi_temporal_pass, co_ambi).rgb;
-                    pixel_ambi += global_noise_ambi * (20 * (3.0-(pixel_ambi.r+pixel_ambi.g+pixel_ambi.b))) ;
-                    pixel_under_content = pixel_ambi;
-                }
+        //Background image:
+            if (DO_BG_IMAGE == 1.0 && BG_IMAGE_OVER == 0.0 && canvas_busy < 1.0) {
+                vec4 pixel_bg_image = fn_pixel_fgbg_image(bg_under);
+                pixel_bg_image.rgb = fn_pixel_nightify(pixel_bg_image.rgb, BG_IMAGE_NIGHTIFY );
+                pixel_bg_image.rgb = ambi_blend_image(pixel_bg_image, pixel_ambi);        
+                pixel_under_content = pixel_bg_image.rgb;
+            }
             
-            //Background image:
-                if (DO_BG_IMAGE == 1.0 && BG_IMAGE_OVER == 0.0) {
-                    vec4 pixel_bg_image = fn_pixel_fgbg_image(bg_under);
-                    pixel_bg_image.rgb = fn_pixel_nightify(pixel_bg_image.rgb, BG_IMAGE_NIGHTIFY );
-                    pixel_bg_image.rgb = ambi_blend_image(pixel_bg_image, pixel_ambi);        
-                    pixel_under_content = pixel_bg_image.rgb;
-                }
-            
-        }
 
-        
         //Smooth the image corners: canvas_busy (the alpha mask) is a white rect with shaded borders.
             pixel_out = mix (pixel_under_content, pixel_out, canvas_busy);
  
@@ -1026,12 +1009,9 @@ void main() {
                 pixel_out = mix(pixel_out, pixel_fg_image.rgb, pixel_fg_image.a);
                 
                 if (DO_AMBILIGHT + AMBI_BG_IMAGE_BLEND_MODE == 2.0) { 
-                    vec3 pixel_ambi_local = texture(ambi_temporal_pass, vOutputCoord ).rgb;
-                    pixel_ambi_local = DO_AMBILIGHT * (pixel_ambi_local + global_noise_ambi);
-                    pixel_ambi_local = max(pixel_ambi_local, 0.0); //<-- antiglitch. Needed to avoid undefined variable on vulkan.
                     float ambi_mask = create_ambi_colorize_shade(co_bezel);
                     float fg_image_alpha_adapted = max(pixel_fg_image.a - AMBI_BG_IMAGE_FORCE, 0.0);
-                    pixel_out = pixel_out + (pixel_ambi_local.rgb * (ambi_mask) * (1- fg_image_alpha_adapted));
+                    pixel_out = pixel_out + (pixel_ambi.rgb * (ambi_mask) * (1- fg_image_alpha_adapted));
                 }
             }
   
