@@ -289,18 +289,23 @@ vec2 get_vOutputCoord_adapted() {
 }
 
 
-vec3 fn_pixel_nightify(vec3 color_in, float strength) {
+vec3 fn_pixel_nightify(vec3 color_in, float strength, vec3 ambilight) {
     if (strength == 0.0) return color_in;
     
     color_in = clamp(color_in, 0.0, 1.0);
     
     vec3 color_hsv_in = rgb2hsv(color_in);
     
+    //If there is an ambientlight, then the strangth has to be lowered:
+        vec3 strength_vec3 = vec3(strength - ambilight); //strength_vec3 = vec3(strength);
+    
+    strength_vec3 = scale_to_range_vec3(strength_vec3, 0.0, 1.0); 
+    
     vec3 color_hsv_min = color_hsv_in;
     color_hsv_min.yz = scale_to_range_vec2(color_hsv_min.yz, -0.1, 0.1); 
 
     vec3 color_rgb_min = hsv2rgb(color_hsv_min);
-    return mix(color_in, color_rgb_min, strength);
+    return mix(color_in, color_rgb_min, strength_vec3);
 }
 
 
@@ -851,12 +856,12 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
         
     //Colorize the bezel (bezel.r expresses the luminance)
         vec3 bezel_out = bezel_color(bezel_in.r);
-        bezel_out.rgb = fn_pixel_nightify(bezel_out.rgb, nightify_str );
     
     float lut_specular = bezel_in.g * BEZEL_SPCL_STRENGTH;
     float reflection_modifier = 0.0;
-
-    //Reflections, can be skipped if blue channel is 0:
+    vec4 pixel_mirrored = vec4(0.0);
+    
+    // Calculate Reflections, can be skipped if blue channel is 0:
         if (bezel_in.b > 0.0) {
         //Reflections: Calculate the bezel roughness to apply to the reflecting area. (bezel_in.g expresses the specularity)
             float roughness = random_fast( 1/1080.0 * BEZEL_ROUGHNESS, vTexCoord );
@@ -866,7 +871,7 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
             reflection_modifier = bezel_in.b; //bezel_in.b expresses how much the area is reflective
             
             //Sample the reflection pass with small offset to simulate the roughness
-                vec4 pixel_mirrored = texture(reflected_blurred_pass, coords_for_mirror + roughness);
+                pixel_mirrored = texture(reflected_blurred_pass, coords_for_mirror + roughness);
                 float fcorners_shade = 1 - corners_shade(coords_for_bezel, 1.0) * BEZEL_CORNER_DARK;
                 
             //Show less reflections in the corners
@@ -875,14 +880,25 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
             //Push it over the specular areas and apply the reflection modifier
                 pixel_mirrored.rgb = pixel_mirrored.rgb * (1 + lut_specular);
 
-            //Apply reflections
-                bezel_out += (pixel_mirrored.rgb * reflection_modifier);
         }
 
-            
-        //Create a shaded box to apply ambilight on external borders only
+
+   //Apply nightification, the strength is modulated by ambient light.
+        //Use a shaded box to apply ambilight on external borders only
             float ambi_colorize_shade = create_ambi_colorize_shade(coords_for_bezel);
-            bezel_out = bezel_out +  (AMBI_OVER_BEZEL * pixel_ambilight * bezel_in.a * ambi_colorize_shade * (1-reflection_modifier));
+            
+            vec3 ambi_over_bezel =  ( (AMBI_OVER_BEZEL * pixel_ambilight) * 
+                                    (bezel_in.a * ambi_colorize_shade) * 
+                                    (1-reflection_modifier) );
+        
+        bezel_out.rgb = fn_pixel_nightify(bezel_out.rgb, nightify_str, ambi_over_bezel )   ;
+
+    
+    //Apply reflections
+            bezel_out += (pixel_mirrored.rgb * reflection_modifier);
+        
+        //Apply ambient light over the bezel        
+            bezel_out = bezel_out + ambi_over_bezel;
         
     //Diffuse the light over specular areas, we use a mipmap with low precision.
         if (lut_specular > 0.0) {
@@ -947,18 +963,19 @@ void main() {
             global_noise_static = random_fast(NOISEPOWER, vTexCoord);
         }
 
-                vec3 pixel_ambi = vec3(0.0);
-                vec3 pixel_under_content = vec3(0.0);        
-    //Draw content only over the alpha mask, spare gpu cycles.
+        
+    vec3 pixel_ambi = vec3(0.0);
+    vec3 pixel_under_content = vec3(0.0);        
+    //Draw content only over the alpha mask, and sample ambientlight outside it to spare gpu cycles.
         if (canvas_busy > 0.0) {
             pixel_out = fn_pixel_content(co_content) * canvas_busy;
         } else {
             //Ambient light
-                if (DO_AMBILIGHT == 1.0) {
-                    pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb;
-                    pixel_ambi += random_fast(NOISEPOWER * NOISEPOWER_AMBI_MUL, vTexCoord * vDynamicSeed  ) * (20 * (3.0-(pixel_ambi.r+pixel_ambi.g+pixel_ambi.b))) ;
-                    pixel_under_content = pixel_ambi;
-                }
+            if (DO_AMBILIGHT == 1.0) {
+                pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb;
+                pixel_ambi += random_fast(NOISEPOWER * NOISEPOWER_AMBI_MUL, vTexCoord * vDynamicSeed  ) * (20 * (3.0-(pixel_ambi.r+pixel_ambi.g+pixel_ambi.b))) ;
+                pixel_under_content = pixel_ambi;
+            }
         }
     
     //Draw Bezel
@@ -986,7 +1003,10 @@ void main() {
         //Background image:
             if (DO_BG_IMAGE == 1.0 && BG_IMAGE_OVER == 0.0 && canvas_busy < 1.0) {
                 vec4 pixel_bg_image = fn_pixel_fgbg_image(bg_under);
-                pixel_bg_image.rgb = fn_pixel_nightify(pixel_bg_image.rgb, BG_IMAGE_NIGHTIFY );
+                vec3 anti_nightify_ambi = (pixel_ambi * AMBI_BG_IMAGE_BLEND_MODE) *
+                                           max(AMBI_BG_IMAGE_FORCE, 1-pixel_bg_image.a) ;
+                                           
+                pixel_bg_image.rgb = fn_pixel_nightify(pixel_bg_image.rgb, BG_IMAGE_NIGHTIFY, anti_nightify_ambi );
                 pixel_bg_image.rgb = ambi_blend_image(pixel_bg_image, pixel_ambi);        
                 pixel_under_content = pixel_bg_image.rgb;
             }
@@ -1004,7 +1024,10 @@ void main() {
         //Foreground image
             if (DO_BG_IMAGE + BG_IMAGE_OVER == 2.0) {
                 vec4 pixel_fg_image = fn_pixel_fgbg_image(bg_over);
-                pixel_fg_image.rgb = fn_pixel_nightify(pixel_fg_image.rgb, BG_IMAGE_NIGHTIFY );
+                vec3 anti_nightify_ambi = (pixel_ambi * AMBI_BG_IMAGE_BLEND_MODE) *
+                                           max(AMBI_BG_IMAGE_FORCE, 1-pixel_fg_image.a) ;
+                
+                pixel_fg_image.rgb = fn_pixel_nightify(pixel_fg_image.rgb, BG_IMAGE_NIGHTIFY, anti_nightify_ambi );
                 
                 pixel_out = mix(pixel_out, pixel_fg_image.rgb, pixel_fg_image.a);
                 
