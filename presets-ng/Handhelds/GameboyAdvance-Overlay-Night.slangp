@@ -1,4 +1,4 @@
-#reference "GameboyAdvance-Overlay.zlangp"
+#reference "GameboyAdvance-Overlay.slangp"
 
 bg_under = "../../textures/gba.jpg"
 
