@@ -63,6 +63,7 @@ void main() {
 
     //Every cycle counts!
         vAMBI_POWER = AMBI_POWER -1;
+               
 }
 
 #pragma stage fragment
@@ -104,10 +105,18 @@ vec3 circle_smooth(vec2 coords, vec2 middle, float f_radius, float FALLOFF, floa
 #define tol_start 0.08 //skip tolerance
 #define tol_end   1-tol_start
 
+
+vec2 tl_warp(vec2 pos, float warp) {
+    
+    pos  = pos*2.0-1.0;    
+    pos *= vec2(1.0 + (pos.y*pos.y)*warp, 1.0 + (pos.x*pos.x)*warp);
+    
+    return pos*0.5 + 0.5;
+}
+
 vec3 ambi_pre_pass(vec2 coords) {
     if (DO_TILT == 1.0)
         coords = tilt(coords, vIs_rotated, vec2(TILT_X, TILT_Y));
-    
     
     //Skip coords in the rect "under the tube"
     if (coords.x > tol_start &&
@@ -116,8 +125,12 @@ vec3 ambi_pre_pass(vec2 coords) {
         coords.y < tol_end)
     return vec3(0.0);
    
+    //Stretch the lights?
+        float z1=1+distance(vec2(0.5,0.5), coords);
+        vec2 zoomed_coords = zoomxy(coords, vec2(z1));
+        coords = mix(coords, zoomed_coords, AMBI_STRETCH);
 
-
+        
     //Finally, emulate leds.
     vec3 pixel_out = vec3(0.0);
     float middle_x; float middle_y ;
