@@ -968,14 +968,14 @@ void main() {
     vec3 pixel_ambi = vec3(0.0);
     vec3 pixel_under_content = vec3(0.0);        
     //Draw content only over the alpha mask, and sample ambientlight outside it to spare gpu cycles.
-        if (canvas_busy > 0.0) {
+        if (canvas_busy > 0.5) {
             pixel_out = fn_pixel_content(co_content) * canvas_busy;
         } else {
             //Ambient light
             if (DO_AMBILIGHT == 1.0) {
                 pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb;
                 pixel_ambi += random_fast(NOISEPOWER * NOISEPOWER_AMBI_MUL, vTexCoord * vDynamicSeed  ) * (20 * (3.0-(pixel_ambi.r+pixel_ambi.g+pixel_ambi.b))) ;
-                pixel_under_content = pixel_ambi;
+                pixel_under_content = pixel_ambi * (1-canvas_busy);
             }
         }
     
