@@ -164,7 +164,8 @@ layout(push_constant) uniform Push {
 	float HALO_VS_SCAN ;
 	float DO_BLOOM ; //4
  	float BLOOM_QUALITY ; //1
-
+ 	
+	float AMBI_STRETCH;
 } params;
 
 layout(std140, set = 0, binding = 0) uniform UBO {
@@ -173,9 +174,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	vec4 FinalViewportSize;
 	vec4 in_glow_passSize;
 	vec4 FXAA_passSize;
-	//vec4 main_passSize;
-	//vec4 monitor_bodySize;
-	//vec4 bgSize;
+
 	vec4 avglum_passSize;
 	vec4 flick_and_noise_passSize;
 	vec4 colortools_and_ntsc_passSize;
@@ -277,7 +276,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float AMBI_FALLOFF;
 	float AMBI_POWER;
 	float AMBI_GAMMA;
-	float AMBI_STRETCH;
+
 	float AMBI_OVER_BEZEL;
 	float AMBI_OVER_BEZEL_SIZE;
 	float AMBI_STEPS;
@@ -329,6 +328,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float BACKDROP_OFFX;
 	float BACKDROP_OFFY;
 	float BACKDROP_ZOOM;
+	
 	
 	float TATE;
 
