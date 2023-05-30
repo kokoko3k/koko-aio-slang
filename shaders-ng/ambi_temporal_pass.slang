@@ -7,7 +7,7 @@
 
 #define PastSampler ambi_temporal_passFeedback
 
-#define internalness 0.07 //The distance between the screen border and the led strip
+#define internalness 0.07  //The distance between the screen border and the led strip
 #define leds_per_strip 8   //How many leds per border
 #define radius 0.001       //The base radius of the emitted light (tuned by user parameter later)
 
@@ -28,9 +28,17 @@ void main() {
     gl_Position = global.MVP * Position;
     vTexCoord = TexCoord;
 
-    border_min=internalness ;
-    border_max=1.0-internalness ;
+    //Move virtual leds position inside to compensate for widen effect
+        float z = 1.0 + (AMBI_STRETCH);
+        float internalness_adpt = internalness*z;
+    
+    border_min=internalness_adpt ;
+    border_max=1.0-internalness_adpt ;
     fstep = (border_max - border_min)  / (leds_per_strip-1);
+    
+
+
+    
     
     //Calc a lod for a texture sized led_strip x led_strip
         lod = log2(global.flick_and_noise_passSize.y / leds_per_strip);
