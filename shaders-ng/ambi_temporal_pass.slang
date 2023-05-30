@@ -28,17 +28,17 @@ void main() {
     gl_Position = global.MVP * Position;
     vTexCoord = TexCoord;
 
+    //Disable internalness when using bezel:
+       float internalness_adpt =  internalness * (1-DO_BEZEL);
+       
     //Move virtual leds position inside to compensate for widen effect
         float z = 1.0 + (AMBI_STRETCH);
-        float internalness_adpt = internalness*z;
+        internalness_adpt = internalness_adpt*z;
     
+        
     border_min=internalness_adpt ;
     border_max=1.0-internalness_adpt ;
     fstep = (border_max - border_min)  / (leds_per_strip-1);
-    
-
-
-    
     
     //Calc a lod for a texture sized led_strip x led_strip
         lod = log2(global.flick_and_noise_passSize.y / leds_per_strip);
