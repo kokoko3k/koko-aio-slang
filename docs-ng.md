@@ -391,6 +391,11 @@
         shown on their transparent areas (alpha channel)
         Switching this you can choose if you want to emulate leds:
         under the image (0/mix) or over the image (1/add)
+    Foggy (power on dark colors, add mode only)
+        When using add mode or when colorizing the bezel via led lights, you may want
+        to lessen the foggy effect to turn it into a more realistic illumination.
+        Think to this as a way to turn the light target from the spectator (foggy)
+        to the background (not foggy).
     Always colorize Back/Foreground image (add mode only)
         When "Back/Foreground image alpha blend" is set to 1/add,
         you can choose to always colorize the foreground image by a certain amount.
