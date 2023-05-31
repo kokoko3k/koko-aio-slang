@@ -298,14 +298,24 @@ vec3 fn_pixel_nightify(vec3 color_in, float strength, vec3 ambilight) {
     
     //If there is an ambientlight, then the strangth has to be lowered:
         vec3 strength_vec3 = vec3(strength - ambilight);
-    
+        
     strength_vec3 = scale_to_range_vec3(strength_vec3, 0.0, 1.0); 
     
     vec3 color_hsv_min = color_hsv_in;
     color_hsv_min.yz = scale_to_range_vec2(color_hsv_min.yz, -0.1, 0.1); 
 
     vec3 color_rgb_min = hsv2rgb(color_hsv_min);
-    return mix(color_in, color_rgb_min, strength_vec3);
+    
+   
+    vec3 pixel_out = mix(color_in, color_rgb_min, strength_vec3);
+
+   //It could make sense to higher the contrast when ambient light hits the picture,
+    //Maybe this could be used independently on the nightify feature?
+    /*vec3 new_contrast = ambilight;
+    vec3 new_brightness = ambilight*0.0;
+    pixel_out = scale_to_range_vec3(pixel_out, -new_contrast, 1+new_contrast) + new_brightness;*/
+
+    return pixel_out;
 }
 
 
@@ -713,9 +723,16 @@ vec4 fn_pixel_fgbg_image(sampler2D smp) {
     return pixel_bgover;
 }
 
+vec3 light_over_image(vec3 light, vec3 image, float black_illumination) {
+    //Simulates illumination.
+    //It works by adding the light on the image.
+    //It will add less light on dark colors (
+    vec3 light_on_black = black_illumination * light;
+    return image.rgb +  ( (light - light_on_black ) * image.rgb ) + light_on_black;
+    
+}
 
-
-vec3 ambi_blend_image(vec4 image, vec3 ambi) {
+vec3 ambi_blend_image(vec4 image, vec3 ambi, float blend_mode) {
     //mix or add ambient light with image, also allow force colorization in add mode.
     if (DO_AMBILIGHT == 0.0) return image.rgb;
     
@@ -725,12 +742,29 @@ vec3 ambi_blend_image(vec4 image, vec3 ambi) {
     // force colorization when mode blend mode is not "ADD".
         float image_alpha_adapted = image.a - (AMBI_BG_IMAGE_FORCE * AMBI_BG_IMAGE_BLEND_MODE);
 
-    image.rgb = (AMBI_BG_IMAGE_BLEND_MODE == 0.0) ? 
+    if (AMBI_BG_IMAGE_BLEND_MODE == 0.0) {
+        image.rgb = mix(ambi.rgb, image.rgb, image_alpha_adapted);
+    } else {
+        //image.rgb =  image.rgb + (ambi.rgb * (1 - image_alpha_adapted)); 
+        /*float light_on_black = 0.3;
+        vec3 ambi_alpha_masked = ambi.rgb *  (1 - image_alpha_adapted);
+        vec3 ambi_on_black = light_on_black * ambi_alpha_masked;
+        
+        image.rgb = image.rgb +  ((ambi_alpha_masked-ambi_on_black) * image.rgb) + ambi_on_black;*/
+        
+        float black_illumination = 0.5;
+        vec3 ambi_alpha_masked = ambi.rgb *  (1 - image_alpha_adapted);
+        image.rgb = light_over_image(ambi_alpha_masked, image.rgb, AMBI_ADD_ON_BLACK) ;
+        
+    }
+    return image.rgb;
+    
+    /*image.rgb = (AMBI_BG_IMAGE_BLEND_MODE == 0.0) ? 
         mix(ambi.rgb, image.rgb, image_alpha_adapted) 
             : 
         image.rgb + (ambi.rgb * (1 - image_alpha_adapted)); 
         
-    return image.rgb;
+    return image.rgb;*/
 }
 
 float gaussian_coefficient(float x, float sigma) {
@@ -817,10 +851,8 @@ vec3 fn_pixel_content(vec2 coords) {
     
     //Black frame insertion, made static, enable it in config.inc.
         #ifdef ALLOW_ALT_BLANK
-            if (DO_ALT_BLANK == 1.0 ) {
+            if (DO_ALT_BLANK == 1.0 )
                 pixel_out.rgb = pixel_alternate(pixel_out.rgb, ALT_BLANK_STRENGTH );
-                //pixel_out.rgb +=  vec3(random_fast(ALT_BLANK_STRENGTH, vTexCoord * mod(params.FrameCount, 2)   ));
-            }
         #endif
         
     return pixel_out;
@@ -898,7 +930,8 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
             bezel_out += (pixel_mirrored.rgb * reflection_modifier);
         
         //Apply ambient light over the bezel        
-            bezel_out = bezel_out + ambi_over_bezel;
+            //bezel_out = bezel_out + ambi_over_bezel;
+            bezel_out = light_over_image(ambi_over_bezel, bezel_out, AMBI_ADD_ON_BLACK);
         
     //Diffuse the light over specular areas, we use a mipmap with low precision.
         if (lut_specular > 0.0) {
@@ -1001,11 +1034,16 @@ void main() {
         //Background image have, no need to paint if not in the outer border:
             if (DO_BG_IMAGE == 1.0 && BG_IMAGE_OVER == 0.0 && canvas_busy < 1.0) {
                 vec4 pixel_bg_image = fn_pixel_fgbg_image(bg_under);
+                
+                                                        //pixel_bg_image.rgb = scale_to_range_vec3(pixel_bg_image.rgb, -pixel_ambi, 1+pixel_ambi);
+                
                 vec3 anti_nightify_ambi = (pixel_ambi * AMBI_BG_IMAGE_BLEND_MODE) *
                                            max(AMBI_BG_IMAGE_FORCE, 1-pixel_bg_image.a) ;
                                            
+                
                 pixel_bg_image.rgb = fn_pixel_nightify(pixel_bg_image.rgb, BG_IMAGE_NIGHTIFY, anti_nightify_ambi );
-                pixel_bg_image.rgb = ambi_blend_image(pixel_bg_image, pixel_ambi);        
+                pixel_bg_image.rgb = ambi_blend_image(pixel_bg_image, pixel_ambi, AMBI_BG_IMAGE_BLEND_MODE);    
+    
                 pixel_under_content = pixel_bg_image.rgb;
             }
             
@@ -1032,11 +1070,12 @@ void main() {
                 if (DO_AMBILIGHT + AMBI_BG_IMAGE_BLEND_MODE == 2.0) { 
                     float ambi_mask = create_ambi_colorize_shade(co_bezel);
                     float fg_image_alpha_adapted = max(pixel_fg_image.a - AMBI_BG_IMAGE_FORCE, 0.0);
-                    pixel_out = pixel_out + (pixel_ambi.rgb * (ambi_mask) * (1- fg_image_alpha_adapted));
+                    //pixel_out = pixel_out + (pixel_ambi.rgb * (ambi_mask) * (1- fg_image_alpha_adapted));
+                    vec3 light = pixel_ambi.rgb * (ambi_mask) * (1- fg_image_alpha_adapted);
+                    pixel_out = light_over_image(light, pixel_out, AMBI_ADD_ON_BLACK);
                 }
             }
   
-     
 
     //Debug functions: 
         #ifdef DEBUG_QUAD_SPLIT

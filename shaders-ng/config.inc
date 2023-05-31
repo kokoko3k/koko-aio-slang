@@ -164,7 +164,7 @@ layout(push_constant) uniform Push {
 	float HALO_VS_SCAN ;
 	float DO_BLOOM ; //4
  	float BLOOM_QUALITY ; //1
- 	
+	float AMBI_ADD_ON_BLACK;
 	float AMBI_STRETCH;
 } params;
 
@@ -282,6 +282,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float AMBI_STEPS;
 	float AMBI_BG_IMAGE_BLEND_MODE;
 	float AMBI_BG_IMAGE_FORCE;
+
 	
 	float ASPECT_X;
 	float ASPECT_Y;
@@ -622,13 +623,14 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter DO_AMBILIGHT	            "★ Ambient light leds enable? ==> "				1.0  0.0  1.0     1.0
 #pragma parameter LABEL_WARNING3            "    ⚠ RetroArch aspect needs to be set to Full! ⚠"		1.0  1.0  1.0     1.0
 #pragma parameter AMBI_STEPS	            "        Slowness"						60.0 5.0  1000.0  5.0
-#pragma parameter AMBI_POWER                "        Led power"						1.5  0.0  10.0     0.05
+#pragma parameter AMBI_POWER                "        Led power"						1.5  0.0  100.0     0.05
 #pragma parameter AMBI_FALLOFF              "        Light Falloff"						0.7  0.1  3.0     0.01
 #pragma parameter AMBI_STRETCH              "        Widen lights"						0.0  0.0  1.0     0.01
 #pragma parameter AMBI_GAMMA                "        Output Gamma"						1.3  0.1  8.0     0.1
 #pragma parameter AMBI_OVER_BEZEL           "        Colorize Bezel"					0.5  0.0  5.0     0.05
 #pragma parameter AMBI_OVER_BEZEL_SIZE      "           . Colorization size"			0.15  0.0  0.5    0.001
-#pragma parameter AMBI_BG_IMAGE_BLEND_MODE  "        Back/Foreground image alpha blend (0=mix, 1/check=add)"	0.0   0.0  1.0    1.0
+#pragma parameter AMBI_BG_IMAGE_BLEND_MODE  "        Back/Foreground image alpha blend (0=mix, 1=add)"	0.0   0.0  1.0    1.0
+#pragma parameter AMBI_ADD_ON_BLACK         "        Foggy (power on dark colors, add mode only)    "		1.0   0.0  1.0    0.05
 #pragma parameter AMBI_BG_IMAGE_FORCE       "        Always colorize Back/Foreground image (add mode only) "		0.0   0.0  1.0    0.1
 #pragma parameter BLANK17 " " 0.0 0.0 1.0 1.0
 

@@ -304,6 +304,10 @@ vec3 scale_to_range_vec3(vec3 x, float dmin, float dmax) {
     return ( (dmax-dmin) * x ) + dmin;
 }
 
+vec3 scale_to_range_vec3(vec3 x, vec3 dmin, vec3 dmax) {
+    //Scales 0..1 range to a..b range
+    return ( (dmax-dmin) * x ) + dmin;
+}
 vec2 scale_to_range_vec2(vec2 x, float dmin, float dmax) {
     //Scales 0..1 range to a..b range
     return ( (dmax-dmin) * x ) + dmin;
