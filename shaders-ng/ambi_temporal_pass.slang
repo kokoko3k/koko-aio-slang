@@ -7,7 +7,7 @@
 
 #define PastSampler ambi_temporal_passFeedback
 
-#define internalness 0.07  //The distance between the screen border and the led strip
+// moved to user param #define internalness 0.07  //The distance between the screen border and the led strip
 #define leds_per_strip 8   //How many leds per border
 #define radius 0.001       //The base radius of the emitted light (tuned by user parameter later)
 
@@ -29,10 +29,12 @@ void main() {
     vTexCoord = TexCoord;
 
     //Disable internalness when using bezel:
-       float internalness_adpt =  internalness * (1-DO_BEZEL);
+       //internalness_adpt =  AMBI_INT_OFFSET * (1-DO_BEZEL);
 
     //Move virtual leds position inside to compensate for widen effect
-        internalness_adpt = internalness_adpt + (AMBI_STRETCH *0.025);
+       float  internalness_adpt = AMBI_INT_OFFSET + (AMBI_STRETCH *0.025);
+
+        //internalness_adpt = -0.18   ;
 
 
     border_min=internalness_adpt ;

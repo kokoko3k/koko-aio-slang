@@ -166,6 +166,7 @@ layout(push_constant) uniform Push {
  	float BLOOM_QUALITY ; //1
 	float AMBI_ADD_ON_BLACK;
 	float AMBI_STRETCH;
+	float AMBI_INT_OFFSET ;
 } params;
 
 layout(std140, set = 0, binding = 0) uniform UBO {
@@ -623,6 +624,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter DO_AMBILIGHT	            "★ Ambient light leds enable? ==> "				1.0  0.0  1.0     1.0
 #pragma parameter LABEL_WARNING3            "    ⚠ RetroArch aspect needs to be set to Full! ⚠"		1.0  1.0  1.0     1.0
 #pragma parameter AMBI_STEPS	            "        Slowness"						60.0 5.0  1000.0  5.0
+#pragma parameter AMBI_INT_OFFSET           "        Led internalness"              0.07 -1.0 1.0 0.01
 #pragma parameter AMBI_POWER                "        Led power"						1.5  0.0  100.0     0.05
 #pragma parameter AMBI_FALLOFF              "        Light Falloff"						0.7  0.1  3.0     0.01
 #pragma parameter AMBI_STRETCH              "        Widen lights"						0.0  0.0  1.0     0.01

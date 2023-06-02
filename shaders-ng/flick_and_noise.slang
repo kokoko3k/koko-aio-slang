@@ -7,7 +7,7 @@
 #define CRED    vec3(1.0,0.0,0.0)
 #define CCUSTOM vec3(1.0,0.5,0.1)
 
-#define DEBUG_COLOR CPURPLE //vec3(0.8)
+#define DEBUG_COLOR CWHITE //vec3(0.8)
 #define DEBUG_BLINK_TIME 20
 #define DEBUG_GRADIENT_STEPS 128
 

@@ -12,7 +12,7 @@
  * 	#define DO_CCORRECTION	global.DO_CCORRECTION
  * 	turns to
  * 	#define DO_CCORRECTION	0.0
- * 
+ *
  * 
  * Since everything after "//" is ignored,
  * you can even do something like:
@@ -195,6 +195,7 @@
 	#define AMBI_BG_IMAGE_BLEND_MODE	global.AMBI_BG_IMAGE_BLEND_MODE
 	#define AMBI_BG_IMAGE_FORCE		global.AMBI_BG_IMAGE_FORCE
 	#define AMBI_ADD_ON_BLACK		params.AMBI_ADD_ON_BLACK
+	#define AMBI_INT_OFFSET			params.AMBI_INT_OFFSET
 
 //Global aspect ratio related
 	#define ASPECT_X		global.ASPECT_X
