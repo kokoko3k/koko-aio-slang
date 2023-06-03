@@ -71,7 +71,7 @@
 	// when changing scene. (range 0..1)
 	// It is wise to correlate it with avglum_divider
 	// try between (1/avglum_divider) and (1/avglum_divider)/3
-//#define AMBI_FAST_STEP 0.125 
+//#define AMBI_FAST_STEP 0.125
 #define AMBI_FAST_STEP 0.25
 
 
@@ -495,7 +495,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter PIXELGRID_SIZE_H          "           . Resolution: (core for scanlines or screen)"	0.0 0.0 1.0 1.0
 #pragma parameter PIXELGRID_MIN_H	        "           . Phosphors height Min"			0.2 0.0 1.0 0.05
 #pragma parameter PIXELGRID_MAX_H           "           . Phosphors height Max"			0.6 0.0 1.0 0.05
-#pragma parameter PIXELGRID_OFFSET_CORE     "           . Slotmask offset (0.25 ok)"	0.0 0.0 1.0 0.01
+#pragma parameter PIXELGRID_OFFSET_CORE     "           . Slotmask offset (0.10..0.25 ok)"	0.0 0.0 1.0 0.01
 #pragma parameter PIXELGRID_MUL_Y           "           . Cell size multiplier y (neg=divider):"	1.0 -8.0 8.0 0.125
 #pragma parameter PIXELGRID_NO_INTERBLEED_H	"           . Avoid inter-cell bleeding (handhelds)"		0.0 0.0 100.0 100.0
 

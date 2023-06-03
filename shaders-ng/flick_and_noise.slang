@@ -8,16 +8,16 @@
 #define CCUSTOM vec3(1.0,0.5,0.1)
 
 #define DEBUG_COLOR CWHITE //vec3(0.8)
-#define DEBUG_BLINK_TIME 20
+#define DEBUG_BLINK_TIME 200
 #define DEBUG_GRADIENT_STEPS 128
 
 //#define DEBUG
-   //#define DEBUG_TIME_FADE
+   #define DEBUG_TIME_FADE
    //#define DEBUG_SOLID_COLOR
    //#define DEBUG_STEP_GRADIENT
    //#define DEBUG_BLINK
    //#define DEBUG_BLINK_CIRCLE
-   #define DEBUG_COLORWHEEL
+   //#define DEBUG_COLORWHEEL
 
 
 #include "config.inc"
