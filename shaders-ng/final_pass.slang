@@ -914,13 +914,18 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
 
         }
 
+    //Yes, we already passed ambilight as parameter, but if geometry content is overridden
+    //then ambientlight may have not been sampled yet due to some skip logic made in the main()
+        if (DO_AMBILIGHT == 1.0)
+            pixel_ambilight = texture(ambi_temporal_pass, vOutputCoord).rgb;
+
     //Apply nightification, the strength is modulated by ambient light.
         //Use a shaded box to apply ambilight on external borders only
             float ambi_colorize_shade = create_ambi_colorize_shade(coords_for_bezel);
 
 
-            vec3 ambi_over_bezel =  ( (AMBI_OVER_BEZEL * pixel_ambilight) * 
-                                    (bezel_in.a * ambi_colorize_shade) * 
+            vec3 ambi_over_bezel =  ( (AMBI_OVER_BEZEL * pixel_ambilight) *
+                                    (bezel_in.a * ambi_colorize_shade) *
                                     (1-reflection_modifier) );
         
         bezel_out.rgb = fn_pixel_nightify(bezel_out.rgb, nightify_str, ambi_over_bezel )   ;
@@ -999,7 +1004,7 @@ void main() {
 
         
     vec3 pixel_ambi = vec3(0.0);
-    vec3 pixel_under_content = vec3(0.0);        
+    vec3 pixel_under_content = vec3(0.0);
     //Draw content only over the alpha mask, and sample ambientlight outside it to spare gpu cycles.
         if (canvas_busy > 0.5) {
             pixel_out = fn_pixel_content(co_content) * canvas_busy;
@@ -1036,7 +1041,6 @@ void main() {
                 vec4 pixel_bg_image = fn_pixel_fgbg_image(bg_under);
                 
                                                         //pixel_bg_image.rgb = scale_to_range_vec3(pixel_bg_image.rgb, -pixel_ambi, 1+pixel_ambi);
-                
                 vec3 anti_nightify_ambi = (pixel_ambi * AMBI_BG_IMAGE_BLEND_MODE) *
                                            max(AMBI_BG_IMAGE_FORCE, 1-pixel_bg_image.a) ;
                                            
@@ -1060,6 +1064,10 @@ void main() {
         //Foreground image
             if (DO_BG_IMAGE + BG_IMAGE_OVER == 2.0) {
                 vec4 pixel_fg_image = fn_pixel_fgbg_image(bg_over);
+                // if geometry content is overridden, ambientlight may have not been sample yet due to some skip logic
+                if (DO_AMBILIGHT == 1.0 && (pixel_fg_image.a+AMBI_BG_IMAGE_FORCE) > 0.0 )
+                    pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb;
+
                 vec3 anti_nightify_ambi = (pixel_ambi * AMBI_BG_IMAGE_BLEND_MODE) *
                                            max(AMBI_BG_IMAGE_FORCE, 1-pixel_fg_image.a) ;
                 
