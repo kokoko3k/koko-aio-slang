@@ -7,7 +7,7 @@
 
 #define PastSampler ambi_temporal_passFeedback
 
-// moved to user param #define internalness 0.07  //The distance between the screen border and the led strip
+#define smp_internalness 0.07  //The distance between the screen border and the color sampling point
 #define leds_per_strip 8   //How many leds per border
 #define radius 0.001       //The base radius of the emitted light (tuned by user parameter later)
 
@@ -15,31 +15,41 @@
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
-layout(location = 1) out float border_min;
-layout(location = 2) out float border_max;
-layout(location = 3) out float fstep;
+layout(location = 1) out float vLedBorder_min;
+layout(location = 2) out float vLedBorder_max;
+layout(location = 3) out float vLed_step;
 layout(location = 4) out float lod;
 layout(location = 5) out vec2 pre_pass_coords;
 layout(location = 6) out float vIs_rotated;
 layout(location = 7) out vec2 vFuzzy_main_pass_stage_1;
 layout(location = 8) out float vAMBI_POWER;
+layout(location = 9) out float vSmpBorder_min;
+layout(location = 10) out float vSmpBorder_max;
+layout(location = 11) out float vSmp_step;
 
 void main() {
     gl_Position = global.MVP * Position;
     vTexCoord = TexCoord;
 
+    //Min/Max points to sample colors:
+        vSmpBorder_min = smp_internalness;
+        vSmpBorder_max = 1.0-smp_internalness;
+
+
     //Disable internalness when using bezel:
-       //internalness_adpt =  AMBI_INT_OFFSET * (1-DO_BEZEL);
+       //led_internalness =  AMBI_INT_OFFSET * (1-DO_BEZEL);
 
     //Move virtual leds position inside to compensate for widen effect
-       float  internalness_adpt = AMBI_INT_OFFSET + (AMBI_STRETCH *0.025);
+       float  led_internalness = AMBI_INT_OFFSET + (AMBI_STRETCH *0.025);
 
-        //internalness_adpt = -0.18   ;
+        //led_internalness = -0.18   ;
 
+    //Min/Max points to show Leds;
+        vLedBorder_min=led_internalness;
+        vLedBorder_max=1.0-led_internalness;
 
-    border_min=internalness_adpt ;
-    border_max=1.0-internalness_adpt ;
-    fstep = (border_max - border_min)  / (leds_per_strip-1);
+    vLed_step = (vLedBorder_max - vLedBorder_min)  / (leds_per_strip-1);
+    vSmp_step = (vSmpBorder_max - vSmpBorder_min)  / (leds_per_strip-1);
 
     //Calc a lod for a texture sized led_strip x led_strip
         lod = log2(global.flick_and_noise_passSize.y / leds_per_strip);
@@ -77,14 +87,17 @@ void main() {
 
 #pragma stage fragment
 layout(location = 0) in vec2 vTexCoord;
-layout(location = 1) in float border_min;
-layout(location = 2) in float border_max;
-layout(location = 3) in float fstep;
+layout(location = 1) in float vLedBorder_min;
+layout(location = 2) in float vLedBorder_max;
+layout(location = 3) in float vLed_step;
 layout(location = 4) in float lod;
 layout(location = 5) in vec2 pre_pass_coords;
 layout(location = 6) in float vIs_rotated;
 layout(location = 7) in vec2 vFuzzy_main_pass_stage_1;
 layout(location = 8) in float vAMBI_POWER;
+layout(location = 9) in float vSmpBorder_min;
+layout(location = 10) in float vSmpBorder_max;
+layout(location = 11) in float vSmp_step;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -92,7 +105,6 @@ layout(set = 0, binding = 1) uniform sampler2D PastSampler;
 layout(set = 0, binding = 2) uniform sampler2D avglum_pass;
 layout(set = 0, binding = 3) uniform sampler2D avglum_passFeedback;
 layout(set = 0, binding = 4) uniform sampler2D flick_and_noise_pass;
-
 
 
 
@@ -104,24 +116,16 @@ vec3 ambi_push_pass(vec2 coords, float f_lod) {
    return pixel_out;
 }
 
-vec3 circle_smooth(vec2 coords, vec2 middle, float f_radius, float FALLOFF, float f_lod) {
-    float fdistance=distance(middle, vec2(coords.x, coords.y));
-    float circle = (1-smoothstep(f_radius-FALLOFF, f_radius+FALLOFF, fdistance));
-    vec3 circle_color = ambi_push_pass(middle, f_lod) * circle;
-    return circle_color;
+
+float fcircle_smooth(vec2 coords, vec2 middle, float f_radius, float FALLOFF) {
+    float fdistance = distance(middle, vec2(coords.x, coords.y));
+    return (1-smoothstep(f_radius-FALLOFF, f_radius+FALLOFF, fdistance));
 }
 
 #define tol_start 0.08 //skip tolerance
 #define tol_end   1-tol_start
 
 
-vec2 tl_warp(vec2 pos, float warp) {
-
-    pos  = pos*2.0-1.0;
-    pos *= vec2(1.0 + (pos.y*pos.y)*warp, 1.0 + (pos.x*pos.x)*warp);
-
-    return pos*0.5 + 0.5;
-}
 
 vec3 ambi_pre_pass(vec2 coords) {
     if (DO_TILT == 1.0)
@@ -142,25 +146,55 @@ vec3 ambi_pre_pass(vec2 coords) {
 
     //Finally, emulate leds.
     vec3 pixel_out = vec3(0.0);
-    float middle_x; float middle_y ;
-    middle_x=border_min;
-    for (middle_y=border_min ; middle_y <= border_max+eps ; middle_y=middle_y + fstep ) {
-        pixel_out +=circle_smooth(coords, vec2(middle_x,middle_y), radius, lAMBI_FALLOFF, lod);
-    }
-    middle_x=border_max;
-    for (middle_y=border_min ; middle_y <=  border_max+eps ; middle_y=middle_y + fstep) {
-        pixel_out +=circle_smooth(coords, vec2(middle_x,middle_y), radius, lAMBI_FALLOFF, lod);
+
+    vec2 smp_point; //The coords where the source color is sampled
+    vec2 led_point; //The coords where the led is shown
+
+
+
+    //LEFT strip
+    led_point = vec2(vLedBorder_min);
+    smp_point = vec2(vSmpBorder_min);
+    for (int i=1 ; i <= leds_per_strip ; i++) {
+        float circle_shape = fcircle_smooth(coords, led_point, radius, lAMBI_FALLOFF);
+        vec3  circle_color = ambi_push_pass(smp_point, lod);
+        pixel_out += circle_shape * circle_color;
+        led_point.y += vLed_step;
+        smp_point.y += vSmp_step;
     }
 
-    middle_y=border_min;
-    for (middle_x=border_min+fstep ; middle_x <= border_max-fstep+eps ; middle_x=middle_x + fstep ) {
-        pixel_out +=circle_smooth(coords, vec2(middle_x,middle_y), radius, lAMBI_FALLOFF, lod);
-    }
-    middle_y=border_max;
-    for (middle_x=border_min+fstep ; middle_x <= border_max-fstep+eps ; middle_x=middle_x + fstep ) {
-        pixel_out +=circle_smooth(coords, vec2(middle_x,middle_y), radius, lAMBI_FALLOFF, lod);
+    //RIGHT strip
+    led_point = vec2(vLedBorder_max, vLedBorder_min);
+    smp_point = vec2(vSmpBorder_max, vSmpBorder_min);
+    for (int i=1 ; i <= leds_per_strip ; i++) {
+        float circle_shape = fcircle_smooth(coords, led_point, radius, lAMBI_FALLOFF);
+        vec3  circle_color = ambi_push_pass(smp_point, lod);
+        pixel_out += circle_shape * circle_color;
+        led_point.y += vLed_step;
+        smp_point.y += vSmp_step;
     }
 
+    //TOP strip
+    led_point = vec2(vLedBorder_min + vLed_step, vLedBorder_min);
+    smp_point = vec2(vSmpBorder_min + vSmp_step, vSmpBorder_min);
+    for (int i=1 ; i <= leds_per_strip-2 ; i++) {
+        float circle_shape = fcircle_smooth(coords, led_point, radius, lAMBI_FALLOFF);
+        vec3  circle_color = ambi_push_pass(smp_point, lod);
+        pixel_out += circle_shape * circle_color;
+        led_point.x += vLed_step;
+        smp_point.x += vSmp_step;
+    }
+
+    //BOTTOM strip
+    led_point = vec2(vLedBorder_min + vLed_step, vLedBorder_max);
+    smp_point = vec2(vSmpBorder_min + vSmp_step, vSmpBorder_max);
+    for (int i=1 ; i <= leds_per_strip-2 ; i++) {
+        float circle_shape = fcircle_smooth(coords, led_point, radius, lAMBI_FALLOFF);
+        vec3  circle_color = ambi_push_pass(smp_point, lod);
+        pixel_out += circle_shape * circle_color;
+        led_point.x += vLed_step;
+        smp_point.x += vSmp_step;
+    }
     //pixel_out = pow(pixel_out, 1/vec3(AMBI_GAMMA));
     return pow(pixel_out, 1/vec3(1+AMBI_STRETCH));
 }
