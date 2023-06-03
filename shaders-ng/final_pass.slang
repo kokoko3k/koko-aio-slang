@@ -914,11 +914,16 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
 
         }
 
+    //Yes, we already passed ambilight as parameter, but if geometry content is overridden
+    //then ambientlight may have not been sampled yet due to some skip logic made in the main()
+    //    if (DO_AMBILIGHT == 1.0)
+    //        pixel_ambilight = texture(ambi_temporal_pass, vOutputCoord).rgb;
 
-   //Apply nightification, the strength is modulated by ambient light.
+    //Apply nightification, the strength is modulated by ambient light.
         //Use a shaded box to apply ambilight on external borders only
             float ambi_colorize_shade = create_ambi_colorize_shade(coords_for_bezel);
-            
+
+
             vec3 ambi_over_bezel =  ( (AMBI_OVER_BEZEL * pixel_ambilight) * 
                                     (bezel_in.a * ambi_colorize_shade) * 
                                     (1-reflection_modifier) );
