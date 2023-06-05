@@ -304,6 +304,10 @@ vec3 scale_to_range_vec3(vec3 x, float dmin, float dmax) {
     return ( (dmax-dmin) * x ) + dmin;
 }
 
+vec3 scale_to_range_vec3(vec3 x, vec3 dmin, vec3 dmax) {
+    //Scales 0..1 range to a..b range
+    return ( (dmax-dmin) * x ) + dmin;
+}
 vec2 scale_to_range_vec2(vec2 x, float dmin, float dmax) {
     //Scales 0..1 range to a..b range
     return ( (dmax-dmin) * x ) + dmin;
@@ -393,6 +397,7 @@ float random_fast(float power, vec2 seed) {
 		return uv;
 	}
 	
+	
 	//warp full new
 	vec2 Warp(vec2 uv,float wx, float wy){
 		// Transform coordinates to range [-1, 1]
@@ -410,7 +415,25 @@ float random_fast(float power, vec2 seed) {
 		return uv* 0.5 + 0.5;
 	}
 
+
+	vec2 Warp_noclamp(vec2 uv,float wx, float wy){
+		// Transform coordinates to range [-1, 1]
+		uv = uv * 2.0 - 1.0;
+		vec2 pow_exp = 1.0/(1.0+vec2(wx, wy) * 0.2 ) ;
+		//float curvedCoordsDistance = length(uv);
+		float curvedCoordsDistance = sqrt(uv.x*uv.x+uv.y*uv.y);
+		//curvedCoordsDistance = clamp(curvedCoordsDistance, 0.0, 1.4142);
+		vec2 pow_base = vec2(1.0-(curvedCoordsDistance/1.4142135623730950488016887242097));
+		pow_base = abs(pow_base); // <-- this way intel and nvidia (probably amd) acts the same.
+		uv /= curvedCoordsDistance;
+		uv *= (1.0-pow(pow_base,  pow_exp ));
+		uv /= (1.0-pow(vec2(0.29289321881345247559915563789515),  pow_exp ));
+		// Transform coordinates back to [0, 1]
+		return uv* 0.5 + 0.5;
+	}
 	
+	
+
 	
 vec2 Warp_try(vec2 pos, float warpX, float warpY) {
 	

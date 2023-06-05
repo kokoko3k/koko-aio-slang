@@ -12,7 +12,7 @@
  * 	#define DO_CCORRECTION	global.DO_CCORRECTION
  * 	turns to
  * 	#define DO_CCORRECTION	0.0
- * 
+ *
  * 
  * Since everything after "//" is ignored,
  * you can even do something like:
@@ -189,10 +189,13 @@
 	#define AMBI_FALLOFF			global.AMBI_FALLOFF
 	#define AMBI_POWER			global.AMBI_POWER
 	#define AMBI_GAMMA			global.AMBI_GAMMA
+	#define AMBI_STRETCH		params.AMBI_STRETCH
 	#define AMBI_OVER_BEZEL			global.AMBI_OVER_BEZEL
 	#define AMBI_OVER_BEZEL_SIZE		global.AMBI_OVER_BEZEL_SIZE
 	#define AMBI_BG_IMAGE_BLEND_MODE	global.AMBI_BG_IMAGE_BLEND_MODE
 	#define AMBI_BG_IMAGE_FORCE		global.AMBI_BG_IMAGE_FORCE
+	#define AMBI_ADD_ON_BLACK		params.AMBI_ADD_ON_BLACK
+	#define AMBI_INT_OFFSET			params.AMBI_INT_OFFSET
 
 //Global aspect ratio related
 	#define ASPECT_X		global.ASPECT_X
@@ -270,7 +273,10 @@
 	#define PIXELGRID_Y_MASK_ON_WHITE global.PIXELGRID_Y_MASK_ON_WHITE
 	#define PIXELGRID_Y_MASK_COORDS global.PIXELGRID_Y_MASK_COORDS
 	#define PIXELGRID_OFFSET_CORE global.PIXELGRID_OFFSET_CORE
-
+	#define PIXELGRID_Y_MASK_SHIFT global.PIXELGRID_Y_MASK_SHIFT
+	#define PIXELGRID_Y_SPARK global.PIXELGRID_Y_SPARK
+	
+	
 	#define PIXELGRID_R_SHIFT global.PIXELGRID_R_SHIFT
 	#define PIXELGRID_G_SHIFT global.PIXELGRID_G_SHIFT
 	#define PIXELGRID_B_SHIFT global.PIXELGRID_B_SHIFT
@@ -281,3 +287,8 @@
 	#define PIXELGRID_INTR_FLICK_POWR global.PIXELGRID_INTR_FLICK_POWR
 	#define PIXELGRID_INTR_DISABLE_Y  global.PIXELGRID_INTR_DISABLE_Y
 	#define PIXELGRID_NO_FLOOR        global.PIXELGRID_NO_FLOOR
+
+	
+	#define SERVICE1 global.SERVICE1
+	#define SERVICE2 global.SERVICE2
+	#define SERVICE3 global.SERVICE3

@@ -9,6 +9,8 @@
 //#define DEBUG_PRINT_VALUE
 //#define DEBUG_QUAD_SPLIT
 //#define DEBUG_DUAL_SPLIT
+//#define DEBUG_DUAL_SPLIT_MIRROR
+
 
 #include "config.inc"
 
@@ -47,13 +49,13 @@ layout(location = 19) out vec4 vPG_offsets_and_size;
 layout(location = 20) out vec2 vPG_freq_base_screen;
 layout(location = 21) out vec2 vPG_freq_base_screen_unfloored;
 layout(location = 22) out vec2 vPG_period_multiplier;
-layout(location = 23) out vec2 vPG_test_floor;
 layout(location = 24) out vec2 vPG_OriginalSize_tated;
 layout(location = 25) out vec2 vPG_OutputSize_tated;
 layout(location = 26) out vec2 vPG_OutputCoord_tated;
 layout(location = 27) out float vDotMat_Grid_Sharpness;
 layout(location = 28) out float vfprintvalue;
 layout(location = 29) out float vPG_mask_height;
+layout(location = 30) out float vPG_spark;
 
 #include "includes/functions.include.slang"
 
@@ -202,6 +204,8 @@ void main() {
         vPG_mask_height = PIXELGRID_Y_MASK_HEIGHT;
         if (vPG_mask_height < 0.0) vPG_mask_height = 1/-vPG_mask_height;
     
+        //vPG_spark = PIXELGRID_Y_SPARK * PIXELGRID_Y_MASK; <--vertex shader collapses here.
+        
     //Dot matrix: measure the final picture size to choose a right sharpness level
     //For simplicity and (my) mental health, take only y into account.
         vDotMat_Grid_Sharpness = DOT_M_G_SHARP;
@@ -212,8 +216,8 @@ void main() {
             vfprintvalue = dotmat_outsize / dotmat_insize;
             vDotMat_Grid_Sharpness = (dotmat_outsize / dotmat_insize);
             vDotMat_Grid_Sharpness = vDotMat_Grid_Sharpness * 3.6 - 3.1;
-            vDotMat_Grid_Sharpness = clamp(vDotMat_Grid_Sharpness, 0.5, 20.0);
-           
+            vDotMat_Grid_Sharpness = clamp(vDotMat_Grid_Sharpness, 0.1, 20.0);
+            //vfprintvalue = vDotMat_Grid_Sharpness;
         }
 }
 
@@ -243,13 +247,13 @@ layout(location = 19) in vec4 vPG_offsets_and_size;
 layout(location = 20) in vec2 vPG_freq_base_screen;
 layout(location = 21) in vec2 vPG_freq_base_screen_unfloored;
 layout(location = 22) in vec2 vPG_period_multiplier;
-layout(location = 23) in vec2 vPG_test_floor;
 layout(location = 24) in vec2 vPG_OriginalSize_tated;
 layout(location = 25) in vec2 vPG_OutputSize_tated;
 layout(location = 26) in vec2 vPG_OutputCoord_tated;
 layout(location = 27) in float vDotMat_Grid_Sharpness;
 layout(location = 28) in float vfprintvalue;
 layout(location = 29) in float vPG_mask_height;
+layout(location = 30) in float vPG_spark;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -285,19 +289,33 @@ vec2 get_vOutputCoord_adapted() {
 }
 
 
-vec3 fn_pixel_nightify(vec3 color_in, float strength) {
+vec3 fn_pixel_nightify(vec3 color_in, float strength, vec3 ambilight) {
     if (strength == 0.0) return color_in;
     
     color_in = clamp(color_in, 0.0, 1.0);
     
     vec3 color_hsv_in = rgb2hsv(color_in);
-    strength = scale_to_range(strength, 0.0, 1.0); 
+    
+    //If there is an ambientlight, then the strangth has to be lowered:
+        vec3 strength_vec3 = vec3(strength - ambilight);
+        
+    strength_vec3 = scale_to_range_vec3(strength_vec3, 0.0, 1.0); 
     
     vec3 color_hsv_min = color_hsv_in;
     color_hsv_min.yz = scale_to_range_vec2(color_hsv_min.yz, -0.1, 0.1); 
 
     vec3 color_rgb_min = hsv2rgb(color_hsv_min);
-    return mix(color_in, color_rgb_min, strength);
+    
+   
+    vec3 pixel_out = mix(color_in, color_rgb_min, strength_vec3);
+
+   //It could make sense to higher the contrast when ambient light hits the picture,
+    //Maybe this could be used independently on the nightify feature?
+    /*vec3 new_contrast = ambilight;
+    vec3 new_brightness = ambilight*0.0;
+    pixel_out = scale_to_range_vec3(pixel_out, -new_contrast, 1+new_contrast) + new_brightness;*/
+
+    return pixel_out;
 }
 
 
@@ -367,7 +385,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         float PG_h_count = vPG_offsets_and_size.a; 
         vec3  PG_offsets = vPG_offsets_and_size.rgb;
 
-        vec2 freq_base_core   = pi * in_coords * vPG_OriginalSize_tated ;
+        vec2 freq_base_core = pi * in_coords * vPG_OriginalSize_tated ;
 
         //Screen coords:
             vec2 period_multiply = vec2(PIXELGRID_MUL_X, PIXELGRID_MUL_Y);
@@ -376,10 +394,13 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 //vec2 freq_base_screen_unfloored = pi * vec2(1/PG_h_count, 0.5) * (vPG_OutputCoord_tated * vPG_OutputSize_tated);
                 vec2 freq_base_screen_unfloored = vPG_freq_base_screen_unfloored; //<-- missing muls because done to vertex shader.
 
-            //Screen coords needs flooring, disable if requested:
-                vec2 freq_base_screen =
-                mix( vPG_freq_base_screen * floor(vPG_OutputCoord_tated * vPG_OutputSize_tated * period_multiply ) / period_multiply,
-                     freq_base_screen_unfloored, PIXELGRID_NO_FLOOR);
+            //Screen coords needs flooring, but we need to disable flooring if requested.
+            //Since this seems to be a crucial point in the code that kills performance on my haswell, mix() or if/then needs to be absolutely avoided.
+            //So my hack here is to always floor the coords, but to floor them with a huge precision to emulate the unfloored coord.
+                float unfloor_hack = PIXELGRID_NO_FLOOR; // <-- 1 to huge number
+                vec2 freq_base_screen = vPG_freq_base_screen * 
+                                        floor(vPG_OutputCoord_tated * vPG_OutputSize_tated * period_multiply * unfloor_hack) / (period_multiply * unfloor_hack);
+
 
 
     //Switch between core and screen sizes (x and y)
@@ -409,21 +430,24 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
     
     //Height phosphor mask (can be used for scanlines, slotmask, aperturegrille):
         vec3 rgb_h = vec3(1.0);
+        
+        //The following is needed by vertical mask level1 and 2
+        //sin() tell use if the current cell position is odd or even:        
+            float o =  (pi/(PG_h_count*2.0));  
+            float sin_check_offset = sin(freq_base_unfloored.x + o);
+            float is_even = step(sin_check_offset, 0.0);
+        
+        
         if (DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0)) {
-            //calculate each phosphor eight according to input luminance 
+            //calculate each phosphor height according to input luminance 
                 vec3 phosphor_height = map_range(pixel_in * rgb_w, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
-            //offset trias to emulate core level slotmask, calc right offset here:
-                //sin() tell use if the current cell position is odd or even:
-                    float o =  (pi/(PG_h_count*2.0));  
-                    float sin_check_offset = sin(freq_base_unfloored.x + o);
-                    float is_even = step(sin_check_offset, 0.0);
                 
-                //Then we can apply the optional offset to emulate the slotmask on even cells
-                    float core_offset =  is_even * pi * PIXELGRID_OFFSET_CORE;
+            //offset trias to emulate core level slotmask by applying the optional offset to emulate the slotmask on even cells
+                float core_offset =  is_even * pi * PIXELGRID_OFFSET_CORE;
                 
-                //Since we can emulate scanlines, take into account current scanline phase:
-                    float interlacing_adapt_period = vScanlinePeriod;
-                    float interlacing_adapt_offset = vScanlineAlternateOffset;
+            //Since we can emulate scanlines, take into account current scanline phase:
+                float interlacing_adapt_period = vScanlinePeriod;
+                float interlacing_adapt_offset = vScanlineAlternateOffset;
                 
             //get a single sine in black/white with applied the optional staggered offset for slotmask:
                 float rgb_h_sin = sin(freq_base.y * interlacing_adapt_period + core_offset + interlacing_adapt_offset );
@@ -439,43 +463,47 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
     //Height phosphor mask number 2, can be used for slotmask,aperturegrille, not scanlines.
     //...well technically yes, but they would have a boxed shape.
         vec3 darklines_mask=vec3(1.0);
+        
         if (PIXELGRID_Y_MASK > 0.0) {
-            //offset trias to emulate core level slotmask, calc right offset here:
-            //sin() tell use if the current cell position is odd or even:
-                float o =  (pi/(PG_h_count*2.0));  
-                float sin_check_offset2 = sin(freq_base_unfloored.x + o);
-                float is_even2 = step(sin_check_offset2, 0.0);
-
             //Switch reference coords according to user pref: 
                 float freq_cell_y = mix_step(freq_base_core.y, freq_base_screen.y, PIXELGRID_Y_MASK_COORDS);
                 
             //mask phosphors heigth
                 #define PH_MASK_HEIGHT (freq_cell_y * vPG_mask_height)
             //phosphors mask stagger
-                #define PH_MASH_OFFSET  (PIXELGRID_Y_MASK_OFFSET * pi * 0.5  )
+                #define PH_MASH_OFFSET  (PIXELGRID_Y_MASK_OFFSET * pi * 0.5 )
                 
-            //Use abs(sin) (later 1-abs(sin) to get orizontal gaps, use pow to make them steep.
-                float mask_shape = abs(cos(PH_MASK_HEIGHT  + (PH_MASH_OFFSET * is_even2))) ;
+            //Use abs(cos) (later 1-abs(cos) to get orizontal gaps, use pow to make them steep.
+            //Stagger them by PH_MASH_OFFSET on even triads
+                float mask_shape = abs(cos(  PIXELGRID_Y_MASK_SHIFT*pi +   PH_MASK_HEIGHT  + (PH_MASH_OFFSET * is_even)) ) ;
                 mask_shape = pow(mask_shape, PIXELGRID_Y_MASK_STEEP);
                 
-            //Get per channel input luminance by clamping pixel_in and aplplying hmask
+            //Get per channel input luminance by clamping pixel_in and applying hmask
                 vec3 lum=clamp(pixel_in * rgb_w, 0.0, 1.0);
             //Adapt the luminance effect via input parameter
                 vec3 lum_adapted = (1-lum*PIXELGRID_Y_MASK_ON_WHITE);
             //Calc final mask visibility as the minimum between tha configured visibility and luminosity effect
                 vec3 V=min( lum_adapted, vec3(PIXELGRID_Y_MASK) );
             //apply user visibility modifier to the mask
-                darklines_mask=1-(mask_shape*V);
+                darklines_mask = 1-(mask_shape*V);
         }
      
+    //Try to get a more brillant/sparkling look by highering the darklines
+    //effect (sub) and pushing the source color, useful for slotmasks.
+        float vPG_spark = PIXELGRID_Y_SPARK * PIXELGRID_Y_MASK;
+        darklines_mask -= vPG_spark;
+        pixel_in *= vPG_spark*4 + 1;
+     
     //Finally put width,height1 and height2 masks togheter:
-        vec3 mask = rgb_w * rgb_h * darklines_mask;
+        //vec3 mask = rgb_w * rgb_h * darklines_mask;
+        vec3 mask = min( (rgb_w * rgb_h), darklines_mask * rgb_h); //<- this way it does not interfree with scanline height!
+        //FIXME: test with coore or fuzzy coords how it works when using variable width phosphors, maybe 
+        //it would need to be: vec3 mask = min((rgb_w * rgb_h), darklines_mask * rgb_h * rgb_w); =
         
-    //Also apply mask to input pixel:
-        vec3 pixel_masked = mask * pixel_in;
-        vec3 pixel_out = mix(pixel_masked, mask, 0.0);
-    //And return it with the alpha channel containing the mask itself, so that halo can selectively light it.
-        return vec4(pixel_out, dot(mask, vec3(0.3333) ));
+      
+    //Apply the mask to the input pixel and return it 
+    //with the alpha channel containing the mask itself, so that halo can selectively light it.
+        return vec4(mask * pixel_in, dot(mask, vec3(0.3333)));
 }
 
 
@@ -540,8 +568,6 @@ float get_clamped_white_reference(vec3 pixel_in){
 
 
 float global_noise_static = 0.0;
-float global_noise_ambi = 0.0;
-
 
 vec3 pixel_backdrop_image() {
     vec2 backdrop_offset=vec2(BACKDROP_OFFX,BACKDROP_OFFY);
@@ -697,9 +723,16 @@ vec4 fn_pixel_fgbg_image(sampler2D smp) {
     return pixel_bgover;
 }
 
+vec3 light_over_image(vec3 light, vec3 image, float black_illumination) {
+    //Simulates illumination.
+    //It works by adding the light on the image.
+    //It will add less light on dark colors (
+    vec3 light_on_black = black_illumination * light;
+    return image.rgb +  ( (light - light_on_black ) * image.rgb ) + light_on_black;
+    
+}
 
-
-vec3 ambi_blend_image(vec4 image, vec3 ambi) {
+vec3 ambi_blend_image(vec4 image, vec3 ambi, float blend_mode) {
     //mix or add ambient light with image, also allow force colorization in add mode.
     if (DO_AMBILIGHT == 0.0) return image.rgb;
     
@@ -709,12 +742,29 @@ vec3 ambi_blend_image(vec4 image, vec3 ambi) {
     // force colorization when mode blend mode is not "ADD".
         float image_alpha_adapted = image.a - (AMBI_BG_IMAGE_FORCE * AMBI_BG_IMAGE_BLEND_MODE);
 
-    image.rgb = (AMBI_BG_IMAGE_BLEND_MODE == 0.0) ? 
+    if (AMBI_BG_IMAGE_BLEND_MODE == 0.0) {
+        image.rgb = mix(ambi.rgb, image.rgb, image_alpha_adapted);
+    } else {
+        //image.rgb =  image.rgb + (ambi.rgb * (1 - image_alpha_adapted)); 
+        /*float light_on_black = 0.3;
+        vec3 ambi_alpha_masked = ambi.rgb *  (1 - image_alpha_adapted);
+        vec3 ambi_on_black = light_on_black * ambi_alpha_masked;
+        
+        image.rgb = image.rgb +  ((ambi_alpha_masked-ambi_on_black) * image.rgb) + ambi_on_black;*/
+        
+        float black_illumination = 0.5;
+        vec3 ambi_alpha_masked = ambi.rgb *  (1 - image_alpha_adapted);
+        image.rgb = light_over_image(ambi_alpha_masked, image.rgb, AMBI_ADD_ON_BLACK) ;
+        
+    }
+    return image.rgb;
+    
+    /*image.rgb = (AMBI_BG_IMAGE_BLEND_MODE == 0.0) ? 
         mix(ambi.rgb, image.rgb, image_alpha_adapted) 
             : 
         image.rgb + (ambi.rgb * (1 - image_alpha_adapted)); 
         
-    return image.rgb;
+    return image.rgb;*/
 }
 
 float gaussian_coefficient(float x, float sigma) {
@@ -801,17 +851,15 @@ vec3 fn_pixel_content(vec2 coords) {
     
     //Black frame insertion, made static, enable it in config.inc.
         #ifdef ALLOW_ALT_BLANK
-            if (DO_ALT_BLANK == 1.0 ) {
+            if (DO_ALT_BLANK == 1.0 )
                 pixel_out.rgb = pixel_alternate(pixel_out.rgb, ALT_BLANK_STRENGTH );
-                //pixel_out.rgb +=  vec3(random_fast(ALT_BLANK_STRENGTH, vTexCoord * mod(params.FrameCount, 2)   ));
-            }
         #endif
         
     return pixel_out;
 }
 
 
-vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightify_str) {
+vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightify_str, vec3 pixel_ambilight) {
     
     //Can we skip Blank outside border and inner blank tube?
         vec4 inner_blank_rect = vec4(1-BEZEL_TUBE_BLANK_SIZE, 1-BEZEL_TUBE_BLANK_SIZE, BEZEL_TUBE_BLANK_SIZE, BEZEL_TUBE_BLANK_SIZE);
@@ -840,12 +888,12 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
         
     //Colorize the bezel (bezel.r expresses the luminance)
         vec3 bezel_out = bezel_color(bezel_in.r);
-        bezel_out.rgb = fn_pixel_nightify(bezel_out.rgb, nightify_str );
     
     float lut_specular = bezel_in.g * BEZEL_SPCL_STRENGTH;
     float reflection_modifier = 0.0;
-
-    //Reflections, can be skipped if blue channel is 0:
+    vec4 pixel_mirrored = vec4(0.0);
+    
+    // Calculate Reflections, can be skipped if blue channel is 0:
         if (bezel_in.b > 0.0) {
         //Reflections: Calculate the bezel roughness to apply to the reflecting area. (bezel_in.g expresses the specularity)
             float roughness = random_fast( 1/1080.0 * BEZEL_ROUGHNESS, vTexCoord );
@@ -855,7 +903,7 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
             reflection_modifier = bezel_in.b; //bezel_in.b expresses how much the area is reflective
             
             //Sample the reflection pass with small offset to simulate the roughness
-                vec4 pixel_mirrored = texture(reflected_blurred_pass, coords_for_mirror + roughness);
+                pixel_mirrored = texture(reflected_blurred_pass, coords_for_mirror + roughness);
                 float fcorners_shade = 1 - corners_shade(coords_for_bezel, 1.0) * BEZEL_CORNER_DARK;
                 
             //Show less reflections in the corners
@@ -864,18 +912,31 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
             //Push it over the specular areas and apply the reflection modifier
                 pixel_mirrored.rgb = pixel_mirrored.rgb * (1 + lut_specular);
 
-            //Apply reflections
-                bezel_out += (pixel_mirrored.rgb * reflection_modifier);
         }
 
-    //Mix ambient light over bezel? (branching this is worse)
-        vec3 ambitemporalpass = texture(ambi_temporal_pass, vOutputCoord ).rgb;
-        ambitemporalpass = max(ambitemporalpass, 0.0); //<-- antiglitch. Needed to avoid undefined variable on vulkan.
-        vec3 pixel_ambilight = DO_AMBILIGHT * ( ambitemporalpass + global_noise_ambi);
-            
-        //Create a shaded box to apply ambilight on external borders only
+    //Yes, we already passed ambilight as parameter, but if geometry content is overridden
+    //then ambientlight may have not been sampled yet due to some skip logic made in the main()
+        if (DO_AMBILIGHT == 1.0)
+            pixel_ambilight = texture(ambi_temporal_pass, vOutputCoord).rgb;
+
+    //Apply nightification, the strength is modulated by ambient light.
+        //Use a shaded box to apply ambilight on external borders only
             float ambi_colorize_shade = create_ambi_colorize_shade(coords_for_bezel);
-            bezel_out = bezel_out +  (AMBI_OVER_BEZEL * pixel_ambilight * bezel_in.a * ambi_colorize_shade * (1-reflection_modifier));
+
+
+            vec3 ambi_over_bezel =  ( (AMBI_OVER_BEZEL * pixel_ambilight) *
+                                    (bezel_in.a * ambi_colorize_shade) *
+                                    (1-reflection_modifier) );
+        
+        bezel_out.rgb = fn_pixel_nightify(bezel_out.rgb, nightify_str, ambi_over_bezel )   ;
+
+    
+    //Apply reflections
+            bezel_out += (pixel_mirrored.rgb * reflection_modifier);
+        
+        //Apply ambient light over the bezel        
+            //bezel_out = bezel_out + ambi_over_bezel;
+            bezel_out = light_over_image(ambi_over_bezel, bezel_out, AMBI_ADD_ON_BLACK);
         
     //Diffuse the light over specular areas, we use a mipmap with low precision.
         if (lut_specular > 0.0) {
@@ -892,19 +953,6 @@ void main() {
     
     float canvas_busy = 0.0; //<-- this allow for paint over not painted areas (spares gpu cycles)
 
-    //Calc a random noise if we need debanding
-        if (DO_VIGNETTE + DO_SPOT + DO_AMBILIGHT >0.0) {
-            //Generate random noise.
-                //global_noise = random(NOISEPOWER, vTexCoord * vDynamicSeed);
-                //global_noise_ambi = global_noise * NOISEPOWER_AMBI_MUL;
-            
-                //The following are faster versions, the dynamic one needs a seed that changes over time
-                //Calculated in Vertex shader for speed.
-                    global_noise_ambi = random_fast(NOISEPOWER * NOISEPOWER_AMBI_MUL, vTexCoord * vDynamicSeed  );
-                    global_noise_static = random_fast(NOISEPOWER, vTexCoord);
-        }
-    
-    
     //Initial content coords
         vec2 co_content = vTexCoord;
         
@@ -936,28 +984,44 @@ void main() {
         if (DO_GAME_GEOM_OVERRIDE == 1.0)
             co_content = content_geom_override(co_content, GAME_GEOM_ASPECT, vIn_aspect, GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
 
+    //Dynamic lum dependant full screen zoom?
         if (DO_DYNZOOM == 1.0)
             co_content = zoom(co_content, get_dyn_zoom(avglum_pass) );
 
     
-    //Create an alpha mask to write content into, it holds opacity info that will be used to compose.:
+    //Create an alpha mask to write content into, it holds opacity info that will be used to compose:
         if (DO_CURVATURE == 1.0)  {
             canvas_busy = fn_border(co_content);
         } else {
             canvas_busy = float(is_first_inside_rect(co_content, RECT01)); //FIXME: is step() faster?
         }
 
+        
+    //Calc a random noise for vignette or spot (this seems a sweet spot in the code to not lose speed)
+        if (DO_VIGNETTE + DO_SPOT > 0.0) {
+            global_noise_static = random_fast(NOISEPOWER, vTexCoord);
+        }
 
-    //Draw content only over the alpha mask, spare gpu cycles.
-        if (canvas_busy > 0.0)
+        
+    vec3 pixel_ambi = vec3(0.0);
+    vec3 pixel_under_content = vec3(0.0);
+    //Draw content only over the alpha mask, and sample ambientlight outside it to spare gpu cycles.
+        if (canvas_busy > 0.5) {
             pixel_out = fn_pixel_content(co_content) * canvas_busy;
-              
-
+        } else {
+            //Ambient light
+            if (DO_AMBILIGHT == 1.0) {
+                pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb;
+                pixel_ambi += random_fast(NOISEPOWER * NOISEPOWER_AMBI_MUL, vTexCoord * vDynamicSeed  ) * (20 * (3.0-(pixel_ambi.r+pixel_ambi.g+pixel_ambi.b))) ;
+                pixel_under_content = pixel_ambi * (1-canvas_busy);
+            }
+        }
+    
     //Draw Bezel
         vec4 pixel_bezel;
         //SKIP LOGIC is inside fn_pixel_bezel
         if (DO_BEZEL == 1.0) {
-            pixel_bezel = fn_pixel_bezel(co_bezel, co_mirror, BG_IMAGE_NIGHTIFY);
+            pixel_bezel = fn_pixel_bezel(co_bezel, co_mirror, BG_IMAGE_NIGHTIFY, pixel_ambi);
             //If we used a smooth_border, canvas_busy is it, but since the content is in the bezel,
             //we can safely use it to smooth/darken the game border
             pixel_out *= canvas_busy; 
@@ -971,31 +1035,23 @@ void main() {
                 //FragColor = vec4(canvas_busy); return; // <- uncomment to debug BEZEL_SHADOW_SIZE
         }
 
-        
-    //The following funcs have to paint in the outer border
-        vec3 pixel_ambi = vec3(0.0);
-        vec3 pixel_under_content = vec3(0.0);
-        if ( canvas_busy < 1.0) {
 
-            //Ambient light
-                if (DO_AMBILIGHT == 1.0) {
-                    vec2 co_ambi = vOutputCoord;
-                    pixel_ambi = texture(ambi_temporal_pass, co_ambi).rgb;
-                    pixel_ambi += global_noise_ambi * (20 * (3.0-(pixel_ambi.r+pixel_ambi.g+pixel_ambi.b))) ;
-                    pixel_under_content = pixel_ambi;
-                }
+        //Background image have, no need to paint if not in the outer border:
+            if (DO_BG_IMAGE == 1.0 && BG_IMAGE_OVER == 0.0 && canvas_busy < 1.0) {
+                vec4 pixel_bg_image = fn_pixel_fgbg_image(bg_under);
+                
+                                                        //pixel_bg_image.rgb = scale_to_range_vec3(pixel_bg_image.rgb, -pixel_ambi, 1+pixel_ambi);
+                vec3 anti_nightify_ambi = (pixel_ambi * AMBI_BG_IMAGE_BLEND_MODE) *
+                                           max(AMBI_BG_IMAGE_FORCE, 1-pixel_bg_image.a) ;
+                                           
+                
+                pixel_bg_image.rgb = fn_pixel_nightify(pixel_bg_image.rgb, BG_IMAGE_NIGHTIFY, anti_nightify_ambi );
+                pixel_bg_image.rgb = ambi_blend_image(pixel_bg_image, pixel_ambi, AMBI_BG_IMAGE_BLEND_MODE);    
+    
+                pixel_under_content = pixel_bg_image.rgb;
+            }
             
-            //Background image:
-                if (DO_BG_IMAGE == 1.0 && BG_IMAGE_OVER == 0.0) {
-                    vec4 pixel_bg_image = fn_pixel_fgbg_image(bg_under);
-                    pixel_bg_image.rgb = fn_pixel_nightify(pixel_bg_image.rgb, BG_IMAGE_NIGHTIFY );
-                    pixel_bg_image.rgb = ambi_blend_image(pixel_bg_image, pixel_ambi);        
-                    pixel_under_content = pixel_bg_image.rgb;
-                }
-            
-        }
 
-        
         //Smooth the image corners: canvas_busy (the alpha mask) is a white rect with shaded borders.
             pixel_out = mix (pixel_under_content, pixel_out, canvas_busy);
  
@@ -1008,21 +1064,26 @@ void main() {
         //Foreground image
             if (DO_BG_IMAGE + BG_IMAGE_OVER == 2.0) {
                 vec4 pixel_fg_image = fn_pixel_fgbg_image(bg_over);
-                pixel_fg_image.rgb = fn_pixel_nightify(pixel_fg_image.rgb, BG_IMAGE_NIGHTIFY );
+                // if geometry content is overridden, ambientlight may have not been sample yet due to some skip logic
+                if (DO_AMBILIGHT == 1.0 && (pixel_fg_image.a+AMBI_BG_IMAGE_FORCE) > 0.0 )
+                    pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb;
+
+                vec3 anti_nightify_ambi = (pixel_ambi * AMBI_BG_IMAGE_BLEND_MODE) *
+                                           max(AMBI_BG_IMAGE_FORCE, 1-pixel_fg_image.a) ;
+                
+                pixel_fg_image.rgb = fn_pixel_nightify(pixel_fg_image.rgb, BG_IMAGE_NIGHTIFY, anti_nightify_ambi );
                 
                 pixel_out = mix(pixel_out, pixel_fg_image.rgb, pixel_fg_image.a);
                 
                 if (DO_AMBILIGHT + AMBI_BG_IMAGE_BLEND_MODE == 2.0) { 
-                    vec3 pixel_ambi_local = texture(ambi_temporal_pass, vOutputCoord ).rgb;
-                    pixel_ambi_local = DO_AMBILIGHT * (pixel_ambi_local + global_noise_ambi);
-                    pixel_ambi_local = max(pixel_ambi_local, 0.0); //<-- antiglitch. Needed to avoid undefined variable on vulkan.
                     float ambi_mask = create_ambi_colorize_shade(co_bezel);
                     float fg_image_alpha_adapted = max(pixel_fg_image.a - AMBI_BG_IMAGE_FORCE, 0.0);
-                    pixel_out = pixel_out + (pixel_ambi_local.rgb * (ambi_mask) * (1- fg_image_alpha_adapted));
+                    //pixel_out = pixel_out + (pixel_ambi.rgb * (ambi_mask) * (1- fg_image_alpha_adapted));
+                    vec3 light = pixel_ambi.rgb * (ambi_mask) * (1- fg_image_alpha_adapted);
+                    pixel_out = light_over_image(light, pixel_out, AMBI_ADD_ON_BLACK);
                 }
             }
   
-     
 
     //Debug functions: 
         #ifdef DEBUG_QUAD_SPLIT
@@ -1033,6 +1094,11 @@ void main() {
         #ifdef DEBUG_DUAL_SPLIT
             if (vTexCoord.y < 0.5) pixel_out = texture(flick_and_noise_pass,vTexCoord).rgb;
         #endif
+
+        #ifdef DEBUG_DUAL_SPLIT_MIRROR
+            if (vTexCoord.x > 0.5) pixel_out = texture(flick_and_noise_pass,vec2(1-vTexCoord.x, vTexCoord.y) ).rgb;
+        #endif
+
             
         #ifdef DEBUG_PRINT_VALUE
             float maxdigits = 10.0;
@@ -1045,6 +1111,6 @@ void main() {
         
  
     FragColor = vec4(pixel_out, 1.0);
-   
     
+    //FragColor = mix(FragColor, texture(ambi_temporal_pass, vOutputCoord), 0.8);
 }

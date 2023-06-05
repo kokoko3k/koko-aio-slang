@@ -71,7 +71,7 @@
 	// when changing scene. (range 0..1)
 	// It is wise to correlate it with avglum_divider
 	// try between (1/avglum_divider) and (1/avglum_divider)/3
-//#define AMBI_FAST_STEP 0.125 
+//#define AMBI_FAST_STEP 0.125
 #define AMBI_FAST_STEP 0.25
 
 
@@ -164,7 +164,9 @@ layout(push_constant) uniform Push {
 	float HALO_VS_SCAN ;
 	float DO_BLOOM ; //4
  	float BLOOM_QUALITY ; //1
-
+	float AMBI_ADD_ON_BLACK;
+	float AMBI_STRETCH;
+	float AMBI_INT_OFFSET ;
 } params;
 
 layout(std140, set = 0, binding = 0) uniform UBO {
@@ -173,9 +175,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	vec4 FinalViewportSize;
 	vec4 in_glow_passSize;
 	vec4 FXAA_passSize;
-	//vec4 main_passSize;
-	//vec4 monitor_bodySize;
-	//vec4 bgSize;
+
 	vec4 avglum_passSize;
 	vec4 flick_and_noise_passSize;
 	vec4 colortools_and_ntsc_passSize;
@@ -277,11 +277,13 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float AMBI_FALLOFF;
 	float AMBI_POWER;
 	float AMBI_GAMMA;
+
 	float AMBI_OVER_BEZEL;
 	float AMBI_OVER_BEZEL_SIZE;
 	float AMBI_STEPS;
 	float AMBI_BG_IMAGE_BLEND_MODE;
 	float AMBI_BG_IMAGE_FORCE;
+
 	
 	float ASPECT_X;
 	float ASPECT_Y;
@@ -329,6 +331,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float BACKDROP_OFFY;
 	float BACKDROP_ZOOM;
 	
+	
 	float TATE;
 
 	float DO_DOT_MATRIX;
@@ -374,6 +377,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float PIXELGRID_Y_MASK_OFFSET;
 	float PIXELGRID_Y_MASK_STEEP;
 	float PIXELGRID_Y_MASK_COORDS;
+	float PIXELGRID_Y_MASK_SHIFT;
+	float PIXELGRID_Y_SPARK;
 	float PIXELGRID_R_SHIFT;
 	float PIXELGRID_G_SHIFT;
 	float PIXELGRID_B_SHIFT;
@@ -381,6 +386,11 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float PIXELGRID_H_PRST;
 
 	float PIXELGRID_NO_FLOOR;
+	
+	float SERVICE1;
+	float SERVICE2;
+	float SERVICE3;
+	
 
 } global;
 
@@ -465,7 +475,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 // pixel Grid
 #pragma parameter DO_PIXELGRID		 "★  Low level Phosphor grid enable? ==>"	0.0 0.0 1.0 1.0
-#pragma parameter PIXELGRID_NO_FLOOR "        Allow use of fuzzy screen coords"   0.0 0.0 1.0 1.0
+#pragma parameter PIXELGRID_NO_FLOOR "      ★ Fuzzy screen coords (1=no)"   1.0 1.0 10000.0 10000.0
 #pragma parameter DO_PIXELGRID_W     "      ★ Enable Horizontal mask "    	1.0 0.0 1.0 1.0
 #pragma parameter PIXELGRID_SIZE_W   "           . Resolution: (core or screen)"	1.0 0.0 1.0 1.0
 #pragma parameter PIXELGRID_MIN_W    "           . Phosphors width Min"			0.25 0.05 1.0 0.01
@@ -481,11 +491,11 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 #pragma parameter BLANK12fs " " 0.0 0.0 1.0 1.0
 
-#pragma parameter DO_PIXELGRID_H            "      ★ Enable scanlines or vertical mask 1 "    	1.0 0.0 1.0 0.1
+#pragma parameter DO_PIXELGRID_H            "      ★ Scanlines or vertical mask 1 (0 to disable)"    	1.0 0.0 1.0 0.1
 #pragma parameter PIXELGRID_SIZE_H          "           . Resolution: (core for scanlines or screen)"	0.0 0.0 1.0 1.0
 #pragma parameter PIXELGRID_MIN_H	        "           . Phosphors height Min"			0.2 0.0 1.0 0.05
 #pragma parameter PIXELGRID_MAX_H           "           . Phosphors height Max"			0.6 0.0 1.0 0.05
-#pragma parameter PIXELGRID_OFFSET_CORE     "           . Slotmask offset (0.25 ok)"	0.0 0.0 1.0 0.01
+#pragma parameter PIXELGRID_OFFSET_CORE     "           . Slotmask offset (0.10..0.25 ok)"	0.0 0.0 1.0 0.01
 #pragma parameter PIXELGRID_MUL_Y           "           . Cell size multiplier y (neg=divider):"	1.0 -8.0 8.0 0.125
 #pragma parameter PIXELGRID_NO_INTERBLEED_H	"           . Avoid inter-cell bleeding (handhelds)"		0.0 0.0 100.0 100.0
 
@@ -499,14 +509,14 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 #pragma parameter BLANK12e " " 0.0 0.0 1.0 1.0
 
-#pragma parameter PIXELGRID_Y_MASK           "        Vertical cell Mask 2 (0.0 to disable)"	0.5 0.0 1.0 0.05
+#pragma parameter PIXELGRID_Y_MASK           "      ★ Vertical cell Mask 2 (0 to disable)"	0.5 0.0 1.0 0.05
 #pragma parameter PIXELGRID_Y_MASK_COORDS    "           . Resolution: (core or screen)"	1.0 0.0 1.0 1.0
 #pragma parameter PIXELGRID_Y_MASK_HEIGHT    "           . Height divider (neg=multiplier):"	0.5 -8.0 8.0 0.125
 #pragma parameter PIXELGRID_Y_MASK_ON_WHITE  "           . Fadeout under light"	0.5 0.0 1.0 0.01
-#pragma parameter PIXELGRID_Y_MASK_STEEP     "           . Steepness"	2.0 1.0 30.0 1.0
 #pragma parameter PIXELGRID_Y_MASK_OFFSET    "           . Even/odd offset"	1.0 0.0 1.0 1.0
-
-
+#pragma parameter PIXELGRID_Y_MASK_SHIFT     "             . Vertical shift (for use with core resolution)"	0.0 0.0 1.0 0.01
+#pragma parameter PIXELGRID_Y_MASK_STEEP     "           . Steepness"	2.0 1.0 30.0 1.0
+#pragma parameter PIXELGRID_Y_SPARK          "           . Sparkling look punch"	0.0 0.0 1.0 0.01
 
 #pragma parameter BLANK12d " " 0.0 0.0 1.0 1.0
 
@@ -534,7 +544,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter HALO_POWER    "        Strength"						0.9 	0.0  5.0 0.01
 #pragma parameter HALO_W        "        Sharpness, horizontal"					1.75	0.35  7.0 0.05
 #pragma parameter HALO_H        "        Sharpness, Vertical"					1.75	0.35  7.0 0.05
-#pragma parameter HALO_GAMMA    "        Gamma, the higher, the less the halo on dark colors"	2.0 	1.0  10.0 0.1
+#pragma parameter HALO_GAMMA    "        Gamma, the higher, the less the halo on dark colors"	2.0 	1.0  10.0 0.05
 #pragma parameter HALO_VS_SCAN  "        Light up scanlines and dot grid gaps too"				0.0	0.0  1.0  0.01
 #pragma parameter BLANK10 " " 0.0 0.0 1.0 1.0
 
@@ -598,8 +608,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BG_IMAGE_ZOOM	     "        Zoom Image"					 1.0  -1.0  3.0    0.0005
 #pragma parameter BG_IMAGE_ROTATION  "        Rotate image mode (-1 for auto)"	     		 -1.0  -1.0  2.0    1.0
 #pragma parameter BG_IMAGE_NIGHTIFY  "        Nightify image"                                 0.0   0.0  1.0    0.1
-#pragma parameter LABEL_0101         "        !NEXT FEATURE IS STATIC, SEE docs.md TO ENABLE"    0.0 0.0 1.0 1.0
-#pragma parameter BG_IMAGE_WRAP_MODE "            Wrap mode: default, clamp to border, edge, repeat" 0.0  0.0    3.0    1.0
+#pragma parameter BG_IMAGE_WRAP_MODE "        Wrap mode: default, clamp to border, edge, repeat" 0.0  0.0    3.0    1.0
 #pragma parameter BLANK16 " " 0.0 0.0 1.0 1.0
 
 //Backdrop image
@@ -615,12 +624,15 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter DO_AMBILIGHT	            "★ Ambient light leds enable? ==> "				1.0  0.0  1.0     1.0
 #pragma parameter LABEL_WARNING3            "    ⚠ RetroArch aspect needs to be set to Full! ⚠"		1.0  1.0  1.0     1.0
 #pragma parameter AMBI_STEPS	            "        Slowness"						60.0 5.0  1000.0  5.0
-#pragma parameter AMBI_FALLOFF              "        Light Falloff"						0.7  0.1  3.0     0.01
-#pragma parameter AMBI_POWER                "        Led power"						1.5  0.0  10.0     0.05
+#pragma parameter AMBI_INT_OFFSET           "        Led internalness"              0.07 -1.0 1.0 0.01
+#pragma parameter AMBI_POWER                "        Led power"						1.8  0.0  100.0     0.05
+#pragma parameter AMBI_FALLOFF              "        Light Falloff"						0.4  0.1  3.0     0.01
+#pragma parameter AMBI_STRETCH              "        Widen lights"						0.0  0.0  1.0     0.01
 #pragma parameter AMBI_GAMMA                "        Output Gamma"						1.3  0.1  8.0     0.1
-#pragma parameter AMBI_OVER_BEZEL           "        Colorize Bezel"					0.5  0.0  5.0     0.05
-#pragma parameter AMBI_OVER_BEZEL_SIZE      "        Colorization size"					0.15  0.0  0.5    0.001
-#pragma parameter AMBI_BG_IMAGE_BLEND_MODE  "        Back/Foreground image alpha blend (0=mix, 1/check=add)"	0.0   0.0  1.0    1.0
+#pragma parameter AMBI_OVER_BEZEL           "        Colorize Bezel"					0.2  0.0  5.0     0.05
+#pragma parameter AMBI_OVER_BEZEL_SIZE      "           . Colorization size"			0.15  0.0  0.5    0.001
+#pragma parameter AMBI_BG_IMAGE_BLEND_MODE  "        Back/Foreground image alpha blend (0=mix, 1=add)"	0.0   0.0  1.0    1.0
+#pragma parameter AMBI_ADD_ON_BLACK         "        Foggy (power on dark colors, add mode only)    "		1.0   0.0  1.0    0.05
 #pragma parameter AMBI_BG_IMAGE_FORCE       "        Always colorize Back/Foreground image (add mode only) "		0.0   0.0  1.0    0.1
 #pragma parameter BLANK17 " " 0.0 0.0 1.0 1.0
 
@@ -642,7 +654,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter V_POWER	"        Power"			1.1  0.05 2.0  0.01
 
 #pragma parameter DO_SPOT	"★ Spot enable? ==>"		0.0   0.0   1.0 1.0
-#pragma parameter S_POSITION 	"        Position"		0.0   -420.0 378.0 1
+#pragma parameter S_POSITION 	"        Position"		194.0   -420.0 378.0 1
 #pragma parameter S_SIZE	"        Size"			0.4   0.0   1.0 0.01
 #pragma parameter S_POWER	"        Power" 		0.1   0.05  2.0 0.01
 #pragma parameter BLANK19 " " 0.0 0.0 1.0 1.0
@@ -702,6 +714,11 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter ALT_BLANK_STRENGTH "        Alternate black frame insertion strength" 	0.5 -1.0 1.0 0.1
 #pragma parameter ALT_BLANK_PERIOD   "        Blank lines period" 				4.0 1.0 30.0 1.0
 #pragma parameter BLANK_02 " " 0.0 0.0 1.0 1.0
+
+
+#pragma parameter SERVICE1 "Don't use me, for debug purposes only" 	0.5 -1.0 1.0 0.01
+#pragma parameter SERVICE2 "Don't use me, for debug purposes only" 	0.5 -1.0 1.0 0.01
+#pragma parameter SERVICE3 "Don't use me, for debug purposes only" 	0.5 -1.0 1.0 0.01
 
 
 

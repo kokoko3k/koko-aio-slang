@@ -82,10 +82,9 @@
     handhelds screens, where pixels you see on screen have to be sized proportionally to the game one.<br>
     
     Allow use of fuzzy screen coords
-        If you want perfect mask triads matching between content and screen,
-        disable this option.
-        Enabling it may allow to have a better representation of color
-        shades in some cases.
+        If you want perfect mask triads matching between content and screen,disable this option.
+        Enabling it may allow to have a better representation of color shades in some cases
+        and the ability to draw the mask at subpixel screen precision.
 
     Horizontal mask
         X resolution: (core or screen) (**):
@@ -125,7 +124,7 @@
                 Likewise, you can use core/game(**) sized masks and divide them by a factor
                 if they appears too big.
             
-            Scanlines or vertical mask 1
+            Scanlines or vertical mask 1: (*4)
                 Y resolution: (core for scanlines or screen), height min/max:
                     See X resolution parameter just explained (**),  all similarly named parameters
                     will refer to the phosphors height instead od the width.
@@ -177,22 +176,29 @@
                 Phosphor masks are usually vertically delimited by thin lines.
                 This parameter will set the visibility of them.
 
-                Resolution: (core or screen)
+                Resolution: (core or screen) (*1)
                     Should the vertical interval (height) between those likes be relative to screen or core pixel size?
-                Height divider (neg=multiplier):
+                Height divider (neg=multiplier) (*2):
                     The more, the less that intervall will be.
                     Interesting values for screen resolution: 1.0, 0.75, 0.5
                 Fadeout under light: How much they will be visible over bright pixels.
-                Steepness: 
-                    The more, the thinner they will be.
-                    Setting this to very high values, may make them disappear unevenly.
-                Even/odd offset:
+                Even/odd offset (slotmask) (*3):
                     If you not used, the previous section to emulate scanlines(*), but still want to emulate
                     slotmasks layouts, you can set this to 1.0.
                     You can draw slotmasks at screen coordinates to emulate real crts or choose to paint
                     them at core coordinates to have a more defined slotmask
                     ...if you like slotmasks so much :-)
-        
+                Vertical shift (for use with core resolution):
+                    This parameter allows you to move the whole vertical mask along the Y axis.
+                    It is intended to be used with core resolution(*1) and integer divider/multiplier(*2)
+                    to clear weird patterns from the screen when using slotmasks (*3) alongside scanline emulation (*4).
+                Steepness: 
+                    The more, the thinner they will be.
+                    Setting this to very high values, may make them disappear unevenly.
+                Sparkling look punch:
+                    Makes the "Vertical cell Mask 2" effect more pronunced and "pinchy/Sparky" by highering its contrast.
+                    Beware, this may produce moiree.
+                    
 **Dot matrix emulation:**<br>
     Emulates low refresh "boxed" screens used in old handheld consoles.<br>
     
@@ -367,21 +373,29 @@
         Keep in mynd that there is a scene detection logic that will make them
         react as fast as possible when a scene change is detected.
     Light Falloff:
-        How wide is the area illuminated.
+        How wide is the light of a single led.
+    Widen lights:
+        Dumb stretch of the visible texture, operates on the whole content, instead of the
+        single led.
     Led power:
         Leds post gain.
         Note: To avoid burn-in effects, keep Light Falloff + Led power not too high.
-    Colorize Bezel
+    Colorize Bezel;
         Allow to add an amount of the ambient light over the bezel frame
-    Colorization size
+    Colorization size:
         How much the ambient light should bleed over the monitor.
         Pushing this too high would make it bleed over the tube.
         This is not supported.
-    Back/Foreground image alpha blend
+    Back/Foreground image alpha blend:
         When displaying background or foreground images, ambient lights are
         shown on their transparent areas (alpha channel)
         Switching this you can choose if you want to emulate leds:
         under the image (0/mix) or over the image (1/add)
+    Foggy (power on dark colors, add mode only)
+        When using add mode or when colorizing the bezel via led lights, you may want
+        to lessen the foggy effect to turn it into a more realistic illumination.
+        Think to this as a way to turn the light target from the spectator (foggy)
+        to the background (not foggy).
     Always colorize Back/Foreground image (add mode only)
         When "Back/Foreground image alpha blend" is set to 1/add,
         you can choose to always colorize the foreground image by a certain amount.
