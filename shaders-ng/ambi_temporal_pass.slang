@@ -36,12 +36,15 @@ void main() {
         vSmpBorder_max = 1.0-smp_internalness;
 
 
-    //Disable internalness when using bezel:
-       //led_internalness =  AMBI_INT_OFFSET * (1-DO_BEZEL);
+
 
     //Move virtual leds position inside to compensate for widen effect
        float  led_internalness = AMBI_INT_OFFSET + (AMBI_STRETCH *0.025);
 
+       
+    //less internalness when using bezel:
+       led_internalness -= 0.07 * (DO_BEZEL);
+       
         //led_internalness = -0.18   ;
 
     //Min/Max points to show Leds;
