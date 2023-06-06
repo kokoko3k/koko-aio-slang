@@ -1,0 +1,25 @@
+#reference "../../shaders/shaders_slang/bezel/koko-aio/monitor-slotmask-bloom-bezel.slangp"
+BEZEL_INNER_ZOOM = "-0.295000"
+BEZEL_FRAME_ZOOM = "-0.045000"
+BEZEL_R = "-0.250000"
+BEZEL_G = "-0.250000"
+BEZEL_B = "-0.250000"
+DO_BG_IMAGE = "1.000000"
+BG_IMAGE_OVER = "1.000000"
+BG_IMAGE_ROTATION = "2.000000"
+AMBI_STEPS = "5.000000"
+AMBI_POWER = "3.349998"
+AMBI_OVER_BEZEL = "0.000000"
+AMBI_OVER_BEZEL_SIZE = "0.202000"
+AMBI_BG_IMAGE_BLEND_MODE = "1.000000"
+AMBI_BG_IMAGE_FORCE = "1.000000"
+DO_GLOBAL_SHZO = "1.000000"
+GLOBAL_OFFX = "0.020000"
+GLOBAL_ZOOM = "1.000000"
+bg_under = "../../shaders/shaders_slang/bezel/koko-aio/textures/arcade_textures/amidar.png"
+bg_over = "../../shaders/shaders_slang/bezel/koko-aio/textures/arcade_textures/amidar.png"
+ 
+// Credits
+// shader by kokoko3k - https://github.com/kokoko3k/koko-aio-slang
+// artwork by Mr. RetroLust
+// preset and artwork adjustments by estefan3112 - https://github.com/estefan3112/koko-aio-slang

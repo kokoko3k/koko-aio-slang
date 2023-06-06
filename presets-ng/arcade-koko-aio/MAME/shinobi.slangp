@@ -1,15 +1,13 @@
 #reference "../../shaders/shaders_slang/bezel/koko-aio/monitor-slotmask-bloom-bezel.slangp"
-BEZEL_INNER_ZOOM = "-0.380000"
-BEZEL_FRAME_ZOOM = "-0.105000"
+GEOM_CORNER_SIZE = "0.020000"
+BEZEL_INNER_ZOOM = "-0.392500"
+BEZEL_FRAME_ZOOM = "-0.115000"
 BEZEL_R = "-0.220000"
 BEZEL_G = "-0.220000"
 BEZEL_B = "-0.220000"
 DO_BG_IMAGE = "1.000000"
-BG_IMAGE_NIGHTIFY = "0.300000"
-AMBI_STEPS = "5.000000"
-AMBI_BG_IMAGE_BLEND_MODE = "1.000000"
-AMBI_BG_IMAGE_FORCE = "0.200000"
-bg_under = "../../shaders/shaders_slang/bezel/koko-aio/textures/arcade_textures/cadash.png"
+DO_AMBILIGHT = "0.000000"
+bg_under = "../../shaders/shaders_slang/bezel/koko-aio/textures/arcade_textures/shinobi.png"
 
 // Credits
 // shader by kokoko3k - https://github.com/kokoko3k/koko-aio-slang

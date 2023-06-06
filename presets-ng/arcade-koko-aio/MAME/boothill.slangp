@@ -1,0 +1,19 @@
+#reference "../../shaders/shaders_slang/bezel/koko-aio/monitor-slotmask.slangp"
+DO_CCORRECTION = "0.000000"
+DO_IN_GLOW = "0.000000"
+HALO_POWER = "0.330000"
+HALO_GAMMA = "1.300000"
+DO_BG_IMAGE = "1.000000"
+BG_IMAGE_OVER = "1.000000"
+DO_BACKDROP = "1.000000"
+DO_AMBILIGHT = "0.000000"
+DO_DYNZOOM = "0.000000"
+DO_GLOBAL_SHZO = "1.000000"
+GLOBAL_ZOOM = "0.820000"
+bg_over = "../../shaders/shaders_slang/bezel/koko-aio/textures/arcade_textures/boothill.png"
+backdrop = "../../shaders/shaders_slang/bezel/koko-aio/textures/arcade_textures/boothill_backdrop.png"
+
+// Credits
+// shader by kokoko3k - https://github.com/kokoko3k/koko-aio-slang
+// artwork and backdrop by John Merrit
+// preset and artwork adjustments by estefan3112 - https://github.com/estefan3112/koko-aio-slang
