@@ -1016,7 +1016,7 @@ void main() {
                 vTexCoord * vDynamicSeed  ) ;
             
                 float  ambi_noise_power = (NOISEPOWER * NOISEPOWER_AMBI_MUL * (1-pixel_ambi.g) ) * //only middle green channel
-                                          dot( pixel_ambi, vec3(1.0,-0.5,-0.5) );                  //denoise only greenish colors
+                                          dot( pixel_ambi, vec3(-0.5,1.0,-0.5) );                  //denoise only greenish colors
                 pixel_ambi += random_fast( ambi_noise_power, vTexCoord * vDynamicSeed  ) ;
                 
                 pixel_under_content = pixel_ambi * (1-canvas_busy);
