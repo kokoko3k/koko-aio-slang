@@ -118,8 +118,8 @@
 
 	//Static dithering applied over vignette and spot
 #define NOISEPOWER 5/1000.0
-	//Temporal noise strength applied over ambient lights
-#define NOISEPOWER_AMBI_MUL 13/1000.0
+	//Temporal noise strength applied on green over ambient lights (multiplied by NOISEPOWER)
+#define NOISEPOWER_AMBI_MUL 25.0
 	
 
 	//Experimental alternating blanking feature has been disabled by default, you can enable it by

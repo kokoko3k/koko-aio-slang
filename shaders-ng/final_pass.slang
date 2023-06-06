@@ -161,7 +161,7 @@ void main() {
 
         
     //Generate a seed that changes over time for temporal random noise
-        vDynamicSeed = mod(params.FrameCount, 60.0001);
+        vDynamicSeed = mod(params.FrameCount, 30.0001);
 
 
     //Calc dotmat grid color
@@ -1012,7 +1012,13 @@ void main() {
             //Ambient light
             if (DO_AMBILIGHT == 1.0) {
                 pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb;
-                pixel_ambi += random_fast(NOISEPOWER * NOISEPOWER_AMBI_MUL, vTexCoord * vDynamicSeed  ) * (20 * (3.0-(pixel_ambi.r+pixel_ambi.g+pixel_ambi.b))) ;
+                pixel_ambi += random_fast( (NOISEPOWER * NOISEPOWER_AMBI_MUL) * ((1-pixel_ambi.g) * (pixel_ambi.g*1 - pixel_ambi.r*0.125 -pixel_ambi.b*0.125  )    ) , 
+                vTexCoord * vDynamicSeed  ) ;
+            
+                float  ambi_noise_power = (NOISEPOWER * NOISEPOWER_AMBI_MUL * (1-pixel_ambi.g) ) * //only middle green channel
+                                          dot( pixel_ambi, vec3(1.0,-0.5,-0.5) );                  //denoise only greenish colors
+                pixel_ambi += random_fast( ambi_noise_power, vTexCoord * vDynamicSeed  ) ;
+                
                 pixel_under_content = pixel_ambi * (1-canvas_busy);
             }
         }

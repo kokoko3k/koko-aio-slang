@@ -5,15 +5,17 @@
 #define CBLACK  vec3(0.0)
 #define CPURPLE vec3(1.0,0.0,1.0)
 #define CRED    vec3(1.0,0.0,0.0)
+#define CGREEN    vec3(0.0,1.0,0.0)
+#define CBLUE    vec3(0.0,0.0,1.0)
 #define CCUSTOM vec3(1.0,0.5,0.1)
 
-#define DEBUG_COLOR CWHITE //vec3(0.8)
+#define DEBUG_COLOR CGREEN // vec3(0.7,0.0,0.0)
 #define DEBUG_BLINK_TIME 200
 #define DEBUG_GRADIENT_STEPS 128
 
 //#define DEBUG
-   #define DEBUG_TIME_FADE
-   //#define DEBUG_SOLID_COLOR
+   //#define DEBUG_TIME_FADE
+   #define DEBUG_SOLID_COLOR
    //#define DEBUG_STEP_GRADIENT
    //#define DEBUG_BLINK
    //#define DEBUG_BLINK_CIRCLE
