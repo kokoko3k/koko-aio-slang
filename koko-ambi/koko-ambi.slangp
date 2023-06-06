@@ -13,7 +13,7 @@ filter_linear0 = true
         alias1 = avglum_pass
 filter_linear1 = true
  mipmap_input1 = true
-   scale_type1 = viewport
+   scale_type1 = source
         scale1 = 1.0
     wrap_mode1 = "mirrored_repeat"
 
