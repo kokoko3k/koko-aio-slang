@@ -1,20 +1,19 @@
 # Koko-aio Fork for Arcade Artwork (currently FinalBurn Neo and MAME 2003/2003plus)
 
-Repository for game-specific Arcade Artwork by using the Koko-aio slang shader. Successfully tested under MacOS, Windows and iPadOS. Currently the Koko-aio shader provides superior performance on all reasonably powered desktops, while providing enhanced shader functions, including bezel reflections,halo/glow effects and many more. It embeds game-specific artwork seamlessly and scales according to resolution. The koko-aio shader is currently under steady development, thus it is a clear aim to stay in line with the Upstream changes.<br>
+Repository for game-specific Arcade Artwork by using the Koko-aio slang shader. Successfully tested under MacOS, Windows and iPadOS. Currently the Koko-aio shader provides superior performance on all reasonably powered desktops (including Macs), while providing enhanced shader functions, including bezel reflections,halo/glow effects and many more. It embeds game-specific artwork seamlessly and scales according to resolution. The koko-aio shader is currently under steady development, thus it is a clear aim to stay in line with the Upstream changes.<br>
 <br>
 Main source of this artwork comes from John Merrit, who set a benchmark for realistic arcade artwork. I still very much like them, and they shine even more in combination with Koko-aio. My selection of the artwork is arbitrary, but I try to publish eye candys earlier :-). Version 0.2 and following releases see the inclusion of some breathtaking 4K artwork provided by Ars Invictus.<br>
 <br>
-Requirements: RetroArch 1.5.0 or a newer RetroArch Nightly Build that support Vulkan. Tested with FinalBurn Neo (mainly) and MAME 2003/2003plus. MAME current does not work out of the box, as the rotation of this core is different.<br>
-
+Requirements: RetroArch 1.5.0 or a newer RetroArch Nightly Build that support Vulkan. Tested with FinalBurn Neo (mainly) and MAME 2003/2003plus. MAME (current) now works out of the box, as the rotation of this core has been adjusted. Having said that, the MAME (current) core is still buggy for me.<br>
+<br>
+Update June 2023: I have successfully moved this repository to the 'ng' shaders that provide another quality increase. Until release 0.4, I would like to nightify all presets to the extent required. This release will also see usage of the new ambilight functionalities, if it makes sense. So stay tuned.
+<br>
 # Release 0.3 contains 52 game-specific presets - download here!
 Backdrop games and 4k artwork included in this release.
 Please see the list of game presets in the Release Notes.
 
-
 # Screenshots
 Screenshots are taken under MacOS with HDR enabled.
-
-In the works: Some nightyfied artwork by Mr. Retrolust - I started nightyfying all presets, the previous ones without the new nightify option will be saved under 'classic'.
 
 <img width="750" alt="Bildschirmfoto 2023-04-08 um 21 03 47" src="https://user-images.githubusercontent.com/24915559/230785582-e364fa18-e0ea-4908-a912-c3de18bfe70c.png">
 
