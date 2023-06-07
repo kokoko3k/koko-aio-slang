@@ -467,7 +467,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         if (PIXELGRID_Y_MASK > 0.0) {
             //Switch reference coords according to user pref: 
                 float freq_cell_y = mix_step(freq_base_core.y, freq_base_screen.y, PIXELGRID_Y_MASK_COORDS);
-                
+
             //mask phosphors heigth
                 #define PH_MASK_HEIGHT (freq_cell_y * vPG_mask_height)
             //phosphors mask stagger
@@ -476,6 +476,9 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //Use abs(cos) (later 1-abs(cos) to get orizontal gaps, use pow to make them steep.
             //Stagger them by PH_MASH_OFFSET on even triads
                 float mask_shape = abs(cos(  PIXELGRID_Y_MASK_SHIFT*pi +   PH_MASK_HEIGHT  + (PH_MASH_OFFSET * is_even)) ) ;
+                
+                 mask_shape = abs(cos(  PIXELGRID_Y_MASK_SHIFT*pi +   PH_MASK_HEIGHT  + (PH_MASH_OFFSET * is_even)) ) ;
+                
                 mask_shape = pow(mask_shape, PIXELGRID_Y_MASK_STEEP);
                 
             //Get per channel input luminance by clamping pixel_in and applying hmask
