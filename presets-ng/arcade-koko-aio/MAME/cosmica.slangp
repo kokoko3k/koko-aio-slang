@@ -22,3 +22,8 @@ AMBI_BG_IMAGE_FORCE = "0.500000"
 S_POWER = "0.190000"
 bg_under = "../../shaders/shaders_slang/bezel/koko-aio/textures/arcade_textures/cosmica.png"
 bg_over = "../../shaders/shaders_slang/bezel/koko-aio/textures/arcade_textures/cosmica.png"
+
+// Credits
+// shader by kokoko3k - https://github.com/kokoko3k/koko-aio-slang
+// artwork by Progetto Snaps - https://www.progettosnaps.net/artworks/
+// preset and artwork adjustments by estefan3112 - https://github.com/estefan3112/koko-aio-slang
