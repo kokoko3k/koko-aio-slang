@@ -319,19 +319,6 @@ vec3 fn_pixel_nightify(vec3 color_in, float strength, vec3 ambilight) {
 }
 
 
-float morph_shape_easy(float shape, float power, float steep ) {
-    return pow(shape, 1/(power*2.0));
-}
-
-
-float morph_shape_05(float shape, float power, float steep ) {
-    float lum_scaled = power;
-    float l = lum_scaled; // (already clamped)
-    float l1 = pow(l, 3) * 10;
-    shape = pow(shape, 1/sqrt(l1));
-    return shape;
-}
-
 
 float morph_shape_full(float shape, float power, float steep ) {
     float lum_scaled = power;
@@ -358,21 +345,6 @@ vec3 morph_shape(vec3 shape, vec3 power, float steep ) {
 float morph_shape(float shape, float power, float steep ) {
     return morph_shape_full(shape, power, steep);
 }
-
-float smoothstep_fast(float edge0, float edge1, float x) {
-  return smoothstep(edge0,edge1,x);
-  float t = clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);
-  //return cos(t * 3.14159265358979323846) * -0.5 + 0.5;
-  return mix(0.0, 1.0, t);
-}
-
-vec3 smoothstep_fast(vec3 edge0, vec3 edge1, vec3 x) {
-  return smoothstep(edge0,edge1,x);
-  vec3 t = clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);
-  //return cos(t * 3.14159265358979323846) * -0.5 + 0.5;
-  return mix(vec3(0.0), vec3(1.0), t);
-}
-
 
 
 vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inLum) { 
