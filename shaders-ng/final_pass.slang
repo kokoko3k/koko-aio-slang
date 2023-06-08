@@ -429,6 +429,8 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         rgb_w = mix( vec3(1.0), rgb_w, DO_PIXELGRID_W);
 
     
+     
+
     //Height phosphor mask (can be used for scanlines, slotmask, aperturegrille):
         vec3 rgb_h = vec3(1.0);
         
@@ -438,8 +440,8 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             float sin_check_offset = sin(freq_base_unfloored.x + o);
             float is_even = step(sin_check_offset, 0.0);
         
-        bool scanline_condition = DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0);
-        if (scanline_condition) {
+        
+        if (DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0)) {
             //calculate each phosphor height according to input luminance 
                 vec3 phosphor_height = map_range(pixel_in * rgb_w, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
                 
@@ -466,7 +468,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
     //Height phosphor mask number 2, can be used for slotmask,aperturegrille, not scanlines.
     //...well technically yes, but they would have a boxed shape.
         vec3 darklines_mask=vec3(1.0);
-        float mask_shape;
+        
         if (PIXELGRID_Y_MASK > 0.0) {
             //Switch reference coords according to user pref: 
                 float freq_cell_y = mix_step(freq_base_core.y, freq_base_screen.y, PIXELGRID_Y_MASK_COORDS);
@@ -479,7 +481,9 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //Use abs(cos) (later 1-abs(cos) to get orizontal gaps, use pow to make them steep.
             //Stagger them by PH_MASH_OFFSET on even triads
                 float mask_shape = abs(cos(  PIXELGRID_Y_MASK_SHIFT*pi +   PH_MASK_HEIGHT  + (PH_MASH_OFFSET * is_even)) ) ;
-                mask_shape = abs(cos(  PIXELGRID_Y_MASK_SHIFT*pi +   PH_MASK_HEIGHT  + (PH_MASH_OFFSET * is_even)) ) ;
+                
+                 mask_shape = abs(cos(  PIXELGRID_Y_MASK_SHIFT*pi +   PH_MASK_HEIGHT  + (PH_MASH_OFFSET * is_even)) ) ;
+                
                 mask_shape = pow(mask_shape, PIXELGRID_Y_MASK_STEEP);
                 
             //Get per channel input luminance by clamping pixel_in and applying hmask
@@ -491,19 +495,6 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //apply user visibility modifier to the mask
                 darklines_mask = 1-(mask_shape*V);
         }
-        
-/*        //Yes, i just made the very same condition up there, ^^ but for some reason is faster that way.
-        if (PIXELGRID_Y_MASK > 0.0) {
-            //Get per channel input luminance by clamping pixel_in and applying hmask
-                vec3 lum=clamp(pixel_in * rgb_w, 0.0, 1.0);
-            //Adapt the luminance effect via input parameter
-                vec3 lum_adapted = (1-lum*PIXELGRID_Y_MASK_ON_WHITE);
-            //Calc final mask visibility as the minimum between tha configured visibility and luminosity effect
-                vec3 V=min( lum_adapted, vec3(PIXELGRID_Y_MASK) );
-            //apply user visibility modifier to the mask
-                darklines_mask = 1-(mask_shape*V);
-        }
-  */      
      
     //Try to get a more brillant/sparkling look by highering the darklines
     //effect (sub) and pushing the source color, useful for slotmasks.
