@@ -167,6 +167,7 @@ layout(push_constant) uniform Push {
 	float AMBI_ADD_ON_BLACK;
 	float AMBI_STRETCH;
 	float AMBI_INT_OFFSET ;
+	
 } params;
 
 layout(std140, set = 0, binding = 0) uniform UBO {
@@ -389,7 +390,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	
 	float SERVICE1;
 	float SERVICE2;
-	float SERVICE3;
+	float PIXELGRID_HMASK_NO_BRIGHT;
 	
 
 } global;
@@ -476,8 +477,10 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 // pixel Grid
 #pragma parameter DO_PIXELGRID		 "★  Low level Phosphor grid enable? ==>"	0.0 0.0 1.0 1.0
 #pragma parameter PIXELGRID_NO_FLOOR "      ★ Fuzzy screen coords (1=no)"   1.0 1.0 10000.0 10000.0
-#pragma parameter DO_PIXELGRID_W     "      ★ Enable Horizontal mask "    	1.0 0.0 1.0 1.0
+
+#pragma parameter DO_PIXELGRID_W     "      ★ Enable Horizontal mask "    	1.0 0.0 1.0 0.1
 #pragma parameter PIXELGRID_SIZE_W   "           . Resolution: (core or screen)"	1.0 0.0 1.0 1.0
+#pragma parameter PIXELGRID_HMASK_NO_BRIGHT  "           . Fade on bright"	0.0 0.0 10.0 0.1
 #pragma parameter PIXELGRID_MIN_W    "           . Phosphors width Min"			0.25 0.05 1.0 0.01
 #pragma parameter PIXELGRID_MAX_W    "           . Phosphors width Max"			0.25 0.05 1.0 0.01
 #pragma parameter PIXELGRID_H_PRST   "           . Mask type preset (0: for manual)"  3.0 0.0 6.0 1.0
@@ -488,7 +491,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter PIXELGRID_B_SHIFT  "                . 0: B shift"      2.0  0.0 4.0 0.1
 #pragma parameter PIXELGRID_MUL_X    "           . Cell size multiplier x (neg=divider):"	1.0 -8.0 8.0 0.125
 #pragma parameter PIXELGRID_NO_INTERBLEED_W	"           . Avoid inter-cell bleeding (handhelds)"		0.0 0.0 100.0 100.0
-
 #pragma parameter BLANK12fs " " 0.0 0.0 1.0 1.0
 
 #pragma parameter DO_PIXELGRID_H            "      ★ Scanlines or vertical mask 1 (0 to disable)"    	1.0 0.0 1.0 0.01
@@ -717,8 +719,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 
 #pragma parameter SERVICE1 "Don't use me, for debug purposes only" 	0.5 -1.0 1.0 0.01
-#pragma parameter SERVICE2 "Don't use me, for debug purposes only" 	0.5 -1.0 1.0 0.01
-#pragma parameter SERVICE3 "Don't use me, for debug purposes only" 	0.5 -1.0 1.0 0.01
+//#pragma parameter SERVICE2 "Don't use me, for debug purposes only" 	0.5 -1.0 1.0 0.01
+//#pragma parameter SERVICE3 "Don't use me, for debug purposes only" 	0.5 -1.0 1.0 0.01
 
 
 
