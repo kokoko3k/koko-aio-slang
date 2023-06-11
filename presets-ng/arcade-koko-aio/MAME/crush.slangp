@@ -1,0 +1,26 @@
+#reference "../../shaders/shaders_slang/bezel/koko-aio/monitor-slotmask-bloom-bezel.slangp"
+LUMINANCE = "0.000000"
+BEZEL_INNER_ZOOM = "-0.072000"
+BEZEL_FRAME_ZOOM = "0.121000"
+BEZEL_R = "-0.220000"
+BEZEL_G = "-0.220000"
+BEZEL_B = "-0.220000"
+DO_BG_IMAGE = "1.000000"
+BG_IMAGE_OFFX = "0.000500"
+BG_IMAGE_OFFY = "0.001000"
+BG_IMAGE_ZOOM = "0.998500"
+BG_IMAGE_ROTATION = "2.000000"
+BG_IMAGE_NIGHTIFY = "0.300000"
+AMBI_STEPS = "5.000000"
+AMBI_POWER = "1.500000"
+AMBI_OVER_BEZEL = "0.300000"
+AMBI_OVER_BEZEL_SIZE = "0.247000"
+AMBI_BG_IMAGE_BLEND_MODE = "1.000000"
+AMBI_BG_IMAGE_FORCE = "0.500000"
+bg_under = "../../shaders/shaders_slang/bezel/koko-aio/textures/arcade_textures/crush.png"
+bg_over = "../../shaders/shaders_slang/bezel/koko-aio/textures/arcade_textures/crush.png"
+
+// Credits
+// shader by kokoko3k - https://github.com/kokoko3k/koko-aio-slang
+// artwork by Progetto Snaps - https://www.progettosnaps.net/artworks/
+// preset and artwork adjustments by estefan3112 - https://github.com/estefan3112/koko-aio-slang
