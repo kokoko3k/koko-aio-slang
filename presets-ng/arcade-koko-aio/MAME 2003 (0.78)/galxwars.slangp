@@ -1,0 +1,28 @@
+#reference "../../shaders/shaders_slang/bezel/koko-aio/monitor-slotmask-bloom-bezel.slangp"
+LUMINANCE = "0.050000"
+IN_GLOW_POWER = "1.350001"
+HALO_POWER = "0.360000"
+BEZEL_INNER_ZOOM = "-0.086000"
+BEZEL_FRAME_ZOOM = "0.111000"
+BEZEL_R = "-0.220000"
+BEZEL_G = "-0.220000"
+BEZEL_B = "-0.220000"
+DO_BG_IMAGE = "1.000000"
+BG_IMAGE_OVER = "1.000000"
+BG_IMAGE_ROTATION = "1.000000"
+BG_IMAGE_NIGHTIFY = "0.500000"
+DO_AMBILIGHT = "0.000000"
+AMBI_STEPS = "5.000000"
+AMBI_POWER = "1.500000"
+AMBI_OVER_BEZEL = "0.300000"
+AMBI_OVER_BEZEL_SIZE = "0.247000"
+AMBI_BG_IMAGE_BLEND_MODE = "1.000000"
+AMBI_BG_IMAGE_FORCE = "0.500000"
+S_POWER = "0.250000"
+bg_under = "../../shaders/shaders_slang/bezel/koko-aio/textures/arcade_textures/galxwars.png"
+bg_over = "../../shaders/shaders_slang/bezel/koko-aio/textures/arcade_textures/galxwars.png"
+
+// Credits
+// shader by kokoko3k - https://github.com/kokoko3k/koko-aio-slang
+// artwork by John Merrit
+// preset and artwork adjustments by estefan3112 - https://github.com/estefan3112/koko-aio-slang
