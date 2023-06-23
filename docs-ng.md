@@ -86,10 +86,12 @@
         Enabling it may allow to have a better representation of color shades in some cases
         and the ability to draw the mask at subpixel screen precision.
 
-    Horizontal mask
+    Horizontal mask (rgb subpixel mask strength)
         X resolution: (core or screen) (**):
             0: Phosphors width will be relative to the pixel width of the core (game).
             1: Phosphors width will be relative to the pixel width of the screen.
+        Fade on bright:
+            How much the mask is visible over bright pixels.
         Phosphors width Min, Max:
             The width of each phosphors can grow or shrink, depending on the
             luminosity of the underlying pixel luminance.

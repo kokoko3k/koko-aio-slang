@@ -43,7 +43,7 @@ void main() {
 
        
     //less internalness when using bezel:
-       led_internalness -= 0.07 * (DO_BEZEL);
+       led_internalness -= 0.07 * DO_BEZEL;
        
         //led_internalness = -0.18   ;
 

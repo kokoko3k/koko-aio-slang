@@ -161,7 +161,7 @@ void main() {
 
         
     //Generate a seed that changes over time for temporal random noise
-        vDynamicSeed = mod(params.FrameCount, 60.0001);
+        vDynamicSeed = mod(params.FrameCount, 30.0001);
 
 
     //Calc dotmat grid color
@@ -319,19 +319,6 @@ vec3 fn_pixel_nightify(vec3 color_in, float strength, vec3 ambilight) {
 }
 
 
-float morph_shape_easy(float shape, float power, float steep ) {
-    return pow(shape, 1/(power*2.0));
-}
-
-
-float morph_shape_05(float shape, float power, float steep ) {
-    float lum_scaled = power;
-    float l = lum_scaled; // (already clamped)
-    float l1 = pow(l, 3) * 10;
-    shape = pow(shape, 1/sqrt(l1));
-    return shape;
-}
-
 
 float morph_shape_full(float shape, float power, float steep ) {
     float lum_scaled = power;
@@ -359,21 +346,28 @@ float morph_shape(float shape, float power, float steep ) {
     return morph_shape_full(shape, power, steep);
 }
 
-float smoothstep_fast(float edge0, float edge1, float x) {
-  return smoothstep(edge0,edge1,x);
-  float t = clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);
-  //return cos(t * 3.14159265358979323846) * -0.5 + 0.5;
-  return mix(0.0, 1.0, t);
+float morph_shape_full_mix(float shape, float power, float steep, float mixto, float mix_strength ) {
+    float lum_scaled = power;
+    float l = lum_scaled; // (already clamped)
+    if (lum_scaled <= 0.5+steep) {
+        float l1 = pow(l, 4) * 15;
+        shape = pow(shape, 1/sqrt(l1));
+    } else {
+        float l2 = (l-0.5)*2.0;
+        shape = mix(shape, 1.0, l2);    //shape = shape * (1-l2) + l2;
+    }
+    mix_strength = clamp(mix_strength, 0.0, 1.0);
+    return mix(mixto, shape, mix_strength);
 }
 
-vec3 smoothstep_fast(vec3 edge0, vec3 edge1, vec3 x) {
-  return smoothstep(edge0,edge1,x);
-  vec3 t = clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);
-  //return cos(t * 3.14159265358979323846) * -0.5 + 0.5;
-  return mix(vec3(0.0), vec3(1.0), t);
+
+vec3 morph_shape_mix(vec3 shape, vec3 power, float steep, float mixto, vec3 mix_strength ) {
+    return vec3(
+      morph_shape_full_mix(shape.x, power.x, steep, mixto, mix_strength.x),
+      morph_shape_full_mix(shape.y, power.y, steep, mixto, mix_strength.y),
+      morph_shape_full_mix(shape.z, power.z, steep, mixto, mix_strength.z)
+    );
 }
-
-
 
 vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inLum) { 
     
@@ -416,7 +410,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
 
     //Width phosphor mask:
         vec3 rgb_w = vec3(1.0);
-        if (DO_PIXELGRID_W == 1.0) {
+        if (DO_PIXELGRID_W > 0.0) {
             //get 3 sines in black/white
                 rgb_w = cos(freq_rgb);
 
@@ -424,10 +418,19 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 rgb_w = (rgb_w * rgb_w);
 
             //modulate each phosphor width according to input luminance
-                vec3 phosphor_width = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
+               vec3 phosphor_width = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
                 rgb_w = morph_shape(rgb_w, phosphor_width, PIXELGRID_NO_INTERBLEED_W);
         }
     
+    //Mask strength modifiers for hmask, performs way better outside the main if then ^^ up there ^^
+        vec3 rgb_w_weakness = (pixel_in * PIXELGRID_HMASK_NO_BRIGHT) ;
+        rgb_w_weakness = clamp(rgb_w_weakness,0.0,1.0);
+        rgb_w = mix( rgb_w, vec3(0.33), rgb_w_weakness);
+        rgb_w = mix( vec3(1.0), rgb_w, DO_PIXELGRID_W);
+
+    
+     
+
     //Height phosphor mask (can be used for scanlines, slotmask, aperturegrille):
         vec3 rgb_h = vec3(1.0);
         
@@ -460,6 +463,8 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 rgb_h = mix(vec3(1.0), rgb_h, DO_PIXELGRID_H);
         }
 
+        
+        
     //Height phosphor mask number 2, can be used for slotmask,aperturegrille, not scanlines.
     //...well technically yes, but they would have a boxed shape.
         vec3 darklines_mask=vec3(1.0);
@@ -467,7 +472,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         if (PIXELGRID_Y_MASK > 0.0) {
             //Switch reference coords according to user pref: 
                 float freq_cell_y = mix_step(freq_base_core.y, freq_base_screen.y, PIXELGRID_Y_MASK_COORDS);
-                
+
             //mask phosphors heigth
                 #define PH_MASK_HEIGHT (freq_cell_y * vPG_mask_height)
             //phosphors mask stagger
@@ -476,6 +481,9 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //Use abs(cos) (later 1-abs(cos) to get orizontal gaps, use pow to make them steep.
             //Stagger them by PH_MASH_OFFSET on even triads
                 float mask_shape = abs(cos(  PIXELGRID_Y_MASK_SHIFT*pi +   PH_MASK_HEIGHT  + (PH_MASH_OFFSET * is_even)) ) ;
+                
+                 mask_shape = abs(cos(  PIXELGRID_Y_MASK_SHIFT*pi +   PH_MASK_HEIGHT  + (PH_MASH_OFFSET * is_even)) ) ;
+                
                 mask_shape = pow(mask_shape, PIXELGRID_Y_MASK_STEEP);
                 
             //Get per channel input luminance by clamping pixel_in and applying hmask
@@ -494,6 +502,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         darklines_mask -= vPG_spark;
         pixel_in *= vPG_spark*4 + 1;
      
+        
     //Finally put width,height1 and height2 masks togheter:
         //vec3 mask = rgb_w * rgb_h * darklines_mask;
         vec3 mask = min( (rgb_w * rgb_h), darklines_mask * rgb_h); //<- this way it does not interfree with scanline height!
@@ -1012,7 +1021,13 @@ void main() {
             //Ambient light
             if (DO_AMBILIGHT == 1.0) {
                 pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb;
-                pixel_ambi += random_fast(NOISEPOWER * NOISEPOWER_AMBI_MUL, vTexCoord * vDynamicSeed  ) * (20 * (3.0-(pixel_ambi.r+pixel_ambi.g+pixel_ambi.b))) ;
+                pixel_ambi += random_fast( (NOISEPOWER * NOISEPOWER_AMBI_MUL) * ((1-pixel_ambi.g) * (pixel_ambi.g*1 - pixel_ambi.r*0.125 -pixel_ambi.b*0.125  )    ) , 
+                vTexCoord * vDynamicSeed  ) ;
+            
+                float  ambi_noise_power = (NOISEPOWER * NOISEPOWER_AMBI_MUL * (1-pixel_ambi.g) ) * //only middle green channel
+                                          dot( pixel_ambi, vec3(-0.5,1.0,-0.5) );                  //denoise only greenish colors
+                pixel_ambi += random_fast( ambi_noise_power, vTexCoord * vDynamicSeed  ) ;
+                
                 pixel_under_content = pixel_ambi * (1-canvas_busy);
             }
         }
