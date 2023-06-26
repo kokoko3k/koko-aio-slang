@@ -134,7 +134,9 @@
 	//Gap size in pixel for 1X to 4X mask scaling:
 #define GAP_SIZE_PER_SCALE vec4(1.0, 1.0, 2.0, 2.0)
 
-  
+	//Halve rendering refresh on bezel and ambilight to spare gpu cycles:
+#define HALVE_BORDER_UPDATE 1.0
+
 // STATIC CONFIG ENDS HERE ##########################################################################################
 
 

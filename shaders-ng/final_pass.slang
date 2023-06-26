@@ -10,7 +10,7 @@
 //#define DEBUG_QUAD_SPLIT
 //#define DEBUG_DUAL_SPLIT_X
 //#define DEBUG_DUAL_SPLIT_Y
-#define DEBUG_DUAL_SPLIT_MIRROR_X
+//#define DEBUG_DUAL_SPLIT_MIRROR_X
 
 
 #include "config.inc"
@@ -272,6 +272,7 @@ layout(set = 0, binding = 10) uniform sampler2D shift_and_bleed_pass;
 layout(set = 0, binding = 11) uniform sampler2D in_glow_pass;
 layout(set = 0, binding = 12) uniform sampler2D halo_pass;
 
+layout(set = 0, binding = 13) uniform sampler2D final_passFeedback;
 
 layout(set = 0, binding = 15) uniform sampler2D flick_and_noise_pass;
 
@@ -1008,7 +1009,7 @@ void main() {
         }
 
         
-    //Calc a random noise for vignette or spot (this seems a sweet spot in the code to not lose speed)
+    //Calc a random noise for vignette or spot (this seems a sweet spot in the code to not lose speed, at least on my haswell)
         if (DO_VIGNETTE + DO_SPOT > 0.0) {
             global_noise_static = random_fast(NOISEPOWER, vTexCoord);
         }
@@ -1020,6 +1021,16 @@ void main() {
         if (canvas_busy > 0.5) {
             pixel_out = fn_pixel_content(co_content) * canvas_busy;
         } else {
+            
+            //Can we halve refresh rate in the outside border to spare some cycles?
+            if ( HALVE_BORDER_UPDATE == 1.0 ) {
+                if ((params.FrameCount % 2) != 0.0) {
+                    pixel_out = texture(final_passFeedback, vOutputCoord).rgb;
+                    FragColor = vec4(pixel_out, 1.0);
+                    return;
+                }
+            }
+            
             //Ambient light
             if (DO_AMBILIGHT == 1.0) {
                 pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb;
