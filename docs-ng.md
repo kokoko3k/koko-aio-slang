@@ -204,7 +204,7 @@
             Mask gamma (H and V):
                 Since emulating phosphors may change the apparent gamma of the final image, it is advised to use this option
                 to compensate, instead of the main gamma correction.
-        
+
 **Dot matrix emulation:**<br>
     Emulates low refresh "boxed" screens used in old handheld consoles.<br>
     

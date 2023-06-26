@@ -10,7 +10,7 @@
 //#define DEBUG_QUAD_SPLIT
 //#define DEBUG_DUAL_SPLIT_X
 //#define DEBUG_DUAL_SPLIT_Y
-//#define DEBUG_DUAL_SPLIT_MIRROR_X
+#define DEBUG_DUAL_SPLIT_MIRROR_X
 
 
 #include "config.inc"
@@ -371,6 +371,8 @@ vec3 morph_shape_mix(vec3 shape, vec3 power, float steep, float mixto, vec3 mix_
 }
 
 vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inLum) { 
+    //Gamma correct mask by modifying the color used to calculate mask weight
+        vec3 pixel_in_gammed = pow(pixel_in,vec3(PIXELGRID_GAMMA));
     
     //Tate ? (other outputsize,originalsize and outputcoords "tated" in vertex shader.)
         if (vDo_Tate == 1.0) in_coords.xy = in_coords.yx;
@@ -419,7 +421,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 rgb_w = (rgb_w * rgb_w);
 
             //modulate each phosphor width according to input luminance
-               vec3 phosphor_width = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
+               vec3 phosphor_width = map_range(pixel_in_gammed, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
                 rgb_w = morph_shape(rgb_w, phosphor_width, PIXELGRID_NO_INTERBLEED_W);
         }
     
@@ -444,7 +446,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         
         if (DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0)) {
             //calculate each phosphor height according to input luminance 
-                vec3 phosphor_height = map_range(pixel_in * rgb_w, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
+                vec3 phosphor_height = map_range(pixel_in_gammed * rgb_w, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
                 
             //offset trias to emulate core level slotmask by applying the optional offset to emulate the slotmask on even cells
                 float core_offset =  is_even * pi * PIXELGRID_OFFSET_CORE;
@@ -479,7 +481,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //phosphors mask stagger
                 #define PH_MASH_OFFSET  (PIXELGRID_Y_MASK_OFFSET * pi * 0.5 )
                 
-            //Use abs(cos) (later 1-abs(cos) to get orizontal gaps, use pow to make them steep.
+            //Use abs(cos) (later 1-abs(cos) to get horizontal gaps, use pow to make them steep.
             //Stagger them by PH_MASH_OFFSET on even triads
                 float mask_shape = abs(cos(  PIXELGRID_Y_MASK_SHIFT*pi +   PH_MASK_HEIGHT  + (PH_MASH_OFFSET * is_even)) ) ;
                 
@@ -509,8 +511,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         vec3 mask = min( (rgb_w * rgb_h), darklines_mask * rgb_h); //<- this way it does not interfree with scanline height!
         //FIXME: test with coore or fuzzy coords how it works when using variable width phosphors, maybe 
         //it would need to be: vec3 mask = min((rgb_w * rgb_h), darklines_mask * rgb_h * rgb_w); =
-        
-      mask=pow(mask,vec3(PIXELGRID_GAMMA));
+          
     //Apply the mask to the input pixel and return it 
     //with the alpha channel containing the mask itself, so that halo can selectively light it.
         return vec4(mask * pixel_in, dot(mask, vec3(0.3333)));
