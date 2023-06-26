@@ -9,14 +9,14 @@
 #define CBLUE    vec3(0.0,0.0,1.0)
 #define CCUSTOM vec3(1.0,0.5,0.1)
 
-#define DEBUG_COLOR CRED
+#define DEBUG_COLOR CWHITE
 #define DEBUG_BLINK_TIME 50
 #define DEBUG_GRADIENT_STEPS 128
 
 //#define DEBUG
    //#define DEBUG_TIME_FADE
-   //#define DEBUG_SOLID_COLOR
-   #define DEBUG_STEP_GRADIENT
+   #define DEBUG_SOLID_COLOR
+   //#define DEBUG_STEP_GRADIENT
    //#define DEBUG_BLINK
    //#define DEBUG_BLINK_CIRCLE
    //#define DEBUG_COLORWHEEL
