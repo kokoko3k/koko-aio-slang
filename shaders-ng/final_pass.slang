@@ -8,8 +8,9 @@
 
 //#define DEBUG_PRINT_VALUE
 //#define DEBUG_QUAD_SPLIT
-//#define DEBUG_DUAL_SPLIT
-//#define DEBUG_DUAL_SPLIT_MIRROR
+//#define DEBUG_DUAL_SPLIT_X
+//#define DEBUG_DUAL_SPLIT_Y
+//#define DEBUG_DUAL_SPLIT_MIRROR_X
 
 
 #include "config.inc"
@@ -509,7 +510,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         //FIXME: test with coore or fuzzy coords how it works when using variable width phosphors, maybe 
         //it would need to be: vec3 mask = min((rgb_w * rgb_h), darklines_mask * rgb_h * rgb_w); =
         
-      
+      mask=pow(mask,vec3(PIXELGRID_GAMMA));
     //Apply the mask to the input pixel and return it 
     //with the alpha channel containing the mask itself, so that halo can selectively light it.
         return vec4(mask * pixel_in, dot(mask, vec3(0.3333)));
@@ -1106,11 +1107,15 @@ void main() {
             pixel_out = texture(flick_and_noise_pass,vOutputCoord).rgb;
         #endif
     
-        #ifdef DEBUG_DUAL_SPLIT
+        #ifdef DEBUG_DUAL_SPLIT_Y
             if (vTexCoord.y < 0.5) pixel_out = texture(flick_and_noise_pass,vTexCoord).rgb;
         #endif
 
-        #ifdef DEBUG_DUAL_SPLIT_MIRROR
+        #ifdef DEBUG_DUAL_SPLIT_X
+            if (vTexCoord.x > 0.5) pixel_out = texture(flick_and_noise_pass,vTexCoord).rgb;
+        #endif
+            
+        #ifdef DEBUG_DUAL_SPLIT_MIRROR_X
             if (vTexCoord.x > 0.5) pixel_out = texture(flick_and_noise_pass,vec2(1-vTexCoord.x, vTexCoord.y) ).rgb;
         #endif
 

@@ -388,6 +388,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 	float PIXELGRID_NO_FLOOR;
 	
+	float PIXELGRID_GAMMA;
+	
 	float SERVICE1;
 	float SERVICE2;
 	float PIXELGRID_HMASK_NO_BRIGHT;
@@ -521,6 +523,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter PIXELGRID_Y_MASK_SHIFT     "             . Vertical shift (for use with core resolution)"	0.0 0.0 1.0 0.01
 #pragma parameter PIXELGRID_Y_MASK_STEEP     "           . Steepness"	2.0 1.0 30.0 1.0
 #pragma parameter PIXELGRID_Y_SPARK          "           . Sparkling look punch"	0.0 0.0 1.0 0.01
+
+#pragma parameter PIXELGRID_GAMMA          "        Mask gamma (H and V)"	1.0 0.05 3.00 0.01
 
 #pragma parameter BLANK12d " " 0.0 0.0 1.0 1.0
 

@@ -102,6 +102,7 @@
         Mask type preset:
             You can have the shader generate a preconfigured mask for you:
             1:gm 2:gmx 3:rgb 4:rgbx 5:rbg 6:rbgx
+            (GreenMagenta, GreenMagentaGap, RedGreenBlue, RedGreenBlueGap, RedBlueGreen, RedBlueGreenGap)
             beware that due to limitations of the actual implementation, masks ending in "x"
             works reliable when emulating slotmasks only at screen coordinates with multiplier = 1.0
             ...or with 0, you can draft your own by using the following knobs:
@@ -200,7 +201,10 @@
                 Sparkling look punch:
                     Makes the "Vertical cell Mask 2" effect more pronunced and "pinchy/Sparky" by highering its contrast.
                     Beware, this may produce moiree.
-                    
+            Mask gamma (H and V):
+                Since emulating phosphors may change the apparent gamma of the final image, it is advised to use this option
+                to compensate, instead of the main gamma correction.
+        
 **Dot matrix emulation:**<br>
     Emulates low refresh "boxed" screens used in old handheld consoles.<br>
     

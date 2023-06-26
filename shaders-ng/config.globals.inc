@@ -289,6 +289,7 @@
 	#define PIXELGRID_INTR_DISABLE_Y  global.PIXELGRID_INTR_DISABLE_Y
 	#define PIXELGRID_NO_FLOOR        global.PIXELGRID_NO_FLOOR
 
+	#define PIXELGRID_GAMMA           global.PIXELGRID_GAMMA
 	
 	#define SERVICE1 global.SERVICE1
 	#define SERVICE2 global.SERVICE2
