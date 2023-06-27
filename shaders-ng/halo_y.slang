@@ -24,7 +24,7 @@ layout(set = 0, binding = 2) uniform sampler2D Source;
 
 
 void main() {
-    if (DO_HALO == 0.0 ) return;
+    if (HALO_POWER == 0.0 ) return;
    
     vec3 pixel_haloed;
     

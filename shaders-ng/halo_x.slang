@@ -28,7 +28,7 @@ layout(set = 0, binding = 5) uniform sampler2D shift_and_bleed_pass;
 #include "includes/functions.include.slang" 
 
 void main() {
-    if (DO_HALO == 0.0 ) return;
+    if (HALO_POWER == 0.0 ) return;
 
    //Pass the right texture unchanged for tighter blurs:
    if (HALO_W >= GLOW_SHARP_MAX && HALO_H >= GLOW_SHARP_MAX) {

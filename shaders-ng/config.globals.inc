@@ -107,15 +107,12 @@
 	#define IN_GLOW_NTSC_ARTF_TRSH	global.IN_GLOW_NTSC_ARTF_TRSH
 	#define IN_GLOW_SHOW_ARTF_MASK  global.IN_GLOW_SHOW_ARTF_MASK
 
-
-#define DO_HALO		global.DO_HALO
+	
+#define HALO_POWER	params.HALO_POWER
 	#define HALO_W		params.HALO_W
 	#define HALO_H		params.HALO_H
-	#define HALO_POWER	params.HALO_POWER
 	#define HALO_GAMMA	params.HALO_GAMMA
 	#define HALO_VS_SCAN	params.HALO_VS_SCAN
-
-
 
 #define DO_BLOOM		params.DO_BLOOM
 	#define BLOOM_MIX		global.BLOOM_MIX

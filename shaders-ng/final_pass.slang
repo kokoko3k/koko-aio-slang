@@ -824,7 +824,7 @@ vec3 fn_pixel_content(vec2 coords) {
     //Halo
         vec3 pixel_haloed = vec3(0.0);;
 
-        if (DO_HALO == 1.0 ) {
+        if (HALO_POWER > 0.0 ) {
             pixel_haloed = texture(halo_pass,coords).rgb;
             //Halo only on scanlines:
             pixel_out += pixel_haloed * dot_mat_or_pixelgrid ;
@@ -1051,7 +1051,7 @@ void main() {
         //Vignette
             if (V_POWER > 0.05) {
                 float dist = length(vec2((co_content.x-0.5)*vIn_aspect, co_content.y-0.5));
-                float vignette = smoothstep(V_SIZE,0.0,dist)* (5-V_POWER);
+                float vignette = smoothstep(V_SIZE,0.0,dist)*V_POWER;
                 pixel_out = pixel_out*vignette;
             }
             
