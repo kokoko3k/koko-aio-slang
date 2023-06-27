@@ -171,7 +171,7 @@ vec3 apply_fuzzy_main_pass(vec3 color_in) {
 		color_out += pow(color_in,vec3(HALO_GAMMA))*HALO_POWER;
 
 	
-	if (DO_VIGNETTE == 1.0)
+	if (V_POWER > 0.0)
 		color_out *= 0.8 * (V_POWER);
 	return color_out;
 }
@@ -213,7 +213,7 @@ vec2 apply_fuzzy_main_pass_stage_1() {
 		gamma_out = gamma_out * mix(1.0, HALO_GAMMA, HALO_POWER*0.25) ;
 	}
 	
-	if (DO_VIGNETTE == 1.0)
+	if (V_POWER > 0.0)
 		color_out *= 0.8 * (V_POWER);
 	
 
