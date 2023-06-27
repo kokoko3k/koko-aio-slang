@@ -576,9 +576,6 @@ float get_clamped_white_reference(vec3 pixel_in){
     return white_reference;
 }
 
-
-float global_noise_static = 0.0;
-
 vec3 pixel_backdrop_image() {
     vec2 backdrop_offset=vec2(BACKDROP_OFFX,BACKDROP_OFFY);
 
@@ -844,20 +841,6 @@ vec3 fn_pixel_content(vec2 coords) {
             vec3 bloomed=texture(bloom_pass_final, coords).rgb ;
             pixel_out = bloomed + float(BLOOM_BYPASS < 0.5) * pixel_out;
         }
-        
-    //Vignette
-        if (DO_VIGNETTE == 1.0) {
-            float dist = length(vec2((coords.x-0.5)*vIn_aspect, coords.y-0.5));
-            float vignette = smoothstep(V_SIZE,0.0,dist)*V_POWER;
-            pixel_out = pixel_out * vignette + global_noise_static;
-        }
-        
-    //Spot
-        if (DO_SPOT == 1.0) {
-                float dist = length(vec2((coords.x-0.5)*vIn_aspect, coords.y-0.5)+spot_offset);
-                float spot = smoothstep(S_SIZE,0.0,dist)*S_POWER;
-                pixel_out = pixel_out + spot + (global_noise_static * (1 - DO_VIGNETTE));
-        }
     
     //Black frame insertion, made static, enable it in config.inc.
         #ifdef ALLOW_ALT_BLANK
@@ -1006,13 +989,7 @@ void main() {
             canvas_busy = float(is_first_inside_rect(co_content, RECT01)); //FIXME: is step() faster?
         }
 
-        
-    //Calc a random noise for vignette or spot (this seems a sweet spot in the code to not lose speed, at least on my haswell)
-        if (DO_VIGNETTE + DO_SPOT > 0.0) {
-            global_noise_static = random_fast(NOISEPOWER, vTexCoord);
-        }
-
-        
+              
     vec3 pixel_ambi = vec3(0.0);
     vec3 pixel_under_content = vec3(0.0);
     //Draw content only over the alpha mask, and sample ambientlight outside it to spare gpu cycles.
@@ -1043,6 +1020,12 @@ void main() {
             }
         }
     
+    //This represents the inner bezel alpha (when using bezel) 
+    //or the pixel_content canvas (when not using bezel)
+    //It is used to draw spot on the whole inner tube even when toe content does not
+    //fill the whole tube.
+        float canvas_bezel_screen = canvas_busy; 
+    
     //Draw Bezel
         vec4 pixel_bezel;
         //SKIP LOGIC is inside fn_pixel_bezel
@@ -1059,9 +1042,31 @@ void main() {
                 float rect_bezel = float(is_first_inside_rect(co_bezel, vec4(BEZEL_SHADOW_SIZE, BEZEL_SHADOW_SIZE, 1.0 - BEZEL_SHADOW_SIZE, 1.0 - BEZEL_SHADOW_SIZE)));
                 canvas_busy = max(pixel_bezel.a, rect_bezel);
                 //FragColor = vec4(canvas_busy); return; // <- uncomment to debug BEZEL_SHADOW_SIZE
+                
+                //Intersect rect_bezel and bezel alpha to get the inner tube alpha
+                canvas_bezel_screen = (1 - pixel_bezel.a) * rect_bezel;
         }
 
 
+        //Vignette
+            if (DO_VIGNETTE == 1.0) {
+                float dist = length(vec2((co_content.x-0.5)*vIn_aspect, co_content.y-0.5));
+                float vignette = smoothstep(V_SIZE,0.0,dist)*V_POWER;
+                pixel_out = pixel_out*vignette;
+            }
+            
+        //Spot
+            if (DO_SPOT == 1.0) {
+                    float dist = length(vec2((co_content.x-0.5)*vIn_aspect, co_content.y-0.5)+spot_offset);
+                    float spot = smoothstep(S_SIZE,0.0,dist)*S_POWER;
+                    pixel_out = pixel_out + spot * canvas_bezel_screen ;
+            }
+
+  
+        if (DO_VIGNETTE + DO_SPOT > 0.0) {
+            pixel_out += random_fast(NOISEPOWER, vOutputCoord )*canvas_bezel_screen  ;
+        }
+        
         //Background image have, no need to paint if not in the outer border:
             if (DO_BG_IMAGE == 1.0 && BG_IMAGE_OVER == 0.0 && canvas_busy < 1.0) {
                 vec4 pixel_bg_image = fn_pixel_fgbg_image(bg_under);
