@@ -137,6 +137,16 @@
 	//Halve rendering refresh on bezel and ambilight to spare gpu cycles:
 #define HALVE_BORDER_UPDATE 1.0
 
+	//Renders only changed parts of screen.
+	//It is good for power consumption, but you can't count on it as a reliable
+	//fps pushing option as it depends on the game content.
+	//DELTA_RENDER_CHECK_AREA The higher, the lower the glitches on screen, the less the gain
+	//DELTA_RENDER_FORCE_REFRESH will force a full render/refresh every # frames clearing the glitches
+	//(use 1.0, 2.0, 3.0, not fractionals)
+#define DELTA_RENDER 1.0
+	#define DELTA_RENDER_CHECK_AREA 1.0
+	#define DELTA_RENDER_FORCE_REFRESH 4
+
 // STATIC CONFIG ENDS HERE ##########################################################################################
 
 

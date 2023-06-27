@@ -989,6 +989,15 @@ void main() {
             canvas_busy = float(is_first_inside_rect(co_content, RECT01)); //FIXME: is step() faster?
         }
 
+    if (DELTA_RENDER == 1.0) {
+        bool reuse_old = false;       
+        reuse_old = bool(texture(in_glow_pass, co_content).a * canvas_busy);
+        reuse_old = reuse_old &&  (params.FrameCount % DELTA_RENDER_FORCE_REFRESH != 0.0);
+        if (reuse_old) {
+            FragColor = texture(final_passFeedback, vOutputCoord) ;
+            return;
+        }
+    }
               
     vec3 pixel_ambi = vec3(0.0);
     vec3 pixel_under_content = vec3(0.0);

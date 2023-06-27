@@ -19,6 +19,8 @@ layout(location = 0) out vec4 FragColor;
 
 layout(set = 0, binding = 5) uniform sampler2D shift_and_bleed_pass;
 
+layout(set = 0, binding = 6) uniform sampler2D shift_and_bleed_passFeedback;
+
 
 #include "includes/functions.include.slang" 
 
@@ -57,7 +59,15 @@ void main() {
    //Make it resolution independent.
       IN_GLOW_W_ADAPTED = IN_GLOW_W_ADAPTED / NEW_SCALEMOD_X;
 
-   FragColor = vec4( blur9_x(shift_and_bleed_pass, vTexCoord, global.flick_and_noise_passSize.xy, IN_GLOW_W_ADAPTED), 1.0);
+   //Delta render?
+      float delta_render_original_unchanged = 0.0;
+      if (DELTA_RENDER == 1.0) {
+         //Keep track of changed pixels to speedup rendering in final pass   
+         delta_render_original_unchanged = float( textureLod(shift_and_bleed_pass,vTexCoord, DELTA_RENDER_CHECK_AREA).rgb == 
+                                                  textureLod(shift_and_bleed_passFeedback, vTexCoord, DELTA_RENDER_CHECK_AREA).rgb);
+      }
+      
+   FragColor = vec4( blur9_x(shift_and_bleed_pass, vTexCoord, global.flick_and_noise_passSize.xy, IN_GLOW_W_ADAPTED), delta_render_original_unchanged);
 
    //To debug ntsc artifacts mask:
    if (IN_GLOW_SHOW_ARTF_MASK > 0.5)

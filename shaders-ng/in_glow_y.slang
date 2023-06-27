@@ -114,6 +114,11 @@ void main() {
       }
    }
 
+   if ( DELTA_RENDER == 1.0) {
+      float original_unchanged = texture(Source,vTexCoord).a;
+      FragColor = vec4(pixel_glowed, original_unchanged);
+      return;
+   }
    
    FragColor = vec4(pixel_glowed,1.0);
    

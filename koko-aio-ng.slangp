@@ -143,6 +143,7 @@ float_framebuffer3 = true
        scale_type4 = source    
 float_framebuffer4 = true
         wrap_mode4 = "mirrored_repeat"
+     mipmap_input4 = true
         
            shader5 = shaders-ng/in_glow_y.slang
             alias5 = "in_glow_pass"
