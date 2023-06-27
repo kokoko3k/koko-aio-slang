@@ -155,16 +155,17 @@
 	#define BEZEL_DIFFUSION_STR global.BEZEL_DIFFUSION_STR
 	#define BEZEL_CORNER_DARK   global.BEZEL_CORNER_DARK
 	#define BEZEL_ROUGHNESS		global.BEZEL_ROUGHNESS
-
-//Spot
-#define S_POWER		global.S_POWER
+	
+#define DO_SPOT		global.DO_SPOT
 	#define S_POSITION	global.S_POSITION
 	#define S_SIZE		global.S_SIZE
+	#define S_POWER		global.S_POWER
 
-//Vignette
-#define V_POWER		global.V_POWER
+
+
+#define DO_VIGNETTE	global.DO_VIGNETTE
 	#define V_SIZE		global.V_SIZE
-	
+	#define V_POWER		global.V_POWER
 
 
 

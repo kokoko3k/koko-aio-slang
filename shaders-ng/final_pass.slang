@@ -1049,24 +1049,24 @@ void main() {
 
 
         //Vignette
-            if (V_POWER > 0.05) {
+            if (DO_VIGNETTE == 1.0) {
                 float dist = length(vec2((co_content.x-0.5)*vIn_aspect, co_content.y-0.5));
-                float vignette = smoothstep(V_SIZE,0.0,dist)* (5-V_POWER);
+                float vignette = smoothstep(V_SIZE,0.0,dist)*V_POWER;
                 pixel_out = pixel_out*vignette;
             }
             
         //Spot
-            if (S_POWER > 0.05) {
+            if (DO_SPOT == 1.0) {
                     float dist = length(vec2((co_content.x-0.5)*vIn_aspect, co_content.y-0.5)+spot_offset);
                     float spot = smoothstep(S_SIZE,0.0,dist)*S_POWER;
                     pixel_out = pixel_out + spot * canvas_bezel_screen ;
             }
 
   
-        if (V_POWER + S_POWER > 0.1) {
+        if (DO_VIGNETTE + DO_SPOT > 0.0) {
             pixel_out += random_fast(NOISEPOWER, vOutputCoord )*canvas_bezel_screen  ;
         }
-
+        
         //Background image have, no need to paint if not in the outer border:
             if (DO_BG_IMAGE == 1.0 && BG_IMAGE_OVER == 0.0 && canvas_busy < 1.0) {
                 vec4 pixel_bg_image = fn_pixel_fgbg_image(bg_under);
