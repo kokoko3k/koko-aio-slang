@@ -159,7 +159,6 @@ layout(push_constant) uniform Push {
 	vec4 final_passSize;
 	uint FrameCount;
 
-	float PLACEHOLDER; // Dont' ask me why removing this cuts fps on my haswell.
 	float HALO_W ;
 	float HALO_H ;
 	float HALO_POWER ;
@@ -191,6 +190,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	
 	float DO_IN_GLOW;
 
+	float DO_HALO ;
 	float DO_CCORRECTION;
 	float DO_ALT_BLANK;
 	float IN_GLOW_BIAS ;
@@ -548,7 +548,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 
 // Halo
-#pragma parameter HALO_POWER    "★ Halo Strength? (0 to disable) ==>"						0.9 	0.0  5.0 0.01
+#pragma parameter DO_HALO       "★ Halo enable? ==>" 						0.0	0.0 1.0 1.0
+#pragma parameter HALO_POWER    "        Strength"						0.9 	0.0  5.0 0.01
 #pragma parameter HALO_W        "        Sharpness, horizontal"					1.75	0.35  7.0 0.05
 #pragma parameter HALO_H        "        Sharpness, Vertical"					1.75	0.35  7.0 0.05
 #pragma parameter HALO_GAMMA    "        Gamma, the higher, the less the halo on dark colors"	2.0 	1.0  10.0 0.05
@@ -656,10 +657,10 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 
 //Vignette and spot
-#pragma parameter V_POWER	"★ Vignette Power (0 to disable) ==>"	1.1  0.05 2.0  0.01
+#pragma parameter V_POWER	"★ Vignette Power ==>"	1.1  0.05 2.0  0.01
 #pragma parameter V_SIZE	"        Size"			1.7  0.0  5.0  0.05
 
-#pragma parameter S_POWER	"★ Spot Power (0 to disable) ==>" 		0.1   0.05  2.0 0.01
+#pragma parameter S_POWER	"★ Spot Power? ==>" 		0.1   0.05  2.0 0.01
 #pragma parameter S_POSITION 	"        Position"		194.0   -420.0 378.0 1
 #pragma parameter S_SIZE	"        Size"			0.4   0.0   1.0 0.01
 
