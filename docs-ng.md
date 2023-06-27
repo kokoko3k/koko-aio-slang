@@ -90,15 +90,6 @@
         X resolution: (core or screen) (**):
             0: Phosphors width will be relative to the pixel width of the core (game).
             1: Phosphors width will be relative to the pixel width of the screen.
-        Fade on bright:
-            How much the mask is visible over bright pixels.
-        Phosphors width Min, Max:
-            The width of each phosphors can grow or shrink, depending on the
-            luminosity of the underlying pixel luminance.
-            1.0 refers to the full mask width, so stay around 0.2 if you want
-            avoid them to blend.
-            Use Min and Max parameter to limit the minimum and maximum size
-            they can reach.
         Mask type preset:
             You can have the shader generate a preconfigured mask for you:
             1:gm 2:gmx 3:rgb 4:rgbx 5:rbg 6:rbgx
@@ -118,6 +109,21 @@
                 ...will give a mask with a blank space, the neutral white color and another blank space
                 Example 4: Phosphors+gap count=1 and R=0 G=0 B=0
                 ...like the previous one, but without any blank spaces.
+        Phosphors width Min, Max:
+            The width of each phosphors can grow or shrink, depending on the
+            luminosity of the underlying pixel luminance.
+            1.0 refers to the full mask width, so stay around 0.2 if you want
+            avoid them to blend.
+            Use Min and Max parameter to limit the minimum and maximum size
+            they can reach.
+        Mask gamma:
+                Since emulating phosphors with high Min-Max range changes the apparent gamma of the final image,
+                it is advised, if needed, to use this option to compensate, instead of the main gamma correction.
+        Fade on bright:
+            How much the mask is visible over bright pixels.
+
+
+
             Cell size multiplier x (neg=divider):
                 Multiply (or divide if the parameter is < 0) the mask (cell) size by a factor.
                 As stated(**), the size may be relative to screen or core, this allow you to
@@ -201,9 +207,7 @@
                 Sparkling look punch:
                     Makes the "Vertical cell Mask 2" effect more pronunced and "pinchy/Sparky" by highering its contrast.
                     Beware, this may produce moiree.
-            Mask gamma (H and V):
-                Since emulating phosphors may change the apparent gamma of the final image, it is advised to use this option
-                to compensate, instead of the main gamma correction.
+
 
 **Dot matrix emulation:**<br>
     Emulates low refresh "boxed" screens used in old handheld consoles.<br>

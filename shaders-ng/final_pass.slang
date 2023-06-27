@@ -372,9 +372,6 @@ vec3 morph_shape_mix(vec3 shape, vec3 power, float steep, float mixto, vec3 mix_
 }
 
 vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inLum) { 
-    //Gamma correct mask by modifying the color used to calculate mask weight
-        vec3 pixel_in_gammed = pow(pixel_in,vec3(PIXELGRID_GAMMA));
-    
     //Tate ? (other outputsize,originalsize and outputcoords "tated" in vertex shader.)
         if (vDo_Tate == 1.0) in_coords.xy = in_coords.yx;
 
@@ -422,6 +419,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 rgb_w = (rgb_w * rgb_w);
 
             //modulate each phosphor width according to input luminance
+               vec3 pixel_in_gammed = pow(pixel_in,vec3(PIXELGRID_GAMMA_W));
                vec3 phosphor_width = map_range(pixel_in_gammed, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
                 rgb_w = morph_shape(rgb_w, phosphor_width, PIXELGRID_NO_INTERBLEED_W);
         }
@@ -447,7 +445,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         
         if (DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0)) {
             //calculate each phosphor height according to input luminance 
-                vec3 phosphor_height = map_range(pixel_in_gammed * rgb_w, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
+                vec3 phosphor_height = map_range(pixel_in * rgb_w, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
                 
             //offset trias to emulate core level slotmask by applying the optional offset to emulate the slotmask on even cells
                 float core_offset =  is_even * pi * PIXELGRID_OFFSET_CORE;

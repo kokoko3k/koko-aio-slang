@@ -390,7 +390,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 	float PIXELGRID_NO_FLOOR;
 	
-	float PIXELGRID_GAMMA;
+	float PIXELGRID_GAMMA_W;
 	
 	float SERVICE1;
 	float SERVICE2;
@@ -492,6 +492,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter PIXELGRID_B_SHIFT  "                . 0: B shift"      2.0  0.0 4.0 0.1
 #pragma parameter PIXELGRID_MIN_W    "           . Phosphors width Min"			0.25 0.05 1.0 0.01
 #pragma parameter PIXELGRID_MAX_W    "           . Phosphors width Max"			0.25 0.05 1.0 0.01
+#pragma parameter PIXELGRID_GAMMA_W  "           . Mask gamma"					1.0 0.05 3.00 0.1
 #pragma parameter PIXELGRID_MUL_X    "           . Cell size multiplier x (neg=divider):"	1.0 -8.0 8.0 0.125
 #pragma parameter PIXELGRID_HMASK_NO_BRIGHT  "           . Fade on bright"	0.0 0.0 1.0 0.01
 
@@ -525,8 +526,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter PIXELGRID_Y_MASK_SHIFT     "             . Vertical shift (for use with core resolution)"	0.0 0.0 1.0 0.01
 #pragma parameter PIXELGRID_Y_MASK_STEEP     "           . Steepness"	2.0 1.0 30.0 1.0
 #pragma parameter PIXELGRID_Y_SPARK          "           . Sparkling look punch"	0.0 0.0 1.0 0.01
-
-#pragma parameter PIXELGRID_GAMMA          "        Mask gamma (H and V)"	1.0 0.05 3.00 0.01
 
 #pragma parameter BLANK12d " " 0.0 0.0 1.0 1.0
 
