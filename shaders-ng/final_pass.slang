@@ -223,7 +223,7 @@ void main() {
             //vfprintvalue = vDotMat_Grid_Sharpness;
         }
                                                                                           // Delta render, mandatory conditions:
-    vDeltaRenderOk = float(  ( params.FrameCount % DELTA_RENDER_FORCE_REFRESH != 0.0 ) && // - We are in a frame that is not forced for full refresh
+    vDeltaRenderOk = float(  ( params.FrameCount % int(DELTA_RENDER_FORCE_REFRESH) != 0.0 ) && // - We are in a frame that is not forced for full refresh
                              ( vIsInterlaced != 1.0 || PIXELGRID_INTR_DISABLE_Y == 1.0)   // - screen is not interlaced or we disabled scanlines on interlaced content
                            ); 
 }

@@ -145,8 +145,7 @@
 	//Is it not compatible with interlaced content.
 	//(use 1.0, 2.0, 3.0, not fractionals)
 #define DELTA_RENDER 1.0
-	#define DELTA_RENDER_CHECK_AREA 1.0
-	#define DELTA_RENDER_FORCE_REFRESH 4
+
 
 // STATIC CONFIG ENDS HERE ##########################################################################################
 
@@ -398,16 +397,16 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float PIXELGRID_B_SHIFT;
 	float PIXELGRID_H_COUNT;
 	float PIXELGRID_H_PRST;
-
 	float PIXELGRID_NO_FLOOR;
-	
 	float PIXELGRID_GAMMA_W;
+
+	float DELTA_RENDER_FORCE_REFRESH;
+	float DELTA_RENDER_CHECK_AREA;
 	
 	float SERVICE1;
 	float SERVICE2;
 	float PIXELGRID_HMASK_NO_BRIGHT;
 	
-
 } global;
 
 // Color correction
@@ -727,6 +726,10 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter TILT_BEZEL_K	"        Bezel multiplier"		1.0    0.0  1.5  0.01
 #pragma parameter BLANK_01 " " 0.0 0.0 1.0 1.0
 
+//Delta render
+#pragma parameter DELTA_RENDER_FORCE_REFRESH    "★ Delta render force refresh interval ? ==>"	4.0 1.0 3600.0 1.0
+#pragma parameter DELTA_RENDER_CHECK_AREA       "        Delta render area size"			1.0 0.0 10.0 1.0
+#pragma parameter BLANK_DR " " 0.0 0.0 1.0 1.0
 
 // Alternative blanking, needs to be statically enabled, see docs.md.
 #pragma parameter DO_ALT_BLANK       "★ Alternate line blanking enable? ==>"			0.0 0.0 1.0 1.0
