@@ -142,6 +142,7 @@
 	//fps pushing option as it depends on the game content.
 	//DELTA_RENDER_CHECK_AREA The higher, the lower the glitches on screen, the less the gain
 	//DELTA_RENDER_FORCE_REFRESH will force a full render/refresh every # frames clearing the glitches
+	//Is it not compatible with interlaced content.
 	//(use 1.0, 2.0, 3.0, not fractionals)
 #define DELTA_RENDER 1.0
 	#define DELTA_RENDER_CHECK_AREA 1.0
