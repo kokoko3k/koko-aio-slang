@@ -24,14 +24,31 @@ layout(set = 0, binding = 6) uniform sampler2D shift_and_bleed_passFeedback;
 
 #include "includes/functions.include.slang" 
 
+
+
 void main() { 
-   if (DO_IN_GLOW == 0.0) return;
+   if (DO_IN_GLOW == 0.0) {
+      //Delta render?
+      if (DELTA_RENDER == 1.0) {
+         float DR_unchanged = float( textureLod(shift_and_bleed_pass,         vTexCoord, DELTA_RENDER_CHECK_AREA).rgb == 
+                                     textureLod(shift_and_bleed_passFeedback, vTexCoord, DELTA_RENDER_CHECK_AREA).rgb);
+         FragColor = vec4(0.0,0.0,0.0,DR_unchanged); 
+         return;
+      }
+   };
 
    //Don't do anything if IN_GLOW_W and IN_GLOW_H are over the upper limit
       if (IN_GLOW_W >= GLOW_SHARP_MAX && IN_GLOW_H >= GLOW_SHARP_MAX) {
-         return;
+         //Delta render?
+         if (DELTA_RENDER == 1.0) {
+            float DR_unchanged = float( textureLod(shift_and_bleed_pass,         vTexCoord, DELTA_RENDER_CHECK_AREA).rgb == 
+                                        textureLod(shift_and_bleed_passFeedback, vTexCoord, DELTA_RENDER_CHECK_AREA).rgb);
+            FragColor = vec4(0.0,0.0,0.0,DR_unchanged); 
+            return;
+         }
       }
 
+      
    float IN_GLOW_W_ADAPTED;
    //Auto calc glow sharpness via IN_GLOW_SPREAD
       if (IN_GLOW_W <= 0.00001)
@@ -60,14 +77,14 @@ void main() {
       IN_GLOW_W_ADAPTED = IN_GLOW_W_ADAPTED / NEW_SCALEMOD_X;
 
    //Delta render?
-      float delta_render_original_unchanged = 0.0;
+      float DR_unchanged = 0.0;
       if (DELTA_RENDER == 1.0) {
          //Keep track of changed pixels to speedup rendering in final pass   
-         delta_render_original_unchanged = float( textureLod(shift_and_bleed_pass,vTexCoord, DELTA_RENDER_CHECK_AREA).rgb == 
-                                                  textureLod(shift_and_bleed_passFeedback, vTexCoord, DELTA_RENDER_CHECK_AREA).rgb);
+         DR_unchanged = float( textureLod(shift_and_bleed_pass,         vTexCoord, DELTA_RENDER_CHECK_AREA).rgb == 
+                                     textureLod(shift_and_bleed_passFeedback, vTexCoord, DELTA_RENDER_CHECK_AREA).rgb);
       }
       
-   FragColor = vec4( blur9_x(shift_and_bleed_pass, vTexCoord, global.flick_and_noise_passSize.xy, IN_GLOW_W_ADAPTED), delta_render_original_unchanged);
+   FragColor = vec4( blur9_x(shift_and_bleed_pass, vTexCoord, global.flick_and_noise_passSize.xy, IN_GLOW_W_ADAPTED), DR_unchanged);
 
    //To debug ntsc artifacts mask:
    if (IN_GLOW_SHOW_ARTF_MASK > 0.5)
