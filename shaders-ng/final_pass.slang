@@ -32,7 +32,7 @@ layout(location = 4) out float vIsRotated;
     layout(location = 6) out vec2 vWarp_arg2;
 
 //Scanlines:
-    layout(location = 7) out float vNoScanlinesBecauseInterlaced;
+    layout(location = 7) out float vIsInterlaced;
     layout(location = 9) out float vScanlinePeriod;
     layout(location = 10) out float vScanlineAlternateOffset;
     layout(location = 11) out float vMax_inLum;
@@ -143,7 +143,7 @@ void main() {
         
     //Help scanline/pixelgrid code too:
         bool bIs_Interlaced = is_interlaced();
-        vNoScanlinesBecauseInterlaced = float( (bIs_Interlaced) && (PIXELGRID_INTR_DISABLE_Y==1.0) ) ;
+        vIsInterlaced = float(bIs_Interlaced);
             
         //Scanline period:
             vScanlinePeriod = 1.0;
@@ -232,7 +232,7 @@ layout(location = 2) in vec2 spot_offset;
 layout(location = 4) in float vIsRotated;
 layout(location = 5) in vec2 vWarp_vexp;
 layout(location = 6) in vec2 vWarp_arg2;
-layout(location = 7) in float vNoScanlinesBecauseInterlaced;
+layout(location = 7) in float vIsInterlaced;
 
 layout(location = 9) in float vScanlinePeriod;
 layout(location = 10) in float vScanlineAlternateOffset;
@@ -443,7 +443,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             float is_even = step(sin_check_offset, 0.0);
         
         
-        if ( (DO_PIXELGRID_H > 0.0) && (vNoScanlinesBecauseInterlaced==0.0)) {
+        if (DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0)) {
             //calculate each phosphor height according to input luminance 
                 vec3 phosphor_height = map_range(pixel_in * rgb_w, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
                 
@@ -838,7 +838,6 @@ vec3 fn_pixel_content(vec2 coords) {
 
     //Bloom
         if (DO_BLOOM == 1.0 ) {
-            //pixel_out = clamp(pixel_out, 0.0,1.0);
             vec3 bloomed=texture(bloom_pass_final, coords).rgb ;
             pixel_out = bloomed + float(BLOOM_BYPASS < 0.5) * pixel_out;
         }
