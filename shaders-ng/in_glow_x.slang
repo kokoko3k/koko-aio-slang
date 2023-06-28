@@ -49,7 +49,7 @@ void main() {
       }
 
       
-   float IN_GLOW_W_ADAPTED;
+   float IN_GLOW_W_ADAPTED = IN_GLOW_W;
    //Auto calc glow sharpness via IN_GLOW_SPREAD
       if (IN_GLOW_W <= 0.00001)
          IN_GLOW_W_ADAPTED = IN_GLOW_SPREAD * IN_GLOW_SHARPNESS_SPREAD_RATIO_W;
@@ -68,7 +68,7 @@ void main() {
       
 
    //finally "subtract" them to the configured sharpness (-> more blur)
-      IN_GLOW_W_ADAPTED = IN_GLOW_W - ntsc_artifacts;
+      IN_GLOW_W_ADAPTED = IN_GLOW_W_ADAPTED - ntsc_artifacts;
 
    //don't allow lower values that look bad:
       IN_GLOW_W_ADAPTED = max(IN_GLOW_W_ADAPTED, MIN_IN_GLOW_SHARP);

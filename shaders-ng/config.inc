@@ -108,7 +108,7 @@
    // When Glow sharpness is controlled by light spread amount
    // The following ratio is used, the lower, the blurrier:
 #define IN_GLOW_SHARPNESS_SPREAD_RATIO_W 0.8334
-#define IN_GLOW_SHARPNESS_SPREAD_RATIO_H 2.0
+#define IN_GLOW_SHARPNESS_SPREAD_RATIO_H 0.8334
 
 
 
