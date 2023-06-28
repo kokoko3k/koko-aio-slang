@@ -59,7 +59,8 @@ void main() {
    //I'm not expecting any performance hit, 
    //since the lookup should have been cached already or will serve so.
       float ntsc_artifacts = texture(shift_and_bleed_pass, vTexCoord).a;
-
+   FragColor = vec4(ntsc_artifacts); return;
+      
    //apply an optional gain to artifacts
       ntsc_artifacts = ntsc_artifacts * IN_GLOW_NTSC_ARTF_MULT;
    //then apply the minimum treshold and scale them to input sharpness so that they can always blur to max.
