@@ -168,6 +168,11 @@
                 This function is useful when you want to emulate handhelds screens, 
                 where cells are well separated.
                 
+            Interlace detect + Scanline alternate above # lines:
+                koko-aio will mark a frame as interlaced and will alternate odd/even scanlines
+                at odd/even frames when the number or lines is above the configured value.
+            Disable on interlaced screen:
+                You may want to avoid drawing scanlines gaps when interlaced content is found
             Interlace Flicker (0=off,1=on,2=if interlaced):
                 Since we can emulate scanline appearence, here we deal with interlaced content too.
                 This setting emulates the flickering issues present on crt interlaced screens
@@ -176,8 +181,7 @@
                 when the input picture is considered interlaced.
                 The threshold for that is defined in config.inc with the parameter: MIN\_LINES\_INTERLACED.
             Interlace Flicker power: The strength of the effect.
-            Disable on interlaced screen:
-                You may want to avoid drawing scanlines gaps when interlaced content is found
+
             
             Vertical cell Mask 2:
                 The shape of the mask generated ny this function is "boxed", while the one
