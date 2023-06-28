@@ -58,6 +58,8 @@ layout(location = 28) out float vfprintvalue;
 layout(location = 29) out float vPG_mask_height;
 layout(location = 30) out float vPG_spark;
 
+layout(location = 31) out float vDeltaRenderOk;
+
 #include "includes/functions.include.slang"
 
 #define PI_15 4.71238898038469 //pi*1.5
@@ -220,6 +222,10 @@ void main() {
             vDotMat_Grid_Sharpness = clamp(vDotMat_Grid_Sharpness, 0.1, 20.0);
             //vfprintvalue = vDotMat_Grid_Sharpness;
         }
+                                                                                          // Delta render, mandatory conditions:
+    vDeltaRenderOk = float(  ( params.FrameCount % DELTA_RENDER_FORCE_REFRESH != 0.0 ) && // - We are in a frame that is not forced for full refresh
+                             ( vIsInterlaced != 1.0 || PIXELGRID_INTR_DISABLE_Y == 1.0)   // - screen is not interlaced or we disabled scanlines on interlaced content
+                           ); 
 }
 
 
@@ -255,6 +261,7 @@ layout(location = 27) in float vDotMat_Grid_Sharpness;
 layout(location = 28) in float vfprintvalue;
 layout(location = 29) in float vPG_mask_height;
 layout(location = 30) in float vPG_spark;
+layout(location = 31) in float vDeltaRenderOk;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -990,9 +997,7 @@ void main() {
         }
 
     if (DELTA_RENDER == 1.0) {
-        bool reuse_old = false;       
-        reuse_old = bool(texture(in_glow_pass, co_content).a * canvas_busy);
-        reuse_old = reuse_old &&  (params.FrameCount % DELTA_RENDER_FORCE_REFRESH != 0.0);
+        bool reuse_old =  bool( texture(in_glow_pass, co_content).a * canvas_busy * vDeltaRenderOk ) ;
         if (reuse_old) {
             FragColor = texture(final_passFeedback, vOutputCoord) ;
             return;
