@@ -129,6 +129,7 @@ float fcircle_smooth(vec2 coords, vec2 middle, float f_radius, float FALLOFF) {
 
 
 vec3 ambi_pre_pass(vec2 coords) {
+    
     if (DO_TILT == 1.0)
         coords = tilt(coords, vIs_rotated, vec2(TILT_X, TILT_Y));
 
@@ -225,11 +226,11 @@ vec3 ambi_step_rgb(vec3 s,vec3 d, vec3 mystep){
 
 
 vec4 pixel_ambilight(vec2 local_pre_pass_coords) {
-
     vec4 past_pixel_vec4 = texture(PastSampler, vTexCoord);
     vec3 present_pixel =  ambi_pre_pass(local_pre_pass_coords).rgb;
     vec3 past_pixel =     past_pixel_vec4.rgb;
 
+    
     float scene_change_remaining = past_pixel_vec4.a;
 
     float past_avg_lum = texture(avglum_passFeedback,vec2(0.25,0.25)).a;
@@ -259,14 +260,17 @@ void main() {
     if (DO_AMBILIGHT != 1.0)
         return;
 
-
     if ( mod(params.FrameCount,FRAME_DIVIDER) != 0.0) {
         vec4 past_sampler = texture(PastSampler, vTexCoord);
         past_sampler = max(past_sampler, 0.0); // <- Sanitize input to avoid glitches when enabling the option runtime.
+        
         FragColor = past_sampler;
         return;
     }
 
+    
+    
+    
 
     FragColor = pixel_ambilight(pre_pass_coords);
 }

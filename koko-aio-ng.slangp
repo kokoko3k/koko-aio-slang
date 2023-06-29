@@ -212,7 +212,7 @@ float_framebuffer7 = true
                 alias9 = "reflected_blurred_pass_pre"
         filter_linear9 = true
            scale_type9 = source
-                scale9 = 1.0
+                scale9 = 0.25
             wrap_mode9 = "clamp_to_border"
 
             
@@ -221,7 +221,7 @@ float_framebuffer7 = true
         filter_linear10 = true
            scale_type10 = source
                 scale10 = 1.0
-         mipmap_input10 = true
+         mipmap_input10 = false
             wrap_mode10 = "mirrored_repeat"
 
 # In the following passes we emulate bloom effect.
@@ -233,7 +233,7 @@ float_framebuffer7 = true
                 alias11 = "bloom_pass_1"
         filter_linear11 = true
            scale_type11 = source
-                scale11 = 1.0
+                scale11 = 4.0
             wrap_mode11 = "mirrored_repeat"
     
     

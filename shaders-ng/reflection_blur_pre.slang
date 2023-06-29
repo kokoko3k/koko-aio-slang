@@ -28,9 +28,11 @@ layout(location = 1) in vec2 vCoordsAdapted;
 layout(location = 0) out vec4 FragColor;
 
 layout(set = 0, binding = 1) uniform sampler2D flick_and_noise_pass;
-layout(set = 0, binding = 2) uniform sampler2D avglum_pass;
+layout(set = 0, binding = 2) uniform sampler2D reflected_blurred_pass_preFeedback;
+layout(set = 0, binding = 3) uniform sampler2D avglum_pass;
 
 #include "includes/functions.include.slang"
+#include "includes/blooms.include.slang"
 
 void main() {
    
@@ -53,8 +55,9 @@ void main() {
       return;
    }
 
-   
+
    FragColor = texture(flick_and_noise_pass, coords);
+
 }
  
  

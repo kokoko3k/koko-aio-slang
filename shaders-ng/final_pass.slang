@@ -1161,5 +1161,4 @@ void main() {
  
     FragColor = vec4(pixel_out, 1.0);
     
-    //FragColor = mix(FragColor, texture(ambi_temporal_pass, vOutputCoord), 0.8);
 }
