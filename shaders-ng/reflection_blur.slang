@@ -77,11 +77,24 @@ void main() {
       vec3 pixel_out = mix(s1, s2, lodmix) * BEZEL_REFL_STRENGTH;
 */
  
-       float blur_radius=1+shade_sharp_blur*4.0;
        
-      float b_quality = 3.0;
+       
+       
+
+
+
+   
+   
+      
+      float p = params.FrameCount % 2;
+      
+      float blur_radius=  1 + (shade_sharp_blur) * 3.0  ;
+      float blur_quality = 2.0;
+      
+      float start_offset = (pi*2/8/4)*p;
       //vec3 bloom(sampler2D smp, vec2 uv, vec4 smpsize, vec2 bsize, float quality, float start_offset, float lod) 
-      vec3 pixel_out = bloom(Source, coords, global.FinalViewportSize, vec2(blur_radius), b_quality, 0.0, 0.0) ;
+
+      vec3 pixel_out = bloom(Source, coords, global.FinalViewportSize, vec2(blur_radius), blur_quality, start_offset, 0.0) ;
  
  
    //Next simulate a diffused light
@@ -95,10 +108,9 @@ void main() {
       //pixel_out = pixel_out * (1 - fcorners_shade);
 
    pixel_out = apply_fuzzy_main_pass_stage_2(pixel_out, vFuzzy_main_pass_stage_1);
-      
-   vec3 pixel_out_fb =  texture(reflected_blurred_passFeedback, vTexCoord).rgb;
-   pixel_out = mix(pixel_out_fb.rgb, pixel_out, 0.5);
    
+   vec3 pixel_out_fb =  texture(reflected_blurred_passFeedback, vTexCoord).rgb;
+   pixel_out = mix(pixel_out_fb.rgb, pixel_out, 0.5 );
    FragColor = vec4(pixel_out, 1.0); 
 
 }
