@@ -78,7 +78,7 @@ void main() {
 */
  
       
-      float blur_radius=  1 + (shade_sharp_blur) * 8.0  ;
+      float blur_radius=  1 + (shade_sharp_blur) * 6.0  ;
       float blur_quality = 3.0;
       
       float p = params.FrameCount % 2;
