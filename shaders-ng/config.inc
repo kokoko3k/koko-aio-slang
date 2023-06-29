@@ -144,7 +144,7 @@
 	//DELTA_RENDER_FORCE_REFRESH will force a full render/refresh every # frames clearing the glitches
 	//Is it not compatible with interlaced content.
 	//(use 1.0, 2.0, 3.0, not fractionals)
-#define DELTA_RENDER 1.0
+#define DELTA_RENDER 0.0
 
 
 // STATIC CONFIG ENDS HERE ##########################################################################################

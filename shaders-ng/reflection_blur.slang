@@ -55,12 +55,19 @@ void main() {
          FragColor = vec4(0.0);
          return;
       }
-
+/*
    //Create a gradient near borders to modulate between blurrend and sharp refection.
       float smoothness = 0.11;
       float shade_sharp_blur = borders_gradient(vTexCoord, smoothness);
       shade_sharp_blur = 1.05 - (shade_sharp_blur + BEZEL_RFL_BLR_SHD); //Modulates between sharp and blur via user parameter
-
+*/
+      
+      
+      
+      float shade_sharp_blur = texture(Source, coords).a;
+      
+      
+      
    //Create gradients in the corners to blur more more near corners:
       #define CORNER_BLURRINESS 0.6
       float fcorners_shade = corners_shade(vTexCoord, 0.9) * CORNER_BLURRINESS;
@@ -78,14 +85,22 @@ void main() {
 */
  
       
-      float blur_radius=  1 + (shade_sharp_blur) * 6.0  ;
-      float blur_quality = 3.0;
+      float blur_radius=   (shade_sharp_blur) * 3.5  ;
+      blur_radius = clamp(blur_radius, 1.0, 100.0);
+      
+      //FragColor = vec4(shade_sharp_blur); return;
+      
+      //      FragColor = texture(Source, coords);return;
+      
+      
+      
+      float blur_quality = 1;
       
       float p = params.FrameCount % 2;
-      float start_offset = (pi*2/8/4)*p;
+      float start_offset = (pi*2/8/4);
 
       vec3 pixel_out = bloom(Source, coords, global.FinalViewportSize, vec2(blur_radius), blur_quality, start_offset, 0.0) ;
-      pixel_out *= BEZEL_REFL_STRENGTH;
+      //pixel_out *= BEZEL_REFL_STRENGTH;
  
    //Next simulate a diffused light
       vec3 pixel_diffused = textureLod( flick_and_noise_pass, coords, 6.0).rgb;
@@ -101,7 +116,11 @@ void main() {
    
    vec3 pixel_out_fb =  texture(reflected_blurred_passFeedback, vTexCoord).rgb;
    pixel_out = mix(pixel_out_fb.rgb, pixel_out, 0.5 );
+   
+
    FragColor = vec4(pixel_out, 1.0); 
+   
+   //FragColor = vec4(shade_sharp_blur);
 
 }
  
