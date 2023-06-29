@@ -77,22 +77,12 @@ void main() {
       vec3 pixel_out = mix(s1, s2, lodmix) * BEZEL_REFL_STRENGTH;
 */
  
-       
-       
-       
-
-
-
-   
-   
       
-      float p = params.FrameCount % 2;
+      float blur_radius=  1 + (shade_sharp_blur) * 5.5  ;
+      float blur_quality = 3.0;
       
-      float blur_radius=  1 + (shade_sharp_blur) * 3.0  ;
-      float blur_quality = 2.0;
-      
-      float start_offset = (pi*2/8/4)*p;
-      //vec3 bloom(sampler2D smp, vec2 uv, vec4 smpsize, vec2 bsize, float quality, float start_offset, float lod) 
+      //float p = params.FrameCount % 2;
+      float start_offset = 0.0; //(pi*2/8/4)*p;
 
       vec3 pixel_out = bloom(Source, coords, global.FinalViewportSize, vec2(blur_radius), blur_quality, start_offset, 0.0) ;
  
