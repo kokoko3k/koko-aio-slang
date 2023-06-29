@@ -77,7 +77,7 @@ void main() {
       vec3 pixel_out = mix(s1, s2, lodmix) * BEZEL_REFL_STRENGTH;
 */
  
-       float blur_radius=1+shade_sharp_blur*10.0;
+       float blur_radius=1+shade_sharp_blur*4.0;
        
       float b_quality = 3.0;
       //vec3 bloom(sampler2D smp, vec2 uv, vec4 smpsize, vec2 bsize, float quality, float start_offset, float lod) 
