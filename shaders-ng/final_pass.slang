@@ -222,9 +222,9 @@ void main() {
             vDotMat_Grid_Sharpness = clamp(vDotMat_Grid_Sharpness, 0.1, 20.0);
             //vfprintvalue = vDotMat_Grid_Sharpness;
         }
-                                                                                          // Delta render, mandatory conditions:
+                                                                                               // Delta render, mandatory conditions:
     vDeltaRenderOk = float(  ( params.FrameCount % int(DELTA_RENDER_FORCE_REFRESH) != 0.0 ) && // - We are in a frame that is not forced for full refresh
-                             ( vIsInterlaced != 1.0 || PIXELGRID_INTR_DISABLE_Y == 1.0)   // - screen is not interlaced or we disabled scanlines on interlaced content
+                             ( vIsInterlaced != 1.0 || PIXELGRID_INTR_DISABLE_Y == 1.0 || DO_PIXELGRID_H == 0.0)   // - screen is not interlaced or we disabled scanlines on interlaced content
                            ); 
 }
 
