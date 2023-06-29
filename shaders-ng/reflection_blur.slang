@@ -9,6 +9,7 @@ layout(location = 0) out vec2 vTexCoord;
 layout(location = 1) out vec2 vFuzzy_main_pass_stage_1;
 
 #include "includes/functions.include.slang"
+#include "includes/blooms.include.slang"
 
 void main() {
    gl_Position = global.MVP * Position;
@@ -26,9 +27,10 @@ layout(location = 0) out vec4 FragColor;
 
 layout(set = 0, binding = 1) uniform sampler2D Source;
 layout(set = 0, binding = 2) uniform sampler2D flick_and_noise_pass;
+layout(set = 0, binding = 3) uniform sampler2D reflected_blurred_passFeedback;
 
 #include "includes/functions.include.slang"
-
+#include "includes/blooms.include.slang"
 
 float borders_gradient(vec2 co, float smoothness) {
    //Draws a square with smooth borders:
@@ -57,13 +59,13 @@ void main() {
    //Create a gradient near borders to modulate between blurrend and sharp refection.
       float smoothness = 0.11;
       float shade_sharp_blur = borders_gradient(vTexCoord, smoothness);
-      shade_sharp_blur = 1 - (shade_sharp_blur + BEZEL_RFL_BLR_SHD); //Modulates between sharp and blur via user parameter
+      shade_sharp_blur = 1.05 - (shade_sharp_blur + BEZEL_RFL_BLR_SHD); //Modulates between sharp and blur via user parameter
 
    //Create gradients in the corners to blur more more near corners:
       #define CORNER_BLURRINESS 0.6
       float fcorners_shade = corners_shade(vTexCoord, 0.9) * CORNER_BLURRINESS;
       shade_sharp_blur = max(fcorners_shade, shade_sharp_blur);
-      
+ /*     
    //Sample a lod and the next integer one, then do a linear smapling between them
    //to blur the reflections as they goes far from the tube.
       float shade_sharp_blur_adapted = shade_sharp_blur * 5.5;
@@ -73,7 +75,15 @@ void main() {
       vec3 s2 = textureLod( Source, coords, lod1).rgb;
       float lodmix = fract(shade_sharp_blur_adapted);
       vec3 pixel_out = mix(s1, s2, lodmix) * BEZEL_REFL_STRENGTH;
-   
+*/
+ 
+       float blur_radius=1+shade_sharp_blur*10.0;
+       
+      float b_quality = 3.0;
+      //vec3 bloom(sampler2D smp, vec2 uv, vec4 smpsize, vec2 bsize, float quality, float start_offset, float lod) 
+      vec3 pixel_out = bloom(Source, coords, global.FinalViewportSize, vec2(blur_radius), b_quality, 0.0, 0.0) ;
+ 
+ 
    //Next simulate a diffused light
       vec3 pixel_diffused = textureLod( flick_and_noise_pass, coords, 6.0).rgb;
       pixel_out = mix( pixel_out, pixel_diffused, BEZEL_DIFFUSION_STR);
@@ -86,6 +96,9 @@ void main() {
 
    pixel_out = apply_fuzzy_main_pass_stage_2(pixel_out, vFuzzy_main_pass_stage_1);
       
+   vec3 pixel_out_fb =  texture(reflected_blurred_passFeedback, vTexCoord).rgb;
+   pixel_out = mix(pixel_out_fb.rgb, pixel_out, 0.5);
+   
    FragColor = vec4(pixel_out, 1.0); 
 
 }

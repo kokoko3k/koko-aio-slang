@@ -221,7 +221,7 @@ float_framebuffer7 = true
         filter_linear10 = true
            scale_type10 = source
                 scale10 = 1.0
-         mipmap_input10 = true
+         mipmap_input10 = false
             wrap_mode10 = "mirrored_repeat"
 
 # In the following passes we emulate bloom effect.
