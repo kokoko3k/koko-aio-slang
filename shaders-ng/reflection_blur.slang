@@ -85,7 +85,7 @@ void main() {
       float start_offset = 0.0; //(pi*2/8/4)*p;
 
       vec3 pixel_out = bloom(Source, coords, global.FinalViewportSize, vec2(blur_radius), blur_quality, start_offset, 0.0) ;
- 
+      pixel_out *= BEZEL_REFL_STRENGTH;
  
    //Next simulate a diffused light
       vec3 pixel_diffused = textureLod( flick_and_noise_pass, coords, 6.0).rgb;
