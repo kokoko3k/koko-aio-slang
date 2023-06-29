@@ -79,7 +79,7 @@ void main() {
 
 
       vec3 pixel_out = bloom(flick_and_noise_pass, coords, global.FinalViewportSize, vec2(blur_radius), blur_quality, 0.0, 1.0) ;
-      pixel_out *= BEZEL_REFL_STRENGTH;
+
       
       
    
