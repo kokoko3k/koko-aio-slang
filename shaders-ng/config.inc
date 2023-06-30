@@ -116,35 +116,27 @@
 
 // MISC STATIC CONFIG ##########################################################################################
 
-	//Static dithering applied over vignette and spot
-#define NOISEPOWER 5/1000.0
-	//Temporal noise strength applied on green over ambient lights (multiplied by NOISEPOWER)
-#define NOISEPOWER_AMBI_MUL 8.0
-	
-
 	//Experimental alternating blanking feature has been disabled by default, you can enable it by
 	//uncommenting the following line:
 //#define ALLOW_ALT_BLANK
-
-	//Should texture wrapping be allowed as a shader parameter?
-	//since it causes branching, better set it as a static value.
-#define ALLOW_BG_IMAGE_TEXTURE_WRAP_IN_SHADER
-
-
-	//Gap size in pixel for 1X to 4X mask scaling:
-#define GAP_SIZE_PER_SCALE vec4(1.0, 1.0, 2.0, 2.0)
 
 	//Halve rendering refresh on bezel and ambilight to spare gpu cycles:
 #define HALVE_BORDER_UPDATE 1.0
 
 	//Renders only changed parts of screen.
-	//It is good for power consumption, but you can't count on it as a reliable
-	//fps pushing option as it depends on the game content.
-	//DELTA_RENDER_CHECK_AREA The higher, the lower the glitches on screen, the less the gain
-	//DELTA_RENDER_FORCE_REFRESH will force a full render/refresh every # frames clearing the glitches
-	//Is it not compatible with interlaced content.
-	//(use 1.0, 2.0, 3.0, not fractionals)
-#define DELTA_RENDER 1.0
+#define DELTA_RENDER 0.0
+
+	//Static dithering applied over vignette and spot
+#define NOISEPOWER 5/1000.0
+	//Temporal noise strength applied on green over ambient lights (multiplied by NOISEPOWER)
+#define NOISEPOWER_AMBI_MUL 8.0
+	
+	//Should texture wrapping be allowed as a shader parameter?
+	//since it causes branching, better set it as a static value.
+#define ALLOW_BG_IMAGE_TEXTURE_WRAP_IN_SHADER
+
+	//Gap size in pixel for 1X to 4X mask scaling:
+#define GAP_SIZE_PER_SCALE vec4(1.0, 1.0, 2.0, 2.0)
 
 
 // STATIC CONFIG ENDS HERE ##########################################################################################
