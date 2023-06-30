@@ -43,6 +43,7 @@ vec3 PrintValueVec3( vec2 vStringCoords, vec2 FragCoord,  float fValue, float fM
 	vec2 vPixelCoord1 = vec2(5.0, 5.0);
 
 	FragCoord.y = (vFontSize.y*2.0) - FragCoord.y;
+	//FragCoord.y = (vFontSize.y*2.0) - FragCoord.y;
 	//FragCoord.x -= 100;
 	
     float customDigit = PrintValue( (  FragCoord - vPixelCoord1    ) / vFontSize, fValue, fMaxDigits, fDecimalPlaces);
