@@ -734,7 +734,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 // Alternative blanking, needs to be statically enabled, see docs.md.
 #pragma parameter DO_ALT_BLANK       "★ Alternate line blanking enable? ==>"			0.0 0.0 1.0 1.0
 #pragma parameter label_alt_blank    "  !THIS FEATURE IS STATIC, SEE docs.md TO ENABLE"    0.0 0.0 0.0 1.0
-#pragma parameter ALT_BLANK_STRENGTH "        Alternate black frame insertion strength" 	0.5 -1.0 1.0 0.1
+#pragma parameter ALT_BLANK_STRENGTH "        Alternate black frame insertion strength" 	0.5 0.0 1.0 0.1
 #pragma parameter ALT_BLANK_PERIOD   "        Blank lines period" 				4.0 1.0 30.0 1.0
 #pragma parameter BLANK_02 " " 0.0 0.0 1.0 1.0
 

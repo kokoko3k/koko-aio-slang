@@ -626,7 +626,7 @@ vec4 textureLod_wrap(sampler2D tex, vec2 co, float lod, float wrap_mode) {
 }
 
 
-vec3 pixel_alternate(vec3 source, float strength) {
+float pixel_blank_alternate(float strength) {
     /*
              vec3 pixel_strobe = pixel_out.rgb * mod(params.FrameCount, 2);
                 float max_c = max(pixel_out.r, max(pixel_out.g, pixel_out.b));
@@ -640,29 +640,31 @@ vec3 pixel_alternate(vec3 source, float strength) {
 
     
     float line = vTexCoord.y * params.OutputSize.y;
-    vec3 pixel_out = clamp(source, 0.0, 1.0);
     float l_period_half = ALT_BLANK_PERIOD / 2;
     
     
     //Use another alg that affects less dark colors for negative strength values.
-    if (strength < 0.0) {
+   /* if (strength < 0.0) {
         strength *= -1;
-        float max_c = max(pixel_out.r, max(pixel_out.g, pixel_out.b));
+        float max_c = max(source.r, max(source.g, source.b));
         float max_c_adpt = 1 - (max_c * 0.5);
         strength *= max_c_adpt;
-    }
-
+    }*/
     
-    
-    
-  
+    //If the frame has been completely blanked, rendered will be 0.0
+    //rendered will be returned and can be used to skip 
+    float rendered;
     
     if  (mod(float(params.FrameCount),2.0  ) == 1) {
-        if  (mod(line,ALT_BLANK_PERIOD) > l_period_half) pixel_out=mix(source,vec3(0), strength) ;
+        if  (mod(line,ALT_BLANK_PERIOD) > l_period_half) {
+            return strength;
+        }
     } else {
-        if  (mod(line,ALT_BLANK_PERIOD) <= l_period_half) pixel_out=mix(source,vec3(0), strength) ;
+        if  (mod(line,ALT_BLANK_PERIOD) <= l_period_half) {
+            return strength;
+        }
     }
-    return pixel_out;
+    return 1.0;
 }
 
 
@@ -790,10 +792,22 @@ float gaussian_coefficient(float x, float sigma) {
 
 
 vec3 fn_pixel_content(vec2 coords) {
+    
     vec3 pixel_in;
     vec3 pixel_glowed;
     vec3 pixel_bleed; //pixel_bleed is the color that will bleed over scanline gap.
                       //Used for SCANLINES_BLEEDING parameter only
+    
+    
+    //Black frame insertion, made static, enable it in config.inc.
+        #ifdef ALLOW_ALT_BLANK
+            float alt_blank_power = 1.0;
+            //Calculate if line has to be blanked
+                if (DO_ALT_BLANK == 1.0 ) alt_blank_power = pixel_blank_alternate( 1 - ALT_BLANK_STRENGTH);
+            
+            //If we completely blanked the line, there is no need to process it further.
+                if (alt_blank_power == 0.0) return vec3(0.0);
+        #endif
     
     if  (DO_IN_GLOW == 1.0) {
         pixel_glowed = texture(in_glow_pass,coords).rgb;
@@ -848,13 +862,15 @@ vec3 fn_pixel_content(vec2 coords) {
             vec3 bloomed=texture(bloom_pass_final, coords).rgb ;
             pixel_out = bloomed + float(BLOOM_BYPASS < 0.5) * pixel_out;
         }
-    
+            
+            
     //Black frame insertion, made static, enable it in config.inc.
         #ifdef ALLOW_ALT_BLANK
             if (DO_ALT_BLANK == 1.0 )
-                pixel_out.rgb = pixel_alternate(pixel_out.rgb, ALT_BLANK_STRENGTH );
+                //apply the blank power we calculated earlier in the code.
+                pixel_out.rgb = clamp(pixel_out.rgb,0.0,1.0) *  alt_blank_power;
         #endif
-        
+    
     return pixel_out;
 }
 
@@ -1013,8 +1029,8 @@ void main() {
             
             //Can we halve refresh rate in the outside border to spare some cycles?
             if ( HALVE_BORDER_UPDATE == 1.0 ) {
-                if ((params.FrameCount % 2) != 1.0) {
-                    pixel_out = texture(final_passFeedback, vOutputCoord).rgb;
+                if ((params.FrameCount % 2) == 1.0) {
+                    pixel_out = texture(final_passFeedback, vOutputCoord).rgb * 10;
                     FragColor = vec4(pixel_out, 1.0);
                     return;
                 }
