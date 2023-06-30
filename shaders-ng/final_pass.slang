@@ -988,7 +988,7 @@ void main() {
     //Curvature 
         //Curvature has to come after inner zoom or bezel curved border will not match content
         //curved border when inner zoom changes.
-        if (DO_CURVATURE == 1.0  &&  ((GEOM_WARP_X != 0.0) || (GEOM_WARP_Y != 0.0))) {
+        if (DO_CURVATURE + GEOM_WARP_X + GEOM_WARP_Y > 1.0) {
             co_content = Warp_fast(co_content, vWarp_vexp, vWarp_arg2, GEOM_CUT_EARS);
         }
         
