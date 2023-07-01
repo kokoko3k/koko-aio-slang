@@ -90,18 +90,10 @@
         X resolution: (core or screen) (**):
             0: Phosphors width will be relative to the pixel width of the core (game).
             1: Phosphors width will be relative to the pixel width of the screen.
-        Fade on bright:
-            How much the mask is visible over bright pixels.
-        Phosphors width Min, Max:
-            The width of each phosphors can grow or shrink, depending on the
-            luminosity of the underlying pixel luminance.
-            1.0 refers to the full mask width, so stay around 0.2 if you want
-            avoid them to blend.
-            Use Min and Max parameter to limit the minimum and maximum size
-            they can reach.
         Mask type preset:
             You can have the shader generate a preconfigured mask for you:
             1:gm 2:gmx 3:rgb 4:rgbx 5:rbg 6:rbgx
+            (GreenMagenta, GreenMagentaGap, RedGreenBlue, RedGreenBlueGap, RedBlueGreen, RedBlueGreenGap)
             beware that due to limitations of the actual implementation, masks ending in "x"
             works reliable when emulating slotmasks only at screen coordinates with multiplier = 1.0
             ...or with 0, you can draft your own by using the following knobs:
@@ -117,6 +109,21 @@
                 ...will give a mask with a blank space, the neutral white color and another blank space
                 Example 4: Phosphors+gap count=1 and R=0 G=0 B=0
                 ...like the previous one, but without any blank spaces.
+        Phosphors width Min, Max:
+            The width of each phosphors can grow or shrink, depending on the
+            luminosity of the underlying pixel luminance.
+            1.0 refers to the full mask width, so stay around 0.2 if you want
+            avoid them to blend.
+            Use Min and Max parameter to limit the minimum and maximum size
+            they can reach.
+        Mask gamma:
+                Since emulating phosphors with high Min-Max range changes the apparent gamma of the final image,
+                it is advised, if needed, to use this option to compensate, instead of the main gamma correction.
+        Fade on bright:
+            How much the mask is visible over bright pixels.
+
+
+
             Cell size multiplier x (neg=divider):
                 Multiply (or divide if the parameter is < 0) the mask (cell) size by a factor.
                 As stated(**), the size may be relative to screen or core, this allow you to
@@ -161,6 +168,11 @@
                 This function is useful when you want to emulate handhelds screens, 
                 where cells are well separated.
                 
+            Interlace detect + Scanline alternate above # lines:
+                koko-aio will mark a frame as interlaced and will alternate odd/even scanlines
+                at odd/even frames when the number or lines is above the configured value.
+            Disable on interlaced screen:
+                You may want to avoid drawing scanlines gaps when interlaced content is found
             Interlace Flicker (0=off,1=on,2=if interlaced):
                 Since we can emulate scanline appearence, here we deal with interlaced content too.
                 This setting emulates the flickering issues present on crt interlaced screens
@@ -169,8 +181,7 @@
                 when the input picture is considered interlaced.
                 The threshold for that is defined in config.inc with the parameter: MIN\_LINES\_INTERLACED.
             Interlace Flicker power: The strength of the effect.
-            Disable on interlaced screen:
-                You may want to avoid drawing scanlines gaps when interlaced content is found
+
             
             Vertical cell Mask 2:
                 The shape of the mask generated ny this function is "boxed", while the one
@@ -200,7 +211,8 @@
                 Sparkling look punch:
                     Makes the "Vertical cell Mask 2" effect more pronunced and "pinchy/Sparky" by highering its contrast.
                     Beware, this may produce moiree.
-                    
+
+
 **Dot matrix emulation:**<br>
     Emulates low refresh "boxed" screens used in old handheld consoles.<br>
     

@@ -189,6 +189,7 @@ void main() {
       //Handle case where only color shifting is requested
       if (DO_SHIFT_RGB > 0.0 || DOT_M_SHADOW_STR > 0.0) {
          pixel_out = deconvergence_shadow_wrap(vTexCoord);
+         pixel_alpha_ntsc_artifacts = texture(flick_and_noise_pass, vTexCoord).a;
    } else 
       if (DO_SAT_BLEED > 0.0) {      
          //Handle case where only chroma bleed is requested
