@@ -108,7 +108,7 @@
    // When Glow sharpness is controlled by light spread amount
    // The following ratio is used, the lower, the blurrier:
 #define IN_GLOW_SHARPNESS_SPREAD_RATIO_W 0.8334
-#define IN_GLOW_SHARPNESS_SPREAD_RATIO_H 2.0
+#define IN_GLOW_SHARPNESS_SPREAD_RATIO_H 0.8334
 
 
 
@@ -116,25 +116,29 @@
 
 // MISC STATIC CONFIG ##########################################################################################
 
+	//Experimental alternating blanking feature has been disabled by default, you can enable it by
+	//uncommenting the following line:
+//#define ALLOW_ALT_BLANK
+
+	//Halve rendering refresh on bezel and ambilight to spare gpu cycles:
+#define HALVE_BORDER_UPDATE 1.0
+
+	//Renders only changed parts of screen.
+#define DELTA_RENDER 1.0
+
 	//Static dithering applied over vignette and spot
 #define NOISEPOWER 5/1000.0
 	//Temporal noise strength applied on green over ambient lights (multiplied by NOISEPOWER)
 #define NOISEPOWER_AMBI_MUL 8.0
 	
-
-	//Experimental alternating blanking feature has been disabled by default, you can enable it by
-	//uncommenting the following line:
-//#define ALLOW_ALT_BLANK
-
 	//Should texture wrapping be allowed as a shader parameter?
 	//since it causes branching, better set it as a static value.
 #define ALLOW_BG_IMAGE_TEXTURE_WRAP_IN_SHADER
 
-
 	//Gap size in pixel for 1X to 4X mask scaling:
 #define GAP_SIZE_PER_SCALE vec4(1.0, 1.0, 2.0, 2.0)
 
-  
+
 // STATIC CONFIG ENDS HERE ##########################################################################################
 
 
@@ -385,14 +389,16 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float PIXELGRID_B_SHIFT;
 	float PIXELGRID_H_COUNT;
 	float PIXELGRID_H_PRST;
-
 	float PIXELGRID_NO_FLOOR;
+	float PIXELGRID_GAMMA_W;
+
+	float DELTA_RENDER_FORCE_REFRESH;
+	float DELTA_RENDER_CHECK_AREA;
 	
 	float SERVICE1;
 	float SERVICE2;
 	float PIXELGRID_HMASK_NO_BRIGHT;
 	
-
 } global;
 
 // Color correction
@@ -480,16 +486,19 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 #pragma parameter DO_PIXELGRID_W     "      ★ Enable Horizontal mask "    	1.0 0.0 1.0 0.1
 #pragma parameter PIXELGRID_SIZE_W   "           . Resolution: (core or screen)"	1.0 0.0 1.0 1.0
-#pragma parameter PIXELGRID_HMASK_NO_BRIGHT  "           . Fade on bright"	0.0 0.0 10.0 0.1
-#pragma parameter PIXELGRID_MIN_W    "           . Phosphors width Min"			0.25 0.05 1.0 0.01
-#pragma parameter PIXELGRID_MAX_W    "           . Phosphors width Max"			0.25 0.05 1.0 0.01
 #pragma parameter PIXELGRID_H_PRST   "           . Mask type preset (0: for manual)"  3.0 0.0 6.0 1.0
 #pragma parameter PG_LABEL1          "             (1:gm 2:gmx 3:rgb 4:rgbx 5:rbg 6:rbgx)"  0.0 0.0 0.0 0.0
 #pragma parameter PIXELGRID_H_COUNT  "                . 0: Phosphors+gap count (mask size)"	3.0 1.0 4.0  1.0
 #pragma parameter PIXELGRID_R_SHIFT  "                . 0: R shift"      0.0  0.0 4.0 0.1
 #pragma parameter PIXELGRID_G_SHIFT  "                . 0: G shift"      1.0  0.0 4.0 0.1
 #pragma parameter PIXELGRID_B_SHIFT  "                . 0: B shift"      2.0  0.0 4.0 0.1
+#pragma parameter PIXELGRID_MIN_W    "           . Phosphors width Min"			0.25 0.05 1.0 0.01
+#pragma parameter PIXELGRID_MAX_W    "           . Phosphors width Max"			0.25 0.05 1.0 0.01
+#pragma parameter PIXELGRID_GAMMA_W  "           . Mask gamma"					1.0 0.05 3.00 0.1
 #pragma parameter PIXELGRID_MUL_X    "           . Cell size multiplier x (neg=divider):"	1.0 -8.0 8.0 0.125
+#pragma parameter PIXELGRID_HMASK_NO_BRIGHT  "           . Fade on bright"	0.0 0.0 1.0 0.01
+
+
 #pragma parameter PIXELGRID_NO_INTERBLEED_W	"           . Avoid inter-cell bleeding (handhelds)"		0.0 0.0 100.0 100.0
 #pragma parameter BLANK12fs " " 0.0 0.0 1.0 1.0
 
@@ -503,7 +512,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 #pragma parameter BLANK12f " " 0.0 0.0 1.0 1.0
 
-#pragma parameter MIN_LINES_INTERLACED      "        Is interlaced above # lines:"		380.0 	1.0 1024 1.0
+#pragma parameter MIN_LINES_INTERLACED      "        Interlace detect + Scanline alternate above # lines:"		380.0 	1.0 1024 1.0
 #pragma parameter PIXELGRID_INTR_DISABLE_Y  "        Disable scanlines on interlaced screen"			  	0.0 	0.0 1.0 1.0
 #pragma parameter PIXELGRID_INTR_FLICK_MODE "        Interlace Flicker (0=off,1=on,2=if interlaced)"		2.0 	0.0 2.0 1.0
 #pragma parameter PIXELGRID_INTR_FLICK_POWR "           . Interlace Flicker power"		  		0.25 	0.0 8.0 0.01
@@ -709,11 +718,15 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter TILT_BEZEL_K	"        Bezel multiplier"		1.0    0.0  1.5  0.01
 #pragma parameter BLANK_01 " " 0.0 0.0 1.0 1.0
 
+//Delta render
+#pragma parameter DELTA_RENDER_FORCE_REFRESH    "★ Delta render force refresh interval ? ==>"	4.0 1.0 3600.0 1.0
+#pragma parameter DELTA_RENDER_CHECK_AREA       "        Delta render area size"			1.0 0.0 10.0 1.0
+#pragma parameter BLANK_DR " " 0.0 0.0 1.0 1.0
 
 // Alternative blanking, needs to be statically enabled, see docs.md.
 #pragma parameter DO_ALT_BLANK       "★ Alternate line blanking enable? ==>"			0.0 0.0 1.0 1.0
 #pragma parameter label_alt_blank    "  !THIS FEATURE IS STATIC, SEE docs.md TO ENABLE"    0.0 0.0 0.0 1.0
-#pragma parameter ALT_BLANK_STRENGTH "        Alternate black frame insertion strength" 	0.5 -1.0 1.0 0.1
+#pragma parameter ALT_BLANK_STRENGTH "        Alternate black frame insertion strength" 	0.5 0.0 1.0 0.1
 #pragma parameter ALT_BLANK_PERIOD   "        Blank lines period" 				4.0 1.0 30.0 1.0
 #pragma parameter BLANK_02 " " 0.0 0.0 1.0 1.0
 

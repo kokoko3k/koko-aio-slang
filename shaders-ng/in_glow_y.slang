@@ -98,7 +98,14 @@ vec3 antialias_blur_bias(sampler2D source_tex, vec2 co, vec3 pixel_glowed, float
 */
 
 void main() { 
-   if (DO_IN_GLOW == 0.0) return;
+   if (DO_IN_GLOW == 0.0) {
+      if ( DELTA_RENDER == 1.0) {
+         float original_unchanged = texture(Source,vTexCoord).a;
+         FragColor = vec4(1.0,1.0,1.0, original_unchanged);
+         return;
+      }
+   }
+
 
    vec3 pixel_glowed;
    //apply just gamma and power for tighter blurs and exit:
@@ -114,6 +121,11 @@ void main() {
       }
    }
 
+   if ( DELTA_RENDER == 1.0) {
+      float original_unchanged = texture(Source,vTexCoord).a;
+      FragColor = vec4(pixel_glowed, original_unchanged);
+      return;
+   }
    
    FragColor = vec4(pixel_glowed,1.0);
    

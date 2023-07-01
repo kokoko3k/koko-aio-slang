@@ -81,7 +81,7 @@ float get_avglum() {
 
     if (reduced_sampling_co) {
         //in the reduced sampling zone, only update at right time; else return the previous frame.
-        bool reduced_sample_time_is_now = (mod(params.FrameCount,AMBI_AVGLUM_DIVIDER) == 0);
+        bool reduced_sample_time_is_now = (mod(params.FrameCount,AMBI_AVGLUM_DIVIDER) == 1); // (== 0 may be problematic for flycast + nvidia + glcore)
         if (reduced_sample_time_is_now)
             return get_avg_lum_from_mip();
         float avglum_feedback = texture(avglum_passFeedback,vTexCoord).a;

@@ -8,8 +8,9 @@
 
 //#define DEBUG_PRINT_VALUE
 //#define DEBUG_QUAD_SPLIT
-//#define DEBUG_DUAL_SPLIT
-//#define DEBUG_DUAL_SPLIT_MIRROR
+//#define DEBUG_DUAL_SPLIT_X
+//#define DEBUG_DUAL_SPLIT_Y
+//#define DEBUG_DUAL_SPLIT_MIRROR_X
 
 
 #include "config.inc"
@@ -56,6 +57,8 @@ layout(location = 27) out float vDotMat_Grid_Sharpness;
 layout(location = 28) out float vfprintvalue;
 layout(location = 29) out float vPG_mask_height;
 layout(location = 30) out float vPG_spark;
+
+layout(location = 31) out float vDeltaRenderOk;
 
 #include "includes/functions.include.slang"
 
@@ -219,6 +222,10 @@ void main() {
             vDotMat_Grid_Sharpness = clamp(vDotMat_Grid_Sharpness, 0.1, 20.0);
             //vfprintvalue = vDotMat_Grid_Sharpness;
         }
+                                                                                               // Delta render, mandatory conditions:
+    vDeltaRenderOk = float(  ( params.FrameCount % int(DELTA_RENDER_FORCE_REFRESH) != 0.0 ) && // - We are in a frame that is not forced for full refresh
+                             ( vIsInterlaced != 1.0 || PIXELGRID_INTR_DISABLE_Y == 1.0 || DO_PIXELGRID_H == 0.0)   // - screen is not interlaced or we disabled scanlines on interlaced content
+                           ); 
 }
 
 
@@ -254,6 +261,7 @@ layout(location = 27) in float vDotMat_Grid_Sharpness;
 layout(location = 28) in float vfprintvalue;
 layout(location = 29) in float vPG_mask_height;
 layout(location = 30) in float vPG_spark;
+layout(location = 31) in float vDeltaRenderOk;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -271,6 +279,7 @@ layout(set = 0, binding = 10) uniform sampler2D shift_and_bleed_pass;
 layout(set = 0, binding = 11) uniform sampler2D in_glow_pass;
 layout(set = 0, binding = 12) uniform sampler2D halo_pass;
 
+layout(set = 0, binding = 13) uniform sampler2D final_passFeedback;
 
 layout(set = 0, binding = 15) uniform sampler2D flick_and_noise_pass;
 
@@ -370,7 +379,6 @@ vec3 morph_shape_mix(vec3 shape, vec3 power, float steep, float mixto, vec3 mix_
 }
 
 vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inLum) { 
-    
     //Tate ? (other outputsize,originalsize and outputcoords "tated" in vertex shader.)
         if (vDo_Tate == 1.0) in_coords.xy = in_coords.yx;
 
@@ -418,7 +426,8 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 rgb_w = (rgb_w * rgb_w);
 
             //modulate each phosphor width according to input luminance
-               vec3 phosphor_width = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
+               vec3 pixel_in_gammed = pow(pixel_in,vec3(PIXELGRID_GAMMA_W));
+               vec3 phosphor_width = map_range(pixel_in_gammed, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
                 rgb_w = morph_shape(rgb_w, phosphor_width, PIXELGRID_NO_INTERBLEED_W);
         }
     
@@ -478,7 +487,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //phosphors mask stagger
                 #define PH_MASH_OFFSET  (PIXELGRID_Y_MASK_OFFSET * pi * 0.5 )
                 
-            //Use abs(cos) (later 1-abs(cos) to get orizontal gaps, use pow to make them steep.
+            //Use abs(cos) (later 1-abs(cos) to get horizontal gaps, use pow to make them steep.
             //Stagger them by PH_MASH_OFFSET on even triads
                 float mask_shape = abs(cos(  PIXELGRID_Y_MASK_SHIFT*pi +   PH_MASK_HEIGHT  + (PH_MASH_OFFSET * is_even)) ) ;
                 
@@ -508,8 +517,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         vec3 mask = min( (rgb_w * rgb_h), darklines_mask * rgb_h); //<- this way it does not interfree with scanline height!
         //FIXME: test with coore or fuzzy coords how it works when using variable width phosphors, maybe 
         //it would need to be: vec3 mask = min((rgb_w * rgb_h), darklines_mask * rgb_h * rgb_w); =
-        
-      
+          
     //Apply the mask to the input pixel and return it 
     //with the alpha channel containing the mask itself, so that halo can selectively light it.
         return vec4(mask * pixel_in, dot(mask, vec3(0.3333)));
@@ -575,9 +583,6 @@ float get_clamped_white_reference(vec3 pixel_in){
     return white_reference;
 }
 
-
-float global_noise_static = 0.0;
-
 vec3 pixel_backdrop_image() {
     vec2 backdrop_offset=vec2(BACKDROP_OFFX,BACKDROP_OFFY);
 
@@ -621,7 +626,7 @@ vec4 textureLod_wrap(sampler2D tex, vec2 co, float lod, float wrap_mode) {
 }
 
 
-vec3 pixel_alternate(vec3 source, float strength) {
+float pixel_blank_alternate(float strength) {
     /*
              vec3 pixel_strobe = pixel_out.rgb * mod(params.FrameCount, 2);
                 float max_c = max(pixel_out.r, max(pixel_out.g, pixel_out.b));
@@ -635,29 +640,31 @@ vec3 pixel_alternate(vec3 source, float strength) {
 
     
     float line = vTexCoord.y * params.OutputSize.y;
-    vec3 pixel_out = clamp(source, 0.0, 1.0);
     float l_period_half = ALT_BLANK_PERIOD / 2;
     
     
     //Use another alg that affects less dark colors for negative strength values.
-    if (strength < 0.0) {
+   /* if (strength < 0.0) {
         strength *= -1;
-        float max_c = max(pixel_out.r, max(pixel_out.g, pixel_out.b));
+        float max_c = max(source.r, max(source.g, source.b));
         float max_c_adpt = 1 - (max_c * 0.5);
         strength *= max_c_adpt;
-    }
-
+    }*/
     
-    
-    
-  
+    //If the frame has been completely blanked, rendered will be 0.0
+    //rendered will be returned and can be used to skip 
+    float rendered;
     
     if  (mod(float(params.FrameCount),2.0  ) == 1) {
-        if  (mod(line,ALT_BLANK_PERIOD) > l_period_half) pixel_out=mix(source,vec3(0), strength) ;
+        if  (mod(line,ALT_BLANK_PERIOD) > l_period_half) {
+            return strength;
+        }
     } else {
-        if  (mod(line,ALT_BLANK_PERIOD) <= l_period_half) pixel_out=mix(source,vec3(0), strength) ;
+        if  (mod(line,ALT_BLANK_PERIOD) <= l_period_half) {
+            return strength;
+        }
     }
-    return pixel_out;
+    return 1.0;
 }
 
 
@@ -785,10 +792,22 @@ float gaussian_coefficient(float x, float sigma) {
 
 
 vec3 fn_pixel_content(vec2 coords) {
+    
     vec3 pixel_in;
     vec3 pixel_glowed;
     vec3 pixel_bleed; //pixel_bleed is the color that will bleed over scanline gap.
                       //Used for SCANLINES_BLEEDING parameter only
+    
+    
+    //Black frame insertion, made static, enable it in config.inc.
+        #ifdef ALLOW_ALT_BLANK
+            float alt_blank_power = 1.0;
+            //Calculate if line has to be blanked
+                if (DO_ALT_BLANK == 1.0 ) alt_blank_power = pixel_blank_alternate( 1 - ALT_BLANK_STRENGTH);
+            
+            //If we completely blanked the line, there is no need to process it further.
+                if (alt_blank_power == 0.0) return vec3(0.0);
+        #endif
     
     if  (DO_IN_GLOW == 1.0) {
         pixel_glowed = texture(in_glow_pass,coords).rgb;
@@ -843,27 +862,15 @@ vec3 fn_pixel_content(vec2 coords) {
             vec3 bloomed=texture(bloom_pass_final, coords).rgb ;
             pixel_out = bloomed + float(BLOOM_BYPASS < 0.5) * pixel_out;
         }
-        
-    //Vignette
-        if (DO_VIGNETTE == 1.0) {
-            float dist = length(vec2((coords.x-0.5)*vIn_aspect, coords.y-0.5));
-            float vignette = smoothstep(V_SIZE,0.0,dist)*V_POWER;
-            pixel_out = pixel_out * vignette + global_noise_static;
-        }
-        
-    //Spot
-        if (DO_SPOT == 1.0) {
-                float dist = length(vec2((coords.x-0.5)*vIn_aspect, coords.y-0.5)+spot_offset);
-                float spot = smoothstep(S_SIZE,0.0,dist)*S_POWER;
-                pixel_out = pixel_out + spot + (global_noise_static * (1 - DO_VIGNETTE));
-        }
-    
+            
+            
     //Black frame insertion, made static, enable it in config.inc.
         #ifdef ALLOW_ALT_BLANK
             if (DO_ALT_BLANK == 1.0 )
-                pixel_out.rgb = pixel_alternate(pixel_out.rgb, ALT_BLANK_STRENGTH );
+                //apply the blank power we calculated earlier in the code.
+                pixel_out.rgb = clamp(pixel_out.rgb,0.0,1.0) *  alt_blank_power;
         #endif
-        
+    
     return pixel_out;
 }
 
@@ -981,7 +988,7 @@ void main() {
     //Curvature 
         //Curvature has to come after inner zoom or bezel curved border will not match content
         //curved border when inner zoom changes.
-        if (DO_CURVATURE == 1.0  &&  ((GEOM_WARP_X != 0.0) || (GEOM_WARP_Y != 0.0))) {
+        if (DO_CURVATURE + GEOM_WARP_X + GEOM_WARP_Y > 1.0) {
             co_content = Warp_fast(co_content, vWarp_vexp, vWarp_arg2, GEOM_CUT_EARS);
         }
         
@@ -1005,19 +1012,30 @@ void main() {
             canvas_busy = float(is_first_inside_rect(co_content, RECT01)); //FIXME: is step() faster?
         }
 
-        
-    //Calc a random noise for vignette or spot (this seems a sweet spot in the code to not lose speed)
-        if (DO_VIGNETTE + DO_SPOT > 0.0) {
-            global_noise_static = random_fast(NOISEPOWER, vTexCoord);
+    if (DELTA_RENDER == 1.0) {
+        bool reuse_old =  bool( texture(in_glow_pass, co_content).a * canvas_busy * vDeltaRenderOk ) ;
+        if (reuse_old) {
+            FragColor = texture(final_passFeedback, vOutputCoord) ;
+            return;
         }
-
-        
+    }
+              
     vec3 pixel_ambi = vec3(0.0);
     vec3 pixel_under_content = vec3(0.0);
     //Draw content only over the alpha mask, and sample ambientlight outside it to spare gpu cycles.
         if (canvas_busy > 0.5) {
             pixel_out = fn_pixel_content(co_content) * canvas_busy;
         } else {
+            
+            //Can we halve refresh rate in the outside border to spare some cycles?
+            if ( HALVE_BORDER_UPDATE == 1.0 ) {
+                if ((params.FrameCount % 2) == 1.0) {
+                    pixel_out = texture(final_passFeedback, vOutputCoord).rgb;
+                    FragColor = vec4(pixel_out, 1.0);
+                    return;
+                }
+            }
+            
             //Ambient light
             if (DO_AMBILIGHT == 1.0) {
                 pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb;
@@ -1031,6 +1049,12 @@ void main() {
                 pixel_under_content = pixel_ambi * (1-canvas_busy);
             }
         }
+    
+    //This represents the inner bezel alpha (when using bezel) 
+    //or the pixel_content canvas (when not using bezel)
+    //It is used to draw spot on the whole inner tube even when toe content does not
+    //fill the whole tube.
+        float canvas_bezel_screen = canvas_busy; 
     
     //Draw Bezel
         vec4 pixel_bezel;
@@ -1048,9 +1072,31 @@ void main() {
                 float rect_bezel = float(is_first_inside_rect(co_bezel, vec4(BEZEL_SHADOW_SIZE, BEZEL_SHADOW_SIZE, 1.0 - BEZEL_SHADOW_SIZE, 1.0 - BEZEL_SHADOW_SIZE)));
                 canvas_busy = max(pixel_bezel.a, rect_bezel);
                 //FragColor = vec4(canvas_busy); return; // <- uncomment to debug BEZEL_SHADOW_SIZE
+                
+                //Intersect rect_bezel and bezel alpha to get the inner tube alpha
+                canvas_bezel_screen = (1 - pixel_bezel.a) * rect_bezel;
         }
 
 
+        //Vignette
+            if (DO_VIGNETTE == 1.0) {
+                float dist = length(vec2((co_content.x-0.5)*vIn_aspect, co_content.y-0.5));
+                float vignette = smoothstep(V_SIZE,0.0,dist)*V_POWER;
+                pixel_out = pixel_out*vignette;
+            }
+            
+        //Spot
+            if (DO_SPOT == 1.0) {
+                    float dist = length(vec2((co_content.x-0.5)*vIn_aspect, co_content.y-0.5)+spot_offset);
+                    float spot = smoothstep(S_SIZE,0.0,dist)*S_POWER;
+                    pixel_out = pixel_out + spot * canvas_bezel_screen ;
+            }
+
+  
+        if (DO_VIGNETTE + DO_SPOT > 0.0) {
+            pixel_out += random_fast(NOISEPOWER, vOutputCoord )*canvas_bezel_screen  ;
+        }
+        
         //Background image have, no need to paint if not in the outer border:
             if (DO_BG_IMAGE == 1.0 && BG_IMAGE_OVER == 0.0 && canvas_busy < 1.0) {
                 vec4 pixel_bg_image = fn_pixel_fgbg_image(bg_under);
@@ -1106,11 +1152,15 @@ void main() {
             pixel_out = texture(flick_and_noise_pass,vOutputCoord).rgb;
         #endif
     
-        #ifdef DEBUG_DUAL_SPLIT
+        #ifdef DEBUG_DUAL_SPLIT_Y
             if (vTexCoord.y < 0.5) pixel_out = texture(flick_and_noise_pass,vTexCoord).rgb;
         #endif
 
-        #ifdef DEBUG_DUAL_SPLIT_MIRROR
+        #ifdef DEBUG_DUAL_SPLIT_X
+            if (vTexCoord.x > 0.5) pixel_out = texture(flick_and_noise_pass,vTexCoord).rgb;
+        #endif
+            
+        #ifdef DEBUG_DUAL_SPLIT_MIRROR_X
             if (vTexCoord.x > 0.5) pixel_out = texture(flick_and_noise_pass,vec2(1-vTexCoord.x, vTexCoord.y) ).rgb;
         #endif
 
