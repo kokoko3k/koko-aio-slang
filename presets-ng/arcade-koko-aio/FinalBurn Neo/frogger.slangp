@@ -8,6 +8,7 @@ BG_IMAGE_ROTATION = "2.000000"
 DO_AMBILIGHT = "0.000000"
 S_POWER = "0.250000"
 bg_under = "../../shaders/shaders_slang/bezel/koko-aio/textures/arcade_textures/frogger.png"
+bg_over = "../../shaders/shaders_slang/bezel/koko-aio/textures/arcade_textures/frogger.png"
 
 // Credits
 // shader by kokoko3k - https://github.com/kokoko3k/koko-aio-slang

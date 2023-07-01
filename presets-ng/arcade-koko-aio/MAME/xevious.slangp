@@ -8,6 +8,7 @@ BG_IMAGE_OVER = "1.000000"
 BG_IMAGE_OFFX = "0.001500"
 DO_AMBILIGHT = "0.000000"
 DO_SPOT = "0.000000"
+bg_under = "../../shaders/shaders_slang/bezel/koko-aio/textures/arcade_textures/xevious.png"
 bg_over = "../../shaders/shaders_slang/bezel/koko-aio/textures/arcade_textures/xevious.png"
 
 // Credits
