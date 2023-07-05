@@ -1029,7 +1029,7 @@ void main() {
             
             //Can we halve refresh rate in the outside border to spare some cycles?
             if ( HALVE_BORDER_UPDATE == 1.0 ) {
-                if ((params.FrameCount % 2) == 1.0) {
+                if ((params.FrameCount % 2) != 1.0) {
                     pixel_out = texture(final_passFeedback, vOutputCoord).rgb;
                     FragColor = vec4(pixel_out, 1.0);
                     return;
