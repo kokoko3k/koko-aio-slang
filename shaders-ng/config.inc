@@ -59,6 +59,9 @@
 
 
 // AMBIENT LIGHT STATIC CONFIG ##########################################################################################
+
+	// 0.0-1.0: sensitivity to scene change (ambilike stuff), 0.0 changes more
+#define AMBI_SCENE_CHG_THRSHLD 0.07  
 	// The following will allow to sample at reduced interval
 	// The scene change detection logic will take advantage of it
 	// So that quick fades will still be treated as scene changes
