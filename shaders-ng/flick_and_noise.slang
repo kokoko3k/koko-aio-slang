@@ -13,7 +13,7 @@
 #define DEBUG_BLINK_TIME 3
 #define DEBUG_GRADIENT_STEPS 128
 
-#define DEBUG
+//#define DEBUG
    #define DEBUG_TIME_FADE
    //#define DEBUG_SOLID_COLOR
    //#define DEBUG_STEP_GRADIENT
