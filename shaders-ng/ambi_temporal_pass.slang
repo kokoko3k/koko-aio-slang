@@ -127,7 +127,6 @@ float fcircle_smooth(vec2 coords, vec2 middle, float f_radius, float FALLOFF) {
 #define tol_end   1-tol_start
 
 
-
 vec3 ambi_pre_pass(vec2 coords) {
     if (DO_TILT == 1.0)
         coords = tilt(coords, vIs_rotated, vec2(TILT_X, TILT_Y));
@@ -201,7 +200,6 @@ vec3 ambi_pre_pass(vec2 coords) {
 }
 
 
-
 #define MAX_STEPS AMBI_STEPS
 
 float ambi_step(float start, float end, float mystep) {
@@ -230,26 +228,25 @@ vec4 pixel_ambilight(vec2 local_pre_pass_coords) {
     vec3 present_pixel =  ambi_pre_pass(local_pre_pass_coords).rgb;
     vec3 past_pixel =     past_pixel_vec4.rgb;
 
-    float scene_change_remaining = past_pixel_vec4.a;
-
     float past_avg_lum = texture(avglum_passFeedback,vec2(0.25,0.25)).a;
     float present_avg_lum = texture(avglum_pass        ,vec2(0.25,0.25)).a;
     float diff_avg_lum = abs(past_avg_lum - present_avg_lum);
 
+    float scene_change = 0.0;
     if (diff_avg_lum >= AMBI_SCENE_CHG_THRSHLD) {
-        scene_change_remaining = 1.0;
+        scene_change = 1.0;
     }
 
     // Are we changing scene?
     vec3 mystep;
-    if (scene_change_remaining > 0.0) {
-        mystep = vec3(max(1.0/MAX_STEPS, AMBI_FAST_STEP)); // <- Never slow down fades due to fast step when changing scene
-        scene_change_remaining -=  AMBI_FAST_STEP;
+    if (scene_change > 0.0) {
+        mystep = vec3(max(1.0/MAX_STEPS, 1.0)); // <- Never slow down fades due to fast step when changing scene
+        scene_change == 0.0;
     } else {
         mystep = abs((past_pixel - present_pixel) / MAX_STEPS); //OK
     }
 
-    return vec4(ambi_step_rgb(past_pixel, present_pixel, mystep), scene_change_remaining);
+    return vec4(ambi_step_rgb(past_pixel, present_pixel, mystep), scene_change);
 }
 
 //3.0 makes scene detection not working.

@@ -10,14 +10,14 @@
 #define CCUSTOM vec3(1.0,0.5,0.1)
 
 #define DEBUG_COLOR CWHITE
-#define DEBUG_BLINK_TIME 1
+#define DEBUG_BLINK_TIME 10
 #define DEBUG_GRADIENT_STEPS 128
 
 //#define DEBUG
-   //#define DEBUG_TIME_FADE
+   #define DEBUG_TIME_FADE
    //#define DEBUG_SOLID_COLOR
    //#define DEBUG_STEP_GRADIENT
-   #define DEBUG_BLINK
+   //#define DEBUG_BLINK
    //#define DEBUG_BLINK_CIRCLE
    //#define DEBUG_COLORWHEEL
 
@@ -118,7 +118,7 @@ void debug() {
    vec3 pixel_debug;
    
    #ifdef DEBUG_TIME_FADE
-      float time_fade = abs(sin(params.FrameCount/3.14/20));
+      float time_fade = abs(sin(params.FrameCount/3.14/DEBUG_BLINK_TIME));
       vec3 color_fade = DEBUG_COLOR * time_fade;
       pixel_debug = color_fade;
       
