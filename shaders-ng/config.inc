@@ -65,7 +65,18 @@
 	// The following will allow to sample at reduced interval
 	// The scene change detection logic will take advantage of it
 	// So that quick fades will still be treated as scene changes
-#define AMBI_AVGLUM_DIVIDER 2
+#define AMBI_AVGLUM_DIVIDER 4
+
+	// The following defines the speed of the color fades 
+	// when changing scene. (range 0..1)
+	// It is wise to correlate it with avglum_divider
+	// try between (1/avglum_divider) and (1/avglum_divider)/3
+//#define AMBI_FAST_STEP 0.125
+#define AMBI_FAST_STEP 0.25
+
+
+
+
 
 
 
@@ -623,7 +634,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 //Emulates leds under the monitor frame that slowly reacts to image contents
 #pragma parameter DO_AMBILIGHT	            "★ Ambient light leds enable? ==> "				1.0  0.0  1.0     1.0
 #pragma parameter LABEL_WARNING3            "    ⚠ RetroArch aspect needs to be set to Full! ⚠"		1.0  1.0  1.0     1.0
-#pragma parameter AMBI_STEPS	            "        Slowness"						50.0 5.0  1000.0  5.0
+#pragma parameter AMBI_STEPS	            "        Slowness"						60.0 5.0  1000.0  5.0
 #pragma parameter AMBI_INT_OFFSET           "        Led internalness"              0.07 -1.0 1.0 0.01
 #pragma parameter AMBI_POWER                "        Led power"						1.8  0.0  100.0     0.05
 #pragma parameter AMBI_FALLOFF              "        Light Falloff"						0.4  0.1  3.0     0.01
