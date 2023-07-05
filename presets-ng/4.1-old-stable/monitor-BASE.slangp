@@ -1,9 +1,9 @@
 #reference "../../koko-aio-ng.slangp"
 
 DO_CCORRECTION = "1.0"
-	GAMMA_OUT = "0.53"	
+	GAMMA_OUT = "0.51"	
 	SATURATION = "1.00"
-	LUMINANCE = "0.2"
+	LUMINANCE = "0.1"
 	
 DO_SHIFT_RGB = "1.0"
 	OFFSET_STRENGTH = "0.25"
@@ -12,7 +12,7 @@ DO_SHIFT_RGB = "1.0"
 	SHIFT_B = "20.0"
 	
 DO_IN_GLOW = "1.0"
-	IN_GLOW_POWER = "1.950000"
+	IN_GLOW_POWER = "1.825000"
 	IN_GLOW_W = "0.0"
 	IN_GLOW_H = "2.0"
 	IN_GLOW_GAMMA = "2.0"
