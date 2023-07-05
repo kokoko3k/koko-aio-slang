@@ -10,7 +10,7 @@
 #define CCUSTOM vec3(1.0,0.5,0.1)
 
 #define DEBUG_COLOR CWHITE
-#define DEBUG_BLINK_TIME 10
+#define DEBUG_BLINK_TIME 2
 #define DEBUG_GRADIENT_STEPS 128
 
 //#define DEBUG
@@ -20,7 +20,7 @@
    //#define DEBUG_BLINK
    //#define DEBUG_BLINK_CIRCLE
    //#define DEBUG_COLORWHEEL
-
+   //#define DEBUG_SERVICE1
 
 #include "config.inc"
 #pragma stage vertex
@@ -118,8 +118,9 @@ void debug() {
    vec3 pixel_debug;
    
    #ifdef DEBUG_TIME_FADE
-      float time_fade = abs(sin(params.FrameCount/3.14/DEBUG_BLINK_TIME));
-      vec3 color_fade = DEBUG_COLOR * time_fade;
+      float a = (sin(params.FrameCount/3.14/DEBUG_BLINK_TIME));
+      float b = floor(a)+1;
+      vec3 color_fade = DEBUG_COLOR * a*b;
       pixel_debug = color_fade;
       
    #elif defined DEBUG_SOLID_COLOR   
@@ -143,6 +144,9 @@ void debug() {
       pixel_debug = vec3(1 - step(radius, length(center)));
       pixel_debug *= float( ( mod(params.FrameCount, DEBUG_BLINK_TIME * 2) < DEBUG_BLINK_TIME));
       pixel_debug *= DEBUG_COLOR;
+      
+  #elif defined DEBUG_SERVICE1
+      pixel_debug = vec3(SERVICE1);
       
    #elif defined DEBUG_COLORWHEEL   
       pixel_debug = colorwheel(vTexCoord);   

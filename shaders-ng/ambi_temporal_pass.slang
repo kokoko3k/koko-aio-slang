@@ -231,25 +231,20 @@ vec4 pixel_ambilight(vec2 local_pre_pass_coords) {
     float past_avg_lum = texture(avglum_passFeedback,vec2(0.25,0.25)).a;
     float present_avg_lum = texture(avglum_pass        ,vec2(0.25,0.25)).a;
     float diff_avg_lum = abs(past_avg_lum - present_avg_lum);
-
-    float scene_change = 0.0;
-    if (diff_avg_lum >= AMBI_SCENE_CHG_THRSHLD) {
-        scene_change = 1.0;
-    }
-
-    // Are we changing scene?
-    vec3 mystep;
-    if (scene_change > 0.0) {
-        mystep = vec3(max(1.0/MAX_STEPS, 1.0)); // <- Never slow down fades due to fast step when changing scene
-        scene_change == 0.0;
-    } else {
-        mystep = abs((past_pixel - present_pixel) / MAX_STEPS); //OK
-    }
-
-    return vec4(ambi_step_rgb(past_pixel, present_pixel, mystep), scene_change);
+    
+    //Per pixel step/fade speed, depends on pixel variation
+    vec3 pixel_step = abs((past_pixel - present_pixel) / MAX_STEPS); //OK
+    
+    //Global speed modulation, depends on scene luminance change.
+    float global_speedup = pow(diff_avg_lum*2.0,2.0);
+    
+    //Final fade speed
+    vec3 mystep = mix(pixel_step, vec3(1.0), global_speedup);
+    
+    return vec4(ambi_step_rgb(past_pixel, present_pixel, mystep), global_speedup);
+    
 }
 
-//3.0 makes scene detection not working.
 #define FRAME_DIVIDER 2.0
 
 void main() {
