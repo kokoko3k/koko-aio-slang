@@ -65,7 +65,7 @@
 	// The following will allow to sample at reduced interval
 	// The scene change detection logic will take advantage of it
 	// So that quick fades will still be treated as scene changes
-#define AMBI_AVGLUM_DIVIDER 4
+#define AMBI_AVGLUM_DIVIDER 3
 
 	// The following defines the speed of the color fades 
 	// when changing scene. (range 0..1)
