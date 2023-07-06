@@ -1,0 +1,7 @@
+#reference "tv-NTSC-1-selective.slangp"
+
+NTSC_ARTF_TRSH = "0.150000"
+NTSC_ARTF_NOBLUR = "1.000000"
+NTSC_ARTF_NOBLEED = "1.000000"
+HALO_W = "7.000000"
+HALO_H = "7.000000"
