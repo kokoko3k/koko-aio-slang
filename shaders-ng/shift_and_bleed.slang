@@ -47,7 +47,7 @@ layout(location = 0) out vec4 FragColor;
 
 layout(set = 0, binding = 3) uniform sampler2D FXAA_pass;
 layout(set = 0, binding = 4) uniform sampler2D flick_and_noise_pass;
-
+layout(set = 0, binding = 5) uniform sampler2D colortools_and_ntsc_pass;
 
 #define bandwidth_mhz_Y_ntsc 4.2
 #define bandwidth_mhz_I 1.5
@@ -116,7 +116,10 @@ vec3 deconvergence_shadow_wrap (vec2 coord) {
 
 
 vec3 pixel_bleed_side_NTSC(vec3 pixel_in, vec2 co, float size, float side, sampler2D in_texture, vec4 sourcesize2) {
-   float w = SAT_BLEED_STRENGTH;
+   //apply strength modifier to blur ntsc artifacts more.
+   float strength_modifier = texture(colortools_and_ntsc_pass,co).a;
+   if (NTSC_SHOW_ARTF_MASK == 1.0) return vec3(strength_modifier);
+   float w = SAT_BLEED_STRENGTH * clamp (strength_modifier, (1-NTSC_ARTF_NOBLEED), 1.0 );// * NTSC_ARTF_NOBLEED);
    vec3 blur_YIQ = pixel_in * mat3_RGB2YIQ;    //Work in YIQ space
    float i = 0.0;
    for ( i=1 ; i <= size ; i++ ){

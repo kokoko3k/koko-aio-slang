@@ -71,7 +71,10 @@
 	#define NTSC_FILTER_FC			global.NTSC_FILTER_FC
 	#define NTSC_MIX				global.NTSC_MIX
 	#define NTSC_PHASE_SHIFT		global.NTSC_PHASE_SHIFT
-
+	#define NTSC_ARTF_NOBLUR 		global.NTSC_ARTF_NOBLUR
+	#define NTSC_ARTF_NOBLEED 		global.NTSC_ARTF_NOBLEED
+	#define NTSC_ARTF_TRSH 			global.NTSC_ARTF_TRSH
+	#define NTSC_SHOW_ARTF_MASK 	global.NTSC_SHOW_ARTF_MASK
 
 
 #define DO_RF_NOISE		global.DO_RF_NOISE

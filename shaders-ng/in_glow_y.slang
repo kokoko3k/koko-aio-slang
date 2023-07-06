@@ -115,7 +115,7 @@ void main() {
       pixel_glowed = blur9_y(Source, vTexCoord, params.SourceSize.xy, vIN_GLOW_H) * IN_GLOW_POWER;
       if (IN_GLOW_BIAS < IN_GLOW_BIAS_MAX && 
          (IN_GLOW_W < GLOW_SHARP_MAX || IN_GLOW_H < GLOW_SHARP_MAX) &&
-         (IN_GLOW_SHOW_ARTF_MASK < 0.5) ) {
+         (NTSC_SHOW_ARTF_MASK < 0.5) ) {
            pixel_glowed = glow_blur_bias(shift_and_bleed_pass, vTexCoord, pixel_glowed, IN_GLOW_BIAS);
            //pixel_glowed = antialias_blur_bias(shift_and_bleed_pass, vTexCoord, pixel_glowed, IN_GLOW_BIAS);
       }

@@ -152,15 +152,10 @@ void main() {
       pixel_out = pixel_out_vec4.rgb;
 
       artifacts = pixel_out_vec4.a;
-      //artifacts = mix(artifacts, texture(colortools_and_ntsc_passFeedback, vTexCoord).a, 0.5);  <-- this helps
-//FragColor = vec4(artifacts); return;
-      
-/*
-      //artifacts = pow(artifacts, IN_GLOW_NTSC_ARTF_TRSH * 8.0);
-      artifacts = artifacts * IN_GLOW_NTSC_ARTF_MULT;
-      artifacts = smoothstep(IN_GLOW_NTSC_ARTF_TRSH, 1.0, artifacts);
-      //artifacts = min(artifacts, 1.0); //<- useless since clamp happens if not uising float framebuffer.
-*/
+      //apply the minimum treshold.
+         artifacts = smoothstep(NTSC_ARTF_TRSH, 1.0, artifacts);
+
+
       
    } else {
       pixel_out = texture(Source, vTexCoord).rgb;

@@ -60,15 +60,9 @@ void main() {
    //since the lookup should have been cached already or will serve so.
       float ntsc_artifacts = texture(shift_and_bleed_pass, vTexCoord).a;
 
-   //apply an optional gain to artifacts
-      ntsc_artifacts = ntsc_artifacts * IN_GLOW_NTSC_ARTF_MULT;
-   //then apply the minimum treshold and scale them to input sharpness so that they can always blur to max.
-      ntsc_artifacts = smoothstep(IN_GLOW_NTSC_ARTF_TRSH, 1.0, ntsc_artifacts * IN_GLOW_NTSC_ARTF_MULT) * IN_GLOW_W;
-
-      
-
-   //finally "subtract" them to the configured sharpness (-> more blur)
-      IN_GLOW_W_ADAPTED = IN_GLOW_W_ADAPTED - ntsc_artifacts;
+   
+   //finally "add" them to the configured sharpness (-> less blur)
+      IN_GLOW_W_ADAPTED = IN_GLOW_W_ADAPTED + ((1-ntsc_artifacts) * NTSC_ARTF_NOBLUR);
 
    //don't allow lower values that look bad:
       IN_GLOW_W_ADAPTED = max(IN_GLOW_W_ADAPTED, MIN_IN_GLOW_SHARP);
@@ -87,7 +81,7 @@ void main() {
    FragColor = vec4( blur9_x(shift_and_bleed_pass, vTexCoord, global.flick_and_noise_passSize.xy, IN_GLOW_W_ADAPTED), DR_unchanged);
 
    //To debug ntsc artifacts mask:
-   if (IN_GLOW_SHOW_ARTF_MASK > 0.5)
+   if (NTSC_SHOW_ARTF_MASK > 0.5)
       FragColor = vec4(ntsc_artifacts);
    
 }
