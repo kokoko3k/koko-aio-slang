@@ -18,15 +18,31 @@
     Use it if you don't want to blur the image and you still don't like<br>
     jagged or too much pixelated images.<br>
 
+** RF Noise: **<br>
+    Emulates radio frequency noise with a given strength<br>
+    
 **CVBS: NTSC color artifacts: **<br>
     Tries to emulate typical NTSC color artifacting without emulating<br>
     full NTSC coding/decoding pipeline.<br>
     While it improves the look of NTSC content, don't expect it to be<br>
     an accurate emulation (yet?)<br>
     As today, it is enough to emulate rainbowing effects on genesis.<br>
+    If you enable Glow/Blur functions or Bandwidth limited chroma,<br>
+    the image will be blurred in a way or another.<br>
+    You can selectively keep the part of the image which does not contain<br>
+    artifacts sharp by using the followin controls.<br>
+    This allow to selectively blend artifacts.
     
-** RF Noise: **<br>
-    Emulates radio frequency noise with a given strength<br>
+    Show NTSC artifacts mask (debug):
+        This will show only the part of the image that contains artifacts.
+        Use it to for a better visual feedback of the following parameters
+    Selective artifacts treshold:
+        Tune this to select more or less artifacts, depending on their strength.
+    Non-artifacts: Cancel blur (Glow):
+        How much the glow/blur function will skip blurring "unartifacted" areas.
+    Non-artifacts: Cancel Bandwidth limited chroma:
+        How much the Bandwidth limited chroma function will skip blurring 
+        "unartifacted" areas.        
     
 **CVBS: Bandwidth limited chroma:**<br>
     Will cause an horizontal chroma bleed which cheaply mimics the effect of<br>
@@ -59,17 +75,6 @@
         Higher negative values -> more glow : brighter colors expands over darker ones.
         Higher positive values -> means blur: all the colors are blurred.
         0.0 means no blur, no glow.
-    Blur NTSC artifacts more
-        When NTSC artifacts emulation is enabled, this option will let you blur
-        them more, this would help to selectively blur things like waterfalls
-        in Sonic 2.
-        The value you set it will be subtracted from glow horizontal sharpness.
-    Blur less NTSC artifacts (min treshold)
-        In relation to the previous setting, this allow to blur only the most
-        prominent artifacts.
-    Show NTSC artifacts mask (debug)
-        This will help you to set the previous 2 values as it will show only
-        the artifacts that will modify the blur.
 
 **Tate mode:**<br>
     Rotates mask and scanlines by 90°<br>
