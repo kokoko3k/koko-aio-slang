@@ -846,7 +846,7 @@ vec2 tilt(vec2 co, float is_rotated, vec2 tilt) {
 
 }
 	
-bool is_first_outside_rect(vec2 point, vec4 rect) {
+/*bool is_first_outside_rect(vec2 point, vec4 rect) {
 	return (point.x < rect.x || point.x > rect.z ||
 			point.y < rect.y || point.y > rect.w) ;
 }
@@ -855,6 +855,16 @@ bool is_first_inside_rect(vec2 point, vec4 rect) {
 	return (point.x >= rect.x && point.x < rect.z &&
 			point.y >= rect.y && point.y < rect.w) ;
 }
+*/
+bool is_first_inside_rect(vec2 point, vec4 rect) {
+	vec2 bounded = clamp(point, rect.xy, rect.zw);
+	return point == bounded;
+}
+bool is_first_outside_rect(vec2 point, vec4 rect) {
+	vec2 bounded = clamp(point, rect.xy, rect.zw);
+	return point != bounded;
+}
+
 
 // COLOR TOOLS
 	vec3 kelvin2rgb(float k) {
