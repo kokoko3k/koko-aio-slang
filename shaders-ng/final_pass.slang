@@ -418,13 +418,16 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         vec3 freq_rgb = vec3(freq_base.x) - PG_offsets;
 
         
-            //The following is needed by vertical mask level1 and 2
-        //sin() tell use if the current cell position is odd or even:        
-            float o =  (pi/(PG_h_count*2.0));  
-            float sin_check_offset = sin(freq_base_unfloored.x + o);
-            float is_even = step(sin_check_offset, 0.0);
+    //The following is needed by vertical mask level1 and 2
+    //sin() tell use if the current cell position is odd or even:
+    //Moving it up there provides a small speed up due to
+    //increased parallalism, I guess.
+        float o =  (pi/(PG_h_count*2.0));  
+        float sin_check_offset = sin(freq_base_unfloored.x + o);
+        float is_even = step(sin_check_offset, 0.0);
         
-    //Width phosphor mask:
+        
+    //Horizontal Triad Mask: **************************************************
         vec3 rgb_w = vec3(1.0);
         if (DO_PIXELGRID_W > 0.0) {
             //get 3 sines in black/white
@@ -439,20 +442,15 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 rgb_w = morph_shape(rgb_w, phosphor_width, PIXELGRID_NO_INTERBLEED_W);
         }
     
-    //Mask strength modifiers for hmask, performs way better outside the main if then ^^ up there ^^
-        vec3 rgb_w_weakness = (pixel_in * PIXELGRID_HMASK_NO_BRIGHT) ;
-        rgb_w_weakness = clamp(rgb_w_weakness,0.0,1.0);
-        rgb_w = mix( rgb_w, vec3(1.0), rgb_w_weakness);
-        rgb_w = mix( vec3(1.0), rgb_w, DO_PIXELGRID_W);
+        //Mask strength modifiers for hmask, performs way better outside the main if then ^^ up there ^^
+            vec3 rgb_w_weakness = (pixel_in * PIXELGRID_HMASK_NO_BRIGHT) ;
+            rgb_w_weakness = clamp(rgb_w_weakness,0.0,1.0);
+            rgb_w = mix( rgb_w, vec3(1.0), rgb_w_weakness);
+            rgb_w = mix( vec3(1.0), rgb_w, DO_PIXELGRID_W);
 
     
-     
-
-    //Height phosphor mask (can be used for scanlines, slotmask, aperturegrille):
+    //Height phosphor mask (can be used for scanlines, slotmask, aperturegrille) ***********************************************:
         vec3 rgb_h = vec3(1.0);
-        
-
-        
         
         if (DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0)) {
             //calculate each phosphor height according to input luminance 
@@ -477,8 +475,8 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         }
 
         
-        
-    //Height phosphor mask number 2, can be used for slotmask,aperturegrille, not scanlines.
+    //Height phosphor mask number 2, *********************************************** 
+    // can be used for slotmask,aperturegrille, not scanlines.
     //...well technically yes, but they would have a boxed shape.
         vec3 darklines_mask=vec3(1.0);
         
