@@ -121,7 +121,7 @@
             avoid them to blend.
             Use Min and Max parameter to limit the minimum and maximum size
             they can reach.
-        Mask gamma:
+        Mask width min->max gamma:
                 Since emulating phosphors with high Min-Max range changes the apparent gamma of the final image,
                 it is advised, if needed, to use this option to compensate, instead of the main gamma correction.
         Fade on bright:
