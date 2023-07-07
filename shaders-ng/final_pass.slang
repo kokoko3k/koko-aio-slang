@@ -57,9 +57,9 @@ layout(location = 27) out float vDotMat_Grid_Sharpness;
 layout(location = 28) out float vfprintvalue;
 layout(location = 29) out float vPG_mask_height;
 layout(location = 30) out float vPG_spark;
-
 layout(location = 31) out float vDeltaRenderOk;
 layout(location = 32) out float vDo_pixelgrid_h;
+layout(location = 33) out float vDo_Curvature;
 
 #include "includes/functions.include.slang"
 
@@ -210,9 +210,11 @@ void main() {
     
     //Pixelgrid: do horizontal if enabled, but skip it if user doesn't want it on interlaced content.
         vDo_pixelgrid_h = float(DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0));
-                
+
     //vPG_spark = PIXELGRID_Y_SPARK * PIXELGRID_Y_MASK; <--vertex shader collapses here.
         
+    vDo_Curvature = DO_CURVATURE + GEOM_WARP_X + GEOM_WARP_Y;
+    
     //Dot matrix: measure the final picture size to choose a right sharpness level
     //For simplicity and (my) mental health, take only y into account.
         vDotMat_Grid_Sharpness = DOT_M_G_SHARP;
@@ -267,6 +269,9 @@ layout(location = 29) in float vPG_mask_height;
 layout(location = 30) in float vPG_spark;
 layout(location = 31) in float vDeltaRenderOk;
 layout(location = 32) in float vDo_pixelgrid_h;
+layout(location = 33) in float vDo_Curvature;
+
+
 
 layout(location = 0) out vec4 FragColor;
 
@@ -997,7 +1002,8 @@ void main() {
     //Curvature 
         //Curvature has to come after inner zoom or bezel curved border will not match content
         //curved border when inner zoom changes.
-        if (DO_CURVATURE + GEOM_WARP_X + GEOM_WARP_Y > 1.0) {
+        //if (DO_CURVATURE + GEOM_WARP_X + GEOM_WARP_Y > 1.0) {
+        if (vDo_Curvature > 1.0) {
             co_content = Warp_fast(co_content, vWarp_vexp, vWarp_arg2, GEOM_CUT_EARS);
         }
         
