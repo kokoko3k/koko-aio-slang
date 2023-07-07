@@ -455,10 +455,12 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         //Mask strength modifiers for hmask, performs way better outside the main if then ^^ up there ^^
             vec3 rgb_w_weakness = (pixel_in * PIXELGRID_HMASK_NO_BRIGHT) ;
             rgb_w_weakness = clamp(rgb_w_weakness,0.0,1.0);
+            
             rgb_w = mix( rgb_w, vec3(1.0), rgb_w_weakness);
             rgb_w = mix( vec3(1.0), rgb_w, DO_PIXELGRID_W);
-
-    
+            //The following should be equivalent to ^ ^ but it seems slower.
+            //    rgb_w = mix( vec3(1.0), rgb_w, DO_PIXELGRID_W * (1-rgb_w_weakness)  );
+            
     //Height phosphor mask (can be used for scanlines, slotmask, aperturegrille) ***********************************************:
         vec3 rgb_h = vec3(1.0);
         

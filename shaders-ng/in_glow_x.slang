@@ -62,7 +62,7 @@ void main() {
 
    
    //finally "add" them to the configured sharpness (-> less blur)
-//      IN_GLOW_W_ADAPTED = IN_GLOW_W_ADAPTED + ((1-ntsc_artifacts) * NTSC_ARTF_NOBLUR);
+      IN_GLOW_W_ADAPTED = IN_GLOW_W_ADAPTED + ((1-ntsc_artifacts) * NTSC_ARTF_NOBLUR);
 
    //don't allow lower values that look bad:
       IN_GLOW_W_ADAPTED = max(IN_GLOW_W_ADAPTED, MIN_IN_GLOW_SHARP);
