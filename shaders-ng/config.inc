@@ -224,16 +224,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float SAT_BLEED_STRENGTH;
 	float SAT_BLEED_PAL;
 	
-	float DO_NTSC_ARTIFACTS;
-	float NTSC_FILTER_WIDTH;
-	float NTSC_FILTER_SCF;
-	float NTSC_FILTER_FC;
-	float NTSC_MIX;
-	float NTSC_PHASE_SHIFT;
-	float NTSC_ARTF_NOBLUR;
-	float NTSC_ARTF_NOBLEED;
-	float NTSC_ARTF_TRSH;
-	float NTSC_SHOW_ARTF_MASK;
+
 	
 
 	float GAMMA_OUT ;
@@ -391,13 +382,29 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float PIXELGRID_H_PRST;
 	float PIXELGRID_NO_FLOOR;
 	float PIXELGRID_GAMMA_W;
-
+	float PIXELGRID_HMASK_NO_BRIGHT;
+	
 	float DELTA_RENDER_FORCE_REFRESH;
 	float DELTA_RENDER_CHECK_AREA;
 	
+
+	float DO_NTSC_ARTIFACTS;
+	float NTSC_FILTER_WIDTH;
+	float NTSC_FILTER_SCF;
+	float NTSC_FILTER_FC;
+	float NTSC_MIX;
+	float NTSC_PHASE_SHIFT;
+
+	float NTSC_ARTF_NOBLEED;
+	float NTSC_ARTF_NOBLUR;
+	float NTSC_ARTF_TRSH;
+	float NTSC_SHOW_ARTF_MASK;
+	
 	float SERVICE1;
-	float SERVICE2;
-	float PIXELGRID_HMASK_NO_BRIGHT;
+	
+	
+	
+
 	
 } global;
 

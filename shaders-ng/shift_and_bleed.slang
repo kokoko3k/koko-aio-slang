@@ -119,7 +119,8 @@ vec3 pixel_bleed_side_NTSC(vec3 pixel_in, vec2 co, float size, float side, sampl
    //apply strength modifier to blur ntsc artifacts more.
    float strength_modifier = texture(colortools_and_ntsc_pass,co).a;
    if (NTSC_SHOW_ARTF_MASK == 1.0) return vec3(strength_modifier);
-   float w = SAT_BLEED_STRENGTH * clamp (strength_modifier, (1-NTSC_ARTF_NOBLEED), 1.0 );// * NTSC_ARTF_NOBLEED);
+//   float w = SAT_BLEED_STRENGTH * clamp (strength_modifier, (1-NTSC_ARTF_NOBLEED), 1.0 );// * NTSC_ARTF_NOBLEED);
+   float w = SAT_BLEED_STRENGTH;
    vec3 blur_YIQ = pixel_in * mat3_RGB2YIQ;    //Work in YIQ space
    float i = 0.0;
    for ( i=1 ; i <= size ; i++ ){
