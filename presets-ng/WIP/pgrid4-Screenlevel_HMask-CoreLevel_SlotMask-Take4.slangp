@@ -1,4 +1,10 @@
 #reference "pgrid4-Screenlevel_HMask-CoreLevel_SlotMask-Take3.slangp"
+IN_GLOW_POWER= "2.4"
+
+LUMINANCE = "0.0"
 PIXELGRID_HMASK_NO_BRIGHT = "0.130000"
-PIXELGRID_MAX_H = "0.80"
+PIXELGRID_MAX_H = "1.0"
 HALO_VS_SCAN = "0.0"
+
+PIXELGRID_MAX_W = "0.400000"
+DO_PIXELGRID_H = "0.600000"
