@@ -59,6 +59,7 @@ layout(location = 29) out float vPG_mask_height;
 layout(location = 30) out float vPG_spark;
 
 layout(location = 31) out float vDeltaRenderOk;
+layout(location = 32) out float vDo_pixelgrid_h;
 
 #include "includes/functions.include.slang"
 
@@ -207,7 +208,10 @@ void main() {
         vPG_mask_height = PIXELGRID_Y_MASK_HEIGHT;
         if (vPG_mask_height < 0.0) vPG_mask_height = 1/-vPG_mask_height;
     
-        //vPG_spark = PIXELGRID_Y_SPARK * PIXELGRID_Y_MASK; <--vertex shader collapses here.
+    //Pixelgrid: do horizontal if enabled, but skip it if user doesn't want it on interlaced content.
+        vDo_pixelgrid_h = float(DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0));
+                
+    //vPG_spark = PIXELGRID_Y_SPARK * PIXELGRID_Y_MASK; <--vertex shader collapses here.
         
     //Dot matrix: measure the final picture size to choose a right sharpness level
     //For simplicity and (my) mental health, take only y into account.
@@ -262,6 +266,7 @@ layout(location = 28) in float vfprintvalue;
 layout(location = 29) in float vPG_mask_height;
 layout(location = 30) in float vPG_spark;
 layout(location = 31) in float vDeltaRenderOk;
+layout(location = 32) in float vDo_pixelgrid_h;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -452,7 +457,9 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
     //Height phosphor mask (can be used for scanlines, slotmask, aperturegrille) ***********************************************:
         vec3 rgb_h = vec3(1.0);
         
-        if (DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0)) {
+        //Pixelgrid: do horizontal if enabled, but skip it if user doesn't want it on interlaced content.
+        //if (DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0)) { //103.1
+        if (vDo_pixelgrid_h > 0.5) {
             //calculate each phosphor height according to input luminance 
                 vec3 phosphor_height = map_range(pixel_in * rgb_w, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
                 
