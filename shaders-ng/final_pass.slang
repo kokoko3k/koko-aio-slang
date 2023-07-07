@@ -379,6 +379,7 @@ vec3 morph_shape_mix(vec3 shape, vec3 power, float steep, float mixto, vec3 mix_
 }
 
 vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inLum) { 
+    
     //Tate ? (other outputsize,originalsize and outputcoords "tated" in vertex shader.)
         if (vDo_Tate == 1.0) in_coords.xy = in_coords.yx;
 
@@ -416,6 +417,13 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         
         vec3 freq_rgb = vec3(freq_base.x) - PG_offsets;
 
+        
+            //The following is needed by vertical mask level1 and 2
+        //sin() tell use if the current cell position is odd or even:        
+            float o =  (pi/(PG_h_count*2.0));  
+            float sin_check_offset = sin(freq_base_unfloored.x + o);
+            float is_even = step(sin_check_offset, 0.0);
+        
     //Width phosphor mask:
         vec3 rgb_w = vec3(1.0);
         if (DO_PIXELGRID_W > 0.0) {
@@ -443,11 +451,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
     //Height phosphor mask (can be used for scanlines, slotmask, aperturegrille):
         vec3 rgb_h = vec3(1.0);
         
-        //The following is needed by vertical mask level1 and 2
-        //sin() tell use if the current cell position is odd or even:        
-            float o =  (pi/(PG_h_count*2.0));  
-            float sin_check_offset = sin(freq_base_unfloored.x + o);
-            float is_even = step(sin_check_offset, 0.0);
+
         
         
         if (DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0)) {
