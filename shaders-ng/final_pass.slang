@@ -24,43 +24,50 @@ layout(location = 0) out vec2 vTexCoord;
 layout(location = 1) out vec2 vOutputCoord;
 layout(location = 2) out vec2 spot_offset;
 
-layout(location = 4) out float vIsRotated;
+layout(location = 3) out float vIsRotated;
 
 
 //Curvature:
-    layout(location = 5) out vec2 vWarp_vexp;
-    layout(location = 6) out vec2 vWarp_arg2;
+    layout(location = 4) out vec2 vWarp_vexp;
+    layout(location = 5) out vec2 vWarp_arg2;
 
 //Scanlines:
-    layout(location = 7) out float vIsInterlaced;
-    layout(location = 9) out float vScanlinePeriod;
-    layout(location = 10) out float vScanlineAlternateOffset;
-    layout(location = 11) out float vMax_inLum;
+    layout(location = 6) out float vIsInterlaced;
+    layout(location = 7) out float vScanlinePeriod;
+    layout(location = 8) out float vScanlineAlternateOffset;
+    layout(location = 9) out float vMax_inLum;
     
 //Vignette, spot:
-    layout(location = 12) out float vIn_aspect;
+    layout(location = 10) out float vIn_aspect;
     
-layout(location = 13) out float vDynamicSeed;
-layout(location = 14) out float vBEZEL_INNER_ZOOM_adapted;
+layout(location = 11) out float vDynamicSeed;
+layout(location = 12) out float vBEZEL_INNER_ZOOM_adapted;
 
 
-layout(location = 17) out float vDo_Tate;
-layout(location = 18) out vec3 vDotMat_Grid_Color;
-layout(location = 19) out vec4 vPG_offsets_and_size;
-layout(location = 20) out vec2 vPG_freq_base_screen;
-layout(location = 21) out vec2 vPG_freq_base_screen_unfloored;
-layout(location = 22) out vec2 vPG_period_multiplier;
-layout(location = 24) out vec2 vPG_OriginalSize_tated;
-layout(location = 25) out vec2 vPG_OutputSize_tated;
-layout(location = 26) out vec2 vPG_OutputCoord_tated;
-layout(location = 27) out float vDotMat_Grid_Sharpness;
-layout(location = 28) out float vfprintvalue;
-layout(location = 29) out float vPG_mask_height;
-layout(location = 30) out float vPG_spark;
+layout(location = 13) out float vDo_Tate;
+layout(location = 14) out vec3 vDotMat_Grid_Color;
+layout(location = 15) out vec4 vPG_offsets_and_size;
+layout(location = 16) out vec2 vPG_freq_base_screen;
+layout(location = 17) out vec2 vPG_freq_base_screen_unfloored;
+layout(location = 18) out vec2 vPG_period_multiplier;
+layout(location = 19) out vec2 vPG_OriginalSize_tated;
+layout(location = 20) out vec2 vPG_OutputSize_tated;
+layout(location = 21) out vec2 vPG_OutputCoord_tated;
+layout(location = 22) out float vDotMat_Grid_Sharpness;
+layout(location = 23) out float vfprintvalue;
+layout(location = 24) out float vPG_mask_height;
+layout(location = 25) out float vPG_spark;
 
-layout(location = 3) out float vDeltaRenderOk;
-layout(location = 8) out float vDo_pixelgrid_h;
-layout(location = 15) out float vDo_Curvature;
+layout(location = 26) out float vDeltaRenderOk;
+layout(location = 27) out float vDo_pixelgrid_h;
+layout(location = 28) out float vDo_Curvature;
+
+
+layout(location = 31) out float I_am_a_placeholder_keep_reading;
+//..to remind you that location = 31 is the last accepted by vulkan
+//or Retroarch crashes or nvidia starts to give Xids.
+//unsure if the issue is with retroarch or with vulkan specs.
+//If in short, consider to pack more datas into vec2,3,4.
 
 #include "includes/functions.include.slang"
 
@@ -242,36 +249,36 @@ layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in vec2 vOutputCoord;
 layout(location = 2) in vec2 spot_offset;
 
-layout(location = 4) in float vIsRotated;
-layout(location = 5) in vec2 vWarp_vexp;
-layout(location = 6) in vec2 vWarp_arg2;
-layout(location = 7) in float vIsInterlaced;
+layout(location = 3) in float vIsRotated;
+layout(location = 4) in vec2 vWarp_vexp;
+layout(location = 5) in vec2 vWarp_arg2;
+layout(location = 6) in float vIsInterlaced;
 
-layout(location = 9) in float vScanlinePeriod;
-layout(location = 10) in float vScanlineAlternateOffset;
-layout(location = 11) in float vMax_inLum;
-layout(location = 12) in float vIn_aspect;
-layout(location = 13) in float vDynamicSeed;
-layout(location = 14) in float vBEZEL_INNER_ZOOM_adapted;
+layout(location = 7) in float vScanlinePeriod;
+layout(location = 8) in float vScanlineAlternateOffset;
+layout(location = 9) in float vMax_inLum;
+layout(location = 10) in float vIn_aspect;
+layout(location = 11) in float vDynamicSeed;
+layout(location = 12) in float vBEZEL_INNER_ZOOM_adapted;
 
 
-layout(location = 17) in float vDo_Tate;
-layout(location = 18) in vec3 vDotMat_Grid_Color;
-layout(location = 19) in vec4 vPG_offsets_and_size;
-layout(location = 20) in vec2 vPG_freq_base_screen;
-layout(location = 21) in vec2 vPG_freq_base_screen_unfloored;
-layout(location = 22) in vec2 vPG_period_multiplier;
-layout(location = 24) in vec2 vPG_OriginalSize_tated;
-layout(location = 25) in vec2 vPG_OutputSize_tated;
-layout(location = 26) in vec2 vPG_OutputCoord_tated;
-layout(location = 27) in float vDotMat_Grid_Sharpness;
-layout(location = 28) in float vfprintvalue;
-layout(location = 29) in float vPG_mask_height;
-layout(location = 30) in float vPG_spark;
+layout(location = 13) in float vDo_Tate;
+layout(location = 14) in vec3 vDotMat_Grid_Color;
+layout(location = 15) in vec4 vPG_offsets_and_size;
+layout(location = 16) in vec2 vPG_freq_base_screen;
+layout(location = 17) in vec2 vPG_freq_base_screen_unfloored;
+layout(location = 18) in vec2 vPG_period_multiplier;
+layout(location = 19) in vec2 vPG_OriginalSize_tated;
+layout(location = 20) in vec2 vPG_OutputSize_tated;
+layout(location = 21) in vec2 vPG_OutputCoord_tated;
+layout(location = 22) in float vDotMat_Grid_Sharpness;
+layout(location = 23) in float vfprintvalue;
+layout(location = 24) in float vPG_mask_height;
+layout(location = 25) in float vPG_spark;
 
-layout(location = 3) in float vDeltaRenderOk;
-layout(location = 8) in float vDo_pixelgrid_h;
-layout(location = 15) in float vDo_Curvature;
+layout(location = 26) in float vDeltaRenderOk;
+layout(location = 27) in float vDo_pixelgrid_h;
+layout(location = 28) in float vDo_Curvature;
 
 
 
