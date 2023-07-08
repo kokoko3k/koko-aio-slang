@@ -124,7 +124,7 @@
 #define HALVE_BORDER_UPDATE 1.0
 
 	//Renders only changed parts of screen.
-#define DELTA_RENDER 0.0
+#define DELTA_RENDER 1.0
 
 	//Static dithering applied over vignette and spot
 #define NOISEPOWER 5/1000.0
