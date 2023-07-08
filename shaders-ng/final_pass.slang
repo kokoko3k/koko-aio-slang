@@ -57,9 +57,10 @@ layout(location = 27) out float vDotMat_Grid_Sharpness;
 layout(location = 28) out float vfprintvalue;
 layout(location = 29) out float vPG_mask_height;
 layout(location = 30) out float vPG_spark;
-layout(location = 31) out float vDeltaRenderOk;
-layout(location = 32) out float vDo_pixelgrid_h;
-layout(location = 33) out float vDo_Curvature;
+
+layout(location = 3) out float vDeltaRenderOk;
+layout(location = 8) out float vDo_pixelgrid_h;
+layout(location = 15) out float vDo_Curvature;
 
 #include "includes/functions.include.slang"
 
@@ -267,9 +268,10 @@ layout(location = 27) in float vDotMat_Grid_Sharpness;
 layout(location = 28) in float vfprintvalue;
 layout(location = 29) in float vPG_mask_height;
 layout(location = 30) in float vPG_spark;
-layout(location = 31) in float vDeltaRenderOk;
-layout(location = 32) in float vDo_pixelgrid_h;
-layout(location = 33) in float vDo_Curvature;
+
+layout(location = 3) in float vDeltaRenderOk;
+layout(location = 8) in float vDo_pixelgrid_h;
+layout(location = 15) in float vDo_Curvature;
 
 
 
