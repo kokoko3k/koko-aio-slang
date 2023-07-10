@@ -492,7 +492,27 @@
     Bezel multiplier:
         Can be used to adjust the bezel rotation
         in relation to the game tilt amount
+        
+**Delta Render:**
+    Koko-aio can render only the part of the screen that has been changed,<br>
+    leading to a measurable power consumption reduction.<br>
+    This feature can, however, produce artifacts in some cases, so the feature<br>
+    is statically disabled by default by now.<br>
+    To use it, you have to manually switch, in file config.inc: <br>
+    #define DELTA_RENDER 0.0 <br>
+    to <br>
+    #define DELTA_RENDER 1.0 <br>
     
+    Force refresh interval:
+        Forces a full screen refresh every #number of frames;
+        if there was artifacts on the screen, they will be cleared.
+        Power comsumption benefits will be lower.
+    Delta render area size
+        If you see artifacts, try to make this higher.
+        Artifacts come basically from bloom.
+        By highering this value, Delta render can take higher blur radiouses
+        into account.
+        Power comsumption benefits will be lower.
     
 **Alternate line blanking:**<br>
     CRT monitors \*real\* refresh was amazing, today is just "meh" in most cases.<br>
