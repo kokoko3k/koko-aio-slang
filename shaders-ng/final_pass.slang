@@ -361,41 +361,50 @@ float morph_shape_full(float shape, float power, float steep ) {
     return shape;
 }
 
+vec3 morph_shape_full_vec3(vec3 shape, vec3 l, float steep ) {
+    vec3 l_pow = pow(l,vec3(4.2));
+    vec3 l2 = l_pow * 16;
+    l2 = clamp(l2, 0.0,1.0);
+    vec3 s1 = pow(shape, 1/sqrt(l2));
+    vec3 s2 = (1-s1) * l_pow;
+    return s1+(s2/(1+steep));
+}
+
+/*vec3 morph_shape_full_vec3(vec3 shape, vec3 l, float steep ) {
+    vec3 l_pow = pow(l,vec3(4.1));
+    vec3 l2 = l_pow * 16;
+    l2 = clamp(l2, 0.0,1.0);
+    vec3 s1 = pow(shape, 1/sqrt(l2));
+    vec3 s2 = (1-s1) * l_pow * (l*l);
+    return s1+(s2/(1+steep));
+}*/
 
 vec3 morph_shape(vec3 shape, vec3 power, float steep ) {
-    return vec3(
+   return morph_shape_full_vec3(shape, power, steep);
+
+    return vec3(    
+      morph_shape_full(shape.x, power.x, steep),
+      morph_shape_full(shape.y, power.y, steep),
+      morph_shape_full(shape.z, power.z, steep)
+    );
+   
+        
+    //Use this to compare different methods
+    if (params.FrameCount % 2 == 0.0)
+        return morph_shape_full_vec3(shape, power, steep);
+            else
+    return vec3(    
       morph_shape_full(shape.x, power.x, steep),
       morph_shape_full(shape.y, power.y, steep),
       morph_shape_full(shape.z, power.z, steep)
     );
 }
 
-float morph_shape(float shape, float power, float steep ) {
+/*float morph_shape(float shape, float power, float steep ) {
     return morph_shape_full(shape, power, steep);
-}
-
-float morph_shape_full_mix(float shape, float power, float steep, float mixto, float mix_strength ) {
-    float lum_scaled = power;
-    float l = lum_scaled; // (already clamped)
-    if (lum_scaled <= 0.5+steep) {
-        float l1 = pow(l, 4) * 15;
-        shape = pow(shape, 1/sqrt(l1));
-    } else {
-        float l2 = (l-0.5)*2.0;
-        shape = mix(shape, 1.0, l2);    //shape = shape * (1-l2) + l2;
-    }
-    mix_strength = clamp(mix_strength, 0.0, 1.0);
-    return mix(mixto, shape, mix_strength);
-}
+}*/
 
 
-vec3 morph_shape_mix(vec3 shape, vec3 power, float steep, float mixto, vec3 mix_strength ) {
-    return vec3(
-      morph_shape_full_mix(shape.x, power.x, steep, mixto, mix_strength.x),
-      morph_shape_full_mix(shape.y, power.y, steep, mixto, mix_strength.y),
-      morph_shape_full_mix(shape.z, power.z, steep, mixto, mix_strength.z)
-    );
-}
 
 vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inLum) { 
     
@@ -448,19 +457,19 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         
     //Horizontal Triad Mask: **************************************************
         vec3 rgb_w = vec3(1.0);
-        if (DO_PIXELGRID_W > 0.0) {
+        if (DO_PIXELGRID_W > 0.0) { //4%
             //get 3 sines in black/white
                 rgb_w = cos(freq_rgb);
-
             //make them always positive and double frequency:
                 rgb_w = (rgb_w * rgb_w);
-
+                
+                
             //modulate each phosphor width according to input luminance
                vec3 pixel_in_gammed = pow(pixel_in,vec3(PIXELGRID_GAMMA_W));
                vec3 phosphor_width = map_range(pixel_in_gammed, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
-                rgb_w = morph_shape(rgb_w, phosphor_width, PIXELGRID_NO_INTERBLEED_W);
+                rgb_w = morph_shape(rgb_w, phosphor_width, PIXELGRID_NO_INTERBLEED_W); //2%
         }
-    
+    //1%
         //Mask strength modifiers for hmask, performs way better outside the main if then ^^ up there ^^
             vec3 rgb_w_weakness = (pixel_in * PIXELGRID_HMASK_NO_BRIGHT) ;
             rgb_w_weakness = clamp(rgb_w_weakness,0.0,1.0);
@@ -470,13 +479,17 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //The following should be equivalent to ^ ^ but it seems slower.
             //    rgb_w = mix( vec3(1.0), rgb_w, DO_PIXELGRID_W * (1-rgb_w_weakness)  );
             
+            
     //Height phosphor mask (can be used for scanlines, slotmask, aperturegrille) ***********************************************:
         vec3 rgb_h = vec3(1.0);
         
         //Pixelgrid: do horizontal if enabled, but skip it if user doesn't want it on interlaced content.
         //if (DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0)) { //103.1
         if (vDo_pixelgrid_h > 0.5) {
+            //4%
             //calculate each phosphor height according to input luminance 
+                //FIXME since scanline weight depends on rgb_w, max_inlum should depend on it too.
+                //It's probably something like min(max_inLum, PIXELGRID_MAX_W) when hmask is active ofc.
                 vec3 phosphor_height = map_range(pixel_in * rgb_w, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
                 
             //offset trias to emulate core level slotmask by applying the optional offset to emulate the slotmask on even cells
@@ -504,6 +517,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         vec3 darklines_mask=vec3(1.0);
         
         if (PIXELGRID_Y_MASK > 0.0) {
+            //2%
             //Switch reference coords according to user pref: 
                 float freq_cell_y = mix_step(freq_base_core.y, freq_base_screen.y, PIXELGRID_Y_MASK_COORDS);
 
@@ -529,12 +543,14 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //apply user visibility modifier to the mask
                 darklines_mask = 1-(mask_shape*V);
         }
-     
+        
     //Try to get a more brillant/sparkling look by highering the darklines
     //effect (sub) and pushing the source color, useful for slotmasks.
         float vPG_spark = PIXELGRID_Y_SPARK * PIXELGRID_Y_MASK;
         darklines_mask -= vPG_spark;
         pixel_in *= vPG_spark*4 + 1;
+     
+
      
         
     //Finally put width,height1 and height2 masks togheter:

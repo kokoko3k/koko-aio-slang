@@ -86,6 +86,15 @@ vec4 sub_bench6(vec2 point) {
 		return vec4(0.1);
 	return vec4(0.0);
 }
+
+vec4 sub_bench7(vec2 point){
+	//point.x = point.x*3.14*10;
+	return vec4(pow(cos(point.x), 2.0)); //33.3
+	//return vec4( cos(point.x) * cos(point.x) );
+	//return vec4(     (cos(point.x*2)+1.0)/2.0                          );  //36.8
+	//float c = cos(point.x); return vec4(c*c); //33.3
+	
+}
 	
 void main() {
 	int iterations = 300;
@@ -98,7 +107,10 @@ void main() {
 		//pixel_out += sub_bench3(vTexCoord); //87 //86.8			33.06
 		//pixel_out += sub_bench4(vTexCoord); //112.6 //112.7		44.7
 		//pixel_out += sub_bench5(vTexCoord); //113.3 //112.8			44.82
-		pixel_out += sub_bench6(vTexCoord); //113.3 //112.8			44.82
+		//pixel_out += sub_bench6(vTexCoord); //113.3 //112.8			44.82
+		
+		pixel_out += sub_bench7(vTexCoord);
+		
 	}
 	FragColor = pixel_out ; 
 	//FragColor = texture(Source, vTexCoord); 
