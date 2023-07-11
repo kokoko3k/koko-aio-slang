@@ -361,14 +361,23 @@ float morph_shape_full(float shape, float power, float steep ) {
     return shape;
 }
 
-vec3 morph_shape_full_vec3(vec3 shape, vec3 l, float steep ) {
-    vec3 l_pow = pow(l,vec3(4.2));
-    vec3 l2 = l_pow * 16;
-    l2 = clamp(l2, 0.0,1.0);
+vec3 morph_shape_full_vec3(vec3 shape, vec3 l, float steep, float gamma ) {
+    vec3 l_pow = pow(l,vec3(gamma));
+    vec3 l2 = min(l_pow * 16, 1+steep);
     vec3 s1 = pow(shape, 1/sqrt(l2));
     vec3 s2 = (1-s1) * l_pow;
     return s1+(s2/(1+steep));
+    
 }
+
+/*vec3 morph_shape_full_vec3(vec3 shape, vec3 l, float steep ) {
+    vec3 l_pow = pow(l,vec3(4.2));
+    vec3 l2 = l_pow * 16;
+    l2 = clamp(l2, 0.0, 1+steep);
+    vec3 s1 = pow(shape, 1/sqrt(l2));
+    vec3 s2 = (1-s1) * l_pow;
+    return s1+(s2/(l+steep));
+}*/
 
 /*vec3 morph_shape_full_vec3(vec3 shape, vec3 l, float steep ) {
     vec3 l_pow = pow(l,vec3(4.1));
@@ -379,8 +388,8 @@ vec3 morph_shape_full_vec3(vec3 shape, vec3 l, float steep ) {
     return s1+(s2/(1+steep));
 }*/
 
-vec3 morph_shape(vec3 shape, vec3 power, float steep ) {
-   return morph_shape_full_vec3(shape, power, steep);
+vec3 morph_shape(vec3 shape, vec3 power, float steep, float gamma ) {
+   return morph_shape_full_vec3(shape, power, steep, gamma);
 
     return vec3(    
       morph_shape_full(shape.x, power.x, steep),
@@ -391,7 +400,7 @@ vec3 morph_shape(vec3 shape, vec3 power, float steep ) {
         
     //Use this to compare different methods
     if (params.FrameCount % 2 == 0.0)
-        return morph_shape_full_vec3(shape, power, steep);
+        return morph_shape_full_vec3(shape, power, steep, gamma);
             else
     return vec3(    
       morph_shape_full(shape.x, power.x, steep),
@@ -462,12 +471,12 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 rgb_w = cos(freq_rgb);
             //make them always positive and double frequency:
                 rgb_w = (rgb_w * rgb_w);
-                
-                
-            //modulate each phosphor width according to input luminance
-               vec3 pixel_in_gammed = pow(pixel_in,vec3(PIXELGRID_GAMMA_W));
-               vec3 phosphor_width = map_range(pixel_in_gammed, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
-                rgb_w = morph_shape(rgb_w, phosphor_width, PIXELGRID_NO_INTERBLEED_W); //2%
+            
+            //Scale Max width according to pre-gains:
+                vec3 phosphor_width = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
+
+            //Get final phosphor width:
+                rgb_w = morph_shape(rgb_w, phosphor_width, PIXELGRID_NO_INTERBLEED_W, PIXELGRID_GAMMA_W); //2%
         }
     //1%
         //Mask strength modifiers for hmask, performs way better outside the main if then ^^ up there ^^
@@ -491,7 +500,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 //FIXME since scanline weight depends on rgb_w, max_inlum should depend on it too.
                 //It's probably something like min(max_inLum, PIXELGRID_MAX_W) when hmask is active ofc.
                 vec3 phosphor_height = map_range(pixel_in * rgb_w, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
-                
+                //phosphor_height = vec3(1.0);
             //offset trias to emulate core level slotmask by applying the optional offset to emulate the slotmask on even cells
                 float core_offset =  is_even * pi * PIXELGRID_OFFSET_CORE;
                 
@@ -506,7 +515,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 
             //Finally get 3 sines out of the previous one by applying height modifiers
                 rgb_h = vec3(rgb_h_sin);
-                rgb_h = morph_shape(rgb_h, phosphor_height, PIXELGRID_NO_INTERBLEED_H);
+                rgb_h = morph_shape(rgb_h, phosphor_height, PIXELGRID_NO_INTERBLEED_H, 4.2);
                 rgb_h = mix(vec3(1.0), rgb_h, DO_PIXELGRID_H);
         }
 
