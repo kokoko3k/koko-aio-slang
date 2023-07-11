@@ -380,6 +380,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float PIXELGRID_B_SHIFT;
 	float PIXELGRID_H_COUNT;
 	float PIXELGRID_H_PRST;
+	float PIXELGRID_GAMMA_H;
 	float PIXELGRID_NO_FLOOR;
 	float PIXELGRID_GAMMA_W;
 	float PIXELGRID_HMASK_NO_BRIGHT;
@@ -499,7 +500,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter PIXELGRID_B_SHIFT  "                . 0: B shift"      2.0  0.0 4.0 0.1
 #pragma parameter PIXELGRID_MIN_W    "           . Phosphors width Min"			0.25 0.05 1.0 0.01
 #pragma parameter PIXELGRID_MAX_W    "           . Phosphors width Max"			0.25 0.05 1.0 0.01
-#pragma parameter PIXELGRID_GAMMA_W  "           . Mask width min->max gamma:"	4.2 1.0 8.00 0.1
+#pragma parameter PIXELGRID_GAMMA_W  "           . Phosphors width min->max gamma:"	4.2 1.0 8.00 0.1
 #pragma parameter PIXELGRID_MUL_X    "           . Cell size multiplier x (neg=divider):"	1.0 -8.0 8.0 0.125
 #pragma parameter PIXELGRID_HMASK_NO_BRIGHT  "           . Fade on bright"	0.0 0.0 1.0 0.01
 
@@ -511,8 +512,9 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter PIXELGRID_SIZE_H          "           . Resolution: (core for scanlines or screen)"	0.0 0.0 1.0 1.0
 #pragma parameter PIXELGRID_MIN_H	        "           . Phosphors height Min"			0.2 0.0 1.0 0.05
 #pragma parameter PIXELGRID_MAX_H           "           . Phosphors height Max"			0.6 0.0 1.0 0.05
+#pragma parameter PIXELGRID_GAMMA_H  "           . Phosphors height min->max gamma:"	4.2 1.0 8.00 0.1
 #pragma parameter PIXELGRID_OFFSET_CORE     "           . Slotmask offset (0.10..0.25 ok)"	0.0 0.0 1.0 0.01
-#pragma parameter PIXELGRID_MUL_Y           "           . Cell size multiplier y (neg=divider):"	1.0 -8.0 8.0 0.125
+#pragma parameter PIXELGRID_MUL_Y           "           . Line size multiplier y (neg=divider):"	1.0 -8.0 8.0 0.125
 #pragma parameter PIXELGRID_NO_INTERBLEED_H	"           . Inter line extra steepness (handhelds)"		0.0 0.0 10.0 0.1
 
 #pragma parameter BLANK12f " " 0.0 0.0 1.0 1.0
