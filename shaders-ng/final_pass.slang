@@ -57,11 +57,18 @@ layout(location = 22) out float vDotMat_Grid_Sharpness;
 layout(location = 23) out float vfprintvalue;
 layout(location = 24) out float vPG_mask_height;
 layout(location = 25) out float vPG_spark;
+layout(location = 26) out vec4 vfloats_packed1;
+//We're running out of available locations for vulkan (max index = 31), so we packed 4 floats into 1.
+    //layout(location = 26) in float vDeltaRenderOk;
+    //layout(location = 27) in float vDo_pixelgrid_h;
+    //layout(location = 28) in float vDo_Curvature;
+    //layout(location = 29) in float vPG_offsets_adjust_for_stagger;
+    #define vDeltaRenderOk  vfloats_packed1.r
+    #define vDo_pixelgrid_h vfloats_packed1.g
+    #define vDo_Curvature   vfloats_packed1.b
+    #define vPG_offsets_adjust_for_stagger vfloats_packed1.a
 
-layout(location = 26) out float vDeltaRenderOk;
-layout(location = 27) out float vDo_pixelgrid_h;
-layout(location = 28) out float vDo_Curvature;
-layout(location = 29) out float vPG_offsets_adjust_for_stagger;
+
 
 layout(location = 31) out float I_am_a_placeholder_keep_reading;
 //..to remind you that location = 31 is the last accepted by vulkan
@@ -279,10 +286,16 @@ layout(location = 23) in float vfprintvalue;
 layout(location = 24) in float vPG_mask_height;
 layout(location = 25) in float vPG_spark;
 
-layout(location = 26) in float vDeltaRenderOk;
-layout(location = 27) in float vDo_pixelgrid_h;
-layout(location = 28) in float vDo_Curvature;
-layout(location = 29) in float vPG_offsets_adjust_for_stagger;
+layout(location = 26) in vec4 vfloats_packed1;
+//We're running out of available locations for vulkan (max index = 31), so we packed 4 floats into 1.
+    //layout(location = 26) in float vDeltaRenderOk;
+    //layout(location = 27) in float vDo_pixelgrid_h;
+    //layout(location = 28) in float vDo_Curvature;
+    //layout(location = 29) in float vPG_offsets_adjust_for_stagger;
+    #define vDeltaRenderOk  vfloats_packed1.r
+    #define vDo_pixelgrid_h vfloats_packed1.g
+    #define vDo_Curvature   vfloats_packed1.b
+    #define vPG_offsets_adjust_for_stagger vfloats_packed1.a
 
 
 layout(location = 0) out vec4 FragColor;
