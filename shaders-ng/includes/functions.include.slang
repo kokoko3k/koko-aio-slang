@@ -951,7 +951,7 @@ vec4 PG_get_hmask_preset() {
         return vec4( PIXELGRID_R_SHIFT, PIXELGRID_G_SHIFT, PIXELGRID_B_SHIFT, PIXELGRID_H_COUNT);
     
     if (PIXELGRID_H_PRST == 1.0)
-        return vec4( vec3(0,1,0), 2); // gm, mask size 2
+        return vec4( vec3(1,0,1), 2); // gm, mask size 2
 
     if (PIXELGRID_H_PRST == 2.0)
         return vec4( vec3(1,0,1), 3); //gmx, mask size 3

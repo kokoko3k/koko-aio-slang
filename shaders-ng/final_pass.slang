@@ -187,8 +187,9 @@ void main() {
     //Pixelgrid: get mask type; .rgb contains layout, .a contains the size.
         #define PG_H_COUNT vPG_offsets_and_size.a
         vPG_offsets_and_size = PG_get_hmask_preset() ;
-        //This is needed to make sure triad order is preserved (visible when staggering the slotmask).
-            vPG_offsets_adjust_for_stagger = (pi*0.5)/PG_H_COUNT;
+        //This is needed to make sure triad order is preserved and consistent betweeb core coords and screen coords.
+        //The issue visible when staggering the slotmask.
+            vPG_offsets_adjust_for_stagger = (1-PIXELGRID_SIZE_W) * (pi*0.5)/PG_H_COUNT;
         //scale offsets to be used by sin/cos:
             vPG_offsets_and_size.rgb *= (pi / PG_H_COUNT);
 
