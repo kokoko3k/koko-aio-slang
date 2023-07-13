@@ -61,7 +61,7 @@ layout(location = 25) out float vPG_spark;
 layout(location = 26) out float vDeltaRenderOk;
 layout(location = 27) out float vDo_pixelgrid_h;
 layout(location = 28) out float vDo_Curvature;
-
+layout(location = 29) out float vPG_offsets_adjust_for_stagger;
 
 layout(location = 31) out float I_am_a_placeholder_keep_reading;
 //..to remind you that location = 31 is the last accepted by vulkan
@@ -187,6 +187,8 @@ void main() {
     //Pixelgrid: get mask type; .rgb contains layout, .a contains the size.
         #define PG_H_COUNT vPG_offsets_and_size.a
         vPG_offsets_and_size = PG_get_hmask_preset() ;
+        //This is needed to make sure triad order is preserved (visible when staggering the slotmask).
+            vPG_offsets_adjust_for_stagger = (pi*0.5)/PG_H_COUNT;
         //scale offsets to be used by sin/cos:
             vPG_offsets_and_size.rgb *= (pi / PG_H_COUNT);
 
@@ -279,7 +281,7 @@ layout(location = 25) in float vPG_spark;
 layout(location = 26) in float vDeltaRenderOk;
 layout(location = 27) in float vDo_pixelgrid_h;
 layout(location = 28) in float vDo_Curvature;
-
+layout(location = 29) in float vPG_offsets_adjust_for_stagger;
 
 
 layout(location = 0) out vec4 FragColor;
@@ -459,8 +461,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
     //sin() tell use if the current cell position is odd or even:
     //Moving it up there provides a small speed up due to
     //increased parallalism, I guess.
-        float o = (pi*0.5)/PG_h_count;
-        float sin_check_offset = sin(freq_base_unfloored.x + o);
+        float sin_check_offset = sin(freq_base_unfloored.x + vPG_offsets_adjust_for_stagger);
         float is_even = step(sin_check_offset, 0.0);
         
         
