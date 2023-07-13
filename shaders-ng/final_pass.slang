@@ -459,7 +459,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
     //sin() tell use if the current cell position is odd or even:
     //Moving it up there provides a small speed up due to
     //increased parallalism, I guess.
-        float o =  (pi/(PG_h_count*2.0));  
+        float o = (pi*0.5)/PG_h_count;
         float sin_check_offset = sin(freq_base_unfloored.x + o);
         float is_even = step(sin_check_offset, 0.0);
         
