@@ -556,6 +556,17 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 float mask_shape = abs(cos(  PIXELGRID_Y_MASK_SHIFT*pi +   PH_MASK_HEIGHT  + (PH_MASH_OFFSET * is_even)) ) ;
                 mask_shape = pow(mask_shape, PIXELGRID_Y_MASK_STEEP);
                 
+                // We can make the stagger dark line less pronunced
+                // on its sides so that lateral staggered color 
+                // can bleed over.
+                // but you really need to have God eyes to notice any improvement, if any imho.
+                // Also, this would probably alter the colors (?)
+                // So keep it disabled.
+                //    float Bleed_force = SERVICE1; //0.02 seems a realistic value.
+                //    float side_visibility = pow(pow(sin_check_offset,2.0),Bleed_force);
+                //    mask_shape = mask_shape* side_visibility;
+                // return vec4(mask_shape);
+                
             //Get per channel input luminance by clamping pixel_in and applying hmask
                 vec3 lum=clamp(pixel_in * rgb_w, 0.0, 1.0);
             //Adapt the luminance effect via input parameter
