@@ -451,11 +451,13 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //Screen coords needs flooring, but we need to disable flooring if requested.
             //Since this seems to be a crucial point in the code that kills performance on my haswell, mix() or if/then needs to be absolutely avoided.
             //So my hack here is to always floor the coords, but to floor them with a huge precision to emulate the unfloored coord.
-                vec2 screen_unfloor_hack = vec2( (1 + float(  PIXELGRID_MUL_X != 1.0  )*10000), 1.0) ;
+                vec2 screen_unfloor_hack = vec2( (1 + float(  abs(PIXELGRID_MUL_X) != 1.0  )*10000), 1.0) ;
                 
                 vec2 freq_base_screen = vPG_freq_base_screen * 
                             floor(vPG_OutputCoord_tated * vPG_OutputSize_tated * screen_unfloor_hack) / (screen_unfloor_hack);
         
+                            
+                
 
     //Switch between core and screen sizes (x and y)
         vec2 freq_base           = mix( freq_base_core, freq_base_screen,           vec2(PIXELGRID_SIZE_W, 0.0));
@@ -501,42 +503,15 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //The following should be equivalent to ^ ^ but it seems slower.
             //    rgb_w = mix( vec3(1.0), rgb_w, DO_PIXELGRID_W * (1-rgb_w_weakness)  );
             
-            
-    //Height phosphor mask (can be used for scanlines, slotmask, aperturegrille) ***********************************************:
-        vec3 rgb_h = vec3(1.0);
-        
-        //Pixelgrid: do horizontal if enabled, but skip it if user doesn't want it on interlaced content.
-        //if (DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0)) { //103.1
-        if (vDo_pixelgrid_h > 0.5) {
-            //Since we emulate scanlines, take into account current scanline phase:
-                float interlacing_adapt_period = vScanlinePeriod;
-                float interlacing_adapt_offset = vScanlineAlternateOffset;
-            //We can offset trias to emulate fake core level slotmask by applying the optional offset to emulate the slotmask on even cells
-                float core_offset =  is_even * pi * PIXELGRID_OFFSET_CORE;
-            //get a single sine in black/white with applied the optional staggered offset for slotmask:
-                float rgb_h_sin = sin(freq_base_core.y * interlacing_adapt_period + core_offset + interlacing_adapt_offset );
-            //make it positve with doubled frequency:
-                rgb_h_sin = (rgb_h_sin * rgb_h_sin);
-            //calculate each phosphor height according to input luminance 
-                //FIXME since scanline weight depends on rgb_w, max_inlum should depend on it too.
-                //It's probably something like min(max_inLum, PIXELGRID_MAX_W) when hmask is active ofc.
-                vec3 phosphor_height = map_range(pixel_in * rgb_w, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
-                //phosphor_height = vec3(1.0);
-            //Finally get 3 sines out of the previous one by applying height modifiers
-                rgb_h = vec3(rgb_h_sin);
-                rgb_h = morph_shape(rgb_h, phosphor_height, PIXELGRID_NO_INTERBLEED_H, PIXELGRID_GAMMA_H);
-                rgb_h = mix(vec3(1.0), rgb_h, DO_PIXELGRID_H);
-        }
-
-        
-    //Height phosphor mask number 2, *********************************************** 
+           
+    //Vertical mask *********************************************** 
     // can be used for slotmask,aperturegrille, not scanlines.
     //...well technically yes, but they would have a boxed shape.
         vec3 darklines_mask=vec3(1.0);
         
         if (PIXELGRID_Y_MASK > 0.0) {
             //Switch reference coords according to user pref: 
-                float freq_cell_y = mix_step(freq_base_core.y,  freq_base_screen.y, PIXELGRID_Y_MASK_COORDS);
+                float freq_cell_y = mix_step(freq_base_core.y,  freq_base_screen_unfloored.y, PIXELGRID_Y_MASK_COORDS);
 
             //mask phosphors heigth
                 #define PH_MASK_HEIGHT (freq_cell_y * vPG_mask_height)
@@ -575,6 +550,35 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 pixel_in *= vPG_spark*4 + 1;
                 
         }
+            
+    //Scanlines and fake slotmask ***********************************************:
+        vec3 rgb_h = vec3(1.0);
+        
+        //Pixelgrid: do horizontal if enabled, but skip it if user doesn't want it on interlaced content.
+        //if (DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0)) { //103.1
+        if (vDo_pixelgrid_h > 0.5) {
+            //Since we emulate scanlines, take into account current scanline phase:
+                float interlacing_adapt_period = vScanlinePeriod;
+                float interlacing_adapt_offset = vScanlineAlternateOffset;
+            //We can offset trias to emulate fake core level slotmask by applying the optional offset to emulate the slotmask on even cells
+                float core_offset =  is_even * pi * PIXELGRID_OFFSET_CORE;
+            //get a single sine in black/white with applied the optional staggered offset for slotmask:
+                float rgb_h_sin = sin(freq_base_core.y * interlacing_adapt_period + core_offset + interlacing_adapt_offset );
+            //make it positve with doubled frequency:
+                rgb_h_sin = (rgb_h_sin * rgb_h_sin);
+            //calculate each phosphor height according to input luminance 
+                //FIXME since scanline weight depends on rgb_w, max_inlum should depend on it too.
+                //It's probably something like min(max_inLum, PIXELGRID_MAX_W) when hmask is active ofc.
+                vec3 phosphor_height = map_range(pixel_in * rgb_w, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
+                //phosphor_height = vec3(1.0);
+            //Finally get 3 sines out of the previous one by applying height modifiers
+                rgb_h = vec3(rgb_h_sin);
+                rgb_h = morph_shape(rgb_h, phosphor_height, PIXELGRID_NO_INTERBLEED_H, PIXELGRID_GAMMA_H);
+                rgb_h = mix(vec3(1.0), rgb_h, DO_PIXELGRID_H);
+        }
+
+        
+
         
 
     //Finally put width,height1 and height2 masks togheter:

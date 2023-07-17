@@ -487,7 +487,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 // pixel Grid
 #pragma parameter DO_PIXELGRID		 "★  Low level Phosphor grid enable? ==>"	0.0 0.0 1.0 1.0
 
-#pragma parameter DO_PIXELGRID_W     "      ★ Enable Horizontal mask "    	1.0 0.0 1.0 0.1
+#pragma parameter DO_PIXELGRID_W     "      ★ Horizontal mask (0 to disable)"    	1.0 0.0 1.0 0.1
 #pragma parameter PIXELGRID_SIZE_W   "           . Resolution: (core or screen)"	1.0 0.0 1.0 1.0
 #pragma parameter PIXELGRID_H_PRST   "           . Mask type preset (0: for manual)"  3.0 0.0 6.0 1.0
 #pragma parameter PG_LABEL1          "             (1:gm 2:gmx 3:rgb 4:rgbx 5:rbg 6:rbgx)"  0.0 0.0 0.0 0.0
