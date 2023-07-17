@@ -451,7 +451,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //Screen coords needs flooring, but we need to disable flooring if requested.
             //Since this seems to be a crucial point in the code that kills performance on my haswell, mix() or if/then needs to be absolutely avoided.
             //So my hack here is to always floor the coords, but to floor them with a huge precision to emulate the unfloored coord.
-                float screen_unfloor_hack = (1 + float(    fract(PIXELGRID_MUL_X) > 00  )*1000);
+                float screen_unfloor_hack = (1 + float(  PIXELGRID_MUL_X != 1.0  )*1000);
                 vec2 period_multiply = vec2(PIXELGRID_MUL_X, 1.0) * vec2(screen_unfloor_hack,1.0) ;
                 
                 vec2 freq_base_screen = vPG_freq_base_screen * 
@@ -472,7 +472,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         vec3 freq_rgb = vec3(freq_base.x) - PG_offsets;
 
         
-    //The following is needed by vertical mask level1 and 2
+    //The following is needed by scanlines and vertical mask
     //sin() tell use if the current cell position is odd or even:
     //Moving it up there provides a small speed up due to
     //increased parallalism, I guess.
