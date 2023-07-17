@@ -522,7 +522,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 #pragma parameter BLANK12e " " 0.0 0.0 1.0 1.0
 
-#pragma parameter PIXELGRID_Y_MASK           "      ★ Vertical cell Mask 2 (0 to disable)"	0.5 0.0 1.0 0.05
+#pragma parameter PIXELGRID_Y_MASK           "      ★ Vertical cell Mask (0 to disable)"	0.5 0.0 1.0 0.05
 #pragma parameter PIXELGRID_Y_MASK_COORDS    "           . Resolution: (core or screen)"	1.0 0.0 1.0 1.0
 #pragma parameter PIXELGRID_Y_MASK_HEIGHT    "           . Height divider (neg=multiplier):"	0.5 -8.0 8.0 0.125
 #pragma parameter PIXELGRID_Y_MASK_ON_WHITE  "           . Fadeout under light"	0.5 0.0 1.0 0.01

@@ -568,17 +568,15 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 vec3 V=min( lum_adapted, vec3(PIXELGRID_Y_MASK) );
             //apply user visibility modifier to the mask
                 darklines_mask = 1-(mask_shape*V);
+            //Try to get a more brillant/sparkling look by highering the darklines
+            //effect (sub) and pushing the source color, useful for slotmasks.
+                float vPG_spark = PIXELGRID_Y_SPARK * PIXELGRID_Y_MASK;
+                darklines_mask -= vPG_spark;
+                pixel_in *= vPG_spark*4 + 1;
+                
         }
         
-    //Try to get a more brillant/sparkling look by highering the darklines
-    //effect (sub) and pushing the source color, useful for slotmasks.
-        float vPG_spark = PIXELGRID_Y_SPARK * PIXELGRID_Y_MASK;
-        darklines_mask -= vPG_spark;
-        pixel_in *= vPG_spark*4 + 1;
-     
 
-     
-        
     //Finally put width,height1 and height2 masks togheter:
         //vec3 mask = rgb_w * rgb_h * darklines_mask;
         vec3 mask = min( (rgb_w * rgb_h), darklines_mask * rgb_h); //<- this way it does not interfree with scanline height!
