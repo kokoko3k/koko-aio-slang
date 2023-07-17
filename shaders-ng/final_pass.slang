@@ -451,13 +451,11 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //Screen coords needs flooring, but we need to disable flooring if requested.
             //Since this seems to be a crucial point in the code that kills performance on my haswell, mix() or if/then needs to be absolutely avoided.
             //So my hack here is to always floor the coords, but to floor them with a huge precision to emulate the unfloored coord.
-                vec2 screen_unfloor_hack = vec2( (1 + float(  abs(PIXELGRID_MUL_X) != 1.0  )*10000), 1.0) ;
+                vec2 screen_unfloor_hack = vec2( (1 + float(  PIXELGRID_MUL_X != 1.0  )*10000), 1.0) ;
                 
                 vec2 freq_base_screen = vPG_freq_base_screen * 
                             floor(vPG_OutputCoord_tated * vPG_OutputSize_tated * screen_unfloor_hack) / (screen_unfloor_hack);
         
-                            
-                
 
     //Switch between core and screen sizes (x and y)
         vec2 freq_base           = mix( freq_base_core, freq_base_screen,           vec2(PIXELGRID_SIZE_W, 0.0));
