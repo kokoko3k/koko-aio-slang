@@ -86,10 +86,6 @@
     By reading the following explanaitions, you will realize that this section can also be used to emulate<br>
     handhelds screens, where pixels you see on screen have to be sized proportionally to the game one.<br>
     
-    Allow use of fuzzy screen coords
-        Use this to smooth out visual artifacts when using non integer screen coords.
-        ie: you use screen coords and set a non integer multiplier for them.
-
     Horizontal mask (rgb subpixel mask strength)
         X resolution: (core or screen) (**):
             0: Phosphors width will be relative to the pixel width of the core (game).

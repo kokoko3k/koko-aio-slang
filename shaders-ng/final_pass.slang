@@ -444,18 +444,19 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         vec2 freq_base_core = pi * in_coords * vPG_OriginalSize_tated ;
 
         //Screen coords:
-            vec2 period_multiply = vec2(PIXELGRID_MUL_X, 1.0);
-
             //The following unfloored coords are needed by sin/cos later to understand if we are on an even or odd mask
                 //vec2 freq_base_screen_unfloored = pi * vec2(1/PG_h_count, 0.5) * (vPG_OutputCoord_tated * vPG_OutputSize_tated);
                 vec2 freq_base_screen_unfloored = vPG_freq_base_screen_unfloored; //<-- missing muls because done to vertex shader.
-
+        
             //Screen coords needs flooring, but we need to disable flooring if requested.
             //Since this seems to be a crucial point in the code that kills performance on my haswell, mix() or if/then needs to be absolutely avoided.
             //So my hack here is to always floor the coords, but to floor them with a huge precision to emulate the unfloored coord.
-                float unfloor_hack = PIXELGRID_NO_FLOOR; // <-- 1 to huge number
+                float screen_unfloor_hack = (1 + float(    fract(PIXELGRID_MUL_X) > 00  )*1000);
+                vec2 period_multiply = vec2(PIXELGRID_MUL_X, 1.0) * vec2(screen_unfloor_hack,1.0) ;
+                
                 vec2 freq_base_screen = vPG_freq_base_screen * 
-                                        floor(vPG_OutputCoord_tated * vPG_OutputSize_tated * period_multiply * unfloor_hack) / (period_multiply * unfloor_hack);
+                            floor(vPG_OutputCoord_tated * vPG_OutputSize_tated * period_multiply) / (period_multiply);
+        
 
 
 

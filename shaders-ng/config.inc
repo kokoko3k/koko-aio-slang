@@ -355,9 +355,9 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float PIXELGRID_SIZE_W;
 	float PIXELGRID_SMOOTH_H;
 	float PIXELGRID_SMOOTH_W;
-	//float PIXELGRID_SPACING;
+	
 	float PIXELGRID_MUL_X;
-													float placeholder; // removing this will slow down performances on my haswell...
+													
 	float PIXELGRID_OFFSET_CORE;
 	float PIXELGRID_NO_INTERBLEED_W;
 	float PIXELGRID_NO_INTERBLEED_H;
@@ -380,7 +380,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float PIXELGRID_H_COUNT;
 	float PIXELGRID_H_PRST;
 	float PIXELGRID_GAMMA_H;
-	float PIXELGRID_NO_FLOOR;
 	float PIXELGRID_GAMMA_W;
 	float PIXELGRID_HMASK_NO_BRIGHT;
 	
@@ -487,7 +486,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 // pixel Grid
 #pragma parameter DO_PIXELGRID		 "★  Low level Phosphor grid enable? ==>"	0.0 0.0 1.0 1.0
-#pragma parameter PIXELGRID_NO_FLOOR "      ★ Fuzzy screen coords (1=no)"   1.0 1.0 10000.0 10000.0
 
 #pragma parameter DO_PIXELGRID_W     "      ★ Enable Horizontal mask "    	1.0 0.0 1.0 0.1
 #pragma parameter PIXELGRID_SIZE_W   "           . Resolution: (core or screen)"	1.0 0.0 1.0 1.0
