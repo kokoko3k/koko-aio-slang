@@ -355,7 +355,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float PIXELGRID_SIZE_W;
 	float PIXELGRID_SMOOTH_H;
 	float PIXELGRID_SMOOTH_W;
-	
+
 	float PIXELGRID_MUL_X;
 													
 	float PIXELGRID_OFFSET_CORE;
@@ -382,7 +382,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float PIXELGRID_GAMMA_H;
 	float PIXELGRID_GAMMA_W;
 	float PIXELGRID_HMASK_NO_BRIGHT;
-	
+		float ciao1;
 	float DELTA_RENDER_FORCE_REFRESH;
 	float DELTA_RENDER_CHECK_AREA;
 	

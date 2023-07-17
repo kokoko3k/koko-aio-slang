@@ -448,15 +448,11 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 //vec2 freq_base_screen_unfloored = pi * vec2(1/PG_h_count, 0.5) * (vPG_OutputCoord_tated * vPG_OutputSize_tated);
                 vec2 freq_base_screen_unfloored = vPG_freq_base_screen_unfloored; //<-- missing muls because done to vertex shader.
         
-            //Screen coords needs flooring, but we need to disable flooring if requested.
-            //Since this seems to be a crucial point in the code that kills performance on my haswell, mix() or if/then needs to be absolutely avoided.
-            //So my hack here is to always floor the coords, but to floor them with a huge precision to emulate the unfloored coord.
-                vec2 screen_unfloor_hack = vec2( (1 + float(  PIXELGRID_MUL_X != 1.0  )*10000), 1.0) ;
-                
-                vec2 freq_base_screen = vPG_freq_base_screen * 
-                            floor(vPG_OutputCoord_tated * vPG_OutputSize_tated * screen_unfloor_hack) / (screen_unfloor_hack);
+            //Screen coords needs flooring, but we need to disable flooring when zooming them
+                vec2 freq_base_screen = mix( vPG_freq_base_screen_unfloored, vPG_freq_base_screen*floor(vPG_OutputCoord_tated * vPG_OutputSize_tated ),
+                                             abs( vec2(PIXELGRID_MUL_X, PIXELGRID_Y_MASK_HEIGHT) ) 
+                                            );
         
-
     //Switch between core and screen sizes (x and y)
         vec2 freq_base           = mix( freq_base_core, freq_base_screen,           vec2(PIXELGRID_SIZE_W, 0.0));
         vec2 freq_base_unfloored = mix( freq_base_core, freq_base_screen_unfloored, vec2(PIXELGRID_SIZE_W, 0.0));
@@ -509,7 +505,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         
         if (PIXELGRID_Y_MASK > 0.0) {
             //Switch reference coords according to user pref: 
-                float freq_cell_y = mix_step(freq_base_core.y,  freq_base_screen_unfloored.y, PIXELGRID_Y_MASK_COORDS);
+                float freq_cell_y = mix(freq_base_core.y,  freq_base_screen.y, PIXELGRID_Y_MASK_COORDS);
 
             //mask phosphors heigth
                 #define PH_MASK_HEIGHT (freq_cell_y * vPG_mask_height)
