@@ -132,7 +132,7 @@
             Likewise, you can use core/game(**) sized masks and divide them by a factor
             if they appears too big.
             
-        Scanlines (*4)
+    Scanlines (*4)
             Scanlines emulation, set the strength of the effect here.
         
         Phosphors height Min, Max:
@@ -143,7 +143,7 @@
             it is advised, if needed, to use this option to compensate, instead of the main gamma correction.
             It is also a quick way to make the image brighter or darker.
             
-        Slotmask offset(*):
+        Slotmask(-fake) offset(*):
             This will cause every cell to be vertically shifted by the configured amount to
             emulate a slotmask phosphors layout.
             It is true that for accurate reproduction of them, slotmasks are commonly emulated
@@ -159,13 +159,13 @@
             just explained while producing a fairly convincing effect, very similar to a screen
             with visible scanlines and visible slotmask.
         
-    Avoid intercell bleeding:
-        When you set maximum width/height to anything > 0.5, the phosphor light will bleed over
-        the adiacent (left/right up/down) one so that they will start to blend togheter.
-        This option will avoid the bleeding.
-        You may want them to merge or not, depending on your preference to see a visible "grid"/lines.
-        This function is useful when you want to emulate handhelds screens, 
-        where cells are well separated.
+        Avoid intercell bleeding:
+            When you set maximum width/height to anything > 0.5, the phosphor light will bleed over
+            the adiacent (left/right up/down) one so that they will start to blend togheter.
+            This option will avoid the bleeding.
+            You may want them to merge or not, depending on your preference to see a visible "grid"/lines.
+            This function is useful when you want to emulate handhelds screens, 
+            where cells are well separated.
         
     Interlace detect + Scanline alternate above # lines:
         koko-aio will mark a frame as interlaced and will alternate odd/even scanlines
