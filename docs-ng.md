@@ -87,9 +87,8 @@
     handhelds screens, where pixels you see on screen have to be sized proportionally to the game one.<br>
     
     Allow use of fuzzy screen coords
-        If you want perfect mask triads matching between content and screen,disable this option.
-        Enabling it may allow to have a better representation of color shades in some cases
-        and the ability to draw the mask at subpixel screen precision.
+        Use this to smooth out visual artifacts when using non integer screen coords.
+        ie: you use screen coords and set a non integer multiplier for them.
 
     Horizontal mask (rgb subpixel mask strength)
         X resolution: (core or screen) (**):
