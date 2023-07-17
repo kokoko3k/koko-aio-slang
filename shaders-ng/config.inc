@@ -353,12 +353,11 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float PIXELGRID_MAX_H;
 	float PIXELGRID_MAX_W;
 	float PIXELGRID_SIZE_W;
-	float PIXELGRID_SIZE_H;
 	float PIXELGRID_SMOOTH_H;
 	float PIXELGRID_SMOOTH_W;
 	//float PIXELGRID_SPACING;
 	float PIXELGRID_MUL_X;
-	float PIXELGRID_MUL_Y;
+													float placeholder; // removing this will slow down performances on my haswell...
 	float PIXELGRID_OFFSET_CORE;
 	float PIXELGRID_NO_INTERBLEED_W;
 	float PIXELGRID_NO_INTERBLEED_H;
@@ -508,13 +507,11 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter PIXELGRID_NO_INTERBLEED_W	"           . Inter-cell extra steepness (handhelds)"		0.0 0.0 10.0 0.1
 #pragma parameter BLANK12fs " " 0.0 0.0 1.0 1.0
 
-#pragma parameter DO_PIXELGRID_H            "      ★ Scanlines or vertical mask 1 (0 to disable)"    	1.0 0.0 1.25 0.01
-#pragma parameter PIXELGRID_SIZE_H          "           . Resolution: (core for scanlines or screen)"	0.0 0.0 1.0 1.0
+#pragma parameter DO_PIXELGRID_H            "      ★ Scanlines (0 to disable)"    	1.0 0.0 1.25 0.01
 #pragma parameter PIXELGRID_MIN_H	        "           . Phosphors height Min"			0.2 0.05 1.0 0.05
 #pragma parameter PIXELGRID_MAX_H           "           . Phosphors height Max"			0.6 0.0 1.0 0.05
 #pragma parameter PIXELGRID_GAMMA_H  "           . Phosphors height min->max gamma:"	4.2 1.0 8.00 0.1
 #pragma parameter PIXELGRID_OFFSET_CORE     "           . Slotmask offset (0.10..0.25 ok)"	0.0 0.0 1.0 0.01
-#pragma parameter PIXELGRID_MUL_Y           "           . Line size multiplier y (neg=divider):"	1.0 -8.0 8.0 0.125
 #pragma parameter PIXELGRID_NO_INTERBLEED_H	"           . Inter line extra steepness (handhelds)"		0.0 0.0 10.0 0.1
 
 #pragma parameter BLANK12f " " 0.0 0.0 1.0 1.0

@@ -136,17 +136,17 @@
             Likewise, you can use core/game(**) sized masks and divide them by a factor
             if they appears too big.
             
-    Scanlines or vertical mask 1: (*4)
-        Y resolution: (core for scanlines or screen), height min/max:
-            See X resolution parameter just explained (**),  all similarly named parameters
-            will refer to the phosphors height instead od the width.
+        Scanlines (*4)
+            Scanlines emulation, set the strength of the effect here.
         
-        The core setting here assumes a particular meaning tho, because setting it so along
-        with a multiplier = 1 allows you to emulate scanlines.
-        This works because the phosphors will grow in height no more than the size
-        of a source (game) row, so that if you set the maximum height to something lower
-        than 1.0, the remaining blank part will actually acts like a scanline gap.
-        
+        Phosphors height Min, Max:
+            Try to keep scanline height between those values, depending on content brightness.
+            
+        Phosphors width min->max gamma:
+            Since emulating phosphors with high Min-Max range changes the apparent gamma of the final image,
+            it is advised, if needed, to use this option to compensate, instead of the main gamma correction.
+            It is also a quick way to make the image brighter or darker.
+            
         Slotmask offset(*):
             This will cause every cell to be vertically shifted by the configured amount to
             emulate a slotmask phosphors layout.

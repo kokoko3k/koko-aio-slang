@@ -213,7 +213,7 @@ void main() {
             }
                 
             // screen coords needs flooring, but unfortunately floor() does not work well in vertex shader, so calc as much as possible without floor()
-                vPG_period_multiplier = vec2(PIXELGRID_MUL_X, PIXELGRID_MUL_Y);
+                vPG_period_multiplier = vec2(PIXELGRID_MUL_X, 1.0);
                 vPG_freq_base_screen = pi * vec2(1/PG_H_COUNT, 0.5);
 
             //the following unfloored coords are needed by sin/cos later to understand if we are on an even or odd mask
@@ -444,7 +444,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         vec2 freq_base_core = pi * in_coords * vPG_OriginalSize_tated ;
 
         //Screen coords:
-            vec2 period_multiply = vec2(PIXELGRID_MUL_X, PIXELGRID_MUL_Y);
+            vec2 period_multiply = vec2(PIXELGRID_MUL_X, 1.0);
 
             //The following unfloored coords are needed by sin/cos later to understand if we are on an even or odd mask
                 //vec2 freq_base_screen_unfloored = pi * vec2(1/PG_h_count, 0.5) * (vPG_OutputCoord_tated * vPG_OutputSize_tated);
@@ -460,8 +460,8 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
 
 
     //Switch between core and screen sizes (x and y)
-        vec2 freq_base           = mix( freq_base_core, freq_base_screen,           vec2(PIXELGRID_SIZE_W, PIXELGRID_SIZE_H));
-        vec2 freq_base_unfloored = mix( freq_base_core, freq_base_screen_unfloored, vec2(PIXELGRID_SIZE_W, PIXELGRID_SIZE_H));
+        vec2 freq_base           = mix( freq_base_core, freq_base_screen,           vec2(PIXELGRID_SIZE_W, 0.0));
+        vec2 freq_base_unfloored = mix( freq_base_core, freq_base_screen_unfloored, vec2(PIXELGRID_SIZE_W, 0.0));
 
         
     //Apply multiplier:
