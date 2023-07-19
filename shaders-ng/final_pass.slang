@@ -958,7 +958,7 @@ vec3 fn_pixel_content(vec2 coords) {
     
     
     rgb_grille *= PIXELGRID_BASAL_GRID;
-    pixel_out = rgb_grille; // max(pixel_out, rgb_grille);
+    pixel_out = max(pixel_out, rgb_grille);
     return pixel_out;
 }
 
