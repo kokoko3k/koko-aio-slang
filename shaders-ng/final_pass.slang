@@ -487,7 +487,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         float sin_check_offset = sin(freq_base_unfloored.x + vPG_offsets_adjust_for_stagger);
         float is_even = step(sin_check_offset, 0.0);
         
-    //Scanlines and fake slotmask ***********************************************:
+    //Scanlines and fake slotmask =========================================================================
         vec3 rgb_h = vec3(1.0);
         
         //Pixelgrid: do horizontal if enabled, but skip it if user doesn't want it on interlaced content.
@@ -512,7 +512,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         }
         
         
-    //Horizontal Triad Mask: **************************************************
+    //Horizontal Triad Mask: ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
         vec3 rgb_w = vec3(1.0);
         if (DO_PIXELGRID_W > 0.0) { //4%
             //get 3 sines in black/white
@@ -537,7 +537,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //    rgb_w = mix( vec3(1.0), rgb_w, DO_PIXELGRID_W * (1-rgb_w_weakness)  );
             
            
-    //Vertical mask *********************************************** 
+    //Vertical mask .:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.
     // can be used for slotmask,aperturegrille, not scanlines.
     //...well technically yes, but they would have a boxed shape.
         vec3 darklines_mask=vec3(1.0);
