@@ -431,7 +431,7 @@ vec3 morph_shape(vec3 shape, vec3 power, float steep, float gamma ) {
 
 
 
-vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inLum, out vec3 rgb_grille ) { 
+vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inLum, out  ) { 
 
     //Tate ? (other outputsize,originalsize and outputcoords "tated" in vertex shader.)
         if (vDo_Tate == 1.0) in_coords.xy = in_coords.yx;
@@ -514,7 +514,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         
     //Horizontal Triad Mask: ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
         vec3 rgb_w = vec3(1.0);
-        rgb_grille = vec3(0.0);
+        vec3 rgb_grille = vec3(0.0);
         if (DO_PIXELGRID_W > 0.0) { //4%
             //get 3 sines in black/white
                 rgb_w = cos(freq_rgb);
@@ -595,14 +595,12 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         vec3 mask = min( (rgb_w * rgb_h), darklines_mask * rgb_h); //<- this way it does not interfree with scanline height!
         //FIXME: test with coore or fuzzy coords how it works when using variable width phosphors, maybe 
         //it would need to be: vec3 mask = min((rgb_w * rgb_h), darklines_mask * rgb_h * rgb_w); =
-    
-    
+          
     //Apply the mask to pixel_in and clamp the minimum to the unexcited grille.
-    //vec3 mask_and_grille = max(mask * pixel_in, rgb_grille );
+    vec3 mask_and_grille = max(mask * pixel_in, rgb_grille * PIXELGRID_BASAL_GRID*0.001);
         
     //return it with alpha channel containing the mask itself, so that halo can selectively light it.
-    //return vec4( mask_and_grille , dot(mask, vec3(0.3333)));
-    return vec4( mask * pixel_in , dot(mask, vec3(0.3333)));
+    return vec4( mask_and_grille , dot(mask, vec3(0.3333)));
 }
 
 
@@ -908,9 +906,8 @@ vec3 fn_pixel_content(vec2 coords) {
     float dot_mat_or_pixelgrid = 1.0; //init dot grid or scanline mask to 1.0
     
     //Pixel grid
-        vec3 rgb_grille = vec3(0.0);
         if (DO_PIXELGRID == 1.0) {
-            vec4 pixel_grid = fn_pixel_grid(coords, pixel_out, 0.0, vMax_inLum, rgb_grille);
+            vec4 pixel_grid = fn_pixel_grid(coords, pixel_out, 0.0, vMax_inLum);
             //grid mask only is needed by halo to selectively light the grid.
                 dot_mat_or_pixelgrid = pixel_grid.a;
                 pixel_out = pixel_grid.rgb;
@@ -943,9 +940,7 @@ vec3 fn_pixel_content(vec2 coords) {
     //Bloom
         if (DO_BLOOM == 1.0 ) {
             vec3 bloomed=texture(bloom_pass_final, coords).rgb ;
-            
             pixel_out = bloomed + float(BLOOM_BYPASS < 0.5) * pixel_out;
-            
         }
             
             
@@ -956,9 +951,6 @@ vec3 fn_pixel_content(vec2 coords) {
                 pixel_out.rgb = clamp(pixel_out.rgb,0.0,1.0) *  alt_blank_power;
         #endif
     
-    
-    rgb_grille *= PIXELGRID_BASAL_GRID;
-    pixel_out = rgb_grille; // max(pixel_out, rgb_grille);
     return pixel_out;
 }
 
