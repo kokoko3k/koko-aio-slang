@@ -431,8 +431,8 @@ vec3 morph_shape(vec3 shape, vec3 power, float steep, float gamma ) {
 
 
 
-vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inLum) { 
-    
+vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inLum ) { 
+
     //Tate ? (other outputsize,originalsize and outputcoords "tated" in vertex shader.)
         if (vDo_Tate == 1.0) in_coords.xy = in_coords.yx;
 
@@ -514,12 +514,15 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         
     //Horizontal Triad Mask: ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
         vec3 rgb_w = vec3(1.0);
+        vec3 rgb_grille = vec3(0.0);
         if (DO_PIXELGRID_W > 0.0) { //4%
             //get 3 sines in black/white
                 rgb_w = cos(freq_rgb);
             //make them always positive and double frequency:
                 rgb_w = (rgb_w * rgb_w);
-            
+            //"export" naked vertical grille
+               rgb_grille = morph_shape(rgb_w, vec3(0.001), 1.0, 1.0);
+                
             //Scale Max width according to pre-gains:
                 vec3 phosphor_width = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
 
@@ -596,9 +599,11 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         //FIXME: test with coore or fuzzy coords how it works when using variable width phosphors, maybe 
         //it would need to be: vec3 mask = min((rgb_w * rgb_h), darklines_mask * rgb_h * rgb_w); =
           
-    //Apply the mask to the input pixel and return it 
-    //with the alpha channel containing the mask itself, so that halo can selectively light it.
-        return vec4(mask * pixel_in, dot(mask, vec3(0.3333)));
+    //Apply the mask to pixel_in and clamp the minimum to the unexcited grille.
+    vec3 mask_and_grille = max(mask * pixel_in, rgb_grille * PIXELGRID_BASAL_GRID*0.001);
+        
+    //return it with alpha channel containing the mask itself, so that halo can selectively light it.
+    return vec4( mask_and_grille , dot(mask, vec3(0.3333)));
 }
 
 
