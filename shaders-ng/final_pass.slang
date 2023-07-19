@@ -576,9 +576,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //make it positve with doubled frequency:
                 rgb_h_sin = (rgb_h_sin * rgb_h_sin);
             //calculate each phosphor height according to input luminance 
-                //FIXME since scanline weight depends on rgb_w, max_inlum should depend on it too.
-                //It's probably something like min(max_inLum, PIXELGRID_MAX_W) when hmask is active ofc.
-                vec3 phosphor_height = map_range(pixel_in * rgb_w, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
+                vec3 phosphor_height = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
                 //phosphor_height = vec3(1.0);
             //Finally get 3 sines out of the previous one by applying height modifiers
                 rgb_h = vec3(rgb_h_sin);
