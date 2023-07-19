@@ -487,6 +487,30 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         float sin_check_offset = sin(freq_base_unfloored.x + vPG_offsets_adjust_for_stagger);
         float is_even = step(sin_check_offset, 0.0);
         
+    //Scanlines and fake slotmask ***********************************************:
+        vec3 rgb_h = vec3(1.0);
+        
+        //Pixelgrid: do horizontal if enabled, but skip it if user doesn't want it on interlaced content.
+        //if (DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0)) { //103.1
+        if (vDo_pixelgrid_h > 0.5) {
+            //Since we emulate scanlines, take into account current scanline phase:
+                float interlacing_adapt_period = vScanlinePeriod;
+                float interlacing_adapt_offset = vScanlineAlternateOffset;
+            //We can offset trias to emulate fake core level slotmask by applying the optional offset to emulate the slotmask on even cells
+                float core_offset =  is_even * pi * PIXELGRID_OFFSET_CORE;
+            //get a single sine in black/white with applied the optional staggered offset for slotmask:
+                float rgb_h_sin = sin(freq_base_core.y * interlacing_adapt_period + core_offset + interlacing_adapt_offset );
+            //make it positve with doubled frequency:
+                rgb_h_sin = (rgb_h_sin * rgb_h_sin);
+            //calculate each phosphor height according to input luminance 
+                vec3 phosphor_height = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
+                //phosphor_height = vec3(1.0);
+            //Finally get 3 sines out of the previous one by applying height modifiers
+                rgb_h = vec3(rgb_h_sin);
+                rgb_h = morph_shape(rgb_h, phosphor_height, PIXELGRID_NO_INTERBLEED_H, PIXELGRID_GAMMA_H);
+                rgb_h = mix(vec3(1.0), rgb_h, DO_PIXELGRID_H);
+        }
+        
         
     //Horizontal Triad Mask: **************************************************
         vec3 rgb_w = vec3(1.0);
@@ -560,29 +584,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 
         }
             
-    //Scanlines and fake slotmask ***********************************************:
-        vec3 rgb_h = vec3(1.0);
-        
-        //Pixelgrid: do horizontal if enabled, but skip it if user doesn't want it on interlaced content.
-        //if (DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0)) { //103.1
-        if (vDo_pixelgrid_h > 0.5) {
-            //Since we emulate scanlines, take into account current scanline phase:
-                float interlacing_adapt_period = vScanlinePeriod;
-                float interlacing_adapt_offset = vScanlineAlternateOffset;
-            //We can offset trias to emulate fake core level slotmask by applying the optional offset to emulate the slotmask on even cells
-                float core_offset =  is_even * pi * PIXELGRID_OFFSET_CORE;
-            //get a single sine in black/white with applied the optional staggered offset for slotmask:
-                float rgb_h_sin = sin(freq_base_core.y * interlacing_adapt_period + core_offset + interlacing_adapt_offset );
-            //make it positve with doubled frequency:
-                rgb_h_sin = (rgb_h_sin * rgb_h_sin);
-            //calculate each phosphor height according to input luminance 
-                vec3 phosphor_height = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
-                //phosphor_height = vec3(1.0);
-            //Finally get 3 sines out of the previous one by applying height modifiers
-                rgb_h = vec3(rgb_h_sin);
-                rgb_h = morph_shape(rgb_h, phosphor_height, PIXELGRID_NO_INTERBLEED_H, PIXELGRID_GAMMA_H);
-                rgb_h = mix(vec3(1.0), rgb_h, DO_PIXELGRID_H);
-        }
+
 
         
 
