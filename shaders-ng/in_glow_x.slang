@@ -39,12 +39,15 @@ void main() {
 
    //Don't do anything if IN_GLOW_W and IN_GLOW_H are over the upper limit
       if (IN_GLOW_W >= GLOW_SHARP_MAX && IN_GLOW_H >= GLOW_SHARP_MAX) {
+         vec4 passthrough = texture(shift_and_bleed_pass, vTexCoord);
          //Delta render?
          if (DELTA_RENDER == 1.0) {
             float DR_unchanged = float( textureLod(shift_and_bleed_pass,         vTexCoord, DELTA_RENDER_CHECK_AREA).rgb == 
                                         textureLod(shift_and_bleed_passFeedback, vTexCoord, DELTA_RENDER_CHECK_AREA).rgb);
-            FragColor = vec4(0.0,0.0,0.0,DR_unchanged); 
+            FragColor = vec4(passthrough.rgb, DR_unchanged);
+            return;
          }
+         FragColor = passthrough;
          return;
       }
 
