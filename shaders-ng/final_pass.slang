@@ -10,7 +10,7 @@
 //#define DEBUG_QUAD_SPLIT
 //#define DEBUG_DUAL_SPLIT_X
 //#define DEBUG_DUAL_SPLIT_Y
-//#define DEBUG_DUAL_SPLIT_MIRROR_X
+#define DEBUG_DUAL_SPLIT_MIRROR_X
 
 
 #include "config.inc"
