@@ -122,7 +122,6 @@
                 It is also a quick way to make the image brighter or darker.
         Fade on bright:
             How much the mask is visible over bright pixels.
-
         Cell size multiplier x (neg=divider):
             Multiply (or divide if the parameter is < 0) the mask (cell) size by a factor.
             As stated(**), the size may be relative to screen or core, this allow you to
@@ -131,18 +130,26 @@
             of 2 or 3 to make room for phosphors and see them visually grow in width.
             Likewise, you can use core/game(**) sized masks and divide them by a factor
             if they appears too big.
+        Inter-cell extra steepness (handhelds)
+            When you set maximum width/height to anything > 0.5, the phosphor light will bleed over
+            the adiacent (left/right up/down) one so that they will start to blend togheter.
+            This option will avoid the bleeding.
+            You may want them to merge or not, depending on your preference to see a visible "grid"/lines.
+            This function is useful when you want to emulate handhelds screens, 
+            where cells are well separated.
+        Black level of the unexcided phosphor grid
+            Draw the vertical grid that hosts phosphors.
+            This is likely to produce moiree when using X resolution = core
+            
             
     Scanlines (*4)
             Scanlines emulation, set the strength of the effect here.
-        
         Phosphors height Min, Max:
             Try to keep scanline height between those values, depending on content brightness.
-            
         Phosphors width min->max gamma:
             Since emulating phosphors with high Min-Max range changes the apparent gamma of the final image,
             it is advised, if needed, to use this option to compensate, instead of the main gamma correction.
             It is also a quick way to make the image brighter or darker.
-            
         Slotmask(-fake) offset(*):
             This will cause every cell to be vertically shifted by the configured amount to
             emulate a slotmask phosphors layout.
@@ -158,8 +165,7 @@
             While this does not exist at all in crt technology, it greatly mitigates the artifacts
             just explained while producing a fairly convincing effect, very similar to a screen
             with visible scanlines and visible slotmask.
-        
-        Avoid intercell bleeding:
+        Inter-cell extra steepness (handhelds)
             When you set maximum width/height to anything > 0.5, the phosphor light will bleed over
             the adiacent (left/right up/down) one so that they will start to blend togheter.
             This option will avoid the bleeding.
