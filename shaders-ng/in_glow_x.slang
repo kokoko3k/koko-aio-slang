@@ -75,14 +75,20 @@ void main() {
       if (DELTA_RENDER == 1.0) {
          //Keep track of changed pixels to speedup rendering in final pass   
          DR_unchanged = float( textureLod(shift_and_bleed_pass,         vTexCoord, DELTA_RENDER_CHECK_AREA).rgb == 
-                                     textureLod(shift_and_bleed_passFeedback, vTexCoord, DELTA_RENDER_CHECK_AREA).rgb);
+                               textureLod(shift_and_bleed_passFeedback, vTexCoord, DELTA_RENDER_CHECK_AREA).rgb);
       }
       
-   FragColor = vec4( blur9_x(shift_and_bleed_pass, vTexCoord, global.flick_and_noise_passSize.xy, IN_GLOW_W_ADAPTED), DR_unchanged);
-
    //To debug ntsc artifacts mask:
-   if (NTSC_SHOW_ARTF_MASK > 0.5)
-      FragColor = vec4(ntsc_artifacts);
+      if (NTSC_SHOW_ARTF_MASK > 0.5) {
+         FragColor = vec4(ntsc_artifacts);
+         return;
+      }
+      
+   //Finally blur horizontally 
+   if (IN_GLOW_W < GLOW_SHARP_MAX)
+      FragColor = vec4( blur9_x(shift_and_bleed_pass, vTexCoord, global.flick_and_noise_passSize.xy, IN_GLOW_W_ADAPTED), DR_unchanged);
+         else
+      FragColor = texture(shift_and_bleed_pass, vTexCoord, DR_unchanged);
    
 }
 
