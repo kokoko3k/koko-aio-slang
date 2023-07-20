@@ -108,9 +108,9 @@ void main() {
 
 
    vec3 pixel_glowed;
-   //apply just gamma and power for tighter blurs and exit:
-   if (IN_GLOW_W >= GLOW_SHARP_MAX && IN_GLOW_H >= GLOW_SHARP_MAX) {
-       pixel_glowed = texture(shift_and_bleed_pass,vTexCoord).rgb * IN_GLOW_POWER; //(Source, IN_GLOW_POWER, IN_GLOW_GAMMA, vTexCoord) ;
+   //apply just power (gamma applied 2 passes before)for tighter blurs and exit:
+   if (IN_GLOW_H >= GLOW_SHARP_MAX) {
+       pixel_glowed = texture(Source,vTexCoord).rgb * IN_GLOW_POWER; //(Source, IN_GLOW_POWER, IN_GLOW_GAMMA, vTexCoord) ;
    } else {
       pixel_glowed = blur9_y(Source, vTexCoord, params.SourceSize.xy, vIN_GLOW_H) * IN_GLOW_POWER;
       if (IN_GLOW_BIAS < IN_GLOW_BIAS_MAX && 
