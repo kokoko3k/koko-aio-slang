@@ -1,0 +1,2 @@
+#reference "Monitor-Screenlevel_HMask-ScreenLevel_SlotMask.slangp"
+PIXELGRID_Y_MASK = "0.0"
