@@ -6,6 +6,8 @@ layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
 layout(location = 1) out float vIN_GLOW_H;
+layout(location = 2) out float vDoInGlowBias;
+
 
 void main() {
    gl_Position = global.MVP * Position;
@@ -21,6 +23,16 @@ void main() {
    IN_GLOW_H_ADAPTED = max(IN_GLOW_H_ADAPTED, MIN_IN_GLOW_SHARP);
    
    vIN_GLOW_H = IN_GLOW_H_ADAPTED / NEW_SCALEMOD_Y; //Make it resolution independent.
+   
+   
+   // If * at least one sharpness is lower than the max
+   //    * we dont want just blur
+   //    * we don't want to show ntsc artifact masks
+   // Then do in glow bias
+   vDoInGlowBias = float (  IN_GLOW_BIAS < IN_GLOW_BIAS_MAX && 
+                            (IN_GLOW_W < GLOW_SHARP_MAX || IN_GLOW_H < GLOW_SHARP_MAX) &&
+                            NTSC_SHOW_ARTF_MASK < 0.5 );
+   
 }
 
 
@@ -28,6 +40,7 @@ void main() {
 
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in float vIN_GLOW_H;
+layout(location = 2) in float vDoInGlowBias;
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 5) uniform sampler2D shift_and_bleed_pass;
 layout(set = 0, binding = 6) uniform sampler2D Source;
@@ -97,26 +110,29 @@ void main() {
       }
    }
 
-
    vec3 pixel_glowed;
-   //apply just power (gamma applied 2 passes before)for tighter blurs and exit:
-   if (IN_GLOW_H >= GLOW_SHARP_MAX) {
-       pixel_glowed = texture(Source,vTexCoord).rgb * IN_GLOW_POWER; //(Source, IN_GLOW_POWER, IN_GLOW_GAMMA, vTexCoord) ;
-   } else {
-      pixel_glowed = blur9_y(Source, vTexCoord, params.SourceSize.xy, vIN_GLOW_H) * IN_GLOW_POWER;
-      if (IN_GLOW_BIAS < IN_GLOW_BIAS_MAX && 
-         (IN_GLOW_W < GLOW_SHARP_MAX || IN_GLOW_H < GLOW_SHARP_MAX) &&
-         (NTSC_SHOW_ARTF_MASK < 0.5) ) {
-           pixel_glowed = glow_blur_bias(shift_and_bleed_pass, vTexCoord, pixel_glowed, IN_GLOW_BIAS);
-           //pixel_glowed = antialias_blur_bias(shift_and_bleed_pass, vTexCoord, pixel_glowed, IN_GLOW_BIAS);
-      }
-   }
 
-   if ( DELTA_RENDER == 1.0) {
-      float original_unchanged = texture(Source,vTexCoord).a;
-      FragColor = vec4(pixel_glowed, original_unchanged);
-      return;
-   }
+   //It over the max sharp, then just passthrough, else do the blur.
+      if (IN_GLOW_H >= GLOW_SHARP_MAX) {
+         pixel_glowed = texture(Source,vTexCoord).rgb * IN_GLOW_POWER; //(Source, IN_GLOW_POWER, IN_GLOW_GAMMA, vTexCoord) ;
+      } else {
+         pixel_glowed = blur9_y(Source, vTexCoord, params.SourceSize.xy, vIN_GLOW_H) * IN_GLOW_POWER;
+      }
+   
+   
+   //Series of conditions to do in glow bias done in vertex shader:
+      if (vDoInGlowBias == 1.0) {
+            pixel_glowed = glow_blur_bias(shift_and_bleed_pass, vTexCoord, pixel_glowed, IN_GLOW_BIAS);
+            //pixel_glowed = antialias_blur_bias(shift_and_bleed_pass, vTexCoord, pixel_glowed, IN_GLOW_BIAS);
+      }
+   
+   //Previous pass compared previous and current source frame and exported that info in the alpha.
+   //Pass it through when we need delta rended.
+      if ( DELTA_RENDER == 1.0) {
+         float original_unchanged = texture(Source,vTexCoord).a;
+         FragColor = vec4(pixel_glowed, original_unchanged);
+         return;
+      }
    
    FragColor = vec4(pixel_glowed,1.0);
    
