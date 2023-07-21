@@ -509,6 +509,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 rgb_h = vec3(rgb_h_sin);
                 rgb_h = morph_shape(rgb_h, phosphor_height, PIXELGRID_NO_INTERBLEED_H, PIXELGRID_GAMMA_H);
                 rgb_h = mix(vec3(1.0), rgb_h, DO_PIXELGRID_H);
+                rgb_h = clamp(rgb_h, 0.0,1.0);
         }
         
         
