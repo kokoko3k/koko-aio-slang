@@ -487,6 +487,51 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         float sin_check_offset = sin(freq_base_unfloored.x + vPG_offsets_adjust_for_stagger);
         float is_even = step(sin_check_offset, 0.0);
         
+        
+        
+        
+
+        
+    //Horizontal Triad Mask: ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+        vec3 rgb_w = vec3(1.0);
+        vec3 rgb_grille = vec3(0.0);
+        if (DO_PIXELGRID_W > 0.0) { //4%
+            //get 3 sines in black/white
+                rgb_w = cos(freq_rgb);
+            //make them always positive and double frequency:
+                rgb_w = (rgb_w * rgb_w);
+            //"export" naked vertical grille
+               rgb_grille = morph_shape(rgb_w, vec3(0.001), 1.0, 1.0);
+                
+            //Scale Max width according to pre-gains:
+                vec3 phosphor_width = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
+
+            //Get final phosphor width:
+                rgb_w = morph_shape(rgb_w, phosphor_width, PIXELGRID_NO_INTERBLEED_W, PIXELGRID_GAMMA_W); //2%
+                
+                
+        }
+    //1%
+        //Mask strength modifiers for hmask, performs way better outside the main if then ^^ up there ^^
+            vec3 rgb_w_weakness = (pixel_in * PIXELGRID_HMASK_NO_BRIGHT) ;
+            rgb_w_weakness = clamp(rgb_w_weakness,0.0,1.0);
+            
+            rgb_w = mix( rgb_w, vec3(1.0), rgb_w_weakness);
+            rgb_w = mix( vec3(1.0), rgb_w, DO_PIXELGRID_W);
+            //The following should be equivalent to ^ ^ but it seems slower.
+            //    rgb_w = mix( vec3(1.0), rgb_w, DO_PIXELGRID_W * (1-rgb_w_weakness)  );
+        
+            //Experimental phosphor level staggering for use with scanlines; unfortunately it kills parallelism.
+            //    float mf = mix(rgb_w.g, rgb_w.r, rgb_w.g*0.587 - rgb_w.b*0.114);
+            //    freq_base_core.y = freq_base_core.y +  mf * pi * 0.5 * float(mod (params.FrameCount, 2.0) != 0.0 );            
+
+
+
+            
+
+
+            
+            
     //Scanlines and fake slotmask =========================================================================
         vec3 rgb_h = vec3(1.0);
         
@@ -513,32 +558,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         }
         
         
-    //Horizontal Triad Mask: ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-        vec3 rgb_w = vec3(1.0);
-        vec3 rgb_grille = vec3(0.0);
-        if (DO_PIXELGRID_W > 0.0) { //4%
-            //get 3 sines in black/white
-                rgb_w = cos(freq_rgb);
-            //make them always positive and double frequency:
-                rgb_w = (rgb_w * rgb_w);
-            //"export" naked vertical grille
-               rgb_grille = morph_shape(rgb_w, vec3(0.001), 1.0, 1.0);
-                
-            //Scale Max width according to pre-gains:
-                vec3 phosphor_width = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
 
-            //Get final phosphor width:
-                rgb_w = morph_shape(rgb_w, phosphor_width, PIXELGRID_NO_INTERBLEED_W, PIXELGRID_GAMMA_W); //2%
-        }
-    //1%
-        //Mask strength modifiers for hmask, performs way better outside the main if then ^^ up there ^^
-            vec3 rgb_w_weakness = (pixel_in * PIXELGRID_HMASK_NO_BRIGHT) ;
-            rgb_w_weakness = clamp(rgb_w_weakness,0.0,1.0);
-            
-            rgb_w = mix( rgb_w, vec3(1.0), rgb_w_weakness);
-            rgb_w = mix( vec3(1.0), rgb_w, DO_PIXELGRID_W);
-            //The following should be equivalent to ^ ^ but it seems slower.
-            //    rgb_w = mix( vec3(1.0), rgb_w, DO_PIXELGRID_W * (1-rgb_w_weakness)  );
             
            
     //Vertical mask .:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.
