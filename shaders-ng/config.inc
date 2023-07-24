@@ -366,6 +366,11 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float PIXELGRID_INTR_FLICK_POWR;
 	float PIXELGRID_INTR_DISABLE_Y;
 	
+	
+	float PIXELGRID_DECON_R_H;
+	float PIXELGRID_DECON_G_H;
+	float PIXELGRID_DECON_B_H;
+	
 	float PIXELGRID_Y_MASK;
 	float PIXELGRID_Y_MASK_ON_WHITE;
 	float PIXELGRID_Y_MASK_HEIGHT;
@@ -406,6 +411,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 	
 } global;
+
 
 // Color correction
 #pragma parameter DO_CCORRECTION "★ Color corrections enable? ==>" 		0.0 	0.0 1.0 1.0
@@ -509,9 +515,16 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter DO_PIXELGRID_H            "      ★ Scanlines (0 to disable)"    	1.0 0.0 1.25 0.05
 #pragma parameter PIXELGRID_MIN_H	        "           . Phosphors height Min"			0.2 0.05 1.0 0.05
 #pragma parameter PIXELGRID_MAX_H           "           . Phosphors height Max"			0.6 0.0 1.25 0.05
-#pragma parameter PIXELGRID_GAMMA_H  "           . Phosphors height min->max gamma:"	4.2 1.0 8.00 0.1
+#pragma parameter PIXELGRID_GAMMA_H         "           . Phosphors height min->max gamma:"	4.2 1.0 8.00 0.1
 #pragma parameter PIXELGRID_OFFSET_CORE     "           . Slotmask(-fake) offset (0.10..0.25 ok)"	0.0 0.0 1.0 0.01
 #pragma parameter PIXELGRID_NO_INTERBLEED_H	"           . Inter line extra steepness (handhelds)"		0.0 0.0 10.0 0.1
+
+
+
+//	#pragma parameter PIXELGRID_DECON_R_H       "           . R phosphor stagger (Y deconvergence)" 0.0 -1.6 1.6 0.1
+//	#pragma parameter PIXELGRID_DECON_G_H       "           . G phosphor stagger (Y deconvergence)" 0.0 -1.6 1.6 0.1
+//	#pragma parameter PIXELGRID_DECON_B_H       "           . B phosphor stagger (Y deconvergence)" 0.0 -1.6 1.6 0.1
+
 
 #pragma parameter BLANK12f " " 0.0 0.0 1.0 1.0
 

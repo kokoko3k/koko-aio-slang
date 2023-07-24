@@ -511,8 +511,17 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 
                 
         }
+            float decon_stagger;
+            #ifdef ENABLE_DECON_STAGGER
+                    decon_stagger = (rgb_w.r * PIXELGRID_DECON_R_H) + 
+                    (rgb_w.g * PIXELGRID_DECON_G_H) + 
+                    (rgb_w.b * PIXELGRID_DECON_B_H) ;
+            #endif
+        
+        
     //1%
         //Mask strength modifiers for hmask, performs way better outside the main if then ^^ up there ^^
+
             vec3 rgb_w_weakness = (pixel_in * PIXELGRID_HMASK_NO_BRIGHT) ;
             rgb_w_weakness = clamp(rgb_w_weakness,0.0,1.0);
             
@@ -525,26 +534,21 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //    float mf = mix(rgb_w.g, rgb_w.r, rgb_w.g*0.587 - rgb_w.b*0.114);
             //    freq_base_core.y = freq_base_core.y +  mf * pi * 0.5 * float(mod (params.FrameCount, 2.0) != 0.0 );            
 
-
-
-            
-
-
-            
-            
+          
     //Scanlines and fake slotmask =========================================================================
         vec3 rgb_h = vec3(1.0);
         
         //Pixelgrid: do horizontal if enabled, but skip it if user doesn't want it on interlaced content.
         //if (DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0)) { //103.1
         if (vDo_pixelgrid_h > 0.5) {
+            
             //Since we emulate scanlines, take into account current scanline phase:
                 float interlacing_adapt_period = vScanlinePeriod;
                 float interlacing_adapt_offset = vScanlineAlternateOffset;
             //We can offset trias to emulate fake core level slotmask by applying the optional offset to emulate the slotmask on even cells
                 float core_offset =  is_even * pi * PIXELGRID_OFFSET_CORE;
             //get a single sine in black/white with applied the optional staggered offset for slotmask:
-                float rgb_h_sin = sin(freq_base_core.y * interlacing_adapt_period + core_offset + interlacing_adapt_offset );
+                float rgb_h_sin = sin((freq_base_core.y+decon_stagger) * interlacing_adapt_period + core_offset + interlacing_adapt_offset );
             //make it positve with doubled frequency:
                 rgb_h_sin = (rgb_h_sin * rgb_h_sin);
             //calculate each phosphor height according to input luminance 
