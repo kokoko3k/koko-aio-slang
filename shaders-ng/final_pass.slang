@@ -511,7 +511,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 
                 
         }
-            float decon_stagger;
+            float decon_stagger = 0.0;
             #ifdef ENABLE_DECON_STAGGER
                     decon_stagger = (rgb_w.r * PIXELGRID_DECON_R_H) + 
                     (rgb_w.g * PIXELGRID_DECON_G_H) + 
