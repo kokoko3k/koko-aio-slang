@@ -33,7 +33,7 @@
     artifacts sharp by using the followin controls.<br>
     This allow to selectively blend artifacts.
 
-    Consider artifacts above this treshol:
+    Consider artifacts above this treshold:
         Tune this to select more or less artifacts, depending on their strength.
     Show the mask of selected artifacts (debug)
         This will show only the part of the image that contains artifacts.
@@ -41,7 +41,7 @@
 
     1* Under treshold: Cancel blur (Glow)
         How much the glow/blur function will skip blurring "unartifacted" areas.
-    2* Under treshold: Cancel Bandwidth limited chroma"
+    2* Under treshold: Cancel Bandwidth limited chroma
         How much the Bandwidth limited chroma function will skip blurring 
         "unartifacted" areas.
     3* Under treshold: Cancel artifacts
