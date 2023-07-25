@@ -27,11 +27,11 @@ void main() {
    
    // If * at least one sharpness is lower than the max
    //    * we dont want just blur
-   //    * we don't want to show ntsc artifact masks
+   //    * we don't want to show ntsc artifact masks if we're doing ntsc artifacts
    // Then do in glow bias
    vDoInGlowBias = float (  IN_GLOW_BIAS < IN_GLOW_BIAS_MAX && 
                             (IN_GLOW_W < GLOW_SHARP_MAX || IN_GLOW_H < GLOW_SHARP_MAX) &&
-                            NTSC_SHOW_ARTF_MASK < 0.5 );
+                            (NTSC_SHOW_ARTF_MASK < 0.5 && DO_NTSC_ARTIFACTS == 1.0)   );
    
 }
 
