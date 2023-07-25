@@ -75,7 +75,7 @@
 	#define NTSC_ARTF_NOBLEED 		global.NTSC_ARTF_NOBLEED
 	#define NTSC_ARTF_TRSH 			global.NTSC_ARTF_TRSH
 	#define NTSC_SHOW_ARTF_MASK 	global.NTSC_SHOW_ARTF_MASK
-
+	#define NTSC_ARTF_ZAP			global.NTSC_ARTF_ZAP
 
 #define DO_RF_NOISE		global.DO_RF_NOISE
 	#define RF_NOISE_STRENGTH	global.RF_NOISE_STRENGTH

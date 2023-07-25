@@ -205,18 +205,25 @@ void main() {
    //This will go into alpha channel to make glow aware of it and blur more.
    //It could be configurable.
    vec3 pixel_out;
-   float artifacts = 0.0;
+   float artifact_mask = 0.0;
 
    
    if (DO_NTSC_ARTIFACTS > 0.5) {
-      vec3 pixel_source = texture(Source, vTexCoord).rgb;
-      vec4 pixel_out_vec4 = ntscdec(vTexCoord);
-      pixel_out = pixel_out_vec4.rgb;
-
-      artifacts = pixel_out_vec4.a;
-      //apply the minimum treshold.
-         artifacts = smoothstep(NTSC_ARTF_TRSH, 1.0, artifacts);      
+      //Get ntsc picture
+         vec4 ntsc_decoded = ntscdec(vTexCoord);
+      //apply the minimum treshold to artifact mask
+         artifact_mask = smoothstep(NTSC_ARTF_TRSH, 1.0, ntsc_decoded.a);    
+         
+      //Optionally completely cut-off artifacts under treshold:
+         vec3 pixel_clean = texture(Source, vTexCoord).rgb;
+         ntsc_decoded = mix(ntsc_decoded, vec4(pixel_clean, 0.0) , (1-artifact_mask)*NTSC_ARTF_ZAP );
+         //Update the artifact mask if something has been cancelled
+            artifact_mask = min(artifact_mask, ntsc_decoded.a);
+      
+      pixel_out = ntsc_decoded.rgb;
+      
    } else {
+      
       pixel_out = texture(Source, vTexCoord).rgb;
    }
 
@@ -248,7 +255,7 @@ void main() {
    }
    
    
-   FragColor = vec4(pixel_out, artifacts);
+   FragColor = vec4(pixel_out, artifact_mask);
    //FragColor = vec4(artifacts);
 }
 

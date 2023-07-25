@@ -32,17 +32,20 @@
     You can selectively keep the part of the image which does not contain<br>
     artifacts sharp by using the followin controls.<br>
     This allow to selectively blend artifacts.
-    
-    Show NTSC artifacts mask (debug):
+
+    Consider artifacts above this treshol:
+        Tune this to select more or less artifacts, depending on their strength.
+    Show the mask of selected artifacts (debug)
         This will show only the part of the image that contains artifacts.
         Use it to for a better visual feedback of the following parameters
-    Selective artifacts treshold:
-        Tune this to select more or less artifacts, depending on their strength.
-    Non-artifacts: Cancel blur (Glow):
+
+    1* Under treshold: Cancel blur (Glow)
         How much the glow/blur function will skip blurring "unartifacted" areas.
-    Non-artifacts: Cancel Bandwidth limited chroma:
+    2* Under treshold: Cancel Bandwidth limited chroma"
         How much the Bandwidth limited chroma function will skip blurring 
-        "unartifacted" areas.        
+        "unartifacted" areas.
+    3* Under treshold: Cancel artifacts
+        How much the artifacts under the treshold will be completely removed.
     
 **CVBS: Bandwidth limited chroma:**<br>
     Will cause an horizontal chroma bleed which cheaply mimics the effect of<br>

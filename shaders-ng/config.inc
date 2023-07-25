@@ -403,6 +403,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float NTSC_ARTF_NOBLUR;
 	float NTSC_ARTF_TRSH;
 	float NTSC_SHOW_ARTF_MASK;
+	float NTSC_ARTF_ZAP;
 	
 	float SERVICE1;
 	
@@ -446,11 +447,13 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter NTSC_FILTER_SCF   "        Subcarrier Frequency"		5.30	0.0 10.0 0.01
 #pragma parameter NTSC_FILTER_FC    "        Frequency cutoff"			2.5	0.0 10.0 0.1
 #pragma parameter NTSC_PHASE_SHIFT  "        Phase shift"			0.0	0.0 1.0  1.0
-#pragma parameter label_blut_ntsc   "        The following need Glow or Bandwidth Limited chroma" 0.0 0.0 0.0 0.0
-#pragma parameter NTSC_ARTF_TRSH      "         . Selective artifacts treshold"			0.1	0.0 1.0 0.01
-#pragma parameter NTSC_ARTF_NOBLUR    "         . Non-artifacts: Cancel blur (Glow)"					0.0	0.0 8.0 0.01
-#pragma parameter NTSC_ARTF_NOBLEED   "         . Non-artifacts: Cancel Bandwidth limited chroma"		0.0	0.0 1.0 0.01
-#pragma parameter NTSC_SHOW_ARTF_MASK "         . Show NTSC artifacts mask (debug)"				0.0	0.0 1.0 1.0
+#pragma parameter label_blut_ntsc   "        1,2 need Glow or Bandwidth Limited chroma" 0.0 0.0 0.0 0.0
+#pragma parameter NTSC_ARTF_TRSH      "      . Consider artifacts above this treshold"			0.1	0.0 1.0 0.01
+#pragma parameter NTSC_SHOW_ARTF_MASK "         . Show selected artifacts mask (debug)"				0.0	0.0 1.0 1.0
+#pragma parameter NTSC_ARTF_NOBLUR    "         . 1* Under treshold: Cancel blur (Glow)"				0.0	0.0 8.0 0.01
+#pragma parameter NTSC_ARTF_NOBLEED   "         . 2* Under treshold: Cancel Bandwidth limited chroma"	0.0	0.0 1.0 0.01
+#pragma parameter NTSC_ARTF_ZAP       "         . 3* Under treshold: Cancel artifacts"					0.0	0.0 1.0 0.01
+
 #pragma parameter BLANK3 " " 0.0 0.0 1.0 1.0
 
 
