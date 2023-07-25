@@ -12,6 +12,9 @@ void main() {
    gl_Position = global.MVP * Position;
    vTexCoord = TexCoord;
    vHALO_H = HALO_H / NEW_SCALEMOD_Y; //Make it resolution independent.
+   
+   
+       //vHALO_H = pow(vHALO_H, 2.0);
 }
 
 #pragma stage fragment
@@ -29,13 +32,13 @@ void main() {
     vec3 pixel_haloed;
     
    //apply just gamma and power for tighter blurs and exit:
-   if (HALO_W >= GLOW_SHARP_MAX && HALO_H >= GLOW_SHARP_MAX) {
-      FragColor = vec4( glow_dumb(Source, HALO_POWER, HALO_GAMMA, vTexCoord), 1.0);
+   if (HALO_H >= GLOW_SHARP_MAX) {
+      FragColor = vec4( glow_dumb(Source, HALO_POWER, 1.0, vTexCoord), 1.0);
       return;
    }
 
-    pixel_haloed = blur9_y(Source, vTexCoord, global.flick_and_noise_passSize.xy, vHALO_H) * HALO_POWER;
-    FragColor = vec4(pixel_haloed.rgb,1.0);
+   pixel_haloed = blur9_y(Source, vTexCoord, global.flick_and_noise_passSize.xy, vHALO_H) * HALO_POWER;
+   FragColor = vec4(pixel_haloed.rgb,1.0);
     
     
 }
