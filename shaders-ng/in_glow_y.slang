@@ -5,25 +5,12 @@
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
-layout(location = 1) out float vIN_GLOW_H;
 layout(location = 2) out float vDoInGlowBias;
 
 
 void main() {
    gl_Position = global.MVP * Position;
    vTexCoord = TexCoord ;  
-
-   float IN_GLOW_H_ADAPTED = IN_GLOW_H;
-
-   //Auto calc glow sharpness via IN_GLOW_SPREAD
-   if (IN_GLOW_H <= 0.00001)
-      IN_GLOW_H_ADAPTED = IN_GLOW_SPREAD * IN_GLOW_SHARPNESS_SPREAD_RATIO_H;
-
-   //don't allow lower values that look bad:
-   IN_GLOW_H_ADAPTED = max(IN_GLOW_H_ADAPTED, MIN_IN_GLOW_SHARP);
-   
-   vIN_GLOW_H = IN_GLOW_H_ADAPTED / NEW_SCALEMOD_Y; //Make it resolution independent.
-   
    
    // If * at least one sharpness is lower than the max
    //    * we dont want just blur
@@ -39,7 +26,6 @@ void main() {
 #pragma stage fragment
 
 layout(location = 0) in vec2 vTexCoord;
-layout(location = 1) in float vIN_GLOW_H;
 layout(location = 2) in float vDoInGlowBias;
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 5) uniform sampler2D shift_and_bleed_pass;
@@ -111,12 +97,31 @@ void main() {
    }
 
    vec3 pixel_glowed;
+   
+   float IN_GLOW_H_ADAPTED = IN_GLOW_H;
+   //Auto calc glow sharpness via IN_GLOW_SPREAD
+      if (IN_GLOW_H <= 0.00001)
+         IN_GLOW_H_ADAPTED = IN_GLOW_SPREAD * IN_GLOW_SHARPNESS_SPREAD_RATIO_H;
 
+   if (DO_NTSC_ARTIFACTS == 1.0) {
+      float ntsc_artifacts = texture(shift_and_bleed_pass, vTexCoord).a;
+      //finally "add" them to the configured sharpness (-> less blur)
+      IN_GLOW_H_ADAPTED = IN_GLOW_H_ADAPTED +  ((1-ntsc_artifacts) * NTSC_ARTF_NOBLUR);
+   }
+   
+   //don't allow lower values that look bad:
+      IN_GLOW_H_ADAPTED = max(IN_GLOW_H_ADAPTED, MIN_IN_GLOW_SHARP);
+
+   //Make it resolution independent.
+      IN_GLOW_H_ADAPTED = IN_GLOW_H_ADAPTED / NEW_SCALEMOD_X;
+   
+   
+   
    //It over the max sharp, then just passthrough, else do the blur.
       if (IN_GLOW_H >= GLOW_SHARP_MAX) {
          pixel_glowed = texture(Source,vTexCoord).rgb * IN_GLOW_POWER; //(Source, IN_GLOW_POWER, IN_GLOW_GAMMA, vTexCoord) ;
       } else {
-         pixel_glowed = blur9_y(Source, vTexCoord, params.SourceSize.xy, vIN_GLOW_H) * IN_GLOW_POWER;
+         pixel_glowed = blur9_y(Source, vTexCoord, params.SourceSize.xy, IN_GLOW_H_ADAPTED) * IN_GLOW_POWER;
       }
    
    

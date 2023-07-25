@@ -62,12 +62,6 @@ const float WEIGHTS[4] = float[4](
 
 
 
-
-
-
-
-
-
 #define BLURDIRECTION vec2(1,0)
  //blur_h_new(shift_and_bleed_pass, vTexCoord, global.flick_and_noise_passSize.xy, IN_GLOW_W_ADAPTED)
 vec3 blur_h_new(sampler2D sourceTexture, vec2 pixelCoord, vec2 sourcesize, float sharpness)
@@ -119,7 +113,7 @@ void main() {
    //Here lies the blur modifier from ntsc pass to glow.
    //I'm not expecting any performance hit, 
    //since the lookup should have been cached already or will serve so.
-      float ntsc_artifacts = texture(shift_and_bleed_pass, vTexCoord).a;
+   float ntsc_artifacts = texture(shift_and_bleed_pass, vTexCoord).a;
 
    //To debug ntsc artifacts mask:
       if (DO_NTSC_ARTIFACTS + NTSC_SHOW_ARTF_MASK > 1.5) {
@@ -128,7 +122,7 @@ void main() {
       }
       
    //finally "add" them to the configured sharpness (-> less blur)
-      IN_GLOW_W_ADAPTED = IN_GLOW_W_ADAPTED +  DO_NTSC_ARTIFACTS * ((1-ntsc_artifacts) * NTSC_ARTF_NOBLUR);
+      //IN_GLOW_W_ADAPTED = IN_GLOW_W_ADAPTED +  DO_NTSC_ARTIFACTS * ((1-ntsc_artifacts) * NTSC_ARTF_NOBLUR);
 
    //don't allow lower values that look bad:
       IN_GLOW_W_ADAPTED = max(IN_GLOW_W_ADAPTED, MIN_IN_GLOW_SHARP);
