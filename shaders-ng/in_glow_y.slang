@@ -18,8 +18,7 @@ void main() {
    // Then do in glow bias
    vDoInGlowBias = float (  IN_GLOW_BIAS < IN_GLOW_BIAS_MAX && 
                             (IN_GLOW_W < GLOW_SHARP_MAX || IN_GLOW_H < GLOW_SHARP_MAX) &&
-                            (NTSC_SHOW_ARTF_MASK < 0.5 && DO_NTSC_ARTIFACTS == 1.0)   );
-   
+                            (DO_NTSC_ARTIFACTS + NTSC_SHOW_ARTF_MASK < 1.5)   );
 }
 
 
