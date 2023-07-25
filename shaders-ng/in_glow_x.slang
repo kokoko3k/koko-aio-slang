@@ -121,7 +121,12 @@ void main() {
    //since the lookup should have been cached already or will serve so.
       float ntsc_artifacts = texture(shift_and_bleed_pass, vTexCoord).a;
 
-   
+   //To debug ntsc artifacts mask:
+      if (DO_NTSC_ARTIFACTS + NTSC_SHOW_ARTF_MASK > 1.5) {
+         FragColor = vec4(ntsc_artifacts);
+         return;
+      }
+      
    //finally "add" them to the configured sharpness (-> less blur)
       IN_GLOW_W_ADAPTED = IN_GLOW_W_ADAPTED +  DO_NTSC_ARTIFACTS * ((1-ntsc_artifacts) * NTSC_ARTF_NOBLUR);
 
@@ -139,11 +144,7 @@ void main() {
                                textureLod(shift_and_bleed_passFeedback, vTexCoord, DELTA_RENDER_CHECK_AREA).rgb);
       }
       
-   //To debug ntsc artifacts mask:
-      if (NTSC_SHOW_ARTF_MASK > 0.5) {
-         FragColor = vec4(ntsc_artifacts);
-         return;
-      }
+
       
    //Finally blur horizontally 
    if (IN_GLOW_W < GLOW_SHARP_MAX) {
