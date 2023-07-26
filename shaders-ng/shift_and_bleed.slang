@@ -117,10 +117,10 @@ vec3 deconvergence_shadow_wrap (vec2 coord) {
 
 vec3 pixel_bleed_side_NTSC(vec3 pixel_in, vec2 co, float size, float side, sampler2D in_texture, vec4 sourcesize2) {
    //apply strength modifier to blur ntsc artifacts more.
-   float strength_modifier = texture(colortools_and_ntsc_pass,co).a;
+   
+   float strength_modifier = mix(1.0, texture(colortools_and_ntsc_pass,co).a, DO_NTSC_ARTIFACTS); 
    if (NTSC_SHOW_ARTF_MASK + DO_NTSC_ARTIFACTS == 2.0) return vec3(strength_modifier);
-   float w = SAT_BLEED_STRENGTH * clamp (strength_modifier, (1-NTSC_ARTF_NOBLEED), 1.0 );// * NTSC_ARTF_NOBLEED);
-//   float w = SAT_BLEED_STRENGTH;
+   float w = SAT_BLEED_STRENGTH * clamp (strength_modifier, (1-NTSC_ARTF_NOBLEED), 1.0 ); 
    vec3 blur_YIQ = pixel_in * mat3_RGB2YIQ;    //Work in YIQ space
    float i = 0.0;
    for ( i=1 ; i <= size ; i++ ){
