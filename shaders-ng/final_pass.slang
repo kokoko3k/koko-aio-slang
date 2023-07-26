@@ -192,13 +192,8 @@ void main() {
         }
             
     //Pixelgrid: get mask type; .rgb contains layout, .a contains the size.
-        #define PG_H_COUNT vPG_offsets_and_size.a
         vPG_offsets_and_size = PG_get_hmask_preset() ;
-        //This is needed to make sure triad order is preserved and consistent betweeb core coords and screen coords.
-        //The issue visible when staggering the slotmask.
-            vPG_offsets_adjust_for_stagger = (1-PIXELGRID_SIZE_W) * (pi*0.5)/PG_H_COUNT;
-        //scale offsets to be used by sin/cos:
-            vPG_offsets_and_size.rgb *= (pi / PG_H_COUNT);
+        #define PG_H_COUNT vPG_offsets_and_size.a
 
     //Pixelgrid: Calc freq_base_screen
         //Tate ?
@@ -218,10 +213,26 @@ void main() {
 
             //the following unfloored coords are needed by sin/cos later to understand if we are on an even or odd mask
                 vPG_freq_base_screen_unfloored = pi * vec2(1/PG_H_COUNT, 0.5) * (vPG_OutputCoord_tated * vPG_OutputSize_tated);
+              
+  
+        //This is needed to make sure even/odd staggering period matches betweeb floored (screen 1X)
+        //and unfloored coords (core or non 1x mask size).
+        //The issue visible when staggering the slotmask.
+            if (PIXELGRID_SIZE_W == 0.0 || PIXELGRID_MUL_X != 1.0) {
+                vec4 unfloored_offsets_fix = vec4(1.5,0.5,1.0,0.0);
+                //vPG_offsets_adjust_for_stagger = (pi*0.5)/PG_H_COUNT;
+                vPG_offsets_adjust_for_stagger = unfloored_offsets_fix[int(PG_H_COUNT)-1];
+            }
+
+
+        //scale offsets to be used by sin/cos:
+            vPG_offsets_and_size.rgb *= (pi / PG_H_COUNT);
                 
     //Pixelgrid: adapt period multiplier
         if (vPG_period_multiplier.x < 0.0) vPG_period_multiplier.x = 1/-vPG_period_multiplier.x;  
-        if (vPG_period_multiplier.y < 0.0) vPG_period_multiplier.y = 1/-vPG_period_multiplier.y;            
+        if (vPG_period_multiplier.y < 0.0) vPG_period_multiplier.y = 1/-vPG_period_multiplier.y;     
+        
+        
     //Pixelgrid: adapt mask height
         vPG_mask_height = PIXELGRID_Y_MASK_HEIGHT;
         if (vPG_mask_height < 0.0) vPG_mask_height = 1/-vPG_mask_height;
@@ -448,17 +459,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 //vec2 freq_base_screen_unfloored = pi * vec2(1/PG_h_count, 0.5) * (vPG_OutputCoord_tated * vPG_OutputSize_tated);
                 vec2 freq_base_screen_unfloored = vPG_freq_base_screen_unfloored; //<-- missing muls because done to vertex shader.
         
-            //Screen coords needs flooring, but we need to disable flooring if requested.
-            //Since this seems to be a crucial point in the code that kills performance on my haswell, mix() or if/then needs to be absolutely avoided.
-            //So my hack here is to always floor the coords, but to floor them with a huge precision to emulate the unfloored coord.
-                /*vec2 screen_unfloor_hack = 1 + vec2( (float(  PIXELGRID_MUL_X != 1.0      )), 
-                                                 (float(  PIXELGRID_Y_MASK_HEIGHT != 1.0  ))
-                                                ) ;
-                vec2 freq_base_screen = vPG_freq_base_screen * 
-                            floor(vPG_OutputCoord_tated * vPG_OutputSize_tated * screen_unfloor_hack) / (screen_unfloor_hack);
-                            
-                */
-                //106.6//
+            //Screen coords needs flooring, but we need to disable flooring if using non 1x screen coords
                 vec2 freq_base_screen = mix( vPG_freq_base_screen_unfloored, 
                                              vPG_freq_base_screen * floor(vPG_OutputCoord_tated * vPG_OutputSize_tated ),
                                              vec2(  
