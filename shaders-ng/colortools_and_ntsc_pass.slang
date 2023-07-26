@@ -10,14 +10,14 @@
 #define CBLUE    vec3(0.0,0.0,1.0)
 #define CCUSTOM vec3(0.3,0.5,0.1)
 
-#define DEBUG_COLOR vec3(1.0,1.0,1.0)
+#define DEBUG_COLOR vec3(0.7)
 #define DEBUG_BLINK_TIME 30
 #define DEBUG_GRADIENT_STEPS 64
 
 //#define DEBUG
-   //#define DEBUG_TIME_FADE
+   #define DEBUG_TIME_FADE
    //#define DEBUG_SOLID_COLOR
-   #define DEBUG_STEP_GRADIENT
+   //#define DEBUG_STEP_GRADIENT
    //#define DEBUG_BLINK
    //#define DEBUG_BLINK_CIRCLE
    //#define DEBUG_COLORWHEEL
@@ -158,6 +158,9 @@ vec4 ntscdec(vec2 uv) {
    float artifacts_mask = abs(YIQ_processed.y)         + abs(YIQ_processed.z) + 
                           abs(YIQ_processed_shifted.y) + abs(YIQ_processed_shifted.z);
    
+                          
+   //artifacts_mask = pow(artifacts_mask, 0.25);
+                          
    return vec4(YIQ_result * YIQ2RGB, artifacts_mask);
 }
 
@@ -212,14 +215,18 @@ void main() {
       //Get ntsc picture
          vec4 ntsc_decoded = ntscdec(vTexCoord);
       //apply the minimum treshold to artifact mask
-         artifact_mask = smoothstep(NTSC_ARTF_TRSH, 1.0, ntsc_decoded.a);    
-         
+         artifact_mask = smoothstep(NTSC_ARTF_TRSH, 1.0, ntsc_decoded.a)*1.0;
+
       //Optionally completely cut-off artifacts under treshold:
          vec3 pixel_clean = texture(Source, vTexCoord).rgb;
          ntsc_decoded = mix(ntsc_decoded, vec4(pixel_clean, 0.0) , (1-artifact_mask)*NTSC_ARTF_ZAP );
          //Update the artifact mask if something has been cancelled
             artifact_mask = min(artifact_mask, ntsc_decoded.a);
-      
+
+            //artifact_mask = clamp (artifact_mask*1.0, 0.0,1.0);
+            artifact_mask *= 2.0;
+            
+            
       pixel_out = ntsc_decoded.rgb;
       
    } else {
