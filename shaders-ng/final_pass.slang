@@ -556,9 +556,9 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 float interlacing_adapt_period = vScanlinePeriod;
                 float interlacing_adapt_offset = vScanlineAlternateOffset;
             //We can offset trias to emulate fake core level slotmask by applying the optional offset to emulate the slotmask on even cells
-                float core_offset =  is_even * pi * PIXELGRID_OFFSET_CORE;
+                float triad_stagger_offset =  is_even * pi * PIXELGRID_OFFSET_CORE;
             //get a single sine in black/white with applied the optional staggered offset for slotmask:
-                float rgb_h_sin = sin((freq_base_core.y+decon_stagger) * interlacing_adapt_period + core_offset + interlacing_adapt_offset );
+                float rgb_h_sin = sin((freq_base_core.y+decon_stagger) * interlacing_adapt_period + triad_stagger_offset + interlacing_adapt_offset );
             //make it positve with doubled frequency:
                 rgb_h_sin = (rgb_h_sin * rgb_h_sin);
             //calculate each phosphor height according to input luminance 
