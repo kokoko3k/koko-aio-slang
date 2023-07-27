@@ -219,7 +219,8 @@ void main() {
         //and unfloored coords (core or non 1x mask size).
         //The issue visible when staggering the slotmask.           FIXME: Not yet 100% perfect
             if (PIXELGRID_SIZE_W == 0.0 || PIXELGRID_MUL_X != 1.0) {
-                vec4 unfloored_offsets_fix = vec4(1.5,0.5,1.0,0.0);
+                //vec4 unfloored_offsets_fix = vec4(1.5,0.5,1.0,0.0);
+                vec4 unfloored_offsets_fix = vec4(1.6, 0.81, 0.54, 0.81);
                 //vPG_offsets_adjust_for_stagger = (pi*0.5)/PG_H_COUNT;
                 vPG_offsets_adjust_for_stagger = unfloored_offsets_fix[int(PG_H_COUNT)-1];
             }
