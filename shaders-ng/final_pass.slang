@@ -217,13 +217,13 @@ void main() {
   
         //This is needed to make sure even/odd staggering period matches betweeb floored (screen 1X)
         //and unfloored coords (core or non 1x mask size).
-        //The issue visible when staggering the slotmask.
+        //The issue visible when staggering the slotmask.           FIXME: Not yet 100% perfect
             if (PIXELGRID_SIZE_W == 0.0 || PIXELGRID_MUL_X != 1.0) {
                 vec4 unfloored_offsets_fix = vec4(1.5,0.5,1.0,0.0);
                 //vPG_offsets_adjust_for_stagger = (pi*0.5)/PG_H_COUNT;
                 vPG_offsets_adjust_for_stagger = unfloored_offsets_fix[int(PG_H_COUNT)-1];
             }
-vPG_offsets_adjust_for_stagger = 0.0;
+
 
         //scale offsets to be used by sin/cos:
             vPG_offsets_and_size.rgb *= (pi / PG_H_COUNT);
