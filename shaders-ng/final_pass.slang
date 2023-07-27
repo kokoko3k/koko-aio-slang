@@ -492,6 +492,14 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         
     //The following is needed by scanlines and vertical mask
     //sin() tell use if the current cell position is odd or even:
+
+        //FIXME: is_even should be a single phosphor property.
+        //If i manage to find a way to do it, i could use 
+        //decon_stagger.r,g,b to stagger syngle phosphors.
+        //And that way, i could blend staggered triads together
+        //without "cuts" betweeb them.
+        //Also, i would solve the triad stagger unalignment problems.        
+        
     //Moving it up there provides a small speed up due to
     //increased parallalism, I guess.
         float sin_check_offset = sin(freq_base_unfloored.x + vPG_offsets_adjust_for_stagger);
@@ -521,14 +529,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 
                 
         }
-            float decon_stagger = 0.0;
-            #ifdef ENABLE_DECON_STAGGER
-                    decon_stagger = (rgb_w.r * PIXELGRID_DECON_R_H) + 
-                    (rgb_w.g * PIXELGRID_DECON_G_H) + 
-                    (rgb_w.b * PIXELGRID_DECON_B_H) ;
-            #endif
-        
-        
+                    
     //1%
         //Mask strength modifiers for hmask, performs way better outside the main if then ^^ up there ^^
 
@@ -557,15 +558,16 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 float interlacing_adapt_offset = vScanlineAlternateOffset;
             //We can offset trias to emulate fake core level slotmask by applying the optional offset to emulate the slotmask on even cells
                 float triad_stagger_offset =  is_even * pi * PIXELGRID_OFFSET_CORE;
-            //get a single sine in black/white with applied the optional staggered offset for slotmask:
-                float rgb_h_sin = sin((freq_base_core.y+decon_stagger) * interlacing_adapt_period + triad_stagger_offset + interlacing_adapt_offset );
+            //get 3 sines with applied the optional staggered offset for slotmask, and single phosphors staggering for y deconvergence.
+                vec3 decon_stagger = vec3( PIXELGRID_DECON_R_H, PIXELGRID_DECON_G_H, PIXELGRID_DECON_B_H) ;
+                vec3 rgb_h_sin = sin((freq_base_core.y + decon_stagger) * interlacing_adapt_period + triad_stagger_offset + interlacing_adapt_offset );
             //make it positve with doubled frequency:
                 rgb_h_sin = (rgb_h_sin * rgb_h_sin);
             //calculate each phosphor height according to input luminance 
                 vec3 phosphor_height = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
                 //phosphor_height = vec3(1.0);
             //Finally get 3 sines out of the previous one by applying height modifiers
-                rgb_h = vec3(rgb_h_sin);
+                rgb_h = rgb_h_sin;
                 rgb_h = morph_shape(rgb_h, phosphor_height, PIXELGRID_NO_INTERBLEED_H, PIXELGRID_GAMMA_H);
                 rgb_h = mix(vec3(1.0), rgb_h, DO_PIXELGRID_H);
                 rgb_h = clamp(rgb_h, 0.0,1.0);

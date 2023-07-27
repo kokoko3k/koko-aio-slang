@@ -175,6 +175,12 @@
             You may want them to merge or not, depending on your preference to see a visible "grid"/lines.
             This function is useful when you want to emulate handhelds screens, 
             where cells are well separated.
+        R,G,B phosphor Y deconvergence
+            This emulates Y deconvergence on phosphor level rather than on image level as seen in
+            the previous deconvergence section.
+            Emulating deconvergence here is good because phosphors will be able to brighten the
+            dark gap left by scanlines.
+        
         
     Interlace detect + Scanline alternate above # lines:
         koko-aio will mark a frame as interlaced and will alternate odd/even scanlines

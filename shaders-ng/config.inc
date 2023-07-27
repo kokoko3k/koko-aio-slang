@@ -524,9 +524,9 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 
 
-//	#pragma parameter PIXELGRID_DECON_R_H       "           . R phosphor stagger (Y deconvergence)" 0.0 -1.6 1.6 0.1
-//	#pragma parameter PIXELGRID_DECON_G_H       "           . G phosphor stagger (Y deconvergence)" 0.0 -1.6 1.6 0.1
-//	#pragma parameter PIXELGRID_DECON_B_H       "           . B phosphor stagger (Y deconvergence)" 0.0 -1.6 1.6 0.1
+#pragma parameter PIXELGRID_DECON_R_H       "           . R phosphor Y deconvergence" 0.0 -1.6 1.6 0.1
+#pragma parameter PIXELGRID_DECON_G_H       "           . G phosphor Y deconvergence" 0.0 -1.6 1.6 0.1
+#pragma parameter PIXELGRID_DECON_B_H       "           . B phosphor Y deconvergence" 0.0 -1.6 1.6 0.1
 
 
 #pragma parameter BLANK12f " " 0.0 0.0 1.0 1.0
