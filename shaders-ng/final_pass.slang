@@ -226,6 +226,7 @@ void main() {
         //This is needed to make sure even/odd staggering period matches betweeb floored (screen 1X)
         //and unfloored coords (core or non 1x mask size).
         //The issue visible when staggering the slotmask.           FIXME: Not yet 100% perfect
+            vPG_offsets_adjust_for_stagger = 0.0;
             if (PIXELGRID_SIZE_W == 0.0 || PIXELGRID_MUL_X != 1.0) {
                 //vec4 unfloored_offsets_fix = vec4(1.5,0.5,1.0,0.0);
                 vec4 unfloored_offsets_fix = vec4(1.6, 0.81, 0.54, 0.81);
