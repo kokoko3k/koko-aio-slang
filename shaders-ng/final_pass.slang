@@ -124,7 +124,15 @@ vec2 get_zooms_modifier() {
 
 void main() {
     gl_Position = global.MVP * Position;
-    vIsRotated = float(is_rotated());
+    bool bIsRotated = is_rotated();
+    vIsRotated = float(bIsRotated);
+    
+    if ( (TATE == 1.0 && bIsRotated) || TATE == 2.0)
+        vDo_Tate = 1.0;
+            else
+        vDo_Tate = 0.0;
+    //vDo_Tate = float(TATE+vIsRotated > 1.001); //<<-- reported problems with amd (?)
+    
     vIn_aspect = get_in_aspect();
     
     //Calculate vTexcoord as fractional or integer scaled?
@@ -147,7 +155,7 @@ void main() {
     vec2 vFragCoord = vec2( floor(vOutputCoord.x * params.OutputSize.x),
                             floor(vOutputCoord.y * params.OutputSize.y));
 
-    vDo_Tate = float(TATE+vIsRotated > 1.001);
+
 
     vBEZEL_INNER_ZOOM_adapted = get_BEZEL_INNER_ZOOM() * DO_BEZEL;
     
