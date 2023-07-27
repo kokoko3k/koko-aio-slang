@@ -98,15 +98,19 @@ void main() {
     
     float fbloom_mix = BLOOM_MIX;
     float bloom_mix_adapted = 1.0;
-    float over_white_correction = 1.0;
+    vec3 over_white_correction = vec3(1.0);
     
     
     if (BLOOM_OVER_WHITE < 1.0) {
         //Use mipmap available in avglum_pass to identify bright areas.
         vec3 avglum = texture(avglum_pass,vTexCoord).rgb;
-        float b_brightness = max(avglum.b,max(avglum.r,avglum.g));
-        b_brightness *= 1-BLOOM_OVER_WHITE;
-        over_white_correction =1- b_brightness;
+        avglum = textureLod(flick_and_noise_pass,vTexCoord, 4.0).rgb;
+
+        over_white_correction = mix( 1-avglum, vec3(1.0), BLOOM_OVER_WHITE);
+        over_white_correction *= over_white_correction;
+        //FragColor = vec4(over_white_correction, 1.0);
+        //return;
+        
     }
     
     bloomed*=BLOOM_POWER;
