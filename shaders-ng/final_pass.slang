@@ -470,14 +470,11 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 vec2 freq_base_screen_unfloored = vPG_freq_base_screen_unfloored; //<-- missing muls because done to vertex shader.
         
             //Screen coords needs flooring, but we need to disable flooring if using non 1x screen coords
+            // y screen coords appear to work just fine even if we always floor them,
+            // you can use "float(fract(1/vPG_mask_height) < 0.01"as the y mix parameter instead of 1.0 if in doubt.
                 vec2 freq_base_screen = mix( vPG_freq_base_screen_unfloored, 
                                              vPG_freq_base_screen * floor(vPG_OutputCoord_tated * vPG_OutputSize_tated ),
-                                             vec2(  
-                                                        float(PIXELGRID_MUL_X==1.0),   
-                                                        float(PIXELGRID_Y_MASK_HEIGHT==1.0) 
-                                                 
-                                                  ) 
-                                            );
+                                             vec2( float(PIXELGRID_MUL_X==1.0), 1.0 ) );
                 
     //Switch between core and screen sizes (x and y)
         vec2 freq_base           = mix( freq_base_core, freq_base_screen,           vec2(PIXELGRID_SIZE_W, 0.0));
