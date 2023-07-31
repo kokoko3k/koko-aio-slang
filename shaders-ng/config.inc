@@ -361,6 +361,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float PIXELGRID_OFFSET_CORE;
 	float PIXELGRID_NO_INTERBLEED_W;
 	float PIXELGRID_NO_INTERBLEED_H;
+	float PIXELGRID_H_DEDOT;
 	
 	float PIXELGRID_INTR_FLICK_MODE;
 	float PIXELGRID_INTR_FLICK_POWR;
@@ -521,9 +522,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter PIXELGRID_GAMMA_H         "           . Phosphors height min->max gamma:"	4.2 1.0 8.00 0.1
 #pragma parameter PIXELGRID_OFFSET_CORE     "           . Slotmask(-fake) offset (0.10..0.25 ok)"	0.0 0.0 1.0 0.01
 #pragma parameter PIXELGRID_NO_INTERBLEED_H	"           . Inter line extra steepness (handhelds)"		0.0 0.0 10.0 0.1
-
-
-
+#pragma parameter PIXELGRID_H_DEDOT			"           . Dedot Horiz. mask on high scanlines"	0.0 0.0 1.0 0.1
 #pragma parameter PIXELGRID_DECON_R_H       "           . R phosphor Y deconvergence" 0.0 -1.6 1.6 0.1
 #pragma parameter PIXELGRID_DECON_G_H       "           . G phosphor Y deconvergence" 0.0 -1.6 1.6 0.1
 #pragma parameter PIXELGRID_DECON_B_H       "           . B phosphor Y deconvergence" 0.0 -1.6 1.6 0.1
@@ -546,7 +545,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter PIXELGRID_Y_MASK_OFFSET    "           . Even/odd offset"	1.0 0.0 1.0 1.0
 #pragma parameter PIXELGRID_Y_MASK_SHIFT     "             . Vertical shift (for use with core resolution)"	0.0 0.0 1.0 0.01
 #pragma parameter PIXELGRID_Y_MASK_STEEP     "           . Steepness"	2.0 1.0 30.0 1.0
-#pragma parameter PIXELGRID_Y_SPARK          "           . Sparkling look punch"	0.0 0.0 1.0 0.01
+#pragma parameter PIXELGRID_Y_SPARK          "           . Sparkling look punch"	0.0 0.0 1.0 0.05
 
 #pragma parameter BLANK12d " " 0.0 0.0 1.0 1.0
 
@@ -750,7 +749,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BLANK_02 " " 0.0 0.0 1.0 1.0
 
 
-#pragma parameter SERVICE1 "Don't use me, for debug purposes only" 	0.5 -5.0 5.0 0.01
+#pragma parameter SERVICE1 "Don't use me, for debug purposes only" 	0.5 0.0 1.0 0.1
 //#pragma parameter SERVICE2 "Don't use me, for debug purposes only" 	0.5 -1.0 1.0 0.01
 //#pragma parameter SERVICE3 "Don't use me, for debug purposes only" 	0.5 -1.0 1.0 0.01
 

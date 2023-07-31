@@ -6,21 +6,36 @@ layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
 layout(location = 1) out float vHALO_H;
+layout(location = 2) out float vHALO_POWER;
 
 
 void main() {
    gl_Position = global.MVP * Position;
    vTexCoord = TexCoord;
-   vHALO_H = HALO_H / NEW_SCALEMOD_Y; //Make it resolution independent.
+   
+   vHALO_H = HALO_H;
+   float vexp = mix(0.1, 1.0, HALO_H);
+   vHALO_H = pow(vHALO_H, vexp)*0.75;
+   
+   vHALO_H = vHALO_H / NEW_SCALEMOD_Y; //Make it resolution independent.
    
    
-       //vHALO_H = pow(vHALO_H, 2.0);
+   
+   //vHALO_H = vHALO_H * 1000.0;
+   //vHALO_H = pow(vHALO_H,0.5) ; //adjust precision for easier drive
+
+ vHALO_POWER = HALO_POWER;
+ if (DO_IN_GLOW == 1.0)
+    vHALO_POWER /= IN_GLOW_POWER;
+
 }
 
 #pragma stage fragment
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in float vHALO_H;
+layout(location = 2) in float vHALO_POWER;
 layout(location = 0) out vec4 FragColor;
+
 layout(set = 0, binding = 2) uniform sampler2D Source;
 
 #include "includes/functions.include.slang"    
@@ -37,7 +52,10 @@ void main() {
       return;
    }
    //pixel_haloed = blur9_y_gamma(Source, vTexCoord, params.SourceSize.xy, vHALO_H, vec3(HALO_GAMMA));
-   pixel_haloed = blur9_y(Source, vTexCoord, params.SourceSize.xy, vHALO_H) * HALO_POWER;
+   pixel_haloed = blur9_y(Source, vTexCoord, params.SourceSize.xy, vHALO_H) * vHALO_POWER ;
+     
+
+   
    FragColor = vec4(pixel_haloed.rgb,1.0);
     
     

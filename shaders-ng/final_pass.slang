@@ -56,7 +56,7 @@ layout(location = 21) out vec2 vPG_OutputCoord_tated;
 layout(location = 22) out float vDotMat_Grid_Sharpness;
 layout(location = 23) out float vfprintvalue;
 layout(location = 24) out float vPG_mask_height;
-layout(location = 25) out float vPG_spark;
+
 layout(location = 26) out vec4 vfloats_packed1;
 //We're running out of available locations for vulkan (max index = 31), so we packed 4 floats into 1.
     //layout(location = 26) in float vDeltaRenderOk;
@@ -250,8 +250,7 @@ void main() {
     //Pixelgrid: do horizontal if enabled, but skip it if user doesn't want it on interlaced content.
         vDo_pixelgrid_h = float(DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0));
 
-    //vPG_spark = PIXELGRID_Y_SPARK * PIXELGRID_Y_MASK; <--vertex shader collapses here.
-        
+       
     vDo_Curvature = DO_CURVATURE + GEOM_WARP_X + GEOM_WARP_Y;
     
     //Dot matrix: measure the final picture size to choose a right sharpness level
@@ -305,7 +304,6 @@ layout(location = 21) in vec2 vPG_OutputCoord_tated;
 layout(location = 22) in float vDotMat_Grid_Sharpness;
 layout(location = 23) in float vfprintvalue;
 layout(location = 24) in float vPG_mask_height;
-layout(location = 25) in float vPG_spark;
 
 layout(location = 26) in vec4 vfloats_packed1;
 //We're running out of available locations for vulkan (max index = 31), so we packed 4 floats into 1.
@@ -507,49 +505,10 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         float is_even = step(sin_check_offset, 0.0);
         
         
-        
-        
-
-        
-    //Horizontal Triad Mask: ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-        vec3 rgb_w = vec3(1.0);
-        vec3 rgb_grille = vec3(0.0);
-        if (DO_PIXELGRID_W > 0.0) { //4%
-            //get 3 sines in black/white
-                rgb_w = cos(freq_rgb);
-            //make them always positive and double frequency:
-                rgb_w = (rgb_w * rgb_w);
-            //"export" naked vertical grille
-               rgb_grille = morph_shape(rgb_w, vec3(0.001), 1.0, 1.0);
-                
-            //Scale Max width according to pre-gains:
-                vec3 phosphor_width = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
-
-            //Get final phosphor width:
-                rgb_w = morph_shape(rgb_w, phosphor_width, PIXELGRID_NO_INTERBLEED_W, PIXELGRID_GAMMA_W); //2%
-                
-                
-        }
-                    
-    //1%
-        //Mask strength modifiers for hmask, performs way better outside the main if then ^^ up there ^^
-
-            vec3 rgb_w_weakness = (pixel_in * PIXELGRID_HMASK_NO_BRIGHT) ;
-            rgb_w_weakness = clamp(rgb_w_weakness,0.0,1.0);
-            
-            rgb_w = mix( rgb_w, vec3(1.0), rgb_w_weakness);
-            rgb_w = mix( vec3(1.0), rgb_w, DO_PIXELGRID_W);
-            //The following should be equivalent to ^ ^ but it seems slower.
-            //    rgb_w = mix( vec3(1.0), rgb_w, DO_PIXELGRID_W * (1-rgb_w_weakness)  );
-        
-            //Experimental phosphor level staggering for use with scanlines; unfortunately it kills parallelism.
-            //    float mf = mix(rgb_w.g, rgb_w.r, rgb_w.g*0.587 - rgb_w.b*0.114);
-            //    freq_base_core.y = freq_base_core.y +  mf * pi * 0.5 * float(mod (params.FrameCount, 2.0) != 0.0 );            
-
-          
     //Scanlines and fake slotmask =========================================================================
         vec3 rgb_h = vec3(1.0);
-        
+        float dedot_mix_inverted = 1.0;
+
         //Pixelgrid: do horizontal if enabled, but skip it if user doesn't want it on interlaced content.
         //if (DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0)) { //103.1
         if (vDo_pixelgrid_h > 0.5) {
@@ -564,25 +523,64 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 vec3 rgb_h_sin = sin((freq_base_core.y + decon_stagger) * interlacing_adapt_period + triad_stagger_offset + interlacing_adapt_offset );
             //make it positve with doubled frequency:
                 rgb_h_sin = (rgb_h_sin * rgb_h_sin);
-            //calculate each phosphor height according to input luminance 
-                vec3 phosphor_height = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
-                //phosphor_height = vec3(1.0);
+            //Compute dedot mix here for use in h mask and vmask2 later
+                dedot_mix_inverted = (1-rgb_h_sin.r) * PIXELGRID_H_DEDOT ;
+                //dedot_mix_inverted *= dot(pixel_in, vec3(0.3333)) / max_inLum;
+                dedot_mix_inverted *= max(max(pixel_in.r, pixel_in.g), pixel_in.b)/max_inLum;
+                dedot_mix_inverted = 1-dedot_mix_inverted;
+            //Compute each phosphor height according to input luminance 
+                vec3 phosphor_height = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);                
             //Finally get 3 sines out of the previous one by applying height modifiers
-                rgb_h = rgb_h_sin;
+                rgb_h = rgb_h_sin;               
                 rgb_h = morph_shape(rgb_h, phosphor_height, PIXELGRID_NO_INTERBLEED_H, PIXELGRID_GAMMA_H);
                 rgb_h = mix(vec3(1.0), rgb_h, DO_PIXELGRID_H);
                 rgb_h = clamp(rgb_h, 0.0,1.0);
+            
         }
         
-        
 
+        
+    //Horizontal Triad Mask: ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+        vec3 rgb_w = vec3(1.0);
+        vec3 rgb_grille = vec3(0.0);
+        
+        if (DO_PIXELGRID_W > 0.0) { //4%
+            //get 3 sines in black/white
+                rgb_w = cos(freq_rgb);
+            //make them always positive and double frequency:
+                rgb_w = (rgb_w * rgb_w);
+            //"export" naked vertical grille
+               rgb_grille = morph_shape(rgb_w, vec3(0.001), 1.0, 1.0);
+                
+            //Scale Max width according to pre-gains:
+                vec3 phosphor_width = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
+
+            //Get final phosphor width:
+                rgb_w = morph_shape(rgb_w, phosphor_width, PIXELGRID_NO_INTERBLEED_W, PIXELGRID_GAMMA_W); //2%
             
-           
+            //Dedot h mask:
+                vec3 rgb_w_dedotted = vec3( dot(rgb_w, vec3(0.333)) );            
+                rgb_w = mix(rgb_w_dedotted, rgb_w, dedot_mix_inverted );
+        }
+                    
+    //1%
+        //Mask strength modifiers for hmask, performs way better outside the main if then ^^ up there ^^
+
+            vec3 rgb_w_weakness = (pixel_in * PIXELGRID_HMASK_NO_BRIGHT) ;
+            rgb_w_weakness = clamp(rgb_w_weakness,0.0,1.0);
+            
+            rgb_w = mix( rgb_w, vec3(1.0), rgb_w_weakness);
+            rgb_w = mix( vec3(1.0), rgb_w, DO_PIXELGRID_W);
+            //The following should be equivalent to ^ ^ but it seems slower.
+            //    rgb_w = mix( vec3(1.0), rgb_w, DO_PIXELGRID_W * (1-rgb_w_weakness)  );
+
+
     //Vertical mask .:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.
     // can be used for slotmask,aperturegrille, not scanlines.
     //...well technically yes, but they would have a boxed shape.
         vec3 darklines_mask=vec3(1.0);
-        
+        float PG_spark;
+        vec3 pixel_in_unsparkled = pixel_in;
         if (PIXELGRID_Y_MASK > 0.0) {
             //Switch reference coords according to user pref: 
                 float freq_cell_y = mix(freq_base_core.y,  freq_base_screen.y, PIXELGRID_Y_MASK_COORDS);
@@ -619,24 +617,26 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 darklines_mask = 1-(mask_shape*V);
             //Try to get a more brillant/sparkling look by highering the darklines
             //effect (sub) and pushing the source color, useful for slotmasks.
-                float vPG_spark = PIXELGRID_Y_SPARK * PIXELGRID_Y_MASK;
-                darklines_mask -= vPG_spark;
-                pixel_in *= vPG_spark*4 + 1;
+                PG_spark = PIXELGRID_Y_SPARK * PIXELGRID_Y_MASK;
+                darklines_mask -= PG_spark;
+                pixel_in *= 1 + ((PG_spark*4) * dedot_mix_inverted);
                 
+            //Dedot darklines mask:
+                darklines_mask = mix(vec3(1.0), darklines_mask, dedot_mix_inverted );
         }
-            
 
 
-
-    //Finally put width,height1 and height2 masks togheter:
+    //Finally put H mask, Scanlines and darklines masks togheter:
         //vec3 mask = rgb_w * rgb_h * darklines_mask;
         vec3 mask = min( (rgb_w * rgb_h), darklines_mask * rgb_h); //<- this way it does not interfree with scanline height!
         //FIXME: test with coore or fuzzy coords how it works when using variable width phosphors, maybe 
         //it would need to be: vec3 mask = min((rgb_w * rgb_h), darklines_mask * rgb_h * rgb_w); =
           
+        
     //Apply the mask to pixel_in and clamp the minimum to the unexcited grille.
     vec3 mask_and_grille = max(mask * pixel_in, rgb_grille * PIXELGRID_BASAL_GRID*0.025);
         
+
     //return it with alpha channel containing the mask itself, so that halo can selectively light it.
     return vec4( mask_and_grille , dot(mask, vec3(0.3333)));
 }
