@@ -123,8 +123,6 @@
                 Since emulating phosphors with high Min-Max range changes the apparent gamma of the final image,
                 it is advised, if needed, to use this option to compensate, instead of the main gamma correction.
                 It is also a quick way to make the image brighter or darker.
-        Fade on bright:
-            How much the mask is visible over bright pixels.
         Cell size multiplier x (neg=divider):
             Multiply (or divide if the parameter is < 0) the mask (cell) size by a factor.
             As stated(**), the size may be relative to screen or core, this allow you to
