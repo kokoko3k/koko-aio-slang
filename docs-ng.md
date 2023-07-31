@@ -393,7 +393,7 @@
     
         
 **Ambient light leds:**<br>
-    Emulates the presence of led strips under the monitor that lights the<br>
+    Emulates the presence of led strips behind the monitor that lights the<br>
     surroundings according to the edges of the game content.<br>
     **-> It is needed that you set retroarch aspect to "Full" <-**<br>
     ( Settings, Video, Scaling, Aspect Ratio = Full )<br>
@@ -404,6 +404,10 @@
         they may distract you.
         Keep in mynd that there is a scene detection logic that will make them
         react as fast as possible when a scene change is detected.
+    Led internalness:
+        The distance between the virtual led strip and the content.
+        High values will move leds behind it, while lower values will move
+        leds around it.
     Light Falloff:
         How wide is the light of a single led.
     Widen lights:
