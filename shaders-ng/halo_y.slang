@@ -19,14 +19,10 @@ void main() {
    
    vHALO_H = vHALO_H / NEW_SCALEMOD_Y; //Make it resolution independent.
    
-   
-   
-   //vHALO_H = vHALO_H * 1000.0;
-   //vHALO_H = pow(vHALO_H,0.5) ; //adjust precision for easier drive
-
- vHALO_POWER = HALO_POWER;
- if (DO_IN_GLOW == 1.0)
-    vHALO_POWER /= IN_GLOW_POWER;
+   if (HALO_POWER >= 0.0)
+      vHALO_POWER = HALO_POWER;
+         else
+      vHALO_POWER = -HALO_POWER/10.0;
 
 }
 

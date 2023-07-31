@@ -271,6 +271,10 @@
 		Do this if you like much more pronunced scanlines, even at the
 		price of some graphical artifacts visible on high contrasted areas. 
 
+    Strength (negative = 10x precision)
+        The effect strength.
+        Negative values are interpreted as positive ones, divided by 10,
+        when fine tuning is needed.
     Refer to "Glowing Input/power" for other parameters meaning.
     
 **Bloom:**<br>

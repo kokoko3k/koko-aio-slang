@@ -570,9 +570,9 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 // Halo
 #pragma parameter DO_HALO       "★ Halo enable? ==>" 						0.0	0.0 1.0 1.0
-#pragma parameter HALO_POWER    "        Strength"						0.9 	0.0  5.0 0.01
-#pragma parameter HALO_W        "        Sharpness, horizontal"					1.75	0.35  7.0 0.05
-#pragma parameter HALO_H        "        Sharpness, Vertical"					1.75	0.35  7.0 0.05
+#pragma parameter HALO_POWER    "        Strength (negative = 10x precision)"	0.9 	-50.0  5.0 0.01
+#pragma parameter HALO_W        "        Sharpness, horizontal"					1.75	0.35   7.0 0.05
+#pragma parameter HALO_H        "        Sharpness, Vertical"					1.75	0.35   7.0 0.05
 #pragma parameter HALO_GAMMA    "        Gamma, the higher, the less the halo on dark colors"	2.0 	1.0  10.0 0.05
 #pragma parameter HALO_VS_SCAN  "        Light up scanlines and dot grid gaps too"				0.0	0.0  1.0  0.01
 #pragma parameter BLANK10 " " 0.0 0.0 1.0 1.0
