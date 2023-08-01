@@ -672,6 +672,24 @@ vec2 Warp_try(vec2 pos, float warpX, float warpY) {
 		return pow( texture(in_texture, coords).rgb, vec3(gamma) ) * glow_power;
 	}
 
+	vec3 blur9_x_fatten(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_x, float fatten ) {
+		vec2 resolution = sourcesize * sharpness_x;
+		vec3 color = vec3(0.0);
+		vec2 off1 = vec2(1.3846153846, 0.0) ;
+		vec2 off2 = vec2(3.2307692308, 0.0) ;	
+		vec3 w = vec3(0.2270270270, 0.3162162162, 0.0702702703);
+		
+		//This will "fatten" and sharp the blur 
+			w=w* vec3(1.0  ,  1 + (fatten*1.0) ,   1+  (fatten*4.0)  );
+
+		color += texture(image, uv).rgb                       * w.x;
+		color += texture(image, uv + (off1 / resolution)).rgb * w.y;
+		color += texture(image, uv - (off1 / resolution)).rgb * w.y;
+		color += texture(image, uv + (off2 / resolution)).rgb * w.z;
+		color += texture(image, uv - (off2 / resolution)).rgb * w.z;
+		return color / (w.x+w.y+w.y+w.z+w.z) ;
+	}
+	
 	vec3 blur9_x(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_x) {
 		vec2 resolution = sourcesize * sharpness_x;
 		vec3 color = vec3(0.0);

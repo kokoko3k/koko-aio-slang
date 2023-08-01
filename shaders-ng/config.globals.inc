@@ -109,7 +109,7 @@
 	#define IN_GLOW_NTSC_ARTF_MULT	global.IN_GLOW_NTSC_ARTF_MULT
 	#define IN_GLOW_NTSC_ARTF_TRSH	global.IN_GLOW_NTSC_ARTF_TRSH
 	#define IN_GLOW_SHOW_ARTF_MASK  global.IN_GLOW_SHOW_ARTF_MASK
-
+	#define IN_GLOW_W_FAT_SHARP		global.IN_GLOW_W_FAT_SHARP
 
 #define DO_HALO		global.DO_HALO
 	#define HALO_W		params.HALO_W
