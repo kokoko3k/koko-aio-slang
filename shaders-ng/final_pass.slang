@@ -561,6 +561,9 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //Dedot h mask:
                 vec3 rgb_w_dedotted = vec3( dot(rgb_w, vec3(0.333)) );            
                 rgb_w = mix(rgb_w_dedotted, rgb_w, dedot_mix_inverted );
+                
+            //lower strength via user parameter?
+                rgb_w = mix(vec3(1.0), rgb_w, DO_PIXELGRID_W);
         }
                     
     //1%
