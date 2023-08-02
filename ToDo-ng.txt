@@ -91,8 +91,9 @@
 #    [v] apply_fuzzy_main_pass can be splitted between vertex and fragment shader
 #    [..] Update bezel presets so that inner zoom matches the bezel, then adjust geometry zoom that is aware of reflections
 #         Cant, since the reflected black border looks weird.
+#    [v] Make handheld presets (look at pgrid*.slangp)
+#    [v] deconvergence after glow/halo (done verically in final pass via phosphors)
 #    [ ] check branching conditions in first_pass.slang
-#    [ ] deconvergence after glow/halo?
 #    [ ] Glow spread in final pass?
 #    [ ] Find a way to smooth borders without cropping the image
 #    [ ] Allow to configure new bezel parameters?
@@ -102,7 +103,11 @@
 #    [ ] copy base presets to overlay repo (after release)
 #    [ ] dynamic contrast, the more the brigher the content, the less the bezel and back/foreground image?
 #    [ ] Try to write your own curvature function
-#    [ ] Make handheld presets (look at pgrid*.slangp)
+#    [ ] When halving border fps, no need to calc reflections in previous pass.
+#    [ ] Sync full screen decon with phosphor decon.
+#    [ ] How does phosphor decon interact with dedotting?
+#    [ ] Has dedotting issues with clouds in outrun?
+#    [ ] Update kakashi preset to use lanczos (update presets to use it)
 
 
 
