@@ -795,9 +795,10 @@ vec2 Warp_try(vec2 pos, float warpX, float warpY) {
 		color += textureLod(image, uv - (off1 / resolution), lod).rgb   * 0.35294117647058826;
 		return color;
 	}
-	
+
+#define RGB2GRAY_VEC3 vec3(0.299, 0.587, 0.114)
 float rgb_to_gray(vec3 rgb) {
-    return dot(rgb, vec3(0.299, 0.587, 0.114));
+    return dot(rgb, RGB2GRAY_VEC3);
 }
 	
 	//smoothly shade x and y < 0.0, currently unused	
