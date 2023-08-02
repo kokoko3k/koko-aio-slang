@@ -67,17 +67,20 @@
         The input signal gain
     Input gamma:
         Controls how much the signal has to be bright to produce the glow.
+    Glow to blur bias:
+        Higher negative values -> more glow : brighter colors expands over darker ones.
+        Higher positive values -> means blur: all the colors are blurred.
+        0.0 means no blur, no glow.
     Glow spread amount:
         The higher, the more the bright colors will smoothly expand.
         It emulates the natural antialiasing you see on CRTs on bright areas.
+        More pronunced as "Glow to blur bias" approaches 0.
+        
     Sharpness (horizontal, vertical):
         The lower, the blurrier the image.
         When set to zero, his value is handled using "Glow spread amount"
         When pushed to its maximum value, no blurring will occour.
-    Glow / blur bias:
-        Higher negative values -> more glow : brighter colors expands over darker ones.
-        Higher positive values -> means blur: all the colors are blurred.
-        0.0 means no blur, no glow.
+
 
 **Tate mode:**<br>
     Rotates mask and scanlines by 90°<br>
