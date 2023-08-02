@@ -200,7 +200,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 	float IN_GLOW_W;
 	float IN_GLOW_H;
-	float IN_GLOW_W_FAT_SHARP;
 	float IN_GLOW_POWER;
 	float IN_GLOW_GAMMA;
 	
@@ -487,7 +486,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter IN_GLOW_SPREAD           "        Glow spread amount"						0.6 	0.0 4.0 0.05
 #pragma parameter IN_GLOW_W                "        Sharpness X (0 = controlled by glow spread)"		2.5	0.0 7.0 0.05
 #pragma parameter IN_GLOW_H                "        Sharpness Y (0 = controlled by glow spread)"		2.5	0.0 7.0 0.05
-#pragma parameter IN_GLOW_W_FAT_SHARP      "        X Post Fatness/Sharpness"							0.0 0.0 1.5 0.25
 #pragma parameter IN_GLOW_BIAS             "        Glow to blur bias"					    	1.0     0.0 1.0 0.05
 #pragma parameter BLANK7 " " 0.0 0.0 1.0 1.0
 

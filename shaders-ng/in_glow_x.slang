@@ -142,8 +142,7 @@ void main() {
       
    //Finally blur horizontally 
    if (IN_GLOW_W < GLOW_SHARP_MAX) {
-         //FragColor = vec4( blur9_x(shift_and_bleed_pass, vTexCoord, global.flick_and_noise_passSize.xy, IN_GLOW_W_ADAPTED), DR_unchanged);
-         FragColor = vec4( blur9_x_fatten(shift_and_bleed_pass, vTexCoord, global.flick_and_noise_passSize.xy, IN_GLOW_W_ADAPTED, IN_GLOW_W_FAT_SHARP), DR_unchanged);
+         FragColor = vec4( blur9_x(shift_and_bleed_pass, vTexCoord, global.flick_and_noise_passSize.xy, IN_GLOW_W_ADAPTED), DR_unchanged);
          //FragColor = vec4( blur_h_new(shift_and_bleed_pass, vTexCoord, global.flick_and_noise_passSize.xy, IN_GLOW_W_ADAPTED), DR_unchanged);
    }else{
       FragColor = texture(shift_and_bleed_pass, vTexCoord, DR_unchanged);
