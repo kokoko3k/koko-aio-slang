@@ -520,7 +520,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 float triad_stagger_offset =  is_even * pi * PIXELGRID_OFFSET_CORE;
             //get 3 sines with applied the optional staggered offset for slotmask, and single phosphors staggering for y deconvergence.
                 vec3 decon_stagger = vec3( PIXELGRID_DECON_R_H, PIXELGRID_DECON_G_H, PIXELGRID_DECON_B_H) ;
-                vec3 rgb_h_sin = sin((freq_base_core.y + decon_stagger) * interlacing_adapt_period + triad_stagger_offset + interlacing_adapt_offset );
+                vec3 rgb_h_sin = sin((freq_base_core.y - decon_stagger) * interlacing_adapt_period + triad_stagger_offset + interlacing_adapt_offset );
             //make it positve with doubled frequency:
                 rgb_h_sin = (rgb_h_sin * rgb_h_sin);
             //Compute dedot mix here for use in h mask and vmask2 later
