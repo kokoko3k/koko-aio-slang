@@ -17,7 +17,7 @@ void main() {
    //    * we don't want to show ntsc artifact masks if we're doing ntsc artifacts
    // Then do in glow bias
    vDoInGlowBias = float (  IN_GLOW_BIAS < IN_GLOW_BIAS_MAX && 
-                            (IN_GLOW_W < GLOW_SHARP_MAX || IN_GLOW_H < GLOW_SHARP_MAX) &&
+                            (abs(IN_GLOW_W) < GLOW_SHARP_MAX || IN_GLOW_H < GLOW_SHARP_MAX) &&
                             (DO_NTSC_ARTIFACTS + NTSC_SHOW_ARTF_MASK < 1.5)   );
 }
 
@@ -98,9 +98,14 @@ void main() {
    vec3 pixel_glowed;
    
    float IN_GLOW_H_ADAPTED = IN_GLOW_H;
-   //Auto calc glow sharpness via IN_GLOW_SPREAD
-      if (IN_GLOW_H <= 0.00001)
-         IN_GLOW_H_ADAPTED = IN_GLOW_SPREAD * IN_GLOW_SHARPNESS_SPREAD_RATIO_H;
+   
+   //GLow to blur via IN_GLOW_SPREAD:
+      //Spread amount needs to lessen its influence when going from glow to blur
+         float in_glow_spread = IN_GLOW_SPREAD * (1-IN_GLOW_BIAS);
+         
+      //Modulate sharpness via IN_GLOW_SPREAD when IN_GLOW_W is under minimum blur sharpness
+         if (IN_GLOW_H <= MIN_IN_GLOW_SHARP)
+            IN_GLOW_H_ADAPTED = in_glow_spread * IN_GLOW_SHARPNESS_SPREAD_RATIO_H;
 
    if (DO_NTSC_ARTIFACTS == 1.0) {
       float ntsc_artifacts = texture(shift_and_bleed_pass, vTexCoord).a;

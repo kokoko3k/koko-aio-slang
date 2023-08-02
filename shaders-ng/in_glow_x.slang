@@ -89,33 +89,30 @@ void main() {
          FragColor = passthrough;
          return;
       }
-
-      
-
-   //Here lies the blur modifier from ntsc pass to glow.
-   //I'm not expecting any performance hit, 
-   //since the lookup should have been cached already or will serve so.
-   float ntsc_artifacts = texture(shift_and_bleed_pass, vTexCoord).a;
-
-   //To debug ntsc artifacts mask:
-      if (DO_NTSC_ARTIFACTS + NTSC_SHOW_ARTF_MASK > 1.5) {
-         FragColor = vec4(ntsc_artifacts);
-         return;
-      }
       
    
    float IN_GLOW_W_ADAPTED = abs(IN_GLOW_W);
    
-   //Auto calc glow sharpness via IN_GLOW_SPREAD
-      float in_glow_spread = IN_GLOW_SPREAD;
-      if (IN_GLOW_W < 0.0) //half in glow spread for lanczos
-         in_glow_spread = IN_GLOW_SPREAD/2.0;
+   //GLow to blur via IN_GLOW_SPREAD:
+      //Spread amount needs to lessen its influence when going from glow to blur
+         float in_glow_spread = IN_GLOW_SPREAD * (1-IN_GLOW_BIAS);
+      //half in glow spread for lanczos
+         if (IN_GLOW_W < 0.0) 
+            in_glow_spread = in_glow_spread/2.0;
+      //Modulate sharpness via IN_GLOW_SPREAD when IN_GLOW_W is under minimum blur sharpness
+         if (IN_GLOW_W_ADAPTED < MIN_IN_GLOW_SHARP )
+            IN_GLOW_W_ADAPTED = in_glow_spread * IN_GLOW_SHARPNESS_SPREAD_RATIO_W;
    
-      if (IN_GLOW_W_ADAPTED < MIN_IN_GLOW_SHARP )
-         IN_GLOW_W_ADAPTED = in_glow_spread * IN_GLOW_SHARPNESS_SPREAD_RATIO_W;
+   //Modulate glow power via ntsc artifact mask:
+      float ntsc_artifacts = texture(shift_and_bleed_pass, vTexCoord).a;
       
-   //finally "add" them to the configured sharpness (-> less blur)
-      IN_GLOW_W_ADAPTED = IN_GLOW_W_ADAPTED +  DO_NTSC_ARTIFACTS * ((1-ntsc_artifacts) * NTSC_ARTF_NOBLUR);
+      //To debug ntsc artifacts mask:
+         if (DO_NTSC_ARTIFACTS + NTSC_SHOW_ARTF_MASK > 1.5) {
+            FragColor = vec4(ntsc_artifacts);
+            return;
+         }
+      //finally "add" them to the configured sharpness (-> less blur)
+         IN_GLOW_W_ADAPTED = IN_GLOW_W_ADAPTED +  DO_NTSC_ARTIFACTS * ((1-ntsc_artifacts) * NTSC_ARTF_NOBLUR);
 
    //don't allow lower values that look bad:
       IN_GLOW_W_ADAPTED = max(IN_GLOW_W_ADAPTED, MIN_IN_GLOW_SHARP);
