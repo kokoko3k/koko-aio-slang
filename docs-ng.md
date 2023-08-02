@@ -180,7 +180,7 @@
             When using Horizontal masks, you mai notice a disturbing dot pattern left between high
             scanlines, that's the residual of horizontal mask.
             Use this parameter to clear it, watch out for moiree tho.
-        R,G,B phosphor Y deconvergence
+        Deconvergence Y: R,G,B phosphor" 
             This emulates Y deconvergence on phosphor level rather than on image level as seen in
             the previous deconvergence section.
             Emulating deconvergence here is good because phosphors will be able to brighten the
