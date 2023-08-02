@@ -105,7 +105,7 @@
             bh selecting preset = 0, you can draft your own by using the following knobs:
                 Phosphors+gap count (mask size):
                     How much phosphors or blank spaces the final mask will have.
-                R,G,B, Shift:
+                R,G,B, Phosphor position:
                     The position of every phosphor.
                 Example 1: Phosphors+gap count=4 and R=0 G=1 B=2
                 ...will give you a mask with red,green,blue and a blank space.
