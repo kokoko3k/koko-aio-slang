@@ -526,6 +526,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //Compute dedot mix here for use in h mask and vmask2 later             
                 dedot_mix_inverted = (1-rgb_h_sin) * PIXELGRID_H_DEDOT ;
                 dedot_mix_inverted = dedot_mix_inverted * (max(max(pixel_in.r, pixel_in.g), pixel_in.b)/max_inLum);
+                //dedot_mix_inverted = dedot_mix_inverted * dot(pixel_in, vec3(0.33333) )/max_inLum;
                 dedot_mix_inverted = 1-dedot_mix_inverted;
             //Compute each phosphor height according to input luminance 
                 vec3 phosphor_height = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);                
@@ -558,8 +559,16 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 rgb_w = morph_shape(rgb_w, phosphor_width, PIXELGRID_NO_INTERBLEED_W, PIXELGRID_GAMMA_W); //2%
             
             //Dedot h mask:
-                vec3 rgb_w_dedotted = vec3( dot(rgb_w, vec3(0.333/max_inLum)));
-                rgb_w = mix(rgb_w_dedotted, rgb_w, dedot_mix_inverted );
+                //vec3 rgb_w_dedotted = vec3( dot(rgb_w, vec3(0.333/max_inLum)));
+                //rgb_w = mix(rgb_w_dedotted, rgb_w, dedot_mix_inverted );
+                
+                //vec3 rgb_w_dedotted =   vec3( dot(rgb_w, vec3(1.0/max_inLum)));
+                //rgb_w = mix(rgb_w_dedotted, rgb_w, pow(dedot_mix_inverted, vec3(2.0)) );
+                
+                vec3 pixel_in_dedotted =   pixel_in/max_inLum/3.0;
+
+                rgb_w = mix(pixel_in_dedotted, rgb_w, pow(dedot_mix_inverted, vec3(2.0)) );
+                
             //lower strength via user parameter?
                 rgb_w = mix(vec3(1.0), rgb_w, DO_PIXELGRID_W);
         }

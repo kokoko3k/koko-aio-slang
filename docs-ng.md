@@ -176,10 +176,11 @@
             You may want them to merge or not, depending on your preference to see a visible "grid"/lines.
             This function is useful when you want to emulate handhelds screens, 
             where cells are well separated.
-        Dedot H.mask and V.Mask on high scanlines
+        Dedot mask between scanlines
             When using Horizontal masks, you mai notice a disturbing dot pattern left between high
             scanlines, that's the residual of horizontal mask.
-            Use this parameter to clear it, watch out for moiree tho.
+            Use this parameter to clear it and use it only if needed or it would have counter-effects.
+            Also, mutating dots to straight lines would make moiree more visible when using curvature.
         Deconvergence Y: R,G,B phosphor" 
             This emulates Y deconvergence on phosphor level rather than on image level as seen in
             the previous deconvergence section.
