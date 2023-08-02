@@ -93,6 +93,10 @@
 #         Cant, since the reflected black border looks weird.
 #    [v] Make handheld presets (look at pgrid*.slangp)
 #    [v] deconvergence after glow/halo (done verically in final pass via phosphors)
+#    [v] How does phosphor decon interact with dedotting?
+			Good looking, move on.
+#    [v] Has dedotting issues with clouds in outrun?
+			Yes, fixed that, dedot replacement lines were too bright.
 #    [ ] check branching conditions in first_pass.slang
 #    [ ] Glow spread in final pass?
 #    [ ] Find a way to smooth borders without cropping the image
@@ -105,8 +109,7 @@
 #    [ ] Try to write your own curvature function
 #    [ ] When halving border fps, no need to calc reflections in previous pass.
 #    [ ] Sync full screen decon with phosphor decon.
-#    [ ] How does phosphor decon interact with dedotting?
-#    [ ] Has dedotting issues with clouds in outrun?
+
 #    [ ] Update kakashi preset to use lanczos (update presets to use it)
 
 
