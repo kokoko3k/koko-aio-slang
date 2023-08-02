@@ -507,7 +507,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         
     //Scanlines and fake slotmask =========================================================================
         vec3 rgb_h = vec3(1.0);
-        vec3 dedot_mix_inverted = vec3(1.0);
+        float dedot_mix_inverted = 1.0;
 
         //Pixelgrid: do horizontal if enabled, but skip it if user doesn't want it on interlaced content.
         //if (DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0)) { //103.1
@@ -524,7 +524,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //make it positve with doubled frequency:
                 rgb_h_sin = (rgb_h_sin * rgb_h_sin);
             //Compute dedot mix here for use in h mask and vmask2 later             
-                dedot_mix_inverted = (1-rgb_h_sin) * PIXELGRID_H_DEDOT ;
+                dedot_mix_inverted = (1-rgb_h_sin.r) * PIXELGRID_H_DEDOT ;
                 dedot_mix_inverted = dedot_mix_inverted * (max(max(pixel_in.r, pixel_in.g), pixel_in.b)/max_inLum);
                 //dedot_mix_inverted = dedot_mix_inverted * dot(pixel_in, vec3(0.33333) )/max_inLum;
                 dedot_mix_inverted = 1-dedot_mix_inverted;
@@ -535,7 +535,6 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 rgb_h = morph_shape(rgb_h, phosphor_height, PIXELGRID_NO_INTERBLEED_H, PIXELGRID_GAMMA_H);
                 rgb_h = mix(vec3(1.0), rgb_h, DO_PIXELGRID_H);
                 rgb_h = clamp(rgb_h, 0.0,1.0);
-            
         }
         
 
@@ -555,6 +554,8 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //Scale Max width according to pre-gains:
                 vec3 phosphor_width = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
 
+
+                
             //Get final phosphor width:
                 rgb_w = morph_shape(rgb_w, phosphor_width, PIXELGRID_NO_INTERBLEED_W, PIXELGRID_GAMMA_W); //2%
             
@@ -566,8 +567,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 //rgb_w = mix(rgb_w_dedotted, rgb_w, pow(dedot_mix_inverted, vec3(2.0)) );
                 
                 vec3 pixel_in_dedotted =   pixel_in/max_inLum/3.0;
-
-                rgb_w = mix(pixel_in_dedotted, rgb_w, pow(dedot_mix_inverted, vec3(2.0)) );
+                rgb_w = mix(pixel_in_dedotted, rgb_w, dedot_mix_inverted);
                 
             //lower strength via user parameter?
                 rgb_w = mix(vec3(1.0), rgb_w, DO_PIXELGRID_W);
