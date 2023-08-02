@@ -25,58 +25,45 @@ layout(set = 0, binding = 6) uniform sampler2D shift_and_bleed_passFeedback;
 #include "includes/functions.include.slang" 
 
 
-//https://lisyarus.github.io/blog/graphics/2023/02/24/blur-coefficients-generator.html
-//sono uguali al vecchio così:
-//raggio 4
-//sigma 1.7 
+#define PI 3.14159265359
+float sinc(float x) {
+    if (abs(x) < 0.001)
+        return 1.0;
 
-//fvedi pure https://www.shadertoy.com/view/4sGcRW
-//e vedi che 
-
-/*float Gaussian( float x )
-{
-x=clamp(x,-1.0,1.0);
-    float c=3.14*0.5;
-    return cos(1.5*x)*cos(1.5*x)*1.0;
-	const float alpha = 5.0;
-	const float expv = exp(-alpha); //note: radius = 1.0
-    return max(0.0, (exp(-alpha * x * x) - expv));
-    //return max(0.0, (exp(-alpha * x * x) - expv) / (1.0-expv)); //note: normalisation-factor to always get f(0)=1
+    x *= pi;
+    return sin(x) / x;
 }
 
-const int SAMPLE_COUNT = 4;
+vec3 lanczos(sampler2D sampler_in, vec2 co, vec4 texsize, float sharpness ) {
+   
+   float data_pix_no = co.x * texsize.x;
+   float data_one    = texsize.z;
+   
+   float texel      = floor(data_pix_no);
+   float phase      = data_pix_no - texel;
+   float base_phase = phase - 0.5;
+   vec2 tex         = vec2((texel + 0.5) * texsize.z, co.y);
 
-const float OFFSETS[4] = float[4](
-    -2.1961930637455005,
-    -0.43006286395671545,
-    1.3004294284587026,
-    3
-);
+   vec3 col = vec3(0.0);
+   for (int i = -2; i <= 2; i++) {
+      float phase = base_phase - float(i);
+      phase*= sharpness;
+      if (abs(phase) < 2.0) { //FIXME check needed?
+         float g = sinc(phase);
+         col += texture(sampler_in, tex + vec2(float(i) * data_one, 0.0)).rgb * g;
+      }
+   }
 
-const float WEIGHTS[4] = float[4](
-    0.12159651477371808,
-    0.5292123790688621,
-    0.3253347133831891,
-    0.02385639277423076
-);
+   return col * sharpness;
+} 
 
-
-
-#define BLURDIRECTION vec2(1,0)
- //blur_h_new(shift_and_bleed_pass, vTexCoord, global.flick_and_noise_passSize.xy, IN_GLOW_W_ADAPTED)
-vec3 blur_h_new(sampler2D sourceTexture, vec2 pixelCoord, vec2 sourcesize, float sharpness)
-{
-    vec3 result = vec3(0.0);
-    vec2 size = sourcesize * sharpness;
-    for (int i = 0; i < SAMPLE_COUNT; ++i)
-    {
-        vec2 offset = BLURDIRECTION * OFFSETS[i] / size;
-        float weight = WEIGHTS[i];
-        result += texture(sourceTexture, pixelCoord + offset).rgb * weight;
-    }
-    return result;
+vec3 blur_gauss_lanczos_wrap(sampler2D texture_in, vec2 co, vec4 sourcesize, float sharpness, bool use_gauss) {
+   if (use_gauss)
+      return blur9_x(texture_in, co, sourcesize.xy, sharpness);
+         else
+      return lanczos(texture_in, co, sourcesize, sharpness);
 }
-*/
+
 
 void main() { 
    if (DO_IN_GLOW == 0.0) {
@@ -104,11 +91,6 @@ void main() {
       }
 
       
-   float IN_GLOW_W_ADAPTED = IN_GLOW_W;
-   //Auto calc glow sharpness via IN_GLOW_SPREAD
-      if (IN_GLOW_W <= 0.00001)
-         IN_GLOW_W_ADAPTED = IN_GLOW_SPREAD * IN_GLOW_SHARPNESS_SPREAD_RATIO_W;
-
 
    //Here lies the blur modifier from ntsc pass to glow.
    //I'm not expecting any performance hit, 
@@ -121,15 +103,32 @@ void main() {
          return;
       }
       
+   
+   float IN_GLOW_W_ADAPTED = abs(IN_GLOW_W);
+   
+   //Auto calc glow sharpness via IN_GLOW_SPREAD
+      float in_glow_spread = IN_GLOW_SPREAD;
+      if (IN_GLOW_W < 0.0) //half in glow spread for lanczos
+         in_glow_spread = IN_GLOW_SPREAD/2.0;
+   
+      if (IN_GLOW_W_ADAPTED < MIN_IN_GLOW_SHARP )
+         IN_GLOW_W_ADAPTED = in_glow_spread * IN_GLOW_SHARPNESS_SPREAD_RATIO_W;
+      
    //finally "add" them to the configured sharpness (-> less blur)
       IN_GLOW_W_ADAPTED = IN_GLOW_W_ADAPTED +  DO_NTSC_ARTIFACTS * ((1-ntsc_artifacts) * NTSC_ARTF_NOBLUR);
 
    //don't allow lower values that look bad:
       IN_GLOW_W_ADAPTED = max(IN_GLOW_W_ADAPTED, MIN_IN_GLOW_SHARP);
 
+   //Scale it for lanczos
+      if (IN_GLOW_W < 0.0) 
+         IN_GLOW_W_ADAPTED =  (IN_GLOW_W_ADAPTED+1)/10.0;
+      
    //Make it resolution independent.
       IN_GLOW_W_ADAPTED = IN_GLOW_W_ADAPTED / NEW_SCALEMOD_X;
+      
 
+      
    //Delta render?
       float DR_unchanged = 0.0;
       if (DELTA_RENDER == 1.0) {
@@ -141,9 +140,9 @@ void main() {
 
       
    //Finally blur horizontally 
-   if (IN_GLOW_W < GLOW_SHARP_MAX) {
-         FragColor = vec4( blur9_x(shift_and_bleed_pass, vTexCoord, global.flick_and_noise_passSize.xy, IN_GLOW_W_ADAPTED), DR_unchanged);
-         //FragColor = vec4( blur_h_new(shift_and_bleed_pass, vTexCoord, global.flick_and_noise_passSize.xy, IN_GLOW_W_ADAPTED), DR_unchanged);
+   if ( abs(IN_GLOW_W) < GLOW_SHARP_MAX) {
+         FragColor = vec4( blur_gauss_lanczos_wrap(shift_and_bleed_pass, vTexCoord, global.flick_and_noise_passSize, IN_GLOW_W_ADAPTED, (IN_GLOW_W >= 0.0) ), 
+                           DR_unchanged);
    }else{
       FragColor = texture(shift_and_bleed_pass, vTexCoord, DR_unchanged);
    }

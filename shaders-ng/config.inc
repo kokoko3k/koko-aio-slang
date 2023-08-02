@@ -480,13 +480,13 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 
 // Input Blur / light glowing
-#pragma parameter DO_IN_GLOW               "★ Glow/Blur enable? ==>"	 					0.0	0.0 1.0 1.0
-#pragma parameter IN_GLOW_POWER            "        Input signal strength"					1.0 	0.0 5.0 0.05
+#pragma parameter DO_IN_GLOW               "★ Glow/Blur enable? ==>"	 									0.0	0.0 1.0 1.0
+#pragma parameter IN_GLOW_POWER            "        Input signal strength"									1.0 	0.0 5.0 0.05
 #pragma parameter IN_GLOW_GAMMA            "        Input gamma, the higher, the less glow on dark colors"	1.0 	1.0 10.0 0.1
-#pragma parameter IN_GLOW_SPREAD           "        Glow spread amount"						0.6 	0.0 4.0 0.05
-#pragma parameter IN_GLOW_W                "        Sharpness X (0 = controlled by glow spread)"		2.5	0.0 7.0 0.05
-#pragma parameter IN_GLOW_H                "        Sharpness Y (0 = controlled by glow spread)"		2.5	0.0 7.0 0.05
-#pragma parameter IN_GLOW_BIAS             "        Glow to blur bias"					    	1.0     0.0 1.0 0.05
+#pragma parameter IN_GLOW_SPREAD           "        Glow spread amount"											0.6 	0.0 4.0 0.05
+#pragma parameter IN_GLOW_W                "        Sharp X (~0 = auto via glow spread, neg = use lanczos)"		2.5	-7.0 7.0 0.05
+#pragma parameter IN_GLOW_H                "        Sharp Y (~0 = auto via glow spread)"						2.5	0.0 7.0 0.05
+#pragma parameter IN_GLOW_BIAS             "        Glow to blur bias"					    					1.0     0.0 1.0 0.05
 #pragma parameter BLANK7 " " 0.0 0.0 1.0 1.0
 
 
