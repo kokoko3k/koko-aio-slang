@@ -77,9 +77,12 @@
         More pronunced as "Glow to blur bias" approaches 0.
         
     Sharpness (horizontal, vertical):
-        The lower, the blurrier the image.
-        When set to zero, his value is handled using "Glow spread amount"
+        Modulates the sharpness of the image.
+        When set near zero, his value is handled using "Glow spread amount" to an extent
+        given by "Glow to blur bias"
         When pushed to its maximum value, no blurring will occour.
+        For Horizontal only, setting a negative number will switch to a different
+        blurring way that will fatten and sharp the borders.
 
 
 **Tate mode:**<br>
