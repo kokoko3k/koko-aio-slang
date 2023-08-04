@@ -206,7 +206,7 @@
 	
 
 #define DO_DYNZOOM		global.DO_DYNZOOM
-	#define DYNZOOM_FACTOR		global.DYNZOOM_FACTOR
+	#define DYNZOOM_FACTOR		80 //global.DYNZOOM_FACTOR
 
 
 #define DO_ALT_BLANK		global.DO_ALT_BLANK

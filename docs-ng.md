@@ -448,7 +448,7 @@
         This internally works by adding the amount of your choice to the alpha channel
         of the foreground image.
         
-**Luminosity dependant zoom:**<br>
+**Luminosity tied zoom:**<br>
     On older CRT monitors, the picture gets bigger when the image was brighter.<br>
 
 **Vignette:**<br>

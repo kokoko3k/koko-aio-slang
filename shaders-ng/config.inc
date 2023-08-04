@@ -670,9 +670,10 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 //Full screen glowing
 //Modulate the image zooming depending on the image luminosity.
 //You can lower the effect power through the DYNZOOM_FACTOR parameter.
-#pragma parameter DO_DYNZOOM	     "★ Luminosity dependant zoom enable? ==>"		1.0   0.0   1.0  1.0
-#pragma parameter LABEL_WARNING6     "⚠ Enabling this feature overrides integer scale"		1.0  1.0  1.0     1.0
-#pragma parameter DYNZOOM_FACTOR     "        Narrowness"				80.0  15.0  120.0 0.5
+#pragma parameter DO_DYNZOOM	     "★ Luminosity tied zoom (overrides integer scale)==>"		1.0   0.0   1.0  1.0
+//Ditched and hardcoded to 80 in config.globals.inc.
+	//#pragma parameter DYNZOOM_FACTOR     "        Narrowness"				80.0  15.0  120.0 0.5
+
 #pragma parameter BLANK18 " " 0.0 0.0 1.0 1.0
 
 
