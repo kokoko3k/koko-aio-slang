@@ -3,7 +3,9 @@
 **Color corrections:**<br>
     Modify luminance, saturation, contrast, brightness and color temperature
     of the signal, at "input" stage.<br>
-    Gamma correction is applied to the final processed picture.<br>
+    Gamma in correction is applied at ti beginning of the chain,<br>
+    Gamma out correction is applied to the final processed picture.<br>
+    <br>
     It is also possible to emulate a monochrome display with custom colors:
     
         Monochrome screen colorization:
@@ -65,8 +67,6 @@
     
     Input signal strength:
         The input signal gain
-    Input gamma:
-        Controls how much the signal has to be bright to produce the glow.
     Glow to blur bias:
         Higher negative values -> more glow : brighter colors expands over darker ones.
         Higher positive values -> means blur: all the colors are blurred.
