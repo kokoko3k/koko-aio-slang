@@ -50,7 +50,11 @@ vec3 blur_select_wrap(sampler2D texture_in, vec2 co, vec4 sourcesize, float shar
          //For sharpness 0.45, no unsharp mask
          //For sharpness 0.8, 0.65 unsharp mask
          //float sharp_sub = (1.857 * abs(IN_GLOW_W) - 0.836);
-         float sharp_sub = 0.8125 * abs(IN_GLOW_W);
+         
+         float in_glow_w = abs(IN_GLOW_W);
+         in_glow_w = max(in_glow_w, MIN_IN_GLOW_SHARP);
+         
+         float sharp_sub = 0.8125 * in_glow_w;
          sharp_sub = clamp(sharp_sub, 0.0,1.0);
 
          return blur9_x_box(texture_in, co, sourcesize.xy, sharpness, sharp_sub);
@@ -90,12 +94,14 @@ void main() {
    //GLow to blur via IN_GLOW_SPREAD:
       //Spread amount needs to lessen its influence when going from glow to blur
          float in_glow_spread = IN_GLOW_SPREAD * (1-IN_GLOW_BIAS);
-      //half in glow spread for lanczos
+      //half in glow spread for box
          if (IN_GLOW_W < 0.0) 
             in_glow_spread = in_glow_spread/2.0;
       //Modulate sharpness via IN_GLOW_SPREAD when IN_GLOW_W is under minimum blur sharpness
+      //It seems that for box blur, setting width to 1.0 works better.
          if (IN_GLOW_W_ADAPTED < MIN_IN_GLOW_SHARP )
-            IN_GLOW_W_ADAPTED = in_glow_spread * IN_GLOW_SHARPNESS_SPREAD_RATIO_W;
+            IN_GLOW_W_ADAPTED = mix(in_glow_spread * IN_GLOW_SHARPNESS_SPREAD_RATIO_W, 1.0, float(IN_GLOW_W < 0.0));
+
    
    //Modulate glow power via ntsc artifact mask:
       float ntsc_artifacts = texture(shift_and_bleed_pass, vTexCoord).a;
