@@ -154,14 +154,15 @@ vec3 pixel_push_luminance(vec3 c, float strength) {
 }
 
 vec3 apply_fuzzy_main_pass(vec3 color_in) {
-	vec3 color_out;
+	vec3 color_out = color_in;
 
-	if (DO_CCORRECTION == 1.0)
-		color_out = pow(color_in, vec3(GAMMA_OUT));
-	
-	if (DO_IN_GLOW == 1.0) {
-		color_out = pow(color_out,vec3(IN_GLOW_GAMMA))*IN_GLOW_POWER;
+	if (DO_CCORRECTION == 1.0) {
+		color_out = pow(color_out, vec3(IN_GLOW_GAMMA * GAMMA_OUT));
 	}
+	
+	if (DO_IN_GLOW == 1.0)
+		color_out = color_out*IN_GLOW_POWER;
+
 	
 	if (DO_PIXELGRID == 1.0) {
 		float m1 = (PIXELGRID_MAX_W + PIXELGRID_MIN_W) * 0.5;

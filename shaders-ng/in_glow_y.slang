@@ -36,10 +36,6 @@ layout(set = 0, binding = 6) uniform sampler2D Source;
 
 vec3 glow_blur_bias(sampler2D source_tex, vec2 co, vec3 pixel_glowed, float bias){
    vec3 pixel_source = texture(source_tex, co).rgb;
-   // Since I moved from one pass blur for glow to 2 passes (x,y), I've had to
-   // move the pow to IN_GLOW_GAMMA in the previous pass, so pow-ering it
-   // again here, is not needed.
-   //       pixel_source  = pow(pixel_source,vec3(IN_GLOW_GAMMA)) * IN_GLOW_POWER;
    pixel_source  = pixel_source * IN_GLOW_POWER;
    
    vec3 glow_light = pixel_glowed - pixel_source;
@@ -123,7 +119,7 @@ void main() {
    
    //It over the max sharp, then just passthrough, else do the blur.
       if (IN_GLOW_H >= GLOW_SHARP_MAX) {
-         pixel_glowed = texture(Source,vTexCoord).rgb * IN_GLOW_POWER; //(Source, IN_GLOW_POWER, IN_GLOW_GAMMA, vTexCoord) ;
+         pixel_glowed = texture(Source,vTexCoord).rgb * IN_GLOW_POWER;
       } else {
          pixel_glowed = blur9_y(Source, vTexCoord, params.SourceSize.xy, IN_GLOW_H_ADAPTED) * IN_GLOW_POWER;
       }
