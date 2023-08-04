@@ -1,6 +1,9 @@
 #version 450
 #include "config.inc"
 
+//Dumbify glow under this treshold.
+#define GLOW_SHARP_MAX_ALTERNATE -1.0 
+
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
@@ -25,43 +28,21 @@ layout(set = 0, binding = 6) uniform sampler2D shift_and_bleed_passFeedback;
 #include "includes/functions.include.slang" 
 
 
-#define PI 3.14159265359
-float sinc(float x) {
-    if (abs(x) < 0.001)
-        return 1.0;
 
-    x *= pi;
-    return sin(x) / x;
-}
-
-vec3 lanczos(sampler2D sampler_in, vec2 co, vec4 texsize, float sharpness ) {
-   
-   float data_pix_no = co.x * texsize.x;
-   float data_one    = texsize.z;
-   
-   float texel      = floor(data_pix_no);
-   float phase      = data_pix_no - texel;
-   float base_phase = phase - 0.5;
-   vec2 tex         = vec2((texel + 0.5) * texsize.z, co.y);
-
-   vec3 col = vec3(0.0);
-   for (int i = -2; i <= 2; i++) {
-      float phase = base_phase - float(i);
-      phase*= sharpness;
-      if (abs(phase) < 2.0) { //FIXME check needed?
-         float g = sinc(phase);
-         col += texture(sampler_in, tex + vec2(float(i) * data_one, 0.0)).rgb * g;
-      }
-   }
-
-   return col * sharpness;
-} 
-
-vec3 blur_gauss_lanczos_wrap(sampler2D texture_in, vec2 co, vec4 sourcesize, float sharpness, bool use_gauss) {
+vec3 blur_select_wrap(sampler2D texture_in, vec2 co, vec4 sourcesize, float sharpness, bool use_gauss) {
    if (use_gauss)
       return blur9_x(texture_in, co, sourcesize.xy, sharpness);
          else
-      return lanczos(texture_in, co, sourcesize, sharpness);
+      {  
+         //Compute subtractive sharpening via blur sharpness strength:
+         //For sharpness 0.45, no unsharp mask
+         //For sharpness 0.8, 0.65 unsharp mask
+         //float sharp_sub = (1.857 * abs(IN_GLOW_W) - 0.836);
+         float sharp_sub = 0.8125 * abs(IN_GLOW_W);
+         sharp_sub = clamp(sharp_sub, 0.0,1.0);
+
+         return blur9_x_box(texture_in, co, sourcesize.xy, sharpness, sharp_sub);
+      }
 }
 
 
@@ -76,8 +57,11 @@ void main() {
       }
    };
 
-   //Don't do anything if IN_GLOW_W and IN_GLOW_H are over the upper limit
-      if (IN_GLOW_W >= GLOW_SHARP_MAX && IN_GLOW_H >= GLOW_SHARP_MAX) {
+   //Don't do anything if IN_GLOW_H is are over the upper limit
+   //and IN_GLOW_W is outside the allowed interval;
+      if ( IN_GLOW_H >= GLOW_SHARP_MAX &&
+           !( IN_GLOW_W < GLOW_SHARP_MAX  && IN_GLOW_W > GLOW_SHARP_MAX_ALTERNATE)
+      ) {
          vec4 passthrough = texture(shift_and_bleed_pass, vTexCoord);
          //Delta render?
          if (DELTA_RENDER == 1.0) {
@@ -118,9 +102,14 @@ void main() {
       IN_GLOW_W_ADAPTED = max(IN_GLOW_W_ADAPTED, MIN_IN_GLOW_SHARP);
 
    //Scale it for lanczos
-      if (IN_GLOW_W < 0.0) 
-         IN_GLOW_W_ADAPTED =  (IN_GLOW_W_ADAPTED+1)/10.0;
+   //   if (IN_GLOW_W < 0.0) 
+   //      IN_GLOW_W_ADAPTED =  (IN_GLOW_W_ADAPTED+1)/10.0;
       
+   //Scale it for box
+      if (IN_GLOW_W < 0.0) 
+         IN_GLOW_W_ADAPTED =  (IN_GLOW_W_ADAPTED)/1.2;   
+   
+   
    //Make it resolution independent.
       IN_GLOW_W_ADAPTED = IN_GLOW_W_ADAPTED / NEW_SCALEMOD_X;
       
@@ -137,10 +126,10 @@ void main() {
 
       
    //Finally blur horizontally 
-   if ( abs(IN_GLOW_W) < GLOW_SHARP_MAX) {
-         FragColor = vec4( blur_gauss_lanczos_wrap(shift_and_bleed_pass, vTexCoord, global.flick_and_noise_passSize, IN_GLOW_W_ADAPTED, (IN_GLOW_W >= 0.0) ), 
-                           DR_unchanged);
-   }else{
+   if ( IN_GLOW_W < GLOW_SHARP_MAX  && IN_GLOW_W > GLOW_SHARP_MAX_ALTERNATE)  {
+         FragColor = vec4(blur_select_wrap(shift_and_bleed_pass, vTexCoord, global.flick_and_noise_passSize, IN_GLOW_W_ADAPTED, (IN_GLOW_W >= 0.0) ), 
+                          DR_unchanged);
+   } else {
       FragColor = texture(shift_and_bleed_pass, vTexCoord, DR_unchanged);
    }
    

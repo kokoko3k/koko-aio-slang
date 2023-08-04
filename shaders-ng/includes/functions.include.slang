@@ -668,6 +668,55 @@ vec2 Warp_try(vec2 pos, float warpX, float warpY) {
 	}
 	
 //Blur/Glow
+#define PI 3.14159265359
+float sinc_lanczos(float x) {
+    if (abs(x) < 0.001)
+        return 1.0;
+
+    x *= pi;
+    return sin(x) / x;
+}
+
+//Lanczos kinda broken, problematic.
+vec3 lanczos(sampler2D sampler_in, vec2 co, vec4 texsize, float sharpness ) {
+   
+   float data_pix_no = co.x * texsize.x;
+   float data_one    = texsize.z;
+   
+   float texel      = floor(data_pix_no);
+   float phase      = data_pix_no - texel;
+   float base_phase = phase - 0.5;
+   vec2 tex         = vec2((texel + 0.5) * texsize.z, co.y);
+
+   vec3 col = vec3(0.0);
+   for (int i = -2; i <= 2; i++) {
+      float phase = base_phase - float(i);
+      phase*= sharpness;
+      if (abs(phase) < 2.0) { //FIXME check needed?
+         float g = sinc_lanczos(phase);
+         col += texture(sampler_in, tex + vec2(float(i) * data_one, 0.0)).rgb * g;
+      }
+   }
+
+   return col * sharpness;
+} 
+
+
+	vec3 blur9_x_box(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_x, float sharp_sub) {
+		sharp_sub = -2*sharp_sub+1;
+		vec2 resolution = sourcesize * sharpness_x;
+		vec3 color = vec3(0.0);
+		vec2 off1 = vec2(1.0, 0.0) ;
+		vec2 off2 = vec2(2.0, 0.0) ;
+		color += texture(image, uv).rgb                       ;
+		color += texture(image, uv + (off1 / resolution)).rgb ;
+		color += texture(image, uv - (off1 / resolution)).rgb ;
+		color += texture(image, uv + (off2 / resolution)).rgb * sharp_sub;
+		color += texture(image, uv - (off2 / resolution)).rgb * sharp_sub;
+		color = color/(3.0 + sharp_sub*2);
+		return max(vec3(0.0), color);
+	}
+
 	vec3 glow_dumb(sampler2D in_texture, float glow_power, float gamma, vec2 coords) {
 		return pow( texture(in_texture, coords).rgb, vec3(gamma) ) * glow_power;
 	}
@@ -684,6 +733,8 @@ vec2 Warp_try(vec2 pos, float warpX, float warpY) {
 		color += texture(image, uv - (off2 / resolution)).rgb * 0.0702702703;
 		return color;
 	}
+
+	
 	
 	vec3 blur9_x_gamma(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_x, vec3 gamma) {
 		vec2 resolution = sourcesize * sharpness_x;

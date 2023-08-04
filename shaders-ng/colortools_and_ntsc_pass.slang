@@ -57,7 +57,9 @@ float hann(float n, float N) {
 float sinc(float x) {
    //if (x == 0.0) return 1.0;
    x = x + eps;
-   return sin(pi*x) / (pi*x);
+   return sin(pi*x) / (pi*x); 
+   //FIXME maybe faster (parallelism) with:
+   //return sin( pi*(x+eps) / (pi*(x+eps) ) );
 }
 
 

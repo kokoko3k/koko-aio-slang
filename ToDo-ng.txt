@@ -111,6 +111,6 @@
 #    [ ] Sync full screen decon with phosphor decon.
 
 #    [ ] Update kakashi preset to use lanczos (update presets to use it)
-
+#    [ ] luminosity dependant zoom: hardcode slowness.
 
 
