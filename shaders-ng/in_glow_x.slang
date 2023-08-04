@@ -8,16 +8,28 @@
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
+layout(location = 1) out float glow_h_and_w_outside_interval;
+layout(location = 2) out float glow_w_inside_interval;
 
 void main() {
    gl_Position = global.MVP * Position;
    vTexCoord = TexCoord ;  
+   
+   //IN_GLOW_H is are over the upper limit and IN_GLOW_W is outside the allowed interval;
+   glow_w_inside_interval = float(IN_GLOW_W < GLOW_SHARP_MAX  && IN_GLOW_W > GLOW_SHARP_MAX_ALTERNATE);
+   
+   
+   glow_h_and_w_outside_interval = float (IN_GLOW_H >= GLOW_SHARP_MAX && glow_w_inside_interval !=1.0) ;
+   
 }
 
 
 #pragma stage fragment
 
 layout(location = 0) in vec2 vTexCoord;
+layout(location = 1) in float glow_h_and_w_outside_interval;
+layout(location = 2) in float glow_w_inside_interval;
+
 layout(location = 0) out vec4 FragColor;
 
 layout(set = 0, binding = 5) uniform sampler2D shift_and_bleed_pass;
@@ -59,9 +71,7 @@ void main() {
 
    //Don't do anything if IN_GLOW_H is are over the upper limit
    //and IN_GLOW_W is outside the allowed interval;
-      if ( IN_GLOW_H >= GLOW_SHARP_MAX &&
-           !( IN_GLOW_W < GLOW_SHARP_MAX  && IN_GLOW_W > GLOW_SHARP_MAX_ALTERNATE)
-      ) {
+      if ( glow_h_and_w_outside_interval == 1.0) {
          vec4 passthrough = texture(shift_and_bleed_pass, vTexCoord);
          //Delta render?
          if (DELTA_RENDER == 1.0) {
@@ -126,7 +136,7 @@ void main() {
 
       
    //Finally blur horizontally 
-   if ( IN_GLOW_W < GLOW_SHARP_MAX  && IN_GLOW_W > GLOW_SHARP_MAX_ALTERNATE)  {
+   if (glow_w_inside_interval == 1.0)  {
          FragColor = vec4(blur_select_wrap(shift_and_bleed_pass, vTexCoord, global.flick_and_noise_passSize, IN_GLOW_W_ADAPTED, (IN_GLOW_W >= 0.0) ), 
                           DR_unchanged);
    } else {
