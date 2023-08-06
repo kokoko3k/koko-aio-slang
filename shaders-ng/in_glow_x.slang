@@ -50,10 +50,10 @@ vec3 blur_select_wrap(sampler2D texture_in, vec2 co, vec4 sourcesize, float shar
          //For sharpness 0.45, no unsharp mask
          //For sharpness 0.8, 0.65 unsharp mask
          //float sharp_sub = (1.857 * abs(IN_GLOW_W) - 0.836);
-         
+
          float in_glow_w = abs(IN_GLOW_W);
          in_glow_w = max(in_glow_w, MIN_IN_GLOW_SHARP);
-         
+
          float sharp_sub = 0.8125 * in_glow_w;
          sharp_sub = clamp(sharp_sub, 0.0,1.0);
 
@@ -99,10 +99,13 @@ void main() {
             in_glow_spread = in_glow_spread/2.0;
       //Modulate sharpness via IN_GLOW_SPREAD when IN_GLOW_W is under minimum blur sharpness
       //It seems that for box blur, setting width to 1.0 works better.
-         if (IN_GLOW_W_ADAPTED < MIN_IN_GLOW_SHARP )
-            IN_GLOW_W_ADAPTED = mix(in_glow_spread * IN_GLOW_SHARPNESS_SPREAD_RATIO_W, 1.0, float(IN_GLOW_W < 0.0));
+         if (IN_GLOW_W_ADAPTED < MIN_IN_GLOW_SHARP ) {
+            float IN_GLOW_W_ADAPTED_SPREADED = mix(in_glow_spread * IN_GLOW_SHARPNESS_SPREAD_RATIO_W, 1.0, float(IN_GLOW_W < 0.0));
+         //The modulation depends on glow to blur bias
+            IN_GLOW_W_ADAPTED_SPREADED = mix(IN_GLOW_W_ADAPTED_SPREADED, IN_GLOW_W_ADAPTED, IN_GLOW_BIAS );
+         }
 
-   
+
    //Modulate glow power via ntsc artifact mask:
       float ntsc_artifacts = texture(shift_and_bleed_pass, vTexCoord).a;
       
@@ -122,10 +125,10 @@ void main() {
    //      IN_GLOW_W_ADAPTED =  (IN_GLOW_W_ADAPTED+1)/10.0;
       
    //Scale it for box
-      if (IN_GLOW_W < 0.0) 
-         IN_GLOW_W_ADAPTED =  (IN_GLOW_W_ADAPTED)/1.2;   
+      if (IN_GLOW_W < 0.0)
+         IN_GLOW_W_ADAPTED =  (IN_GLOW_W_ADAPTED)/1.2;
    
-   
+
    //Make it resolution independent.
       IN_GLOW_W_ADAPTED = IN_GLOW_W_ADAPTED / NEW_SCALEMOD_X;
       
