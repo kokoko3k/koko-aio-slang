@@ -12,20 +12,12 @@ layout(location = 2) out vec3 vHALO_GAMMA;
 void main() {
     gl_Position = global.MVP * Position;
     vTexCoord = TexCoord;
-    
-    
-    
-   vHALO_W = HALO_W;
-   float vexp = mix(0.1, 1.0, HALO_W);
-   vHALO_W = pow(vHALO_W, vexp)*0.75;
-    
-    
-    vHALO_W = HALO_W / NEW_SCALEMOD_X; //Make it resolution independent.
-    
-    
-    
-    
-    
+
+    vHALO_W = HALO_W;
+    float vexp = mix(0.1, 1.0, HALO_W);
+    //vHALO_W = pow(vHALO_W, vexp)*0.75;
+    //vHALO_W = HALO_W / NEW_SCALEMOD_X; //Make it resolution independent.
+
     vHALO_GAMMA = vec3(HALO_GAMMA);
 }
 

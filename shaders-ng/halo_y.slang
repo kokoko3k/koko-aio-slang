@@ -14,9 +14,9 @@ void main() {
    vTexCoord = TexCoord;
    
    vHALO_H = HALO_H;
-   float vexp = mix(0.1, 1.0, HALO_H);
-   vHALO_H = pow(vHALO_H, vexp)*0.75;
-   
+   //float vexp = mix(0.1, 1.0, HALO_H);
+   //vHALO_H = pow(vHALO_H, vexp)*0.75;
+
    vHALO_H = vHALO_H / NEW_SCALEMOD_Y; //Make it resolution independent.
    
    if (HALO_POWER >= 0.0)
