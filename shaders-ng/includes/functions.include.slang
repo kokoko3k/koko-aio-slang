@@ -1,3 +1,10 @@
+vec4 texture_NEAREST(sampler2D tex, vec2 co_linear, vec4 tex_size) {
+   //return nearest sampling from a linear filtered texture
+   vec2 integerCoords = floor(co_linear.xy * tex_size.xy);
+   vec2 co_nearest = (integerCoords + 0.5) * tex_size.zw; // Aggiungi 0.5 per centrare il texel
+   return texture(tex, co_nearest);
+}
+
 float DigitBin( const int x )
 {
     return x==0?480599.0:x==1?139810.0:x==2?476951.0:x==3?476999.0:x==4?350020.0:x==5?464711.0:x==6?464727.0:x==7?476228.0:x==8?481111.0:x==9?481095.0:0.0;
@@ -147,14 +154,15 @@ vec3 pixel_push_luminance(vec3 c, float strength) {
 }
 
 vec3 apply_fuzzy_main_pass(vec3 color_in) {
-	vec3 color_out;
+	vec3 color_out = color_in;
 
-	if (DO_CCORRECTION == 1.0)
-		color_out = pow(color_in, vec3(GAMMA_OUT));
-	
-	if (DO_IN_GLOW == 1.0) {
-		color_out = pow(color_out,vec3(IN_GLOW_GAMMA))*IN_GLOW_POWER;
+	if (DO_CCORRECTION == 1.0) {
+		color_out = pow(color_out, vec3(IN_GLOW_GAMMA * GAMMA_OUT));
 	}
+	
+	if (DO_IN_GLOW == 1.0)
+		color_out = color_out*IN_GLOW_POWER;
+
 	
 	if (DO_PIXELGRID == 1.0) {
 		float m1 = (PIXELGRID_MAX_W + PIXELGRID_MIN_W) * 0.5;
@@ -661,6 +669,55 @@ vec2 Warp_try(vec2 pos, float warpX, float warpY) {
 	}
 	
 //Blur/Glow
+#define PI 3.14159265359
+float sinc_lanczos(float x) {
+    if (abs(x) < 0.001)
+        return 1.0;
+
+    x *= pi;
+    return sin(x) / x;
+}
+
+//Lanczos kinda broken, problematic.
+vec3 lanczos(sampler2D sampler_in, vec2 co, vec4 texsize, float sharpness ) {
+   
+   float data_pix_no = co.x * texsize.x;
+   float data_one    = texsize.z;
+   
+   float texel      = floor(data_pix_no);
+   float phase      = data_pix_no - texel;
+   float base_phase = phase - 0.5;
+   vec2 tex         = vec2((texel + 0.5) * texsize.z, co.y);
+
+   vec3 col = vec3(0.0);
+   for (int i = -2; i <= 2; i++) {
+      float phase = base_phase - float(i);
+      phase*= sharpness;
+      if (abs(phase) < 2.0) { //FIXME check needed?
+         float g = sinc_lanczos(phase);
+         col += texture(sampler_in, tex + vec2(float(i) * data_one, 0.0)).rgb * g;
+      }
+   }
+
+   return col * sharpness;
+} 
+
+
+	vec3 blur9_x_box(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_x, float sharp_sub) {
+		sharp_sub = -2*sharp_sub+1;
+		vec2 resolution = sourcesize * sharpness_x;
+		vec3 color = vec3(0.0);
+		vec2 off1 = vec2(1.0, 0.0) ;
+		vec2 off2 = vec2(2.0, 0.0) ;
+		color += texture(image, uv).rgb                       ;
+		color += texture(image, uv + (off1 / resolution)).rgb ;
+		color += texture(image, uv - (off1 / resolution)).rgb ;
+		color += texture(image, uv + (off2 / resolution)).rgb * sharp_sub;
+		color += texture(image, uv - (off2 / resolution)).rgb * sharp_sub;
+		color = color/(3.0 + sharp_sub*2);
+		return max(vec3(0.0), color);
+	}
+
 	vec3 glow_dumb(sampler2D in_texture, float glow_power, float gamma, vec2 coords) {
 		return pow( texture(in_texture, coords).rgb, vec3(gamma) ) * glow_power;
 	}
@@ -677,6 +734,8 @@ vec2 Warp_try(vec2 pos, float warpX, float warpY) {
 		color += texture(image, uv - (off2 / resolution)).rgb * 0.0702702703;
 		return color;
 	}
+
+	
 	
 	vec3 blur9_x_gamma(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_x, vec3 gamma) {
 		vec2 resolution = sourcesize * sharpness_x;
@@ -696,6 +755,25 @@ vec2 Warp_try(vec2 pos, float warpX, float warpY) {
 		return color;
 	}
 
+	vec3 blur9_y_gamma(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_x, vec3 gamma) {
+																											//FIXME can this be unrolled by using 5 variables?
+		vec2 resolution = sourcesize * sharpness_x;
+		vec3 color = vec3(0.0);
+		vec2 off1 = vec2(0.0, 1.3846153846) ;
+		vec2 off2 = vec2(0.0, 3.2307692308) ;
+		vec3 lookup = texture(image, uv).rgb;
+		color += pow(lookup, gamma) * 0.2270270270;
+		lookup = texture(image, uv + (off1 / resolution)).rgb;
+		color += pow(lookup, gamma) * 0.3162162162;
+		lookup = texture(image, uv - (off1 / resolution)).rgb;
+		color += pow(lookup, gamma) * 0.3162162162;
+		lookup = texture(image, uv + (off2 / resolution)).rgb;
+		color += pow(lookup, gamma) *  0.0702702703;
+		lookup = texture(image, uv - (off2 / resolution)).rgb;
+		color += pow(lookup, gamma) *  0.0702702703;
+		return color;
+	}
+	
 	vec3 blur9_y(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_y) {
 		vec2 resolution = sourcesize * sharpness_y;
 		vec3 color = vec3(0.0);
@@ -769,9 +847,10 @@ vec2 Warp_try(vec2 pos, float warpX, float warpY) {
 		color += textureLod(image, uv - (off1 / resolution), lod).rgb   * 0.35294117647058826;
 		return color;
 	}
-	
+
+#define RGB2GRAY_VEC3 vec3(0.299, 0.587, 0.114)
 float rgb_to_gray(vec3 rgb) {
-    return dot(rgb, vec3(0.299, 0.587, 0.114));
+    return dot(rgb, RGB2GRAY_VEC3);
 }
 	
 	//smoothly shade x and y < 0.0, currently unused	
@@ -846,7 +925,7 @@ vec2 tilt(vec2 co, float is_rotated, vec2 tilt) {
 
 }
 	
-bool is_first_outside_rect(vec2 point, vec4 rect) {
+/*bool is_first_outside_rect(vec2 point, vec4 rect) {
 	return (point.x < rect.x || point.x > rect.z ||
 			point.y < rect.y || point.y > rect.w) ;
 }
@@ -855,6 +934,16 @@ bool is_first_inside_rect(vec2 point, vec4 rect) {
 	return (point.x >= rect.x && point.x < rect.z &&
 			point.y >= rect.y && point.y < rect.w) ;
 }
+*/
+bool is_first_inside_rect(vec2 point, vec4 rect) {
+	vec2 bounded = clamp(point, rect.xy, rect.zw);
+	return point == bounded;
+}
+bool is_first_outside_rect(vec2 point, vec4 rect) {
+	vec2 bounded = clamp(point, rect.xy, rect.zw);
+	return point != bounded;
+}
+
 
 // COLOR TOOLS
 	vec3 kelvin2rgb(float k) {
@@ -941,7 +1030,7 @@ vec4 PG_get_hmask_preset() {
         return vec4( PIXELGRID_R_SHIFT, PIXELGRID_G_SHIFT, PIXELGRID_B_SHIFT, PIXELGRID_H_COUNT);
     
     if (PIXELGRID_H_PRST == 1.0)
-        return vec4( vec3(0,1,0), 2); // gm, mask size 2
+        return vec4( vec3(1,0,1), 2); // gm, mask size 2
 
     if (PIXELGRID_H_PRST == 2.0)
         return vec4( vec3(1,0,1), 3); //gmx, mask size 3

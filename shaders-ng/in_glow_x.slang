@@ -1,20 +1,35 @@
 #version 450
 #include "config.inc"
 
+//Dumbify glow under this treshold.
+#define GLOW_SHARP_MAX_ALTERNATE -1.0 
+
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
+layout(location = 1) out float glow_h_and_w_outside_interval;
+layout(location = 2) out float glow_w_inside_interval;
 
 void main() {
    gl_Position = global.MVP * Position;
    vTexCoord = TexCoord ;  
+   
+   //IN_GLOW_H is are over the upper limit and IN_GLOW_W is outside the allowed interval;
+   glow_w_inside_interval = float(IN_GLOW_W < GLOW_SHARP_MAX  && IN_GLOW_W > GLOW_SHARP_MAX_ALTERNATE);
+   
+   
+   glow_h_and_w_outside_interval = float (IN_GLOW_H >= GLOW_SHARP_MAX && glow_w_inside_interval !=1.0) ;
+   
 }
 
 
 #pragma stage fragment
 
 layout(location = 0) in vec2 vTexCoord;
+layout(location = 1) in float glow_h_and_w_outside_interval;
+layout(location = 2) in float glow_w_inside_interval;
+
 layout(location = 0) out vec4 FragColor;
 
 layout(set = 0, binding = 5) uniform sampler2D shift_and_bleed_pass;
@@ -24,6 +39,27 @@ layout(set = 0, binding = 6) uniform sampler2D shift_and_bleed_passFeedback;
 
 #include "includes/functions.include.slang" 
 
+
+
+vec3 blur_select_wrap(sampler2D texture_in, vec2 co, vec4 sourcesize, float sharpness, bool use_gauss) {
+   if (use_gauss)
+      return blur9_x(texture_in, co, sourcesize.xy, sharpness);
+         else
+      {  
+         //Compute subtractive sharpening via blur sharpness strength:
+         //For sharpness 0.45, no unsharp mask
+         //For sharpness 0.8, 0.65 unsharp mask
+         //float sharp_sub = (1.857 * abs(IN_GLOW_W) - 0.836);
+
+         float in_glow_w = abs(IN_GLOW_W);
+         in_glow_w = max(in_glow_w, MIN_IN_GLOW_SHARP);
+
+         float sharp_sub = 0.8125 * in_glow_w;
+         sharp_sub = clamp(sharp_sub, 0.0,1.0);
+
+         return blur9_x_box(texture_in, co, sourcesize.xy, sharpness, sharp_sub);
+      }
+}
 
 
 void main() { 
@@ -37,58 +73,84 @@ void main() {
       }
    };
 
-   //Don't do anything if IN_GLOW_W and IN_GLOW_H are over the upper limit
-      if (IN_GLOW_W >= GLOW_SHARP_MAX && IN_GLOW_H >= GLOW_SHARP_MAX) {
+   //Don't do anything if IN_GLOW_H is are over the upper limit
+   //and IN_GLOW_W is outside the allowed interval;
+      if ( glow_h_and_w_outside_interval == 1.0) {
+         vec4 passthrough = texture(shift_and_bleed_pass, vTexCoord);
          //Delta render?
          if (DELTA_RENDER == 1.0) {
             float DR_unchanged = float( textureLod(shift_and_bleed_pass,         vTexCoord, DELTA_RENDER_CHECK_AREA).rgb == 
                                         textureLod(shift_and_bleed_passFeedback, vTexCoord, DELTA_RENDER_CHECK_AREA).rgb);
-            FragColor = vec4(0.0,0.0,0.0,DR_unchanged); 
+            FragColor = vec4(passthrough.rgb, DR_unchanged);
             return;
          }
+         FragColor = passthrough;
+         return;
       }
-
       
-   float IN_GLOW_W_ADAPTED = IN_GLOW_W;
-   //Auto calc glow sharpness via IN_GLOW_SPREAD
-      if (IN_GLOW_W <= 0.00001)
-         IN_GLOW_W_ADAPTED = IN_GLOW_SPREAD * IN_GLOW_SHARPNESS_SPREAD_RATIO_W;
+   
+   float IN_GLOW_W_ADAPTED = abs(IN_GLOW_W);
+   
+   //GLow to blur via IN_GLOW_SPREAD:
+      //Spread amount needs to lessen its influence when going from glow to blur
+         float in_glow_spread = IN_GLOW_SPREAD * (1-IN_GLOW_BIAS);
+      //half in glow spread for box
+         if (IN_GLOW_W < 0.0) 
+            in_glow_spread = in_glow_spread/2.0;
+      //Modulate sharpness via IN_GLOW_SPREAD when IN_GLOW_W is under minimum blur sharpness
+      //It seems that for box blur, setting width to 1.0 works better.
+         if (IN_GLOW_W_ADAPTED < MIN_IN_GLOW_SHARP ) {
+            float IN_GLOW_W_ADAPTED_SPREADED = mix(in_glow_spread * IN_GLOW_SHARPNESS_SPREAD_RATIO_W, 1.0, float(IN_GLOW_W < 0.0));
+         //The modulation depends on glow to blur bias
+            IN_GLOW_W_ADAPTED_SPREADED = mix(IN_GLOW_W_ADAPTED_SPREADED, IN_GLOW_W_ADAPTED, IN_GLOW_BIAS );
+         }
 
 
-   //Here lies the blur modifier from ntsc pass to glow.
-   //I'm not expecting any performance hit, 
-   //since the lookup should have been cached already or will serve so.
+   //Modulate glow power via ntsc artifact mask:
       float ntsc_artifacts = texture(shift_and_bleed_pass, vTexCoord).a;
-
-   //apply an optional gain to artifacts
-      ntsc_artifacts = ntsc_artifacts * IN_GLOW_NTSC_ARTF_MULT;
-   //then apply the minimum treshold and scale them to input sharpness so that they can always blur to max.
-      ntsc_artifacts = smoothstep(IN_GLOW_NTSC_ARTF_TRSH, 1.0, ntsc_artifacts * IN_GLOW_NTSC_ARTF_MULT) * IN_GLOW_W;
-
       
-
-   //finally "subtract" them to the configured sharpness (-> more blur)
-      IN_GLOW_W_ADAPTED = IN_GLOW_W_ADAPTED - ntsc_artifacts;
+      //To debug ntsc artifacts mask:
+         if (DO_NTSC_ARTIFACTS + NTSC_SHOW_ARTF_MASK > 1.5) {
+            FragColor = vec4(ntsc_artifacts);
+            return;
+         }
+      //finally "add" them to the configured sharpness (-> less blur)
+         IN_GLOW_W_ADAPTED = IN_GLOW_W_ADAPTED +  DO_NTSC_ARTIFACTS * ((1-ntsc_artifacts) * NTSC_ARTF_NOBLUR);
 
    //don't allow lower values that look bad:
       IN_GLOW_W_ADAPTED = max(IN_GLOW_W_ADAPTED, MIN_IN_GLOW_SHARP);
 
+   //Scale it for lanczos
+   //   if (IN_GLOW_W < 0.0) 
+   //      IN_GLOW_W_ADAPTED =  (IN_GLOW_W_ADAPTED+1)/10.0;
+      
+   //Scale it for box
+      if (IN_GLOW_W < 0.0)
+         IN_GLOW_W_ADAPTED =  (IN_GLOW_W_ADAPTED)/1.2;
+   
+
    //Make it resolution independent.
       IN_GLOW_W_ADAPTED = IN_GLOW_W_ADAPTED / NEW_SCALEMOD_X;
+      
 
+      
    //Delta render?
       float DR_unchanged = 0.0;
       if (DELTA_RENDER == 1.0) {
          //Keep track of changed pixels to speedup rendering in final pass   
          DR_unchanged = float( textureLod(shift_and_bleed_pass,         vTexCoord, DELTA_RENDER_CHECK_AREA).rgb == 
-                                     textureLod(shift_and_bleed_passFeedback, vTexCoord, DELTA_RENDER_CHECK_AREA).rgb);
+                               textureLod(shift_and_bleed_passFeedback, vTexCoord, DELTA_RENDER_CHECK_AREA).rgb);
       }
       
-   FragColor = vec4( blur9_x(shift_and_bleed_pass, vTexCoord, global.flick_and_noise_passSize.xy, IN_GLOW_W_ADAPTED), DR_unchanged);
 
-   //To debug ntsc artifacts mask:
-   if (IN_GLOW_SHOW_ARTF_MASK > 0.5)
-      FragColor = vec4(ntsc_artifacts);
+      
+   //Finally blur horizontally 
+   if (glow_w_inside_interval == 1.0)  {
+         FragColor = vec4(blur_select_wrap(shift_and_bleed_pass, vTexCoord, global.flick_and_noise_passSize, IN_GLOW_W_ADAPTED, (IN_GLOW_W >= 0.0) ), 
+                          DR_unchanged);
+   } else {
+      FragColor = texture(shift_and_bleed_pass, vTexCoord, DR_unchanged);
+   }
    
 }
 

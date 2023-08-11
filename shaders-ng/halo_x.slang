@@ -12,7 +12,12 @@ layout(location = 2) out vec3 vHALO_GAMMA;
 void main() {
     gl_Position = global.MVP * Position;
     vTexCoord = TexCoord;
+
+    vHALO_W = HALO_W;
+    //float vexp = mix(0.1, 1.0, HALO_W);
+    //vHALO_W = pow(vHALO_W, vexp)*0.75;
     vHALO_W = HALO_W / NEW_SCALEMOD_X; //Make it resolution independent.
+
     vHALO_GAMMA = vec3(HALO_GAMMA);
 }
 
@@ -28,27 +33,29 @@ layout(set = 0, binding = 5) uniform sampler2D shift_and_bleed_pass;
 #include "includes/functions.include.slang" 
 
 void main() {
+    
     if (DO_HALO == 0.0 ) return;
-
-   //Pass the right texture unchanged for tighter blurs:
-   if (HALO_W >= GLOW_SHARP_MAX && HALO_H >= GLOW_SHARP_MAX) {
-        if (DO_IN_GLOW == 1.0)
-                FragColor = texture(in_glow_pass, vTexCoord);
-            else
-                FragColor = texture(shift_and_bleed_pass, vTexCoord);
-
-      return;
-   }
     
     vec3 pixel_haloed;
+    //Pass the right texture unchanged for tighter blurs:
+    if (HALO_W >= GLOW_SHARP_MAX) {
+        if (DO_IN_GLOW == 1.0)
+                pixel_haloed = pow(texture(in_glow_pass, vTexCoord).rgb, vec3(vHALO_GAMMA)) ;
+            else
+                pixel_haloed = pow(texture(shift_and_bleed_pass, vTexCoord).rgb, vec3(vHALO_GAMMA)) ;
+
+        FragColor = vec4(pixel_haloed.rgb, 1.0);
+        return;
+    }
+    
+
     if (DO_IN_GLOW == 1.0) {
-        //pixel_haloed = blur9_x(in_glow_pass, vTexCoord, global.FXAA_passSize.xy, vHALO_W);
-        
         pixel_haloed = blur9_x_gamma(in_glow_pass, vTexCoord, global.FXAA_passSize.xy, vHALO_W, vHALO_GAMMA);
     }
     else {
         pixel_haloed = blur9_x_gamma(shift_and_bleed_pass, vTexCoord, global.FXAA_passSize.xy, vHALO_W, vHALO_GAMMA);
     }
+    
     
     FragColor = vec4(pixel_haloed.rgb, 1.0);
 }

@@ -1,0 +1,10 @@
+// Released under: See LICENSE.txt
+ 
+ 
+shaders = 1
+       shader0 = bench.slang
+filter_linear0 = true
+ mipmap_input0 = false
+   scale_type0 = viewport
+        scale0 = 1.0
+    wrap_mode0 = "clamp_to_border"

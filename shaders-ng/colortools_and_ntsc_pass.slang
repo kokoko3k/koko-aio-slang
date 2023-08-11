@@ -1,4 +1,29 @@
 #version 450
+
+
+#define CWHITE  vec3(1.0)
+#define CGRAY   vec3(0.5)
+#define CBLACK  vec3(0.0)
+#define CPURPLE vec3(1.0,0.0,1.0)
+#define CRED    vec3(1.0,0.0,0.0)
+#define CGREEN    vec3(0.0,1.0,0.0)
+#define CBLUE    vec3(0.0,0.0,1.0)
+#define CCUSTOM vec3(0.3,0.5,0.1)
+
+#define DEBUG_COLOR vec3(0.0, 1.0,0.0)
+#define DEBUG_BLINK_TIME 30
+#define DEBUG_GRADIENT_STEPS 128
+
+//#define DEBUG
+   //#define DEBUG_TIME_FADE
+   //#define DEBUG_SOLID_COLOR
+   #define DEBUG_STEP_GRADIENT
+   //#define DEBUG_BLINK
+   //#define DEBUG_BLINK_CIRCLE
+   //#define DEBUG_COLORWHEEL
+
+   
+   
 #include "config.inc"
 
 #define NTSC_FILTER_WIDTH_MAX 25
@@ -32,7 +57,9 @@ float hann(float n, float N) {
 float sinc(float x) {
    //if (x == 0.0) return 1.0;
    x = x + eps;
-   return sin(pi*x) / (pi*x);
+   return sin(pi*x) / (pi*x); 
+   //FIXME maybe faster (parallelism) with:
+   //return sin( pi*(x+eps) / (pi*(x+eps) ) );
 }
 
 
@@ -76,6 +103,16 @@ layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D Source;
 layout(set = 0, binding = 3) uniform sampler2D colortools_and_ntsc_passFeedback;
 
+
+vec3 colorwheel(vec2 uv){
+   float timeoffset = params.FrameCount / 120.0;
+   vec2 uvc = -1.0 * ((2.0 * uv) - 1.0);
+   float dist = length(uvc);
+   float ang = (atan(uvc.y, uvc.x) + pi) / (2.0 * pi) - timeoffset;
+   ang = mod(ang, 1.0);
+   vec3 colHSV = vec3(ang, 1.0, dist);
+   return hsv2rgb(colHSV);
+}
 
 //	Colorspace conversion matrix for YIQ-to-RGB
 const mat3 YIQ2RGB = mat3(1.000, 1.000, 1.000,
@@ -123,54 +160,94 @@ vec4 ntscdec(vec2 uv) {
    float artifacts_mask = abs(YIQ_processed.y)         + abs(YIQ_processed.z) + 
                           abs(YIQ_processed_shifted.y) + abs(YIQ_processed_shifted.z);
    
+                          
+   //artifacts_mask = pow(artifacts_mask, 0.25);
+                          
    return vec4(YIQ_result * YIQ2RGB, artifacts_mask);
 }
 
 
 vec3 debug() {
+//Just test patterns here
    vec3 pixel_debug;
-   float blink_time = 120;
-   vec2 center = vTexCoord - vec2(0.5,0.5);
-   float radius = 0.1;
-   pixel_debug = vec3(1 - step(radius, length(center)));
-   pixel_debug *= float((mod(params.FrameCount,blink_time*2) < blink_time));
+   
+   #ifdef DEBUG_TIME_FADE
+      float time_fade = abs(sin(params.FrameCount/3.14/20));
+      vec3 color_fade = DEBUG_COLOR * time_fade;
+      pixel_debug = color_fade;
+      
+   #elif defined DEBUG_SOLID_COLOR   
+      pixel_debug = DEBUG_COLOR;
+      
+   #elif defined DEBUG_GRADIENT
+      pixel_debug = DEBUG_COLOR * vTexCoord.x;
+      
+   #elif defined DEBUG_STEP_GRADIENT
+      pixel_debug = DEBUG_COLOR * floor(vTexCoord.x* DEBUG_GRADIENT_STEPS )/ DEBUG_GRADIENT_STEPS ;
+      
+   #elif defined DEBUG_BLINK
+      if (mod(params.FrameCount, DEBUG_BLINK_TIME*2) < DEBUG_BLINK_TIME) 
+         pixel_debug = vec3(0.2) ;
+      else 
+         pixel_debug = DEBUG_COLOR;
+   
+   #elif defined DEBUG_BLINK_CIRCLE
+      vec2 center = vTexCoord - vec2(0.5,0.5);
+      float radius = 0.1;
+      pixel_debug = vec3(1 - step(radius, length(center)));
+      pixel_debug *= float( ( mod(params.FrameCount, DEBUG_BLINK_TIME * 2) < DEBUG_BLINK_TIME));
+      pixel_debug *= DEBUG_COLOR;
+      
+   #elif defined DEBUG_COLORWHEEL   
+      pixel_debug = colorwheel(vTexCoord);   
+   #endif
+   
    return pixel_debug;
 }
 
 void main() {
-
-   //FragColor = vec4(debug(), 1.0); return;
-
+   
    //This will go into alpha channel to make glow aware of it and blur more.
    //It could be configurable.
-   float artifacts = 0.0;
-
    vec3 pixel_out;
-   if (DO_NTSC_ARTIFACTS > 0.5) {
-      vec3 pixel_source = texture(Source, vTexCoord).rgb;
-      vec4 pixel_out_vec4 = ntscdec(vTexCoord);
-      pixel_out = pixel_out_vec4.rgb;
+   float artifact_mask = 0.0;
 
-      artifacts = pixel_out_vec4.a;
-      //artifacts = mix(artifacts, texture(colortools_and_ntsc_passFeedback, vTexCoord).a, 0.5);  <-- this helps
-//FragColor = vec4(artifacts); return;
-      
-/*
-      //artifacts = pow(artifacts, IN_GLOW_NTSC_ARTF_TRSH * 8.0);
-      artifacts = artifacts * IN_GLOW_NTSC_ARTF_MULT;
-      artifacts = smoothstep(IN_GLOW_NTSC_ARTF_TRSH, 1.0, artifacts);
-      //artifacts = min(artifacts, 1.0); //<- useless since clamp happens if not uising float framebuffer.
-*/
+   
+   if (DO_NTSC_ARTIFACTS > 0.5) {
+      //Get ntsc picture
+         vec4 ntsc_decoded = ntscdec(vTexCoord);
+      //apply the minimum treshold to artifact mask
+         artifact_mask = smoothstep(NTSC_ARTF_TRSH, 1.0, ntsc_decoded.a)*1.0;
+
+      //Optionally completely cut-off artifacts under treshold:
+         vec3 pixel_clean = texture(Source, vTexCoord).rgb;
+         ntsc_decoded = mix(ntsc_decoded, vec4(pixel_clean, 0.0) , (1-artifact_mask)*NTSC_ARTF_ZAP );
+         //Update the artifact mask if something has been cancelled
+            artifact_mask = min(artifact_mask, ntsc_decoded.a);
+
+            //artifact_mask = clamp (artifact_mask*1.0, 0.0,1.0);
+            artifact_mask *= 2.0;
+            
+            
+      pixel_out = ntsc_decoded.rgb;
       
    } else {
+      
       pixel_out = texture(Source, vTexCoord).rgb;
    }
 
+  
+   
+   #ifdef DEBUG
+      //Vant "debug" ntsc artifacts because it samples from source (original)
+      pixel_out = debug();
+   #endif
+      
+  FragColor = vec4(pixel_out, 1.0);
+   
    if (DO_CCORRECTION == 1.0)
       pixel_out = color_tools(pixel_out, vTemperature_rgb);
 
-   
-   
    if (DO_DOT_MATRIX + DOT_M_MBLUR_STR > 1.0) {
       vec3 feedback = texture(colortools_and_ntsc_passFeedback, vTexCoord).rgb;
       
@@ -187,13 +264,8 @@ void main() {
    }
    
    
-   FragColor = vec4(pixel_out, artifacts);
-
-
-
-  // FragColor = vec4(artifacts);
-
-
+   FragColor = vec4(pixel_out, artifact_mask);
+   //FragColor = vec4(artifacts);
 }
 
 

@@ -237,7 +237,7 @@ vec4 pixel_ambilight(vec2 local_pre_pass_coords) {
     float diff_avg_lum = abs(past_avg_lum - present_avg_lum);
 
     if (diff_avg_lum >= AMBI_SCENE_CHG_THRSHLD) {
-        scene_change_remaining = 1.0;
+        scene_change_remaining = 1/AMBI_FAST_STEP;
     }
 
     // Are we changing scene?

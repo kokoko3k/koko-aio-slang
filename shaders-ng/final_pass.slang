@@ -24,41 +24,57 @@ layout(location = 0) out vec2 vTexCoord;
 layout(location = 1) out vec2 vOutputCoord;
 layout(location = 2) out vec2 spot_offset;
 
-layout(location = 4) out float vIsRotated;
+layout(location = 3) out float vIsRotated;
 
 
 //Curvature:
-    layout(location = 5) out vec2 vWarp_vexp;
-    layout(location = 6) out vec2 vWarp_arg2;
+    layout(location = 4) out vec2 vWarp_vexp;
+    layout(location = 5) out vec2 vWarp_arg2;
 
 //Scanlines:
-    layout(location = 7) out float vIsInterlaced;
-    layout(location = 9) out float vScanlinePeriod;
-    layout(location = 10) out float vScanlineAlternateOffset;
-    layout(location = 11) out float vMax_inLum;
+    layout(location = 6) out float vIsInterlaced;
+    layout(location = 7) out float vScanlinePeriod;
+    layout(location = 8) out float vScanlineAlternateOffset;
+    layout(location = 9) out float vMax_inLum;
     
 //Vignette, spot:
-    layout(location = 12) out float vIn_aspect;
+    layout(location = 10) out float vIn_aspect;
     
-layout(location = 13) out float vDynamicSeed;
-layout(location = 14) out float vBEZEL_INNER_ZOOM_adapted;
+layout(location = 11) out float vDynamicSeed;
+layout(location = 12) out float vBEZEL_INNER_ZOOM_adapted;
 
 
-layout(location = 17) out float vDo_Tate;
-layout(location = 18) out vec3 vDotMat_Grid_Color;
-layout(location = 19) out vec4 vPG_offsets_and_size;
-layout(location = 20) out vec2 vPG_freq_base_screen;
-layout(location = 21) out vec2 vPG_freq_base_screen_unfloored;
-layout(location = 22) out vec2 vPG_period_multiplier;
-layout(location = 24) out vec2 vPG_OriginalSize_tated;
-layout(location = 25) out vec2 vPG_OutputSize_tated;
-layout(location = 26) out vec2 vPG_OutputCoord_tated;
-layout(location = 27) out float vDotMat_Grid_Sharpness;
-layout(location = 28) out float vfprintvalue;
-layout(location = 29) out float vPG_mask_height;
-layout(location = 30) out float vPG_spark;
+layout(location = 13) out float vDo_Tate;
+layout(location = 14) out vec3 vDotMat_Grid_Color;
+layout(location = 15) out vec4 vPG_offsets_and_size;
+layout(location = 16) out vec2 vPG_freq_base_screen;
+layout(location = 17) out vec2 vPG_freq_base_screen_unfloored;
+layout(location = 18) out vec2 vPG_period_multiplier;
+layout(location = 19) out vec2 vPG_OriginalSize_tated;
+layout(location = 20) out vec2 vPG_OutputSize_tated;
+layout(location = 21) out vec2 vPG_OutputCoord_tated;
+layout(location = 22) out float vDotMat_Grid_Sharpness;
+layout(location = 23) out float vfprintvalue;
+layout(location = 24) out float vPG_mask_height;
 
-layout(location = 31) out float vDeltaRenderOk;
+layout(location = 26) out vec4 vfloats_packed1;
+//We're running out of available locations for vulkan (max index = 31), so we packed 4 floats into 1.
+    //layout(location = 26) in float vDeltaRenderOk;
+    //layout(location = 27) in float vDo_pixelgrid_h;
+    //layout(location = 28) in float vDo_Curvature;
+    //layout(location = 29) in float vPG_offsets_adjust_for_stagger;
+    #define vDeltaRenderOk  vfloats_packed1.r
+    #define vDo_pixelgrid_h vfloats_packed1.g
+    #define vDo_Curvature   vfloats_packed1.b
+    #define vPG_offsets_adjust_for_stagger vfloats_packed1.a
+
+
+
+layout(location = 31) out float I_am_a_placeholder_keep_reading;
+//..to remind you that location = 31 is the last accepted by vulkan
+//or Retroarch crashes or nvidia starts to give Xids.
+//unsure if the issue is with retroarch or with vulkan specs.
+//If in short, consider to pack more datas into vec2,3,4.
 
 #include "includes/functions.include.slang"
 
@@ -108,7 +124,15 @@ vec2 get_zooms_modifier() {
 
 void main() {
     gl_Position = global.MVP * Position;
-    vIsRotated = float(is_rotated());
+    bool bIsRotated = is_rotated();
+    vIsRotated = float(bIsRotated);
+    
+    if ( (TATE == 1.0 && bIsRotated) || TATE == 2.0)
+        vDo_Tate = 1.0;
+            else
+        vDo_Tate = 0.0;
+    //vDo_Tate = float(TATE+vIsRotated > 1.001); //<<-- reported problems with amd (?)
+    
     vIn_aspect = get_in_aspect();
     
     //Calculate vTexcoord as fractional or integer scaled?
@@ -131,7 +155,7 @@ void main() {
     vec2 vFragCoord = vec2( floor(vOutputCoord.x * params.OutputSize.x),
                             floor(vOutputCoord.y * params.OutputSize.y));
 
-    vDo_Tate = float(TATE+vIsRotated > 1.001);
+
 
     vBEZEL_INNER_ZOOM_adapted = get_BEZEL_INNER_ZOOM() * DO_BEZEL;
     
@@ -176,10 +200,8 @@ void main() {
         }
             
     //Pixelgrid: get mask type; .rgb contains layout, .a contains the size.
-        #define PG_H_COUNT vPG_offsets_and_size.a
         vPG_offsets_and_size = PG_get_hmask_preset() ;
-        //scale offsets to be used by sin/cos:
-            vPG_offsets_and_size.rgb *= (pi / PG_H_COUNT);
+        #define PG_H_COUNT vPG_offsets_and_size.a
 
     //Pixelgrid: Calc freq_base_screen
         //Tate ?
@@ -194,21 +216,43 @@ void main() {
             }
                 
             // screen coords needs flooring, but unfortunately floor() does not work well in vertex shader, so calc as much as possible without floor()
-                vPG_period_multiplier = vec2(PIXELGRID_MUL_X, PIXELGRID_MUL_Y);
+                vPG_period_multiplier = vec2(PIXELGRID_MUL_X, 1.0);
                 vPG_freq_base_screen = pi * vec2(1/PG_H_COUNT, 0.5);
 
             //the following unfloored coords are needed by sin/cos later to understand if we are on an even or odd mask
                 vPG_freq_base_screen_unfloored = pi * vec2(1/PG_H_COUNT, 0.5) * (vPG_OutputCoord_tated * vPG_OutputSize_tated);
+              
+  
+        //This is needed to make sure even/odd staggering period matches betweeb floored (screen 1X)
+        //and unfloored coords (core or non 1x mask size).
+        //The issue visible when staggering the slotmask.           FIXME: Not yet 100% perfect
+            vPG_offsets_adjust_for_stagger = 0.0;
+            if (PIXELGRID_SIZE_W == 0.0 || PIXELGRID_MUL_X != 1.0) {
+                //vec4 unfloored_offsets_fix = vec4(1.5,0.5,1.0,0.0);
+                vec4 unfloored_offsets_fix = vec4(1.6, 0.81, 0.54, 0.81);
+                //vPG_offsets_adjust_for_stagger = (pi*0.5)/PG_H_COUNT;
+                vPG_offsets_adjust_for_stagger = unfloored_offsets_fix[int(PG_H_COUNT)-1];
+            }
+
+
+        //scale offsets to be used by sin/cos:
+            vPG_offsets_and_size.rgb *= (pi / PG_H_COUNT);
                 
     //Pixelgrid: adapt period multiplier
         if (vPG_period_multiplier.x < 0.0) vPG_period_multiplier.x = 1/-vPG_period_multiplier.x;  
-        if (vPG_period_multiplier.y < 0.0) vPG_period_multiplier.y = 1/-vPG_period_multiplier.y;            
+        if (vPG_period_multiplier.y < 0.0) vPG_period_multiplier.y = 1/-vPG_period_multiplier.y;     
+        
+        
     //Pixelgrid: adapt mask height
         vPG_mask_height = PIXELGRID_Y_MASK_HEIGHT;
         if (vPG_mask_height < 0.0) vPG_mask_height = 1/-vPG_mask_height;
     
-        //vPG_spark = PIXELGRID_Y_SPARK * PIXELGRID_Y_MASK; <--vertex shader collapses here.
-        
+    //Pixelgrid: do horizontal if enabled, but skip it if user doesn't want it on interlaced content.
+        vDo_pixelgrid_h = float(DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0));
+
+       
+    vDo_Curvature = DO_CURVATURE + GEOM_WARP_X + GEOM_WARP_Y;
+    
     //Dot matrix: measure the final picture size to choose a right sharpness level
     //For simplicity and (my) mental health, take only y into account.
         vDotMat_Grid_Sharpness = DOT_M_G_SHARP;
@@ -235,33 +279,43 @@ layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in vec2 vOutputCoord;
 layout(location = 2) in vec2 spot_offset;
 
-layout(location = 4) in float vIsRotated;
-layout(location = 5) in vec2 vWarp_vexp;
-layout(location = 6) in vec2 vWarp_arg2;
-layout(location = 7) in float vIsInterlaced;
+layout(location = 3) in float vIsRotated;
+layout(location = 4) in vec2 vWarp_vexp;
+layout(location = 5) in vec2 vWarp_arg2;
+layout(location = 6) in float vIsInterlaced;
 
-layout(location = 9) in float vScanlinePeriod;
-layout(location = 10) in float vScanlineAlternateOffset;
-layout(location = 11) in float vMax_inLum;
-layout(location = 12) in float vIn_aspect;
-layout(location = 13) in float vDynamicSeed;
-layout(location = 14) in float vBEZEL_INNER_ZOOM_adapted;
+layout(location = 7) in float vScanlinePeriod;
+layout(location = 8) in float vScanlineAlternateOffset;
+layout(location = 9) in float vMax_inLum;
+layout(location = 10) in float vIn_aspect;
+layout(location = 11) in float vDynamicSeed;
+layout(location = 12) in float vBEZEL_INNER_ZOOM_adapted;
 
 
-layout(location = 17) in float vDo_Tate;
-layout(location = 18) in vec3 vDotMat_Grid_Color;
-layout(location = 19) in vec4 vPG_offsets_and_size;
-layout(location = 20) in vec2 vPG_freq_base_screen;
-layout(location = 21) in vec2 vPG_freq_base_screen_unfloored;
-layout(location = 22) in vec2 vPG_period_multiplier;
-layout(location = 24) in vec2 vPG_OriginalSize_tated;
-layout(location = 25) in vec2 vPG_OutputSize_tated;
-layout(location = 26) in vec2 vPG_OutputCoord_tated;
-layout(location = 27) in float vDotMat_Grid_Sharpness;
-layout(location = 28) in float vfprintvalue;
-layout(location = 29) in float vPG_mask_height;
-layout(location = 30) in float vPG_spark;
-layout(location = 31) in float vDeltaRenderOk;
+layout(location = 13) in float vDo_Tate;
+layout(location = 14) in vec3 vDotMat_Grid_Color;
+layout(location = 15) in vec4 vPG_offsets_and_size;
+layout(location = 16) in vec2 vPG_freq_base_screen;
+layout(location = 17) in vec2 vPG_freq_base_screen_unfloored;
+layout(location = 18) in vec2 vPG_period_multiplier;
+layout(location = 19) in vec2 vPG_OriginalSize_tated;
+layout(location = 20) in vec2 vPG_OutputSize_tated;
+layout(location = 21) in vec2 vPG_OutputCoord_tated;
+layout(location = 22) in float vDotMat_Grid_Sharpness;
+layout(location = 23) in float vfprintvalue;
+layout(location = 24) in float vPG_mask_height;
+
+layout(location = 26) in vec4 vfloats_packed1;
+//We're running out of available locations for vulkan (max index = 31), so we packed 4 floats into 1.
+    //layout(location = 26) in float vDeltaRenderOk;
+    //layout(location = 27) in float vDo_pixelgrid_h;
+    //layout(location = 28) in float vDo_Curvature;
+    //layout(location = 29) in float vPG_offsets_adjust_for_stagger;
+    #define vDeltaRenderOk  vfloats_packed1.r
+    #define vDo_pixelgrid_h vfloats_packed1.g
+    #define vDo_Curvature   vfloats_packed1.b
+    #define vPG_offsets_adjust_for_stagger vfloats_packed1.a
+
 
 layout(location = 0) out vec4 FragColor;
 
@@ -342,43 +396,62 @@ float morph_shape_full(float shape, float power, float steep ) {
     return shape;
 }
 
+vec3 morph_shape_full_vec3(vec3 shape, vec3 l, float steep, float gamma ) {
+    vec3 l_pow = pow(l,vec3(gamma));
+    vec3 l2 = min(l_pow * 16, 1+steep);
+    vec3 s1 = pow(shape, 1/sqrt(l2));
+    vec3 s2 = (1-s1) * l_pow;
+    return s1+(s2/(1+steep));
+    
+}
 
-vec3 morph_shape(vec3 shape, vec3 power, float steep ) {
-    return vec3(
+/*vec3 morph_shape_full_vec3(vec3 shape, vec3 l, float steep ) {
+    vec3 l_pow = pow(l,vec3(4.2));
+    vec3 l2 = l_pow * 16;
+    l2 = clamp(l2, 0.0, 1+steep);
+    vec3 s1 = pow(shape, 1/sqrt(l2));
+    vec3 s2 = (1-s1) * l_pow;
+    return s1+(s2/(l+steep));
+}*/
+
+/*vec3 morph_shape_full_vec3(vec3 shape, vec3 l, float steep ) {
+    vec3 l_pow = pow(l,vec3(4.1));
+    vec3 l2 = l_pow * 16;
+    l2 = clamp(l2, 0.0,1.0);
+    vec3 s1 = pow(shape, 1/sqrt(l2));
+    vec3 s2 = (1-s1) * l_pow * (l*l);
+    return s1+(s2/(1+steep));
+}*/
+
+vec3 morph_shape(vec3 shape, vec3 power, float steep, float gamma ) {
+   return morph_shape_full_vec3(shape, power, steep, gamma);
+
+    return vec3(    
+      morph_shape_full(shape.x, power.x, steep),
+      morph_shape_full(shape.y, power.y, steep),
+      morph_shape_full(shape.z, power.z, steep)
+    );
+   
+        
+    //Use this to compare different methods
+    if (params.FrameCount % 2 == 0.0)
+        return morph_shape_full_vec3(shape, power, steep, gamma);
+            else
+    return vec3(    
       morph_shape_full(shape.x, power.x, steep),
       morph_shape_full(shape.y, power.y, steep),
       morph_shape_full(shape.z, power.z, steep)
     );
 }
 
-float morph_shape(float shape, float power, float steep ) {
+/*float morph_shape(float shape, float power, float steep ) {
     return morph_shape_full(shape, power, steep);
-}
-
-float morph_shape_full_mix(float shape, float power, float steep, float mixto, float mix_strength ) {
-    float lum_scaled = power;
-    float l = lum_scaled; // (already clamped)
-    if (lum_scaled <= 0.5+steep) {
-        float l1 = pow(l, 4) * 15;
-        shape = pow(shape, 1/sqrt(l1));
-    } else {
-        float l2 = (l-0.5)*2.0;
-        shape = mix(shape, 1.0, l2);    //shape = shape * (1-l2) + l2;
-    }
-    mix_strength = clamp(mix_strength, 0.0, 1.0);
-    return mix(mixto, shape, mix_strength);
-}
+}*/
 
 
-vec3 morph_shape_mix(vec3 shape, vec3 power, float steep, float mixto, vec3 mix_strength ) {
-    return vec3(
-      morph_shape_full_mix(shape.x, power.x, steep, mixto, mix_strength.x),
-      morph_shape_full_mix(shape.y, power.y, steep, mixto, mix_strength.y),
-      morph_shape_full_mix(shape.z, power.z, steep, mixto, mix_strength.z)
-    );
-}
 
-vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inLum) { 
+vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inLum  ) { 
+
     //Tate ? (other outputsize,originalsize and outputcoords "tated" in vertex shader.)
         if (vDo_Tate == 1.0) in_coords.xy = in_coords.yx;
 
@@ -390,24 +463,23 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         vec2 freq_base_core = pi * in_coords * vPG_OriginalSize_tated ;
 
         //Screen coords:
-            vec2 period_multiply = vec2(PIXELGRID_MUL_X, PIXELGRID_MUL_Y);
-
             //The following unfloored coords are needed by sin/cos later to understand if we are on an even or odd mask
                 //vec2 freq_base_screen_unfloored = pi * vec2(1/PG_h_count, 0.5) * (vPG_OutputCoord_tated * vPG_OutputSize_tated);
                 vec2 freq_base_screen_unfloored = vPG_freq_base_screen_unfloored; //<-- missing muls because done to vertex shader.
-
-            //Screen coords needs flooring, but we need to disable flooring if requested.
-            //Since this seems to be a crucial point in the code that kills performance on my haswell, mix() or if/then needs to be absolutely avoided.
-            //So my hack here is to always floor the coords, but to floor them with a huge precision to emulate the unfloored coord.
-                float unfloor_hack = PIXELGRID_NO_FLOOR; // <-- 1 to huge number
-                vec2 freq_base_screen = vPG_freq_base_screen * 
-                                        floor(vPG_OutputCoord_tated * vPG_OutputSize_tated * period_multiply * unfloor_hack) / (period_multiply * unfloor_hack);
-
-
-
+        
+            //Screen coords needs flooring, but we need to disable flooring if using non 1x screen coords
+            // y screen coords appear to work just fine even if we always floor them,
+            // you can use "float(fract(1/vPG_mask_height) < 0.01"as the y mix parameter instead of 1.0 if in doubt.
+                #define SCREEN_Y_MIX 1.0 //<-- Always floor screen y coords (seems to work good everytime)
+                //#define SCREEN_Y_MIX float(fract(1/vPG_mask_height) < 0.01) //<-- only floor screen y coords when non integer multipliers
+                vec2 freq_base_screen = mix( vPG_freq_base_screen_unfloored, 
+                                             vPG_freq_base_screen * floor(vPG_OutputCoord_tated * vPG_OutputSize_tated ),
+                                             vec2( float(PIXELGRID_MUL_X==1.0), SCREEN_Y_MIX )
+                                            );
+                
     //Switch between core and screen sizes (x and y)
-        vec2 freq_base           = mix( freq_base_core, freq_base_screen,           vec2(PIXELGRID_SIZE_W, PIXELGRID_SIZE_H));
-        vec2 freq_base_unfloored = mix( freq_base_core, freq_base_screen_unfloored, vec2(PIXELGRID_SIZE_W, PIXELGRID_SIZE_H));
+        vec2 freq_base           = mix( freq_base_core, freq_base_screen,           vec2(PIXELGRID_SIZE_W, 0.0));
+        vec2 freq_base_unfloored = mix( freq_base_core, freq_base_screen_unfloored, vec2(PIXELGRID_SIZE_W, 0.0));
 
         
     //Apply multiplier:
@@ -416,71 +488,113 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         
         vec3 freq_rgb = vec3(freq_base.x) - PG_offsets;
 
-    //Width phosphor mask:
-        vec3 rgb_w = vec3(1.0);
-        if (DO_PIXELGRID_W > 0.0) {
-            //get 3 sines in black/white
-                rgb_w = cos(freq_rgb);
+        
+    //The following is needed by scanlines and vertical mask
+    //sin() tell use if the current cell position is odd or even:
 
-            //make them always positive and double frequency:
-                rgb_w = (rgb_w * rgb_w);
-
-            //modulate each phosphor width according to input luminance
-               vec3 pixel_in_gammed = pow(pixel_in,vec3(PIXELGRID_GAMMA_W));
-               vec3 phosphor_width = map_range(pixel_in_gammed, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
-                rgb_w = morph_shape(rgb_w, phosphor_width, PIXELGRID_NO_INTERBLEED_W);
-        }
-    
-    //Mask strength modifiers for hmask, performs way better outside the main if then ^^ up there ^^
-        vec3 rgb_w_weakness = (pixel_in * PIXELGRID_HMASK_NO_BRIGHT) ;
-        rgb_w_weakness = clamp(rgb_w_weakness,0.0,1.0);
-        rgb_w = mix( rgb_w, vec3(0.33), rgb_w_weakness);
-        rgb_w = mix( vec3(1.0), rgb_w, DO_PIXELGRID_W);
-
-    
-     
-
-    //Height phosphor mask (can be used for scanlines, slotmask, aperturegrille):
+        //FIXME: is_even should be a single phosphor property.
+        //If i manage to find a way to do it, i could use 
+        //decon_stagger.r,g,b to stagger syngle phosphors.
+        //And that way, i could blend staggered triads together
+        //without "cuts" betweeb them.
+        //Also, i would solve the triad stagger unalignment problems.        
+        
+    //Moving it up there provides a small speed up due to
+    //increased parallalism, I guess.
+        float sin_check_offset = sin(freq_base_unfloored.x + vPG_offsets_adjust_for_stagger);
+        float is_even = step(sin_check_offset, 0.0);
+        
+        
+    //Scanlines and fake slotmask =========================================================================
         vec3 rgb_h = vec3(1.0);
-        
-        //The following is needed by vertical mask level1 and 2
-        //sin() tell use if the current cell position is odd or even:        
-            float o =  (pi/(PG_h_count*2.0));  
-            float sin_check_offset = sin(freq_base_unfloored.x + o);
-            float is_even = step(sin_check_offset, 0.0);
-        
-        
-        if (DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0)) {
-            //calculate each phosphor height according to input luminance 
-                vec3 phosphor_height = map_range(pixel_in * rgb_w, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
-                
-            //offset trias to emulate core level slotmask by applying the optional offset to emulate the slotmask on even cells
-                float core_offset =  is_even * pi * PIXELGRID_OFFSET_CORE;
-                
-            //Since we can emulate scanlines, take into account current scanline phase:
+        float dedot_mix_inverted = 1.0;
+
+        //Pixelgrid: do horizontal if enabled, but skip it if user doesn't want it on interlaced content.
+        //if (DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0)) { //103.1
+        if (vDo_pixelgrid_h > 0.5) {
+            
+            //Since we emulate scanlines, take into account current scanline phase:
                 float interlacing_adapt_period = vScanlinePeriod;
                 float interlacing_adapt_offset = vScanlineAlternateOffset;
-                
-            //get a single sine in black/white with applied the optional staggered offset for slotmask:
-                float rgb_h_sin = sin(freq_base.y * interlacing_adapt_period + core_offset + interlacing_adapt_offset );
+            //We can offset trias to emulate fake core level slotmask by applying the optional offset to emulate the slotmask on even cells
+                float triad_stagger_offset =  is_even * pi * PIXELGRID_OFFSET_CORE;
+            //get 3 sines with applied the optional staggered offset for slotmask, and single phosphors staggering for y deconvergence.
+                vec3 decon_stagger = vec3( PIXELGRID_DECON_R_H, PIXELGRID_DECON_G_H, PIXELGRID_DECON_B_H) ;
+                vec3 rgb_h_sin = sin((freq_base_core.y - decon_stagger) * interlacing_adapt_period + triad_stagger_offset + interlacing_adapt_offset );
             //make it positve with doubled frequency:
                 rgb_h_sin = (rgb_h_sin * rgb_h_sin);
-                
+            //Compute dedot mix here for use in h mask and vmask2 later             
+                dedot_mix_inverted = (1-rgb_h_sin.r) * PIXELGRID_H_DEDOT ;
+                dedot_mix_inverted = dedot_mix_inverted * (max(max(pixel_in.r, pixel_in.g), pixel_in.b)/max_inLum);
+                //dedot_mix_inverted = dedot_mix_inverted * dot(pixel_in, vec3(0.33333) )/max_inLum;
+                dedot_mix_inverted = 1-dedot_mix_inverted;
+            //Compute each phosphor height according to input luminance 
+                vec3 phosphor_height = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);                
             //Finally get 3 sines out of the previous one by applying height modifiers
-                rgb_h = vec3(rgb_h_sin);
-                rgb_h = morph_shape(rgb_h, phosphor_height, PIXELGRID_NO_INTERBLEED_H);
+                rgb_h = rgb_h_sin;               
+                rgb_h = morph_shape(rgb_h, phosphor_height, PIXELGRID_NO_INTERBLEED_H, PIXELGRID_GAMMA_H);
                 rgb_h = mix(vec3(1.0), rgb_h, DO_PIXELGRID_H);
+                rgb_h = clamp(rgb_h, 0.0,1.0);
         }
+        
 
         
+    //Horizontal Triad Mask: ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+        vec3 rgb_w = vec3(1.0);
+        vec3 rgb_grille = vec3(0.0);
         
-    //Height phosphor mask number 2, can be used for slotmask,aperturegrille, not scanlines.
+        if (DO_PIXELGRID_W > 0.0) { //4%
+            //get 3 sines in black/white
+                rgb_w = cos(freq_rgb);
+            //make them always positive and double frequency:
+                rgb_w = (rgb_w * rgb_w);
+            //"export" naked vertical grille
+               rgb_grille = morph_shape(rgb_w, vec3(0.001), 1.0, 1.0);
+                
+            //Scale Max width according to pre-gains:
+                vec3 phosphor_width = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
+
+
+                
+            //Get final phosphor width:
+                rgb_w = morph_shape(rgb_w, phosphor_width, PIXELGRID_NO_INTERBLEED_W, PIXELGRID_GAMMA_W); //2%
+            
+            //Dedot h mask:
+                //vec3 rgb_w_dedotted = vec3( dot(rgb_w, vec3(0.333/max_inLum)));
+                //rgb_w = mix(rgb_w_dedotted, rgb_w, dedot_mix_inverted );
+                
+                //vec3 rgb_w_dedotted =   vec3( dot(rgb_w, vec3(1.0/max_inLum)));
+                //rgb_w = mix(rgb_w_dedotted, rgb_w, pow(dedot_mix_inverted, vec3(2.0)) );
+                
+                vec3 pixel_in_dedotted =   pixel_in/max_inLum/3.0;
+                rgb_w = mix(pixel_in_dedotted, rgb_w, dedot_mix_inverted);
+                
+            //lower strength via user parameter?
+                rgb_w = mix(vec3(1.0), rgb_w, DO_PIXELGRID_W);
+        }
+                    
+    //1%
+        //Mask strength modifiers for hmask, performs way better outside the main if then ^^ up there ^^
+
+        /*     
+            vec3 rgb_w_weakness = (pixel_in * PIXELGRID_HMASK_NO_BRIGHT) ;
+            rgb_w_weakness = clamp(rgb_w_weakness,0.0,1.0);
+            
+            rgb_w = mix( rgb_w, vec3(1.0), rgb_w_weakness);
+            rgb_w = mix( vec3(1.0), rgb_w, DO_PIXELGRID_W);
+            //The following should be equivalent to ^ ^ but it seems slower.
+            //    rgb_w = mix( vec3(1.0), rgb_w, DO_PIXELGRID_W * (1-rgb_w_weakness)  );
+        */
+
+    //Vertical mask .:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.
+    // can be used for slotmask,aperturegrille, not scanlines.
     //...well technically yes, but they would have a boxed shape.
         vec3 darklines_mask=vec3(1.0);
-        
+        float PG_spark;
+        vec3 pixel_in_unsparkled = pixel_in;
         if (PIXELGRID_Y_MASK > 0.0) {
             //Switch reference coords according to user pref: 
-                float freq_cell_y = mix_step(freq_base_core.y, freq_base_screen.y, PIXELGRID_Y_MASK_COORDS);
+                float freq_cell_y = mix(freq_base_core.y,  freq_base_screen.y, PIXELGRID_Y_MASK_COORDS);
 
             //mask phosphors heigth
                 #define PH_MASK_HEIGHT (freq_cell_y * vPG_mask_height)
@@ -489,11 +603,20 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 
             //Use abs(cos) (later 1-abs(cos) to get horizontal gaps, use pow to make them steep.
             //Stagger them by PH_MASH_OFFSET on even triads
+                
                 float mask_shape = abs(cos(  PIXELGRID_Y_MASK_SHIFT*pi +   PH_MASK_HEIGHT  + (PH_MASH_OFFSET * is_even)) ) ;
-                
-                 mask_shape = abs(cos(  PIXELGRID_Y_MASK_SHIFT*pi +   PH_MASK_HEIGHT  + (PH_MASH_OFFSET * is_even)) ) ;
-                
                 mask_shape = pow(mask_shape, PIXELGRID_Y_MASK_STEEP);
+                
+                // We can make the stagger dark line less pronunced
+                // on its sides so that lateral staggered color 
+                // can bleed over.
+                // but you really need to have God eyes to notice any improvement, if any imho.
+                // Also, this would probably alter the colors (?)
+                // So keep it disabled.
+                //    float Bleed_force = SERVICE1; //0.02 seems a realistic value.
+                //    float side_visibility = pow(pow(sin_check_offset,2.0),Bleed_force);
+                //    mask_shape = mask_shape* side_visibility;
+                // return vec4(mask_shape);
                 
             //Get per channel input luminance by clamping pixel_in and applying hmask
                 vec3 lum=clamp(pixel_in * rgb_w, 0.0, 1.0);
@@ -503,24 +626,30 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 vec3 V=min( lum_adapted, vec3(PIXELGRID_Y_MASK) );
             //apply user visibility modifier to the mask
                 darklines_mask = 1-(mask_shape*V);
+            //Try to get a more brillant/sparkling look by highering the darklines
+            //effect (sub) and pushing the source color, useful for slotmasks.
+                PG_spark = PIXELGRID_Y_SPARK * PIXELGRID_Y_MASK;
+                darklines_mask -= PG_spark;
+                pixel_in *= 1 + ((PG_spark*4) * dedot_mix_inverted);
+                
+            //Dedot darklines mask:
+                darklines_mask = mix(vec3(1.0), darklines_mask, dedot_mix_inverted );
         }
-     
-    //Try to get a more brillant/sparkling look by highering the darklines
-    //effect (sub) and pushing the source color, useful for slotmasks.
-        float vPG_spark = PIXELGRID_Y_SPARK * PIXELGRID_Y_MASK;
-        darklines_mask -= vPG_spark;
-        pixel_in *= vPG_spark*4 + 1;
-     
-        
-    //Finally put width,height1 and height2 masks togheter:
+
+
+    //Finally put H mask, Scanlines and darklines masks togheter:
         //vec3 mask = rgb_w * rgb_h * darklines_mask;
         vec3 mask = min( (rgb_w * rgb_h), darklines_mask * rgb_h); //<- this way it does not interfree with scanline height!
         //FIXME: test with coore or fuzzy coords how it works when using variable width phosphors, maybe 
         //it would need to be: vec3 mask = min((rgb_w * rgb_h), darklines_mask * rgb_h * rgb_w); =
           
-    //Apply the mask to the input pixel and return it 
-    //with the alpha channel containing the mask itself, so that halo can selectively light it.
-        return vec4(mask * pixel_in, dot(mask, vec3(0.3333)));
+        
+    //Apply the mask to pixel_in and clamp the minimum to the unexcited grille.
+    vec3 mask_and_grille = max(mask * pixel_in, rgb_grille * PIXELGRID_BASAL_GRID*0.025);
+        
+
+    //return it with alpha channel containing the mask itself, so that halo can selectively light it.
+    return vec4( mask_and_grille , dot(mask, vec3(0.3333)));
 }
 
 
@@ -988,7 +1117,8 @@ void main() {
     //Curvature 
         //Curvature has to come after inner zoom or bezel curved border will not match content
         //curved border when inner zoom changes.
-        if (DO_CURVATURE + GEOM_WARP_X + GEOM_WARP_Y > 1.0) {
+        //if (DO_CURVATURE + GEOM_WARP_X + GEOM_WARP_Y > 1.0) {
+        if (vDo_Curvature > 1.0) {
             co_content = Warp_fast(co_content, vWarp_vexp, vWarp_arg2, GEOM_CUT_EARS);
         }
         
@@ -1029,7 +1159,7 @@ void main() {
             
             //Can we halve refresh rate in the outside border to spare some cycles?
             if ( HALVE_BORDER_UPDATE == 1.0 ) {
-                if ((params.FrameCount % 2) == 1.0) {
+                if ((params.FrameCount % 2) != 1.0) {
                     pixel_out = texture(final_passFeedback, vOutputCoord).rgb;
                     FragColor = vec4(pixel_out, 1.0);
                     return;
