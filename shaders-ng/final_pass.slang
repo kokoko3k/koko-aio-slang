@@ -649,7 +649,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         
 
     //return it with alpha channel containing the mask itself, so that halo can selectively light it.
-    return vec4( mask_and_grille , dot(mask, vec3(0.3333)));
+    return vec4( mask_and_grille , dot(rgb_h, vec3(0.3333)));
 }
 
 
