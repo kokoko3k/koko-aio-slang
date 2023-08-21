@@ -158,8 +158,8 @@ float_framebuffer5 = true
 # This essentially is the same as glowing by a code point of view.
 # But the result of this pass will be added (+) to the input signal
 # in the final pass.
-           shader6 = shaders-ng/halo_x.slang
-            alias6 = "halo_pass_x"
+           shader6 = shaders-ng/halo_pre_gamma.slang
+            alias6 = "halo_pre_gamma_pass"
     filter_linear6 = true
             scale6 = 1.0
        scale_type6 = source
@@ -167,7 +167,7 @@ float_framebuffer6 = true
      mipmap_input6 = false
         wrap_mode6 = "clamp_to_edge"
         
-           shader7 = shaders-ng/halo_y.slang
+           shader7 = shaders-ng/halo.slang
             alias7 = "halo_pass"
     filter_linear7 = true
             scale7 = 1.0

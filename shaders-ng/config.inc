@@ -85,7 +85,7 @@
 	//Setting the glow/halo sharpness parameter to this
 	//will skip the blurring phase and lowers the gpu use
 	//Set this to the same value as used for the maximum
-	//of IN_GLOW_W/H, HALO_W/H
+	//of IN_GLOW_W/H, HALO_SHARPNESS
 #define GLOW_SHARP_MAX 7	        
 
 	//Minumum glow sharpness
@@ -161,8 +161,8 @@ layout(push_constant) uniform Push {
 	vec4 final_passSize;
 	uint FrameCount;
 
-	float HALO_W ;
-	float HALO_H ;
+	float HALO_SHARPNESS ;
+										float HALO_H_placeholder ;
 	float HALO_POWER ;
 	float HALO_GAMMA ;
 	float HALO_VS_SCAN ;
@@ -571,8 +571,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 // Halo
 #pragma parameter DO_HALO       "★ Halo enable? ==>" 						0.0	0.0 1.0 1.0
 #pragma parameter HALO_POWER    "        Strength (negative = 10x precision)"	0.9 	-50.0  5.0 0.01
-#pragma parameter HALO_W        "        Sharpness, horizontal"					1.75	0.35   7.0 0.05
-#pragma parameter HALO_H        "        Sharpness, Vertical"					1.75	0.35   7.0 0.05
+#pragma parameter HALO_SHARPNESS        "        Sharpness"					3.00	0.35   7.0 0.05
 #pragma parameter HALO_GAMMA    "        Gamma, the higher, the less the halo on dark colors"	2.0 	1.0  10.0 0.05
 #pragma parameter HALO_VS_SCAN  "        Light up scanlines and dot grid gaps too"				0.0	0.0  1.0  0.01
 #pragma parameter BLANK10 " " 0.0 0.0 1.0 1.0
