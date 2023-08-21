@@ -559,18 +559,13 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //Get final phosphor width:
                 rgb_w = morph_shape(rgb_w, phosphor_width, PIXELGRID_NO_INTERBLEED_W, PIXELGRID_GAMMA_W); //2%
             
-            //Dedot h mask:
-                //vec3 rgb_w_dedotted = vec3( dot(rgb_w, vec3(0.333/max_inLum)));
-                //rgb_w = mix(rgb_w_dedotted, rgb_w, dedot_mix_inverted );
+            //Dedot rgb mask between h mask.
+            //This work only when there are dots and have the countereffect when there are not.
+            //This happen because flattening the rgb mask will make unflattened rgb triads
+            //more evident, so this has to be used only when needed.    
+                vec3 pixel_dedotted = rgb_h * dot(rgb_w, vec3(0.333));
+                rgb_w = mix(pixel_dedotted, rgb_w, dedot_mix_inverted);
                 
-                //vec3 rgb_w_dedotted =   vec3( dot(rgb_w, vec3(1.0/max_inLum)));
-                //rgb_w = mix(rgb_w_dedotted, rgb_w, pow(dedot_mix_inverted, vec3(2.0)) );
-                
-                vec3 pixel_in_dedotted =   pixel_in/max_inLum/3.0;
-                rgb_w = mix(pixel_in_dedotted, rgb_w, dedot_mix_inverted);
-                
-            //lower strength via user parameter?
-                rgb_w = mix(vec3(1.0), rgb_w, DO_PIXELGRID_W);
         }
                     
     //1%
