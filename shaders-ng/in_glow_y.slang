@@ -89,7 +89,6 @@ void main() {
          FragColor = vec4(1.0,1.0,1.0, original_unchanged);
          return;
       }
-      return;
    }
 
    vec3 pixel_glowed;
