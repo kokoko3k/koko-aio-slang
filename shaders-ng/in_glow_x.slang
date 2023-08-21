@@ -71,7 +71,6 @@ void main() {
          FragColor = vec4(0.0,0.0,0.0,DR_unchanged); 
          return;
       }
-      return;
    };
 
    //Don't do anything if IN_GLOW_H is are over the upper limit

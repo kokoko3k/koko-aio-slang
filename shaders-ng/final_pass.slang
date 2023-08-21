@@ -563,7 +563,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //This work only when there are dots and have the countereffect when there are not.
             //This happen because flattening the rgb mask will make unflattened rgb triads
             //more evident, so this has to be used only when needed.    
-                vec3 pixel_dedotted = rgb_h * dot(rgb_w, vec3(0.333));
+                vec3 pixel_dedotted = rgb_h;
                 rgb_w = mix(pixel_dedotted, rgb_w, dedot_mix_inverted);
                 
         }
