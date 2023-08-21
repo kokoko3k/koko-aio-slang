@@ -22,7 +22,6 @@ void main() {
 
     //Adapt to the old params range
         vHALO_SHARPNESS = vec2(GLOW_SHARP_MAX - HALO_SHARPNESS);
-        
         vHALO_SHARPNESS = vHALO_SHARPNESS/6.0;
 
 
