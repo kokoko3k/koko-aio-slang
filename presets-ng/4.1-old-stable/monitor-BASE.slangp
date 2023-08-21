@@ -23,8 +23,7 @@ DO_IN_GLOW = "1.0"
 
 DO_HALO = "1.0"
 	HALO_POWER = "0.43" 
-	HALO_W = "3.5"
-	HALO_H = "3.5"
+	HALO_SHARPNESS = "6.5"
 	HALO_GAMMA = "1.30" 
 	HALO_VS_SCAN = "0.8"
 

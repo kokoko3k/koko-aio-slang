@@ -22,10 +22,9 @@ void main() {
 
     //Adapt to the old params range
         vHALO_SHARPNESS = vec2(GLOW_SHARP_MAX - HALO_SHARPNESS);
-        vHALO_SHARPNESS = vHALO_SHARPNESS/4.0; 
+        
+        vHALO_SHARPNESS = vHALO_SHARPNESS/6.0;
 
-        /*vHALO_SHARPNESS = vHALO_SHARPNESS/5.0;
-        vHALO_SHARPNESS = pow(vHALO_SHARPNESS, vec2(3.0));*/
 
 //20..1 10...2 prova 5..3
     //Correct aspect
