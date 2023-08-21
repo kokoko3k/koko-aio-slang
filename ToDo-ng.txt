@@ -112,5 +112,13 @@
 
 #    [ ] Update kakashi preset to use lanczos (update presets to use it)
 #    [ ] luminosity dependant zoom: hardcode slowness.
-
-
+#	 [ ] tune changed halo parameter to match old values as close as possible
+#    [ ] apply halo after gamma out in final pass and provide a dedicated gamma out setting for halo
+#    [ ] dedicated subtractive sharpness in glow section
+#    [ ] erode/dilate setting in glow section
+#    [ ] why altering glow power alters scanline shape?
+#    [v] mask passed for selective halo plays bad on white text over black background when using scanline deconvergence.
+#        seems that halo needs to light up just scanlines gaps.
+#        It is a win win because it also allow halo to better coloring phosphors too.
+#    [ ] Adapt presets to new halo modes and parameter scale
+#    [ ] blur9_box2 needs optimizations
