@@ -90,7 +90,7 @@ void main() {
    if (DO_IN_GLOW == 0.0) {
       if ( DELTA_RENDER == 1.0) {
          float original_unchanged = texture(Source,vTexCoord).a;
-         vec3 color = texture(shift_and_bleed_pass, vTexCoord).rgb;
+         vec3 color = texture(shift_and_bleed_pass, vTexCoord).rgb * vGlow_Gain;
          FragColor = vec4(color, original_unchanged);
          return;
       }

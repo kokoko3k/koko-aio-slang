@@ -11,7 +11,7 @@
 //#define DEBUG_DUAL_SPLIT_X
 //#define DEBUG_DUAL_SPLIT_Y
 //#define DEBUG_DUAL_SPLIT_MIRROR_X
-
+//#define DEBUG_SHOW_CLIP
 
 #include "config.inc"
 
@@ -1295,7 +1295,11 @@ void main() {
             pixel_out += PrintValueVec3( vTexCoord, vFragCoord, fvalue, maxdigits, decimalplaces );
         #endif
         
- 
+    #ifdef DEBUG_SHOW_CLIP
+        if (max(max(pixel_out.r, pixel_out.g), pixel_out.b) > 1.0)
+            pixel_out = vec3(1.0,0.0,0.0);
+    #endif
+            
     FragColor = vec4(pixel_out, 1.0);
     
     //FragColor = mix(FragColor, texture(ambi_temporal_pass, vOutputCoord), 0.8);

@@ -27,17 +27,8 @@ layout(set = 0, binding = 5) uniform sampler2D shift_and_bleed_pass;
 void main() {
     if (DO_HALO == 0.0 ) return;
     
-    vec3 pixel_haloed;
-    if (DO_IN_GLOW == 1.0) {
-        pixel_haloed = texture(in_glow_pass, vTexCoord).rgb;
-        pixel_haloed = pow(pixel_haloed, vHALO_GAMMA);
-        FragColor = vec4(pixel_haloed.rgb, 1.0);
-        return;
-    }
-    else {
-        pixel_haloed = texture(shift_and_bleed_pass, vTexCoord).rgb;
-        pixel_haloed = pow(pixel_haloed, vHALO_GAMMA);
-        FragColor = vec4(pixel_haloed.rgb, 1.0);
-        return;
-    }
+    vec3 pixel_haloed = texture(in_glow_pass, vTexCoord).rgb;
+    pixel_haloed = pow(pixel_haloed, vHALO_GAMMA);
+    FragColor = vec4(pixel_haloed.rgb, 1.0);
+
 }
