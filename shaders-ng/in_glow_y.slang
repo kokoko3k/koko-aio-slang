@@ -36,7 +36,7 @@ layout(set = 0, binding = 6) uniform sampler2D Source;
 
 vec3 glow_blur_bias(sampler2D source_tex, vec2 co, vec3 pixel_glowed, float bias){
    vec3 pixel_source = texture(source_tex, co).rgb;
-   pixel_source  = pixel_source * IN_GLOW_POWER;
+   pixel_source  = pixel_source * (IN_GLOW_POWER * DO_CCORRECTION);
    
    vec3 glow_light = pixel_glowed - pixel_source;
    
@@ -90,7 +90,7 @@ void main() {
          FragColor = vec4(color, original_unchanged);
          return;
       }
-      FragColor = texture(shift_and_bleed_pass, vTexCoord);
+      FragColor = texture(shift_and_bleed_pass, vTexCoord) * (IN_GLOW_POWER * DO_CCORRECTION);
       return;
    }
 
@@ -122,9 +122,9 @@ void main() {
    
    //It over the max sharp, then just passthrough, else do the blur.
       if (IN_GLOW_H >= GLOW_SHARP_MAX) {
-         pixel_glowed = texture(Source,vTexCoord).rgb * IN_GLOW_POWER;
+         pixel_glowed = texture(Source,vTexCoord).rgb * (IN_GLOW_POWER * DO_CCORRECTION);
       } else {
-         pixel_glowed = blur9_y(Source, vTexCoord, params.SourceSize.xy, IN_GLOW_H_ADAPTED) * IN_GLOW_POWER;
+         pixel_glowed = blur9_y(Source, vTexCoord, params.SourceSize.xy, IN_GLOW_H_ADAPTED) * (IN_GLOW_POWER * DO_CCORRECTION);
       }
    
    

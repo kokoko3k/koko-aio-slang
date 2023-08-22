@@ -5,7 +5,8 @@
     of the signal, at "input" stage.<br>
     Gamma in correction is applied at ti beginning of the chain,<br>
     Gamma out correction is applied to the final processed picture.<br>
-    <br>
+    Input signal gain is applied in the chain just before the crt emulation stages.<br>
+    
     It is also possible to emulate a monochrome display with custom colors:
     
         Monochrome screen colorization:
@@ -65,8 +66,6 @@
     the image will light their surroundings,<br>
     with options to switch to classic blur.<br>
     
-    Input signal strength:
-        The input signal gain
     Glow to blur bias:
         Higher negative values -> more glow : brighter colors expands over darker ones.
         Higher positive values -> means blur: all the colors are blurred.

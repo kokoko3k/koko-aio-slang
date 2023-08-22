@@ -184,7 +184,7 @@ void main() {
         //contrast and brightness into account. This is needed so that scanline generation
         //can map the proper input range and strictly obey scanline thickness constraints.
         vMax_inLum = max( 1.0, DO_CCORRECTION * apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS)) *
-                     max( 1.0, DO_IN_GLOW * IN_GLOW_POWER);
+                     max( 1.0, DO_CCORRECTION * IN_GLOW_POWER);
 
         
     //Generate a seed that changes over time for temporal random noise
