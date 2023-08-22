@@ -20,7 +20,6 @@ layout(location = 2) in vec3 vHALO_GAMMA;
 layout(location = 0) out vec4 FragColor;
 
 layout(set = 0, binding = 4) uniform sampler2D in_glow_pass;
-layout(set = 0, binding = 5) uniform sampler2D shift_and_bleed_pass;
 
 #include "includes/functions.include.slang" 
 
