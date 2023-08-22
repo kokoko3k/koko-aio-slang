@@ -936,7 +936,10 @@ vec3 fn_pixel_content(vec2 coords) {
         pixel_glowed = texture(in_glow_pass,coords).rgb;
         pixel_in = pixel_glowed;
     } else {
-        //pixel_in = texture_NEAREST(shift_and_bleed_pass, coords, global.flick_and_noise_passSize).rgb;
+        //vec3 pixel_in_near = texture_NEAREST(shift_and_bleed_pass, coords, global.flick_and_noise_passSize).rgb;
+        //vec3 pixel_in_quilez = texture_QUILEZ(shift_and_bleed_pass, coords, global.flick_and_noise_passSize).rgb;
+        //vec3 pixel_in_linear = texture(shift_and_bleed_pass,coords).rgb ;
+        //pixel_in = min(pixel_in_linear, pixel_in_near);
         pixel_in = texture(shift_and_bleed_pass,coords).rgb ;
     }
     

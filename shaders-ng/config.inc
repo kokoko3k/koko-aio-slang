@@ -737,7 +737,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BLANK_01 " " 0.0 0.0 1.0 1.0
 
 //Delta render
-#pragma parameter label_alt_blank    "  !THIS FEATURE IS STATIC, SEE docs.md TO ENABLE"    0.0 0.0 0.0 1.0
+#pragma parameter label_alt_blank    "  !THE FOLLOWING FEATURES ARE STATIC, SEE docs-ng.md TO ENABLE"    0.0 0.0 0.0 1.0
 #pragma parameter DELTA_RENDER_FORCE_REFRESH    "★ Delta render force refresh interval ? ==>"	4.0 1.0 3600.0 1.0
 #pragma parameter DELTA_RENDER_CHECK_AREA       "        Delta render area size"			1.0 0.0 10.0 1.0
 #pragma parameter BLANK_DR " " 0.0 0.0 1.0 1.0

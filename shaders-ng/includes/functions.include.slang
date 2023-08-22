@@ -1,4 +1,4 @@
-vec4 texture_quilez(sampler2D tex, vec4 texsize, vec2 co) {
+vec4 texture_QUILEZ(sampler2D tex, vec2 co, vec4 texsize) {
 	//https://iquilezles.org/articles/texture/
 	co = co * texsize.xy + vec2(0.5, 0.5);
 
