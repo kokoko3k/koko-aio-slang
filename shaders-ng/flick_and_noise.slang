@@ -112,7 +112,15 @@ void main() {
    //I'm not expecting any performance hit, since the lookup should have been cached alreadyl
       float pixel_alpha = texture(Source, vTexCoord).a;
    
+   
+   //dots, need in_coords = in_coords - global.flick_and_noise_passSize.zw*0.5 in pixelgrid pass
+   //vec2 integerCoords = floor(vTexCoord.xy * params.OutputSize.xy);
+   //float black = float(  mod(integerCoords.x, 2.0) != 0.0 && mod(integerCoords.y, 2.0) != 0.0 );
+   //FragColor = vec4(pixel_out*black, pixel_alpha);
+   
+   
    FragColor = vec4(pixel_out, pixel_alpha);
+
 }
 
 
