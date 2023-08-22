@@ -931,7 +931,7 @@ vec3 fn_pixel_content(vec2 coords) {
                 if (alt_blank_power == 0.0) return vec3(0.0);
         #endif
     
-    #define USE_QUILEZ
+    //#define USE_QUILEZ
     
     #ifdef USE_QUILEZ
         pixel_out = texture(in_glow_pass, coords_QULEZ(coords, global.flick_and_noise_passSize)).rgb;
