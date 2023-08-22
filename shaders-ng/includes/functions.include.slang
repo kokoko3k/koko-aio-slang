@@ -169,6 +169,8 @@ vec3 pixel_push_luminance(vec3 c, float strength) {
 	return c * (1+vec3((1-whiteness) * strength));
 }
 
+/*
+ * Superseeded by stage1/stage2 
 vec3 apply_fuzzy_main_pass(vec3 color_in) {
 	vec3 color_out = color_in;
 
@@ -200,7 +202,7 @@ vec3 apply_fuzzy_main_pass(vec3 color_in) {
 		color_out *= 0.8 * (V_POWER);
 	return color_out;
 }
-
+*/
 
 
 vec2 apply_fuzzy_main_pass_stage_1() {
@@ -213,8 +215,13 @@ vec2 apply_fuzzy_main_pass_stage_1() {
 	
 	float color_in = 1.0;
 	float color_out = 1.0;
-	
 	float gamma_out = 1.0;
+	
+	float halo_power_adapted;
+	if (HALO_POWER > 0.0) 
+		halo_power_adapted = HALO_POWER;
+			else
+		halo_power_adapted = -HALO_POWER/10.0;
 	
 	if (DO_CCORRECTION == 1.0) {
 		color_out = pow(color_in, GAMMA_OUT);
@@ -234,8 +241,8 @@ vec2 apply_fuzzy_main_pass_stage_1() {
 
 
 	if (DO_HALO == 1.0) {
-		color_out += color_in*HALO_POWER;
-		gamma_out = gamma_out * mix(1.0, HALO_GAMMA, HALO_POWER*0.25) ;
+		color_out += color_in*halo_power_adapted;
+		gamma_out = gamma_out * mix(1.0, HALO_GAMMA, halo_power_adapted*0.25) ;
 	}
 	
 	if (DO_VIGNETTE == 1.0)
