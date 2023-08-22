@@ -914,9 +914,12 @@ float gaussian_coefficient(float x, float sigma) {
 }
 
 
+
+
 vec3 fn_pixel_content(vec2 coords) {
     
     vec3 pixel_out;    
+    float dot_mat_or_pixelgrid = 1.0; //init dot grid or scanline mask to 1.0
     
     //Black frame insertion, made static, enable it in config.inc.
         #ifdef ALLOW_ALT_BLANK
@@ -928,10 +931,14 @@ vec3 fn_pixel_content(vec2 coords) {
                 if (alt_blank_power == 0.0) return vec3(0.0);
         #endif
     
-   
-                
-    pixel_out = texture(in_glow_pass,coords).rgb;
-    float dot_mat_or_pixelgrid = 1.0; //init dot grid or scanline mask to 1.0
+    #define USE_QUILEZ
+    
+    #ifdef USE_QUILEZ
+        pixel_out = texture(in_glow_pass, coords_QULEZ(coords, global.flick_and_noise_passSize)).rgb;
+    #else
+        pixel_out = texture(in_glow_pass, coords).rgb;
+    #endif
+    
     
     //Pixel grid
         if (DO_PIXELGRID == 1.0) {
