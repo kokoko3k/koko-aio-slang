@@ -14,6 +14,21 @@ vec4 texture_QUILEZ(sampler2D tex, vec2 co, vec4 texsize) {
 	return texture(tex, co);
 }
 
+vec2 coords_QULEZ(vec2 co, vec4 texsize){
+	//https://iquilezles.org/articles/texture/
+	co = co * texsize.xy + vec2(0.5, 0.5);
+
+	vec2 i = floor(co);
+	vec2 f = co - i;
+	f = (f * f) *
+	    (f * (f * (f * 6.0 - vec2(15.0, 15.0)) + vec2(10.0, 10.0)));
+
+
+	co = i + f;
+	co = (co - vec2(0.5, 0.5)) * (texsize.zw);
+	return co;
+}
+
 vec4 texture_NEAREST(sampler2D tex, vec2 co_linear, vec4 tex_size) {
    //return nearest sampling from a linear filtered texture
    vec2 integerCoords = floor(co_linear.xy * tex_size.xy);
