@@ -636,7 +636,12 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         vec3 mask = min( (rgb_w * rgb_h), darklines_mask * rgb_h); //<- this way it does not interfree with scanline height!
         //FIXME: test with coore or fuzzy coords how it works when using variable width phosphors, maybe 
         //it would need to be: vec3 mask = min((rgb_w * rgb_h), darklines_mask * rgb_h * rgb_w); =
-          
+    
+    //mask posterization experiment:
+        //mask = floor(mask*16.0)/16.0;
+        //mask = pow(mask, vec3(0.));
+
+        
         
     //Apply the mask to pixel_in and clamp the minimum to the unexcited grille.
     vec3 mask_and_grille = max(mask * pixel_in, rgb_grille * PIXELGRID_BASAL_GRID*0.025);
