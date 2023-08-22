@@ -6,6 +6,7 @@ layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
 layout(location = 2) out float vDoInGlowBias;
+layout(location = 3) out float vGlow_Gain;
 
 
 void main() {
@@ -19,6 +20,8 @@ void main() {
    vDoInGlowBias = float (  IN_GLOW_BIAS < IN_GLOW_BIAS_MAX && 
                             (abs(IN_GLOW_W) < GLOW_SHARP_MAX || IN_GLOW_H < GLOW_SHARP_MAX) &&
                             (DO_NTSC_ARTIFACTS + NTSC_SHOW_ARTF_MASK < 1.5)   );
+   
+   vGlow_Gain = mix(1.0, IN_GLOW_POWER, DO_CCORRECTION);
 }
 
 
@@ -26,6 +29,8 @@ void main() {
 
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 2) in float vDoInGlowBias;
+layout(location = 3) in float vGlow_Gain;
+
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 5) uniform sampler2D shift_and_bleed_pass;
 layout(set = 0, binding = 6) uniform sampler2D Source;
@@ -36,7 +41,7 @@ layout(set = 0, binding = 6) uniform sampler2D Source;
 
 vec3 glow_blur_bias(sampler2D source_tex, vec2 co, vec3 pixel_glowed, float bias){
    vec3 pixel_source = texture(source_tex, co).rgb;
-   pixel_source  = pixel_source * (IN_GLOW_POWER * DO_CCORRECTION);
+   pixel_source  = pixel_source * vGlow_Gain;
    
    vec3 glow_light = pixel_glowed - pixel_source;
    
@@ -45,8 +50,7 @@ vec3 glow_blur_bias(sampler2D source_tex, vec2 co, vec3 pixel_glowed, float bias
    //glow_light = pow(glow_light, vec3(SERVICE1));
    
    vec3 proper_glow = glow_light * glow_light + pixel_source;  
-   return mix(proper_glow, pixel_glowed, max(0.0, bias));   
-
+   return mix(proper_glow, pixel_glowed, max(0.0, bias));      
 }
 
 /*
@@ -90,7 +94,7 @@ void main() {
          FragColor = vec4(color, original_unchanged);
          return;
       }
-      FragColor = texture(shift_and_bleed_pass, vTexCoord) * (IN_GLOW_POWER * DO_CCORRECTION);
+      FragColor = texture(shift_and_bleed_pass, vTexCoord) * vGlow_Gain;
       return;
    }
 
@@ -122,7 +126,7 @@ void main() {
    
    //It over the max sharp, then just passthrough, else do the blur.
       if (IN_GLOW_H >= GLOW_SHARP_MAX) {
-         pixel_glowed = texture(Source,vTexCoord).rgb * (IN_GLOW_POWER * DO_CCORRECTION);
+         pixel_glowed = texture(Source,vTexCoord).rgb * vGlow_Gain;
       } else {
          pixel_glowed = blur9_y(Source, vTexCoord, params.SourceSize.xy, IN_GLOW_H_ADAPTED) * (IN_GLOW_POWER * DO_CCORRECTION);
       }
