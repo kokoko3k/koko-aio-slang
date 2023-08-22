@@ -240,12 +240,12 @@ vec2 apply_fuzzy_main_pass_stage_1() {
 	
 	if (DO_CCORRECTION == 1.0) {
 		color_out = pow(color_in, GAMMA_OUT);
+		gamma_out = gamma_out * IN_GLOW_GAMMA;
 		gamma_out = gamma_out * GAMMA_OUT;
 	}
 	
 	if (DO_IN_GLOW == 1.0) {
 		color_out = pow(color_out,IN_GLOW_GAMMA)*IN_GLOW_POWER;
-		gamma_out = gamma_out * IN_GLOW_GAMMA;
 	}
 	
 	if (DO_PIXELGRID == 1.0) {

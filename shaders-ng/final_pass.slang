@@ -929,19 +929,6 @@ vec3 fn_pixel_content(vec2 coords) {
         #endif
     
     pixel_out = texture(in_glow_pass,coords).rgb;
-                
-    /*if  (DO_IN_GLOW == 1.0) {
-        pixel_out = texture(in_glow_pass,coords).rgb;
-    } else {
-        //vec3 pixel_in_near = texture_NEAREST(shift_and_bleed_pass, coords, global.flick_and_noise_passSize).rgb;
-        //vec3 pixel_in_quilez = texture_QUILEZ(shift_and_bleed_pass, coords, global.flick_and_noise_passSize).rgb;
-        //vec3 pixel_in_linear = texture(shift_and_bleed_pass,coords).rgb ;
-        //pixel_out = min(pixel_in_linear, pixel_in_near);
-        //pixel_out = texture_QUILEZ(shift_and_bleed_pass, coords, global.flick_and_noise_passSize).rgb;
-        pixel_out = texture(shift_and_bleed_pass,coords).rgb ;
-    }*/
-    
-    
     float dot_mat_or_pixelgrid = 1.0; //init dot grid or scanline mask to 1.0
     
     //Pixel grid
