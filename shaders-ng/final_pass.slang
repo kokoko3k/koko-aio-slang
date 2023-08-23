@@ -535,6 +535,17 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 rgb_h = morph_shape(rgb_h, phosphor_height, PIXELGRID_NO_INTERBLEED_H, PIXELGRID_GAMMA_H);
                 rgb_h = mix(vec3(1.0), rgb_h, DO_PIXELGRID_H);
                 rgb_h = clamp(rgb_h, 0.0,1.0);
+                
+                //Scanline "mangler"
+                    //float t = 0.2;
+                    //t = - (-0.6 * 0.3 - 0.12);
+                    //t = 0.3;
+                    //float t = SERVICE1;
+                    //rgb_h = smoothstep(t, t+0.2, phosphor_height) * rgb_h;
+                
+                //Mask Gamma "out"
+                    //rgb_h = pow(rgb_h, vec3(PIXELGRID_GAMMA_OUT_H));
+                    //if (phosphor_height.r < 0.1) rgb_h = vec3(0.0);
         }
         
 
@@ -624,6 +635,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //effect (sub) and pushing the source color, useful for slotmasks.
                 PG_spark = PIXELGRID_Y_SPARK * PIXELGRID_Y_MASK;
                 darklines_mask -= PG_spark;
+                                
                 pixel_in *= 1 + ((PG_spark*4) * dedot_mix_inverted);
                 
             //Dedot darklines mask:
@@ -642,7 +654,8 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         //mask = floor(mask*16.0)/16.0;
         //mask = pow(mask, vec3(0.5));
         
-        
+
+                                                                                        
     //Apply the mask to pixel_in and clamp the minimum to the unexcited grille.
     vec3 mask_and_grille = max(mask * pixel_in, rgb_grille * PIXELGRID_BASAL_GRID*0.025);
         

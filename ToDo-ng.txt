@@ -127,3 +127,6 @@ TODO:
 	[ ] why altering glow power alters scanline shape?
 
 	[ ] blur9_box2 needs optimizations
+	[ ] allow negative glow y
+[ ] does auto glow blur radius work?
+[ ] la maschera orizontale non è più modulabile.
