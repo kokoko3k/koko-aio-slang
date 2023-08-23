@@ -128,7 +128,7 @@ void main() {
       if (IN_GLOW_H >= GLOW_SHARP_MAX) {
          pixel_glowed = texture(Source,vTexCoord).rgb * vGlow_Gain;
       } else {
-         pixel_glowed = blur9_y(Source, vTexCoord, params.SourceSize.xy, IN_GLOW_H_ADAPTED) * (IN_GLOW_POWER * DO_CCORRECTION);
+         pixel_glowed = blur9_y(Source, vTexCoord, params.SourceSize.xy, IN_GLOW_H_ADAPTED) * vGlow_Gain;
       }
    
    
