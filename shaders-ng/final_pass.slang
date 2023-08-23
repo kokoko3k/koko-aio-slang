@@ -639,7 +639,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
     
     //mask posterization experiment:
         //mask = floor(mask*16.0)/16.0;
-        //mask = pow(mask, vec3(0.));
+        //mask = pow(mask, vec3(0.5));
 
         
         
