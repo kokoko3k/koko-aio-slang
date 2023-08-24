@@ -95,8 +95,10 @@
     handhelds screens, where pixels you see on screen have to be sized proportionally to the game one.<br>
     
     Overmask (1.0 = neutral):
-        Values > 1.0 give a gritty/gariny look to the whole mask
+        Values > 1.0 give a gritty/gariny look to the whole mask.
+          It may cause moiree if combined with curvature, dedot, or sparkling look punch.
         Values < 1.0 tend to nullify the whole mask effect.
+        
     
     Horizontal mask (rgb subpixel mask strength)
         X resolution: (core or screen) (**):
