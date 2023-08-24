@@ -94,6 +94,10 @@
     By reading the following explanaitions, you will realize that this section can also be used to emulate<br>
     handhelds screens, where pixels you see on screen have to be sized proportionally to the game one.<br>
     
+    Overmask (1.0 = neutral):
+        Values > 1.0 give a gritty/gariny look to the whole mask
+        Values < 1.0 tend to nullify the whole mask effect.
+    
     Horizontal mask (rgb subpixel mask strength)
         X resolution: (core or screen) (**):
             0: Phosphors width will be relative to the pixel width of the core (game).

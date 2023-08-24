@@ -753,6 +753,21 @@ vec3 lanczos(sampler2D sampler_in, vec2 co, vec4 texsize, float sharpness ) {
 		return max(vec3(0.0), color);
 	}
 
+	vec3 blur9_y_box(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_y, float sharp_sub) {
+		sharp_sub = -2*sharp_sub+1;
+		vec2 resolution = sourcesize * sharpness_y;
+		vec3 color = vec3(0.0);
+		vec2 off1 = vec2(0.0, 1.0) ;
+		vec2 off2 = vec2(0.0, 2.0) ;
+		color += texture(image, uv).rgb                       ;
+		color += texture(image, uv + (off1 / resolution)).rgb ;
+		color += texture(image, uv - (off1 / resolution)).rgb ;
+		color += texture(image, uv + (off2 / resolution)).rgb * sharp_sub;
+		color += texture(image, uv - (off2 / resolution)).rgb * sharp_sub;
+		color = color/(3.0 + sharp_sub*2);
+		return max(vec3(0.0), color);
+	}
+	
 	vec3 glow_dumb(sampler2D in_texture, float glow_power, float gamma, vec2 coords) {
 		return pow( texture(in_texture, coords).rgb, vec3(gamma) ) * glow_power;
 	}
