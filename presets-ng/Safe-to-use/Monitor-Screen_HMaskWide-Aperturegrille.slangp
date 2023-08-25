@@ -1,3 +1,0 @@
-#reference "Monitor-ScreenLevel_HMaskWide-Corelevel_SlotMask.slangp"
-
-PIXELGRID_Y_MASK = "0.000000"
