@@ -273,19 +273,26 @@
     So you can use this to restore the brightness and color saturation<br>
     loss when using features like scanlines, darklines or RGB masks.<br>
     
-	Light up scanlines too:
-		Theoretically Halo have to be applied 
-		"over" everything, because that is the way it works in nature.
-		But you can choose to cheat and instead apply scanlines over the halo
-		instead.
-		Do this if you like much more pronunced scanlines, even at the
-		price of some graphical artifacts visible on high contrasted areas. 
- 
+    Pre-attenuate input signal gain to 1x:
+        Nullifies the input gain applied in the color correction section.
+        This way the halo effect will be consistent and will not depend on 
+        it, avoiding hard to manage cascading effects.
+    
     Strength (negative = 10x precision)
         The effect strength.
         Negative values are interpreted as positive ones, divided by 10,
         when fine tuning is needed.
     Refer to "Glowing Input/power" for other parameters meaning.
+    
+    Light up scanline gaps and dot grid gaps too:
+		Theoretically Halo have to be applied 
+		"over" everything, because that is the way it works in nature.
+		But you can choose to cheat and instead apply scanlines over the halo
+		instead.
+		Do this if you like much more pronunced scanlines, even at the
+		price of some graphical artifacts visible on high contrasted areas.
+		The same apply for the grid emulated via dot matrix emulation feature.
+ 
     
 **Bloom:**<br>
     Acts like Halo, but affects a much wider area and is more configurable.<br>

@@ -80,6 +80,8 @@ void main() {
     
     //pixel_haloed = blur5_x(Source, vTexCoord, params.SourceSize.xy, vHALO_SHARPNESS, 0.0);
     pixel_haloed = blur_px(Source, vTexCoord, vHALO_SHARPNESS, params.SourceSize) * vHALO_POWER;
+
     
     FragColor = vec4(pixel_haloed.rgb, 1.0);
+    
 }

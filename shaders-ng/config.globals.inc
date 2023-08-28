@@ -113,6 +113,7 @@
 
 #define DO_HALO		global.DO_HALO
 	#define HALO_SHARPNESS	params.HALO_SHARPNESS
+	#define HALO_NO_PREGAIN params.HALO_NO_PREGAIN
 	#define HALO_POWER	params.HALO_POWER
 	#define HALO_GAMMA	params.HALO_GAMMA
 	#define HALO_VS_SCAN	params.HALO_VS_SCAN

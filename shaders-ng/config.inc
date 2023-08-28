@@ -162,7 +162,7 @@ layout(push_constant) uniform Push {
 	uint FrameCount;
 
 	float HALO_SHARPNESS ;
-										float HALO_H_placeholder ;
+	float HALO_NO_PREGAIN;
 	float HALO_POWER ;
 	float HALO_GAMMA ;
 	float HALO_VS_SCAN ;
@@ -571,11 +571,12 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 
 // Halo
-#pragma parameter DO_HALO       "★ Halo enable? (ha) ==>" 						0.0	0.0 1.0 1.0
-#pragma parameter HALO_POWER    "        Strength (negative = 10x precision)"	0.9 	-50.0  5.0 0.01
-#pragma parameter HALO_SHARPNESS        "        Sharpness"					3.00	0.05   7.0 0.05
-#pragma parameter HALO_GAMMA    "        Gamma, the higher, the less the halo on dark colors"	2.0 	1.0  10.0 0.05
-#pragma parameter HALO_VS_SCAN  "        Light up scanlines and dot grid gaps too"				0.0	0.0  1.0  0.01
+#pragma parameter DO_HALO         "★ Halo enable? (ha) ==>" 						0.0	0.0 1.0 1.0
+#pragma parameter HALO_NO_PREGAIN "        Pre-attenuate input signal gain to 1x"	0.0		0.0	1.0	1.0
+#pragma parameter HALO_POWER      "        Strength (negative = 10x precision)"	0.9 	-50.0  5.0 0.01
+#pragma parameter HALO_SHARPNESS  "        Sharpness"					3.00	0.05   7.0 0.05
+#pragma parameter HALO_GAMMA      "        Gamma, the higher, the less the halo on dark colors"	2.0 	1.0  10.0 0.05
+#pragma parameter HALO_VS_SCAN    "        Light up scanline gaps and dot grid gaps too"				0.0	0.0  1.0  0.01
 #pragma parameter BLANK10 " " 0.0 0.0 1.0 1.0
 
 
