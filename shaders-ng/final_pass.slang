@@ -1020,10 +1020,8 @@ vec3 fn_pixel_content(vec2 coords) {
     //Bloom
         if (DO_BLOOM == 1.0 ) {
             vec3 bloomed=texture(bloom_pass_final, coords).rgb ;
-            
-            float lum=max(max(pixel_out.r,pixel_out.g), pixel_out.b);
-            float over_white_correcion = (1-lum)*(1-lum);
-            bloomed = mix( bloomed * over_white_correcion , bloomed, BLOOM_OVER_WHITE);
+            vec3 darkness=(1-pixel_glowed) * (1-pixel_glowed);
+            bloomed = mix( bloomed * darkness , bloomed, BLOOM_OVER_WHITE);
             pixel_out = bloomed + float(BLOOM_BYPASS < 0.5) * pixel_out;
         }
             
