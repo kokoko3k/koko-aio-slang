@@ -533,8 +533,22 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //Finally get 3 sines out of the previous one by applying height modifiers
                 rgb_h = rgb_h_sin;               
                 rgb_h = morph_shape(rgb_h, phosphor_height, PIXELGRID_NO_INTERBLEED_H, PIXELGRID_GAMMA_H);
+                
+                
+
+                
+                
+                
                 rgb_h = mix(vec3(1.0), rgb_h, DO_PIXELGRID_H);
                 rgb_h = clamp(rgb_h, 0.0,1.0);
+                
+                
+             /*   float punch_y = sin(freq_base_core.y);
+                punch_y = pow(punch_y,32.0);
+                float punch_x = sin(freq_base.x);
+                punch_x = pow(punch_x,32.0);
+                rgb_h +=vec3(punch_x * punch_y ) * SERVICE1 * 50;
+                //return vec4(punch_x * punch_y );*/
                 
                 //Scanline "mangler"
                     //float t = 0.2;
