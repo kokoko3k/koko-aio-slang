@@ -10,7 +10,9 @@
 //#define DEBUG_QUAD_SPLIT
 //#define DEBUG_DUAL_SPLIT_X
 //#define DEBUG_DUAL_SPLIT_Y
+//#define DEBUG_DUAL_SPLIT_Y_GAMMA
 //#define DEBUG_DUAL_SPLIT_MIRROR_X
+//#define DEBUG_DUAL_SPLIT_MIRROR_X_GAMMA
 //#define DEBUG_SHOW_CLIP
 
 #include "config.inc"
@@ -1312,6 +1314,10 @@ void main() {
             if (vTexCoord.y < 0.5) pixel_out = texture(flick_and_noise_pass,vTexCoord).rgb;
         #endif
 
+        #ifdef DEBUG_DUAL_SPLIT_Y_GAMMA
+            if (vTexCoord.y < 0.5) pixel_out = pow(texture(flick_and_noise_pass,vTexCoord).rgb, vec3(1.08));
+        #endif
+            
         #ifdef DEBUG_DUAL_SPLIT_X
             if (vTexCoord.x > 0.5) pixel_out = texture(flick_and_noise_pass,vTexCoord).rgb;
         #endif
@@ -1320,6 +1326,9 @@ void main() {
             if (vTexCoord.x > 0.5) pixel_out = texture(flick_and_noise_pass,vec2(1-vTexCoord.x, vTexCoord.y) ).rgb;
         #endif
 
+        #ifdef DEBUG_DUAL_SPLIT_MIRROR_X_GAMMA
+            if (vTexCoord.x > 0.5) pixel_out = pow(texture(flick_and_noise_pass,vec2(1-vTexCoord.x, vTexCoord.y) ).rgb, vec3(1.08));
+        #endif
             
         #ifdef DEBUG_PRINT_VALUE
             float maxdigits = 10.0;

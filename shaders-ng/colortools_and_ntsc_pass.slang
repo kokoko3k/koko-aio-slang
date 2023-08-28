@@ -18,10 +18,10 @@
 
 
 //#define DEBUG
-   #define DEBUG_COLOR_CALIB
+   //#define DEBUG_COLOR_CALIB
    //#define DEBUG_TIME_FADE
    //#define DEBUG_SOLID_COLOR
-   //#define DEBUG_STEP_GRADIENT
+   #define DEBUG_STEP_GRADIENT
    //#define DEBUG_BLINK
    //#define DEBUG_BLINK_CIRCLE
    //#define DEBUG_COLORWHEEL
