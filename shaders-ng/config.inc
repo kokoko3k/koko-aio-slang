@@ -577,7 +577,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter HALO_POWER      "        Strength (negative = 10x precision)"	0.9 	-50.0  5.0 0.01
 #pragma parameter HALO_SHARPNESS  "        Sharpness"					3.00	0.05   7.0 0.05
 #pragma parameter HALO_GAMMA      "        Gamma in, the higher, the less the halo on dark colors"	2.0 	1.0  10.0 0.05
-#pragma parameter HALO_GAMMA_OUT  "        Gamma out"	 1.0	1.0  4.0 0.1
+#pragma parameter HALO_GAMMA_OUT  "        Gamma out"	 1.0	0.25  4.0 0.1
 #pragma parameter HALO_VS_SCAN    "        Light up scanline gaps and dot grid gaps too"				0.0	0.0  1.0  0.01
 #pragma parameter BLANK10 " " 0.0 0.0 1.0 1.0
 
