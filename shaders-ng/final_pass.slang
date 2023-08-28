@@ -961,6 +961,7 @@ float gaussian_coefficient(float x, float sigma) {
 vec3 fn_pixel_content(vec2 coords) {
     
     vec3 pixel_out;    
+    vec3 pixel_glowed;
     float dot_mat_or_pixelgrid = 1.0; //init dot grid or scanline mask to 1.0
     
     //Black frame insertion, made static, enable it in config.inc.
@@ -976,9 +977,11 @@ vec3 fn_pixel_content(vec2 coords) {
     //#define USE_QUILEZ
     
     #ifdef USE_QUILEZ
-        pixel_out = texture(in_glow_pass, coords_QULEZ(coords, global.flick_and_noise_passSize)).rgb;
+        pixel_glowed = texture(in_glow_pass, coords_QULEZ(coords, global.flick_and_noise_passSize)).rgb;
+        pixel_out = pixel_glowed;
     #else
-        pixel_out = texture(in_glow_pass, coords).rgb;
+        pixel_glowed = texture(in_glow_pass, coords).rgb;
+        pixel_out = pixel_glowed;
     #endif
     
     
@@ -1017,6 +1020,10 @@ vec3 fn_pixel_content(vec2 coords) {
     //Bloom
         if (DO_BLOOM == 1.0 ) {
             vec3 bloomed=texture(bloom_pass_final, coords).rgb ;
+            
+            float lum=max(max(pixel_out.r,pixel_out.g), pixel_out.b);
+            float over_white_correcion = (1-lum)*(1-lum);
+            bloomed = mix( bloomed * over_white_correcion , bloomed, BLOOM_OVER_WHITE);
             pixel_out = bloomed + float(BLOOM_BYPASS < 0.5) * pixel_out;
         }
             

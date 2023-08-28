@@ -28,7 +28,7 @@ layout(location = 1) in vec2 vFuzzy_main_pass_stage_1;
 layout(location = 0) out vec4 FragColor;
 
 layout(set = 0, binding = 1) uniform sampler2D Source;
-layout(set = 0, binding = 2) uniform sampler2D avglum_pass;
+layout(set = 0, binding = 2) uniform sampler2D in_glow_pass;
 layout(set = 0, binding = 3) uniform sampler2D flick_and_noise_pass;
 layout(set = 0, binding = 4) uniform sampler2D bloom_pass_finalFeedback;
 
@@ -101,17 +101,17 @@ void main() {
     vec3 over_white_correction = vec3(1.0);
     
     
-    if (BLOOM_OVER_WHITE < 1.0) {
+  /*  if (BLOOM_OVER_WHITE < 1.0) {
         //Use mipmap available in avglum_pass to identify bright areas.
-        vec3 avglum = texture(avglum_pass,vTexCoord).rgb;
-        avglum = textureLod(flick_and_noise_pass,vTexCoord, 4.0).rgb;
+        vec3 avglum = texture(in_glow_pass,vTexCoord).rgb;
+        avglum = vec3(max(max(avglum.r,avglum.g),avglum.b));
+        //avglum = textureLod(flick_and_noise_pass,vTexCoord, 4.0).rgb;
 
         over_white_correction = mix( 1-avglum, vec3(1.0), BLOOM_OVER_WHITE);
         over_white_correction *= over_white_correction;
-        //FragColor = vec4(over_white_correction, 1.0);
-        //return;
+        //FragColor = vec4(over_white_correction, 1.0); return;
         
-    }
+    }*/
     
     bloomed*=BLOOM_POWER;
     
