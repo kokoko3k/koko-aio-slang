@@ -1,4 +1,4 @@
-#reference "pgrid3-Corelevel_HMask-Aperturegrille.slangp"
+#reference "pgrid3-Core_HMask-Aperturegrille.slangp"
 
 	PIXELGRID_MIN_W = "0.350000"
 	PIXELGRID_MAX_W = "0.600000"
