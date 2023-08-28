@@ -681,7 +681,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
   
     
     //Apply the mask to pixel_in and clamp the minimum to the unexcited grille.
-    vec3 mask_and_grille = max(mask * pixel_in, rgb_grille * PIXELGRID_BASAL_GRID*0.025);
+    vec3 mask_and_grille = max(mask * pixel_in, rgb_grille * PIXELGRID_BASAL_GRID*0.0025);
 
 
     //return it with alpha channel containing the mask itself, so that halo can selectively light it.
