@@ -277,13 +277,17 @@
         Nullifies the input gain applied in the color correction section.
         This way the halo effect will be consistent and will not depend on 
         it, avoiding hard to manage cascading effects.
-    
     Strength (negative = 10x precision)
         The effect strength.
         Negative values are interpreted as positive ones, divided by 10,
         when fine tuning is needed.
-    Refer to "Glowing Input/power" for other parameters meaning.
-    
+    Sharpness
+        The lower, the wider the halo.
+    Gamma in
+        Act like a soft treshold; the higher, the less the darker colors
+        will be "haloed"
+    Gamma out
+        Post-gamma correction applied to the halo.
     Light up scanline gaps and dot grid gaps too:
 		Theoretically Halo have to be applied 
 		"over" everything, because that is the way it works in nature.

@@ -117,6 +117,7 @@
 	#define HALO_POWER	params.HALO_POWER
 	#define HALO_GAMMA	params.HALO_GAMMA
 	#define HALO_VS_SCAN	params.HALO_VS_SCAN
+	#define HALO_GAMMA_OUT	params.HALO_GAMMA_OUT
 
 
 
