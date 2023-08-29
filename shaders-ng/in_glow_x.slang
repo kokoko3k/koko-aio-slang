@@ -17,10 +17,9 @@ void main() {
    
    //IN_GLOW_H is are over the upper limit and IN_GLOW_W is outside the allowed interval;
    glow_w_inside_interval = float(IN_GLOW_W < GLOW_SHARP_MAX  && IN_GLOW_W > GLOW_SHARP_MAX_ALTERNATE);
+   float glow_h_inside_interval = float(IN_GLOW_H < GLOW_SHARP_MAX  && IN_GLOW_H > GLOW_SHARP_MAX_ALTERNATE);
    
-   
-   glow_h_and_w_outside_interval = float (IN_GLOW_H >= GLOW_SHARP_MAX && glow_w_inside_interval !=1.0) ;
-   
+   glow_h_and_w_outside_interval = float (glow_h_inside_interval != 1.0 && glow_w_inside_interval != 1.0) ;
 }
 
 
@@ -88,25 +87,9 @@ void main() {
          return;
       }
       
-   
+
    float IN_GLOW_W_ADAPTED = abs(IN_GLOW_W);
-   
-   //GLow to blur via IN_GLOW_SPREAD:
-      //Spread amount needs to lessen its influence when going from glow to blur
-         float in_glow_spread = IN_GLOW_SPREAD * (1-IN_GLOW_BIAS);
-      //half in glow spread for box
-         if (IN_GLOW_W < 0.0) in_glow_spread = in_glow_spread/2.0;
-         
-      //Modulate sharpness via IN_GLOW_SPREAD when IN_GLOW_W is under minimum blur sharpness
-         float IN_GLOW_W_ADAPTED_SPREADED = in_glow_spread * IN_GLOW_SHARPNESS_SPREAD_RATIO_W;
-         if (IN_GLOW_W_ADAPTED < MIN_IN_GLOW_SHARP ) {
-            //It seems that for box blur, setting width to 1.0 works better.
-            IN_GLOW_W_ADAPTED_SPREADED = mix(IN_GLOW_W_ADAPTED_SPREADED, 1.0, float(IN_GLOW_W < 0.0));
-         }
-         //The modulation depends on glow to blur bias
-            IN_GLOW_W_ADAPTED = mix(IN_GLOW_W_ADAPTED_SPREADED, IN_GLOW_W_ADAPTED, IN_GLOW_BIAS );
-       
-   
+            
    //Modulate glow power via ntsc artifact mask:
       float ntsc_artifacts = texture(shift_and_bleed_pass, vTexCoord).a;
       

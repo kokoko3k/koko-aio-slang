@@ -92,11 +92,10 @@
 	//I set this to allow negative values for glow sharpness
 	//that will calc their values from light spread amount
 #define MIN_IN_GLOW_SHARP 0.40
-	//Setting glow to blur bias parameter to this
-	//will skip the glow/blur mix codem and just return
-	//the blurred image
-	//Set this to the same value as used for the maximum
-	//of IN_GLOW_BIAS
+
+	//Setting glow to blur bias parameter to this will skip the glow/blur 
+	//mix code and just return the blurred image
+	//Set this to the same value as used for the maximum for IN_GLOW_BIAS pragma
 #define IN_GLOW_BIAS_MAX 1.0
 
 	//Try to keep blur sizes consistent across input resolutions
@@ -104,13 +103,6 @@
 #define SCALEMOD_Y 270
 #define NEW_SCALEMOD_X (global.flick_and_noise_passSize.x/(360.0*2.0) / 2.2)
 #define NEW_SCALEMOD_Y (global.flick_and_noise_passSize.y/(270.0*2.0) / 2.2)
-
-   // When Glow sharpness is controlled by light spread amount
-   // The following ratio is used, the lower, the blurrier:
-#define IN_GLOW_SHARPNESS_SPREAD_RATIO_W 0.8334
-#define IN_GLOW_SHARPNESS_SPREAD_RATIO_H 0.8334
-
-
 
 
 
@@ -487,8 +479,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter DO_IN_GLOW               "★ Glow/Blur enable? (gl) ==>"	 					0.0	0.0 1.0 1.0
 #pragma parameter IN_GLOW_BIAS             "        Glow to blur bias"							1.0     0.0 1.0 0.05
 #pragma parameter IN_GLOW_SPREAD           "        Glow spread amount"		0.6 	0.0 4.0 0.05
-#pragma parameter IN_GLOW_W                "        Sharp X (~0=auto by glow spread, neg=use BOX unsharp)"		2.5	-1.0 7.0 0.05
-#pragma parameter IN_GLOW_H                "        Sharp Y (~0=auto by glow spread, neg=use BOX unsharp))"		2.5	-1.0 7.0 0.02
+#pragma parameter IN_GLOW_W                "        Sharp X (neg=use BOX unsharp)"		2.5	-1.0 7.0 0.05
+#pragma parameter IN_GLOW_H                "        Sharp Y (neg=use BOX unsharp)"		2.5	-1.0 7.0 0.02
 #pragma parameter BLANK7 " " 0.0 0.0 1.0 1.0
 
 
