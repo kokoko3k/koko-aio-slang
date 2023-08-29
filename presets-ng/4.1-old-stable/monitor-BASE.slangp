@@ -13,12 +13,11 @@ DO_SHIFT_RGB = "1.0"
 	
 DO_IN_GLOW = "1.0"
 	IN_GLOW_POWER = "1.825000"
-	IN_GLOW_W = "0.0"
-	IN_GLOW_H = "2.0"
+	IN_GLOW_W = "2.5"
+	IN_GLOW_H = "2.5"
 	IN_GLOW_GAMMA = "2.0"
-	IN_GLOW_ADD = "0.0"
 	IN_GLOW_BIAS = "0.0"
-	IN_GLOW_SPREAD = "0.6"
+	IN_GLOW_SPREAD = "2.0"
 
 
 DO_HALO = "1.0"
