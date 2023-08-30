@@ -515,11 +515,28 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         //if (DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0)) { //103.1
         if (vDo_pixelgrid_h > 0.5) {
             
+            //vec2 freq_base_core = pi * in_coords * vPG_OriginalSize_tated ;
+           
+            float moire_diff = 1.0;
+            
+            /*float moire_check_now = sin(freq_base_core.y);
+            moire_check_now*=moire_check_now;
+            float freq_next = pi * (in_coords.y - params.OutputSize.w) * vPG_OriginalSize_tated.y ;
+            float moire_check_next = sin(freq_next);
+            moire_check_now*=moire_check_now;
+            moire_check_next*=moire_check_next;
+            moire_diff =1-abs(moire_check_now-moire_check_next);
+            
+            moire_diff = moire_diff * 0.05 ;*/
+            
+            //moire_diff = 0.05;
+            
+            
             //Since we emulate scanlines, take into account current scanline phase:
                 float interlacing_adapt_period = vScanlinePeriod;
                 float interlacing_adapt_offset = vScanlineAlternateOffset;
             //We can offset trias to emulate fake core level slotmask by applying the optional offset to emulate the slotmask on even cells
-                float triad_stagger_offset =  is_even * pi * PIXELGRID_OFFSET_CORE;
+                float triad_stagger_offset =  is_even * pi * (PIXELGRID_OFFSET_CORE + moire_diff);
             //get 3 sines with applied the optional staggered offset for slotmask, and single phosphors staggering for y deconvergence.
                 vec3 decon_stagger = vec3( PIXELGRID_DECON_R_H, PIXELGRID_DECON_G_H, PIXELGRID_DECON_B_H) ; //* (pixel_in/max_inLum) ;
                 vec3 rgb_h_sin = sin((freq_base_core.y - decon_stagger) * interlacing_adapt_period + triad_stagger_offset + interlacing_adapt_offset );
