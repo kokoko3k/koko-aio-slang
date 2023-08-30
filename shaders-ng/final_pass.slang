@@ -5,7 +5,8 @@
  * Does masks, spot, bezel, vignette, background image (anything else?)
  */
 
-
+                                #define DEBUG_TEXTURE Original
+                                //#define DEBUG_TEXTURE colortools_and_ntsc_pass
 //#define DEBUG_PRINT_VALUE
 //#define DEBUG_QUAD_SPLIT
 //#define DEBUG_DUAL_SPLIT_X
@@ -14,6 +15,7 @@
 //#define DEBUG_DUAL_SPLIT_MIRROR_X
 //#define DEBUG_DUAL_SPLIT_MIRROR_X_GAMMA
 //#define DEBUG_SHOW_CLIP
+
 
 #include "config.inc"
 
@@ -337,7 +339,7 @@ layout(set = 0, binding = 12) uniform sampler2D halo_pass;
 
 layout(set = 0, binding = 13) uniform sampler2D final_passFeedback;
 
-layout(set = 0, binding = 15) uniform sampler2D Original;
+layout(set = 0, binding = 15) uniform sampler2D DEBUG_TEXTURE;
 
 
 
@@ -1331,27 +1333,27 @@ void main() {
     //Debug functions: 
         #ifdef DEBUG_QUAD_SPLIT
             if ( vOutputCoord.x < 0.5  && vOutputCoord.y > 0.5 || vOutputCoord.x > 0.5  && vOutputCoord.y < 0.5 )
-            pixel_out = texture(Original,vOutputCoord).rgb;
+            pixel_out = texture(DEBUG_TEXTURE,vOutputCoord).rgb;
         #endif
     
         #ifdef DEBUG_DUAL_SPLIT_Y
-            if (vTexCoord.y < 0.5) pixel_out = texture(Original,vTexCoord).rgb;
+            if (vTexCoord.y < 0.5) pixel_out = texture(DEBUG_TEXTURE,vTexCoord).rgb;
         #endif
 
         #ifdef DEBUG_DUAL_SPLIT_Y_GAMMA
-            if (vTexCoord.y < 0.5) pixel_out = pow(texture(Original,vTexCoord).rgb, vec3(1.08));
+            if (vTexCoord.y < 0.5) pixel_out = pow(texture(DEBUG_TEXTURE,vTexCoord).rgb, vec3(1.08));
         #endif
             
         #ifdef DEBUG_DUAL_SPLIT_X
-            if (vTexCoord.x > 0.5) pixel_out = texture(Original,vTexCoord).rgb;
+            if (vTexCoord.x > 0.5) pixel_out = texture(DEBUG_TEXTURE,vTexCoord).rgb;
         #endif
             
         #ifdef DEBUG_DUAL_SPLIT_MIRROR_X
-            if (vTexCoord.x > 0.5) pixel_out = texture(Original,vec2(1-vTexCoord.x, vTexCoord.y) ).rgb;
+            if (vTexCoord.x > 0.5) pixel_out = texture(DEBUG_TEXTURE,vec2(1-vTexCoord.x, vTexCoord.y) ).rgb;
         #endif
 
         #ifdef DEBUG_DUAL_SPLIT_MIRROR_X_GAMMA
-            if (vTexCoord.x > 0.5) pixel_out = pow(texture(Original,vec2(1-vTexCoord.x, vTexCoord.y) ).rgb, vec3(1.11));
+            if (vTexCoord.x > 0.5) pixel_out = pow(texture(DEBUG_TEXTURE,vec2(1-vTexCoord.x, vTexCoord.y) ).rgb, vec3(1.11));
         #endif
             
         #ifdef DEBUG_PRINT_VALUE

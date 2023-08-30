@@ -20,8 +20,9 @@
 //#define DEBUG
    //#define DEBUG_COLOR_CALIB
    //#define DEBUG_TIME_FADE
-   #define DEBUG_SOLID_COLOR
+   //#define DEBUG_SOLID_COLOR
    //#define DEBUG_STEP_GRADIENT
+   //#define DEBUG_STEP_GRADIENT_V
    //#define DEBUG_BLINK
    //#define DEBUG_BLINK_CIRCLE
    //#define DEBUG_COLORWHEEL
@@ -192,6 +193,9 @@ vec3 debug() {
       
    #elif defined DEBUG_STEP_GRADIENT
       pixel_debug = DEBUG_COLOR * floor(vTexCoord.x* DEBUG_GRADIENT_STEPS )/ DEBUG_GRADIENT_STEPS ;
+
+   #elif defined DEBUG_STEP_GRADIENT_V
+      pixel_debug = DEBUG_COLOR * floor(vTexCoord.y* DEBUG_GRADIENT_STEPS )/ DEBUG_GRADIENT_STEPS ;
       
    #elif defined DEBUG_BLINK
       if (mod(params.FrameCount, DEBUG_BLINK_TIME*2) < DEBUG_BLINK_TIME) 
