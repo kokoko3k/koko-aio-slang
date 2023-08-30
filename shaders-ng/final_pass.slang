@@ -337,7 +337,7 @@ layout(set = 0, binding = 12) uniform sampler2D halo_pass;
 
 layout(set = 0, binding = 13) uniform sampler2D final_passFeedback;
 
-layout(set = 0, binding = 15) uniform sampler2D flick_and_noise_pass;
+layout(set = 0, binding = 15) uniform sampler2D Original;
 
 
 
@@ -1331,27 +1331,27 @@ void main() {
     //Debug functions: 
         #ifdef DEBUG_QUAD_SPLIT
             if ( vOutputCoord.x < 0.5  && vOutputCoord.y > 0.5 || vOutputCoord.x > 0.5  && vOutputCoord.y < 0.5 )
-            pixel_out = texture(flick_and_noise_pass,vOutputCoord).rgb;
+            pixel_out = texture(Original,vOutputCoord).rgb;
         #endif
     
         #ifdef DEBUG_DUAL_SPLIT_Y
-            if (vTexCoord.y < 0.5) pixel_out = texture(flick_and_noise_pass,vTexCoord).rgb;
+            if (vTexCoord.y < 0.5) pixel_out = texture(Original,vTexCoord).rgb;
         #endif
 
         #ifdef DEBUG_DUAL_SPLIT_Y_GAMMA
-            if (vTexCoord.y < 0.5) pixel_out = pow(texture(flick_and_noise_pass,vTexCoord).rgb, vec3(1.08));
+            if (vTexCoord.y < 0.5) pixel_out = pow(texture(Original,vTexCoord).rgb, vec3(1.08));
         #endif
             
         #ifdef DEBUG_DUAL_SPLIT_X
-            if (vTexCoord.x > 0.5) pixel_out = texture(flick_and_noise_pass,vTexCoord).rgb;
+            if (vTexCoord.x > 0.5) pixel_out = texture(Original,vTexCoord).rgb;
         #endif
             
         #ifdef DEBUG_DUAL_SPLIT_MIRROR_X
-            if (vTexCoord.x > 0.5) pixel_out = texture(flick_and_noise_pass,vec2(1-vTexCoord.x, vTexCoord.y) ).rgb;
+            if (vTexCoord.x > 0.5) pixel_out = texture(Original,vec2(1-vTexCoord.x, vTexCoord.y) ).rgb;
         #endif
 
         #ifdef DEBUG_DUAL_SPLIT_MIRROR_X_GAMMA
-            if (vTexCoord.x > 0.5) pixel_out = pow(texture(flick_and_noise_pass,vec2(1-vTexCoord.x, vTexCoord.y) ).rgb, vec3(1.08));
+            if (vTexCoord.x > 0.5) pixel_out = pow(texture(Original,vec2(1-vTexCoord.x, vTexCoord.y) ).rgb, vec3(1.11));
         #endif
             
         #ifdef DEBUG_PRINT_VALUE
