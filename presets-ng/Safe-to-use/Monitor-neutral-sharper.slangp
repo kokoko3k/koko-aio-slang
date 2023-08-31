@@ -1,6 +1,0 @@
-#reference "Monitor-neutral.slangp"
-
-IN_GLOW_BIAS = "0.000000"
-IN_GLOW_SPREAD = "2.0"
-IN_GLOW_W = "-0.750000"
-IN_GLOW_H = "-0.750000
