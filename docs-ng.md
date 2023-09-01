@@ -142,12 +142,12 @@
             of 2 or 3 to make room for phosphors and see them visually grow in width.
             Likewise, you can use core/game(**) sized masks and divide them by a factor
             if they appears too big.
-        Inter-cell extra steepness (handhelds)
+        Inter-cell extra steepness (for integer scaling)
             When you set maximum width/height to anything > 0.5, the phosphor light will bleed over
             the adiacent (left/right up/down) one so that they will start to blend togheter.
             This option will avoid the bleeding.
             You may want them to merge or not, depending on your preference to see a visible "grid"/lines.
-            This function is useful when you want to emulate handhelds screens, 
+            This function is useful when you want to emulate handhelds screens using integer scaling, 
             where cells are well separated.
         Black level of the unexcided phosphor grid
             Draw the vertical grid that hosts phosphors.
@@ -177,12 +177,12 @@
             While this does not exist at all in crt technology, it greatly mitigates the artifacts
             just explained while producing a fairly convincing effect, very similar to a screen
             with visible scanlines and visible slotmask.
-        Inter-cell extra steepness (handhelds)
+        Inter-cell extra steepness (for integer scaling)
             When you set maximum width/height to anything > 0.5, the phosphor light will bleed over
             the adiacent (left/right up/down) one so that they will start to blend togheter.
             This option will avoid the bleeding.
             You may want them to merge or not, depending on your preference to see a visible "grid"/lines.
-            This function is useful when you want to emulate handhelds screens, 
+            This function is useful when you want to emulate handhelds screens using integer scaling, 
             where cells are well separated.
         Dedot mask between scanlines
             When using Horizontal masks, you mai notice a disturbing dot pattern left between high
