@@ -27,7 +27,7 @@ void main() {
     if (DO_HALO == 0.0 ) return;
     
     vec3 pixel_haloed = texture(in_glow_pass, vTexCoord).rgb;
-    if (HALO_NO_PREGAIN == 1.0)  pixel_haloed/= IN_GLOW_POWER;
+    if (HALO_NO_PREGAIN == 1.0)  pixel_haloed/= mix(1.0, IN_GLOW_POWER, DO_CCORRECTION);
     pixel_haloed = pow(pixel_haloed, vHALO_GAMMA);
     
     FragColor = vec4(pixel_haloed.rgb, 1.0);
