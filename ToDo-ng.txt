@@ -104,7 +104,10 @@ TODO:
 		It is a win win because it also allow halo to better coloring phosphors too.
 	[v] Adapt presets to new halo modes and parameter scale
 	[v] luminosity dependant zoom: hardcode slowness.
-
+	[x] does auto glow blur radius work?
+	ditched.
+	[v] allow negative glow y
+	
 	[ ] check branching conditions in first_pass.slang
 	[ ] Glow spread in final pass?
 	[ ] Find a way to smooth borders without cropping the image
@@ -127,6 +130,6 @@ TODO:
 	[ ] why altering glow power alters scanline shape?
 
 	[ ] blur9_box2 needs optimizations
-	[ ] allow negative glow y
-[ ] does auto glow blur radius work?
-[ ] la maschera orizontale non è più modulabile.
+	[ ] fake pass seems not aware of the halo "ungain"
+	[ ] allow for lower than -1 glox values to trigger unsharp 
+	

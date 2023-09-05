@@ -233,10 +233,11 @@ vec2 apply_fuzzy_main_pass_stage_1() {
 	float gamma_out = 1.0;
 	
 	float halo_power_adapted;
-	if (HALO_POWER > 0.0) 
-		halo_power_adapted = HALO_POWER;
-			else
-		halo_power_adapted = -HALO_POWER/10.0;
+	halo_power_adapted = HALO_POWER;
+	if (HALO_NO_PREGAIN == 1.0) halo_power_adapted/= mix(1.0, IN_GLOW_POWER, DO_CCORRECTION);
+		
+	if (HALO_POWER < 0.0) 
+		halo_power_adapted = -halo_power_adapted/10.0;
 	
 	if (DO_CCORRECTION == 1.0) {
 		color_out = pow(color_in, GAMMA_OUT);
