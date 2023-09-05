@@ -2,7 +2,7 @@
 #include "config.inc"
 
 //Dumbify glow under this treshold.
-#define GLOW_SHARP_MAX_ALTERNATE -1.0 
+#define GLOW_SHARP_MAX_ALTERNATE -2.0 
 
 #pragma stage vertex
 layout(location = 0) in vec4 Position;

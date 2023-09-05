@@ -107,6 +107,7 @@ TODO:
 	[x] does auto glow blur radius work?
 	ditched.
 	[v] allow negative glow y
+	[v] fake pass seems not aware of the halo "ungain"
 	
 	[ ] check branching conditions in first_pass.slang
 	[ ] Glow spread in final pass?
@@ -130,6 +131,6 @@ TODO:
 	[ ] why altering glow power alters scanline shape?
 
 	[ ] blur9_box2 needs optimizations
-	[ ] fake pass seems not aware of the halo "ungain"
+	
 	[ ] allow for lower than -1 glox values to trigger unsharp 
 	
