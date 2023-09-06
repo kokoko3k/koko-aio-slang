@@ -1,4 +1,4 @@
-#reference "Monitor-Base.slangp"
+#reference "Base.slangp"
 TEMPERATURE = "7500.000000"
 
 IN_GLOW_POWER = "1.3"
