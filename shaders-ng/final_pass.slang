@@ -456,6 +456,7 @@ vec3 morph_shape(vec3 shape, vec3 power, float steep, float gamma ) {
 
 vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inLum  ) { 
 
+    
     //Tate ? (other outputsize,originalsize and outputcoords "tated" in vertex shader.)
         if (vDo_Tate == 1.0) in_coords.xy = in_coords.yx;
     //in_coords = in_coords - global.flick_and_noise_passSize.zw*0.5; //<-- needed if for whatever reason you want to draw scanlines and vgaps in first_pass

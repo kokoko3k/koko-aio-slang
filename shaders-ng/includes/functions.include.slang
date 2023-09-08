@@ -1,3 +1,18 @@
+float clamp_smooth(float x, float a, float b) {
+	float sharp = 0.0;
+    return mix(a, b, smoothstep(a-sharp, b+sharp, x));
+}
+
+vec3 clamp_smooth(vec3 x, vec3 a, vec3 b) {
+	float sharp = 0.0;
+    return mix(a, b, smoothstep(a-sharp, b+sharp, x));
+}
+
+vec2 clamp_smooth(vec2 x, vec2 a, vec2 b) {
+	float sharp = 0.0;
+    return mix(a, b, smoothstep(a-sharp, b+sharp, x));
+}
+
 vec2 coords_QULEZ_faster(vec2 co, vec4 texsize){
 	//based on idea: https://iquilezles.org/articles/texture/
 	co = co * texsize.xy + vec2(0.5);
@@ -255,7 +270,7 @@ vec2 apply_fuzzy_main_pass_stage_1() {
 
 	if (DO_HALO == 1.0) {
 		color_out += color_in*halo_power_adapted;
-		gamma_out = gamma_out * mix(1.0, HALO_GAMMA, halo_power_adapted*0.25) ;
+		gamma_out = gamma_out * mix(1.0, HALO_GAMMA*HALO_GAMMA_OUT, halo_power_adapted*0.25) ;
 	}
 	
 	if (DO_VIGNETTE == 1.0)
