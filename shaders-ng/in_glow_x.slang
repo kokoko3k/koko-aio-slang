@@ -133,7 +133,7 @@ void main() {
          FragColor = vec4(blur_select_wrap(shift_and_bleed_pass, vTexCoord, global.flick_and_noise_passSize, IN_GLOW_W_ADAPTED, (IN_GLOW_W >= 0.0) ), 
                           DR_unchanged);
    } else {
-      FragColor = texture(shift_and_bleed_pass, vTexCoord, DR_unchanged);
+      FragColor = vec4(texture(shift_and_bleed_pass, vTexCoord).rgb, DR_unchanged);
    }
    
 }

@@ -110,6 +110,7 @@ TODO:
 	[v] fake pass seems not aware of the halo "ungain"
 	[v] allow for lower than -1 glox values to trigger more unsharp 
 	[v] provide a dedicated gamma out setting for halo
+	[v] fake main pass is not aware of halo gamma out.
 	
 	[ ] check branching conditions in first_pass.slang
 	[ ] Glow spread in final pass?
@@ -126,12 +127,10 @@ TODO:
 
 	[ ] Update kakashi preset to use lanczos (update presets to use it)
 	
-	[ ] tune changed halo parameter to match old values as close as possible
-	
 	[ ] dedicated subtractive sharpness in glow section
 	[ ] erode/dilate setting in glow section
 	[ ] why altering glow power alters scanline shape?
 
 	[ ] blur9_box2 needs optimizations
-	[ ] fake main pass is not aware of halo gamma out.
+
 	
