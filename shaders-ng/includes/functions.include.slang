@@ -1,11 +1,11 @@
-float clamp_smooth(float x, float a, float b) {
+float clamp_smooth(float x, float amin, float amax) {
 	float sharp = 0.0;
-    return mix(a, b, smoothstep(a-sharp, b+sharp, x));
+    return mix(amin, amax, smoothstep(amin-sharp, amax+sharp, x));
 }
 
-vec3 clamp_smooth(vec3 x, vec3 a, vec3 b) {
+vec3 clamp_smooth(vec3 x, vec3 amin, vec3 amax) {
 	float sharp = 0.0;
-    return mix(a, b, smoothstep(a-sharp, b+sharp, x));
+    return mix(amin, amax, smoothstep(amin-sharp, amax+sharp, x));
 }
 
 vec2 clamp_smooth(vec2 x, vec2 a, vec2 b) {
