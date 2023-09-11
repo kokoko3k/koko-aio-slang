@@ -505,7 +505,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter PIXELGRID_GAMMA_W  "           . Phosphors width min->max gamma:"	4.2 1.0 8.00 0.1
 #pragma parameter PIXELGRID_MUL_X    "           . Cell size multiplier x (neg=divider):"	1.0 -8.0 8.0 0.125
 //#pragma parameter PIXELGRID_HMASK_NO_BRIGHT  "           . Fade on bright"	0.0 0.0 1.0 0.01
-#pragma parameter PIXELGRID_NO_INTERBLEED_W	"           . Inter-cell extra steepness (for integer scaling)"		0.0 0.0 10.0 0.1
+#pragma parameter PIXELGRID_NO_INTERBLEED_W	"           . Inter-cell extra steepness"		0.0 0.0 10.0 0.1
 #pragma parameter PIXELGRID_BASAL_GRID  "           . Black level of the unexcided phosphor grid"	0.0 0.0 10.0 0.01
 #pragma parameter BLANK12fs " " 0.0 0.0 1.0 1.0
 
@@ -513,10 +513,10 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 #pragma parameter DO_PIXELGRID_H            "      ★ Scanlines (0 to disable)"    	1.0 0.0 1.25 0.05
 #pragma parameter PIXELGRID_MIN_H	        "           . Phosphors height Min"			0.2 0.00 1.0 0.05
-#pragma parameter PIXELGRID_MAX_H           "           . Phosphors height Max"			0.6 0.0 1.25 0.05
+#pragma parameter PIXELGRID_MAX_H           "           . Phosphors height Max"			0.6 0.0 1.5 0.05
 #pragma parameter PIXELGRID_GAMMA_H         "           . Phosphors height min->max gamma:"	4.2 1.0 8.00 0.1
 #pragma parameter PIXELGRID_OFFSET_CORE     "           . Slotmask(-fake) offset (0.10..0.25 ok)"	0.0 0.0 1.0 0.01
-#pragma parameter PIXELGRID_NO_INTERBLEED_H	"           . Inter line extra steepness (for integer scaling)"		0.0 0.0 10.0 0.1
+#pragma parameter PIXELGRID_NO_INTERBLEED_H	"           . Inter line extra steepness"		0.0 0.0 10.0 0.1
 #pragma parameter PIXELGRID_H_DEDOT			"           . Dedot mask between scanlines (use only if needed!)"	0.0 0.0 1.0 0.1
 #pragma parameter PIXELGRID_DECON_R_H       "           . Deconvergence Y: R phosphor" 0.0 -1.6 1.6 0.1
 #pragma parameter PIXELGRID_DECON_G_H       "           . Deconvergence Y: G phosphor" 0.0 -1.6 1.6 0.1
@@ -676,7 +676,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 //Vignette and spot
 #pragma parameter DO_VIGNETTE	"★ Vignette enable? (vi) ==>"	0.0  0.0  1.0  1.0
-#pragma parameter V_SIZE	"        Size"			0.7  0.5  2.0  0.02
+#pragma parameter V_SIZE	"        Size"			0.7  0.3  2.0  0.02
 #pragma parameter V_POWER	"        Power"			1.0  0.05 1.0  0.01
 
 #pragma parameter DO_SPOT	"★ Spot enable? (sp) ==>"		0.0   0.0   1.0 1.0
