@@ -454,8 +454,12 @@ vec3 morph_shape(vec3 shape, vec3 power, float steep, float gamma ) {
 
 
 
-vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inLum  ) { 
-
+vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inLum  ) {     
+        
+    //Scanlines: compute each phosphor height according to input luminance, puttin it here helpas parallelism a bit.
+        float extragain_h = max(PIXELGRID_MAX_H, 1.0); //Handle 
+        vec3 phosphor_height = map_range(pixel_in*extragain_h, min_inLum, max_inLum, PIXELGRID_MIN_H, clamp(PIXELGRID_MAX_H, PIXELGRID_MIN_H, 1.0));   
+    
     
     //Tate ? (other outputsize,originalsize and outputcoords "tated" in vertex shader.)
         if (vDo_Tate == 1.0) in_coords.xy = in_coords.yx;
@@ -508,7 +512,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
     //increased parallalism, I guess.
         float sin_check_offset = sin(freq_base_unfloored.x + vPG_offsets_adjust_for_stagger);
         float is_even = step(sin_check_offset, 0.0);
-        
+
         
     //Scanlines and fake slotmask =========================================================================
         vec3 rgb_h = vec3(1.0);
@@ -517,24 +521,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         //Pixelgrid: do horizontal if enabled, but skip it if user doesn't want it on interlaced content.
         //if (DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0)) { //103.1
         if (vDo_pixelgrid_h > 0.5) {
-            
-            //vec2 freq_base_core = pi * in_coords * vPG_OriginalSize_tated ;
-           
-            //float moire_diff = 1.0;
-            
-            /*float moire_check_now = sin(freq_base_core.y);
-            moire_check_now*=moire_check_now;
-            float freq_next = pi * (in_coords.y - params.OutputSize.w) * vPG_OriginalSize_tated.y ;
-            float moire_check_next = sin(freq_next);
-            moire_check_now*=moire_check_now;
-            moire_check_next*=moire_check_next;
-            moire_diff =1-abs(moire_check_now-moire_check_next);
-            
-            moire_diff = moire_diff * 0.05 ;*/
-            
-            //moire_diff = 0.05;
-            
-            
+
             //Since we emulate scanlines, take into account current scanline phase:
                 float interlacing_adapt_period = vScanlinePeriod;
                 float interlacing_adapt_offset = vScanlineAlternateOffset;
@@ -545,21 +532,22 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 vec3 rgb_h_sin = sin((freq_base_core.y - decon_stagger) * interlacing_adapt_period + triad_stagger_offset + interlacing_adapt_offset );
             //make it positve with doubled frequency:
                 rgb_h_sin = (rgb_h_sin * rgb_h_sin);
+                        
             //Compute dedot mix here for use in h mask and vmask2 later             
                 dedot_mix_inverted = (1-rgb_h_sin.r) * PIXELGRID_H_DEDOT ;
                 dedot_mix_inverted = dedot_mix_inverted * (max(max(pixel_in.r, pixel_in.g), pixel_in.b)/max_inLum);
                 //dedot_mix_inverted = dedot_mix_inverted * dot(pixel_in, vec3(0.33333) )/max_inLum;
                 dedot_mix_inverted = 1-dedot_mix_inverted;
-            //Compute each phosphor height according to input luminance 
-                vec3 phosphor_height = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);                
+            
+            // Compute each phosphor height according to input luminance, 
+            // Moved outside the branch to help parallelism a bit
+                //float extragain_h = max(PIXELGRID_MAX_H, 1.0); //Handle 
+                //vec3 phosphor_height = map_range(pixel_in*extragain_h, min_inLum, max_inLum, PIXELGRID_MIN_H, clamp(PIXELGRID_MAX_H, PIXELGRID_MIN_H, 1.0));
+                
+                
             //Finally get 3 sines out of the previous one by applying height modifiers
                 rgb_h = rgb_h_sin;               
                 rgb_h = morph_shape(rgb_h, phosphor_height, PIXELGRID_NO_INTERBLEED_H, PIXELGRID_GAMMA_H);
-                
-                
-
-                
-                
                 
                 rgb_h = mix(vec3(1.0), rgb_h, DO_PIXELGRID_H);
                 rgb_h = clamp(rgb_h, 0.0,1.0);

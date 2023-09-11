@@ -18,9 +18,9 @@
 
 
 //#define DEBUG
-   #define DEBUG_COLOR_CALIB
+   //#define DEBUG_COLOR_CALIB
    //#define DEBUG_TIME_FADE
-   //#define DEBUG_SOLID_COLOR
+   #define DEBUG_SOLID_COLOR
    //#define DEBUG_STEP_GRADIENT
    //#define DEBUG_STEP_GRADIENT_V
    //#define DEBUG_BLINK
