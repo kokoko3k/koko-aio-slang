@@ -1255,7 +1255,7 @@ void main() {
                 canvas_bezel_screen = (1 - pixel_bezel.a) * rect_bezel;
         }
 
-
+    if (canvas_bezel_screen > 0.5) {
         //Vignette
             if (DO_VIGNETTE == 1.0) {
                 float dist = length(vec2((co_content.x-0.5)*vIn_aspect, co_content.y-0.5));
@@ -1274,7 +1274,7 @@ void main() {
         if (DO_VIGNETTE + DO_SPOT > 0.0) {
             pixel_out += random_fast(NOISEPOWER, vOutputCoord )*canvas_bezel_screen  ;
         }
-        
+    }
         //Background image have, no need to paint if not in the outer border:
             if (DO_BG_IMAGE == 1.0 && BG_IMAGE_OVER == 0.0 && canvas_busy < 1.0) {
                 vec4 pixel_bg_image = fn_pixel_fgbg_image(bg_under);
