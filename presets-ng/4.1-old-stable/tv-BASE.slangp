@@ -80,7 +80,7 @@ DO_AMBILIGHT = 1.0
 	AMBI_OVER_BEZEL = "0.2"
 
 DO_VIGNETTE = "0.0"
-	V_SIZE = "2.7"
+	V_SIZE = "1.08"
 	V_POWER = "1.00"
 
 DO_SPOT = "0.0"

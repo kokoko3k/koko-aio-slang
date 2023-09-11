@@ -1259,9 +1259,11 @@ void main() {
         //Vignette
             float vignette = 1.0;
             if (DO_VIGNETTE == 1.0) {
-                float dist = length(vec2((co_content.x-0.5)*vIn_aspect, co_content.y-0.5));
-                vignette = smoothstep(V_SIZE,0.0,dist)*V_POWER;
-            }
+                //float dist = length(vec2((co_content.x-0.5)*vIn_aspect, co_content.y-0.5));
+                //vignette = smoothstep(V_SIZE,0.0,dist)*V_POWER;
+                vec2 sinco = vec2(vIn_aspect, 1.0) * (co_content-0.5) / V_SIZE ;
+                vignette = cos(sinco.x) * cos(sinco.y) * V_POWER;
+            } 
             
         //Spot
             float spot = 0.0;

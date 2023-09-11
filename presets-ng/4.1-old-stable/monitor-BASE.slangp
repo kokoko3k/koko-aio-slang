@@ -65,7 +65,7 @@ DO_BEZEL = "0.0"
 
 	
 DO_VIGNETTE = "0.0"
-	V_SIZE = "2.7"
+	V_SIZE = "1.08"
 	V_POWER = "1.00"
 
 DO_SPOT = "0.0"
