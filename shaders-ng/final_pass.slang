@@ -1267,12 +1267,12 @@ void main() {
             if (DO_SPOT == 1.0) {
                     float dist = length(vec2((co_content.x-0.5)*vIn_aspect, co_content.y-0.5)+spot_offset);
                     float spot = smoothstep(S_SIZE,0.0,dist)*S_POWER;
-                    pixel_out = pixel_out + spot ;
+                    pixel_out = pixel_out + spot * canvas_bezel_screen ;
             }
 
   
         if (DO_VIGNETTE + DO_SPOT > 0.0) {
-            pixel_out += random_fast(NOISEPOWER, vOutputCoord )  ;
+            pixel_out += random_fast(NOISEPOWER, vOutputCoord )*canvas_bezel_screen  ;
         }
     }
         //Background image have, no need to paint if not in the outer border:
