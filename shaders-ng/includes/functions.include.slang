@@ -782,30 +782,32 @@ vec3 lanczos(sampler2D sampler_in, vec2 co, vec4 texsize, float sharpness ) {
 
 	vec3 blur9_x_box(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_x, float sharp_sub) {
 		sharp_sub = -2*sharp_sub+1;
-		vec2 resolution = sourcesize * sharpness_x;
+		float resolution = sourcesize.x * sharpness_x;
 		vec3 color = vec3(0.0);
-		vec2 off1 = vec2(1.0, 0.0) ;
-		vec2 off2 = vec2(2.0, 0.0) ;
-		color += texture(image, uv).rgb                       ;
-		color += texture(image, uv + (off1 / resolution)).rgb ;
-		color += texture(image, uv - (off1 / resolution)).rgb ;
-		color += texture(image, uv + (off2 / resolution)).rgb * sharp_sub;
-		color += texture(image, uv - (off2 / resolution)).rgb * sharp_sub;
+		
+		vec2 off1 = vec2(1.0 / resolution, 0.0)  ;
+		vec2 off2 = vec2(2.0 / resolution, 0.0)  ;
+			
+		color += texture(image, uv).rgb        ;
+		color += texture(image, uv + off1).rgb ;
+		color += texture(image, uv - off1).rgb ;
+		color += texture(image, uv + off2).rgb * sharp_sub;
+		color += texture(image, uv - off2).rgb * sharp_sub;
 		color = color/(3.0 + sharp_sub*2);
 		return max(vec3(0.0), color);
 	}
 
 	vec3 blur9_y_box(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_y, float sharp_sub) {
 		sharp_sub = -2*sharp_sub+1;
-		vec2 resolution = sourcesize * sharpness_y;
+		float resolution = sourcesize.y * sharpness_y;
 		vec3 color = vec3(0.0);
-		vec2 off1 = vec2(0.0, 1.0) ;
-		vec2 off2 = vec2(0.0, 2.0) ;
+		vec2 off1 = vec2(0.0, 1.0 / resolution) ;
+		vec2 off2 = vec2(0.0, 2.0 / resolution) ;
 		color += texture(image, uv).rgb                       ;
-		color += texture(image, uv + (off1 / resolution)).rgb ;
-		color += texture(image, uv - (off1 / resolution)).rgb ;
-		color += texture(image, uv + (off2 / resolution)).rgb * sharp_sub;
-		color += texture(image, uv - (off2 / resolution)).rgb * sharp_sub;
+		color += texture(image, uv + off1).rgb ;
+		color += texture(image, uv - off1).rgb ;
+		color += texture(image, uv + off2).rgb * sharp_sub;
+		color += texture(image, uv - off2).rgb * sharp_sub;
 		color = color/(3.0 + sharp_sub*2);
 		return max(vec3(0.0), color);
 	}
@@ -815,67 +817,66 @@ vec3 lanczos(sampler2D sampler_in, vec2 co, vec4 texsize, float sharpness ) {
 	}
 
 	vec3 blur9_x(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_x) {
-		vec2 resolution = sourcesize * sharpness_x;
+		float resolution = sourcesize.x * sharpness_x;
 		vec3 color = vec3(0.0);
-		vec2 off1 = vec2(1.3846153846, 0.0) ;
-		vec2 off2 = vec2(3.2307692308, 0.0) ;
+		vec2 off1 = vec2(1.3846153846 / resolution, 0.0);
+		vec2 off2 = vec2(3.2307692308 / resolution, 0.0);
 		color += texture(image, uv).rgb                       * 0.2270270270;
-		color += texture(image, uv + (off1 / resolution)).rgb * 0.3162162162;
-		color += texture(image, uv - (off1 / resolution)).rgb * 0.3162162162;
-		color += texture(image, uv + (off2 / resolution)).rgb * 0.0702702703;
-		color += texture(image, uv - (off2 / resolution)).rgb * 0.0702702703;
+		color += texture(image, uv + off1).rgb * 0.3162162162;
+		color += texture(image, uv - off1).rgb * 0.3162162162;
+		color += texture(image, uv + off2).rgb * 0.0702702703;
+		color += texture(image, uv - off2).rgb * 0.0702702703;
 		return color;
 	}
 
 	
 	
 	vec3 blur9_x_gamma(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_x, vec3 gamma) {
-		vec2 resolution = sourcesize * sharpness_x;
+		float resolution = sourcesize.x * sharpness_x;
 		vec3 color = vec3(0.0);
-		vec2 off1 = vec2(1.3846153846, 0.0) ;
-		vec2 off2 = vec2(3.2307692308, 0.0) ;
+		vec2 off1 = vec2(1.3846153846 / resolution, 0.0);
+		vec2 off2 = vec2(3.2307692308 / resolution, 0.0);
 		vec3 lookup = texture(image, uv).rgb;
 		color += pow(lookup, gamma) * 0.2270270270;
-		lookup = texture(image, uv + (off1 / resolution)).rgb;
+		lookup = texture(image, uv + off1).rgb;
 		color += pow(lookup, gamma) * 0.3162162162;
-		lookup = texture(image, uv - (off1 / resolution)).rgb;
+		lookup = texture(image, uv - off1).rgb;
 		color += pow(lookup, gamma) * 0.3162162162;
-		lookup = texture(image, uv + (off2 / resolution)).rgb;
+		lookup = texture(image, uv + off2).rgb;
 		color += pow(lookup, gamma) *  0.0702702703;
-		lookup = texture(image, uv - (off2 / resolution)).rgb;
+		lookup = texture(image, uv - off2).rgb;
 		color += pow(lookup, gamma) *  0.0702702703;
 		return color;
 	}
 
 	vec3 blur9_y_gamma(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_x, vec3 gamma) {
-																											//FIXME can this be unrolled by using 5 variables?
-		vec2 resolution = sourcesize * sharpness_x;
+		float resolution = sourcesize.x * sharpness_x;
 		vec3 color = vec3(0.0);
-		vec2 off1 = vec2(0.0, 1.3846153846) ;
-		vec2 off2 = vec2(0.0, 3.2307692308) ;
+		vec2 off1 = vec2(0.0, 1.3846153846 / resolution) ;
+		vec2 off2 = vec2(0.0, 3.2307692308 / resolution) ;
 		vec3 lookup = texture(image, uv).rgb;
 		color += pow(lookup, gamma) * 0.2270270270;
-		lookup = texture(image, uv + (off1 / resolution)).rgb;
+		lookup = texture(image, uv + off1).rgb;
 		color += pow(lookup, gamma) * 0.3162162162;
-		lookup = texture(image, uv - (off1 / resolution)).rgb;
+		lookup = texture(image, uv - off1).rgb;
 		color += pow(lookup, gamma) * 0.3162162162;
-		lookup = texture(image, uv + (off2 / resolution)).rgb;
+		lookup = texture(image, uv + off2).rgb;
 		color += pow(lookup, gamma) *  0.0702702703;
-		lookup = texture(image, uv - (off2 / resolution)).rgb;
+		lookup = texture(image, uv - off2).rgb;
 		color += pow(lookup, gamma) *  0.0702702703;
 		return color;
 	}
 	
 	vec3 blur9_y(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_y) {
-		vec2 resolution = sourcesize * sharpness_y;
+		float resolution = sourcesize.y * sharpness_y;
 		vec3 color = vec3(0.0);
-		vec2 off1 = vec2(0.0, 1.3846153846) ;
-		vec2 off2 = vec2(0.0, 3.2307692308) ;
-		color += texture(image, uv).rgb                       * 0.2270270270;
-		color += texture(image, uv + (off1 / resolution)).rgb * 0.3162162162;
-		color += texture(image, uv - (off1 / resolution)).rgb * 0.3162162162;
-		color += texture(image, uv + (off2 / resolution)).rgb * 0.0702702703;
-		color += texture(image, uv - (off2 / resolution)).rgb * 0.0702702703;
+		vec2 off1 = vec2(0.0, 1.3846153846 / resolution) ;
+		vec2 off2 = vec2(0.0, 3.2307692308 / resolution) ;
+		color += texture(image, uv).rgb       * 0.2270270270;
+		color += texture(image, uv + off1).rgb * 0.3162162162;
+		color += texture(image, uv - off1).rgb * 0.3162162162;
+		color += texture(image, uv + off2).rgb * 0.0702702703;
+		color += texture(image, uv - off2).rgb * 0.0702702703;
 		return color;
 	}
 
@@ -921,22 +922,22 @@ vec3 lanczos(sampler2D sampler_in, vec2 co, vec4 texsize, float sharpness ) {
 	*/
 	
 	vec3 blur5_x(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_x, float lod) {
-		vec2 resolution = sourcesize * sharpness_x;
+		float resolution = sourcesize.x * sharpness_x;
 		vec3 color = vec3(0.0);
-		vec2 off1 = vec2(1.333333333333, 0.0) ;
+		vec2 off1 = vec2(1.333333333333 / resolution, 0.0);
 		color += textureLod(image, uv, lod).rgb   * 0.29411764705882354;
-		color += textureLod(image, uv + (off1 / resolution), lod).rgb   * 0.35294117647058826;
-		color += textureLod(image, uv - (off1 / resolution), lod).rgb   * 0.35294117647058826;
+		color += textureLod(image, uv + off1, lod).rgb   * 0.35294117647058826;
+		color += textureLod(image, uv - off1, lod).rgb   * 0.35294117647058826;
 		return color;
 	}
 	
 	vec3 blur5_y(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_y, float lod) {
-		vec2 resolution = sourcesize * sharpness_y;
+		float resolution = sourcesize.y * sharpness_y;
 		vec3 color = vec3(0.0);
-		vec2 off1 = vec2(0.0, 1.333333333333) ;
+		vec2 off1 = vec2(0.0, 1.333333333333 / resolution) ;
 		color += textureLod(image, uv, lod).rgb   * 0.29411764705882354;
-		color += textureLod(image, uv + (off1 / resolution), lod).rgb   * 0.35294117647058826;
-		color += textureLod(image, uv - (off1 / resolution), lod).rgb   * 0.35294117647058826;
+		color += textureLod(image, uv + off1, lod).rgb   * 0.35294117647058826;
+		color += textureLod(image, uv - off1, lod).rgb   * 0.35294117647058826;
 		return color;
 	}
 
