@@ -494,8 +494,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 #pragma parameter DO_PIXELGRID_W     "      ★ Horizontal mask (0 to disable)"    	1.0 0.0 1.0 0.05
 #pragma parameter PIXELGRID_SIZE_W   "           . Resolution: (core or screen)"	1.0 0.0 1.0 1.0
-#pragma parameter PIXELGRID_H_PRST   "           . Mask type preset (0: for manual)"  3.0 0.0 6.0 1.0
-#pragma parameter PG_LABEL1          "             (1:gm 2:gmx 3:rgb 4:rgbx 5:rbg 6:rbgx)"  0.0 0.0 0.0 0.0
+#pragma parameter PIXELGRID_H_PRST   "           . Mask type preset (0: for manual)"  3.0 0.0 7.0 1.0
+#pragma parameter PG_LABEL1          "             (1:gm 2:gmx 3:rgb 4:rgbx 5:rbg 6:rbgx 7:wx)"  0.0 0.0 0.0 0.0
 #pragma parameter PIXELGRID_H_COUNT  "                . 0: Phosphors+gap count (mask size)"	3.0 1.0 4.0  1.0
 #pragma parameter PIXELGRID_R_SHIFT  "                . 0: R phospor position"      0.0  0.0 4.0 0.1
 #pragma parameter PIXELGRID_G_SHIFT  "                . 0: G phospor position"      1.0  0.0 4.0 0.1

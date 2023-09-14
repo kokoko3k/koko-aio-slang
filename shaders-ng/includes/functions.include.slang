@@ -260,6 +260,12 @@ vec3 apply_fuzzy_main_pass(vec3 color_in) {
 }
 */
 
+float get_halo_ungain_factor() {
+	return mix(1.0, 
+			   max(IN_GLOW_POWER, 1.0), 
+			   DO_CCORRECTION
+			   );
+}
 
 vec2 apply_fuzzy_main_pass_stage_1() {
 	//This simulates the final pass pixel processing so that previous passes like 
@@ -275,8 +281,9 @@ vec2 apply_fuzzy_main_pass_stage_1() {
 	
 	float halo_power_adapted;
 	halo_power_adapted = HALO_POWER;
-	if (HALO_NO_PREGAIN == 1.0) halo_power_adapted/= mix(1.0, IN_GLOW_POWER, DO_CCORRECTION);
-		
+	if (HALO_NO_PREGAIN == 1.0) {
+		halo_power_adapted /= get_halo_ungain_factor();
+	}
 	if (HALO_POWER < 0.0) 
 		halo_power_adapted = -halo_power_adapted/10.0;
 	
@@ -1118,6 +1125,7 @@ vec4 PG_get_hmask_preset() {
     * 4 rgbx : mask size = 4 | offsets=0,1,2  | width=0.20
     * 3 rbg  : mask size = 3 | offsets=0,1,2  | width=0.25
     * 4 rbgx : mask size = 4 | offsets=0,1,2  | width=0.20
+	* 5 wx   : mask size = 2 | offsets=0.3,0.3,0.3
     */
     if (PIXELGRID_H_PRST == 0.0) // manual mask and size
         return vec4( PIXELGRID_R_SHIFT, PIXELGRID_G_SHIFT, PIXELGRID_B_SHIFT, PIXELGRID_H_COUNT);
@@ -1139,6 +1147,7 @@ vec4 PG_get_hmask_preset() {
 
     if (PIXELGRID_H_PRST == 6.0)
         return vec4( vec3(0,2,1), 4); //rbgx, mask size 4
-
-        
+		
+    if (PIXELGRID_H_PRST == 7.0)
+        return vec4( vec3(0.3,0.3,0.3), 2); //WX, mask size 2
 }
