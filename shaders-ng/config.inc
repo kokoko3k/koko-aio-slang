@@ -746,7 +746,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BLANK_02 " " 0.0 0.0 1.0 1.0
 
 
-#pragma parameter SERVICE1 "Don't use me, for debug purposes only" 	0.5 0.0 1.0 0.1
+#pragma parameter SERVICE1 "Don't use me, for debug purposes only" 	0.5 0.0 1.0 0.01
 //#pragma parameter SERVICE2 "Don't use me, for debug purposes only" 	0.5 -1.0 1.0 0.01
 //#pragma parameter SERVICE3 "Don't use me, for debug purposes only" 	0.5 -1.0 1.0 0.01
 

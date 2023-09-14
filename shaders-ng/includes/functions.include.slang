@@ -1,3 +1,29 @@
+vec3 texture_BILINEAR(sampler2D t, vec2 uv, vec4 texSize, float k) {
+       uv = uv -texSize.zw*0.5*k;
+       vec2 texelSize = texSize.zw * k;
+    vec2 f = fract( uv * texSize.xy );
+    uv += ( .5 - f ) * texelSize;    // move uv to texel centre
+    vec3 tl = texture(t, uv).rgb;
+    vec3 tr = texture(t, uv + vec2(texelSize.x, 0.0)).rgb;
+    vec3 bl = texture(t, uv + vec2(0.0, texelSize.y)).rgb;
+    vec3 br = texture(t, uv + vec2(texelSize.x, texelSize.y)).rgb;
+    vec3 tA = mix( tl, tr, f.x );
+    vec3 tB = mix( bl, br, f.x );
+    return mix( tA, tB, f.y );
+}
+
+
+vec3 texture_BILINEAR_X(sampler2D t, vec2 uv, vec4 texSize, float k) {
+       uv = uv -texSize.zw*0.5*vec2(k,1.0);
+       vec2 texelSize = texSize.zw * vec2(k, 1.0);
+    vec2 f = fract( uv * texSize.xy );
+    uv += ( .5 - f ) * texelSize;    // move uv to texel centre
+    vec3 tl = texture(t, uv).rgb;
+    vec3 tr = texture(t, uv + vec2(texelSize.x, 0.0)).rgb;
+    return  mix( tl, tr, f.x );
+}
+
+
 float clamp_smooth(float x, float amin, float amax) {
 	float sharp = 0.0;
     return mix(amin, amax, smoothstep(amin-sharp, amax+sharp, x));
@@ -43,30 +69,6 @@ vec4 texture_QUILEZ(sampler2D tex, vec2 co, vec4 texsize) {
 	return texture(tex, co);
 }
 
-
-vec3 texture_BILINEAR(sampler2D t, vec2 uv, vec4 texSize, float k) {
-	uv = uv -texSize.zw*0.5*k;
-	vec2 texelSize = texSize.zw * k;
-    vec2 f = fract( uv * texSize.xy );
-    uv += ( .5 - f ) * texelSize;    // move uv to texel centre
-    vec3 tl = texture(t, uv).rgb;
-    vec3 tr = texture(t, uv + vec2(texelSize.x, 0.0)).rgb;
-    vec3 bl = texture(t, uv + vec2(0.0, texelSize.y)).rgb;
-    vec3 br = texture(t, uv + vec2(texelSize.x, texelSize.y)).rgb;
-    vec3 tA = mix( tl, tr, f.x );
-    vec3 tB = mix( bl, br, f.x );
-    return mix( tA, tB, f.y );
-}
-
-vec3 texture_BILINEAR_X(sampler2D t, vec2 uv, vec4 texSize, float k) {
-	uv = uv -texSize.zw*0.5*vec2(k,1.0);
-	vec2 texelSize = texSize.zw * vec2(k, 1.0);
-    vec2 f = fract( uv * texSize.xy );
-    uv += ( .5 - f ) * texelSize;    // move uv to texel centre
-    vec3 tl = texture(t, uv).rgb;
-    vec3 tr = texture(t, uv + vec2(texelSize.x, 0.0)).rgb;
-    return  mix( tl, tr, f.x );
-}
 
 vec4 texture_NEAREST(sampler2D tex, vec2 co_linear, vec4 tex_size) {
    //return nearest sampling from a linear filtered texture

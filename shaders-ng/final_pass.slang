@@ -454,8 +454,74 @@ vec3 morph_shape(vec3 shape, vec3 power, float steep, float gamma ) {
 
 
 
-vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inLum  ) {     
+
+vec3 downsample( sampler2D tex, vec2 uv, vec4 sourcesize,  float sharpness_add ) {
+    vec2 sharpness = vec2(1.0)+sharpness_add; 
+    vec2 scale = sourcesize.xy * sharpness;
+    
+    vec2 iuv = floor(uv * scale);
+    vec2 bottomleft  =    iuv;
+    vec2 bottomright =  ( iuv + vec2(1.0,0.0)) / scale;
+    vec2 topleft     =  ( iuv + vec2(0.0,1.0)) / scale;
+    vec2 topright    =  ( iuv + vec2(1.0,1.0)) / scale;
         
+    bottomleft /= scale;
+   
+    vec2 dist = (uv - bottomleft)*scale;
+        
+    vec3 bl = texture(tex, bottomleft).xyz   ;
+    vec3 br = texture(tex, bottomright).xyz  ;
+    vec3 tl = texture(tex, topleft).xyz      ;
+    vec3 tr = texture(tex, topright).xyz     ;
+    
+    vec3 tA = mix( bl, br, dist.x );
+    vec3 tB = mix( tl, tr, dist.x );
+    return mix( tA, tB, dist.y );
+
+}
+
+vec3 downsample_x( sampler2D tex, vec2 uv, vec4 sourcesize, float sharpness_add ) {  
+    
+    float sharpness = 1.0+sharpness_add;
+    
+    vec2 scale = vec2(sourcesize.x * sharpness, 1.0);
+
+    vec2 iuv = vec2( floor(uv.x * scale.x), uv.y);
+       
+    vec2 bottomleft  =    iuv;
+    vec2 bottomright =  ( iuv + vec2(1.0,0.0)) / scale;
+        
+    bottomleft /= scale;
+   
+    vec2 dist = (uv - bottomleft)*scale;
+
+    vec3 bl = texture(tex, bottomleft).xyz   ;
+    vec3 br = texture(tex, bottomright).xyz  ;
+   
+    return mix( bl, br, dist.x );
+    
+}
+
+vec3 smoothstep_fast(vec3 edge0, vec3 edge1, vec3 x) {
+
+  vec3 t = clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);
+  //return cos(t * 3.14159265358979323846) * -0.5 + 0.5;
+  return mix(vec3(0.0), vec3(1.0), t);
+}
+
+vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inLum  ) {     
+    /*
+     This would provide an additional method to alter scanlines "inertia", but has a cost of 4fps
+     when using smoothstep_fast and 13fps(!) when using standard smoothstep.
+     It could replace glow_x for tight blurs.
+    */
+    
+    ////vec3 lum_h =  downsample(in_glow_pass, in_coords, global.flick_and_noise_passSize, 0.0).rgb;
+    //vec3 lum_h =  downsample_x(in_glow_pass, in_coords, global.flick_and_noise_passSize, 0.0).rgb;  
+    //lum_h *= smoothstep_fast( vec3(SERVICE1-0.1) ,vec3(SERVICE1), lum_h);
+    //pixel_in = max(pixel_in, lum_h);
+    
+   
     //Scanlines: compute each phosphor height according to input luminance, puttin it here helpas parallelism a bit.
         float extragain_h = max(PIXELGRID_MAX_H, 1.0); //Handle 
         vec3 phosphor_height = map_range(pixel_in*extragain_h, min_inLum, max_inLum, PIXELGRID_MIN_H, clamp(PIXELGRID_MAX_H, PIXELGRID_MIN_H, 1.0));   
