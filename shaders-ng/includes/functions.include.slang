@@ -288,7 +288,7 @@ vec2 apply_fuzzy_main_pass_stage_1() {
 		halo_power_adapted = -halo_power_adapted/10.0;
 	
 	if (DO_CCORRECTION == 1.0) {
-		color_out = pow(color_in, GAMMA_OUT);
+		color_out = pow(color_in, GAMMA_OUT); //<- nonsense
 		gamma_out = gamma_out * GAMMA_OUT;
 		gamma_out = gamma_out * IN_GLOW_GAMMA;
 		color_out = pow(color_out,IN_GLOW_GAMMA)*IN_GLOW_POWER;
@@ -302,8 +302,8 @@ vec2 apply_fuzzy_main_pass_stage_1() {
 
 
 	if (DO_HALO == 1.0) {
-		color_out += color_in*halo_power_adapted;
-		gamma_out = gamma_out * mix(1.0, HALO_GAMMA*HALO_GAMMA_OUT, halo_power_adapted*0.25) ;
+		color_out += color_in*halo_power_adapted / HALO_GAMMA;
+		gamma_out = gamma_out * mix(1.0, HALO_GAMMA_OUT, halo_power_adapted*0.25) ;
 	}
 	
 	if (DO_VIGNETTE == 1.0)
