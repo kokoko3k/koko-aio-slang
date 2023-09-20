@@ -595,7 +595,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 float triad_stagger_offset =  is_even * pi * (PIXELGRID_OFFSET_CORE);
             //get 3 sines with applied the optional staggered offset for slotmask, and single phosphors staggering for y deconvergence.
                 vec3 decon_stagger = vec3( PIXELGRID_DECON_R_H, PIXELGRID_DECON_G_H, PIXELGRID_DECON_B_H) ; //* (pixel_in/max_inLum) ;
-                vec3 rgb_h_sin = sin((freq_base_core.y - decon_stagger) * interlacing_adapt_period + triad_stagger_offset + interlacing_adapt_offset );
+                vec3 rgb_h_sin = sin( (freq_base_core.y * interlacing_adapt_period) + triad_stagger_offset - decon_stagger + interlacing_adapt_offset );
             //make it positve with doubled frequency:
                 rgb_h_sin = (rgb_h_sin * rgb_h_sin);
                         
@@ -1431,8 +1431,9 @@ void main() {
         #endif
         
     #ifdef DEBUG_SHOW_CLIP
-        if (max(max(pixel_out.r, pixel_out.g), pixel_out.b) > 1.0)
-            pixel_out = vec3(1.0,0.0,0.0);
+        float clip = max(max(pixel_out.r, pixel_out.g), pixel_out.b) ;
+        if (clip  > 1.0)
+            pixel_out = 1-pixel_out;//;-clip;
     #endif
             
     FragColor = vec4(pixel_out, 1.0);
