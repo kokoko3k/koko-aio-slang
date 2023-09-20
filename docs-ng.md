@@ -77,12 +77,10 @@
         
     Sharpness (horizontal, vertical):
         Modulates the sharpness of the image.
-        When set near zero, his value is handled using "Glow spread amount" to an extent
-        given by "Glow to blur bias"
-        When pushed to its maximum value, no blurring will occour.
-        For Horizontal only, setting a negative number will switch to a different
-        blurring way that will fatten and sharp the borders.
-
+        - Max (actually 7.0) will not alter the image sharpness.
+        - More than 0: will use gauss blur
+        - Less than 0: will use box blur and will preogressively
+          add visual sharpness to image at lower values.
 
 **Tate mode:**<br>
     Rotates mask and scanlines by 90°<br>
