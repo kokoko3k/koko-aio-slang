@@ -79,8 +79,8 @@
         Modulates the sharpness of the image.
         - Max (actually 7.0) will not alter the image sharpness.
         - More than 0: will use gauss blur
-        - Less than 0: will use box blur and will preogressively
-          add visual sharpness to image at lower values.
+        - Less than 0: will use box blur and will progressively
+          add visual sharpness to image when approaching lower values.
 
 **Tate mode:**<br>
     Rotates mask and scanlines by 90°<br>
