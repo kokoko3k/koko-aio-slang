@@ -665,8 +665,9 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //This happen because flattening the rgb mask will make unflattened rgb triads
             //more evident, so this has to be used only when needed.    
                 
-                rgb_w = mix(rgb_h, rgb_w, dedot_mix_inverted);
-                
+                //rgb_w = mix(rgb_h, rgb_w, dedot_mix_inverted);
+                rgb_w = mix(phosphor_width, rgb_w, dedot_mix_inverted);
+                               
             //lower strength via user parameter?
                 rgb_w = mix(vec3(1.0), rgb_w, DO_PIXELGRID_W);
         }
