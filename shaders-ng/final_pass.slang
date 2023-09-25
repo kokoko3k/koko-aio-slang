@@ -650,7 +650,9 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 rgb_w = (rgb_w * rgb_w);
             //"export" naked vertical grille
                //rgb_grille = morph_shape(rgb_w, vec3(0.001), 1.0, 1.0);
-               rgb_grille = pow(rgb_w, vec3(8.0)); // same as previous, faster.
+               //rgb_grille = pow(rgb_w, vec3(8.0)); // same as previous, faster.
+               rgb_grille = (rgb_w * rgb_w) * (rgb_w * rgb_w);
+               
                 
             //Scale Max width according to pre-gains:
                 vec3 phosphor_width = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
