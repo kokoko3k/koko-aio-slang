@@ -569,10 +569,10 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
 
         //FIXME: is_even should be a single phosphor property.
         //If i manage to find a way to do it, i could use 
-        //decon_stagger.r,g,b to stagger syngle phosphors.
+        //decon_stagger.r,g,b to stagger single phosphors.
         //And that way, i could blend staggered triads together
-        //without "cuts" betweeb them.
-        //Also, i would solve the triad stagger unalignment problems.        
+        //without "cuts" between them.
+        //FIXME FIXME: Unsurer if the previous statement is still valid.
         
     //Moving it up there provides a small speed up due to
     //increased parallalism, I guess.
@@ -611,9 +611,8 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 //vec3 phosphor_height = map_range(pixel_in*extragain_h, min_inLum, max_inLum, PIXELGRID_MIN_H, clamp(PIXELGRID_MAX_H, PIXELGRID_MIN_H, 1.0));
                 
                 
-            //Finally get 3 sines out of the previous one by applying height modifiers
-                rgb_h = rgb_h_sin;               
-                rgb_h = morph_shape(rgb_h, phosphor_height, PIXELGRID_NO_INTERBLEED_H, PIXELGRID_GAMMA_H);
+            //Finally get 3 sines out of the previous one by applying height modifiers            
+                rgb_h = morph_shape(rgb_h_sin, phosphor_height, PIXELGRID_NO_INTERBLEED_H, PIXELGRID_GAMMA_H);
                 
                 rgb_h = mix(vec3(1.0), rgb_h, DO_PIXELGRID_H);
                 rgb_h = clamp(rgb_h, 0.0,1.0);
