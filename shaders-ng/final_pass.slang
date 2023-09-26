@@ -255,7 +255,7 @@ void main() {
         vDo_pixelgrid_h = float(DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0));
 
        
-    vDo_Curvature = DO_CURVATURE + GEOM_WARP_X + GEOM_WARP_Y;
+    vDo_Curvature = DO_CURVATURE * (GEOM_WARP_X + GEOM_WARP_Y);
     
     //Dot matrix: measure the final picture size to choose a right sharpness level
     //For simplicity and (my) mental health, take only y into account.
@@ -1235,7 +1235,7 @@ void main() {
         //Curvature has to come after inner zoom or bezel curved border will not match content
         //curved border when inner zoom changes.
         //if (DO_CURVATURE + GEOM_WARP_X + GEOM_WARP_Y > 1.0) {
-        if (vDo_Curvature > 1.0) {
+        if (vDo_Curvature > 0.0) {
             co_content = Warp_fast(co_content, vWarp_vexp, vWarp_arg2, GEOM_CUT_EARS);
         }
         
