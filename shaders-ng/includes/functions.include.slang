@@ -526,32 +526,26 @@ float random_fast(float power, vec2 seed) {
 	}
 	
 	
-
+	vec2 Warp_koko_full(vec2 co, vec2 w, float protrusion) {
+		float dist = distance(co, vec2(0.5));
+		float czoom = 1-dist;
+		czoom = mix(czoom, czoom * protrusion, czoom);
+		w = w / (protrusion+0.5)*0.625;
+		vec2 czoom2d = mix( vec2(1.0) , vec2(czoom), w);
+		float coff_adapt = mix(0.75, 0.5, protrusion);
+		vec2 coff =    mix( vec2(0.0), vec2(coff_adapt), w);
+		return zoomxy(co, coff+czoom2d);
+	}
 	
-vec2 Warp_try(vec2 pos, float warpX, float warpY) {
-	
-/*	float dist = length(pos-vec2(0.5))*10;
-	float c = 1 - clamp(dist, 0.0,1.0);
-	pos=zoom(pos, c);
-	return pos;
-	
-	pos=zoom(pos, 1.006);
-	*/
-	float k=0.5; //0.1
-	warpX*=k;
-	warpY*=k;
-	
-	//pos.x=zoom1D(pos.x, 1+warpX*0.16);
-	float powexp = 1.8;
-    pos  = pos*2.0-1.0;    
-    pos *= vec2(1.0 + pow(pos.y, powexp)*warpX, 1.0 + pow(pos.x, powexp)*warpY);
-    
-    return pos*0.5 + 0.5;
-	
-	
-	
-	
-}
+	vec2 Warp_koko_faster(vec2 co, vec2 w){
+		//hardcoded protrusion = 0.5
+		float dist = distance(co, vec2(0.5));
+		float czoom = 1-dist;
+		czoom = mix(czoom, czoom * 0.5, czoom);
+		vec2 czoom2d = mix( vec2(1.0) , vec2(czoom), w);
+		vec2 coff =    mix( vec2(0.0), vec2(0.625), w);
+		return zoomxy(co, coff+czoom2d);
+	}
 	
 	vec2 Warp_fast(vec2 uv, vec2 v_exp, vec2 arg2, float cut_ears) {
 		/*This version is exact and faster than the other implementation,
