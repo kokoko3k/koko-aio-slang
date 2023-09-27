@@ -22,46 +22,36 @@
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
-
-
 layout(location = 0) out vec2 vTexCoord;
 layout(location = 1) out vec2 vOutputCoord;
 layout(location = 2) out vec2 spot_offset;
-
 layout(location = 3) out float vIsRotated;
-
-
-//Curvature:
-    layout(location = 4) out vec2 vWarp_vexp;
-    layout(location = 5) out vec2 vWarp_arg2;
-
 //Scanlines:
-    layout(location = 6) out float vIsInterlaced;
-    layout(location = 7) out float vScanlinePeriod;
-    layout(location = 8) out float vScanlineAlternateOffset;
-    layout(location = 9) out float vMax_inLum;
-    
+layout(location = 4) out float vIsInterlaced;
+layout(location = 5) out float vScanlinePeriod;
+layout(location = 6) out float vScanlineAlternateOffset;
+layout(location = 7) out float vMax_inLum;
 //Vignette, spot:
-    layout(location = 10) out float vIn_aspect;
-    
-layout(location = 11) out float vDynamicSeed;
-layout(location = 12) out float vBEZEL_INNER_ZOOM_adapted;
-layout(location = 13) out float vDo_Tate;
-layout(location = 14) out vec3 vDotMat_Grid_Color;
-layout(location = 15) out vec4 vPG_offsets_and_size;
-layout(location = 16) out vec2 vPG_freq_base_screen;
-layout(location = 17) out vec2 vPG_freq_base_screen_unfloored;
-layout(location = 18) out vec2 vPG_period_multiplier;
-layout(location = 19) out vec2 vPG_OriginalSize_tated;
-layout(location = 20) out vec2 vPG_OutputSize_tated;
-layout(location = 21) out vec2 vPG_OutputCoord_tated;
-layout(location = 22) out float vDotMat_Grid_Sharpness;
-layout(location = 23) out float vfprintvalue;
-layout(location = 24) out float vPG_mask_height;
-layout(location = 25) out float vDeltaRenderOk;
-layout(location = 26) out float vDo_pixelgrid_h;
-layout(location = 27) out float vDo_Curvature;
-layout(location = 28) out float vPG_offsets_adjust_for_stagger;
+layout(location = 8) out float vIn_aspect;
+//
+layout(location = 9) out float vDynamicSeed;
+layout(location = 10) out float vBEZEL_INNER_ZOOM_adapted;
+layout(location = 11) out float vDo_Tate;
+layout(location = 12) out vec3 vDotMat_Grid_Color;
+layout(location = 13) out vec4 vPG_offsets_and_size;
+layout(location = 14) out vec2 vPG_freq_base_screen;
+layout(location = 15) out vec2 vPG_freq_base_screen_unfloored;
+layout(location = 16) out vec2 vPG_period_multiplier;
+layout(location = 17) out vec2 vPG_OriginalSize_tated;
+layout(location = 18) out vec2 vPG_OutputSize_tated;
+layout(location = 19) out vec2 vPG_OutputCoord_tated;
+layout(location = 20) out float vDotMat_Grid_Sharpness;
+layout(location = 21) out float vfprintvalue;
+layout(location = 22) out float vPG_mask_height;
+layout(location = 23) out float vDeltaRenderOk;
+layout(location = 24) out float vDo_pixelgrid_h;
+layout(location = 25) out float vDo_Curvature;
+layout(location = 26) out float vPG_offsets_adjust_for_stagger;
 
 
 layout(location = 31) out float I_am_a_placeholder_keep_reading;
@@ -155,9 +145,6 @@ void main() {
 
     vBEZEL_INNER_ZOOM_adapted = get_BEZEL_INNER_ZOOM() * DO_BEZEL;
     
-    //Precalc some Curvature/Warp values:
-        vWarp_vexp = 1.0/ (1 + (vec2(GEOM_WARP_X, GEOM_WARP_Y) * 0.2)) ;
-        vWarp_arg2 = 1.0 - pow(vec2(0.29289321881345247559915563789515), vWarp_vexp );
 
     //SPOT
         spot_offset = offsets_from_float(S_POSITION+420.0,40);
@@ -275,31 +262,29 @@ layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in vec2 vOutputCoord;
 layout(location = 2) in vec2 spot_offset;
 layout(location = 3) in float vIsRotated;
-layout(location = 4) in vec2 vWarp_vexp;
-layout(location = 5) in vec2 vWarp_arg2;
-layout(location = 6) in float vIsInterlaced;
-layout(location = 7) in float vScanlinePeriod;
-layout(location = 8) in float vScanlineAlternateOffset;
-layout(location = 9) in float vMax_inLum;
-layout(location = 10) in float vIn_aspect;
-layout(location = 11) in float vDynamicSeed;
-layout(location = 12) in float vBEZEL_INNER_ZOOM_adapted;
-layout(location = 13) in float vDo_Tate;
-layout(location = 14) in vec3 vDotMat_Grid_Color;
-layout(location = 15) in vec4 vPG_offsets_and_size;
-layout(location = 16) in vec2 vPG_freq_base_screen;
-layout(location = 17) in vec2 vPG_freq_base_screen_unfloored;
-layout(location = 18) in vec2 vPG_period_multiplier;
-layout(location = 19) in vec2 vPG_OriginalSize_tated;
-layout(location = 20) in vec2 vPG_OutputSize_tated;
-layout(location = 21) in vec2 vPG_OutputCoord_tated;
-layout(location = 22) in float vDotMat_Grid_Sharpness;
-layout(location = 23) in float vfprintvalue;
-layout(location = 24) in float vPG_mask_height;
-layout(location = 25) in float vDeltaRenderOk;
-layout(location = 26) in float vDo_pixelgrid_h;
-layout(location = 27) in float vDo_Curvature;
-layout(location = 28) in float vPG_offsets_adjust_for_stagger;
+layout(location = 4) in float vIsInterlaced;
+layout(location = 5) in float vScanlinePeriod;
+layout(location = 6) in float vScanlineAlternateOffset;
+layout(location = 7) in float vMax_inLum;
+layout(location = 8) in float vIn_aspect;
+layout(location = 9) in float vDynamicSeed;
+layout(location = 10) in float vBEZEL_INNER_ZOOM_adapted;
+layout(location = 11) in float vDo_Tate;
+layout(location = 12) in vec3 vDotMat_Grid_Color;
+layout(location = 13) in vec4 vPG_offsets_and_size;
+layout(location = 14) in vec2 vPG_freq_base_screen;
+layout(location = 15) in vec2 vPG_freq_base_screen_unfloored;
+layout(location = 16) in vec2 vPG_period_multiplier;
+layout(location = 17) in vec2 vPG_OriginalSize_tated;
+layout(location = 18) in vec2 vPG_OutputSize_tated;
+layout(location = 19) in vec2 vPG_OutputCoord_tated;
+layout(location = 20) in float vDotMat_Grid_Sharpness;
+layout(location = 21) in float vfprintvalue;
+layout(location = 22) in float vPG_mask_height;
+layout(location = 23) in float vDeltaRenderOk;
+layout(location = 24) in float vDo_pixelgrid_h;
+layout(location = 25) in float vDo_Curvature;
+layout(location = 26) in float vPG_offsets_adjust_for_stagger;
 
 
 
@@ -1216,8 +1201,7 @@ void main() {
         //Curvature has to come after inner zoom or bezel curved border will not match content
         //curved border when inner zoom changes.
         if (vDo_Curvature > 0.0) {
-            co_content = Warp_fast(co_content, vWarp_vexp, vWarp_arg2, GEOM_CUT_EARS);
-            //co_content = Warp_koko_faster(co_content, vec2(GEOM_WARP_X, GEOM_WARP_Y)*0.625);
+            co_content = Warp_koko_faster(co_content, vec2(GEOM_WARP_X, GEOM_WARP_Y));
             //co_content = Warp_koko_full(co_content, vec2(GEOM_WARP_X, GEOM_WARP_Y), 0.5); 
         }
         
