@@ -46,8 +46,6 @@ layout(location = 3) out float vIsRotated;
     
 layout(location = 11) out float vDynamicSeed;
 layout(location = 12) out float vBEZEL_INNER_ZOOM_adapted;
-
-
 layout(location = 13) out float vDo_Tate;
 layout(location = 14) out vec3 vDotMat_Grid_Color;
 layout(location = 15) out vec4 vPG_offsets_and_size;
@@ -60,18 +58,10 @@ layout(location = 21) out vec2 vPG_OutputCoord_tated;
 layout(location = 22) out float vDotMat_Grid_Sharpness;
 layout(location = 23) out float vfprintvalue;
 layout(location = 24) out float vPG_mask_height;
-
-layout(location = 26) out vec4 vfloats_packed1;
-//We're running out of available locations for vulkan (max index = 31), so we packed 4 floats into 1.
-    //layout(location = 26) in float vDeltaRenderOk;
-    //layout(location = 27) in float vDo_pixelgrid_h;
-    //layout(location = 28) in float vDo_Curvature;
-    //layout(location = 29) in float vPG_offsets_adjust_for_stagger;
-    #define vDeltaRenderOk  vfloats_packed1.r
-    #define vDo_pixelgrid_h vfloats_packed1.g
-    #define vDo_Curvature   vfloats_packed1.b
-    #define vPG_offsets_adjust_for_stagger vfloats_packed1.a
-
+layout(location = 25) out float vDeltaRenderOk;
+layout(location = 26) out float vDo_pixelgrid_h;
+layout(location = 27) out float vDo_Curvature;
+layout(location = 28) out float vPG_offsets_adjust_for_stagger;
 
 
 layout(location = 31) out float I_am_a_placeholder_keep_reading;
@@ -79,6 +69,8 @@ layout(location = 31) out float I_am_a_placeholder_keep_reading;
 //or Retroarch crashes or nvidia starts to give Xids.
 //unsure if the issue is with retroarch or with vulkan specs.
 //If in short, consider to pack more datas into vec2,3,4.
+//But bear in mind that exceding the limit leads to 
+//slowdowns.
 
 #include "includes/functions.include.slang"
 
@@ -282,20 +274,16 @@ void main() {
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in vec2 vOutputCoord;
 layout(location = 2) in vec2 spot_offset;
-
 layout(location = 3) in float vIsRotated;
 layout(location = 4) in vec2 vWarp_vexp;
 layout(location = 5) in vec2 vWarp_arg2;
 layout(location = 6) in float vIsInterlaced;
-
 layout(location = 7) in float vScanlinePeriod;
 layout(location = 8) in float vScanlineAlternateOffset;
 layout(location = 9) in float vMax_inLum;
 layout(location = 10) in float vIn_aspect;
 layout(location = 11) in float vDynamicSeed;
 layout(location = 12) in float vBEZEL_INNER_ZOOM_adapted;
-
-
 layout(location = 13) in float vDo_Tate;
 layout(location = 14) in vec3 vDotMat_Grid_Color;
 layout(location = 15) in vec4 vPG_offsets_and_size;
@@ -308,17 +296,12 @@ layout(location = 21) in vec2 vPG_OutputCoord_tated;
 layout(location = 22) in float vDotMat_Grid_Sharpness;
 layout(location = 23) in float vfprintvalue;
 layout(location = 24) in float vPG_mask_height;
+layout(location = 25) in float vDeltaRenderOk;
+layout(location = 26) in float vDo_pixelgrid_h;
+layout(location = 27) in float vDo_Curvature;
+layout(location = 28) in float vPG_offsets_adjust_for_stagger;
 
-layout(location = 26) in vec4 vfloats_packed1;
-//We're running out of available locations for vulkan (max index = 31), so we packed 4 floats into 1.
-    //layout(location = 26) in float vDeltaRenderOk;
-    //layout(location = 27) in float vDo_pixelgrid_h;
-    //layout(location = 28) in float vDo_Curvature;
-    //layout(location = 29) in float vPG_offsets_adjust_for_stagger;
-    #define vDeltaRenderOk  vfloats_packed1.r
-    #define vDo_pixelgrid_h vfloats_packed1.g
-    #define vDo_Curvature   vfloats_packed1.b
-    #define vPG_offsets_adjust_for_stagger vfloats_packed1.a
+
 
 
 layout(location = 0) out vec4 FragColor;
@@ -336,9 +319,7 @@ layout(set = 0, binding = 9)  uniform sampler2D bg_over;
 //layout(set = 0, binding = 10) uniform sampler2D shift_and_bleed_pass;
 layout(set = 0, binding = 11) uniform sampler2D in_glow_pass;
 layout(set = 0, binding = 12) uniform sampler2D halo_pass;
-
 layout(set = 0, binding = 13) uniform sampler2D final_passFeedback;
-
 layout(set = 0, binding = 15) uniform sampler2D DEBUG_TEXTURE;
 
 
@@ -1234,9 +1215,10 @@ void main() {
     //Curvature 
         //Curvature has to come after inner zoom or bezel curved border will not match content
         //curved border when inner zoom changes.
-        //if (DO_CURVATURE + GEOM_WARP_X + GEOM_WARP_Y > 1.0) {
         if (vDo_Curvature > 0.0) {
             co_content = Warp_fast(co_content, vWarp_vexp, vWarp_arg2, GEOM_CUT_EARS);
+            //co_content = Warp_koko_faster(co_content, vec2(GEOM_WARP_X, GEOM_WARP_Y)*0.625);
+            //co_content = Warp_koko_full(co_content, vec2(GEOM_WARP_X, GEOM_WARP_Y), 0.5); 
         }
         
     //Mirror coords needs to be calculated here, before geom override, but after curvature.

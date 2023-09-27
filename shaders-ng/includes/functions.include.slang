@@ -539,6 +539,7 @@ float random_fast(float power, vec2 seed) {
 	
 	vec2 Warp_koko_faster(vec2 co, vec2 w){
 		//hardcoded protrusion = 0.5
+		//w needs to be scaled by 0.625
 		float dist = distance(co, vec2(0.5));
 		float czoom = 1-dist;
 		czoom = mix(czoom, czoom * 0.5, czoom);
