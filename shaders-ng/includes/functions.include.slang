@@ -530,8 +530,6 @@ float random_fast(float power, vec2 seed) {
 		//Keep protrusion higher than ~0.5
 		float czoom  = 1 - distance(co, vec2(0.5));
 		czoom        = mix(czoom, czoom * protrusion, czoom);
-		//czoom          = (czoom + (protrusion - 1)) * (czoom*czoom);
-
 		vec2 czoom2d = mix(vec2(1.0), vec2(czoom), w);
 		vec2 coff    = mix( vec2(0.0), vec2(0.625), w);
 		return zoomxy(co, coff + czoom2d );

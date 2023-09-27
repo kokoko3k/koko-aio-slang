@@ -556,12 +556,12 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
 
             //Since we emulate scanlines, take into account current scanline phase:
                 float interlacing_adapt_period = vScanlinePeriod;
-                float interlacing_adapt_offset = vScanlineAlternateOffset;
+
             //We can offset trias to emulate fake core level slotmask by applying the optional offset to emulate the slotmask on even cells
                 float triad_stagger_offset =  is_even * pi * (PIXELGRID_OFFSET_CORE);
             //get 3 sines with applied the optional staggered offset for slotmask, and single phosphors staggering for y deconvergence.
                 vec3 decon_stagger = vec3( PIXELGRID_DECON_R_H, PIXELGRID_DECON_G_H, PIXELGRID_DECON_B_H) ; //* (pixel_in/max_inLum) ;
-                vec3 rgb_h_sin = sin( (freq_base_core.y * interlacing_adapt_period) + triad_stagger_offset - decon_stagger + interlacing_adapt_offset );
+                vec3 rgb_h_sin = sin( (freq_base_core.y * interlacing_adapt_period) + triad_stagger_offset - decon_stagger + vScanlineAlternateOffset );
             //make it positve with doubled frequency:
                 rgb_h_sin = (rgb_h_sin * rgb_h_sin);
                         
