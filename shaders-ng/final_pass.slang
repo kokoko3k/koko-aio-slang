@@ -615,16 +615,9 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //make them always positive and double frequency:
                 rgb_w = (rgb_w * rgb_w);
             //"export" naked vertical grille
-               //rgb_grille = morph_shape(rgb_w, vec3(0.001), 1.0, 1.0);
-               //rgb_grille = pow(rgb_w, vec3(8.0)); // same as previous, faster.
                rgb_grille = (rgb_w * rgb_w) * (rgb_w * rgb_w);
-               
-                
             //Scale Max width according to pre-gains:
                 vec3 phosphor_width = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
-
-
-                
             //Get final phosphor width:
                 rgb_w = morph_shape(rgb_w, phosphor_width, PIXELGRID_NO_INTERBLEED_W, PIXELGRID_GAMMA_W); //2%
             
@@ -632,7 +625,6 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //This work only when there are dots and have the countereffect when there are not.
             //This happen because flattening the rgb mask will make unflattened rgb triads
             //more evident, so this has to be used only when needed.    
-                
                 //rgb_w = mix(rgb_h, rgb_w, dedot_mix_inverted);
                 rgb_w = mix(phosphor_width, rgb_w, dedot_mix_inverted);
                                
