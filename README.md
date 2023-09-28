@@ -41,7 +41,6 @@ Several presets are included.<br>
 
 ***External code by:***
 * Nvidia (FXAA)
-* EasyMode (curvature related code)
         
 # Examples
 
