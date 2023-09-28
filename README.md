@@ -42,7 +42,45 @@ Several presets are included.<br>
 ***External code by:***
 * Nvidia (FXAA)
         
-# Examples
+# Examples from NG version
+
+***Dynamic Ambient light examples***
+![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots-ng-1.0/Amby-night.jpeg?raw=true)
+![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots-ng-1.0/Amby-day.jpeg?raw=true)
+![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots-ng-1.0/Amby-widen.jpeg?raw=true)
+
+***Hires content***
+![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots-ng-1.0/hires.jpeg?raw=true)
+
+***Overmasked***
+![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots-ng-1.0/Overmask,jpeg?raw=true)
+![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots-ng-1.0/Overmask2.jpeg?raw=true)
+
+***Ntsc selective blurring and sharpening***
+![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots-ng-1.0/sonic1.jpeg?raw=true)
+
+***Antialiased***
+![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots-ng-1.0/fxaa.jpeg?raw=true)
+
+***Mask experiments***
+![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots-ng-1.0/overlapped.jpeg?raw=true)
+![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots-ng-1.0/oldpainless.jpeg?raw=true)
+![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots-ng-1.0/pinchlook.jpeg?raw=true)
+![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots-ng-1.0/Wide-Mask?raw=true)
+
+***ffmpeg player***
+![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots-ng-1.0/tv.jpeg ?raw=true)
+
+***Handhelds***
+![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots-ng-1.0/handhelds/gg_lights1.jpeg?raw=true)
+![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots-ng-1.0/handhelds/gg_ambilights.jpeg?raw=true)
+![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots-ng-1.0/handhelds/gmb_zoom.jpeg?raw=true)
+![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots-ng-1.0/handhelds/gbp.jpeg?raw=true)
+![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots-ng-1.0/handhelds/gbm_desktop.jpeg?raw=true)
+![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots-ng-1.0/handhelds/wario.jpeg?raw=true)
+
+
+# Old screenshots from 3.5
 
 ***monitor-slotmask-bloom-bezelwider - Arcade - Final fight***
 ![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots.3.5/monitor-slotmask-bloom-bezelwider.mame.ffight.png?raw=true)
