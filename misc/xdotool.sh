@@ -59,14 +59,15 @@ function xdosavepreset {
 	SendKey "Escape"
 }
 
-for preset in $(ls -1 /koko/koko-aio-slang/presets/* | grep slangp) ; do 
+for preset in $(find /koko/koko-aio-slang/presets-ng -iname "*.slangp" |grep -vi experimental|grep -vi debug|grep -vi wip) ; do 
 	echo $preset
+	
 	presetname=$(basename "$preset")
 	echo $presetname
 	xdosavepreset 5 &
-	retroarch  -L /koko/.config/retroarch/cores/mame2003_plus_libretro.so $1 \
-	--set-shader $preset  2>&1|grep -i error 
+	retroarch  -L /koko/.config/retroarch/cores/mame2003_plus_libretro.so $1 --set-shader $preset  2>&1|grep -i error 
 	mv /koko/.config/retroarch/shaders/1.slangp /koko/.config/retroarch/shaders/$presetname
+	sleep 1
 done
 
 
