@@ -69,7 +69,7 @@ Several presets are included.<br>
 ![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots-ng-1.0/Wide-Mask?raw=true)
 
 ***ffmpeg player***
-![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots-ng-1.0/tv.jpeg ?raw=true)
+![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots-ng-1.0/tv.jpeg?raw=true)
 
 ***Handhelds***
 ![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots-ng-1.0/handhelds/gg_lights1.jpeg?raw=true)
