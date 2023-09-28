@@ -1,0 +1,4 @@
+#reference "Monitor-FXAA_sharp-Core_SlotMask.slangp"
+
+	PIXELGRID_OFFSET_CORE = "0.0"
+	PIXELGRID_OVERMASK = "1.000000"
