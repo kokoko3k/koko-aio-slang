@@ -429,17 +429,17 @@
         they may distract you.
         Keep in mynd that there is a scene detection logic that will make them
         react as fast as possible when a scene change is detected.
+    Led power/Falloff:
+        How input gain is applied to a single led, affects light wideness.
+    Led saturation:
+        Leds saturation post gain.      
     Led internalness:
         The distance between the virtual led strip and the content.
         High values will move leds behind it, while lower values will move
         leds around it.
-    Light Falloff:
-        How wide is the light of a single led.
     Widen lights:
         Dumb stretch of the visible texture, operates on the whole content, instead of the
         single led.
-    Led power:
-        Leds post gain.
         Note: To avoid burn-in effects, keep Light Falloff + Led power not too high.
     Colorize Bezel;
         Allow to add an amount of the ambient light over the bezel frame
