@@ -2,7 +2,7 @@
 #include "config.inc"
 
 //Dumbify glow under this treshold.
-#define GLOW_SHARP_MAX_ALTERNATE -1.0 
+#define GLOW_SHARP_MAX_ALTERNATE -2.0 
 
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
@@ -17,10 +17,9 @@ void main() {
    
    //IN_GLOW_H is are over the upper limit and IN_GLOW_W is outside the allowed interval;
    glow_w_inside_interval = float(IN_GLOW_W < GLOW_SHARP_MAX  && IN_GLOW_W > GLOW_SHARP_MAX_ALTERNATE);
+   float glow_h_inside_interval = float(IN_GLOW_H < GLOW_SHARP_MAX  && IN_GLOW_H > GLOW_SHARP_MAX_ALTERNATE);
    
-   
-   glow_h_and_w_outside_interval = float (IN_GLOW_H >= GLOW_SHARP_MAX && glow_w_inside_interval !=1.0) ;
-   
+   glow_h_and_w_outside_interval = float (glow_h_inside_interval != 1.0 && glow_w_inside_interval != 1.0) ;
 }
 
 
@@ -88,24 +87,9 @@ void main() {
          return;
       }
       
-   
+
    float IN_GLOW_W_ADAPTED = abs(IN_GLOW_W);
-   
-   //GLow to blur via IN_GLOW_SPREAD:
-      //Spread amount needs to lessen its influence when going from glow to blur
-         float in_glow_spread = IN_GLOW_SPREAD * (1-IN_GLOW_BIAS);
-      //half in glow spread for box
-         if (IN_GLOW_W < 0.0) 
-            in_glow_spread = in_glow_spread/2.0;
-      //Modulate sharpness via IN_GLOW_SPREAD when IN_GLOW_W is under minimum blur sharpness
-      //It seems that for box blur, setting width to 1.0 works better.
-         if (IN_GLOW_W_ADAPTED < MIN_IN_GLOW_SHARP ) {
-            float IN_GLOW_W_ADAPTED_SPREADED = mix(in_glow_spread * IN_GLOW_SHARPNESS_SPREAD_RATIO_W, 1.0, float(IN_GLOW_W < 0.0));
-         //The modulation depends on glow to blur bias
-            IN_GLOW_W_ADAPTED_SPREADED = mix(IN_GLOW_W_ADAPTED_SPREADED, IN_GLOW_W_ADAPTED, IN_GLOW_BIAS );
-         }
-
-
+            
    //Modulate glow power via ntsc artifact mask:
       float ntsc_artifacts = texture(shift_and_bleed_pass, vTexCoord).a;
       
@@ -118,7 +102,7 @@ void main() {
          IN_GLOW_W_ADAPTED = IN_GLOW_W_ADAPTED +  DO_NTSC_ARTIFACTS * ((1-ntsc_artifacts) * NTSC_ARTF_NOBLUR);
 
    //don't allow lower values that look bad:
-      IN_GLOW_W_ADAPTED = max(IN_GLOW_W_ADAPTED, MIN_IN_GLOW_SHARP);
+      //IN_GLOW_W_ADAPTED = max(IN_GLOW_W_ADAPTED, MIN_IN_GLOW_SHARP);
 
    //Scale it for lanczos
    //   if (IN_GLOW_W < 0.0) 
@@ -149,7 +133,7 @@ void main() {
          FragColor = vec4(blur_select_wrap(shift_and_bleed_pass, vTexCoord, global.flick_and_noise_passSize, IN_GLOW_W_ADAPTED, (IN_GLOW_W >= 0.0) ), 
                           DR_unchanged);
    } else {
-      FragColor = texture(shift_and_bleed_pass, vTexCoord, DR_unchanged);
+      FragColor = vec4(texture(shift_and_bleed_pass, vTexCoord).rgb, DR_unchanged);
    }
    
 }

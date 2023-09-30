@@ -5,7 +5,8 @@
     of the signal, at "input" stage.<br>
     Gamma in correction is applied at ti beginning of the chain,<br>
     Gamma out correction is applied to the final processed picture.<br>
-    <br>
+    Input signal gain is applied in the chain just before the crt emulation stages.<br>
+    
     It is also possible to emulate a monochrome display with custom colors:
     
         Monochrome screen colorization:
@@ -65,8 +66,6 @@
     the image will light their surroundings,<br>
     with options to switch to classic blur.<br>
     
-    Input signal strength:
-        The input signal gain
     Glow to blur bias:
         Higher negative values -> more glow : brighter colors expands over darker ones.
         Higher positive values -> means blur: all the colors are blurred.
@@ -78,12 +77,10 @@
         
     Sharpness (horizontal, vertical):
         Modulates the sharpness of the image.
-        When set near zero, his value is handled using "Glow spread amount" to an extent
-        given by "Glow to blur bias"
-        When pushed to its maximum value, no blurring will occour.
-        For Horizontal only, setting a negative number will switch to a different
-        blurring way that will fatten and sharp the borders.
-
+        - Max (actually 7.0) will not alter the image sharpness.
+        - More than 0: will use gauss blur
+        - Less than 0: will use box blur and will progressively
+          add visual sharpness to image when approaching lower values.
 
 **Tate mode:**<br>
     Rotates mask and scanlines by 90°<br>
@@ -95,15 +92,23 @@
     By reading the following explanaitions, you will realize that this section can also be used to emulate<br>
     handhelds screens, where pixels you see on screen have to be sized proportionally to the game one.<br>
     
+    Overmask (1.0 = neutral):
+        Values > 1.0 give a gritty/gariny look to the whole mask.
+          It may cause moiree if combined with curvature, dedot, or sparkling look punch.
+        Values < 1.0 tend to nullify the whole mask effect.
+        
+    
     Horizontal mask (rgb subpixel mask strength)
         X resolution: (core or screen) (**):
             0: Phosphors width will be relative to the pixel width of the core (game).
             1: Phosphors width will be relative to the pixel width of the screen.
         Mask type preset:
             You can have the shader generate a preconfigured mask for you:
-            1:gm 2:gmx 3:rgb 4:rgbx 5:rbg 6:rbgx
-            (GreenMagenta, GreenMagentaGap, RedGreenBlue, RedGreenBlueGap, RedBlueGreen, RedBlueGreenGap)
-            (beware that due to limitations of the actual implementation, masks ending in "x"
+            1:gm 2:gmx 3:rgb 4:rgbx 5:rbg 6:rbgx 7:wx
+            1:GreenMagenta, 2:GreenMagentaGap, 3:RedGreenBlue, 4:RedGreenBlueGap, 5:RedBlueGreen, 6:RedBlueGreenGap
+            7:WhiteGap (means r,g and b phosphors are completely overlapped, nice with scanline deconvergence)
+            
+            (beware that due to limitations of the actual implementation, masks ending in "x")
             works reliable when emulating slotmasks only at screen coordinates with multiplier = 1.0)
             bh selecting preset = 0, you can draft your own by using the following knobs:
                 Phosphors+gap count (mask size):
@@ -137,12 +142,12 @@
             of 2 or 3 to make room for phosphors and see them visually grow in width.
             Likewise, you can use core/game(**) sized masks and divide them by a factor
             if they appears too big.
-        Inter-cell extra steepness (handhelds)
+        Inter-cell extra steepness (for integer scaling)
             When you set maximum width/height to anything > 0.5, the phosphor light will bleed over
             the adiacent (left/right up/down) one so that they will start to blend togheter.
             This option will avoid the bleeding.
             You may want them to merge or not, depending on your preference to see a visible "grid"/lines.
-            This function is useful when you want to emulate handhelds screens, 
+            This function is useful when you want to emulate handhelds screens using integer scaling, 
             where cells are well separated.
         Black level of the unexcided phosphor grid
             Draw the vertical grid that hosts phosphors.
@@ -172,12 +177,12 @@
             While this does not exist at all in crt technology, it greatly mitigates the artifacts
             just explained while producing a fairly convincing effect, very similar to a screen
             with visible scanlines and visible slotmask.
-        Inter-cell extra steepness (handhelds)
+        Inter-cell extra steepness (for integer scaling)
             When you set maximum width/height to anything > 0.5, the phosphor light will bleed over
             the adiacent (left/right up/down) one so that they will start to blend togheter.
             This option will avoid the bleeding.
             You may want them to merge or not, depending on your preference to see a visible "grid"/lines.
-            This function is useful when you want to emulate handhelds screens, 
+            This function is useful when you want to emulate handhelds screens using integer scaling, 
             where cells are well separated.
         Dedot mask between scanlines
             When using Horizontal masks, you mai notice a disturbing dot pattern left between high
@@ -268,19 +273,30 @@
     So you can use this to restore the brightness and color saturation<br>
     loss when using features like scanlines, darklines or RGB masks.<br>
     
-	Light up scanlines too:
+    Pre-attenuate input signal gain to 1x:
+        Nullifies the input gain applied in the color correction section.
+        This way the halo effect will be consistent and will not depend on 
+        it, avoiding hard to manage cascading effects.
+    Strength (negative = 10x precision)
+        The effect strength.
+        Negative values are interpreted as positive ones, divided by 10,
+        when fine tuning is needed.
+    Sharpness
+        The lower, the wider the halo.
+    Gamma in
+        Act like a soft treshold; the higher, the less the darker colors
+        will be "haloed"
+    Gamma out
+        Post-gamma correction applied to the halo.
+    Light up scanline gaps and dot grid gaps too:
 		Theoretically Halo have to be applied 
 		"over" everything, because that is the way it works in nature.
 		But you can choose to cheat and instead apply scanlines over the halo
 		instead.
 		Do this if you like much more pronunced scanlines, even at the
-		price of some graphical artifacts visible on high contrasted areas. 
+		price of some graphical artifacts visible on high contrasted areas.
+		The same apply for the grid emulated via dot matrix emulation feature.
  
-    Strength (negative = 10x precision)
-        The effect strength.
-        Negative values are interpreted as positive ones, divided by 10,
-        when fine tuning is needed.
-    Refer to "Glowing Input/power" for other parameters meaning.
     
 **Bloom:**<br>
     Acts like Halo, but affects a much wider area and is more configurable.<br>
@@ -413,17 +429,17 @@
         they may distract you.
         Keep in mynd that there is a scene detection logic that will make them
         react as fast as possible when a scene change is detected.
+    Led power/Falloff:
+        How input gain is applied to a single led, affects light wideness.
+    Led saturation:
+        Leds saturation post gain.      
     Led internalness:
         The distance between the virtual led strip and the content.
         High values will move leds behind it, while lower values will move
         leds around it.
-    Light Falloff:
-        How wide is the light of a single led.
     Widen lights:
         Dumb stretch of the visible texture, operates on the whole content, instead of the
         single led.
-    Led power:
-        Leds post gain.
         Note: To avoid burn-in effects, keep Light Falloff + Led power not too high.
     Colorize Bezel;
         Allow to add an amount of the ambient light over the bezel frame

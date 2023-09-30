@@ -122,24 +122,61 @@ Several presets are included.<br>
 
 ***External code by:***
 * Nvidia (FXAA)
-* EasyMode (curvature related code)
         
-# Examples
+# Examples from NG version
+
+***Dynamic Ambient light examples***
+![ ](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots-ng-1.0/Amby-night.jpeg?raw=true)
+![ ](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots-ng-1.0/Amby-day.jpeg?raw=true)
+![ ](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots-ng-1.0/Amby-widen.jpeg?raw=true)
+
+***Hires content***
+![ ](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots-ng-1.0/hires.jpeg?raw=true)
+
+***Overmasked***
+![ ](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots-ng-1.0/Overmask,jpeg?raw=true)
+![ ](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots-ng-1.0/Overmask2.jpeg?raw=true)
+
+***Ntsc selective blurring and sharpening***
+![ ](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots-ng-1.0/sonic1.jpeg?raw=true)
+
+***Antialiased***
+![ ](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots-ng-1.0/fxaa.jpeg?raw=true)
+
+***Mask experiments***
+![ ](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots-ng-1.0/overlapped.jpeg?raw=true)
+![ ](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots-ng-1.0/oldpainless.jpeg?raw=true)
+![ ](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots-ng-1.0/pinchlook.jpeg?raw=true)
+![ ](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots-ng-1.0/Wide-Mask?raw=true)
+
+***ffmpeg player***
+![ ](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots-ng-1.0/tv.jpeg?raw=true)
+
+***Handhelds***
+![ ](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots-ng-1.0/handhelds/gg_lights1.jpeg?raw=true)
+![ ](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots-ng-1.0/handhelds/gg_ambilights.jpeg?raw=true)
+![ ](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots-ng-1.0/handhelds/gmb_zoom.jpeg?raw=true)
+![ ](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots-ng-1.0/handhelds/gbp.jpeg?raw=true)
+![ ](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots-ng-1.0/handhelds/gbm_desktop.jpeg?raw=true)
+![ ](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots-ng-1.0/handhelds/wario.jpeg?raw=true)
+
+
+# Old screenshots from 3.5
 
 ***monitor-slotmask-bloom-bezelwider - Arcade - Final fight***
-![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots.3.5/monitor-slotmask-bloom-bezelwider.mame.ffight.png?raw=true)
+![ ](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots.3.5/monitor-slotmask-bloom-bezelwider.mame.ffight.png?raw=true)
 
 ***monitor-Commodore_1084S-wider - Amiga - ProjectX SE***
-![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots.3.5/monitor-Commodore_1084S-wider.puae.projectx.png?raw=true)
+![ ](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots.3.5/monitor-Commodore_1084S-wider.puae.projectx.png?raw=true)
 
 ***tv-PAL-my-old - Master System - Trans Bot***
-![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots.3.5/tv-PAL-my-old,mastersystem.transbot.png?raw=true)
+![ ](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots.3.5/tv-PAL-my-old,mastersystem.transbot.png?raw=true)
 
 ***tv-NTSC-1 - Genesis - Sonic 2***
-![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots.3.5/tv-NTSC-1.md.sonic2.png?raw=true)
+![ ](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots.3.5/tv-NTSC-1.md.sonic2.png?raw=true)
 
 ***tv-NTSC-2 - Snes - Aladdin***
-![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots.3.5/tv-NTSC-2.snes.aladdin.png?raw=true)
+![ ](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots.3.5/tv-NTSC-2.snes.aladdin.png?raw=true)
 
 ***tv-aperturegrille-bloom-bezel - Amiga - Leander***
-![alt text](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots.3.5/tv-aperturegrille-bloom-bezel.puae.leander.png?raw=true)
+![ ](https://github.com/kokoko3k/koko-aio-slang/blob/main/screenshots/screenshots.3.5/tv-aperturegrille-bloom-bezel.puae.leander.png?raw=true)

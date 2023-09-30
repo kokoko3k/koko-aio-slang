@@ -8,20 +8,24 @@
 #define CRED    vec3(1.0,0.0,0.0)
 #define CGREEN    vec3(0.0,1.0,0.0)
 #define CBLUE    vec3(0.0,0.0,1.0)
+#define CYELLOW  vec3(1.0,1.0,0.0)
 #define CCUSTOM vec3(0.3,0.5,0.1)
 
-#define DEBUG_COLOR vec3(0.0, 1.0,0.0)
+#define DEBUG_COLOR vec3(1.0)
 #define DEBUG_BLINK_TIME 30
-#define DEBUG_GRADIENT_STEPS 128
+#define DEBUG_GRADIENT_STEPS 64
+
+
 
 //#define DEBUG
-   //#define DEBUG_TIME_FADE
+   //#define DEBUG_COLOR_CALIB
+   #define DEBUG_TIME_FADE
    //#define DEBUG_SOLID_COLOR
-   #define DEBUG_STEP_GRADIENT
+   //#define DEBUG_STEP_GRADIENT
+   //#define DEBUG_STEP_GRADIENT_V
    //#define DEBUG_BLINK
    //#define DEBUG_BLINK_CIRCLE
    //#define DEBUG_COLORWHEEL
-
    
    
 #include "config.inc"
@@ -167,6 +171,11 @@ vec4 ntscdec(vec2 uv) {
 }
 
 
+vec3 gradient(vec3 start, vec3 end, float m, float q){
+   m = ceil(m*q)/q;
+   return mix(start, end, m);
+}
+
 vec3 debug() {
 //Just test patterns here
    vec3 pixel_debug;
@@ -184,6 +193,9 @@ vec3 debug() {
       
    #elif defined DEBUG_STEP_GRADIENT
       pixel_debug = DEBUG_COLOR * floor(vTexCoord.x* DEBUG_GRADIENT_STEPS )/ DEBUG_GRADIENT_STEPS ;
+
+   #elif defined DEBUG_STEP_GRADIENT_V
+      pixel_debug = DEBUG_COLOR * floor(vTexCoord.y* DEBUG_GRADIENT_STEPS )/ DEBUG_GRADIENT_STEPS ;
       
    #elif defined DEBUG_BLINK
       if (mod(params.FrameCount, DEBUG_BLINK_TIME*2) < DEBUG_BLINK_TIME) 
@@ -200,6 +212,27 @@ vec3 debug() {
       
    #elif defined DEBUG_COLORWHEEL   
       pixel_debug = colorwheel(vTexCoord);   
+   
+   #elif defined DEBUG_COLOR_CALIB
+      pixel_debug = vec3(0.0);
+      if (vTexCoord.y < 0.1)
+         pixel_debug = gradient(CBLACK, CBLUE, vTexCoord.x, DEBUG_GRADIENT_STEPS);
+      else if (vTexCoord.y < 0.2)
+         pixel_debug = gradient(CBLACK, CGREEN, vTexCoord.x, DEBUG_GRADIENT_STEPS);
+      else if (vTexCoord.y < 0.3)
+         pixel_debug = gradient(CBLACK, vec3(0.0,1.0,1.0), vTexCoord.x, DEBUG_GRADIENT_STEPS);
+      else if (vTexCoord.y < 0.4)
+         pixel_debug = gradient(CBLACK, CRED, vTexCoord.x, DEBUG_GRADIENT_STEPS);
+      else if (vTexCoord.y < 0.5)
+         pixel_debug = gradient(CBLACK, CPURPLE, vTexCoord.x, DEBUG_GRADIENT_STEPS); 
+      else if (vTexCoord.y < 0.6)
+         pixel_debug = gradient(CBLACK, CYELLOW, vTexCoord.x, DEBUG_GRADIENT_STEPS); 
+      else if (vTexCoord.y < 0.7)
+         pixel_debug = gradient(CBLACK, CWHITE, vTexCoord.x, DEBUG_GRADIENT_STEPS); 
+      else if (vTexCoord.y < 0.8)
+         pixel_debug = gradient(vec3(0.9), vec3(1.0), vTexCoord.x, 8); 
+      else if (vTexCoord.y < 0.9)
+         pixel_debug = gradient(vec3(0.0), vec3(0.1), vTexCoord.x, 8);    
    #endif
    
    return pixel_debug;

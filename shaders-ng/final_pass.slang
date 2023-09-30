@@ -5,12 +5,16 @@
  * Does masks, spot, bezel, vignette, background image (anything else?)
  */
 
-
+                                #define DEBUG_TEXTURE Original
+                                //#define DEBUG_TEXTURE colortools_and_ntsc_pass
 //#define DEBUG_PRINT_VALUE
 //#define DEBUG_QUAD_SPLIT
 //#define DEBUG_DUAL_SPLIT_X
 //#define DEBUG_DUAL_SPLIT_Y
+//#define DEBUG_DUAL_SPLIT_Y_GAMMA
 //#define DEBUG_DUAL_SPLIT_MIRROR_X
+//#define DEBUG_DUAL_SPLIT_MIRROR_X_GAMMA
+//#define DEBUG_SHOW_CLIP
 
 
 #include "config.inc"
@@ -18,56 +22,36 @@
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
-
-
 layout(location = 0) out vec2 vTexCoord;
 layout(location = 1) out vec2 vOutputCoord;
 layout(location = 2) out vec2 spot_offset;
-
 layout(location = 3) out float vIsRotated;
-
-
-//Curvature:
-    layout(location = 4) out vec2 vWarp_vexp;
-    layout(location = 5) out vec2 vWarp_arg2;
-
 //Scanlines:
-    layout(location = 6) out float vIsInterlaced;
-    layout(location = 7) out float vScanlinePeriod;
-    layout(location = 8) out float vScanlineAlternateOffset;
-    layout(location = 9) out float vMax_inLum;
-    
+layout(location = 4) out float vIsInterlaced;
+layout(location = 5) out float vScanlinePeriod;
+layout(location = 6) out float vScanlineAlternateOffset;
+layout(location = 7) out float vMax_inLum;
 //Vignette, spot:
-    layout(location = 10) out float vIn_aspect;
-    
-layout(location = 11) out float vDynamicSeed;
-layout(location = 12) out float vBEZEL_INNER_ZOOM_adapted;
-
-
-layout(location = 13) out float vDo_Tate;
-layout(location = 14) out vec3 vDotMat_Grid_Color;
-layout(location = 15) out vec4 vPG_offsets_and_size;
-layout(location = 16) out vec2 vPG_freq_base_screen;
-layout(location = 17) out vec2 vPG_freq_base_screen_unfloored;
-layout(location = 18) out vec2 vPG_period_multiplier;
-layout(location = 19) out vec2 vPG_OriginalSize_tated;
-layout(location = 20) out vec2 vPG_OutputSize_tated;
-layout(location = 21) out vec2 vPG_OutputCoord_tated;
-layout(location = 22) out float vDotMat_Grid_Sharpness;
-layout(location = 23) out float vfprintvalue;
-layout(location = 24) out float vPG_mask_height;
-
-layout(location = 26) out vec4 vfloats_packed1;
-//We're running out of available locations for vulkan (max index = 31), so we packed 4 floats into 1.
-    //layout(location = 26) in float vDeltaRenderOk;
-    //layout(location = 27) in float vDo_pixelgrid_h;
-    //layout(location = 28) in float vDo_Curvature;
-    //layout(location = 29) in float vPG_offsets_adjust_for_stagger;
-    #define vDeltaRenderOk  vfloats_packed1.r
-    #define vDo_pixelgrid_h vfloats_packed1.g
-    #define vDo_Curvature   vfloats_packed1.b
-    #define vPG_offsets_adjust_for_stagger vfloats_packed1.a
-
+layout(location = 8) out float vIn_aspect;
+//
+layout(location = 9) out float vDynamicSeed;
+layout(location = 10) out float vBEZEL_INNER_ZOOM_adapted;
+layout(location = 11) out float vDo_Tate;
+layout(location = 12) out vec3 vDotMat_Grid_Color;
+layout(location = 13) out vec4 vPG_offsets_and_size;
+layout(location = 14) out vec2 vPG_freq_base_screen;
+layout(location = 15) out vec2 vPG_freq_base_screen_unfloored;
+layout(location = 16) out vec2 vPG_period_multiplier;
+layout(location = 17) out vec2 vPG_OriginalSize_tated;
+layout(location = 18) out vec2 vPG_OutputSize_tated;
+layout(location = 19) out vec2 vPG_OutputCoord_tated;
+layout(location = 20) out float vDotMat_Grid_Sharpness;
+layout(location = 21) out float vfprintvalue;
+layout(location = 22) out float vPG_mask_height;
+layout(location = 23) out float vDeltaRenderOk;
+layout(location = 24) out float vDo_pixelgrid_h;
+layout(location = 25) out float vDo_Curvature;
+layout(location = 26) out float vPG_offsets_adjust_for_stagger;
 
 
 layout(location = 31) out float I_am_a_placeholder_keep_reading;
@@ -75,6 +59,8 @@ layout(location = 31) out float I_am_a_placeholder_keep_reading;
 //or Retroarch crashes or nvidia starts to give Xids.
 //unsure if the issue is with retroarch or with vulkan specs.
 //If in short, consider to pack more datas into vec2,3,4.
+//But bear in mind that exceding the limit leads to 
+//slowdowns.
 
 #include "includes/functions.include.slang"
 
@@ -159,9 +145,6 @@ void main() {
 
     vBEZEL_INNER_ZOOM_adapted = get_BEZEL_INNER_ZOOM() * DO_BEZEL;
     
-    //Precalc some Curvature/Warp values:
-        vWarp_vexp = 1.0/ (1 + (vec2(GEOM_WARP_X, GEOM_WARP_Y) * 0.2)) ;
-        vWarp_arg2 = 1.0 - pow(vec2(0.29289321881345247559915563789515), vWarp_vexp );
 
     //SPOT
         spot_offset = offsets_from_float(S_POSITION+420.0,40);
@@ -184,7 +167,7 @@ void main() {
         //contrast and brightness into account. This is needed so that scanline generation
         //can map the proper input range and strictly obey scanline thickness constraints.
         vMax_inLum = max( 1.0, DO_CCORRECTION * apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS)) *
-                     max( 1.0, DO_IN_GLOW * IN_GLOW_POWER);
+                     max( 1.0, mix(1.0, IN_GLOW_POWER, DO_CCORRECTION));
 
         
     //Generate a seed that changes over time for temporal random noise
@@ -251,7 +234,7 @@ void main() {
         vDo_pixelgrid_h = float(DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0));
 
        
-    vDo_Curvature = DO_CURVATURE + GEOM_WARP_X + GEOM_WARP_Y;
+    vDo_Curvature = DO_CURVATURE * (GEOM_WARP_X + GEOM_WARP_Y);
     
     //Dot matrix: measure the final picture size to choose a right sharpness level
     //For simplicity and (my) mental health, take only y into account.
@@ -278,43 +261,32 @@ void main() {
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in vec2 vOutputCoord;
 layout(location = 2) in vec2 spot_offset;
-
 layout(location = 3) in float vIsRotated;
-layout(location = 4) in vec2 vWarp_vexp;
-layout(location = 5) in vec2 vWarp_arg2;
-layout(location = 6) in float vIsInterlaced;
+layout(location = 4) in float vIsInterlaced;
+layout(location = 5) in float vScanlinePeriod;
+layout(location = 6) in float vScanlineAlternateOffset;
+layout(location = 7) in float vMax_inLum;
+layout(location = 8) in float vIn_aspect;
+layout(location = 9) in float vDynamicSeed;
+layout(location = 10) in float vBEZEL_INNER_ZOOM_adapted;
+layout(location = 11) in float vDo_Tate;
+layout(location = 12) in vec3 vDotMat_Grid_Color;
+layout(location = 13) in vec4 vPG_offsets_and_size;
+layout(location = 14) in vec2 vPG_freq_base_screen;
+layout(location = 15) in vec2 vPG_freq_base_screen_unfloored;
+layout(location = 16) in vec2 vPG_period_multiplier;
+layout(location = 17) in vec2 vPG_OriginalSize_tated;
+layout(location = 18) in vec2 vPG_OutputSize_tated;
+layout(location = 19) in vec2 vPG_OutputCoord_tated;
+layout(location = 20) in float vDotMat_Grid_Sharpness;
+layout(location = 21) in float vfprintvalue;
+layout(location = 22) in float vPG_mask_height;
+layout(location = 23) in float vDeltaRenderOk;
+layout(location = 24) in float vDo_pixelgrid_h;
+layout(location = 25) in float vDo_Curvature;
+layout(location = 26) in float vPG_offsets_adjust_for_stagger;
 
-layout(location = 7) in float vScanlinePeriod;
-layout(location = 8) in float vScanlineAlternateOffset;
-layout(location = 9) in float vMax_inLum;
-layout(location = 10) in float vIn_aspect;
-layout(location = 11) in float vDynamicSeed;
-layout(location = 12) in float vBEZEL_INNER_ZOOM_adapted;
 
-
-layout(location = 13) in float vDo_Tate;
-layout(location = 14) in vec3 vDotMat_Grid_Color;
-layout(location = 15) in vec4 vPG_offsets_and_size;
-layout(location = 16) in vec2 vPG_freq_base_screen;
-layout(location = 17) in vec2 vPG_freq_base_screen_unfloored;
-layout(location = 18) in vec2 vPG_period_multiplier;
-layout(location = 19) in vec2 vPG_OriginalSize_tated;
-layout(location = 20) in vec2 vPG_OutputSize_tated;
-layout(location = 21) in vec2 vPG_OutputCoord_tated;
-layout(location = 22) in float vDotMat_Grid_Sharpness;
-layout(location = 23) in float vfprintvalue;
-layout(location = 24) in float vPG_mask_height;
-
-layout(location = 26) in vec4 vfloats_packed1;
-//We're running out of available locations for vulkan (max index = 31), so we packed 4 floats into 1.
-    //layout(location = 26) in float vDeltaRenderOk;
-    //layout(location = 27) in float vDo_pixelgrid_h;
-    //layout(location = 28) in float vDo_Curvature;
-    //layout(location = 29) in float vPG_offsets_adjust_for_stagger;
-    #define vDeltaRenderOk  vfloats_packed1.r
-    #define vDo_pixelgrid_h vfloats_packed1.g
-    #define vDo_Curvature   vfloats_packed1.b
-    #define vPG_offsets_adjust_for_stagger vfloats_packed1.a
 
 
 layout(location = 0) out vec4 FragColor;
@@ -329,13 +301,11 @@ layout(set = 0, binding = 6)  uniform sampler2D monitor_body_straight;
 layout(set = 0, binding = 7)  uniform sampler2D monitor_body_curved;
 layout(set = 0, binding = 8)  uniform sampler2D bg_under;
 layout(set = 0, binding = 9)  uniform sampler2D bg_over;
-layout(set = 0, binding = 10) uniform sampler2D shift_and_bleed_pass;
+//layout(set = 0, binding = 10) uniform sampler2D shift_and_bleed_pass;
 layout(set = 0, binding = 11) uniform sampler2D in_glow_pass;
 layout(set = 0, binding = 12) uniform sampler2D halo_pass;
-
 layout(set = 0, binding = 13) uniform sampler2D final_passFeedback;
-
-layout(set = 0, binding = 15) uniform sampler2D flick_and_noise_pass;
+layout(set = 0, binding = 15) uniform sampler2D DEBUG_TEXTURE;
 
 
 
@@ -450,11 +420,82 @@ vec3 morph_shape(vec3 shape, vec3 power, float steep, float gamma ) {
 
 
 
-vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inLum  ) { 
 
+vec3 downsample( sampler2D tex, vec2 uv, vec4 sourcesize,  float sharpness_add ) {
+    vec2 sharpness = vec2(1.0)+sharpness_add; 
+    vec2 scale = sourcesize.xy * sharpness;
+    
+    vec2 iuv = floor(uv * scale);
+    vec2 bottomleft  =    iuv;
+    vec2 bottomright =  ( iuv + vec2(1.0,0.0)) / scale;
+    vec2 topleft     =  ( iuv + vec2(0.0,1.0)) / scale;
+    vec2 topright    =  ( iuv + vec2(1.0,1.0)) / scale;
+        
+    bottomleft /= scale;
+   
+    vec2 dist = (uv - bottomleft)*scale;
+        
+    vec3 bl = texture(tex, bottomleft).xyz   ;
+    vec3 br = texture(tex, bottomright).xyz  ;
+    vec3 tl = texture(tex, topleft).xyz      ;
+    vec3 tr = texture(tex, topright).xyz     ;
+    
+    vec3 tA = mix( bl, br, dist.x );
+    vec3 tB = mix( tl, tr, dist.x );
+    return mix( tA, tB, dist.y );
+
+}
+
+vec3 downsample_x( sampler2D tex, vec2 uv, vec4 sourcesize, float sharpness_add ) {  
+    
+    float sharpness = 1.0+sharpness_add;
+    
+    vec2 scale = vec2(sourcesize.x * sharpness, 1.0);
+
+    vec2 iuv = vec2( floor(uv.x * scale.x), uv.y);
+       
+    vec2 bottomleft  =    iuv;
+    vec2 bottomright =  ( iuv + vec2(1.0,0.0)) / scale;
+        
+    bottomleft /= scale;
+   
+    vec2 dist = (uv - bottomleft)*scale;
+
+    vec3 bl = texture(tex, bottomleft).xyz   ;
+    vec3 br = texture(tex, bottomright).xyz  ;
+   
+    return mix( bl, br, dist.x );
+    
+}
+
+vec3 smoothstep_fast(vec3 edge0, vec3 edge1, vec3 x) {
+
+  vec3 t = clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);
+  //return cos(t * 3.14159265358979323846) * -0.5 + 0.5;
+  return mix(vec3(0.0), vec3(1.0), t);
+}
+
+vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inLum  ) {     
+    /*
+     This would provide an additional method to alter scanlines "inertia", but has a cost of 4fps
+     when using smoothstep_fast and 13fps(!) when using standard smoothstep.
+     It could replace glow_x for tight blurs.
+    */
+    
+    ////vec3 lum_h =  downsample(in_glow_pass, in_coords, global.flick_and_noise_passSize, 0.0).rgb;
+    //vec3 lum_h =  downsample_x(in_glow_pass, in_coords, global.flick_and_noise_passSize, 0.0).rgb;  
+    //lum_h *= smoothstep_fast( vec3(SERVICE1-0.1) ,vec3(SERVICE1), lum_h);
+    //pixel_in = max(pixel_in, lum_h);
+    
+   
+    //Scanlines: compute each phosphor height according to input luminance, puttin it here helpas parallelism a bit.
+        float extragain_h = max(PIXELGRID_MAX_H, 1.0); //Handle 
+        vec3 phosphor_height = map_range(pixel_in*extragain_h, min_inLum, max_inLum, PIXELGRID_MIN_H, clamp(PIXELGRID_MAX_H, PIXELGRID_MIN_H, 1.0));   
+    
+    
     //Tate ? (other outputsize,originalsize and outputcoords "tated" in vertex shader.)
         if (vDo_Tate == 1.0) in_coords.xy = in_coords.yx;
-
+    //in_coords = in_coords - global.flick_and_noise_passSize.zw*0.5; //<-- needed if for whatever reason you want to draw scanlines and vgaps in first_pass
       
     //Get preset masks on ".rgb" and mask size on ".a" , mask and period for every phosphor done in vertex shader.
         float PG_h_count = vPG_offsets_and_size.a; 
@@ -494,16 +535,16 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
 
         //FIXME: is_even should be a single phosphor property.
         //If i manage to find a way to do it, i could use 
-        //decon_stagger.r,g,b to stagger syngle phosphors.
+        //decon_stagger.r,g,b to stagger single phosphors.
         //And that way, i could blend staggered triads together
-        //without "cuts" betweeb them.
-        //Also, i would solve the triad stagger unalignment problems.        
+        //without "cuts" between them.
+        //FIXME FIXME: Unsurer if the previous statement is still valid.
         
     //Moving it up there provides a small speed up due to
     //increased parallalism, I guess.
         float sin_check_offset = sin(freq_base_unfloored.x + vPG_offsets_adjust_for_stagger);
         float is_even = step(sin_check_offset, 0.0);
-        
+
         
     //Scanlines and fake slotmask =========================================================================
         vec3 rgb_h = vec3(1.0);
@@ -512,29 +553,54 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         //Pixelgrid: do horizontal if enabled, but skip it if user doesn't want it on interlaced content.
         //if (DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0)) { //103.1
         if (vDo_pixelgrid_h > 0.5) {
-            
+
             //Since we emulate scanlines, take into account current scanline phase:
                 float interlacing_adapt_period = vScanlinePeriod;
-                float interlacing_adapt_offset = vScanlineAlternateOffset;
+
             //We can offset trias to emulate fake core level slotmask by applying the optional offset to emulate the slotmask on even cells
-                float triad_stagger_offset =  is_even * pi * PIXELGRID_OFFSET_CORE;
+                float triad_stagger_offset =  is_even * pi * (PIXELGRID_OFFSET_CORE);
             //get 3 sines with applied the optional staggered offset for slotmask, and single phosphors staggering for y deconvergence.
-                vec3 decon_stagger = vec3( PIXELGRID_DECON_R_H, PIXELGRID_DECON_G_H, PIXELGRID_DECON_B_H) ;
-                vec3 rgb_h_sin = sin((freq_base_core.y - decon_stagger) * interlacing_adapt_period + triad_stagger_offset + interlacing_adapt_offset );
+                vec3 decon_stagger = vec3( PIXELGRID_DECON_R_H, PIXELGRID_DECON_G_H, PIXELGRID_DECON_B_H) ; //* (pixel_in/max_inLum) ;
+                vec3 rgb_h_sin = sin( (freq_base_core.y * interlacing_adapt_period) + triad_stagger_offset - decon_stagger + vScanlineAlternateOffset );
             //make it positve with doubled frequency:
                 rgb_h_sin = (rgb_h_sin * rgb_h_sin);
+                        
             //Compute dedot mix here for use in h mask and vmask2 later             
                 dedot_mix_inverted = (1-rgb_h_sin.r) * PIXELGRID_H_DEDOT ;
                 dedot_mix_inverted = dedot_mix_inverted * (max(max(pixel_in.r, pixel_in.g), pixel_in.b)/max_inLum);
                 //dedot_mix_inverted = dedot_mix_inverted * dot(pixel_in, vec3(0.33333) )/max_inLum;
                 dedot_mix_inverted = 1-dedot_mix_inverted;
-            //Compute each phosphor height according to input luminance 
-                vec3 phosphor_height = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);                
-            //Finally get 3 sines out of the previous one by applying height modifiers
-                rgb_h = rgb_h_sin;               
-                rgb_h = morph_shape(rgb_h, phosphor_height, PIXELGRID_NO_INTERBLEED_H, PIXELGRID_GAMMA_H);
+            
+            // Compute each phosphor height according to input luminance, 
+            // Moved outside the branch to help parallelism a bit
+                //float extragain_h = max(PIXELGRID_MAX_H, 1.0); //Handle 
+                //vec3 phosphor_height = map_range(pixel_in*extragain_h, min_inLum, max_inLum, PIXELGRID_MIN_H, clamp(PIXELGRID_MAX_H, PIXELGRID_MIN_H, 1.0));
+                
+                
+            //Finally get 3 sines out of the previous one by applying height modifiers            
+                rgb_h = morph_shape(rgb_h_sin, phosphor_height, PIXELGRID_NO_INTERBLEED_H, PIXELGRID_GAMMA_H);
+                
                 rgb_h = mix(vec3(1.0), rgb_h, DO_PIXELGRID_H);
                 rgb_h = clamp(rgb_h, 0.0,1.0);
+                
+                
+             /*   float punch_y = sin(freq_base_core.y);
+                punch_y = pow(punch_y,32.0);
+                float punch_x = sin(freq_base.x);
+                punch_x = pow(punch_x,32.0);
+                rgb_h +=vec3(punch_x * punch_y ) * SERVICE1 * 50;
+                //return vec4(punch_x * punch_y );*/
+                
+                //Scanline "mangler"
+                    //float t = 0.2;
+                    //t = - (-0.6 * 0.3 - 0.12);
+                    //t = 0.3;
+                    //float t = SERVICE1;
+                    //rgb_h = smoothstep(t, t+0.2, phosphor_height) * rgb_h;
+                
+                //Mask Gamma "out"
+                    //rgb_h = pow(rgb_h, vec3(PIXELGRID_GAMMA_OUT_H));
+                    //if (phosphor_height.r < 0.1) rgb_h = vec3(0.0);
         }
         
 
@@ -549,26 +615,19 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //make them always positive and double frequency:
                 rgb_w = (rgb_w * rgb_w);
             //"export" naked vertical grille
-               rgb_grille = morph_shape(rgb_w, vec3(0.001), 1.0, 1.0);
-                
+               rgb_grille = (rgb_w * rgb_w) * (rgb_w * rgb_w);
             //Scale Max width according to pre-gains:
                 vec3 phosphor_width = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
-
-
-                
             //Get final phosphor width:
                 rgb_w = morph_shape(rgb_w, phosphor_width, PIXELGRID_NO_INTERBLEED_W, PIXELGRID_GAMMA_W); //2%
             
-            //Dedot h mask:
-                //vec3 rgb_w_dedotted = vec3( dot(rgb_w, vec3(0.333/max_inLum)));
-                //rgb_w = mix(rgb_w_dedotted, rgb_w, dedot_mix_inverted );
-                
-                //vec3 rgb_w_dedotted =   vec3( dot(rgb_w, vec3(1.0/max_inLum)));
-                //rgb_w = mix(rgb_w_dedotted, rgb_w, pow(dedot_mix_inverted, vec3(2.0)) );
-                
-                vec3 pixel_in_dedotted =   pixel_in/max_inLum/3.0;
-                rgb_w = mix(pixel_in_dedotted, rgb_w, dedot_mix_inverted);
-                
+            //Dedot rgb mask between h mask.
+            //This work only when there are dots and have the countereffect when there are not.
+            //This happen because flattening the rgb mask will make unflattened rgb triads
+            //more evident, so this has to be used only when needed.    
+                //rgb_w = mix(rgb_h, rgb_w, dedot_mix_inverted);
+                rgb_w = mix(phosphor_width, rgb_w, dedot_mix_inverted);
+                               
             //lower strength via user parameter?
                 rgb_w = mix(vec3(1.0), rgb_w, DO_PIXELGRID_W);
         }
@@ -630,6 +689,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //effect (sub) and pushing the source color, useful for slotmasks.
                 PG_spark = PIXELGRID_Y_SPARK * PIXELGRID_Y_MASK;
                 darklines_mask -= PG_spark;
+                                
                 pixel_in *= 1 + ((PG_spark*4) * dedot_mix_inverted);
                 
             //Dedot darklines mask:
@@ -642,14 +702,25 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         vec3 mask = min( (rgb_w * rgb_h), darklines_mask * rgb_h); //<- this way it does not interfree with scanline height!
         //FIXME: test with coore or fuzzy coords how it works when using variable width phosphors, maybe 
         //it would need to be: vec3 mask = min((rgb_w * rgb_h), darklines_mask * rgb_h * rgb_w); =
-          
-        
-    //Apply the mask to pixel_in and clamp the minimum to the unexcited grille.
-    vec3 mask_and_grille = max(mask * pixel_in, rgb_grille * PIXELGRID_BASAL_GRID*0.025);
+
+    
+    //mask posterization experiment:
+        //mask = floor(mask*16.0)/16.0;
+        //mask = pow(mask, vec3(0.5));
         
 
+    
+    //Apply Overmask:
+        mask = PIXELGRID_OVERMASK * (mask - 0.5) + 0.5;
+        pixel_in = mix(pixel_in, pixel_in * PIXELGRID_OVERMASK, PIXELGRID_OVERMASK);
+  
+    
+    //Apply the mask to pixel_in and clamp the minimum to the unexcited grille.
+    vec3 mask_and_grille = max(mask * pixel_in, rgb_grille * PIXELGRID_BASAL_GRID*0.0025);
+
+
     //return it with alpha channel containing the mask itself, so that halo can selectively light it.
-    return vec4( mask_and_grille , dot(mask, vec3(0.3333)));
+    return vec4( mask_and_grille , dot(rgb_h, vec3(0.3333)));
 }
 
 
@@ -920,13 +991,13 @@ float gaussian_coefficient(float x, float sigma) {
 }
 
 
+
+
 vec3 fn_pixel_content(vec2 coords) {
     
-    vec3 pixel_in;
+    vec3 pixel_out;    
     vec3 pixel_glowed;
-    vec3 pixel_bleed; //pixel_bleed is the color that will bleed over scanline gap.
-                      //Used for SCANLINES_BLEEDING parameter only
-    
+    float dot_mat_or_pixelgrid = 1.0; //init dot grid or scanline mask to 1.0
     
     //Black frame insertion, made static, enable it in config.inc.
         #ifdef ALLOW_ALT_BLANK
@@ -938,21 +1009,16 @@ vec3 fn_pixel_content(vec2 coords) {
                 if (alt_blank_power == 0.0) return vec3(0.0);
         #endif
     
-    if  (DO_IN_GLOW == 1.0) {
-        pixel_glowed = texture(in_glow_pass,coords).rgb;
-        pixel_in = pixel_glowed;
-    } else {
-        pixel_in = texture(shift_and_bleed_pass,coords).rgb ;
-    }
+    //#define USE_QUILEZ
     
-
-                                                                            
-    pixel_bleed = pixel_in;
+    #ifdef USE_QUILEZ
+        pixel_glowed = texture(in_glow_pass, coords_QULEZ(coords, global.flick_and_noise_passSize)).rgb;
+        pixel_out = pixel_glowed;
+    #else
+        pixel_glowed = texture(in_glow_pass, coords).rgb;
+        pixel_out = pixel_glowed;
+    #endif
     
-    vec3 pixel_out = pixel_in;
-
-   
-    float dot_mat_or_pixelgrid = 1.0; //init dot grid or scanline mask to 1.0
     
     //Pixel grid
         if (DO_PIXELGRID == 1.0) {
@@ -987,11 +1053,20 @@ vec3 fn_pixel_content(vec2 coords) {
             pixel_out = pow(max(pixel_out, vec3(0.0)),vec3(GAMMA_OUT));
 
     //Bloom
+    /*    if (DO_BLOOM == 1.0 ) {
+            vec3 bloomed=texture(bloom_pass_final, coords).rgb ;
+            if (BLOOM_BYPASS != 1.0 ) {
+                vec3 lum = clamp(pixel_glowed, 0.0,1.0);
+                vec3 darkness=(1-lum) * (1-lum);
+                bloomed = mix( bloomed * darkness , bloomed, BLOOM_OVER_WHITE);
+            }
+            pixel_out = bloomed + float(BLOOM_BYPASS < 0.5) * pixel_out;
+        }*/
+    //Bloom
         if (DO_BLOOM == 1.0 ) {
             vec3 bloomed=texture(bloom_pass_final, coords).rgb ;
             pixel_out = bloomed + float(BLOOM_BYPASS < 0.5) * pixel_out;
         }
-            
             
     //Black frame insertion, made static, enable it in config.inc.
         #ifdef ALLOW_ALT_BLANK
@@ -1117,9 +1192,8 @@ void main() {
     //Curvature 
         //Curvature has to come after inner zoom or bezel curved border will not match content
         //curved border when inner zoom changes.
-        //if (DO_CURVATURE + GEOM_WARP_X + GEOM_WARP_Y > 1.0) {
-        if (vDo_Curvature > 1.0) {
-            co_content = Warp_fast(co_content, vWarp_vexp, vWarp_arg2, GEOM_CUT_EARS);
+        if (vDo_Curvature > 0.0) {
+            co_content = Warp_koko(co_content, vec2(GEOM_WARP_X, GEOM_WARP_Y), 0.5); 
         }
         
     //Mirror coords needs to be calculated here, before geom override, but after curvature.
@@ -1207,26 +1281,31 @@ void main() {
                 canvas_bezel_screen = (1 - pixel_bezel.a) * rect_bezel;
         }
 
-
+    if (canvas_bezel_screen > 0.5) {
         //Vignette
+            float vignette = 1.0;
             if (DO_VIGNETTE == 1.0) {
-                float dist = length(vec2((co_content.x-0.5)*vIn_aspect, co_content.y-0.5));
-                float vignette = smoothstep(V_SIZE,0.0,dist)*V_POWER;
-                pixel_out = pixel_out*vignette;
-            }
+                //float dist = length(vec2((co_content.x-0.5)*vIn_aspect, co_content.y-0.5));
+                //vignette = smoothstep(V_SIZE,0.0,dist)*V_POWER;
+                vec2 sinco = (co_content-0.5) / V_SIZE ;
+                vignette = cos(sinco.x) * cos(sinco.y) * V_POWER;
+            } 
             
         //Spot
+            float spot = 0.0;
             if (DO_SPOT == 1.0) {
                     float dist = length(vec2((co_content.x-0.5)*vIn_aspect, co_content.y-0.5)+spot_offset);
-                    float spot = smoothstep(S_SIZE,0.0,dist)*S_POWER;
-                    pixel_out = pixel_out + spot * canvas_bezel_screen ;
+                    spot = smoothstep(S_SIZE,0.0,dist)*S_POWER;
             }
 
-  
-        if (DO_VIGNETTE + DO_SPOT > 0.0) {
-            pixel_out += random_fast(NOISEPOWER, vOutputCoord )*canvas_bezel_screen  ;
-        }
+            float spot_vignette_noise = 0.0;
+            if (DO_VIGNETTE + DO_SPOT > 0.0) {
+                spot_vignette_noise = random_fast(NOISEPOWER, vOutputCoord ) ;
+            }
         
+            pixel_out = (pixel_out*vignette) + (spot + spot_vignette_noise)*canvas_bezel_screen;
+        
+    }
         //Background image have, no need to paint if not in the outer border:
             if (DO_BG_IMAGE == 1.0 && BG_IMAGE_OVER == 0.0 && canvas_busy < 1.0) {
                 vec4 pixel_bg_image = fn_pixel_fgbg_image(bg_under);
@@ -1279,21 +1358,28 @@ void main() {
     //Debug functions: 
         #ifdef DEBUG_QUAD_SPLIT
             if ( vOutputCoord.x < 0.5  && vOutputCoord.y > 0.5 || vOutputCoord.x > 0.5  && vOutputCoord.y < 0.5 )
-            pixel_out = texture(flick_and_noise_pass,vOutputCoord).rgb;
+            pixel_out = texture(DEBUG_TEXTURE,vOutputCoord).rgb;
         #endif
     
         #ifdef DEBUG_DUAL_SPLIT_Y
-            if (vTexCoord.y < 0.5) pixel_out = texture(flick_and_noise_pass,vTexCoord).rgb;
+            if (vTexCoord.y < 0.5) pixel_out = texture(DEBUG_TEXTURE,vTexCoord).rgb;
         #endif
 
+        #ifdef DEBUG_DUAL_SPLIT_Y_GAMMA
+            if (vTexCoord.y < 0.5) pixel_out = pow(texture(DEBUG_TEXTURE,vTexCoord).rgb, vec3(1.08));
+        #endif
+            
         #ifdef DEBUG_DUAL_SPLIT_X
-            if (vTexCoord.x > 0.5) pixel_out = texture(flick_and_noise_pass,vTexCoord).rgb;
+            if (vTexCoord.x > 0.5) pixel_out = texture(DEBUG_TEXTURE,vTexCoord).rgb;
         #endif
             
         #ifdef DEBUG_DUAL_SPLIT_MIRROR_X
-            if (vTexCoord.x > 0.5) pixel_out = texture(flick_and_noise_pass,vec2(1-vTexCoord.x, vTexCoord.y) ).rgb;
+            if (vTexCoord.x > 0.5) pixel_out = texture(DEBUG_TEXTURE,vec2(1-vTexCoord.x, vTexCoord.y) ).rgb;
         #endif
 
+        #ifdef DEBUG_DUAL_SPLIT_MIRROR_X_GAMMA
+            if (vTexCoord.x > 0.5) pixel_out = pow(texture(DEBUG_TEXTURE,vec2(1-vTexCoord.x, vTexCoord.y) ).rgb, vec3(1.11));
+        #endif
             
         #ifdef DEBUG_PRINT_VALUE
             float maxdigits = 10.0;
@@ -1304,8 +1390,13 @@ void main() {
             pixel_out += PrintValueVec3( vTexCoord, vFragCoord, fvalue, maxdigits, decimalplaces );
         #endif
         
- 
+    #ifdef DEBUG_SHOW_CLIP
+        float clip = max(max(pixel_out.r, pixel_out.g), pixel_out.b) ;
+        if (clip  > 1.0)
+            pixel_out = 1-pixel_out;//;-clip;
+    #endif
+            
     FragColor = vec4(pixel_out, 1.0);
     
-    //FragColor = mix(FragColor, texture(ambi_temporal_pass, vOutputCoord), 0.8);
+    //FragColor = texture(halo_pass, vOutputCoord);
 }

@@ -1,11 +1,16 @@
 #version 450
 #include "config.inc"
 
+//Dumbify glow under this treshold.
+#define GLOW_SHARP_MAX_ALTERNATE -2.0 
+
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
+layout(location = 1) out float glow_h_inside_interval;
 layout(location = 2) out float vDoInGlowBias;
+layout(location = 3) out float vGlow_Gain;
 
 
 void main() {
@@ -19,13 +24,20 @@ void main() {
    vDoInGlowBias = float (  IN_GLOW_BIAS < IN_GLOW_BIAS_MAX && 
                             (abs(IN_GLOW_W) < GLOW_SHARP_MAX || IN_GLOW_H < GLOW_SHARP_MAX) &&
                             (DO_NTSC_ARTIFACTS + NTSC_SHOW_ARTF_MASK < 1.5)   );
+   
+   glow_h_inside_interval = float(IN_GLOW_H < GLOW_SHARP_MAX  && IN_GLOW_H > GLOW_SHARP_MAX_ALTERNATE);
+   
+   vGlow_Gain = mix(1.0, IN_GLOW_POWER, DO_CCORRECTION);
 }
 
 
 #pragma stage fragment
 
 layout(location = 0) in vec2 vTexCoord;
+layout(location = 1) in float glow_h_inside_interval;
 layout(location = 2) in float vDoInGlowBias;
+layout(location = 3) in float vGlow_Gain;
+
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 5) uniform sampler2D shift_and_bleed_pass;
 layout(set = 0, binding = 6) uniform sampler2D Source;
@@ -36,7 +48,7 @@ layout(set = 0, binding = 6) uniform sampler2D Source;
 
 vec3 glow_blur_bias(sampler2D source_tex, vec2 co, vec3 pixel_glowed, float bias){
    vec3 pixel_source = texture(source_tex, co).rgb;
-   pixel_source  = pixel_source * IN_GLOW_POWER;
+   pixel_source  = pixel_source * vGlow_Gain;
    
    vec3 glow_light = pixel_glowed - pixel_source;
    
@@ -44,9 +56,30 @@ vec3 glow_blur_bias(sampler2D source_tex, vec2 co, vec3 pixel_glowed, float bias
   
    //glow_light = pow(glow_light, vec3(SERVICE1));
    
+   
+   
    vec3 proper_glow = glow_light * glow_light + pixel_source;  
-   return mix(proper_glow, pixel_glowed, max(0.0, bias));   
+   return mix(proper_glow, pixel_glowed, max(0.0, bias));      
+}
 
+vec3 blur_select_wrap(sampler2D texture_in, vec2 co, vec4 sourcesize, float sharpness, bool use_gauss) {
+   if (use_gauss)
+      return blur9_y(texture_in, co, sourcesize.xy, sharpness);
+         else
+      {  
+         //Compute subtractive sharpening via blur sharpness strength:
+         //For sharpness 0.45, no unsharp mask
+         //For sharpness 0.8, 0.65 unsharp mask
+         //float sharp_sub = (1.857 * abs(IN_GLOW_W) - 0.836);
+
+         float in_glow_h = abs(IN_GLOW_H);
+         in_glow_h = max(in_glow_h, MIN_IN_GLOW_SHARP);
+
+         float sharp_sub = 0.8125 * in_glow_h;
+         sharp_sub = clamp(sharp_sub, 0.0,1.0);
+
+         return blur9_y_box(texture_in, co, sourcesize.xy, sharpness, sharp_sub);
+      }
 }
 
 /*
@@ -86,31 +119,26 @@ void main() {
    if (DO_IN_GLOW == 0.0) {
       if ( DELTA_RENDER == 1.0) {
          float original_unchanged = texture(Source,vTexCoord).a;
-         FragColor = vec4(1.0,1.0,1.0, original_unchanged);
+         vec3 color = texture(shift_and_bleed_pass, vTexCoord).rgb * vGlow_Gain;
+         FragColor = vec4(color, original_unchanged);
          return;
       }
+      FragColor = texture(shift_and_bleed_pass, vTexCoord) * vGlow_Gain;
+      return;
    }
 
    vec3 pixel_glowed;
    
-   float IN_GLOW_H_ADAPTED = IN_GLOW_H;
+   float IN_GLOW_H_ADAPTED = abs(IN_GLOW_H);
    
-   //GLow to blur via IN_GLOW_SPREAD:
-      //Spread amount needs to lessen its influence when going from glow to blur
-         float in_glow_spread = IN_GLOW_SPREAD * (1-IN_GLOW_BIAS);
-         
-      //Modulate sharpness via IN_GLOW_SPREAD when IN_GLOW_W is under minimum blur sharpness
-         if (IN_GLOW_H <= MIN_IN_GLOW_SHARP)
-            IN_GLOW_H_ADAPTED = in_glow_spread * IN_GLOW_SHARPNESS_SPREAD_RATIO_H;
-
    if (DO_NTSC_ARTIFACTS == 1.0) {
       float ntsc_artifacts = texture(shift_and_bleed_pass, vTexCoord).a;
       //finally "add" them to the configured sharpness (-> less blur)
       IN_GLOW_H_ADAPTED = IN_GLOW_H_ADAPTED +  ((1-ntsc_artifacts) * NTSC_ARTF_NOBLUR);
    }
-   
+
    //don't allow lower values that look bad:
-      IN_GLOW_H_ADAPTED = max(IN_GLOW_H_ADAPTED, MIN_IN_GLOW_SHARP);
+   //   IN_GLOW_H_ADAPTED = max(IN_GLOW_H_ADAPTED, MIN_IN_GLOW_SHARP);
 
    //Make it resolution independent.
       IN_GLOW_H_ADAPTED = IN_GLOW_H_ADAPTED / NEW_SCALEMOD_Y;
@@ -118,10 +146,11 @@ void main() {
    
    
    //It over the max sharp, then just passthrough, else do the blur.
-      if (IN_GLOW_H >= GLOW_SHARP_MAX) {
-         pixel_glowed = texture(Source,vTexCoord).rgb * IN_GLOW_POWER;
+      if (glow_h_inside_interval == 1.0) {
+         pixel_glowed = blur_select_wrap(Source, vTexCoord, global.flick_and_noise_passSize, IN_GLOW_H_ADAPTED, (IN_GLOW_H >= 0.0) ) * vGlow_Gain;
+         //pixel_glowed = blur9_y(Source, vTexCoord, params.SourceSize.xy, IN_GLOW_H_ADAPTED) * vGlow_Gain;
       } else {
-         pixel_glowed = blur9_y(Source, vTexCoord, params.SourceSize.xy, IN_GLOW_H_ADAPTED) * IN_GLOW_POWER;
+         pixel_glowed = texture(Source, vTexCoord).rgb * vGlow_Gain;
       }
    
    

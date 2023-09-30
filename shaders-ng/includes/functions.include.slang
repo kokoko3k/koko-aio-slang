@@ -1,3 +1,75 @@
+vec3 texture_BILINEAR(sampler2D t, vec2 uv, vec4 texSize, float k) {
+       uv = uv -texSize.zw*0.5*k;
+       vec2 texelSize = texSize.zw * k;
+    vec2 f = fract( uv * texSize.xy );
+    uv += ( .5 - f ) * texelSize;    // move uv to texel centre
+    vec3 tl = texture(t, uv).rgb;
+    vec3 tr = texture(t, uv + vec2(texelSize.x, 0.0)).rgb;
+    vec3 bl = texture(t, uv + vec2(0.0, texelSize.y)).rgb;
+    vec3 br = texture(t, uv + vec2(texelSize.x, texelSize.y)).rgb;
+    vec3 tA = mix( tl, tr, f.x );
+    vec3 tB = mix( bl, br, f.x );
+    return mix( tA, tB, f.y );
+}
+
+
+vec3 texture_BILINEAR_X(sampler2D t, vec2 uv, vec4 texSize, float k) {
+       uv = uv -texSize.zw*0.5*vec2(k,1.0);
+       vec2 texelSize = texSize.zw * vec2(k, 1.0);
+    vec2 f = fract( uv * texSize.xy );
+    uv += ( .5 - f ) * texelSize;    // move uv to texel centre
+    vec3 tl = texture(t, uv).rgb;
+    vec3 tr = texture(t, uv + vec2(texelSize.x, 0.0)).rgb;
+    return  mix( tl, tr, f.x );
+}
+
+
+float clamp_smooth(float x, float amin, float amax) {
+	float sharp = 0.0;
+    return mix(amin, amax, smoothstep(amin-sharp, amax+sharp, x));
+}
+
+vec3 clamp_smooth(vec3 x, vec3 amin, vec3 amax) {
+	float sharp = 0.0;
+    return mix(amin, amax, smoothstep(amin-sharp, amax+sharp, x));
+}
+
+vec2 clamp_smooth(vec2 x, vec2 a, vec2 b) {
+	float sharp = 0.0;
+    return mix(a, b, smoothstep(a-sharp, b+sharp, x));
+}
+
+vec2 coords_QULEZ_faster(vec2 co, vec4 texsize){
+	//based on idea: https://iquilezles.org/articles/texture/
+	co = co * texsize.xy + vec2(0.5);
+	vec2 i = floor(co);
+    vec2 f = sin((co - i - 0.5) * pi) * 0.5 + 0.5 ;
+	co = i + f;
+	co = (co - vec2(0.5) ) * texsize.zw;
+	return co;
+}
+
+vec2 coords_QULEZ(vec2 co, vec4 texsize){
+	//https://iquilezles.org/articles/texture/
+	co = co * texsize.xy + vec2(0.5, 0.5);
+
+	vec2 i = floor(co);
+	vec2 f = co - i;
+	f = (f * f) *
+	    (f * (f * (f * 6.0 - vec2(15.0, 15.0)) + vec2(10.0, 10.0)));
+
+
+	co = i + f;
+	co = (co - vec2(0.5, 0.5)) * (texsize.zw);
+	return co;
+}
+
+vec4 texture_QUILEZ(sampler2D tex, vec2 co, vec4 texsize) {
+	co = coords_QULEZ(co, texsize);
+	return texture(tex, co);
+}
+
+
 vec4 texture_NEAREST(sampler2D tex, vec2 co_linear, vec4 tex_size) {
    //return nearest sampling from a linear filtered texture
    vec2 integerCoords = floor(co_linear.xy * tex_size.xy);
@@ -153,6 +225,8 @@ vec3 pixel_push_luminance(vec3 c, float strength) {
 	return c * (1+vec3((1-whiteness) * strength));
 }
 
+/*
+ * Superseeded by stage1/stage2 
 vec3 apply_fuzzy_main_pass(vec3 color_in) {
 	vec3 color_out = color_in;
 
@@ -184,8 +258,14 @@ vec3 apply_fuzzy_main_pass(vec3 color_in) {
 		color_out *= 0.8 * (V_POWER);
 	return color_out;
 }
+*/
 
-
+float get_halo_ungain_factor() {
+	return mix(1.0, 
+			   max(IN_GLOW_POWER, 1.0), 
+			   DO_CCORRECTION
+			   );
+}
 
 vec2 apply_fuzzy_main_pass_stage_1() {
 	//This simulates the final pass pixel processing so that previous passes like 
@@ -197,17 +277,21 @@ vec2 apply_fuzzy_main_pass_stage_1() {
 	
 	float color_in = 1.0;
 	float color_out = 1.0;
-	
 	float gamma_out = 1.0;
 	
-	if (DO_CCORRECTION == 1.0) {
-		color_out = pow(color_in, GAMMA_OUT);
-		gamma_out = gamma_out * GAMMA_OUT;
+	float halo_power_adapted;
+	halo_power_adapted = HALO_POWER;
+	if (HALO_NO_PREGAIN == 1.0) {
+		halo_power_adapted /= get_halo_ungain_factor();
 	}
+	if (HALO_POWER < 0.0) 
+		halo_power_adapted = -halo_power_adapted/10.0;
 	
-	if (DO_IN_GLOW == 1.0) {
-		color_out = pow(color_out,IN_GLOW_GAMMA)*IN_GLOW_POWER;
+	if (DO_CCORRECTION == 1.0) {
+		color_out = pow(color_in, GAMMA_OUT); //<- nonsense
+		gamma_out = gamma_out * GAMMA_OUT;
 		gamma_out = gamma_out * IN_GLOW_GAMMA;
+		color_out = pow(color_out,IN_GLOW_GAMMA)*IN_GLOW_POWER;
 	}
 	
 	if (DO_PIXELGRID == 1.0) {
@@ -218,8 +302,8 @@ vec2 apply_fuzzy_main_pass_stage_1() {
 
 
 	if (DO_HALO == 1.0) {
-		color_out += color_in*HALO_POWER;
-		gamma_out = gamma_out * mix(1.0, HALO_GAMMA, HALO_POWER*0.25) ;
+		color_out += color_in*halo_power_adapted / HALO_GAMMA;
+		gamma_out = gamma_out * mix(1.0, HALO_GAMMA_OUT, halo_power_adapted*0.25) ;
 	}
 	
 	if (DO_VIGNETTE == 1.0)
@@ -442,32 +526,15 @@ float random_fast(float power, vec2 seed) {
 	}
 	
 	
+	vec2 Warp_koko(vec2 co, vec2 w, float protrusion) {
+		//Keep protrusion higher than ~0.5
+		float czoom  = 1 - distance(co, vec2(0.5));
+		czoom        = mix(czoom, czoom * protrusion, czoom);
+		vec2 czoom2d = mix(vec2(1.0), vec2(czoom), w);
+		vec2 coff    = mix( vec2(0.0), vec2(0.625), w);
+		return zoomxy(co, coff + czoom2d );
+	}
 
-	
-vec2 Warp_try(vec2 pos, float warpX, float warpY) {
-	
-/*	float dist = length(pos-vec2(0.5))*10;
-	float c = 1 - clamp(dist, 0.0,1.0);
-	pos=zoom(pos, c);
-	return pos;
-	
-	pos=zoom(pos, 1.006);
-	*/
-	float k=0.5; //0.1
-	warpX*=k;
-	warpY*=k;
-	
-	//pos.x=zoom1D(pos.x, 1+warpX*0.16);
-	float powexp = 1.8;
-    pos  = pos*2.0-1.0;    
-    pos *= vec2(1.0 + pow(pos.y, powexp)*warpX, 1.0 + pow(pos.x, powexp)*warpY);
-    
-    return pos*0.5 + 0.5;
-	
-	
-	
-	
-}
 	
 	vec2 Warp_fast(vec2 uv, vec2 v_exp, vec2 arg2, float cut_ears) {
 		/*This version is exact and faster than the other implementation,
@@ -705,85 +772,101 @@ vec3 lanczos(sampler2D sampler_in, vec2 co, vec4 texsize, float sharpness ) {
 
 	vec3 blur9_x_box(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_x, float sharp_sub) {
 		sharp_sub = -2*sharp_sub+1;
-		vec2 resolution = sourcesize * sharpness_x;
+		float resolution = sourcesize.x * sharpness_x;
 		vec3 color = vec3(0.0);
-		vec2 off1 = vec2(1.0, 0.0) ;
-		vec2 off2 = vec2(2.0, 0.0) ;
-		color += texture(image, uv).rgb                       ;
-		color += texture(image, uv + (off1 / resolution)).rgb ;
-		color += texture(image, uv - (off1 / resolution)).rgb ;
-		color += texture(image, uv + (off2 / resolution)).rgb * sharp_sub;
-		color += texture(image, uv - (off2 / resolution)).rgb * sharp_sub;
+		
+		vec2 off1 = vec2(1.0 / resolution, 0.0)  ;
+		vec2 off2 = vec2(2.0 / resolution, 0.0)  ;
+			
+		color += texture(image, uv).rgb        ;
+		color += texture(image, uv + off1).rgb ;
+		color += texture(image, uv - off1).rgb ;
+		color += texture(image, uv + off2).rgb * sharp_sub;
+		color += texture(image, uv - off2).rgb * sharp_sub;
 		color = color/(3.0 + sharp_sub*2);
 		return max(vec3(0.0), color);
 	}
 
+	vec3 blur9_y_box(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_y, float sharp_sub) {
+		sharp_sub = -2*sharp_sub+1;
+		float resolution = sourcesize.y * sharpness_y;
+		vec3 color = vec3(0.0);
+		vec2 off1 = vec2(0.0, 1.0 / resolution) ;
+		vec2 off2 = vec2(0.0, 2.0 / resolution) ;
+		color += texture(image, uv).rgb                       ;
+		color += texture(image, uv + off1).rgb ;
+		color += texture(image, uv - off1).rgb ;
+		color += texture(image, uv + off2).rgb * sharp_sub;
+		color += texture(image, uv - off2).rgb * sharp_sub;
+		color = color/(3.0 + sharp_sub*2);
+		return max(vec3(0.0), color);
+	}
+	
 	vec3 glow_dumb(sampler2D in_texture, float glow_power, float gamma, vec2 coords) {
 		return pow( texture(in_texture, coords).rgb, vec3(gamma) ) * glow_power;
 	}
 
 	vec3 blur9_x(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_x) {
-		vec2 resolution = sourcesize * sharpness_x;
+		float resolution = sourcesize.x * sharpness_x;
 		vec3 color = vec3(0.0);
-		vec2 off1 = vec2(1.3846153846, 0.0) ;
-		vec2 off2 = vec2(3.2307692308, 0.0) ;
+		vec2 off1 = vec2(1.3846153846 / resolution, 0.0);
+		vec2 off2 = vec2(3.2307692308 / resolution, 0.0);
 		color += texture(image, uv).rgb                       * 0.2270270270;
-		color += texture(image, uv + (off1 / resolution)).rgb * 0.3162162162;
-		color += texture(image, uv - (off1 / resolution)).rgb * 0.3162162162;
-		color += texture(image, uv + (off2 / resolution)).rgb * 0.0702702703;
-		color += texture(image, uv - (off2 / resolution)).rgb * 0.0702702703;
+		color += texture(image, uv + off1).rgb * 0.3162162162;
+		color += texture(image, uv - off1).rgb * 0.3162162162;
+		color += texture(image, uv + off2).rgb * 0.0702702703;
+		color += texture(image, uv - off2).rgb * 0.0702702703;
 		return color;
 	}
 
 	
 	
 	vec3 blur9_x_gamma(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_x, vec3 gamma) {
-		vec2 resolution = sourcesize * sharpness_x;
+		float resolution = sourcesize.x * sharpness_x;
 		vec3 color = vec3(0.0);
-		vec2 off1 = vec2(1.3846153846, 0.0) ;
-		vec2 off2 = vec2(3.2307692308, 0.0) ;
+		vec2 off1 = vec2(1.3846153846 / resolution, 0.0);
+		vec2 off2 = vec2(3.2307692308 / resolution, 0.0);
 		vec3 lookup = texture(image, uv).rgb;
 		color += pow(lookup, gamma) * 0.2270270270;
-		lookup = texture(image, uv + (off1 / resolution)).rgb;
+		lookup = texture(image, uv + off1).rgb;
 		color += pow(lookup, gamma) * 0.3162162162;
-		lookup = texture(image, uv - (off1 / resolution)).rgb;
+		lookup = texture(image, uv - off1).rgb;
 		color += pow(lookup, gamma) * 0.3162162162;
-		lookup = texture(image, uv + (off2 / resolution)).rgb;
+		lookup = texture(image, uv + off2).rgb;
 		color += pow(lookup, gamma) *  0.0702702703;
-		lookup = texture(image, uv - (off2 / resolution)).rgb;
+		lookup = texture(image, uv - off2).rgb;
 		color += pow(lookup, gamma) *  0.0702702703;
 		return color;
 	}
 
 	vec3 blur9_y_gamma(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_x, vec3 gamma) {
-																											//FIXME can this be unrolled by using 5 variables?
-		vec2 resolution = sourcesize * sharpness_x;
+		float resolution = sourcesize.x * sharpness_x;
 		vec3 color = vec3(0.0);
-		vec2 off1 = vec2(0.0, 1.3846153846) ;
-		vec2 off2 = vec2(0.0, 3.2307692308) ;
+		vec2 off1 = vec2(0.0, 1.3846153846 / resolution) ;
+		vec2 off2 = vec2(0.0, 3.2307692308 / resolution) ;
 		vec3 lookup = texture(image, uv).rgb;
 		color += pow(lookup, gamma) * 0.2270270270;
-		lookup = texture(image, uv + (off1 / resolution)).rgb;
+		lookup = texture(image, uv + off1).rgb;
 		color += pow(lookup, gamma) * 0.3162162162;
-		lookup = texture(image, uv - (off1 / resolution)).rgb;
+		lookup = texture(image, uv - off1).rgb;
 		color += pow(lookup, gamma) * 0.3162162162;
-		lookup = texture(image, uv + (off2 / resolution)).rgb;
+		lookup = texture(image, uv + off2).rgb;
 		color += pow(lookup, gamma) *  0.0702702703;
-		lookup = texture(image, uv - (off2 / resolution)).rgb;
+		lookup = texture(image, uv - off2).rgb;
 		color += pow(lookup, gamma) *  0.0702702703;
 		return color;
 	}
 	
 	vec3 blur9_y(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_y) {
-		vec2 resolution = sourcesize * sharpness_y;
+		float resolution = sourcesize.y * sharpness_y;
 		vec3 color = vec3(0.0);
-		vec2 off1 = vec2(0.0, 1.3846153846) ;
-		vec2 off2 = vec2(0.0, 3.2307692308) ;
-		color += texture(image, uv).rgb                       * 0.2270270270;
-		color += texture(image, uv + (off1 / resolution)).rgb * 0.3162162162;
-		color += texture(image, uv - (off1 / resolution)).rgb * 0.3162162162;
-		color += texture(image, uv + (off2 / resolution)).rgb * 0.0702702703;
-		color += texture(image, uv - (off2 / resolution)).rgb * 0.0702702703;
+		vec2 off1 = vec2(0.0, 1.3846153846 / resolution) ;
+		vec2 off2 = vec2(0.0, 3.2307692308 / resolution) ;
+		color += texture(image, uv).rgb       * 0.2270270270;
+		color += texture(image, uv + off1).rgb * 0.3162162162;
+		color += texture(image, uv - off1).rgb * 0.3162162162;
+		color += texture(image, uv + off2).rgb * 0.0702702703;
+		color += texture(image, uv - off2).rgb * 0.0702702703;
 		return color;
 	}
 
@@ -829,22 +912,22 @@ vec3 lanczos(sampler2D sampler_in, vec2 co, vec4 texsize, float sharpness ) {
 	*/
 	
 	vec3 blur5_x(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_x, float lod) {
-		vec2 resolution = sourcesize * sharpness_x;
+		float resolution = sourcesize.x * sharpness_x;
 		vec3 color = vec3(0.0);
-		vec2 off1 = vec2(1.333333333333, 0.0) ;
+		vec2 off1 = vec2(1.333333333333 / resolution, 0.0);
 		color += textureLod(image, uv, lod).rgb   * 0.29411764705882354;
-		color += textureLod(image, uv + (off1 / resolution), lod).rgb   * 0.35294117647058826;
-		color += textureLod(image, uv - (off1 / resolution), lod).rgb   * 0.35294117647058826;
+		color += textureLod(image, uv + off1, lod).rgb   * 0.35294117647058826;
+		color += textureLod(image, uv - off1, lod).rgb   * 0.35294117647058826;
 		return color;
 	}
 	
 	vec3 blur5_y(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_y, float lod) {
-		vec2 resolution = sourcesize * sharpness_y;
+		float resolution = sourcesize.y * sharpness_y;
 		vec3 color = vec3(0.0);
-		vec2 off1 = vec2(0.0, 1.333333333333) ;
+		vec2 off1 = vec2(0.0, 1.333333333333 / resolution) ;
 		color += textureLod(image, uv, lod).rgb   * 0.29411764705882354;
-		color += textureLod(image, uv + (off1 / resolution), lod).rgb   * 0.35294117647058826;
-		color += textureLod(image, uv - (off1 / resolution), lod).rgb   * 0.35294117647058826;
+		color += textureLod(image, uv + off1, lod).rgb   * 0.35294117647058826;
+		color += textureLod(image, uv - off1, lod).rgb   * 0.35294117647058826;
 		return color;
 	}
 
@@ -1025,6 +1108,7 @@ vec4 PG_get_hmask_preset() {
     * 4 rgbx : mask size = 4 | offsets=0,1,2  | width=0.20
     * 3 rbg  : mask size = 3 | offsets=0,1,2  | width=0.25
     * 4 rbgx : mask size = 4 | offsets=0,1,2  | width=0.20
+	* 5 wx   : mask size = 2 | offsets=0.3,0.3,0.3
     */
     if (PIXELGRID_H_PRST == 0.0) // manual mask and size
         return vec4( PIXELGRID_R_SHIFT, PIXELGRID_G_SHIFT, PIXELGRID_B_SHIFT, PIXELGRID_H_COUNT);
@@ -1046,6 +1130,7 @@ vec4 PG_get_hmask_preset() {
 
     if (PIXELGRID_H_PRST == 6.0)
         return vec4( vec3(0,2,1), 4); //rbgx, mask size 4
-
-        
+		
+    if (PIXELGRID_H_PRST == 7.0)
+        return vec4( vec3(0.3,0.3,0.3), 2); //WX, mask size 2
 }

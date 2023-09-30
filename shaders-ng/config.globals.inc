@@ -112,11 +112,12 @@
 
 
 #define DO_HALO		global.DO_HALO
-	#define HALO_W		params.HALO_W
-	#define HALO_H		params.HALO_H
+	#define HALO_SHARPNESS	params.HALO_SHARPNESS
+	#define HALO_NO_PREGAIN params.HALO_NO_PREGAIN
 	#define HALO_POWER	params.HALO_POWER
 	#define HALO_GAMMA	params.HALO_GAMMA
 	#define HALO_VS_SCAN	params.HALO_VS_SCAN
+	#define HALO_GAMMA_OUT	params.HALO_GAMMA_OUT
 
 
 
@@ -254,6 +255,7 @@
 	#define MIN_LINES_INTERLACED global.MIN_LINES_INTERLACED
 
 #define DO_PIXELGRID			global.DO_PIXELGRID
+	#define PIXELGRID_OVERMASK	global.PIXELGRID_OVERMASK
 	#define DO_PIXELGRID_W		global.DO_PIXELGRID_W
 	#define DO_PIXELGRID_H		global.DO_PIXELGRID_H
 	//#define PIXELGRID_HMASK_NO_BRIGHT global.PIXELGRID_HMASK_NO_BRIGHT

@@ -113,7 +113,6 @@ vec3 ambi_push_pass(vec2 coords, float f_lod) {
    vec3 pixel_out = textureLod(flick_and_noise_pass, coords, f_lod).rgb;
    pixel_out = pow(pixel_out, vec3(AMBI_GAMMA) );
    pixel_out = pixel_push_luminance(pixel_out, vAMBI_POWER);
-
    return pixel_out;
 }
 
