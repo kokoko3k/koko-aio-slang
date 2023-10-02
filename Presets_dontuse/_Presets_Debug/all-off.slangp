@@ -1,4 +1,4 @@
-#reference "../../koko-aio-ng.slangp"
+#reference "../koko-aio-ng.slangp"
 
 DO_FXAA = "0.0"
 

@@ -1,4 +1,4 @@
-#reference "../../koko-aio-ng.slangp"
+#reference "../koko-aio-ng.slangp"
 
 DO_CCORRECTION = "1.000000"
 	LUMINANCE = "0.300000"

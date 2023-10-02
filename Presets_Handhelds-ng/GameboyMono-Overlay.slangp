@@ -1,4 +1,4 @@
-#reference "../../koko-aio-ng.slangp"
+#reference "../koko-aio-ng.slangp"
 
 bg_over = "../../textures/overlays/gbm.jpg"
 bg_under = "../../textures/overlays/gbm.jpg"
