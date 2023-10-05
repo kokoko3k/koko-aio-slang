@@ -138,7 +138,6 @@
 #define DO_CURVATURE		global.DO_CURVATURE
 	#define GEOM_WARP_X		global.GEOM_WARP_X
 	#define GEOM_WARP_Y		global.GEOM_WARP_Y
-	#define GEOM_CUT_EARS	global.GEOM_CUT_EARS
 	#define GEOM_CORNER_SIZE	global.GEOM_CORNER_SIZE
 	#define GEOM_CORNER_SMOOTH	global.GEOM_CORNER_SMOOTH
 
