@@ -381,7 +381,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float PIXELGRID_GAMMA_H;
 	float PIXELGRID_GAMMA_W;
 	//float PIXELGRID_HMASK_NO_BRIGHT;
-	float MOIRE_SWEET_SPOT;
+	//float MOIRE_SWEET_SPOT;
 	
 	float PIXELGRID_BASAL_GRID;
 	float DELTA_RENDER_FORCE_REFRESH;
@@ -517,7 +517,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter PIXELGRID_MAX_H           "           . Phosphors height Max"			0.6 0.0 1.5 0.05
 #pragma parameter PIXELGRID_GAMMA_H         "           . Phosphors height min->max gamma:"	4.2 1.0 8.00 0.1
 #pragma parameter PIXELGRID_NO_INTERBLEED_H	"           . Inter line extra steepness"		0.0 0.0 10.0 0.1
-#pragma parameter MOIRE_SWEET_SPOT          "           . Moire mitigation sweet spot"      0.0  0.0 1.0 0.01
+//#pragma parameter MOIRE_SWEET_SPOT          "           . Moire mitigation sweet spot"      0.0  0.0 1.0 0.01
 #pragma parameter PIXELGRID_OFFSET_CORE     "           . Slotmask(-fake) offset" 0.0 0.0 1.0 0.01
 #pragma parameter PIXELGRID_DECON_R_H       "           . Deconvergence Y: R phosphor" 0.0 -1.6 1.6 0.1
 #pragma parameter PIXELGRID_DECON_G_H       "           . Deconvergence Y: G phosphor" 0.0 -1.6 1.6 0.1
