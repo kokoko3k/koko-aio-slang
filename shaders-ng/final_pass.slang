@@ -475,7 +475,7 @@ vec3 smoothstep_fast(vec3 edge0, vec3 edge1, vec3 x) {
   return mix(vec3(0.0), vec3(1.0), t);
 }
 
-vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inLum  ) {     
+vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inLum, float moire_mitigation_sweet_spot  ) {     
     /*
      This would provide an additional method to alter scanlines "inertia", but has a cost of 4fps
      when using smoothstep_fast and 13fps(!) when using standard smoothstep.
@@ -561,7 +561,11 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 float triad_stagger_offset =  is_even * pi * (PIXELGRID_OFFSET_CORE);
             //get 3 sines with applied the optional staggered offset for slotmask, and single phosphors staggering for y deconvergence.
                 vec3 decon_stagger = vec3( PIXELGRID_DECON_R_H, PIXELGRID_DECON_G_H, PIXELGRID_DECON_B_H) ; //* (pixel_in/max_inLum) ;
-                vec3 rgb_h_sin = sin( (freq_base_core.y * interlacing_adapt_period) + triad_stagger_offset - decon_stagger + vScanlineAlternateOffset );
+                
+                
+                
+                
+                vec3 rgb_h_sin = sin( (freq_base_core.y * interlacing_adapt_period) + triad_stagger_offset - decon_stagger + vScanlineAlternateOffset + moire_mitigation_sweet_spot );
             //make it positve with doubled frequency:
                 rgb_h_sin = (rgb_h_sin * rgb_h_sin);
                         
@@ -989,7 +993,7 @@ float gaussian_coefficient(float x, float sigma) {
 
 
 
-vec3 fn_pixel_content(vec2 coords) {
+vec3 fn_pixel_content(vec2 coords, float moire_mitigation_sweet_spot) {
     
     vec3 pixel_out;    
     vec3 pixel_glowed;
@@ -1018,7 +1022,7 @@ vec3 fn_pixel_content(vec2 coords) {
     
     //Pixel grid
         if (DO_PIXELGRID == 1.0) {
-            vec4 pixel_grid = fn_pixel_grid(coords, pixel_out, 0.0, vMax_inLum);
+            vec4 pixel_grid = fn_pixel_grid(coords, pixel_out, 0.0, vMax_inLum, moire_mitigation_sweet_spot);
             //grid mask only is needed by halo to selectively light the grid.
                 dot_mat_or_pixelgrid = pixel_grid.a;
                 pixel_out = pixel_grid.rgb;
@@ -1165,6 +1169,11 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
 
 
 void main() {
+    //The following code is needed by scanline function later on.
+    #define IS_EVEN float(sin(vPG_freq_base_screen_unfloored.x * vPG_offsets_and_size.a) > 0.5)
+    float moire_mitigation_sweet_spot = IS_EVEN * MOIRE_SWEET_SPOT;
+
+    //moire_mitigation_sweet_spot = 0.0;
     vec3 pixel_out = vec3(0.0);
     
     float canvas_busy = 0.0; //<-- this allow for paint over not painted areas (spares gpu cycles)
@@ -1203,7 +1212,6 @@ void main() {
     //Dynamic lum dependant full screen zoom?
         if (DO_DYNZOOM == 1.0)
             co_content = zoom(co_content, get_dyn_zoom(avglum_pass) );
-
     
     //Create an alpha mask to write content into, it holds opacity info that will be used to compose:
         if (DO_CURVATURE == 1.0)  {
@@ -1224,7 +1232,7 @@ void main() {
     vec3 pixel_under_content = vec3(0.0);
     //Draw content only over the alpha mask, and sample ambientlight outside it to spare gpu cycles.
         if (canvas_busy > 0.5) {
-            pixel_out = fn_pixel_content(co_content) * canvas_busy;
+            pixel_out = fn_pixel_content(co_content, moire_mitigation_sweet_spot) * canvas_busy;
         } else {
             
             //Can we halve refresh rate in the outside border to spare some cycles?
