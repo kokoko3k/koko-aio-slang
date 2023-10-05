@@ -21,7 +21,7 @@ layout(location = 3) out float vLed_step;
 layout(location = 4) out float lod;
 layout(location = 5) out vec2 pre_pass_coords;
 layout(location = 6) out float vIs_rotated;
-
+layout(location = 7) out float vAMBI_STRETCH;
 layout(location = 8) out float vAMBI_POWER;
 layout(location = 9) out float vSmpBorder_min;
 layout(location = 10) out float vSmpBorder_max;
@@ -36,10 +36,16 @@ void main() {
         vSmpBorder_max = 1.0-smp_internalness;
 
 
+    bool isrotated = is_rotated();
+    vIs_rotated = float(isrotated);
 
+    if (isrotated)
+        vAMBI_STRETCH = AMBI_STRETCH_VERTICAL;
+            else
+        vAMBI_STRETCH = AMBI_STRETCH;
 
     //Move virtual leds position inside to compensate for widen effect
-       float  led_internalness = AMBI_INT_OFFSET + (AMBI_STRETCH *0.025);
+       float  led_internalness = AMBI_INT_OFFSET + (vAMBI_STRETCH *0.025);
 
        
     //less internalness when using bezel:
@@ -61,9 +67,7 @@ void main() {
    //Scale to the original aspect
     float in_aspect = get_in_aspect();
 
-    bool isrotated = is_rotated();
-    vIs_rotated = float(isrotated);
-
+    
     if ( need_NO_integer_scale() )
         pre_pass_coords = get_scaled_coords_aspect(TexCoord,global.FinalViewportSize, in_aspect, isrotated) + vec2(0.00001);
             else
@@ -94,7 +98,7 @@ layout(location = 3) in float vLed_step;
 layout(location = 4) in float lod;
 layout(location = 5) in vec2 pre_pass_coords;
 layout(location = 6) in float vIs_rotated;
-
+layout(location = 7) in float vAMBI_STRETCH;
 layout(location = 8) in float vAMBI_POWER;
 layout(location = 9) in float vSmpBorder_min;
 layout(location = 10) in float vSmpBorder_max;
@@ -141,8 +145,8 @@ vec3 ambi_pre_pass(vec2 coords) {
     //Stretch the lights?
         float z1=distance(vec2(0.5,0.5), coords);
         vec2 zoomed_coords = zoomxy(coords, vec2(1+z1));
-        coords = mix(coords, zoomed_coords, AMBI_STRETCH*0.5);
-        float lAMBI_FALLOFF = AMBI_FALLOFF + (z1 * AMBI_STRETCH*0.5);
+        coords = mix(coords, zoomed_coords, vAMBI_STRETCH*0.5);
+        float lAMBI_FALLOFF = AMBI_FALLOFF + (z1 * vAMBI_STRETCH*0.5);
 
     //Finally, emulate leds.
     vec3 pixel_out = vec3(0.0);
@@ -196,7 +200,7 @@ vec3 ambi_pre_pass(vec2 coords) {
         smp_point.x += vSmp_step;
     }
     //pixel_out = pow(pixel_out, 1/vec3(AMBI_GAMMA));
-    return pow(pixel_out, 1/vec3(1+AMBI_STRETCH));
+    return pow(pixel_out, 1/vec3(1+vAMBI_STRETCH));
 }
 
 

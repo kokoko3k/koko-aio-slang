@@ -163,6 +163,7 @@ layout(push_constant) uniform Push {
  	float BLOOM_QUALITY ; //1
 	float AMBI_ADD_ON_BLACK;
 	float AMBI_STRETCH;
+	float AMBI_STRETCH_VERTICAL;
 	float AMBI_INT_OFFSET ;
 	
 } params;
@@ -653,7 +654,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter AMBI_FALLOFF              "        Led power/falloff"			0.4  0.1  3.0     0.01
 #pragma parameter AMBI_POWER                "        Led Saturation"						1.8  0.0  100.0     0.05
 #pragma parameter AMBI_INT_OFFSET           "        Led internalness"              0.07 -1.0 1.0 0.01
-#pragma parameter AMBI_STRETCH              "        Widen lights"						0.0  0.0  1.0     0.01
+#pragma parameter AMBI_STRETCH              "        Widen lights (horizontal games)"	0.0  0.0  1.0     0.01
+#pragma parameter AMBI_STRETCH_VERTICAL     "        Widen lights (vertical games)"		0.5  0.0  1.0     0.01
 #pragma parameter AMBI_GAMMA                "        Output Gamma"						1.3  0.1  8.0     0.1
 #pragma parameter AMBI_OVER_BEZEL           "        Colorize Bezel"					0.2  0.0  5.0     0.05
 #pragma parameter AMBI_OVER_BEZEL_SIZE      "           . Colorization size"			0.15  0.0  0.5    0.001
