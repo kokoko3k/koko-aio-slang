@@ -1252,7 +1252,8 @@ void main() {
             //Ambient light
             if (DO_AMBILIGHT == 1.0) {
                 pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb;
-                pixel_ambi += random_fast( (NOISEPOWER * NOISEPOWER_AMBI_MUL) * ((1-pixel_ambi.g) * (pixel_ambi.g*1 - pixel_ambi.r*0.125 -pixel_ambi.b*0.125  )    ) , 
+                if (DO_BG_IMAGE != 1.0)
+                    pixel_ambi += random_fast( (NOISEPOWER * NOISEPOWER_AMBI_MUL) * ((1-pixel_ambi.g) * (pixel_ambi.g*1 - pixel_ambi.r*0.125 -pixel_ambi.b*0.125  )    ) , 
                 vTexCoord * vDynamicSeed  ) ;
             
                 float  ambi_noise_power = (NOISEPOWER * NOISEPOWER_AMBI_MUL * (1-pixel_ambi.g) ) * //only middle green channel
