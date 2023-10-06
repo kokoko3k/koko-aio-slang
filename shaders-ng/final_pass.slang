@@ -947,9 +947,15 @@ vec3 light_over_image(vec3 light, vec3 image, float black_illumination) {
     //Simulates illumination.
     //It works by adding the light on the image.
     //It will add less light on dark colors (
-    vec3 light_on_black = black_illumination * light;
-    return image.rgb +  ( (light - light_on_black ) * image.rgb ) + light_on_black;
     
+    //mitigate clipping by lowering light on bright images:
+    light = light * (1-   (max(image.r,image.g),image.b)       )     ;
+
+    
+    vec3 light_on_black = black_illumination * light;
+    vec3 modulated_on_black = image.rgb +  ( (light - 0.0 ) * image.rgb ) + light_on_black;
+    
+    return modulated_on_black;
 }
 
 vec3 ambi_blend_image(vec4 image, vec3 ambi, float blend_mode) {
