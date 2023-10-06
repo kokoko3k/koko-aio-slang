@@ -1132,5 +1132,5 @@ vec4 PG_get_hmask_preset() {
         return vec4( vec3(0,2,1), 4); //rbgx, mask size 4
 		
     if (PIXELGRID_H_PRST == 7.0)
-        return vec4( vec3(0.3,0.3,0.3), 2); //WX, mask size 2
+        return vec4( vec3(0.0,0.0,0.0), 2); //WX, mask size 2
 }

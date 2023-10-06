@@ -51,7 +51,7 @@ layout(location = 22) out float vPG_mask_height;
 layout(location = 23) out float vDeltaRenderOk;
 layout(location = 24) out float vDo_pixelgrid_h;
 layout(location = 25) out float vDo_Curvature;
-layout(location = 26) out float vPG_offsets_adjust_for_stagger;
+layout(location = 26) out float vPG_offsets_adjust_for_unfloor;
 
 
 layout(location = 31) out float I_am_a_placeholder_keep_reading;
@@ -206,15 +206,13 @@ void main() {
                 vPG_freq_base_screen_unfloored = pi * vec2(1/PG_H_COUNT, 0.5) * (vPG_OutputCoord_tated * vPG_OutputSize_tated);
               
   
-        //This is needed to make sure even/odd staggering period matches betweeb floored (screen 1X)
+        //This is needed to make sure even/odd staggering period matches between floored (screen 1X)
         //and unfloored coords (core or non 1x mask size).
         //The issue visible when staggering the slotmask.           FIXME: Not yet 100% perfect
-            vPG_offsets_adjust_for_stagger = 0.0;
+            vPG_offsets_adjust_for_unfloor = pi/2.0;//  0.0;
             if (PIXELGRID_SIZE_W == 0.0 || PIXELGRID_MUL_X != 1.0) {
-                //vec4 unfloored_offsets_fix = vec4(1.5,0.5,1.0,0.0);
-                vec4 unfloored_offsets_fix = vec4(1.6, 0.81, 0.54, 0.81);
-                //vPG_offsets_adjust_for_stagger = (pi*0.5)/PG_H_COUNT;
-                vPG_offsets_adjust_for_stagger = unfloored_offsets_fix[int(PG_H_COUNT)-1];
+                vec4 unfloored_offsets_fix = vec4(0.0, pi/4.0, pi/3.0, pi/4.0);
+                vPG_offsets_adjust_for_unfloor = unfloored_offsets_fix[int(PG_H_COUNT)-1];
             }
 
 
@@ -284,7 +282,7 @@ layout(location = 22) in float vPG_mask_height;
 layout(location = 23) in float vDeltaRenderOk;
 layout(location = 24) in float vDo_pixelgrid_h;
 layout(location = 25) in float vDo_Curvature;
-layout(location = 26) in float vPG_offsets_adjust_for_stagger;
+layout(location = 26) in float vPG_offsets_adjust_for_unfloor;
 
 
 
@@ -527,8 +525,9 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         freq_base /= vPG_period_multiplier;
         freq_base_unfloored /= vPG_period_multiplier;
         
-        vec3 freq_rgb = vec3(freq_base.x) - PG_offsets;
+        vec3 freq_rgb = vec3(freq_base.x) - PG_offsets + vPG_offsets_adjust_for_unfloor ;
 
+        //(+pi/count?)
         
     //The following is needed by scanlines and vertical mask
     //sin() tell use if the current cell position is odd or even:
@@ -542,7 +541,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         
     //Moving it up there provides a small speed up due to
     //increased parallalism, I guess.
-        float sin_check_offset = sin(freq_base_unfloored.x + vPG_offsets_adjust_for_stagger);
+        float sin_check_offset = sin(freq_base_unfloored.x);// + vPG_offsets_adjust_for_unfloor);
         float is_even = step(sin_check_offset, 0.0);
 
         
@@ -619,7 +618,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         
         if (DO_PIXELGRID_W > 0.0) { //4%
             //get 3 sines in black/white
-                rgb_w = cos(freq_rgb);
+                rgb_w = sin(freq_rgb);
             //make them always positive and double frequency:
                 rgb_w = (rgb_w * rgb_w);
             //"export" naked vertical grille
