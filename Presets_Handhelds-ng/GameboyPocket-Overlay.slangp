@@ -1,7 +1,7 @@
 #reference "GameboyPocket.slangp"
 
-bg_over = "../../textures/overlays/gbp.jpg"
-bg_under = "../../textures/overlays/gbp.jpg"
+bg_over = "../textures/overlays/gbp.jpg"
+bg_under = "../textures/overlays/gbp.jpg"
 
 DO_BG_IMAGE = "1.000000"
 	BG_IMAGE_OFFY = "-0.425000"

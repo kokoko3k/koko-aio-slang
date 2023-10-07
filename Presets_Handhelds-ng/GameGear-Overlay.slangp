@@ -1,7 +1,7 @@
 #reference "../koko-aio-ng.slangp"
 
 
-bg_under = "../../textures/overlays/gamegear.jpg"
+bg_under = "../textures/overlays/gamegear.jpg"
 
 DO_HALO = "1.000000"
 	HALO_POWER = "0.200000"

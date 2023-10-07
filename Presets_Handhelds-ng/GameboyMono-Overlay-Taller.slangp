@@ -1,7 +1,7 @@
 #reference "GameboyMono-Overlay.slangp"
 
-bg_over = "../../textures/overlays/gbm.jpg"
-bg_under = "../../textures/overlays/gbm.jpg"
+bg_over = "../textures/overlays/gbm.jpg"
+bg_under = "../textures/overlays/gbm.jpg"
 
 BG_IMAGE_OFFY = "-0.115000"
 BG_IMAGE_ZOOM = "1.368502"

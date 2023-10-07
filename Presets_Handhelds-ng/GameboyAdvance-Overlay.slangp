@@ -1,6 +1,6 @@
 #reference "../koko-aio-ng.slangp"
 
-bg_under = "../../textures/overlays/gba.jpg"
+bg_under = "../textures/overlays/gba.jpg"
 
 
 
