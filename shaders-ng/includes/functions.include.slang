@@ -1100,37 +1100,79 @@ bool is_first_outside_rect(vec2 point, vec4 rect) {
 	return pixel_out;
 	}
 
-vec4 PG_get_hmask_preset() {
-    /* Common masks:
-    * 1 gm   : mask size = 2 | offsets=1,0,1  | width=0.3
-    * 2 gmx  : mask size = 3 | offsets=1,0,1  | width=0.25
-    * 3 rgb  : mask size = 3 | offsets=0,1,2  | width=0.25
-    * 4 rgbx : mask size = 4 | offsets=0,1,2  | width=0.20
-    * 3 rbg  : mask size = 3 | offsets=0,1,2  | width=0.25
-    * 4 rbgx : mask size = 4 | offsets=0,1,2  | width=0.20
-	* 5 wx   : mask size = 2 | offsets=0.3,0.3,0.3
-    */
+vec4 PG_get_hmask_preset_floored() {
     if (PIXELGRID_H_PRST == 0.0) // manual mask and size
         return vec4( PIXELGRID_R_SHIFT, PIXELGRID_G_SHIFT, PIXELGRID_B_SHIFT, PIXELGRID_H_COUNT);
     
     if (PIXELGRID_H_PRST == 1.0)
-        return vec4( vec3(1,0,1), 2); // gm, mask size 2
+        return vec4( vec3(0,
+						  1,
+						  0), 2); // gm, mask size 2
 
     if (PIXELGRID_H_PRST == 2.0)
-        return vec4( vec3(1,0,1), 3); //gmx, mask size 3
+        return vec4( vec3(2.5,
+						  1.5,
+						  2.5), 3); //gmx, mask size 3
 
     if (PIXELGRID_H_PRST == 3.0)
-        return vec4( vec3(0,1,2), 3); //rgb, mask size 3
+        return vec4( vec3(1.5,
+						  2.5,
+						  3.5), 3); //rgb, mask size 3
 
     if (PIXELGRID_H_PRST == 4.0)
-        return vec4( vec3(0,1,2), 4); //rgbx, mask size 4
+        return vec4( vec3(2.0,
+						  3.0,
+						  4.0), 4); //rgbx, mask size 4
 
     if (PIXELGRID_H_PRST == 5.0)
-        return vec4( vec3(0,2,1), 3); //rbg, mask size 3
+        return vec4( vec3(1.5,
+						  3.5,
+						  2.5), 3); //rbg, mask size 3
 
     if (PIXELGRID_H_PRST == 6.0)
-        return vec4( vec3(0,2,1), 4); //rbgx, mask size 4
-		
+        return vec4( vec3(2.0,
+						  4.0,
+						  3.0), 4); //rbgx, mask size 4
+
     if (PIXELGRID_H_PRST == 7.0)
-        return vec4( vec3(0.5,0.5,0.5), 2); //WX, mask size 2
+        return vec4( vec3(0.0), 2); //WX, mask size 2
+}
+
+vec4 PG_get_hmask_preset_unfloored() {
+    if (PIXELGRID_H_PRST == 0.0) // manual mask and size
+        return vec4( PIXELGRID_R_SHIFT, PIXELGRID_G_SHIFT, PIXELGRID_B_SHIFT, PIXELGRID_H_COUNT);
+
+    if (PIXELGRID_H_PRST == 1.0)
+        return vec4( vec3(+0.25,
+						  -0.25,
+						  +0.25)*2, 2); // gm, mask size 2
+
+    if (PIXELGRID_H_PRST == 2.0)
+        return vec4( vec3(+1/6.0,
+						  -1/6.0,
+						  +1/6.0)*3, 3); //gmx, mask size 3
+
+    if (PIXELGRID_H_PRST == 3.0)
+        return vec4( vec3(-1/3.0,
+						  0.0,
+						  1/3.0)*3, 3); //rgb, mask size 3
+
+    if (PIXELGRID_H_PRST == 4.0)
+        return vec4( vec3(-1/4.0,
+						  0.0,
+						  +1/4.0)*4, 4); //rgbx, mask size 4
+
+    if (PIXELGRID_H_PRST == 5.0)
+        return vec4( vec3(-1/3.0,
+						  +1/3.0,
+						  0.0   )*3, 3); //rbg, mask size 3
+
+    if (PIXELGRID_H_PRST == 6.0)
+        return vec4( vec3(-1/4.0,
+						  +1/4.0,
+						  0.0   )*4, 4); //rbgx, mask size 4
+
+    if (PIXELGRID_H_PRST == 7.0)
+        return vec4( vec3(0.0), 2); //WX, mask size 2
+
 }

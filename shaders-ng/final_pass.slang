@@ -51,8 +51,6 @@ layout(location = 22) out float vPG_mask_height;
 layout(location = 23) out float vDeltaRenderOk;
 layout(location = 24) out float vDo_pixelgrid_h;
 layout(location = 25) out float vDo_Curvature;
-layout(location = 26) out float vPG_offsets_adjust_for_unfloor;
-
 
 layout(location = 31) out float I_am_a_placeholder_keep_reading;
 //..to remind you that location = 31 is the last accepted by vulkan
@@ -182,9 +180,18 @@ void main() {
                 vDotMat_Grid_Color *= DOT_M_G_BRT ;
         }
             
+
     //Pixelgrid: get mask type; .rgb contains layout, .a contains the size.
-        vPG_offsets_and_size = PG_get_hmask_preset() ;
+    //we use 2 different layouts for floored and unfloored coords, because
+    //with unfloored coords we move the gap half beginning, half end,
+    //while with floored coords it must have its own integer spot.
+        if (PIXELGRID_SIZE_W == 0.0 || PIXELGRID_MUL_X != 1.0)
+            vPG_offsets_and_size = PG_get_hmask_preset_unfloored() ;
+                else
+            vPG_offsets_and_size = PG_get_hmask_preset_floored() ;
+       //scale offsets to be used by sin:
         #define PG_H_COUNT vPG_offsets_and_size.a
+        vPG_offsets_and_size.rgb *= (pi / PG_H_COUNT);
 
     //Pixelgrid: Calc freq_base_screen
         //Tate ?
@@ -205,20 +212,8 @@ void main() {
             //the following unfloored coords are needed by sin/cos later to understand if we are on an even or odd mask
                 vPG_freq_base_screen_unfloored = pi * vec2(1/PG_H_COUNT, 0.5) * (vPG_OutputCoord_tated * vPG_OutputSize_tated);
               
-  
-        //This is needed to make sure even/odd staggering period matches between floored (screen 1X)
-        //and unfloored coords (core or non 1x mask size).
-        //The issue visible when staggering the slotmask.           FIXME: Not yet 100% perfect
-            vPG_offsets_adjust_for_unfloor = pi/2.0;//  0.0;
-            if (PIXELGRID_SIZE_W == 0.0 || PIXELGRID_MUL_X != 1.0) {
-                vec4 unfloored_offsets_fix = vec4(0.0, pi/4.0, pi/3.0, pi/4.0);
-                vPG_offsets_adjust_for_unfloor = unfloored_offsets_fix[int(PG_H_COUNT)-1];
-            }
 
 
-        //scale offsets to be used by sin/cos:
-            vPG_offsets_and_size.rgb *= (pi / PG_H_COUNT);
-                
     //Pixelgrid: adapt period multiplier
         if (vPG_period_multiplier.x < 0.0) vPG_period_multiplier.x = 1/-vPG_period_multiplier.x;  
         if (vPG_period_multiplier.y < 0.0) vPG_period_multiplier.y = 1/-vPG_period_multiplier.y;     
@@ -282,7 +277,6 @@ layout(location = 22) in float vPG_mask_height;
 layout(location = 23) in float vDeltaRenderOk;
 layout(location = 24) in float vDo_pixelgrid_h;
 layout(location = 25) in float vDo_Curvature;
-layout(location = 26) in float vPG_offsets_adjust_for_unfloor;
 
 
 
@@ -525,7 +519,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         freq_base /= vPG_period_multiplier;
         freq_base_unfloored /= vPG_period_multiplier;
         
-        vec3 freq_rgb = vec3(freq_base.x) - PG_offsets + vPG_offsets_adjust_for_unfloor ;
+        vec3 freq_rgb = vec3(freq_base.x) - PG_offsets;
 
         //(+pi/count?)
         
@@ -541,7 +535,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         
     //Moving it up there provides a small speed up due to
     //increased parallalism, I guess.
-        float sin_check_offset = sin(freq_base_unfloored.x);// + vPG_offsets_adjust_for_unfloor);
+        float sin_check_offset = sin(freq_base_unfloored.x);
         float is_even = step(sin_check_offset, 0.0);
 
         
