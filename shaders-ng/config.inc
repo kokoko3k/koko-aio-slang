@@ -482,7 +482,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter IN_GLOW_BIAS             "        Glow to blur bias"							1.0     0.0 1.0 0.05
 #pragma parameter IN_GLOW_SPREAD           "        Glow spread amount"		0.6 	0.0 4.0 0.05
 #pragma parameter IN_GLOW_W                "        Sharp X (neg=use BOX unsharp)"		2.5	-2.0 7.0 0.05
-#pragma parameter IN_GLOW_H                "        Sharp Y (neg=use BOX unsharp)"		2.5	-2.0 7.0 0.02
+#pragma parameter IN_GLOW_H                "        Sharp Y (neg=use BOX unsharp)"		2.5	-2.0 7.0 0.05
 #pragma parameter BLANK7 " " 0.0 0.0 1.0 1.0
 
 
