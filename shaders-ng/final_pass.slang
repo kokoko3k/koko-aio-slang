@@ -1048,6 +1048,15 @@ vec3 fn_pixel_content(vec2 coords) {
             //vec2 ch = mix(coords, cq, SERVICE1);
             //pixel_haloed = texture(halo_pass,ch).rgb;
             pixel_haloed = texture(halo_pass,coords).rgb;
+            
+            
+            
+            
+            
+            
+            
+            
+            
             //Halo only on scanlines:
             pixel_out += pixel_haloed * dot_mat_or_pixelgrid ;
             //Halo over scanlines gap too:
@@ -1402,6 +1411,13 @@ void main() {
             pixel_out = 1-pixel_out;//;-clip;
     #endif
             
+    
+    //pixel_out = texture(halo_pass,co_content).rgb;
+    //pixel_out = texture_NEAREST(halo_pass,co_content, global.in_glow_passSize).rgb;
+    
+    
+    
+    
     FragColor = vec4(pixel_out, 1.0);
     
     //FragColor = texture(halo_pass, vOutputCoord);
