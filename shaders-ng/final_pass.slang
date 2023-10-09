@@ -1044,7 +1044,9 @@ vec3 fn_pixel_content(vec2 coords) {
         vec3 pixel_haloed = vec3(0.0);;
 
         if (DO_HALO == 1.0 ) {
-            pixel_haloed = texture(halo_pass,coords).rgb;
+            vec2 cq = coords_QULEZ(coords, global.in_glow_passSize);
+            vec2 ch = mix(coords, cq, SERVICE1);
+            pixel_haloed = texture(halo_pass,ch).rgb;
             //Halo only on scanlines:
             pixel_out += pixel_haloed * dot_mat_or_pixelgrid ;
             //Halo over scanlines gap too:
