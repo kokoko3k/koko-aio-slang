@@ -59,7 +59,7 @@ function xdosavepreset {
 	SendKey "Escape"
 }
 
-for preset in $(find /koko/koko-aio-slang/presets-ng -iname "*.slangp" |grep -vi experimental|grep -vi debug|grep -vi wip) ; do 
+for preset in $(find /koko/koko-aio-slang/convert -iname "*.slangp" |grep -vi experimental|grep -vi debug|grep -vi wip) ; do 
 	echo $preset
 	
 	presetname=$(basename "$preset")
