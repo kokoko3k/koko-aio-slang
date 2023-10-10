@@ -822,36 +822,63 @@ vec4 textureLod_wrap(sampler2D tex, vec2 co, float lod, float wrap_mode) {
     return textureLod(tex, co, lod);
 }
 
+    
+  
+vec3 pixel_blank_alternate_v2(vec2 co, vec4 texsize, float strength, vec3 c) {    
 
-float pixel_blank_alternate(float strength) {
-    /*
-             vec3 pixel_strobe = pixel_out.rgb * mod(params.FrameCount, 2);
-                float max_c = max(pixel_out.r, max(pixel_out.g, pixel_out.b));
-                float max_c_adpt = 1 - (max_c * 0.5);
-                pixel_out.rgb = mix (pixel_out.rgb, pixel_strobe, ALT_BLANK_STRENGTH *    max_c_adpt       )   ;
-    */
-    
-    // Emulate the low crt persistance by only drawing odd/even lines
-    // on odd/even frames
-    
+	c = pow(c, vec3(2.2));
 
+    vec3 S=vec3(strength);
+    vec3 ref = clamp(c, 0.0,1.0);
+    S = min(S, vec3(1.0)-ref);   
+    S = min(S, ref);
     
-    float line = vTexCoord.y * params.OutputSize.y;
+    float line = co.y * texsize.y;
+    float column = co.x * texsize.x;
+    
     float l_period_half = ALT_BLANK_PERIOD / 2;
     
+    float sinlinea= sin(line*pi/ALT_BLANK_PERIOD);
+    sinlinea*=sinlinea;
+
+    float sincolonna= sin(column*pi/ALT_BLANK_PERIOD);
+    sincolonna*=sincolonna;
     
-    //Use another alg that affects less dark colors for negative strength values.
-   /* if (strength < 0.0) {
-        strength *= -1;
-        float max_c = max(source.r, max(source.g, source.b));
-        float max_c_adpt = 1 - (max_c * 0.5);
-        strength *= max_c_adpt;
-    }*/
+
+    bool linea_pari = sinlinea > 0.5;
+    bool frame_pari =  mod(float(params.FrameCount),2.0  ) == 1 ;
+
+    if (frame_pari) {
+        if (linea_pari)
+            S = -S;
+                else
+            S = +S;
+	} else {
+
+		if (!frame_pari) {
+			if (linea_pari)
+				S = S;
+					else
+				S = -S;
+		}
+    }
     
-    //If the frame has been completely blanked, rendered will be 0.0
-    //rendered will be returned and can be used to skip 
-    float rendered;
+    c = c+S;
     
+	c = pow(c, vec3(1/2.2));
+    
+    return c;
+}
+
+
+float pixel_blank_alternate(float strength) {
+   
+    // Emulate the low crt persistance by only drawing odd/even lines
+    // on odd/even frames
+
+    float line = vTexCoord.y * params.OutputSize.y;
+    float l_period_half = ALT_BLANK_PERIOD / 2;
+        
     if  (mod(float(params.FrameCount),2.0  ) == 1) {
         if  (mod(line,ALT_BLANK_PERIOD) > l_period_half) {
             return strength;
