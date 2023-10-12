@@ -1,7 +1,7 @@
 #reference "../koko-aio-ng.slangp"
 
 bg_over = "../textures/overlays/gbm.jpg"
-bg_under = ""../textures/overlays/gbm.jpg"
+bg_under = "../textures/overlays/gbm.jpg"
 
 DO_CCORRECTION = "1.000000"
 	BRIGHTNESS = "0.030000"
