@@ -224,7 +224,7 @@ void main() {
         if (vPG_mask_height < 0.0) vPG_mask_height = 1/-vPG_mask_height;
     
     //Pixelgrid: do horizontal if enabled, but skip it if user doesn't want it on interlaced content.
-        vDo_pixelgrid_h = float(DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0));
+        vDo_pixelgrid_h = float(DO_PIXELGRID > 0.0 && DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0));
 
        
     vDo_Curvature = DO_CURVATURE * (GEOM_WARP_X + GEOM_WARP_Y);
