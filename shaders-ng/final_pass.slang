@@ -1069,26 +1069,26 @@ vec3 fn_pixel_content(vec2 coords) {
         }
         
     //Halo
-        vec3 pixel_haloed = vec3(0.0);;
-
         if (DO_HALO == 1.0 ) {
             //vec2 cq = coords_QULEZ(coords, global.in_glow_passSize);
             //vec2 ch = mix(coords, cq, SERVICE1);
             //pixel_haloed = texture(halo_pass,ch).rgb;
-            pixel_haloed = texture(halo_pass,coords).rgb;
             
+            vec2 halo_coords = coords;
             
-            
-            
-            
-            
-            
-            
-            
-            //Halo only on scanlines:
-            pixel_out += pixel_haloed * dot_mat_or_pixelgrid ;
-            //Halo over scanlines gap too:
-            pixel_out += pixel_haloed * (HALO_VS_SCAN) * (1 - dot_mat_or_pixelgrid) ;            
+            if (HALO_PRE_SCANLINE_GAP == 1.0 &&  vDo_pixelgrid_h == 1.0) {
+                //FIXME dot_mat lasciato indietro
+                halo_coords.y += global.in_glow_passSize.w*0.5*DO_PIXELGRID_H*(0.75-HALO_VS_SCAN);
+                vec3 pixel_haloed = texture(halo_pass, halo_coords).rgb;    
+                pixel_out += pixel_haloed;
+            } else {
+                vec3 pixel_haloed = texture(halo_pass, halo_coords).rgb;
+                //Halo only on scanlines:
+                pixel_out += pixel_haloed * dot_mat_or_pixelgrid ;
+                //Halo over scanlines gap too:
+                pixel_out += pixel_haloed * (HALO_VS_SCAN) * (1 - dot_mat_or_pixelgrid) ;   
+            }
+
         }
     
     // Apply gamma out:

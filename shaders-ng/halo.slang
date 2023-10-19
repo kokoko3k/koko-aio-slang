@@ -9,10 +9,14 @@ layout(location = 0) out vec2 vTexCoord;
 layout(location = 1) out vec2 vHALO_SHARPNESS;
 layout(location = 2) out float vHALO_POWER;
 
-vec2 radius_blur_adapt(vec2 bsize){
+vec2 radius_blur_adapt(vec2 bsize, vec4 sourcesize){
     vec2 r;
     r.x = bsize.x / SCALEMOD_X;
     r.y = r.x *  get_in_aspect();
+    
+	float aspect = (sourcesize.x/sourcesize.y);
+	r = r / vec2(1.0, aspect);
+
     return r;
 }
 
@@ -27,7 +31,7 @@ void main() {
 
 //20..1 10...2 prova 5..3
     //Correct aspect
-        vHALO_SHARPNESS = radius_blur_adapt(vHALO_SHARPNESS);
+        vHALO_SHARPNESS = radius_blur_adapt(vHALO_SHARPNESS, params.SourceSize);
 
 
    if (HALO_POWER >= 0.0)
@@ -57,7 +61,7 @@ void main() {
     }
     
     //pixel_haloed = blur5_x(Source, vTexCoord, params.SourceSize.xy, vHALO_SHARPNESS, 0.0);
-    vec3 pixel_haloed = blur_px(Source, vTexCoord, vHALO_SHARPNESS, params.SourceSize) * vHALO_POWER;
+    vec3 pixel_haloed = blur_px(Source, vTexCoord, vHALO_SHARPNESS) * vHALO_POWER;
 
     pixel_haloed =  pow(pixel_haloed, vec3(HALO_GAMMA_OUT));
     
