@@ -895,7 +895,11 @@ vec3 blur_px(sampler2D smp, vec2 co, vec2 r, vec4 sourcesize) {
 
     //c1=1.0;
     //c2=1.0;
-    
+	
+	//float aspect = (sourcesize.x/sourcesize.y);
+	//r = r / vec2(1.0, aspect);
+	
+	
     c += texture(smp, co + vec2(0.0, 1.0) * r).rgb * c1;
     c += texture(smp, co + vec2(0.7071, 0.7071) * r).rgb * c2;
     c += texture(smp, co + vec2(1.0, 0.0) * r).rgb * c1 ;
