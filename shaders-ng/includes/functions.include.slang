@@ -387,6 +387,10 @@ bool is_interlaced() {
 	return (params.OriginalSize.y > MIN_LINES_INTERLACED);
 }
 
+bool pixelgrid_h_needed() {
+	return DO_PIXELGRID > 0.0 && DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && is_interlaced() );
+}
+
 float scale_to_range(float x, float dmin, float dmax) {
     //Scales 0..1 range to a..b range
     return ( (dmax-dmin) * x ) + dmin;
