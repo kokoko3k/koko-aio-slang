@@ -888,6 +888,28 @@ vec3 lanczos(sampler2D sampler_in, vec2 co, vec4 texsize, float sharpness ) {
 		return color;
 	}
 	
+vec3 blur_px(sampler2D smp, vec2 co, vec2 r, vec4 sourcesize) {
+    vec3 c=vec3(0.0);
+    float c1 = 0.75;
+    float c2 = 1.25;
+
+    //c1=1.0;
+    //c2=1.0;
+    
+    c += texture(smp, co + vec2(0.0, 1.0) * r).rgb * c1;
+    c += texture(smp, co + vec2(0.7071, 0.7071) * r).rgb * c2;
+    c += texture(smp, co + vec2(1.0, 0.0) * r).rgb * c1 ;
+    c += texture(smp, co + vec2(0.7071, -0.7071) * r).rgb * c2;
+    c += texture(smp, co + vec2(0.0, -1.0) * r).rgb * c1;
+    c += texture(smp, co + vec2(-0.7071, -0.7071) * r).rgb * c2;
+    c += texture(smp, co + vec2(-1.0, 0.0) * r).rgb * c1;
+    c += texture(smp, co + vec2(-0.7071, 0.7071) * r).rgb * c2;
+
+    //vec3 c0 = texture(smp, co + vec2(0.0, 0.0) * r).rgb;
+    //return min(c0, c/8.0);
+    return c/8.0;
+}
+	
 	/*float is_scanline(vec2 uv){
 		return float(int(mod(uv.y * params.OutputSize.y , 2.0 )) !=0.0) ;
 	}
