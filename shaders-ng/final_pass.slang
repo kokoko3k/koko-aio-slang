@@ -293,7 +293,7 @@ layout(set = 0, binding = 6)  uniform sampler2D monitor_body_straight;
 layout(set = 0, binding = 7)  uniform sampler2D monitor_body_curved;
 layout(set = 0, binding = 8)  uniform sampler2D bg_under;
 layout(set = 0, binding = 9)  uniform sampler2D bg_over;
-//layout(set = 0, binding = 10) uniform sampler2D shift_and_bleed_pass;
+//layout(set = 0, binding = 10) uniform sampler2D halo_pre_gamma_pass;
 layout(set = 0, binding = 11) uniform sampler2D in_glow_pass;
 layout(set = 0, binding = 12) uniform sampler2D halo_pass;
 layout(set = 0, binding = 13) uniform sampler2D final_passFeedback;
@@ -474,12 +474,12 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
      It could replace glow_x for tight blurs.
     */
     
-    ////vec3 lum_h =  downsample(in_glow_pass, in_coords, global.flick_and_noise_passSize, 0.0).rgb;
+    //vec3 lum_h =  downsample(in_glow_pass, in_coords, global.flick_and_noise_passSize, 0.0).rgb;
     //vec3 lum_h =  downsample_x(in_glow_pass, in_coords, global.flick_and_noise_passSize, 0.0).rgb;  
     //lum_h *= smoothstep_fast( vec3(SERVICE1-0.1) ,vec3(SERVICE1), lum_h);
     //pixel_in = max(pixel_in, lum_h);
     
-    //pixel_in = blur9_x_box1tap(in_glow_pass, in_coords, params.OriginalSize.xy, SERVICE1*7.5); //102.4
+    //pixel_in = blur9_x_box1tap(in_glow_pass, in_coords, params.OriginalSize.xy, abs(IN_GLOW_W)*2.0) ; //102.4
    
     //Scanlines: compute each phosphor height according to input luminance, puttin it here helpas parallelism a bit.
         float extragain_h = max(PIXELGRID_MAX_H, 1.0); //Handle 
@@ -1080,6 +1080,9 @@ vec3 fn_pixel_content(vec2 coords) {
                 //FIXME dot_mat lasciato indietro
                 halo_coords.y += global.in_glow_passSize.w*0.5*DO_PIXELGRID_H*(0.75-HALO_VS_SCAN);
                 vec3 pixel_haloed = texture(halo_pass, halo_coords).rgb;    
+                 
+                //pixel_haloed = blur_px(halo_pre_gamma_pass, halo_coords, vec2(SERVICE1*0.1)) ;
+                
                 pixel_out += pixel_haloed;
             } else {
                 vec3 pixel_haloed = texture(halo_pass, halo_coords).rgb;

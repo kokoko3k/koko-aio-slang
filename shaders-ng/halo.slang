@@ -15,6 +15,7 @@ vec2 radius_blur_adapt(vec2 bsize, vec4 sourcesize){
     r.y = r.x *  get_in_aspect();
     
 	float aspect = (sourcesize.x/sourcesize.y);
+    
 	r = r / vec2(1.0, aspect);
 
     return r;

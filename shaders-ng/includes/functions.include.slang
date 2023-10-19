@@ -890,9 +890,11 @@ vec3 lanczos(sampler2D sampler_in, vec2 co, vec4 texsize, float sharpness ) {
 	
 vec3 blur_px(sampler2D smp, vec2 co, vec2 r) {
     vec3 c=vec3(0.0);
-    float c1 = 0.75;
-    float c2 = 1.25;
+    //float c1 = 0.75;
+    //float c2 = 1.25;
 
+	#define c1 1.0
+	#define c2 1.0
 
     c += texture(smp, co + vec2(0.0, 1.0) * r).rgb * c1;
     c += texture(smp, co + vec2(0.7071, 0.7071) * r).rgb * c2;
