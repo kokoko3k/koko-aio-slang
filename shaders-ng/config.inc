@@ -345,6 +345,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float PIXELGRID_OVERMASK;
 	float DO_PIXELGRID_W;
 	float DO_PIXELGRID_H;
+	float PIXELGRID_COREY_FAKE_SCAN;
 	float PIXELGRID_MIN_H;
 	float PIXELGRID_MIN_W;
 	float PIXELGRID_MAX_H;
@@ -517,6 +518,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 
 #pragma parameter DO_PIXELGRID_H            "      ★ Scanlines (0 to disable)"    	1.0 0.0 1.25 0.05
+#pragma parameter PIXELGRID_COREY_FAKE_SCAN "           . Use fake integer scanlines"   0.0 0.0 1.0 1.0
 #pragma parameter PIXELGRID_MIN_H	        "           . Phosphors height Min"			0.2 0.00 1.0 0.05
 #pragma parameter PIXELGRID_MAX_H           "           . Phosphors height Max"			0.6 0.0 1.5 0.05
 #pragma parameter PIXELGRID_GAMMA_H         "           . Phosphors height min->max gamma:"	4.2 1.0 8.00 0.1
@@ -531,9 +533,10 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 #pragma parameter BLANK12f " " 0.0 0.0 1.0 1.0
 
-#pragma parameter MIN_LINES_INTERLACED      "        Interlace detect + Scanline alternate above # lines:"		380.0 	1.0 1024 1.0
-#pragma parameter PIXELGRID_INTR_DISABLE_Y  "        Disable scanlines on interlaced screen"			  	0.0 	0.0 1.0 1.0
-#pragma parameter PIXELGRID_INTR_FLICK_MODE "        Interlace Flicker (0=off,1=on,2=if interlaced)"		2.0 	0.0 2.0 1.0
+#pragma parameter LABEL_INTERLACE           "      ★ Interlace Handling" 0.0 0.0 0.0 0.0
+#pragma parameter MIN_LINES_INTERLACED      "           . Interlace + Scanline alternate above # lines:"		380.0 	1.0 1024 1.0
+#pragma parameter PIXELGRID_INTR_DISABLE_Y  "           . Interlaced Scanlines? (-1=fake, 0=yes, 1=no)"				-1.0 	-1.0 1.0 1.0
+#pragma parameter PIXELGRID_INTR_FLICK_MODE "           . Interlace Flicker (0=off,1=on,2=if interlaced)"			2.0 	0.0 2.0 1.0
 #pragma parameter PIXELGRID_INTR_FLICK_POWR "           . Interlace Flicker power"		  		0.25 	0.0 8.0 0.01
 
 

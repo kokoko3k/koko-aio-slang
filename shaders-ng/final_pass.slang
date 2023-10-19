@@ -51,6 +51,8 @@ layout(location = 21) out float vPG_mask_height;
 layout(location = 22) out float vDeltaRenderOk;
 layout(location = 23) out float vDo_pixelgrid_h;
 layout(location = 24) out float vDo_Curvature;
+layout(location = 25) out float vFake_scanline_period;
+layout(location = 26) out float vUse_Fake_scanlines;
 
 layout(location = 31) out float I_am_a_placeholder_keep_reading;
 //..to remind you that location = 31 is the last accepted by vulkan
@@ -228,7 +230,7 @@ void main() {
 
        
     vDo_Curvature = DO_CURVATURE * (GEOM_WARP_X + GEOM_WARP_Y);
-    
+        
     //Dot matrix: measure the final picture size to choose a right sharpness level
     //For simplicity and (my) mental health, take only y into account.
         vDotMat_Grid_Sharpness = DOT_M_G_SHARP;
@@ -246,6 +248,15 @@ void main() {
     vDeltaRenderOk = float(  ( params.FrameCount % int(DELTA_RENDER_FORCE_REFRESH) != 0.0 ) && // - We are in a frame that is not forced for full refresh
                              ( (! bIs_Interlaced) || PIXELGRID_INTR_DISABLE_Y == 1.0 || DO_PIXELGRID_H == 0.0)   // - screen is not interlaced or we disabled scanlines on interlaced content
                            ); 
+    
+    //For use with interlacrd content, here we calculate an amount of lines that it integer multiple of the screen lines and that
+    //is near to the real input/core lines
+    vUse_Fake_scanlines = 0.0; 
+    if ( (PIXELGRID_INTR_DISABLE_Y == -1.0 && bIs_Interlaced) || (PIXELGRID_COREY_FAKE_SCAN == 1.0)) {
+        vUse_Fake_scanlines = 1.0;
+        float fake_scanlines_numlines = global.FinalViewportSize.y/ceil(   (global.FinalViewportSize.y*get_zooms_modifier().y) /params.OriginalSize.y);
+        vFake_scanline_period = pi * fake_scanlines_numlines * vOutputCoord.y;
+    }
 }
 
 
@@ -277,8 +288,8 @@ layout(location = 21) in float vPG_mask_height;
 layout(location = 22) in float vDeltaRenderOk;
 layout(location = 23) in float vDo_pixelgrid_h;
 layout(location = 24) in float vDo_Curvature;
-
-
+layout(location = 25) in float vFake_scanline_period;
+layout(location = 26) in float vUse_Fake_scanlines;
 
 
 layout(location = 0) out vec4 FragColor;
@@ -496,6 +507,12 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
 
         vec2 freq_base_core = pi * in_coords * vPG_OriginalSize_tated ;
 
+        //Use fake scanlines?
+        if (vUse_Fake_scanlines == 1.0) 
+            freq_base_core.y = vFake_scanline_period;
+        
+        
+       
         //Screen coords:
             //The following unfloored coords are needed by sin/cos later to understand if we are on an even or odd mask
                 //vec2 freq_base_screen_unfloored = pi * vec2(1/PG_h_count, 0.5) * (vPG_OutputCoord_tated * vPG_OutputSize_tated);

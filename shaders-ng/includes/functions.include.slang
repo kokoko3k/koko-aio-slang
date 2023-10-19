@@ -888,6 +888,7 @@ vec3 lanczos(sampler2D sampler_in, vec2 co, vec4 texsize, float sharpness ) {
 		return color;
 	}
 	
+	
 vec3 blur_px(sampler2D smp, vec2 co, vec2 r) {
     vec3 c=vec3(0.0);
     //float c1 = 0.75;
