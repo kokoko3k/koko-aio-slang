@@ -479,6 +479,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
     //lum_h *= smoothstep_fast( vec3(SERVICE1-0.1) ,vec3(SERVICE1), lum_h);
     //pixel_in = max(pixel_in, lum_h);
     
+    //pixel_in = blur9_x_box1tap(in_glow_pass, in_coords, params.OriginalSize.xy, SERVICE1*7.5); //102.4
    
     //Scanlines: compute each phosphor height according to input luminance, puttin it here helpas parallelism a bit.
         float extragain_h = max(PIXELGRID_MAX_H, 1.0); //Handle 

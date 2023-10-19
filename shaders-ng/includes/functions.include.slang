@@ -874,6 +874,20 @@ vec3 lanczos(sampler2D sampler_in, vec2 co, vec4 texsize, float sharpness ) {
 		return color;
 	}
 
+	vec3 blur9_x_box1tap(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_x) {
+		float resolution = sourcesize.x * sharpness_x;
+		vec3 color = vec3(0.0);
+		
+		vec2 off1 = vec2(1.0 / resolution, 0.0)  ;
+		vec2 off2 = vec2(2.0 / resolution, 0.0)  ;
+			
+		color += texture(image, uv).rgb        ;
+		color += texture(image, uv + off1).rgb ;
+		color += texture(image, uv - off1).rgb ;
+		color = color/3.0;
+		return color;
+	}
+	
 	/*float is_scanline(vec2 uv){
 		return float(int(mod(uv.y * params.OutputSize.y , 2.0 )) !=0.0) ;
 	}
