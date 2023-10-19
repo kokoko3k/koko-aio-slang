@@ -252,10 +252,12 @@ void main() {
     //For use with interlacrd content, here we calculate an amount of lines that it integer multiple of the screen lines and that
     //is near to the real input/core lines
     vUse_Fake_scanlines = 0.0; 
-    if ( (PIXELGRID_INTR_DISABLE_Y == -1.0 && bIs_Interlaced) || (PIXELGRID_COREY_FAKE_SCAN == 1.0)) {
+    //FIXME 1fps lost here, maybe too much even for a vertex shader.
+    if ( (PIXELGRID_INTR_DISABLE_Y <= -1.0 && bIs_Interlaced) || (PIXELGRID_COREY_FAKE_SCAN == 1.0)) {
         vUse_Fake_scanlines = 1.0;
         float fake_scanlines_numlines = global.FinalViewportSize.y/ceil(   (global.FinalViewportSize.y*get_zooms_modifier().y) /params.OriginalSize.y);
         vFake_scanline_period = pi * fake_scanlines_numlines * vOutputCoord.y;
+        if (PIXELGRID_INTR_DISABLE_Y == -2.0 && PIXELGRID_COREY_FAKE_SCAN == 0.0) vFake_scanline_period*=1.5;
     }
 }
 
