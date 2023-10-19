@@ -206,7 +206,7 @@
        0=yes:   Use interlaced scanlines, may need >1080p screen to avoid moire or weavy artifacts
        1=no:    You may want to avoid drawing scanlines gaps when interlaced content is found
       -1=fake:  Use a number of scanlines that perfectly fits the screen, a good glitches free tradeoff.
-      -2=faker: Use a number of scanlines that perfectly fits the screen * 1.5, another good glitches free tradeoff.
+      -2=faker: Use a number of scanlines that perfectly fits the screen * 1.5, another good (almost) glitches free tradeoff.
     Interlace Flicker (0=off,1=on,2=if interlaced):
         Since we can emulate scanline appearence, here we deal with interlaced content too.
         This setting emulates the flickering issues present on crt interlaced screens
