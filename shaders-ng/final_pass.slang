@@ -252,7 +252,7 @@ void main() {
     //For use with interlacrd content, here we calculate an amount of lines that it integer multiple of the screen lines and that
     //is near to the real input/core lines
     vUse_Fake_scanlines = 0.0; 
-    //FIXME 1fps lost here, maybe too much even for a vertex shader.
+
     if ( (PIXELGRID_INTR_DISABLE_Y <= -1.0 && bIs_Interlaced) || (PIXELGRID_COREY_FAKE_SCAN == 1.0)) {
         vUse_Fake_scanlines = 1.0;
         float fake_scanlines_numlines = global.FinalViewportSize.y/ceil(   (global.FinalViewportSize.y*get_zooms_modifier().y) /params.OriginalSize.y);
@@ -892,23 +892,13 @@ vec3 pixel_blank_alternate_v2(vec2 co, vec4 texsize, float strength, vec3 c) {
 
 
 float pixel_blank_alternate(float strength) {
-   
-    // Emulate the low crt persistance by only drawing odd/even lines
-    // on odd/even frames
-
-    float line = vTexCoord.y * params.OutputSize.y;
-    float l_period_half = ALT_BLANK_PERIOD / 2;
-        
-    if  (mod(float(params.FrameCount),2.0  ) == 1) {
-        if  (mod(line,ALT_BLANK_PERIOD) > l_period_half) {
-            return strength;
-        }
+    float square_wave_line = float(mod(vTexCoord.y * params.OutputSize.y, ALT_BLANK_PERIOD) > ALT_BLANK_PERIOD / 2);
+    if ( mod(params.FrameCount, 2.0) == 1.0) {
+        return min(square_wave_line + strength, 1.0);
     } else {
-        if  (mod(line,ALT_BLANK_PERIOD) <= l_period_half) {
-            return strength;
-        }
+        return min(1 - square_wave_line + strength, 1.0); 
     }
-    return 1.0;
+
 }
 
 

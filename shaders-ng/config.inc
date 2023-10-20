@@ -113,7 +113,7 @@
 
 	//Experimental alternating blanking feature has been disabled by default, you can enable it by
 	//uncommenting the following line:
-//#define ALLOW_ALT_BLANK
+#define ALLOW_ALT_BLANK
 
 	//Halve rendering refresh on bezel and ambilight to spare gpu cycles:
 #define HALVE_BORDER_UPDATE 1.0

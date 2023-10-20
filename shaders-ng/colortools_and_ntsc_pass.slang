@@ -17,11 +17,11 @@
 
 
 
-//#define DEBUG
+#define DEBUG
    //#define DEBUG_COLOR_CALIB
-   #define DEBUG_TIME_FADE
+   //#define DEBUG_TIME_FADE
    //#define DEBUG_SOLID_COLOR
-   //#define DEBUG_STEP_GRADIENT
+   #define DEBUG_STEP_GRADIENT
    //#define DEBUG_STEP_GRADIENT_V
    //#define DEBUG_BLINK
    //#define DEBUG_BLINK_CIRCLE
@@ -296,6 +296,16 @@ void main() {
       pixel_out = mix(pixel_out, feedback,          m_blur_adapted  );
    }
    
+   
+/*    float range = 0.2;
+    float square_wave_time = float(mod(params.FrameCount,  2.0) == 0.0);
+    
+    vec3 square_wave_time_vec3 = min( pixel_out, 1-pixel_out) * square_wave_time * range;   
+    pixel_out = pixel_out + square_wave_time_vec3;
+    
+    float square_wave_y = float(mod(vTexCoord.y * params.OriginalSize.y + square_wave_time, 2.0) > 1.0);
+    pixel_out = vec3(square_wave_y);
+*/    
    
    FragColor = vec4(pixel_out, artifact_mask);
    //FragColor = vec4(artifacts);
