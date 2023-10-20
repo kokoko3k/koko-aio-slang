@@ -892,6 +892,7 @@ vec3 pixel_blank_alternate_v2(vec2 co, vec4 texsize, float strength, vec3 c) {
 
 
 float pixel_blank_alternate(float strength) {
+    
     float square_wave_line = float(mod(vTexCoord.y * params.OutputSize.y, ALT_BLANK_PERIOD) > ALT_BLANK_PERIOD / 2);
     if ( mod(params.FrameCount, 2.0) == 1.0) {
         return min(square_wave_line + strength, 1.0);
@@ -903,11 +904,13 @@ float pixel_blank_alternate(float strength) {
 
 
 vec3 bezel_color(float lum)  {
+    
     //Colorize bezel frame
     vec3 col = vec3(BEZEL_R,BEZEL_G,BEZEL_B) + lum;
     float con_max =  0.5 * BEZEL_CON + 0.5;
     col = scale_to_range_vec3(col, -con_max+1, con_max);
     return clamp(col,0.0,1.0);
+    
 }
 
 
