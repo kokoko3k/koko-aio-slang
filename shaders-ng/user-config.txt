@@ -1,0 +1,55 @@
+//DONT DELETE THIS LINE1
+//DONT DELETE THIS LINE2
+
+
+
+/* There yoy have a chance to boost your FPS.
+ * 
+ * The more lines you edit, the more your FPS will be high.
+ * 
+ * Edit lines that way, eg:
+ * 
+ * 	#define SCANLINE_DARK	params.SCANLINE_DARK
+ * 	turns to:
+ * 	#define SCANLINE_DARK	0.2
+ * 
+ * or:
+ * 	#define DO_CCORRECTION	global.DO_CCORRECTION
+ * 	turns to
+ * 	#define DO_CCORRECTION	0.0
+ *
+ * 
+ * Since everything after "//" is ignored,
+ * you can even do something like:
+ * 	#define DO_CCORRECTION	0.0 //global.DO_CCORRECTION
+ * 
+ * 
+ * ...that's it, you just need to copy the values from the
+ * preset you like to the right setting here.
+ * 
+ * The downside of using this method is that every setting
+ * you turn, will be static and you will not be able to
+ * modify it "on-the-fly" in retroarch.
+ * 
+ * The only way to change that values will be to edit this file
+ * again, so maybe doing multiple copies of this file
+ * or even of the whole koko-shader would be a good idea.
+ * 
+ * 
+ * I suggest you to start from the easy ones, the ones that
+ * starts with DO_****, like DO_SCANLINES.
+ * it takes a value = 0 or 1, where 0 means no, 1 means yes.
+ * I repeat: if you always wants scanlines, just use:
+ * 
+ * 	#define DO_SCANLINES		1.0
+ * 	instead of
+ * 	#define #DO_SCANLINES	global.DO_SCANLINES
+ * 
+ * 
+ * Also, take a copy of this (modified) file, because it would be overwritten by
+ * updates.
+ * 
+ */
+ 
+ 
+ 

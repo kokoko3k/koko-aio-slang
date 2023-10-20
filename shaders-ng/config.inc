@@ -113,7 +113,7 @@
 
 	//Experimental alternating blanking feature has been disabled by default, you can enable it by
 	//uncommenting the following line:
-#define ALLOW_ALT_BLANK
+//#define ALLOW_ALT_BLANK
 
 	//Halve rendering refresh on bezel and ambilight to spare gpu cycles:
 #define HALVE_BORDER_UPDATE 1.0
@@ -759,6 +759,9 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 //#pragma parameter SERVICE2 "Don't use me, for debug purposes only" 	0.5 -1.0 1.0 0.01
 //#pragma parameter SERVICE3 "Don't use me, for debug purposes only" 	0.5 -1.0 1.0 0.01
 
-
+//User parameters goes here, they overrides almost everything:
+#include "user-config.txt"
 
 #include "config.globals.inc"
+
+
