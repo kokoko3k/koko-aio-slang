@@ -52,5 +52,6 @@
  * 
  */
  
- 
- 
+// for l in $(cat /koko/.config/retroarch/shaders/test.slangp |grep ^[A-Z] ) ; do p=$(echo $l|cut -d " " -f 1) ; v=$(echo $l | cut -d \" -f 2); echo \#define $p $v; done
+
+
