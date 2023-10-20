@@ -891,13 +891,15 @@ vec3 pixel_blank_alternate_v2(vec2 co, vec4 texsize, float strength, vec3 c) {
 }
 
 
-float pixel_blank_alternate(float strength) {
-    
-    float square_wave_line = float(mod(vTexCoord.y * params.OutputSize.y, ALT_BLANK_PERIOD) > ALT_BLANK_PERIOD / 2);
+vec3 pixel_blank_alternate(vec3 strength, vec3 pixel_in) {
+    //strength *= 1-pixel_in; <<--- less on bright areas?
+    strength =  1-strength;
+
+    float square_wave_line = float(mod((vTexCoord.y+0.0001) * params.OutputSize.y, ALT_BLANK_PERIOD) > ALT_BLANK_PERIOD / 2);
     if ( mod(params.FrameCount, 2.0) == 1.0) {
-        return min(square_wave_line + strength, 1.0);
+        return min(square_wave_line + strength, vec3(1.0));
     } else {
-        return min(1 - square_wave_line + strength, 1.0); 
+        return min(1 - square_wave_line + strength, vec3(1.0)); 
     }
 
 }
@@ -1042,15 +1044,7 @@ vec3 fn_pixel_content(vec2 coords) {
     vec3 pixel_glowed;
     float dot_mat_or_pixelgrid = 1.0; //init dot grid or scanline mask to 1.0
     
-    //Black frame insertion, made static, enable it in config.inc.
-        #ifdef ALLOW_ALT_BLANK
-            float alt_blank_power = 1.0;
-            //Calculate if line has to be blanked
-                if (DO_ALT_BLANK == 1.0 ) alt_blank_power = pixel_blank_alternate( 1 - ALT_BLANK_STRENGTH);
-            
-            //If we completely blanked the line, there is no need to process it further.
-                if (alt_blank_power == 0.0) return vec3(0.0);
-        #endif
+
     
     //#define USE_QUILEZ
     
@@ -1063,6 +1057,16 @@ vec3 fn_pixel_content(vec2 coords) {
     #endif
     
     
+    //Black frame insertion, made static, enable it in config.inc.
+        #ifdef ALLOW_ALT_BLANK
+            vec3 alt_blank_power = vec3(1.0);
+            //Calculate if line has to be blanked
+                if (DO_ALT_BLANK == 1.0 ) alt_blank_power = pixel_blank_alternate( vec3(ALT_BLANK_STRENGTH), pixel_glowed);
+            
+            //If we completely blanked the line, there is no need to process it further.
+                if (alt_blank_power == vec3(0.0)) return vec3(0.0);
+        #endif
+        
     //Pixel grid
         if (DO_PIXELGRID == 1.0) {
             vec4 pixel_grid = fn_pixel_grid(coords, pixel_out, 0.0, vMax_inLum);
