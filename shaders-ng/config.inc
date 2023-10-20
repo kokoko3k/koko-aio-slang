@@ -7,7 +7,7 @@
 	//and are used to calculate the sampling lod.
 	//Change if you change the texture resolution or
 	//you can comment it to let the shader calculates them at runtime (heavier).
-#define BEZEL_RES vec2(2923, 2178)
+#define BEZEL_RES vec2(2927, 2178)
 
 	//The following can slightly correct bezel aspect
 #define BEZEL_ASPECT_CORRECTION (1.0 - 0.004)
