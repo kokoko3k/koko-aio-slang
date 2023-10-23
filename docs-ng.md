@@ -1,4 +1,29 @@
-**koko-aio-slang parameters documentation**
+**koko-aio-slang documentation**
+
+**USEFUL LOCATIONS/FILES:**
+    config-static.inc:
+        Some shader parameters can't be changed within retroarch,
+        use this file instead.
+        -
+    config-user.txt:
+        shader parameters that can be changed within Retroarch.
+        can be set within this file too.
+        PRO: The shader will be faster
+        CON: The parameters can no longer be modified within Retroarch. 
+        -
+    textures/background_under.png
+        This is the image that can is shown by default under the main content and under the bezel.
+        Read further for details. 
+        -
+    textures/background_over.png
+        This is the image that can is shown by default over the main content and under the bezel.
+        Read further for details.
+        -
+    textures/monitor_body_curved.png, textures/monitor_body_straight.png
+        This is the image used to draw the bezel.
+        Read further for details.
+        -
+    
 
 **Color corrections:**<br>
     Modify luminance, saturation, contrast, brightness and color temperature
@@ -21,10 +46,10 @@
     Use it if you don't want to blur the image and you still don't like<br>
     jagged or too much pixelated images.<br>
 
-** RF Noise: **<br>
+** RF Noise:**<br>
     Emulates radio frequency noise with a given strength<br>
     
-**CVBS: NTSC color artifacts: **<br>
+**CVBS: NTSC color artifacts:**<br>
     Tries to emulate typical NTSC color artifacting without emulating<br>
     full NTSC coding/decoding pipeline.<br>
     While it improves the look of NTSC content, don't expect it to be<br>
@@ -85,7 +110,7 @@
 **Tate mode:**<br>
     Rotates mask and scanlines by 90°<br>
         
-**Low level phosphor grid**<br>
+**Low level phosphor grid:**<br>
     This is a way to produce horizontal masks, scanlines and aperturegrille/slotmasks.<br>
     Parameters are tricky to setup, but possibilities are mny more quality is good at 1080p<br>
     and hopefully great at higher resolutions.<br>
@@ -213,7 +238,6 @@
         where the brighter lines flickers when they are near dark ones.
         You can choose to produce the flickering: never, always or only 
         when the input picture is considered interlaced.
-        The threshold for that is defined in config.inc with the parameter: MIN\_LINES\_INTERLACED.
     Interlace Flicker power: The strength of the effect.
 
     
@@ -348,7 +372,8 @@
 **Bezel:**<br>
     Draws a monitor frame with simulated reflections from the game content.<br>
     The monitor frame is an image loaded by the shader and is shipped<br>
-    in the "textures" shader subdirectory, named "monitor\_body.png"<br>
+    in the "textures" shader subdirectory, named:
+    monitor_body_curved.png and monitor_body_straight.png
     It has been made with the following rules that may come handy<br>
     only if you want to edit it; otherwise go on.<br>
     - The red channel represents the luminance information<br>
@@ -385,7 +410,11 @@
 
 **Backgound image:**<br>
     Draws an image on screen picked from the "textures" shader subdirectory,<br>
-    named: background.png<br><br>
+    named by default background_over.png and background_under.png<br>
+    <br>
+    Of course you can use other path/names, but then you have to edit the preset by modifying<br>
+    bg_over and/or bg_under.
+    <br>
     **-> It is needed that you set retroarch aspect to "Full" <-**<br>
     ( Settings, Video, Scaling, Aspect Ratio = Full )<br>
     The image is painted "under" the game content and under the monitor frame by<br>
@@ -401,11 +430,7 @@
     Rotate image mode
         This could be needed when dealing with vertical games.
         Use -1 to let the shader try to guess if the rotation is needed.
-    Wrap mode:
-        This feature is static, to use it 
-        you have to manually enable it by removing the leading: "//"
-        from "//#define ALLOW_BG_IMAGE_TEXTURE_WRAP_IN_SHADER" in config.inc
-        
+    Wrap mode:      
         What to do outside the image:
         0  Mirrored repeat because so is configured in main .slangp.
         1  Clamp to border and it means black.
@@ -546,7 +571,7 @@
     leading to a measurable power consumption reduction.<br>
     This feature can, however, produce artifacts in some cases, so the feature<br>
     is statically disabled by default by now.<br>
-    To use it, you have to manually switch, in file config.inc: <br>
+    To use it, you have to manually switch, in file config-static.inc: <br>
     #define DELTA_RENDER 0.0 <br>
     to <br>
     #define DELTA_RENDER 1.0 <br>
@@ -570,7 +595,7 @@
     
     This feature is static, to use it 
     you have to manually enable it by removing the leading: "//"
-    from "//#define ALLOW_ALT_BLANK" in config.inc
+    from "//#define ALLOW_ALT_BLANK" in config-static.inc
     
     Frame insertion strength:
         How much the line will be blanked.

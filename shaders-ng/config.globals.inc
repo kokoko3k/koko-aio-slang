@@ -1,4 +1,4 @@
-//
+//Wrap any translation into an ifndef so that we can override them with a static include.
 
 
 #ifndef DO_CCORRECTION
