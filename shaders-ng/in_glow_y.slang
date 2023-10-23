@@ -168,6 +168,7 @@ void main() {
          return;
       }
    
+  
    FragColor = vec4(pixel_glowed,1.0);
    
 }

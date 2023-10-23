@@ -1,0 +1,82 @@
+//DON'T DELETE THIS LINE
+
+//   KEEP A BACKUP OF THIS FILE IF YOU MODIFY IT!
+//   
+//   There yoy have a chance to boost your FPS,
+//   the more lines you insert, the more your FPS will be high.
+//   
+//   The downside of using this method is that every setting
+//   you will write here, will be static and so that 
+//   you will NOT BE ABLE RO MODIFY it "on-the-fly" in Retroarch anymore.
+//
+//   Lines have this format: #define PARAMETER VALUE
+//   where:
+//       * PARAMETER is the shader parameter as defined in config.inc
+//         (look for lines starting with #pragma there).
+//       * VALUE is the value you want to assign to that parameter.
+//         (it is the same you would assign to that within retroarch)
+//
+//   Notice, there is no equal sign, nor double quotes, so, eg:
+//       If you know that you will always use the bezel frame:
+//       #define DO_BEZEL 1.0
+//
+//       If you know you'll never alter the contrast:
+//       #define CONTRAST 0.0
+//
+//       If you know your curvature will never change:
+//       #define GEOM_WARP_X
+//
+//   You can disable a line by erasing it or,
+//   since everything after "//" is ignored,
+//   by prepending "//", eg:
+//
+//       // #define DO_BEZEL 1.0
+//   
+//   ...that's it, you just need to copy the values from the
+//   preset you like to the right setting here.
+//   
+//   
+  
+
+ 
+// #define DO_CCORRECTION 1.0
+// #define BRIGHTNESS 0.0
+// #define CONTRAST   0.0
+// #define SATURATION 1.0
+
+// #define DO_IN_GLOW 1.0
+
+// #define DO_PIXELGRID 1.0
+
+// #define GEOM_WARP_X 0.28
+// #define GEOM_WARP_Y 0.32
+
+// #define DO_AMBILIGHT 1.0
+
+// #define DO_BEZEL 1.0
+// #define BEZEL_USE_STRAIGHT 0.0
+// #define BEZEL_RFL_BLR_SHD 0.0
+// #define BEZEL_RFL_OFFSET 0.001
+// #define BEZEL_REFL_ZOOM 0.99
+// #define BEZEL_R -0.3
+// #define BEZEL_G -0.3
+// #define BEZEL_B -0.3
+	
+// #define DO_VIGNETTE 1.0
+// #define V_SIZE 1.08
+// #define V_POWER 1.00
+
+// #define DO_SPOT 1.0
+// #define S_POSITION 194.0
+// #define S_SIZE 0.4
+// #define S_POWER 0.1
+ 
+// #define ASPECT_X 0.0
+
+// #define DO_TILT 0.0
+
+
+// Developer reminder: bash script to partially convert a shader preset 
+// for l in $(cat /koko/.config/retroarch/shaders/test.slangp |grep ^[A-Z] ) ; do p=$(echo $l|cut -d " " -f 1) ; v=$(echo $l | cut -d \" -f 2); echo \// #define $p $v; done
+
+//DONT DELETE THIS LINE

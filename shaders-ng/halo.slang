@@ -9,10 +9,15 @@ layout(location = 0) out vec2 vTexCoord;
 layout(location = 1) out vec2 vHALO_SHARPNESS;
 layout(location = 2) out float vHALO_POWER;
 
-vec2 radius_blur_adapt(vec2 bsize){
+vec2 radius_blur_adapt(vec2 bsize, vec4 sourcesize){
     vec2 r;
     r.x = bsize.x / SCALEMOD_X;
     r.y = r.x *  get_in_aspect();
+    
+	float aspect = (sourcesize.x/sourcesize.y);
+    
+	r = r / vec2(1.0, aspect);
+
     return r;
 }
 
@@ -27,7 +32,7 @@ void main() {
 
 //20..1 10...2 prova 5..3
     //Correct aspect
-        vHALO_SHARPNESS = radius_blur_adapt(vHALO_SHARPNESS);
+        vHALO_SHARPNESS = radius_blur_adapt(vHALO_SHARPNESS, params.SourceSize);
 
 
    if (HALO_POWER >= 0.0)
@@ -45,33 +50,6 @@ layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 4) uniform sampler2D Source;
 
 
-
-
-vec3 blur_px(sampler2D smp, vec2 co, vec2 r, vec4 sourcesize) {
-    vec3 c=vec3(0.0);
-    float c1 = 0.75;
-    float c2 = 1.25;
-
-    //c1=1.0;
-    //c2=1.0;
-    
-    c += texture(smp, co + vec2(0.0, 1.0) * r).rgb * c1;
-    c += texture(smp, co + vec2(0.7071, 0.7071) * r).rgb * c2;
-    c += texture(smp, co + vec2(1.0, 0.0) * r).rgb * c1 ;
-    c += texture(smp, co + vec2(0.7071, -0.7071) * r).rgb * c2;
-    c += texture(smp, co + vec2(0.0, -1.0) * r).rgb * c1;
-    c += texture(smp, co + vec2(-0.7071, -0.7071) * r).rgb * c2;
-    c += texture(smp, co + vec2(-1.0, 0.0) * r).rgb * c1;
-    c += texture(smp, co + vec2(-0.7071, 0.7071) * r).rgb * c2;
-
-    //vec3 c0 = texture(smp, co + vec2(0.0, 0.0) * r).rgb;
-    //return min(c0, c/8.0);
-    return c/8.0;
-}
-
-
-
-
 void main() {
     
     if (DO_HALO == 0.0 ) return;
@@ -84,7 +62,7 @@ void main() {
     }
     
     //pixel_haloed = blur5_x(Source, vTexCoord, params.SourceSize.xy, vHALO_SHARPNESS, 0.0);
-    vec3 pixel_haloed = blur_px(Source, vTexCoord, vHALO_SHARPNESS, params.SourceSize) * vHALO_POWER;
+    vec3 pixel_haloed = blur_px(Source, vTexCoord, vHALO_SHARPNESS) * vHALO_POWER;
 
     pixel_haloed =  pow(pixel_haloed, vec3(HALO_GAMMA_OUT));
     

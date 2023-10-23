@@ -92,7 +92,7 @@ it aims to give users "visual" parameters to make their monitors look similar.<b
 Several presets are included.<br>
 
 ***Additional documentation:***
-* [See here](docs.md)
+* [See here](docs-ng.md)
 
 ***Additional artwork:***
 * https://github.com/kokoko3k/koko-aio-slang-presets-and-overlays

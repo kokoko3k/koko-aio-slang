@@ -1,144 +1,4 @@
-
-// BEZEL STATIC CONFIG ##############################################################################################
-	//The following defines the monitor frame resolution in textures/monitor_body_[curved/straight].png
-	//and are used to calculate the sampling lod.
-	//Change if you change the texture resolution or
-	//you can comment it to let the shader calculates them at runtime (heavier).
-#define BEZEL_RES vec2(2923, 2178)
-
-	//The following can slightly correct bezel aspect
-#define BEZEL_ASPECT_CORRECTION (1.0 - 0.004)
-
-	//This is used to skip calculations in the reflection blur code.
-	//set it to minimum value that allows you to see reflection entirely
-#define BEZEL_REFL_SKIP_SIZE 0.08
-
-	//This is the size (in 0..1 range) of the bezel texture that does
-	//not include the center tube, including reflection area, and the shadow.
-	//It is actually used to skip drawing game content under the bezel or
-	//over its shadow.
-	//Set it to the maximum size as long as you see the full game content
-	//in the bezel.
-#define BEZEL_BORDER_SIZE vec2(0.07, 0.07)
-
-	//This is the blank area or shadow size (one side, in percent) at the sides of the bezel as defined by the bezel texture
-	//BEZEL_SHADOW_SIZE = max shadow or blank side size / bezel_texture_size.
-	//It is used to skip drawing bg/fg or ambient light over the tube, set it to a value that allow for them to be 
-	//shown over the bezel blank/shadowed sides but not on the tube (ie: value too big)
-#define BEZEL_SHADOW_SIZE 0.06
-
-	//to speedup things, bezel rende logic can be completely skipped in the inner tube, if we
-	//already know it is completely transparent.
-	//Set the following to the maximum value that allow you to see 
-	//bezel borders and, if present in the source bezel texture, inner content/border shades
-#define BEZEL_TUBE_BLANK_SIZE 0.88
-
-	//In the second reflection pass, the coordinates are zoomedout by the
-	//BEZEL_REFL_ZOOMOUT_ROOM so that the image is mirrored-repeated by retroarch.
-	//they are adjusted by an inverse amount in final pass to align them
-	//lowering this value makes more room for reflections, but this steals
-	//pixels for reflection resolution, so make it higher as possible as
-	//long as you can see the reflections on the reflective area without
-	//them blanking or repeating.
-	//Modifying it require you to tweak BEZEL_REFL_CORNER_BLANK_SIZE too.
-#define BEZEL_REFL_ZOOMOUT_ROOM 0.8
-
-
-	// Define the size and the smoothness of the rectangle 
-	// in the bezel corners that will hide and blur the reflections 
-#define BEZEL_REFL_CORNER_BLANK_SIZE 0.091
-#define BEZEL_REFL_CORNER_BLANK_SHADE 0.055  // keep it > 0.0
-
-
-	//When colorizing the bezel via ambient light, it is possible to choose where 
-	//the colorization ends. depending on the bezel texture/lut used, the following
-	//parameter wil allow to colorize top/bottom and left/right border with the
-	//same shade amount.
-#define AMBI_OVER_BEZEL_AR_CORRECTION 0.98
-
-
-
-// AMBIENT LIGHT STATIC CONFIG ##########################################################################################
-
-	// 0.0-1.0: sensitivity to scene change (ambilike stuff), 0.0 changes more
-#define AMBI_SCENE_CHG_THRSHLD 0.07  
-	// The following will allow to sample at reduced interval
-	// The scene change detection logic will take advantage of it
-	// So that quick fades will still be treated as scene changes
-#define AMBI_AVGLUM_DIVIDER 3
-
-	// The following defines the speed of the color fades 
-	// when changing scene. (range 0..1)
-	// It is wise to correlate it with avglum_divider
-	// try between (1/avglum_divider) and (1/avglum_divider)/3
-//#define AMBI_FAST_STEP 0.125
-#define AMBI_FAST_STEP 0.25
-
-
-
-
-
-
-
-// GLOW STATIC CONFIG ##########################################################################################
-
-	//Setting the glow/halo sharpness parameter to this
-	//will skip the blurring phase and lowers the gpu use
-	//Set this to the same value as used for the maximum
-	//of IN_GLOW_W/H, HALO_SHARPNESS
-#define GLOW_SHARP_MAX 7	        
-
-	//Minumum glow sharpness
-	//I set this to allow negative values for glow sharpness
-	//that will calc their values from light spread amount
-#define MIN_IN_GLOW_SHARP 0.40
-
-	//Setting glow to blur bias parameter to this will skip the glow/blur 
-	//mix code and just return the blurred image
-	//Set this to the same value as used for the maximum for IN_GLOW_BIAS pragma
-#define IN_GLOW_BIAS_MAX 1.0
-
-	//Try to keep blur sizes consistent across input resolutions
-#define SCALEMOD_X 360
-#define SCALEMOD_Y 270
-#define NEW_SCALEMOD_X (global.flick_and_noise_passSize.x/(360.0*2.0) / 2.2)
-#define NEW_SCALEMOD_Y (global.flick_and_noise_passSize.y/(270.0*2.0) / 2.2)
-
-
-
-// MISC STATIC CONFIG ##########################################################################################
-
-	//Experimental alternating blanking feature has been disabled by default, you can enable it by
-	//uncommenting the following line:
-//#define ALLOW_ALT_BLANK
-
-	//Halve rendering refresh on bezel and ambilight to spare gpu cycles:
-#define HALVE_BORDER_UPDATE 1.0
-
-	//Renders only changed parts of screen.
-#define DELTA_RENDER 0.0
-
-	//Static dithering applied over vignette and spot
-#define NOISEPOWER 5/1000.0
-	//Temporal noise strength applied on green over ambient lights (multiplied by NOISEPOWER)
-#define NOISEPOWER_AMBI_MUL 8.0
-	
-	//Should texture wrapping be allowed as a shader parameter?
-	//since it causes branching, better set it as a static value.
-#define ALLOW_BG_IMAGE_TEXTURE_WRAP_IN_SHADER
-
-	//Gap size in pixel for 1X to 4X mask scaling:
-#define GAP_SIZE_PER_SCALE vec4(1.0, 1.0, 2.0, 2.0)
-
-
-// STATIC CONFIG ENDS HERE ##########################################################################################
-
-
-
-
-
-
-
+#include "config-static.inc"
 
 #define eps 1e-5
 #define pi  3.141592653589793
@@ -163,6 +23,7 @@ layout(push_constant) uniform Push {
  	float BLOOM_QUALITY ; //1
 	float AMBI_ADD_ON_BLACK;
 	float AMBI_STRETCH;
+	float AMBI_STRETCH_VERTICAL;
 	float AMBI_INT_OFFSET ;
 	
 } params;
@@ -230,7 +91,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float DO_CURVATURE;
 	float GEOM_WARP_X;
 	float GEOM_WARP_Y;
-	float GEOM_CUT_EARS;
 	float GEOM_CORNER_SIZE;
 	float GEOM_CORNER_SMOOTH;
 
@@ -342,6 +202,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float PIXELGRID_OVERMASK;
 	float DO_PIXELGRID_W;
 	float DO_PIXELGRID_H;
+	float PIXELGRID_COREY_FAKE_SCAN;
 	float PIXELGRID_MIN_H;
 	float PIXELGRID_MIN_W;
 	float PIXELGRID_MAX_H;
@@ -382,6 +243,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float PIXELGRID_GAMMA_H;
 	float PIXELGRID_GAMMA_W;
 	//float PIXELGRID_HMASK_NO_BRIGHT;
+	//float MOIRE_SWEET_SPOT;
+	
 	float PIXELGRID_BASAL_GRID;
 	float DELTA_RENDER_FORCE_REFRESH;
 	float DELTA_RENDER_CHECK_AREA;
@@ -480,11 +343,11 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter IN_GLOW_BIAS             "        Glow to blur bias"							1.0     0.0 1.0 0.05
 #pragma parameter IN_GLOW_SPREAD           "        Glow spread amount"		0.6 	0.0 4.0 0.05
 #pragma parameter IN_GLOW_W                "        Sharp X (neg=use BOX unsharp)"		2.5	-2.0 7.0 0.05
-#pragma parameter IN_GLOW_H                "        Sharp Y (neg=use BOX unsharp)"		2.5	-2.0 7.0 0.02
+#pragma parameter IN_GLOW_H                "        Sharp Y (neg=use BOX unsharp)"		2.5	-2.0 7.0 0.05
 #pragma parameter BLANK7 " " 0.0 0.0 1.0 1.0
 
 
-#pragma parameter TATE                     "★ Tate mode (0:disabled 1:auto 2:forced)"		0.0 	0.0 2.0 1.0
+#pragma parameter TATE                     "★ Tate mode (0:disabled 1:auto 2:forced)"		1.0 	0.0 2.0 1.0
 #pragma parameter BLANK7a " " 0.0 0.0 1.0 1.0
 
 
@@ -512,22 +375,25 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 
 #pragma parameter DO_PIXELGRID_H            "      ★ Scanlines (0 to disable)"    	1.0 0.0 1.25 0.05
+#pragma parameter PIXELGRID_COREY_FAKE_SCAN "           . Use fake integer scanlines"   0.0 0.0 1.0 1.0
 #pragma parameter PIXELGRID_MIN_H	        "           . Phosphors height Min"			0.2 0.00 1.0 0.05
 #pragma parameter PIXELGRID_MAX_H           "           . Phosphors height Max"			0.6 0.0 1.5 0.05
 #pragma parameter PIXELGRID_GAMMA_H         "           . Phosphors height min->max gamma:"	4.2 1.0 8.00 0.1
-#pragma parameter PIXELGRID_OFFSET_CORE     "           . Slotmask(-fake) offset (low => anti-moiree)" 0.0 0.0 1.0 0.01
 #pragma parameter PIXELGRID_NO_INTERBLEED_H	"           . Inter line extra steepness"		0.0 0.0 10.0 0.1
-#pragma parameter PIXELGRID_H_DEDOT			"           . Dedot mask between scanlines (use only if needed!)"	0.0 0.0 1.0 0.1
+//#pragma parameter MOIRE_SWEET_SPOT          "           . Moire mitigation sweet spot"      0.0  0.0 1.0 0.01
+#pragma parameter PIXELGRID_OFFSET_CORE     "           . Slotmask(-fake) offset" 0.0 0.0 1.0 0.01
 #pragma parameter PIXELGRID_DECON_R_H       "           . Deconvergence Y: R phosphor" 0.0 -1.6 1.6 0.1
 #pragma parameter PIXELGRID_DECON_G_H       "           . Deconvergence Y: G phosphor" 0.0 -1.6 1.6 0.1
-#pragma parameter PIXELGRID_DECON_B_H       "           . Deconvergence Y: B phosphor" 0.0 -1.6 1.6 0.1
+#pragma parameter PIXELGRID_DECON_B_H       "           . Deconvergence Y: B phosphor" 0.0   -1.6 1.6 0.1
+#pragma parameter PIXELGRID_H_DEDOT			"           . Dedot mask between scanlines (use only if needed!)"	0.0 0.0 1.0 0.1
 
 
 #pragma parameter BLANK12f " " 0.0 0.0 1.0 1.0
 
-#pragma parameter MIN_LINES_INTERLACED      "        Interlace detect + Scanline alternate above # lines:"		380.0 	1.0 1024 1.0
-#pragma parameter PIXELGRID_INTR_DISABLE_Y  "        Disable scanlines on interlaced screen"			  	0.0 	0.0 1.0 1.0
-#pragma parameter PIXELGRID_INTR_FLICK_MODE "        Interlace Flicker (0=off,1=on,2=if interlaced)"		2.0 	0.0 2.0 1.0
+#pragma parameter LABEL_INTERLACE           "      ★ Interlace Handling" 0.0 0.0 0.0 0.0
+#pragma parameter MIN_LINES_INTERLACED      "           . Interlace + Scanline alternate above # lines:"		380.0 	1.0 1024 1.0
+#pragma parameter PIXELGRID_INTR_DISABLE_Y  "           . Interlaced Scanlines (-2=faker,-1=fake,0=yes,1=no)"   -2.0    -2.0 1.0 1.0
+#pragma parameter PIXELGRID_INTR_FLICK_MODE "           . Interlace Flicker (0=off,1=on,2=if interlaced)"			2.0 	0.0 2.0 1.0
 #pragma parameter PIXELGRID_INTR_FLICK_POWR "           . Interlace Flicker power"		  		0.25 	0.0 8.0 0.01
 
 
@@ -595,7 +461,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter DO_CURVATURE	     "★ Curvature/Border enable? (cu) ==>"			0.0   0.0 1.0 1.0
 #pragma parameter GEOM_WARP_X        "        Warp X"				0.28   0.0 6.0 0.01
 #pragma parameter GEOM_WARP_Y        "        Warp Y"				0.32   0.0 6.0 0.01
-#pragma parameter GEOM_CUT_EARS      "        Cut curvature ears"	1.4   1.0 10.0 0.01
 #pragma parameter GEOM_CORNER_SIZE   "        Corner radius"			0.005  0.005 0.1 0.001
 #pragma parameter GEOM_CORNER_SMOOTH "        Corner sharpness"			350.0 15.0 1000.0 1.0
 #pragma parameter BLANK14 " " 0.0 0.0 1.0 1.0
@@ -652,7 +517,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter AMBI_FALLOFF              "        Led power/falloff"			0.4  0.1  3.0     0.01
 #pragma parameter AMBI_POWER                "        Led Saturation"						1.8  0.0  100.0     0.05
 #pragma parameter AMBI_INT_OFFSET           "        Led internalness"              0.07 -1.0 1.0 0.01
-#pragma parameter AMBI_STRETCH              "        Widen lights"						0.0  0.0  1.0     0.01
+#pragma parameter AMBI_STRETCH              "        Widen lights (horizontal games)"	0.0  0.0  1.0     0.01
+#pragma parameter AMBI_STRETCH_VERTICAL     "        Widen lights (vertical games)"		0.5  0.0  1.0     0.01
 #pragma parameter AMBI_GAMMA                "        Output Gamma"						1.3  0.1  8.0     0.1
 #pragma parameter AMBI_OVER_BEZEL           "        Colorize Bezel"					0.2  0.0  5.0     0.05
 #pragma parameter AMBI_OVER_BEZEL_SIZE      "           . Colorization size"			0.15  0.0  0.5    0.001
@@ -752,4 +618,14 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 
 
+
+
+
+
+//User parameters goes here, they overrides almost everything:
+#include "config-user.txt"
+
+//Following translates global.PARAMETER to PARAMETER
 #include "config.globals.inc"
+
+
