@@ -1,28 +1,29 @@
 **koko-aio-slang documentation**
 
 **USEFUL LOCATIONS/FILES:**
+
     config-static.inc:
         Some shader parameters can't be changed within retroarch,
         use this file instead.
-        -
+        
     config-user.txt:
         shader parameters that can be changed within Retroarch.
         can be set within this file too.
         PRO: The shader will be faster
         CON: The parameters can no longer be modified within Retroarch. 
-        -
+        
     textures/background_under.png
         This is the image that can is shown by default under the main content and under the bezel.
         Read further for details. 
-        -
+        
     textures/background_over.png
         This is the image that can is shown by default over the main content and under the bezel.
         Read further for details.
-        -
+        
     textures/monitor_body_curved.png, textures/monitor_body_straight.png
         This is the image used to draw the bezel.
         Read further for details.
-        -
+        
     
 
 **Color corrections:**<br>
