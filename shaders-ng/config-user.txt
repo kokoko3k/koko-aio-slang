@@ -5,25 +5,38 @@
 //   There yoy have a chance to boost your FPS,
 //   the more lines you insert, the more your FPS will be high.
 //   
-//   lines have this format: // #define PARAMETER VALUE
+//   The downside of using this method is that every setting
+//   you will write here, will be static and so that 
+//   you will NOT BE ABLE RO MODIFY it "on-the-fly" in Retroarch anymore.
+//
+//   Lines have this format: #define PARAMETER VALUE
+//   where:
+//       * PARAMETER is the shader parameter as defined in config.inc
+//         (look for lines starting with #pragma there).
+//       * VALUE is the value you want to assign to that parameter.
+//         (it is the same you would assign to that within retroarch)
+//
 //   Notice, there is no equal sign, nor double quotes, so, eg:
-//       // #define DO_BEZEL 1.0
-//       // #define CONTRAST 0.0
+//       If you know that you will always use the bezel frame:
+//       #define DO_BEZEL 1.0
+//
+//       If you know you'll never alter the contrast:
+//       #define CONTRAST 0.0
+//
+//       If you know your curvature will never change:
+//       #define GEOM_WARP_X
 //
 //   You can disable a line by erasing it or,
 //   since everything after "//" is ignored,
 //   by prepending "//", eg:
 //
-//       //// #define DO_BEZEL 1.0
+//       // #define DO_BEZEL 1.0
 //   
 //   ...that's it, you just need to copy the values from the
 //   preset you like to the right setting here.
 //   
-//   The downside of using this method is that every setting
-//   you turn, will be static and you will not be able to
-//   modify it "on-the-fly" in retroarch.
 //   
-//   
+  
 
  
 // #define DO_CCORRECTION 1.0
