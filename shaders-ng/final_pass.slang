@@ -335,10 +335,8 @@ vec3 fn_pixel_nightify(vec3 color_in, float strength, vec3 ambilight) {
     vec3 color_hsv_in = rgb2hsv(color_in);
     
     //If there is an ambientlight, then the strangth has to be lowered:
-        vec3 strength_vec3 = vec3(strength - ambilight);
-        
-    strength_vec3 = scale_to_range_vec3(strength_vec3, 0.0, 1.0); 
-    
+    vec3 strength_vec3 = vec3(strength - ambilight);
+    strength_vec3 = clamp(strength_vec3, 0.0,1.0);
     vec3 color_hsv_min = color_hsv_in;
     color_hsv_min.yz = scale_to_range_vec2(color_hsv_min.yz, -0.1, 0.1); 
 
@@ -982,13 +980,13 @@ vec3 light_over_image(vec3 light, vec3 image, float black_illumination) {
     //Simulates illumination.
     //It works by adding the light on the image.
     //It will add less light on dark colors (
-    
+
     //mitigate clipping by lowering light on bright images:
-    light = light * (1-   (max(image.r,image.g),image.b)       )     ;
+    light = light * (1 - (max(image.r,image.g),image.b)       )     ;
 
     
     vec3 light_on_black = black_illumination * light;
-    vec3 modulated_on_black = image.rgb +  ( (light - 0.0 ) * image.rgb ) + light_on_black;
+    vec3 modulated_on_black = image.rgb +  ( light  * image.rgb ) + light_on_black;
     
     return modulated_on_black;
 }
@@ -1005,17 +1003,10 @@ vec3 ambi_blend_image(vec4 image, vec3 ambi, float blend_mode) {
 
     if (AMBI_BG_IMAGE_BLEND_MODE == 0.0) {
         image.rgb = mix(ambi.rgb, image.rgb, image_alpha_adapted);
-    } else {
-        //image.rgb =  image.rgb + (ambi.rgb * (1 - image_alpha_adapted)); 
-        /*float light_on_black = 0.3;
-        vec3 ambi_alpha_masked = ambi.rgb *  (1 - image_alpha_adapted);
-        vec3 ambi_on_black = light_on_black * ambi_alpha_masked;
-        
-        image.rgb = image.rgb +  ((ambi_alpha_masked-ambi_on_black) * image.rgb) + ambi_on_black;*/
-        
+    } else {        
         float black_illumination = 0.5;
         vec3 ambi_alpha_masked = ambi.rgb *  (1 - image_alpha_adapted);
-        image.rgb = light_over_image(ambi_alpha_masked, image.rgb, AMBI_ADD_ON_BLACK) ;
+        image.rgb = light_over_image(ambi_alpha_masked, image.rgb, AMBI_ADD_ON_BLACK);
         
     }
     return image.rgb;
@@ -1217,7 +1208,6 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
             bezel_out += (pixel_mirrored.rgb * reflection_modifier);
         
         //Apply ambient light over the bezel        
-            //bezel_out = bezel_out + ambi_over_bezel;
             bezel_out = light_over_image(ambi_over_bezel, bezel_out, AMBI_ADD_ON_BLACK);
         
     //Diffuse the light over specular areas, we use a mipmap with low precision.
