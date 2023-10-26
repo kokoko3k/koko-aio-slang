@@ -1,4 +1,4 @@
-#include "config-static.inc"
+#include "../config/config-static.inc"
 
 #define eps 1e-5
 #define pi  3.141592653589793
@@ -623,7 +623,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 
 //User parameters goes here, they overrides almost everything:
-#include "config-user.txt"
+#include "../config/config-user.txt"
 
 //Following translates global.PARAMETER to PARAMETER
 #include "config.globals.inc"
