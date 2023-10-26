@@ -1,4 +1,4 @@
-#reference "../../shaders/shaders_slang/bezel/koko-aio/koko-aio-ng.slangp"
+#reference "../../shaders/shaders_slang/bezel/koko-aio/Presets-ng/Monitor-Ambilight-immersive.slangp"
 DO_CCORRECTION = "1.000000"
 LUMINANCE = "0.200000"
 GAMMA_OUT = "0.500000"
@@ -48,6 +48,7 @@ V_SIZE = "2.500000"
 V_POWER = "1.000000"
 ALT_BLANK_STRENGTH = "0.000000"
 bg_under = "../../shaders/shaders_slang/bezel/koko-aio/textures/arcade_textures/astrof.png"
+bg_over = "../../shaders/shaders_slang/bezel/koko-aio/textures/arcade_textures/astrof.png"
 
 // Credits
 // shader by kokoko3k - https://github.com/kokoko3k/koko-aio-slang
