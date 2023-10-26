@@ -6,6 +6,8 @@ Main source of this artwork comes from John Merrit, who set a benchmark for real
 <br>
 Requirements: RetroArch 1.5.0 or a newer RetroArch Nightly Build that support Vulkan. Tested with FinalBurn Neo (mainly) and MAME 2003/2003plus. MAME (current) now works out of the box, as the rotation of this core has been adjusted. Having said that, the MAME (current) core is still buggy for me.<br>
 <br>
+Update October 2023: Moving this repository to the 'ng' shaders requires more work on the brand new presets. Currently the last version of this repository does not provide for working presets, please bear with me. Presets marked with 'ng update' are already working. 
+<br>
 Update June 2023: I have successfully moved this repository to the 'ng' shaders that provide another quality increase. Until release 0.4, I would like to nightify all presets to the extent required. This release will also see usage of the new ambilight functionalities, if it makes sense. So stay tuned.
 <br>
 # Release 0.3 contains 52 game-specific presets - download here!
