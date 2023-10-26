@@ -11,6 +11,9 @@
 // Haloing happens on a scanlined/gapped image or not
 	#define HALO_PRE_SCANLINE_GAP 0.0
 
+// The higher, the more the image will alter its size depending on the scene luminance.
+	#define DYNZOOM_FACTOR		80
+	
 // BEZEL STATIC CONFIG ##############################################################################################
 	//The following defines the monitor frame resolution in textures/monitor_body_[curved/straight].png
 	//and are used to calculate the sampling lod.
@@ -20,6 +23,7 @@
 
 	//The following can slightly correct bezel aspect
 #define BEZEL_ASPECT_CORRECTION (1.0 - 0.004)
+
 
 	//This is used to skip calculations in the reflection blur code.
 	//set it to minimum value that allows you to see reflection entirely

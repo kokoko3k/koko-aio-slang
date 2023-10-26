@@ -120,8 +120,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float V_POWER;
 
 	float DO_DYNZOOM;
-	float DYNZOOM_FACTOR;
-	
+
 	float DO_AMBILIGHT;
 	float AMBI_FALLOFF;
 	float AMBI_POWER;
