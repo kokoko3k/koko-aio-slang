@@ -11,6 +11,9 @@
 // Haloing happens on a scanlined/gapped image or not
 	#define HALO_PRE_SCANLINE_GAP 0.0
 
+// The higher, the more the image will alter its size depending on the scene luminance.
+	#define DYNZOOM_FACTOR		80
+	
 // BEZEL STATIC CONFIG ##############################################################################################
 	//The following defines the monitor frame resolution in textures/monitor_body_[curved/straight].png
 	//and are used to calculate the sampling lod.
@@ -19,7 +22,8 @@
 #define BEZEL_RES vec2(2927, 2178)
 
 	//The following can slightly correct bezel aspect
-#define BEZEL_ASPECT_CORRECTION (1.0 - 0.004)
+	//eg: #define BEZEL_ASPECT_CORRECTION (1.0 - 0.004) will make it shorter.
+#define BEZEL_ASPECT_CORRECTION (1.0)
 
 	//This is used to skip calculations in the reflection blur code.
 	//set it to minimum value that allows you to see reflection entirely
@@ -135,9 +139,6 @@
 	//Should texture wrapping be allowed as a shader parameter?
 	//since it causes branching, better set it as a static value.
 #define ALLOW_BG_IMAGE_TEXTURE_WRAP_IN_SHADER
-
-	//Gap size in pixel for 1X to 4X mask scaling:
-#define GAP_SIZE_PER_SCALE vec4(1.0, 1.0, 2.0, 2.0)
 
 
 // STATIC CONFIG ENDS HERE ##########################################################################################

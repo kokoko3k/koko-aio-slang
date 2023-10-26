@@ -477,10 +477,6 @@
     #define DO_DYNZOOM		global.DO_DYNZOOM
 #endif
 
-#ifndef DYNZOOM_FACTOR
-    #define DYNZOOM_FACTOR		80 //global.DYNZOOM_FACTOR
-#endif
-
 #ifndef DO_ALT_BLANK
     #define DO_ALT_BLANK		global.DO_ALT_BLANK
 #endif

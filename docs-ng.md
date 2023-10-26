@@ -2,11 +2,11 @@
 
 **USEFUL LOCATIONS/FILES:**
 
-    config-static.inc:
+    config/config-static.inc:
         Some shader parameters can't be changed within retroarch,
         use this file instead.
         
-    config-user.txt:
+    config/config-user.txt:
         shader parameters that can be changed within Retroarch.
         can be set within this file too.
         PRO: The shader will be faster
