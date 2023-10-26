@@ -136,8 +136,5 @@
 	//since it causes branching, better set it as a static value.
 #define ALLOW_BG_IMAGE_TEXTURE_WRAP_IN_SHADER
 
-	//Gap size in pixel for 1X to 4X mask scaling:
-#define GAP_SIZE_PER_SCALE vec4(1.0, 1.0, 2.0, 2.0)
-
 
 // STATIC CONFIG ENDS HERE ##########################################################################################
