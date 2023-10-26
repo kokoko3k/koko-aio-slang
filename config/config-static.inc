@@ -22,8 +22,8 @@
 #define BEZEL_RES vec2(2927, 2178)
 
 	//The following can slightly correct bezel aspect
-#define BEZEL_ASPECT_CORRECTION (1.0 - 0.004)
-
+	//eg: #define BEZEL_ASPECT_CORRECTION (1.0 - 0.004) will make it shorter.
+#define BEZEL_ASPECT_CORRECTION (1.0)
 
 	//This is used to skip calculations in the reflection blur code.
 	//set it to minimum value that allows you to see reflection entirely
