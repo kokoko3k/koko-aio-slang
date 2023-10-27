@@ -45,10 +45,10 @@ layout(set = 0, binding = 4) uniform sampler2D in_glow_pass;
 void main() {
     if (DO_HALO == 0.0 ) return;
     
-    vec3 ref = texture(in_glow_pass, vTexCoord).rgb;
-    vec3 pixel_haloed = ref;
+    vec3 pixel_haloed = texture(in_glow_pass, vTexCoord).rgb;
     if (HALO_NO_PREGAIN == 1.0)  pixel_haloed/= vHALO_UNGAIN_FACTOR;
-    pixel_haloed = pow(ref, vHALO_GAMMA);
+    
+    pixel_haloed = pow(pixel_haloed, vHALO_GAMMA);
     
     //Prepaint scanlines gaps?
     if (HALO_PRE_SCANLINE_GAP == 1.0) {
