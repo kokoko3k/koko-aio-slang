@@ -425,6 +425,12 @@ float normalize_range(float value, float min_in, float max_in) {
 	return (value - min_in)  / (max_in - min_in);
 }
 
+vec3 contrast_with_pivot(vec3 x, float c, float p){
+	//c=1-->neutral
+	return (x-1+p) * c + p;
+}
+
+
 vec3 apply_contrast_brightness(vec3 c, float contrast, float brightness) {
    return scale_to_range_vec3(c, -contrast, 1+contrast) + brightness;
 }
