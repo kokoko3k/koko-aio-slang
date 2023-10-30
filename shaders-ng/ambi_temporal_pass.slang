@@ -234,15 +234,17 @@ vec4 pixel_ambilight(vec2 local_pre_pass_coords) {
     vec3 past_pixel =     past_pixel_vec4.rgb;
 
     float scene_change_remaining = past_pixel_vec4.a;
+    
+    #ifndef D3D_WORKAROUND
+        float past_avg_lum = texture(avglum_passFeedback,vec2(0.25,0.25)).a;
+        float present_avg_lum = texture(avglum_pass        ,vec2(0.25,0.25)).a;
+        float diff_avg_lum = abs(past_avg_lum - present_avg_lum);
 
-    float past_avg_lum = texture(avglum_passFeedback,vec2(0.25,0.25)).a;
-    float present_avg_lum = texture(avglum_pass        ,vec2(0.25,0.25)).a;
-    float diff_avg_lum = abs(past_avg_lum - present_avg_lum);
-
-    if (diff_avg_lum >= AMBI_SCENE_CHG_THRSHLD) {
-        scene_change_remaining = 1/AMBI_FAST_STEP;
-    }
-
+        if (diff_avg_lum >= AMBI_SCENE_CHG_THRSHLD) {
+            scene_change_remaining = 1/AMBI_FAST_STEP;
+        }
+    #endif 
+    
     // Are we changing scene?
     vec3 mystep;
     if (scene_change_remaining > 0.0) {
@@ -251,7 +253,7 @@ vec4 pixel_ambilight(vec2 local_pre_pass_coords) {
     } else {
         mystep = abs((past_pixel - present_pixel) / MAX_STEPS); //OK
     }
-
+    
     return vec4(ambi_step_rgb(past_pixel, present_pixel, mystep), scene_change_remaining);
 }
 

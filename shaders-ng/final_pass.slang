@@ -309,7 +309,9 @@ layout(set = 0, binding = 9)  uniform sampler2D bg_over;
 //layout(set = 0, binding = 10) uniform sampler2D halo_pre_gamma_pass;
 layout(set = 0, binding = 11) uniform sampler2D in_glow_pass;
 layout(set = 0, binding = 12) uniform sampler2D halo_pass;
-layout(set = 0, binding = 13) uniform sampler2D final_passFeedback;
+#ifndef D3D_WORKAROUND
+    layout(set = 0, binding = 13) uniform sampler2D final_passFeedback;
+#endif
 layout(set = 0, binding = 15) uniform sampler2D DEBUG_TEXTURE;
 
 
@@ -1257,8 +1259,10 @@ void main() {
             co_content = content_geom_override(co_content, GAME_GEOM_ASPECT, vIn_aspect, GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
 
     //Dynamic lum dependant full screen zoom?
+    #ifndef D3D_WORKAROUND
         if (DO_DYNZOOM == 1.0)
             co_content = zoom(co_content, get_dyn_zoom(avglum_pass) );
+    #endif
     
     //Create an alpha mask to write content into, it holds opacity info that will be used to compose:
         if (DO_CURVATURE == 1.0)  {
@@ -1266,14 +1270,15 @@ void main() {
         } else {
             canvas_busy = float(is_first_inside_rect(co_content, RECT01)); //FIXME: is step() faster?
         }
-
-    if (DELTA_RENDER == 1.0) {
-        bool reuse_old =  bool( texture(in_glow_pass, co_content).a * canvas_busy * vDeltaRenderOk ) ;
-        if (reuse_old) {
-            FragColor = texture(final_passFeedback, vOutputCoord) ;
-            return;
+    #ifndef D3D_WORKAROUND
+        if (DELTA_RENDER == 1.0) {
+            bool reuse_old =  bool( texture(in_glow_pass, co_content).a * canvas_busy * vDeltaRenderOk ) ;
+            if (reuse_old) {
+                FragColor = texture(final_passFeedback, vOutputCoord) ;
+                return;
+            }
         }
-    }
+    #endif
               
     vec3 pixel_ambi = vec3(0.0);
     vec3 pixel_under_content = vec3(0.0);
@@ -1283,13 +1288,15 @@ void main() {
         } else {
             
             //Can we halve refresh rate in the outside border to spare some cycles?
-            if ( HALVE_BORDER_UPDATE == 1.0 ) {
-                if ((params.FrameCount % 2) != 1.0) {
-                    pixel_out = texture(final_passFeedback, vOutputCoord).rgb;
-                    FragColor = vec4(pixel_out, 1.0);
-                    return;
+            #ifndef D3D_WORKAROUND
+                if ( HALVE_BORDER_UPDATE == 1.0 ) {
+                    if ((params.FrameCount % 2) != 1.0) {
+                        pixel_out = texture(final_passFeedback, vOutputCoord).rgb;
+                        FragColor = vec4(pixel_out, 1.0);
+                        return;
+                    }
                 }
-            }
+            #endif
             
             //Ambient light
             if (DO_AMBILIGHT == 1.0) {

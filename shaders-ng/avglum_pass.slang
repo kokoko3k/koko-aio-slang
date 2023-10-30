@@ -79,22 +79,25 @@ float get_avglum() {
             vTexCoord.y > 0.74 && vTexCoord.y < 0.76 ;
 
 
-    if (reduced_sampling_co) {
-        //in the reduced sampling zone, only update at right time; else return the previous frame.
-        bool reduced_sample_time_is_now = (mod(params.FrameCount,AMBI_AVGLUM_DIVIDER) == 1); // (== 0 may be problematic for flycast + nvidia + glcore)
-        if (reduced_sample_time_is_now)
-            return get_avg_lum_from_mip();
-        float avglum_feedback = texture(avglum_passFeedback,vTexCoord).a;
-        avglum_feedback = max(avglum_feedback, 0.0); // <- Sanitize input to avoid glitches when enabling the option runtime.
-        return avglum_feedback;
-    }
+    #ifndef D3D_WORKAROUND
+        if (reduced_sampling_co) {
+            //in the reduced sampling zone, only update at right time; else return the previous frame.
+            bool reduced_sample_time_is_now = (mod(params.FrameCount,AMBI_AVGLUM_DIVIDER) == 1); // (== 0 may be problematic for flycast + nvidia + glcore)
+            if (reduced_sample_time_is_now)
+                return get_avg_lum_from_mip();
+            float avglum_feedback = texture(avglum_passFeedback,vTexCoord).a;
+            avglum_feedback = max(avglum_feedback, 0.0); // <- Sanitize input to avoid glitches when enabling the option runtime.
+            return avglum_feedback;
+        }
 
-    if (smoothed_sampling_co) {
-        return mix(texture(avglum_passFeedback,vTexCoord).a, get_avg_lum_from_mip(), SMOOTHNESS_SPEED);
-    }
-
+        if (smoothed_sampling_co) {
+            return mix(texture(avglum_passFeedback,vTexCoord).a, get_avg_lum_from_mip(), SMOOTHNESS_SPEED);
+        }
+    #endif
+    
     //Outside specific areas, update continuously; this is used by bezel highlights.
     return get_avg_lum_from_mip();
+
 
 }
 
