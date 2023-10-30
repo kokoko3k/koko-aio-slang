@@ -1181,7 +1181,7 @@ vec4 PG_get_hmask_preset_floored() {
 						  4.0,
 						  3.0), 4); //rbgx, mask size 4
 
-    if (PIXELGRID_H_PRST == 7.0)
+    //if (PIXELGRID_H_PRST == 7.0) // Implicit, because we need a default return value (DX/D3D)
         return vec4( vec3(0.0), 2); //WX, mask size 2
 }
 
@@ -1219,7 +1219,7 @@ vec4 PG_get_hmask_preset_unfloored() {
 						  +1/4.0,
 						  0.0   )*4, 4); //rbgx, mask size 4
 
-    if (PIXELGRID_H_PRST == 7.0)
+    //if (PIXELGRID_H_PRST == 7.0) // Implicit, because we need a default return value (DX/D3D)
         return vec4( vec3(0.0), 2); //WX, mask size 2
 
 }
