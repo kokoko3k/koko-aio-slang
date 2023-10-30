@@ -10,7 +10,7 @@
 // D3D/XBOX users should enable Direct3D workarounds to avoid glitches or crashes
 // by removing the leading "//" from the following line:
 
-#define D3D_WORKAROUND
+// #define D3D_WORKAROUND
 
 
 // Haloing happens on a scanlined/gapped image or not
