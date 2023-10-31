@@ -676,9 +676,16 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
 
             //Compute phosphors height mask with the right reference coords.
             //It seems multiplying twice in the mix helps with performances.
-                float ph_mask_height =  mix(freq_base_core.y   * vPG_mask_height,  
+                /*float ph_mask_height =  mix(freq_base_core.y   * vPG_mask_height,  
                                             freq_base_screen.y * vPG_mask_height, 
-                                            PIXELGRID_Y_MASK_COORDS);
+                                            PIXELGRID_Y_MASK_COORDS);*/
+                float ph_mask_height;
+                if ( PIXELGRID_Y_MASK_COORDS == 1.0 ) {
+                    ph_mask_height = freq_base_screen.y * vPG_mask_height;
+                } else {
+                    ph_mask_height = freq_base_core.y * vPG_mask_height;
+                }
+                
             //phosphors mask stagger
                 #define PH_MASH_OFFSET  (PIXELGRID_Y_MASK_OFFSET * HALF_PI )
                 
