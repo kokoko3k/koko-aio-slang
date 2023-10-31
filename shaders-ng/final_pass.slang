@@ -496,11 +496,10 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
     
     //pixel_in = blur9_x_box1tap(in_glow_pass, in_coords, params.OriginalSize.xy, abs(IN_GLOW_W)*2.0) ; //102.4
    
-    //Scanlines: compute each phosphor height according to input luminance, puttin it here helpas parallelism a bit.
-        float extragain_h = max(PIXELGRID_MAX_H, 1.0); //Handle 
+    //Scanlines: compute each phosphor height according to input luminance, puttin it here helps parallelism a bit.
+        float extragain_h = max(PIXELGRID_MAX_H, 1.0);
         vec3 phosphor_height = map_range(pixel_in*extragain_h, min_inLum, max_inLum, PIXELGRID_MIN_H, clamp(PIXELGRID_MAX_H, PIXELGRID_MIN_H, 1.0));   
-    
-    
+
     //Tate ? (other outputsize,originalsize and outputcoords "tated" in vertex shader.)
         if (vDo_Tate == 1.0) in_coords.xy = in_coords.yx;
     //in_coords = in_coords - global.flick_and_noise_passSize.zw*0.5; //<-- needed if for whatever reason you want to draw scanlines and vgaps in first_pass
@@ -681,12 +680,12 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //mask phosphors heigth
                 #define PH_MASK_HEIGHT (freq_cell_y * vPG_mask_height)
             //phosphors mask stagger
-                #define PH_MASH_OFFSET  (PIXELGRID_Y_MASK_OFFSET * pi * 0.5 )
+                #define PH_MASH_OFFSET  (PIXELGRID_Y_MASK_OFFSET * HALF_PI )
                 
             //Use abs(cos) (later 1-abs(cos) to get horizontal gaps, use pow to make them steep.
             //Stagger them by PH_MASH_OFFSET on even triads
                 
-                float mask_shape = abs(cos(  PIXELGRID_Y_MASK_SHIFT*pi +   PH_MASK_HEIGHT  + (PH_MASH_OFFSET * is_even)) ) ;
+                float mask_shape = abs(cos(  PIXELGRID_Y_MASK_SHIFT * pi + PH_MASK_HEIGHT  + (PH_MASH_OFFSET * is_even)) ) ;
                 mask_shape = pow(mask_shape, PIXELGRID_Y_MASK_STEEP);
                 
                 // We can make the stagger dark line less pronunced
