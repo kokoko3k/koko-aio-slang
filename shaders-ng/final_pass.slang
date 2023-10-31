@@ -523,12 +523,12 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             #define SCREEN_Y_MIX 1.0 //<-- Always floor screen y coords (seems to work good everytime)
             //#define SCREEN_Y_MIX float(fract(1/vPG_mask_height) < 0.01) //<-- only floor screen y coords when non integer multipliers
             vec2 freq_base_screen = mix( vPG_freq_base_screen_unfloored, 
-                                            vPG_freq_base_screen * floor(vPG_OutputCoord_tated * vPG_OutputSize_tated ),
-                                            vec2( float(PIXELGRID_MUL_X==1.0), SCREEN_Y_MIX )
-                                        );
+                                         vPG_freq_base_screen * floor(vPG_OutputCoord_tated * vPG_OutputSize_tated ),
+                                         vec2( float(PIXELGRID_MUL_X==1.0), SCREEN_Y_MIX )
+                                       );
                 
     //Switch between core and screen sizes (x and y)
-        vec2 freq_base           = mix( freq_base_core, freq_base_screen,           vec2(PIXELGRID_SIZE_W, 0.0));
+        vec2 freq_base           = mix( freq_base_core, freq_base_screen,               vec2(PIXELGRID_SIZE_W, 0.0));
         vec2 freq_base_unfloored = mix( freq_base_core, vPG_freq_base_screen_unfloored, vec2(PIXELGRID_SIZE_W, 0.0));
 
         
@@ -536,7 +536,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         freq_base /= vPG_period_multiplier;
         freq_base_unfloored /= vPG_period_multiplier;
         
-        vec3 freq_rgb = vec3(freq_base.x) - PG_offsets;
+        vec3 freq_rgb = freq_base.xxx - PG_offsets;
         
     //The following is needed by scanlines and vertical mask
     //sin() tell use if the current cell position is odd or even:
