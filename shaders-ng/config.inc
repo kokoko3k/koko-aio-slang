@@ -271,6 +271,10 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 } global;
 
 
+#pragma parameter PRETEXT2 "Read the documentation in docs-ng.md text file" 		0.0 	0.0 0.0 1.0
+#pragma parameter PRETEXT3 "==================================================" 		0.0 	0.0 0.0 1.0
+#pragma parameter PRETEXT4 " " 		0.0 	0.0 0.0 1.0
+
 // Color correction
 #pragma parameter DO_CCORRECTION "★ Color corrections enable? (co) ==>" 		0.0 	0.0 1.0 1.0
 #pragma parameter IN_GLOW_POWER  "       Input signal gain (was in glow section):"					1.0 	0.0 5.0 0.05
