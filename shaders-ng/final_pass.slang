@@ -497,11 +497,13 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
     //pixel_in = blur9_x_box1tap(in_glow_pass, in_coords, params.OriginalSize.xy, abs(IN_GLOW_W)*2.0) ; //102.4
    
     //Scanlines: compute each phosphor height according to input luminance, puttin it here helps parallelism a bit.
+
         float extragain_h = max(PIXELGRID_MAX_H, 1.0);
-        vec3 phosphor_height = map_range(pixel_in*extragain_h, min_inLum, max_inLum, PIXELGRID_MIN_H, clamp(PIXELGRID_MAX_H, PIXELGRID_MIN_H, 1.0));   
+        vec3 phosphor_height = map_range(pixel_in*extragain_h, min_inLum, max_inLum, PIXELGRID_MIN_H, clamp(PIXELGRID_MAX_H, PIXELGRID_MIN_H, 1.0));
 
     //Tate ? (other outputsize,originalsize and outputcoords "tated" in vertex shader.)
         if (vDo_Tate == 1.0) in_coords.xy = in_coords.yx;
+        
     //in_coords = in_coords - global.flick_and_noise_passSize.zw*0.5; //<-- needed if for whatever reason you want to draw scanlines and vgaps in first_pass
       
     //Get preset masks on ".rgb" and mask size on ".a" , mask and period for every phosphor done in vertex shader.
@@ -514,26 +516,20 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         if (vUse_Fake_scanlines == 1.0) 
             freq_base_core.y = vFake_scanline_period;
         
-        
-       
         //Screen coords:
-            //The following unfloored coords are needed by sin/cos later to understand if we are on an even or odd mask
-                //vec2 freq_base_screen_unfloored = pi * vec2(1/PG_h_count, 0.5) * (vPG_OutputCoord_tated * vPG_OutputSize_tated);
-                vec2 freq_base_screen_unfloored = vPG_freq_base_screen_unfloored; //<-- missing muls because done to vertex shader.
-        
-            //Screen coords needs flooring, but we need to disable flooring if using non 1x screen coords
-            // y screen coords appear to work just fine even if we always floor them,
-            // you can use "float(fract(1/vPG_mask_height) < 0.01"as the y mix parameter instead of 1.0 if in doubt.
-                #define SCREEN_Y_MIX 1.0 //<-- Always floor screen y coords (seems to work good everytime)
-                //#define SCREEN_Y_MIX float(fract(1/vPG_mask_height) < 0.01) //<-- only floor screen y coords when non integer multipliers
-                vec2 freq_base_screen = mix( vPG_freq_base_screen_unfloored, 
-                                             vPG_freq_base_screen * floor(vPG_OutputCoord_tated * vPG_OutputSize_tated ),
-                                             vec2( float(PIXELGRID_MUL_X==1.0), SCREEN_Y_MIX )
-                                            );
+        //Screen coords needs flooring, but we need to disable flooring if using non 1x screen coords.
+        //y screen coords appear to work just fine even if we always floor them,
+        //you can use "float(fract(1/vPG_mask_height) < 0.01"as the y mix parameter instead of 1.0 if in doubt.
+            #define SCREEN_Y_MIX 1.0 //<-- Always floor screen y coords (seems to work good everytime)
+            //#define SCREEN_Y_MIX float(fract(1/vPG_mask_height) < 0.01) //<-- only floor screen y coords when non integer multipliers
+            vec2 freq_base_screen = mix( vPG_freq_base_screen_unfloored, 
+                                            vPG_freq_base_screen * floor(vPG_OutputCoord_tated * vPG_OutputSize_tated ),
+                                            vec2( float(PIXELGRID_MUL_X==1.0), SCREEN_Y_MIX )
+                                        );
                 
     //Switch between core and screen sizes (x and y)
         vec2 freq_base           = mix( freq_base_core, freq_base_screen,           vec2(PIXELGRID_SIZE_W, 0.0));
-        vec2 freq_base_unfloored = mix( freq_base_core, freq_base_screen_unfloored, vec2(PIXELGRID_SIZE_W, 0.0));
+        vec2 freq_base_unfloored = mix( freq_base_core, vPG_freq_base_screen_unfloored, vec2(PIXELGRID_SIZE_W, 0.0));
 
         
     //Apply multiplier:
@@ -541,8 +537,6 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         freq_base_unfloored /= vPG_period_multiplier;
         
         vec3 freq_rgb = vec3(freq_base.x) - PG_offsets;
-
-        //(+pi/count?)
         
     //The following is needed by scanlines and vertical mask
     //sin() tell use if the current cell position is odd or even:
@@ -637,7 +631,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //make them always positive and double frequency:
                 rgb_w = (rgb_w * rgb_w);
             //"export" naked vertical grille
-               rgb_grille = (rgb_w * rgb_w) * (rgb_w * rgb_w);
+                rgb_grille = (rgb_w * rgb_w) * (rgb_w * rgb_w);
             //Scale Max width according to pre-gains:
                 vec3 phosphor_width = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
             //Get final phosphor width:
