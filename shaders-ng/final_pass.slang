@@ -675,17 +675,18 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         vec3 pixel_in_unsparkled = pixel_in;
         if (PIXELGRID_Y_MASK > 0.0) {
             //Switch reference coords according to user pref: 
-                float freq_cell_y = mix(freq_base_core.y,  freq_base_screen.y, PIXELGRID_Y_MASK_COORDS);
+                //float freq_cell_y = mix(freq_base_core.y,  freq_base_screen.y, PIXELGRID_Y_MASK_COORDS);
 
             //mask phosphors heigth
-                #define PH_MASK_HEIGHT (freq_cell_y * vPG_mask_height)
+                //#define PH_MASK_HEIGHT (freq_cell_y * vPG_mask_height)
+                float PH_MASK_HEIGHT =  mix(freq_base_core.y * vPG_mask_height,  freq_base_screen.y * vPG_mask_height, PIXELGRID_Y_MASK_COORDS);
             //phosphors mask stagger
                 #define PH_MASH_OFFSET  (PIXELGRID_Y_MASK_OFFSET * HALF_PI )
                 
             //Use abs(cos) (later 1-abs(cos) to get horizontal gaps, use pow to make them steep.
             //Stagger them by PH_MASH_OFFSET on even triads
                 
-                float mask_shape = abs(cos(  PIXELGRID_Y_MASK_SHIFT * pi + PH_MASK_HEIGHT  + (PH_MASH_OFFSET * is_even)) ) ;
+                float mask_shape = abs(cos(  (PIXELGRID_Y_MASK_SHIFT * pi) + PH_MASK_HEIGHT  + (PH_MASH_OFFSET * is_even)) ) ;
                 mask_shape = pow(mask_shape, PIXELGRID_Y_MASK_STEEP);
                 
                 // We can make the stagger dark line less pronunced
