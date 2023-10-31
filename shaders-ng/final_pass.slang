@@ -516,27 +516,26 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         if (vUse_Fake_scanlines == 1.0) 
             freq_base_core.y = vFake_scanline_period;
         
-        //Screen coords:
-        //Screen coords needs flooring, but we need to disable flooring if using non 1x screen coords.
-        //y screen coords appear to work just fine even if we always floor them,
-        //you can use "float(fract(1/vPG_mask_height) < 0.01"as the y mix parameter instead of 1.0 if in doubt.
-            #define SCREEN_Y_MIX 1.0 //<-- Always floor screen y coords (seems to work good everytime)
-            //#define SCREEN_Y_MIX float(fract(1/vPG_mask_height) < 0.01) //<-- only floor screen y coords when non integer multipliers
-            vec2 freq_base_screen = mix( vPG_freq_base_screen_unfloored, 
-                                         vPG_freq_base_screen * floor(vPG_OutputCoord_tated * vPG_OutputSize_tated ),
-                                         vec2( float(PIXELGRID_MUL_X==1.0), SCREEN_Y_MIX )
-                                       );
+    //Screen coords:
+    //Floor x screen coords when using non 1.0x sizes.
+    //y screen coords appear to work just fine even if we don't floor them,
+        vec2 freq_base_screen;
+        if (PIXELGRID_MUL_X == 1.0) {
+            freq_base_screen = vec2(vPG_freq_base_screen.x * floor(vPG_OutputCoord_tated.x * vPG_OutputSize_tated.x ), vPG_freq_base_screen_unfloored.y);
+        } else {
+            freq_base_screen = vPG_freq_base_screen_unfloored;
+        }
+            
                 
-    //Switch between core and screen sizes (x and y)
-        vec2 freq_base           = mix( freq_base_core, freq_base_screen,               vec2(PIXELGRID_SIZE_W, 0.0));
-        vec2 freq_base_unfloored = mix( freq_base_core, vPG_freq_base_screen_unfloored, vec2(PIXELGRID_SIZE_W, 0.0));
-
+    //Switch frequency between core and screen and apply asked multipliers
+        vec2 freq_base = freq_base_core / vPG_period_multiplier ;
+        vec2 freq_base_unfloored = freq_base_core;
+        if (PIXELGRID_SIZE_W == 1.0) {
+            freq_base.x = freq_base_screen.x / vPG_period_multiplier.x;
+            freq_base_unfloored.x = vPG_freq_base_screen_unfloored.x / vPG_period_multiplier.x;
+        }
         
-    //Apply multiplier:
-        freq_base /= vPG_period_multiplier;
-        freq_base_unfloored /= vPG_period_multiplier;
-        
-        vec3 freq_rgb = freq_base.xxx - PG_offsets;
+    vec3 freq_rgb = freq_base.xxx - PG_offsets;
         
     //The following is needed by scanlines and vertical mask
     //sin() tell use if the current cell position is odd or even:
@@ -568,16 +567,22 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //We can offset trias to emulate fake core level slotmask by applying the optional offset to emulate the slotmask on even cells
                 float triad_stagger_offset =  (is_even * pi) * (PIXELGRID_OFFSET_CORE);
             //get 3 sines with applied the optional staggered offset for slotmask, and single phosphors staggering for y deconvergence.
-                vec3 decon_stagger = vec3( PIXELGRID_DECON_R_H, PIXELGRID_DECON_G_H, PIXELGRID_DECON_B_H) ;
+                vec3 decon_stagger = vec3( PIXELGRID_DECON_R_H, PIXELGRID_DECON_G_H, PIXELGRID_DECON_B_H);                
+
                 
-                #ifdef MOIRE_MITIGATION
-                    #define IS_EVEN float(sin(vPG_freq_base_screen_unfloored.x * vPG_offsets_and_size.a) > 0.5)
-                    float moire_mitigation_sweet_spot = IS_EVEN * MOIRE_SWEET_SPOT;
-                    vec3 rgb_h_sin = sin( (freq_base_core.y * interlacing_adapt_period) + triad_stagger_offset - decon_stagger + vScanlineAlternateOffset + moire_mitigation_sweet_spot );
-                #else
-                    vec3 rgb_h_sin = sin( (freq_base_core.y * interlacing_adapt_period) + triad_stagger_offset - decon_stagger + vScanlineAlternateOffset);
-                #endif
-                    
+// Antimoire experiments:     
+//             vec3 rgb_h_sin = vec3(1.0);            
+//             if (SERVICE1 > 0.0) {
+//                 float anti_moire_freq = sin(vPG_freq_base_screen_unfloored.x * vPG_offsets_and_size.a );
+//                 float anti_moire_amp = SERVICE1;
+//                 rgb_h_sin = sin( (freq_base_core.yyy * interlacing_adapt_period) + ( anti_moire_freq * anti_moire_amp ) + vScanlineAlternateOffset);
+//             } else {
+//                    rgb_h_sin = sin( (freq_base_core.y * interlacing_adapt_period) + triad_stagger_offset - decon_stagger + vScanlineAlternateOffset);
+//             }
+                
+            vec3 rgb_h_sin = vec3(1.0);
+            rgb_h_sin = sin( (freq_base_core.y * interlacing_adapt_period) + triad_stagger_offset - decon_stagger + vScanlineAlternateOffset);
+
             //make it positve with doubled frequency:
                 rgb_h_sin = (rgb_h_sin * rgb_h_sin);
                         
