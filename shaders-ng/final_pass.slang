@@ -570,18 +570,18 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 vec3 decon_stagger = vec3( PIXELGRID_DECON_R_H, PIXELGRID_DECON_G_H, PIXELGRID_DECON_B_H);                
 
                 
-// Antimoire experiments:     
-//             vec3 rgb_h_sin = vec3(1.0);            
-//             if (SERVICE1 > 0.0) {
-//                 float anti_moire_freq = sin(vPG_freq_base_screen_unfloored.x * vPG_offsets_and_size.a );
-//                 float anti_moire_amp = SERVICE1;
-//                 rgb_h_sin = sin( (freq_base_core.yyy * interlacing_adapt_period) + ( anti_moire_freq * anti_moire_amp ) + vScanlineAlternateOffset);
-//             } else {
-//                    rgb_h_sin = sin( (freq_base_core.y * interlacing_adapt_period) + triad_stagger_offset - decon_stagger + vScanlineAlternateOffset);
-//             }
+//Antimoire experiments:     
+            vec3 rgb_h_sin = vec3(1.0);            
+            if (PIXELGRID_H_ANTIMOIRE > 0.0) {
+                float anti_moire_freq = sin(vPG_freq_base_screen_unfloored.x * vPG_offsets_and_size.a );
+                float anti_moire_amp = PIXELGRID_H_ANTIMOIRE;
+                rgb_h_sin = sin( (freq_base_core.yyy * interlacing_adapt_period) + ( anti_moire_freq * anti_moire_amp ) + vScanlineAlternateOffset);
+            } else {
+                   rgb_h_sin = sin( (freq_base_core.y * interlacing_adapt_period) + triad_stagger_offset - decon_stagger + vScanlineAlternateOffset);
+            }
                 
-            vec3 rgb_h_sin = vec3(1.0);
-            rgb_h_sin = sin( (freq_base_core.y * interlacing_adapt_period) + triad_stagger_offset - decon_stagger + vScanlineAlternateOffset);
+            
+        //    rgb_h_sin = sin( (freq_base_core.y * interlacing_adapt_period) + triad_stagger_offset - decon_stagger + vScanlineAlternateOffset);
 
             //make it positve with doubled frequency:
                 rgb_h_sin = (rgb_h_sin * rgb_h_sin);
@@ -675,16 +675,12 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         if (PIXELGRID_Y_MASK > 0.0) {
 
             //Compute phosphors height mask with the right reference coords.
-            //It seems multiplying twice in the mix helps with performances.
-                /*float ph_mask_height =  mix(freq_base_core.y   * vPG_mask_height,  
-                                            freq_base_screen.y * vPG_mask_height, 
-                                            PIXELGRID_Y_MASK_COORDS);*/
                 float ph_mask_height;
-                if ( PIXELGRID_Y_MASK_COORDS == 1.0 ) {
+                if ( PIXELGRID_Y_MASK_COORDS == 1.0 )
                     ph_mask_height = freq_base_screen.y * vPG_mask_height;
-                } else {
+                else
                     ph_mask_height = freq_base_core.y * vPG_mask_height;
-                }
+
                 
             //phosphors mask stagger
                 #define PH_MASH_OFFSET  (PIXELGRID_Y_MASK_OFFSET * HALF_PI )

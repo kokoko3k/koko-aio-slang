@@ -182,10 +182,10 @@
             Likewise, you can use core/game(**) sized masks and divide them by a factor
             if they appears too big.
         Inter-cell extra steepness (for integer scaling)
-            When you set maximum width/height to anything > 0.5, the phosphor light will bleed over
-            the adiacent (left/right up/down) one so that they will start to blend togheter.
+            When you set maximum width to anything > 0.33, the phosphor light will bleed over
+            the adiacent (left/right) ones so that they will start to blend togheter.
             This option will avoid the bleeding.
-            You may want them to merge or not, depending on your preference to see a visible "grid"/lines.
+            You may want them to blend or not, depending on your preference to see a "grid".
             This function is useful when you want to emulate handhelds screens using integer scaling, 
             where cells are well separated.
         Black level of the unexcided phosphor grid
@@ -204,7 +204,20 @@
             Since emulating phosphors with high Min-Max range changes the apparent gamma of the final image,
             it is advised, if needed, to use this option to compensate, instead of the main gamma correction.
             It is also a quick way to make the image brighter or darker.
-        Slotmask(-fake) offset(*):
+        Inter-line extra steepness (for integer scaling)
+            When you set maximum height to anything > 0.5, the phosphor light will bleed over
+            the adiacent (up/down) ones so that they will start to blend togheter.
+            This option will avoid the bleeding.
+            You may want them to blend or not, depending on your preference to keep scanlines separated.
+            This function is useful when you want to emulate handhelds screens using integer scaling, 
+            where cells are well separated.
+        Anti-moire sweet spot:
+            When dealing with curvature and deep scanlines gaps, moire patterns could appear on screen.
+            This setting staggers screen phosphors by the configured amount and that halps in mitigating
+            the disturbing effect.
+            I observed that a value of 0.17 does a good job for low-res content rendered at 1080p height.
+            Any value > 0.0 disables the, following functions: Slotmask(fake) and Deconvergence Y
+        Slotmask(fake) offset(*):
             This will cause every cell to be vertically shifted by the configured amount to
             emulate a slotmask phosphors layout.
             It is true that for accurate reproduction of them, slotmasks are commonly emulated
@@ -219,23 +232,17 @@
             While this does not exist at all in crt technology, it greatly mitigates the artifacts
             just explained while producing a fairly convincing effect, very similar to a screen
             with visible scanlines and visible slotmask.
-        Inter-cell extra steepness (for integer scaling)
-            When you set maximum width/height to anything > 0.5, the phosphor light will bleed over
-            the adiacent (left/right up/down) one so that they will start to blend togheter.
-            This option will avoid the bleeding.
-            You may want them to merge or not, depending on your preference to see a visible "grid"/lines.
-            This function is useful when you want to emulate handhelds screens using integer scaling, 
-            where cells are well separated.
-        Dedot mask between scanlines
-            When using Horizontal masks, you mai notice a disturbing dot pattern left between high
-            scanlines, that's the residual of horizontal mask.
-            Use this parameter to clear it and use it only if needed or it would have counter-effects.
-            Also, mutating dots to straight lines would make moiree more visible when using curvature.
         Deconvergence Y: R,G,B phosphor" 
             This emulates Y deconvergence on phosphor level rather than on image level as seen in
             the previous deconvergence section.
             Emulating deconvergence here is good because phosphors will be able to brighten the
             dark gap left by scanlines.
+        Dedot mask between scanlines
+            When using Horizontal masks, you mai notice a disturbing dot pattern left between high
+            scanlines, that's the residual of horizontal mask.
+            Use this parameter to clear it and use it only if needed or it would have counter-effects.
+            Also, mutating dots to straight lines would make moiree more visible when using curvature.
+
         
         
     Interlace + Scanline alternate above # lines:
