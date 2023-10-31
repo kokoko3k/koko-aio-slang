@@ -42,7 +42,7 @@ layout(location = 12) out vec4 vPG_offsets_and_size;
 layout(location = 13) out vec2 vPG_freq_base_screen;
 layout(location = 14) out vec2 vPG_freq_base_screen_unfloored;
 layout(location = 15) out vec2 vPG_period_multiplier;
-layout(location = 16) out vec2 vPG_OriginalSize_tated;
+layout(location = 16) out vec2 vPG_OriginalSize_tated_mul_pi;
 layout(location = 17) out vec2 vPG_OutputSize_tated;
 layout(location = 18) out vec2 vPG_OutputCoord_tated;
 layout(location = 19) out float vDotMat_Grid_Sharpness;
@@ -199,13 +199,15 @@ void main() {
         //Tate ?
             vPG_OutputSize_tated   = params.OutputSize.xy;
             vPG_OutputCoord_tated  = vOutputCoord.xy + vec2(0.00001);
-            vPG_OriginalSize_tated = params.OriginalSize.xy;
+            vPG_OriginalSize_tated_mul_pi = params.OriginalSize.xy;
             
             if (vDo_Tate == 1.0) {
                 vPG_OutputSize_tated   = params.OutputSize.yx;
                 vPG_OutputCoord_tated  = vOutputCoord.yx;
-                vPG_OriginalSize_tated = params.OriginalSize.yx;
+                vPG_OriginalSize_tated_mul_pi = params.OriginalSize.yx;
             }
+                
+            vPG_OriginalSize_tated_mul_pi *= pi;
                 
             // screen coords needs flooring, but unfortunately floor() does not work well in vertex shader, so calc as much as possible without floor()
                 vPG_period_multiplier = vec2(PIXELGRID_MUL_X, 1.0);
@@ -281,7 +283,7 @@ layout(location = 12) in vec4 vPG_offsets_and_size;
 layout(location = 13) in vec2 vPG_freq_base_screen;
 layout(location = 14) in vec2 vPG_freq_base_screen_unfloored;
 layout(location = 15) in vec2 vPG_period_multiplier;
-layout(location = 16) in vec2 vPG_OriginalSize_tated;
+layout(location = 16) in vec2 vPG_OriginalSize_tated_mul_pi;
 layout(location = 17) in vec2 vPG_OutputSize_tated;
 layout(location = 18) in vec2 vPG_OutputCoord_tated;
 layout(location = 19) in float vDotMat_Grid_Sharpness;
@@ -507,7 +509,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         float PG_h_count = vPG_offsets_and_size.a; 
         vec3  PG_offsets = vPG_offsets_and_size.rgb;
 
-        vec2 freq_base_core = pi * in_coords * vPG_OriginalSize_tated ;
+        vec2 freq_base_core = in_coords * vPG_OriginalSize_tated_mul_pi ;
 
         //Use fake scanlines?
         if (vUse_Fake_scanlines == 1.0) 
