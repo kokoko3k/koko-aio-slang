@@ -4,9 +4,9 @@ Repository for game-specific Arcade Artwork by using the Koko-aio slang shader. 
 <br>
 Main source of this artwork comes from John Merrit, who set a benchmark for realistic arcade artwork. I still very much like them, and they shine even more in combination with Koko-aio. My selection of the artwork is arbitrary, but I try to publish eye candys earlier :-). Version 0.2 and following releases see the inclusion of some breathtaking 4K artwork provided by Ars Invictus.<br>
 <br>
-Requirements: RetroArch 1.5.0 or a newer RetroArch Nightly Build that support Vulkan. Tested with FinalBurn Neo (mainly) and MAME 2003/2003plus. MAME (current) now works out of the box, as the rotation of this core has been adjusted. Having said that, the MAME (current) core is still buggy for me.<br>
+Requirements: RetroArch 1.5.0 or a newer RetroArch Nightly Build that support Vulkan. Tested with FinalBurn Neo (mainly) and MAME 2003/2003plus. MAME (current) now works out of the box, as the rotation of this core has been adjusted. Having said that, the MAME (current) core is still buggy, at least for me.<br>
 <br>
-Update October 2023: Moving this repository to the 'ng' shaders requires more work - basically new presets. Currently the last version of this repository does not provide for working presets, please bear with me. Presets marked with 'ng update' are already working.<br> 
+Update October 2023: Moving this repository to the 'ng' shaders (ambient preset) requires more work - basically new presets. Currently the last version of this repository does not provide for working presets, please bear with me. Presets marked with 'ng update' are already working.<br> 
 <br>
 Update June 2023: I have successfully moved this repository to the 'ng' shaders that provide another quality increase. Until release 0.4, I would like to nightify all presets to the extent required. This release will also see usage of the new ambilight functionalities, if it makes sense. So stay tuned.
 <br>
@@ -55,7 +55,7 @@ Please also refer to the instructions contained in the ReadMe.md of these folder
 
 # Manual installation from the Github repository
 
-Please note that the koko-aio github repository has a different folder structure than RetroArch. In order to make a GitHub clone work, you must move all .slang presets from the presets directory one level up. Then you must adjust the reference in the two BASE presets, so that these BASE presets refer to the same directory, and you are ready to go.
+Update November 2023: In the new ng shader environment, it will be sufficient to move the koko-aio folder structure as is into the local RetroArch shader environment. Migration is still ongoing.
 <br>
 
 # Further clones of the same game
@@ -68,9 +68,12 @@ With latest Github (30 March 2023) and Release 0.3, backdrop support landed in k
 
 # Technical Information
 
-This fork will remain as closely as possible in line with the main repository, as I frequently update from Upstream. Here is a list of deviations from Upstream:
-- koko-aio.slangp - line 43:  bg_under_wrap_mode = "clamp_to_border" (instead of "mirrored_repeat")
-- koko-aio.slangp - line 48:  bg_over_wrap_mode = "clamp_to_border" (instead of "mirrored_repeat")
+(Update November 2023) This fork will remain as closely as possible in line with the main repository, as I frequently update from Upstream. Here is a list of deviations from Upstream:
+- koko-aio-ng.slangp - line 43:  bg_under_wrap_mode = "clamp_to_edge" (instead of previously "clamp_to_border") 
+- koko-aio-ng.slangp - line 48:  bg_over_wrap_mode = "clamp_to_edge" (instead of previously "clamp_to_border")
+- koko-aio-ng.slangp - line 54:  backdrop_wrap_mode = "clamp_to_edge"
+In koko-aio.slangp, I used "clamp_to_border", but the new, stronger ambilight then shines beyond the artwork. Workaround: apply a 1px black frame to the artwork and set "clamp_to_edge", this lets the black frame repeat black, and thereby the ambilight no longer shines through.
+
 These changes are beneficial for this repository, as a mirrored repeat looks very strange for realistic cabinet backgrounds/foregrounds.
 
 LEGACY no longer required as of April 2023, just for documentation: 
