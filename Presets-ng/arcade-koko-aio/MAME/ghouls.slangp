@@ -1,13 +1,17 @@
-#reference "../../shaders/shaders_slang/bezel/koko-aio/monitor-slotmask-bloom-bezel.slangp"
+#reference "../../shaders/shaders_slang/bezel/koko-aio/Presets-ng/Monitor-Ambilight-immersive.slangp"
 GEOM_CORNER_SIZE = "0.020000"
+BEZEL_INNER_ZOOM = "-0.210000"
+BEZEL_FRAME_ZOOM = "0.000000"
 BEZEL_R = "-0.220000"
 BEZEL_G = "-0.220000"
 BEZEL_B = "-0.220000"
-BEZEL_INNER_ZOOM = "-0.320000"
-BEZEL_FRAME_ZOOM = "-0.060000"
-DO_BG_IMAGE = "1.000000"
-DO_AMBILIGHT = "0.000000"
+BG_IMAGE_OVER = "0.000000"
+BG_IMAGE_NIGHTIFY = "0.400000"
+GLOBAL_OFFX = "-0.002500"
+GLOBAL_OFFY = "0.002500"
+GLOBAL_ZOOM = "1.049496"
 bg_under = "../../shaders/shaders_slang/bezel/koko-aio/textures/arcade_textures/ghouls.png"
+bg_over = "../../shaders/shaders_slang/bezel/koko-aio/textures/arcade_textures/ghouls.png"
 
 // Credits
 // shader by kokoko3k - https://github.com/kokoko3k/koko-aio-slang

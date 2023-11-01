@@ -15,12 +15,7 @@ DO_DYNZOOM = "0.000000"
 DO_VIGNETTE = "0.000000"
 DO_SPOT = "0.000000"
 GLOBAL_OFFX = "0.008500"
-GLOBAL_OFFY = "0.000500"
-GLOBAL_ZOOM = "1.030498"
+GLOBAL_OFFY = "0.003000"
+GLOBAL_ZOOM = "1.065495"
 bg_under = "../../shaders/shaders_slang/bezel/koko-aio/textures/arcade_textures/bombjack.png"
 bg_over = "../../shaders/shaders_slang/bezel/koko-aio/textures/arcade_textures/bombjack.png"
-
-// Credits
-// shader by kokoko3k - https://github.com/kokoko3k/koko-aio-slang
-// artwork by John Merrit
-// preset and artwork adjustments by estefan3112 - https://github.com/estefan3112/koko-aio-slang
