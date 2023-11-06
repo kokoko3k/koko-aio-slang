@@ -141,6 +141,14 @@
         X resolution: (core or screen) (**):
             0: Phosphors width will be relative to the pixel width of the core (game).
             1: Phosphors width will be relative to the pixel width of the screen.
+        Cell size multiplier x (neg=divider):
+            Multiply (or divide if the parameter is < 0) the mask (cell) size by a factor.
+            As stated(**), the size may be relative to screen or core, this allow you to
+            "zoom" the cell horizontally and can be useful if you have an HiDPI screen.
+            For example, you may choose to use screen sized masks and zoom them by a factor
+            of 2 or 3 to make room for phosphors and see them visually grow in width.
+            Likewise, you can use core/game(**) sized masks and divide them by a factor
+            if they appear too big.
         Mask type preset:
             You can have the shader generate a preconfigured mask for you:
             1:gm 2:gmx 3:rgb 4:rgbx 5:rbg 6:rbgx 7:wx
@@ -173,14 +181,6 @@
                 Since emulating phosphors with high Min-Max range changes the apparent gamma of the final image,
                 it is advised, if needed, to use this option to compensate, instead of the main gamma correction.
                 It is also a quick way to make the image brighter or darker.
-        Cell size multiplier x (neg=divider):
-            Multiply (or divide if the parameter is < 0) the mask (cell) size by a factor.
-            As stated(**), the size may be relative to screen or core, this allow you to
-            "zoom" the cell horizontally and can be useful if you have an HiDPI screen.
-            For example, you may choose to use screen sized masks and zoom them by a factor
-            of 2 or 3 to make room for phosphors and see them visually grow in width.
-            Likewise, you can use core/game(**) sized masks and divide them by a factor
-            if they appears too big.
         Inter-cell extra steepness (for integer scaling)
             When you set maximum width to anything > 0.33, the phosphor light will bleed over
             the adiacent (left/right) ones so that they will start to blend togheter.
