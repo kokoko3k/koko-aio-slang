@@ -41,7 +41,7 @@ layout(location = 11) out vec3 vDotMat_Grid_Color;
 layout(location = 12) out vec4 vPG_offsets_and_size;
 layout(location = 13) out vec2 vPG_freq_base_screen;
 layout(location = 14) out vec2 vPG_freq_base_screen_unfloored;
-layout(location = 15) out vec2 vPG_period_multiplier;
+layout(location = 15) out float vPG_period_multiplier_x;
 layout(location = 16) out vec2 vPG_OriginalSize_tated_mul_pi;
 layout(location = 17) out vec2 vPG_OutputSize_tated;
 layout(location = 18) out vec2 vPG_OutputCoord_tated;
@@ -210,7 +210,7 @@ void main() {
             vPG_OriginalSize_tated_mul_pi *= pi;
                 
             // screen coords needs flooring, but unfortunately floor() does not work well in vertex shader, so calc as much as possible without floor()
-                vPG_period_multiplier = vec2(PIXELGRID_MUL_X, 1.0);
+                vPG_period_multiplier_x = PIXELGRID_MUL_X;
                 vPG_freq_base_screen = pi * vec2(1/PG_H_COUNT, 0.5);
 
             //the following unfloored coords are needed by sin/cos later to understand if we are on an even or odd mask
@@ -219,8 +219,8 @@ void main() {
 
 
     //Pixelgrid: adapt period multiplier
-        if (vPG_period_multiplier.x < 0.0) vPG_period_multiplier.x = 1/-vPG_period_multiplier.x;  
-        if (vPG_period_multiplier.y < 0.0) vPG_period_multiplier.y = 1/-vPG_period_multiplier.y;     
+        if (vPG_period_multiplier_x < 0.0) vPG_period_multiplier_x = 1/-vPG_period_multiplier_x;  
+
         
         
     //Pixelgrid: adapt mask height
@@ -282,7 +282,7 @@ layout(location = 11) in vec3 vDotMat_Grid_Color;
 layout(location = 12) in vec4 vPG_offsets_and_size;
 layout(location = 13) in vec2 vPG_freq_base_screen;
 layout(location = 14) in vec2 vPG_freq_base_screen_unfloored;
-layout(location = 15) in vec2 vPG_period_multiplier;
+layout(location = 15) in float vPG_period_multiplier_x;
 layout(location = 16) in vec2 vPG_OriginalSize_tated_mul_pi;
 layout(location = 17) in vec2 vPG_OutputSize_tated;
 layout(location = 18) in vec2 vPG_OutputCoord_tated;
@@ -528,11 +528,11 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             
                 
     //Switch frequency between core and screen and apply asked multipliers
-        vec2 freq_base = freq_base_core / vPG_period_multiplier ;
+        vec2 freq_base = freq_base_core / (vPG_period_multiplier_x, 1.0) ;
         vec2 freq_base_unfloored = freq_base_core;
         if (PIXELGRID_SIZE_W == 1.0) {
-            freq_base.x = freq_base_screen.x / vPG_period_multiplier.x;
-            freq_base_unfloored.x = vPG_freq_base_screen_unfloored.x / vPG_period_multiplier.x;
+            freq_base.x = freq_base_screen.x / vPG_period_multiplier_x;
+            freq_base_unfloored.x = vPG_freq_base_screen_unfloored.x / vPG_period_multiplier_x;
         }
         
     vec3 freq_rgb = freq_base.xxx - PG_offsets;
