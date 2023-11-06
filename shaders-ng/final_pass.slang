@@ -378,7 +378,7 @@ vec3 morph_shape_full_vec3(vec3 shape, vec3 l, float steep, float gamma ) {
     vec3 l2 = min(l_pow * 16, 1+steep);
     vec3 s1 = pow(shape, 1/sqrt(l2));
     vec3 s2 = (1-s1) * l_pow;
-    return s1+(s2/(1+steep));
+    return (s2/(1+steep)) + s1;
     
 }
 
@@ -580,9 +580,6 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                    rgb_h_sin = sin( (freq_base_core.y * interlacing_adapt_period) + triad_stagger_offset - decon_stagger + vScanlineAlternateOffset);
             }
                 
-            
-        //    rgb_h_sin = sin( (freq_base_core.y * interlacing_adapt_period) + triad_stagger_offset - decon_stagger + vScanlineAlternateOffset);
-
             //make it positve with doubled frequency:
                 rgb_h_sin = (rgb_h_sin * rgb_h_sin);
                         
@@ -908,7 +905,7 @@ vec3 bezel_color(float lum)  {
     
     //Colorize bezel frame
     vec3 col = vec3(BEZEL_R,BEZEL_G,BEZEL_B) + lum;
-    float con_max =  0.5 * BEZEL_CON + 0.5;
+    float con_max = fma(0.5, BEZEL_CON, 0.5); // <<- same as: float con_max =  0.5 * BEZEL_CON + 0.5;
     col = scale_to_range_vec3(col, -con_max+1, con_max);
     return clamp(col,0.0,1.0);
     
@@ -988,7 +985,7 @@ vec3 light_over_image(vec3 light, vec3 image, float black_illumination) {
     
     vec3 light_on_black = black_illumination * light;
     vec3 modulated_on_black = image.rgb +  ( light  * image.rgb ) + light_on_black;
-    
+        
     return modulated_on_black;
 }
 
@@ -1086,7 +1083,7 @@ vec3 fn_pixel_content(vec2 coords) {
             
             if (HALO_PRE_SCANLINE_GAP == 1.0 &&  vDo_pixelgrid_h == 1.0) {
                 //FIXME dot_mat lasciato indietro
-                halo_coords.y += global.in_glow_passSize.w*0.5*DO_PIXELGRID_H*(0.75-HALO_VS_SCAN);
+                halo_coords.y +=  (DO_PIXELGRID_H  * global.in_glow_passSize.w) * ( 0.5 * (0.75-HALO_VS_SCAN) );
                 vec3 pixel_haloed = texture(halo_pass, halo_coords).rgb;    
                  
                 //pixel_haloed = blur_px(halo_pre_gamma_pass, halo_coords, vec2(SERVICE1*0.1)) ;
@@ -1097,7 +1094,7 @@ vec3 fn_pixel_content(vec2 coords) {
                 //Halo only on scanlines:
                 pixel_out += pixel_haloed * dot_mat_or_pixelgrid ;
                 //Halo over scanlines gap too:
-                pixel_out += pixel_haloed * (HALO_VS_SCAN) * (1 - dot_mat_or_pixelgrid) ;   
+                pixel_out += (pixel_haloed * HALO_VS_SCAN) * (1 - dot_mat_or_pixelgrid) ;   
             }
 
         }
@@ -1119,7 +1116,7 @@ vec3 fn_pixel_content(vec2 coords) {
     //Bloom
         if (DO_BLOOM == 1.0 ) {
             vec3 bloomed=texture(bloom_pass_final, coords).rgb ;
-            pixel_out = bloomed + float(BLOOM_BYPASS < 0.5) * pixel_out;
+            pixel_out = float(BLOOM_BYPASS < 0.5) * pixel_out + bloomed;
         }
             
     //Black frame insertion, made static, enable it in config.inc.
@@ -1149,7 +1146,9 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
         #else
             vec2 bezel_lut_size = BEZEL_RES;
         #endif
-        float bezel_frame_lod = log2(bezel_lut_size.y * (BEZEL_FRAME_ZOOM+1.0) /global.FinalViewportSize.y);
+        //float bezel_frame_lod = log2(bezel_lut_size.y * (BEZEL_FRAME_ZOOM+1.0) /global.FinalViewportSize.y);
+        float bezel_frame_lod = log2(bezel_lut_size.y * (BEZEL_FRAME_ZOOM+1.0) / global.FinalViewportSize.y);
+        
         
         if (BEZEL_USE_STRAIGHT < 0.5)
             bezel_in = textureLod(monitor_body_curved,coords_for_bezel,bezel_frame_lod);
