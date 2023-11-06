@@ -17,7 +17,7 @@
 
 
 
-#define DEBUG
+//#define DEBUG
    //#define DEBUG_COLOR_CALIB
    #define DEBUG_TIME_FADE
    //#define DEBUG_SOLID_COLOR

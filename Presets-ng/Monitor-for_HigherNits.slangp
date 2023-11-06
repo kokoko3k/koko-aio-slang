@@ -1,0 +1,3 @@
+#reference "Monitor-for_HiNits.slangp"
+
+DO_HALO = "0.0"
