@@ -257,7 +257,7 @@ void main() {
 
     if ( (PIXELGRID_INTR_DISABLE_Y <= -1.0 && bIs_Interlaced) || (PIXELGRID_COREY_FAKE_SCAN == 1.0)) {
         vUse_Fake_scanlines = 1.0;
-        float fake_scanlines_numlines = global.FinalViewportSize.y/ceil(   (global.FinalViewportSize.y*get_zooms_modifier().y) /params.OriginalSize.y);
+        float fake_scanlines_numlines = global.FinalViewportSize.y/ceil(   (global.FinalViewportSize.y*get_zooms_modifier().y) * params.OriginalSize.y);
         vFake_scanline_period = pi * fake_scanlines_numlines * vOutputCoord.y;
         if (PIXELGRID_INTR_DISABLE_Y == -2.0 && PIXELGRID_COREY_FAKE_SCAN == 0.0) vFake_scanline_period*=1.5;
     }
@@ -800,7 +800,7 @@ vec3 pixel_backdrop_image() {
     vec2 backdrop_offset=vec2(BACKDROP_OFFX,BACKDROP_OFFY);
 
     vec2 backdrop_tex_size = textureSize(backdrop, 0);
-    float backdrop_lod = log2(backdrop_tex_size.y / global.FinalViewportSize.y);
+    float backdrop_lod = log2(backdrop_tex_size.y * global.FinalViewportSize.w);
 
     vec2 backdrop_coords =  get_scaled_coords_aspect(
                             vOutputCoord+backdrop_offset,
@@ -953,7 +953,7 @@ vec2 get_scaled_coords_for_bezel() {
 vec4 fn_pixel_fgbg_image(sampler2D smp) {
     vec2 fg_image_offset=vec2(BG_IMAGE_OFFX,BG_IMAGE_OFFY);
     vec2 tex_size = textureSize(smp, 0); // * BG_ZOOM;
-    float bg_over_lod = log2(tex_size.y / global.FinalViewportSize.y);
+    float bg_over_lod = log2(tex_size.y * global.FinalViewportSize.w);
 
     if (BG_IMAGE_ROTATION > 0.0  || ( BG_IMAGE_ROTATION < 0.0 && bool(vIsRotated) )  ) tex_size.xy = tex_size.yx;
 
@@ -1146,8 +1146,7 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
         #else
             vec2 bezel_lut_size = BEZEL_RES;
         #endif
-        //float bezel_frame_lod = log2(bezel_lut_size.y * (BEZEL_FRAME_ZOOM+1.0) /global.FinalViewportSize.y);
-        float bezel_frame_lod = log2(bezel_lut_size.y * (BEZEL_FRAME_ZOOM+1.0) / global.FinalViewportSize.y);
+        float bezel_frame_lod = log2(bezel_lut_size.y * (BEZEL_FRAME_ZOOM+1.0) * global.FinalViewportSize.w);
         
         
         if (BEZEL_USE_STRAIGHT < 0.5)
