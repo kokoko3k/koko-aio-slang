@@ -181,13 +181,6 @@
                 Since emulating phosphors with high Min-Max range changes the apparent gamma of the final image,
                 it is advised, if needed, to use this option to compensate, instead of the main gamma correction.
                 It is also a quick way to make the image brighter or darker.
-        Inter-cell extra steepness (for integer scaling)
-            When you set maximum width to anything > 0.33, the phosphor light will bleed over
-            the adiacent (left/right) ones so that they will start to blend togheter.
-            This option will avoid the bleeding.
-            You may want them to blend or not, depending on your preference to see a "grid".
-            This function is useful when you want to emulate handhelds screens using integer scaling, 
-            where cells are well separated.
         Black level of the unexcided phosphor grid
             Draw the vertical grid that hosts phosphors.
             This is likely to produce moiree when using X resolution = core

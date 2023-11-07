@@ -379,7 +379,14 @@ vec3 morph_shape_full_vec3(vec3 shape, vec3 l, float steep, float gamma ) {
     vec3 s1 = pow(shape, 1/sqrt(l2));
     vec3 s2 = (1-s1) * l_pow;
     return (s2/(1+steep)) + s1;
-    
+}
+
+vec3 morph_shape_full_no_steepness_vec3(vec3 shape, vec3 l, float gamma ) {
+    vec3 l_pow = pow(l,vec3(gamma));
+    vec3 l2 = min(l_pow * 16, 1);
+    vec3 s1 = pow(shape, 1/sqrt(l2));
+    vec3 s2 = (1-s1) * l_pow;
+    return s2 + s1;    
 }
 
 /*vec3 morph_shape_full_vec3(vec3 shape, vec3 l, float steep ) {
@@ -637,7 +644,8 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //Scale Max width according to pre-gains:
                 vec3 phosphor_width = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
             //Get final phosphor width:
-                rgb_w = morph_shape(rgb_w, phosphor_width, PIXELGRID_NO_INTERBLEED_W, PIXELGRID_GAMMA_W); //2%
+                //rgb_w = morph_shape(rgb_w, phosphor_width, PIXELGRID_NO_INTERBLEED_W, PIXELGRID_GAMMA_W); //2%
+                rgb_w = morph_shape_full_no_steepness_vec3(rgb_w, phosphor_width, PIXELGRID_GAMMA_W); //2%
             
             //Dedot rgb mask between h mask.
             //This work only when there are dots and have the countereffect when there are not.
