@@ -483,11 +483,22 @@ vec3 downsample_x( sampler2D tex, vec2 uv, vec4 sourcesize, float sharpness_add 
 }
 
 vec3 smoothstep_fast(vec3 edge0, vec3 edge1, vec3 x) {
-
   vec3 t = clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);
-  //return cos(t * 3.14159265358979323846) * -0.5 + 0.5;
-  return mix(vec3(0.0), vec3(1.0), t);
+  //return cos(t * pi) * -0.5 + 0.5;
+  return t;
 }
+
+float smoothstep_fast(float edge0, float edge1, float x) {
+  float t = clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);
+  //return cos(t * pi) * -0.5 + 0.5;
+  return t;
+}
+
+float smoothstep_cos(float edge0, float edge1, float x) {
+  float t = clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);
+  return cos(t * pi) * -0.5 + 0.5;
+}
+
 
 vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inLum  ) {     
     /*
@@ -1357,6 +1368,8 @@ void main() {
             float spot = 0.0;
             if (DO_SPOT == 1.0) {
                     float dist = length(vec2((co_content.x-0.5)*vIn_aspect, co_content.y-0.5)+spot_offset);
+                    //spot = smoothstep_fast(S_SIZE,0.0,dist)*S_POWER;
+                    //spot = smoothstep_cos(S_SIZE,0.0,dist)*S_POWER;
                     spot = smoothstep(S_SIZE,0.0,dist)*S_POWER;
             }
 
