@@ -138,8 +138,8 @@
 
 	//Static dithering applied over vignette and spot
 #define NOISEPOWER 5/1000.0
-	//Temporal noise strength applied on green over ambient lights (multiplied by NOISEPOWER)
-#define NOISEPOWER_AMBI_MUL 8.0
+	//Temporal noise strength applied on green channel when green is dark over ambient lights (multiplied by NOISEPOWER)
+#define NOISEPOWER_AMBI_MUL 3.0
 	
 	//Should texture wrapping be allowed as a shader parameter?
 	//since it causes branching, better set it as a static value.

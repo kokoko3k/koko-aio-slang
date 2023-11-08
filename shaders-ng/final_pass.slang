@@ -577,7 +577,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 vec3 decon_stagger = vec3( PIXELGRID_DECON_R_H, PIXELGRID_DECON_G_H, PIXELGRID_DECON_B_H);                
 
                 
-//Antimoire experiments:     
+        //Antimoire experiments:     
             vec3 rgb_h_sin = vec3(1.0);            
             if (PIXELGRID_H_ANTIMOIRE > 0.0) {
                 float anti_moire_freq = sin(vPG_freq_base_screen_unfloored.x * vPG_offsets_and_size.a );
@@ -1149,13 +1149,14 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
     vec4 bezel_in;    
     
     //Sample main bezel texture:
+    //We assume straight and curved textures are the same size. WARNING
         #ifndef BEZEL_RES
-            vec2 bezel_lut_size = textureSize(monitor_body_curved, 0); //no need to branch here if we assume straight and curved textures are the same size. //FIXME?
+            vec2 bezel_lut_size = textureSize(monitor_body_curved, 0); 
+            float bezel_frame_lod = log2(bezel_lut_size.y * (BEZEL_FRAME_ZOOM+1.0) * global.FinalViewportSize.w);
         #else
-            vec2 bezel_lut_size = BEZEL_RES;
+            float bezel_frame_lod = log2( BEZEL_RES.y * (BEZEL_FRAME_ZOOM + 1.0) * global.FinalViewportSize.w);
         #endif
-        float bezel_frame_lod = log2(bezel_lut_size.y * (BEZEL_FRAME_ZOOM+1.0) * global.FinalViewportSize.w);
-        
+
         
         if (BEZEL_USE_STRAIGHT < 0.5)
             bezel_in = textureLod(monitor_body_curved,coords_for_bezel,bezel_frame_lod);
@@ -1306,14 +1307,11 @@ void main() {
             //Ambient light
             if (DO_AMBILIGHT == 1.0) {
                 pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb;
-                if (DO_BG_IMAGE != 1.0)
-                    pixel_ambi += random_fast( (NOISEPOWER * NOISEPOWER_AMBI_MUL) * ((1-pixel_ambi.g) * (pixel_ambi.g*1 - pixel_ambi.r*0.125 -pixel_ambi.b*0.125  )    ) , 
-                vTexCoord * vDynamicSeed  ) ;
-            
-                float  ambi_noise_power = (NOISEPOWER * NOISEPOWER_AMBI_MUL * (1-pixel_ambi.g) ) * //only middle green channel
-                                          dot( pixel_ambi, vec3(-0.5,1.0,-0.5) );                  //denoise only greenish colors
-                pixel_ambi += random_fast( ambi_noise_power, vTexCoord * vDynamicSeed  ) ;
-                
+                if (DO_BG_IMAGE != 1.0) {
+                    float anoise = random_fast( NOISEPOWER * NOISEPOWER_AMBI_MUL, vTexCoord * vDynamicSeed);
+                    anoise *=  (1 - pixel_ambi.g);
+                    pixel_ambi += anoise; 
+                }              
                 pixel_under_content = pixel_ambi * (1-canvas_busy);
             }
         }
