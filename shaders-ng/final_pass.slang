@@ -1348,6 +1348,7 @@ void main() {
             //on the tube and we don't want to paint anything there, so use a dumb rect and add it to canvas_busy:
                 float rect_bezel = float(is_first_inside_rect(co_bezel, vec4(BEZEL_SHADOW_SIZE, BEZEL_SHADOW_SIZE, 1.0 - BEZEL_SHADOW_SIZE, 1.0 - BEZEL_SHADOW_SIZE)));
                 canvas_busy = max(pixel_bezel.a, rect_bezel);
+                
                 //FragColor = vec4(canvas_busy); return; // <- uncomment to debug BEZEL_SHADOW_SIZE
                 
                 //Intersect rect_bezel and bezel alpha to get the inner tube alpha
@@ -1355,31 +1356,29 @@ void main() {
         }
 
     if (canvas_bezel_screen > 0.5) {
+        
+        //Deband
+        float spot_vignette_noise = 0.0;
+        if (DO_VIGNETTE + DO_SPOT > 0.0) {
+            spot_vignette_noise = random_fast(NOISEPOWER, vOutputCoord) ;
+        }
+        
         //Vignette
-            float vignette = 1.0;
             if (DO_VIGNETTE == 1.0) {
                 //float dist = length(vec2((co_content.x-0.5)*vIn_aspect, co_content.y-0.5));
                 //vignette = smoothstep(V_SIZE,0.0,dist)*V_POWER;
                 vec2 sinco = (co_content-0.5) / V_SIZE ;
-                vignette = cos(sinco.x) * cos(sinco.y) * V_POWER;
+                float vignette = cos(sinco.x) * cos(sinco.y) * V_POWER;
+                pixel_out = (pixel_out*vignette);
             } 
             
         //Spot
-            float spot = 0.0;
             if (DO_SPOT == 1.0) {
-                    float dist = length(vec2((co_content.x-0.5)*vIn_aspect, co_content.y-0.5)+spot_offset);
+                    float dist = length(vec2((co_content.x-0.5) * vIn_aspect, co_content.y-0.5) + spot_offset);
                     //spot = smoothstep_fast(S_SIZE,0.0,dist)*S_POWER;
                     //spot = smoothstep_cos(S_SIZE,0.0,dist)*S_POWER;
-                    spot = smoothstep(S_SIZE,0.0,dist)*S_POWER;
+                    pixel_out += smoothstep(S_SIZE,0.0,dist) * S_POWER * canvas_bezel_screen;      
             }
-
-            float spot_vignette_noise = 0.0;
-            if (DO_VIGNETTE + DO_SPOT > 0.0) {
-                spot_vignette_noise = random_fast(NOISEPOWER, vOutputCoord ) ;
-            }
-        
-            pixel_out = (pixel_out*vignette) + (spot + spot_vignette_noise)*canvas_bezel_screen;
-        
     }
         //Background image have, no need to paint if not in the outer border:
             if (DO_BG_IMAGE == 1.0 && BG_IMAGE_OVER == 0.0 && canvas_busy < 1.0) {
