@@ -131,7 +131,7 @@
 //#define ALLOW_ALT_BLANK
 
 	//Halve rendering refresh on bezel and ambilight to spare gpu cycles:
-#define HALVE_BORDER_UPDATE 1.0
+#define HALVE_BORDER_UPDATE 0.0
 
 	//Renders only changed parts of screen.
 #define DELTA_RENDER 0.0
