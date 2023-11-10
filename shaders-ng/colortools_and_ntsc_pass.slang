@@ -272,11 +272,10 @@ void main() {
   
    
    #ifdef DEBUG
-      //Vant "debug" ntsc artifacts because it samples from source (original)
+      //Cant "debug" ntsc artifacts because it samples from source (original)
       pixel_out = debug();
    #endif
       
-  FragColor = vec4(pixel_out, 1.0);
    
    if (DO_CCORRECTION == 1.0)
       pixel_out = color_tools(pixel_out, vTemperature_rgb);
