@@ -1108,7 +1108,7 @@ bool is_first_outside_rect(vec2 point, vec4 rect) {
 		pixel_out = pixel_push_luminance(pixel_out,LUMINANCE);
 
 	//Modify contrast and brightness
-		if (CONTRAST != 0.0 || BRIGHTNESS != 0.0)
+		if (CONTRAST * BRIGHTNESS != 0.0) //<- one of them is != 0.0
 			pixel_out.rgb = apply_contrast_brightness(pixel_out.rgb, CONTRAST, BRIGHTNESS);
 
 	//Modify color temperature
