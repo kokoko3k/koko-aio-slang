@@ -87,7 +87,7 @@ void main() {
       }
       
 
-   float IN_GLOW_W_ADAPTED = abs(IN_GLOW_W);
+   float in_glow_w_adapted = abs(IN_GLOW_W);
             
    //Modulate glow power via ntsc artifact mask:
       float ntsc_artifacts = texture(shift_and_bleed_pass, vTexCoord).a;
@@ -98,22 +98,22 @@ void main() {
             return;
          }
       //finally "add" them to the configured sharpness (-> less blur)
-         IN_GLOW_W_ADAPTED = IN_GLOW_W_ADAPTED +  DO_NTSC_ARTIFACTS * ((1-ntsc_artifacts) * NTSC_ARTF_NOBLUR);
+         in_glow_w_adapted = in_glow_w_adapted +  DO_NTSC_ARTIFACTS * ((1-ntsc_artifacts) * NTSC_ARTF_NOBLUR);
 
    //don't allow lower values that look bad:
-      //IN_GLOW_W_ADAPTED = max(IN_GLOW_W_ADAPTED, MIN_IN_GLOW_SHARP);
+      //in_glow_w_adapted = max(in_glow_w_adapted, MIN_IN_GLOW_SHARP);
 
    //Scale it for lanczos
    //   if (IN_GLOW_W < 0.0) 
-   //      IN_GLOW_W_ADAPTED =  (IN_GLOW_W_ADAPTED+1)/10.0;
+   //      in_glow_w_adapted =  (in_glow_w_adapted+1)/10.0;
       
    //Scale it for box
       if (IN_GLOW_W < 0.0)
-         IN_GLOW_W_ADAPTED =  (IN_GLOW_W_ADAPTED)/1.2;
+         in_glow_w_adapted =  (in_glow_w_adapted)/1.2;
    
 
    //Make it resolution independent.
-      IN_GLOW_W_ADAPTED = IN_GLOW_W_ADAPTED / NEW_SCALEMOD_X;
+      in_glow_w_adapted = in_glow_w_adapted / NEW_SCALEMOD_X;
       
 
       
@@ -129,7 +129,7 @@ void main() {
       
    //Finally blur horizontally 
    if (glow_w_inside_interval == 1.0)  {
-         FragColor = vec4(blur_select_wrap(shift_and_bleed_pass, vTexCoord, global.flick_and_noise_passSize, IN_GLOW_W_ADAPTED, (IN_GLOW_W >= 0.0) ), 
+         FragColor = vec4(blur_select_wrap(shift_and_bleed_pass, vTexCoord, global.flick_and_noise_passSize, in_glow_w_adapted, (IN_GLOW_W >= 0.0) ), 
                           DR_unchanged);
    } else {
       FragColor = vec4(texture(shift_and_bleed_pass, vTexCoord).rgb, DR_unchanged);
