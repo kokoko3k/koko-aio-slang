@@ -112,7 +112,7 @@ TODO:
 	[v] provide a dedicated gamma out setting for halo
 	[v] fake main pass is not aware of halo gamma out.
 	
-	[ ] check branching conditions in first_pass.slang
+	[v] check branching conditions in first_pass.slang
 	[ ] Glow spread in final pass?
 	[ ] Find a way to smooth borders without cropping the image
 	[ ] Allow to configure new bezel parameters?

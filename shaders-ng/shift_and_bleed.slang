@@ -11,6 +11,7 @@ layout(location = 1) out vec2 vR_offset;
 layout(location = 2) out vec2 vG_offset;
 layout(location = 3) out vec2 vB_offset;
 layout(location = 4) out float vDo_shadow_mode;
+layout(location = 5) out float vDecon_or_SatBleed_or_JustShadow;
 
 #include "includes/functions.include.slang"
 
@@ -32,6 +33,8 @@ void main()
       vG_offset=offsets_from_float(SHIFT_G+210.0,RGB_SHIFT_RANGE);
       vB_offset=offsets_from_float(SHIFT_B+210.0,RGB_SHIFT_RANGE);
    }
+   
+   vDecon_or_SatBleed_or_JustShadow =  float(DO_SHIFT_RGB + DO_SAT_BLEED > 1.0 || DOT_M_SHADOW_STR > 0.0 );
 }
 
 
@@ -42,6 +45,7 @@ layout(location = 1) in vec2 vR_offset;
 layout(location = 2) in vec2 vG_offset;
 layout(location = 3) in vec2 vB_offset;
 layout(location = 4) in float vDo_shadow_mode;
+layout(location = 5) in float vDecon_or_SatBleed_or_JustShadow;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -98,11 +102,7 @@ vec3 deconvergence_shadow(vec3 pixel_cur,vec2 coord, sampler2D in_texture, vec4 
       vec3 shadow_mode = pixel_cur - max( (pixel_cur - pixel_offset), vec3(0.0) ) * DOT_M_SHADOW_STR;
       
       return mix_step(deconvergence_mode, shadow_mode, vDo_shadow_mode);
-      
-      
-      //Shadow mode:
-      //return  pixel_cur - 
-      //       max( (pixel_cur - pixel_offset), vec3(0.0) ) * OFFSET_STRENGTH;
+
 }
 
 
@@ -174,11 +174,13 @@ vec3 pixel_bleed(vec3 pixel_in, vec2 co, sampler2D in_texture, vec4 sourcesize2)
 
 }
 void main() {
-   float pixel_alpha_ntsc_artifacts; // <- this holds ntsc artifacts needed by glow to modulate blur there.
+   float pixel_alpha_ntsc_artifacts; // <- this carries ntsc artifacts needed by glow to modulate blur there.
    vec3 pixel_out;
+   
    //Handle case where both are needed:
    //First shift the right source, then pass it to bleed function.
-   if (DO_SHIFT_RGB + DO_SAT_BLEED > 1.0 || DOT_M_SHADOW_STR > 0.0 )  {
+   
+   if (vDecon_or_SatBleed_or_JustShadow > 0.0 )  {
       pixel_out = deconvergence_shadow_wrap(vTexCoord);
       if (DO_SAT_BLEED > 0.0) {      
          if ( DO_FXAA == 1.0)  {
