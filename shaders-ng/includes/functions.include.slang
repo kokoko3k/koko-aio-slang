@@ -1126,20 +1126,16 @@ bool is_first_outside_rect(vec2 point, vec4 rect) {
 			lum=scale_to_range(lum, 0.0-bias.x, 1.0+bias.y);
 			pixel_in_hsv.y=1.0; //sat
 
-							//Mix hues in rgb colorspace:
-								vec3 pixel_rgb_hue1 = hsv2rgb( vec3(COLOR_MONO_HUE1, 1.0, pixel_in_hsv.z ) );
-								vec3 pixel_rgb_hue2 = hsv2rgb( vec3(COLOR_MONO_HUE2, 1.0, pixel_in_hsv.z ) );
-								vec3 pixel_rgb_hue12 = mix(pixel_rgb_hue2, pixel_rgb_hue1, vec3(lum));
-							//Mix original and colorized with a specified strength
-								pixel_out = mix(pixel_out, pixel_rgb_hue12, COLOR_MONO_COLORIZE);
-
-
-			//pixel_in_hsv.x = mix(COLOR_MONO_HUE2, COLOR_MONO_HUE1, lum); //hue
-			//pixel_out = mix(pixel_out, hsv2rgb(pixel_in_hsv), COLOR_MONO_COLORIZE);pk
+			//Mix hues in rgb colorspace:
+				vec3 pixel_rgb_hue1 = hsv2rgb( vec3(COLOR_MONO_HUE1, 1.0, pixel_in_hsv.z ) );
+				vec3 pixel_rgb_hue2 = hsv2rgb( vec3(COLOR_MONO_HUE2, 1.0, pixel_in_hsv.z ) );
+				vec3 pixel_rgb_hue12 = mix(pixel_rgb_hue2, pixel_rgb_hue1, vec3(lum));
+			//Mix original and colorized with a specified strength
+				pixel_out = mix(pixel_out, pixel_rgb_hue12, COLOR_MONO_COLORIZE);
 		}
 
 	//Modify saturation
-		if (!(SATURATION == 1.0)) {
+		if (SATURATION != 1.0) {
 			vec3 intensity = vec3(dot(pixel_out.rgb, W));
 			pixel_out.rgb = mix(intensity, pixel_out.rgb, SATURATION);
 		}
