@@ -12,6 +12,7 @@ layout(location = 2) out vec2 vG_offset;
 layout(location = 3) out vec2 vB_offset;
 layout(location = 4) out float vDo_shadow_mode;
 layout(location = 5) out float vDecon_or_SatBleed_or_JustShadow;
+layout(location = 6) out float vDecon_or_JustShadow;
 
 #include "includes/functions.include.slang"
 
@@ -34,7 +35,9 @@ void main()
       vB_offset=offsets_from_float(SHIFT_B+210.0,RGB_SHIFT_RANGE);
    }
    
+   //Precalc some conditions:
    vDecon_or_SatBleed_or_JustShadow =  float(DO_SHIFT_RGB + DO_SAT_BLEED > 1.0 || DOT_M_SHADOW_STR > 0.0 );
+   vDecon_or_JustShadow =  float(DO_SHIFT_RGB > 0.0 || DOT_M_SHADOW_STR > 0.0);
 }
 
 
@@ -46,12 +49,14 @@ layout(location = 2) in vec2 vG_offset;
 layout(location = 3) in vec2 vB_offset;
 layout(location = 4) in float vDo_shadow_mode;
 layout(location = 5) in float vDecon_or_SatBleed_or_JustShadow;
+layout(location = 6) in float vDecon_or_JustShadow;
 
 layout(location = 0) out vec4 FragColor;
 
 layout(set = 0, binding = 3) uniform sampler2D FXAA_pass;
 layout(set = 0, binding = 4) uniform sampler2D flick_and_noise_pass;
 layout(set = 0, binding = 5) uniform sampler2D colortools_and_ntsc_pass;
+
 
 #define bandwidth_mhz_Y_ntsc 4.2
 #define bandwidth_mhz_I 1.5
@@ -193,7 +198,7 @@ void main() {
       }
    } else
       //Handle case where only color shifting is requested
-      if (DO_SHIFT_RGB > 0.0 || DOT_M_SHADOW_STR > 0.0) {
+      if (vDecon_or_JustShadow > 0.0 ) {
          pixel_out = deconvergence_shadow_wrap(vTexCoord);
          pixel_alpha_ntsc_artifacts = texture(flick_and_noise_pass, vTexCoord).a;
    } else 
