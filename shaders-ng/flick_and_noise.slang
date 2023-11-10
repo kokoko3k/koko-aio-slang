@@ -9,6 +9,7 @@ layout(location = 0) out vec2 vTexCoord;
 layout(location = 1) out float vDynamicSeed;
 layout(location = 2) out float vFlickering_power;
 layout(location = 3) out float vDo_flickering;
+layout(location = 4) out vec2  vFlickerCoords;
 
 #include "includes/functions.include.slang"
 
@@ -20,9 +21,26 @@ void main() {
    //Generate a seed that changes over time for temporal random noise
       vDynamicSeed = mod(params.FrameCount, 120.0001);
       
-   vFlickering_power = DO_PIXELGRID * PIXELGRID_INTR_FLICK_POWR;
-   
    vDo_flickering  = float ( scanline_have_to_flicker(is_interlaced()) ) ; 
+   
+   if (vDo_flickering == 1.0) {
+      //Flicker one over 3 frames:
+         float ModFlicker = params.FrameCount % 3;
+      
+      //Compute y flicker offset:
+         float FlickerOffset = 0.0;
+         float line_tick = (params.OriginalSize.y > MIN_LINES_INTERLACED ) ? 1 : 2 ;
+         if (ModFlicker == 1.0 )
+            FlickerOffset = params.OriginalSize.w/line_tick;
+         else if (ModFlicker == 2.0)
+            FlickerOffset = -params.OriginalSize.w/line_tick;
+      
+      //Export flicker coords for Fragment shader here:
+         vFlickerCoords =  vec2(TexCoord.x, TexCoord.y + FlickerOffset);
+         
+      vFlickering_power = DO_PIXELGRID * PIXELGRID_INTR_FLICK_POWR;
+   }
+
 }
 
 
@@ -31,6 +49,7 @@ layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in float vDynamicSeed;
 layout(location = 2) in float vFlickering_power;
 layout(location = 3) in float vDo_flickering;
+layout(location = 4) in vec2  vFlickerCoords;
 
 layout(location = 0) out vec4 FragColor;  
 
@@ -62,22 +81,12 @@ vec3 pixel_flickering() {
 
    
    vec3 pixel_cur = texture(Source,vTexCoord).rgb;   
-   float mymod = params.FrameCount % 3;
-
-   if (mymod == 0.0) return pixel_cur;
-   float line_tick = (params.OriginalSize.y > MIN_LINES_INTERLACED ) ? 1 : 2 ;
-   vec3 flickline;
-   if (mymod == 1.0 )
-      flickline = texture(Source, vTexCoord + vec2(0.0,params.OriginalSize.w/line_tick)).rgb;
-   else if (mymod == 2.0)
-      flickline = texture(Source, vTexCoord - vec2(0.0,params.OriginalSize.w/line_tick)).rgb;
-
+   vec3 flickline = texture(Source,vFlickerCoords).rgb;
+   
    float lumdiff = abs(flickline.r + flickline.g + flickline.b - pixel_cur.r - pixel_cur.g - pixel_cur.b);
 
    lumdiff = min(lumdiff * vFlickering_power, 1.0);
    return mix(pixel_cur,flickline,lumdiff);
-   
-
 }
 
 
