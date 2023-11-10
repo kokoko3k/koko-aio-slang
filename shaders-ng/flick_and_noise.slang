@@ -92,25 +92,11 @@ vec3 pixel_flickering() {
 
 void main() {
    
-
-   /* since flickering code needs
-      luminosity difference between 2 vertical lines
-      both have to be processed through color corrections and rgb pixel offsets.
-      before flickering code can operate. (pixel_no_flicker)
-      Therefore we call pixel_no_flicker inside it when we want flickering scanlines
-      and outside id when we dont.
-   */
-
    vec3 pixel_out;
-   if (DO_PIXELGRID == 0.0)
-      pixel_out = texture(Source, vTexCoord).rgb;
-   
-   else if (vDo_flickering==1.0) 
+   if (vDo_flickering==1.0) 
       pixel_out = pixel_flickering();
-   else
-   //Implicit else: DO_SCANLINES == 1.0 but no flickering needed.
-   pixel_out = texture(Source, vTexCoord).rgb;
-
+   else 
+      pixel_out = texture(Source, vTexCoord).rgb;
    
    if (DO_RF_NOISE > 0.0) {
       vec3 noise = vec3(random_fast(RF_NOISE_STRENGTH, vTexCoord * vDynamicSeed));
