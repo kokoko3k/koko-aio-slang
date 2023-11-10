@@ -257,7 +257,7 @@ void main() {
 
     if ( (PIXELGRID_INTR_DISABLE_Y <= -1.0 && bIs_Interlaced) || (PIXELGRID_COREY_FAKE_SCAN == 1.0)) {
         vUse_Fake_scanlines = 1.0;
-        float fake_scanlines_numlines = global.FinalViewportSize.y/ceil(   (global.FinalViewportSize.y*get_zooms_modifier().y) * params.OriginalSize.y);
+        float fake_scanlines_numlines = global.FinalViewportSize.y/ceil(   (global.FinalViewportSize.y*get_zooms_modifier().y) * params.OriginalSize.w);
         vFake_scanline_period = pi * fake_scanlines_numlines * vOutputCoord.y;
         if (PIXELGRID_INTR_DISABLE_Y == -2.0 && PIXELGRID_COREY_FAKE_SCAN == 0.0) vFake_scanline_period*=1.5;
     }
