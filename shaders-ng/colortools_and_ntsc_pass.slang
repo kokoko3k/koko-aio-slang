@@ -39,7 +39,7 @@ layout(location = 1) in vec2 TexCoord;
 layout(location = 1) out vec3 vTemperature_rgb;
 layout(location = 0) out vec2 vTexCoord;
 layout(location = 2) out float vNTSC_FILTER_FC;
-layout(location = 3) out float vSubcarrierFrequency_mul_size;
+layout(location = 3) out float vSubcarrierFrequency_mul_size_mul_TAU;
 layout(location = 4) out float vNTSC_weights[NTSC_FILTER_WIDTH_MAX];
   
 
@@ -73,7 +73,7 @@ void main() {
 
    if (DO_NTSC_ARTIFACTS > 0.0) {
       vNTSC_FILTER_FC = NTSC_FILTER_FC * 0.1;
-      vSubcarrierFrequency_mul_size = NTSC_FILTER_SCF * 0.1 * params.SourceSize.x;
+      vSubcarrierFrequency_mul_size_mul_TAU = NTSC_FILTER_SCF * 0.1 * params.SourceSize.x * TAU;
       float sum = 0.0;
       float N = NTSC_FILTER_WIDTH;
       //  Compute sampling weights
@@ -82,7 +82,6 @@ void main() {
          int i = int(n);
          vNTSC_weights[i] = hann(n, N) * sinc(vNTSC_FILTER_FC * (n-NTSC_FILTER_MIDDLE));
          sum += vNTSC_weights[i];
-         
       }
       //  Normalize sampling weights
       for (int n = 0; n < N; n++) {
@@ -101,7 +100,7 @@ void main() {
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in vec3 vTemperature_rgb;
 layout(location = 2) in float vNTSC_FILTER_FC;
-layout(location = 3) in float vSubcarrierFrequency_mul_size;
+layout(location = 3) in float vSubcarrierFrequency_mul_size_mul_TAU;
 layout(location = 4) in float vNTSC_weights[NTSC_FILTER_WIDTH_MAX];
 
 
@@ -134,35 +133,41 @@ const mat3 RGB2YIQ = mat3(
 
 #define pi10 pi*10
 #define PHASE_SHIFT_FOR_BLUR_K pi/3
-vec4 ntscdec(vec2 uv) {
+vec4 ntscdec(vec2 uv, vec3 RGB_ori) {
+   
+   vec3 YIQ_ori = RGB_ori * RGB2YIQ;
+   
    //	Sample composite signal and decode to YIQ
-      vec3 YIQ_processed = vec3(0.0);
-      vec3 YIQ_processed_shifted = vec3(0.0);
+      vec2 YIQ_processed = vec2(0.0);
+      vec2 YIQ_processed_shifted = vec2(0.0);
       //by doing another ntsc filtering with this histed phase, we're able to better identify
       //artifacts that will drive the blur modulation.
          float phase_shift_for_blur;
          
       int N = int(NTSC_FILTER_WIDTH);
       for (int n=0; n < N; n++) {
-         vec2 pos = uv + vec2(float(n-NTSC_FILTER_MIDDLE) * params.SourceSize.z, 0.0);
-         float phase =  TAU * (vSubcarrierFrequency_mul_size * pos.x);
+         vec2 pos = uv + vec2((n-NTSC_FILTER_MIDDLE) * params.SourceSize.z, 0.0);
+         vec3 smp_mul_weight = vec3((texture(Source, pos).rgb * RGB2YIQ).x) * vNTSC_weights[n] ;
+         
+         float phase =  vSubcarrierFrequency_mul_size_mul_TAU * pos.x;
          float phase_shift_for_blur = phase  + PHASE_SHIFT_FOR_BLUR_K;
          
          phase += ( pos.y * -pi10 ) * (NTSC_PHASE_SHIFT);
          
          //Just sample luminance via yiq:
-            vec3 smp = vec3((texture(Source, pos).rgb * RGB2YIQ).x);
-            YIQ_processed += vec3(1.0, cos(phase), sin(phase)) * smp * vNTSC_weights[n];
-            YIQ_processed_shifted += vec3(1.0, cos(phase_shift_for_blur), sin(phase_shift_for_blur)) * smp * vNTSC_weights[n];
+            //vec3 smp_mul_weight = vec3((texture(Source, pos).rgb * RGB2YIQ).x) * vNTSC_weights[n] ; <--- moved up for speedup through parallelism
+            YIQ_processed         += vec2(cos(phase), sin(phase)  ) * smp_mul_weight.yz;
+            YIQ_processed_shifted += vec2(cos(phase_shift_for_blur), sin(phase_shift_for_blur)) * smp_mul_weight.yz;
       }
 
-   vec3 RGB_ori = texture(Source, uv).rgb;
-   vec3 YIQ_ori = RGB_ori * RGB2YIQ;
-
-   vec3 YIQ_result = vec3(YIQ_ori.x, YIQ_ori.yz + YIQ_processed.yz * NTSC_MIX);
    
-   float artifacts_mask = abs(YIQ_processed.y)         + abs(YIQ_processed.z) + 
-                          abs(YIQ_processed_shifted.y) + abs(YIQ_processed_shifted.z);
+   vec3 YIQ_result = vec3(YIQ_ori.x, YIQ_ori.yz + YIQ_processed.xy * NTSC_MIX);
+   
+   YIQ_processed = abs(YIQ_processed);
+   YIQ_processed_shifted = abs(YIQ_processed_shifted);
+   
+   float artifacts_mask = (YIQ_processed.x         + YIQ_processed.y) + 
+                          (YIQ_processed_shifted.x + YIQ_processed_shifted.y);
    
                           
    //artifacts_mask = pow(artifacts_mask, 0.25);
@@ -239,15 +244,15 @@ vec3 debug() {
 }
 
 void main() {
+   vec3 pixel_out = texture(Source, vTexCoord).rgb;
    
    //This will go into alpha channel to make glow aware of it and blur more.
    //It could be configurable.
-   vec3 pixel_out;
    float artifact_mask = 0.0;
 
    if (DO_NTSC_ARTIFACTS > 0.5) {
       //Get ntsc picture
-         vec4 ntsc_decoded = ntscdec(vTexCoord);
+         vec4 ntsc_decoded = ntscdec(vTexCoord, pixel_out);
       //apply the minimum treshold to artifact mask
          artifact_mask = smoothstep(NTSC_ARTF_TRSH, 1.0, ntsc_decoded.a);
 
@@ -262,10 +267,6 @@ void main() {
             
             
       pixel_out = ntsc_decoded.rgb;
-      
-   } else {
-      
-      pixel_out = texture(Source, vTexCoord).rgb;
    }
 
   
