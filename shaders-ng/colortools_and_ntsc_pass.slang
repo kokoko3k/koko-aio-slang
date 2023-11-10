@@ -161,7 +161,7 @@ vec4 ntscdec(vec2 uv, vec3 RGB_ori) {
       }
 
    
-   vec3 YIQ_result = vec3(YIQ_ori.x, YIQ_ori.yz + YIQ_processed.xy * NTSC_MIX);
+   vec3 YIQ_result_to_RGB = vec3(YIQ_ori.x, YIQ_ori.yz + YIQ_processed.xy * NTSC_MIX) * YIQ2RGB ;
    
    YIQ_processed = abs(YIQ_processed);
    YIQ_processed_shifted = abs(YIQ_processed_shifted);
@@ -172,7 +172,7 @@ vec4 ntscdec(vec2 uv, vec3 RGB_ori) {
                           
    //artifacts_mask = pow(artifacts_mask, 0.25);
                           
-   return vec4(YIQ_result * YIQ2RGB, artifacts_mask);
+   return vec4(YIQ_result_to_RGB, artifacts_mask);
 }
 
 
@@ -244,27 +244,25 @@ vec3 debug() {
 }
 
 void main() {
-   vec3 pixel_out = texture(Source, vTexCoord).rgb;
-   
+   vec3 pixel_in = texture(Source, vTexCoord).rgb;
+   vec3 pixel_out = pixel_in;
    //This will go into alpha channel to make glow aware of it and blur more.
    //It could be configurable.
    float artifact_mask = 0.0;
 
    if (DO_NTSC_ARTIFACTS > 0.5) {
       //Get ntsc picture
-         vec4 ntsc_decoded = ntscdec(vTexCoord, pixel_out);
+         vec4 ntsc_decoded = ntscdec(vTexCoord, pixel_in);
       //apply the minimum treshold to artifact mask
          artifact_mask = smoothstep(NTSC_ARTF_TRSH, 1.0, ntsc_decoded.a);
 
       //Optionally completely cut-off artifacts under treshold:
-         vec3 pixel_clean = texture(Source, vTexCoord).rgb;
-         ntsc_decoded = mix(ntsc_decoded, vec4(pixel_clean, 0.0) , (1-artifact_mask)*NTSC_ARTF_ZAP );
+         ntsc_decoded = mix(ntsc_decoded, vec4(pixel_in, 0.0) , (1-artifact_mask)*NTSC_ARTF_ZAP );
          //Update the artifact mask if something has been cancelled
             artifact_mask = min(artifact_mask, ntsc_decoded.a);
 
             //artifact_mask = clamp (artifact_mask*1.0, 0.0,1.0);
             artifact_mask *= 2.0;
-            
             
       pixel_out = ntsc_decoded.rgb;
    }
@@ -276,7 +274,7 @@ void main() {
       pixel_out = debug();
    #endif
       
-   
+
    if (DO_CCORRECTION == 1.0)
       pixel_out = color_tools(pixel_out, vTemperature_rgb);
 
