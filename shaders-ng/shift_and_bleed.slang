@@ -13,7 +13,7 @@ layout(location = 3) out vec2 vB_offset;
 layout(location = 4) out float vDo_shadow_mode;
 layout(location = 5) out float vDecon_or_SatBleed_or_JustShadow;
 layout(location = 6) out float vDecon_or_JustShadow;
-
+layout(location = 7) out float vShow_artifact_mask;
 #include "includes/functions.include.slang"
 
 void main()
@@ -38,6 +38,7 @@ void main()
    //Precalc some conditions:
    vDecon_or_SatBleed_or_JustShadow =  float(DO_SHIFT_RGB + DO_SAT_BLEED > 1.0 || DOT_M_SHADOW_STR > 0.0 );
    vDecon_or_JustShadow =  float(DO_SHIFT_RGB > 0.0 || DOT_M_SHADOW_STR > 0.0);
+   vShow_artifact_mask = float(NTSC_SHOW_ARTF_MASK + DO_NTSC_ARTIFACTS == 2.0);
 }
 
 
@@ -50,6 +51,7 @@ layout(location = 3) in vec2 vB_offset;
 layout(location = 4) in float vDo_shadow_mode;
 layout(location = 5) in float vDecon_or_SatBleed_or_JustShadow;
 layout(location = 6) in float vDecon_or_JustShadow;
+layout(location = 7) in float vShow_artifact_mask;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -142,7 +144,7 @@ vec3 pixel_bleed_side_NTSC(vec3 pixel_in, vec2 co, float size, float side, sampl
       //blur_YIQ = mix(blur_YIQ.xyz, smp_YIQ.xyz, vec3_mix);
    }
    //blur_YIQ.z/=i;
-   if (NTSC_SHOW_ARTF_MASK + DO_NTSC_ARTIFACTS == 2.0) return vec3(strength_modifier);
+   if (vShow_artifact_mask == 1.0) return vec3(strength_modifier);
    return blur_YIQ.xyz * mat3_YIQ2RGB; //return to RGB colorspace
 }
 
