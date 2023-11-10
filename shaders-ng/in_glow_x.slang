@@ -78,6 +78,15 @@ void main() {
       }
    };
 
+   //Modulate glow power via ntsc artifact mask:
+      float ntsc_artifacts = texture(shift_and_bleed_pass, vTexCoord).a;
+      
+      //To debug ntsc artifacts mask:
+      if (vShowArtifactsMask == 1.0) {
+         FragColor = vec4(ntsc_artifacts);
+         return;
+      }
+   
    //Don't do anything if IN_GLOW_H is are over the upper limit
    //and IN_GLOW_W is outside the allowed interval;
       if ( glow_h_and_w_outside_interval == 1.0) {
@@ -96,16 +105,9 @@ void main() {
 
    float in_glow_w_adapted = abs(IN_GLOW_W);
             
+
    //Modulate glow power via ntsc artifact mask:
-      float ntsc_artifacts = texture(shift_and_bleed_pass, vTexCoord).a;
-      
-      //To debug ntsc artifacts mask:
-      if (vShowArtifactsMask == 1.0) {
-         FragColor = vec4(ntsc_artifacts);
-         return;
-      }
-//       
-      //finally "add" them to the configured sharpness (-> less blur)
+   //"add" them to the configured sharpness (-> less blur)
          in_glow_w_adapted = in_glow_w_adapted +  DO_NTSC_ARTIFACTS * ((1-ntsc_artifacts) * NTSC_ARTF_NOBLUR);
 
    //don't allow lower values that look bad:
