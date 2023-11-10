@@ -99,8 +99,8 @@ vec4 deconvergence_shadow(vec2 coords, sampler2D in_texture, vec4 sourcesize2) {
       vec4 pixel_cur = texture(in_texture, coords);
    
       vec2 d = -vec2(sourcesize2.z, sourcesize2.w)*0.5;
-      vec3 pixel_offset;
       
+      vec3 pixel_offset;
       pixel_offset.r=texture(in_texture,coords + vR_offset * d).r;
       pixel_offset.g=texture(in_texture,coords + vG_offset * d).g;
       pixel_offset.b=texture(in_texture,coords + vB_offset * d).b;
@@ -126,7 +126,6 @@ vec3 pixel_bleed_side_NTSC(vec3 pixel_in, vec2 co, float size, float side, sampl
    //apply strength modifier to blur ntsc artifacts more.
    
    float strength_modifier = mix(1.0, texture(colortools_and_ntsc_pass,co).a, DO_NTSC_ARTIFACTS); 
-   if (NTSC_SHOW_ARTF_MASK + DO_NTSC_ARTIFACTS == 2.0) return vec3(strength_modifier);
    float w = SAT_BLEED_STRENGTH * clamp (strength_modifier, (1-NTSC_ARTF_NOBLEED), 1.0 ); 
    vec3 blur_YIQ = pixel_in * mat3_RGB2YIQ;    //Work in YIQ space
    float i = 0.0;
@@ -143,6 +142,7 @@ vec3 pixel_bleed_side_NTSC(vec3 pixel_in, vec2 co, float size, float side, sampl
       //blur_YIQ = mix(blur_YIQ.xyz, smp_YIQ.xyz, vec3_mix);
    }
    //blur_YIQ.z/=i;
+   if (NTSC_SHOW_ARTF_MASK + DO_NTSC_ARTIFACTS == 2.0) return vec3(strength_modifier);
    return blur_YIQ.xyz * mat3_YIQ2RGB; //return to RGB colorspace
 }
 
