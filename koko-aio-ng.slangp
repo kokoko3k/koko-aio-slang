@@ -54,7 +54,7 @@
       backdrop_wrap_mode = "mirrored_repeat"
          backdrop_mipmap = "true"
 
-shaders = 9 //17
+shaders = 17
 
 # NTSC Color artifacts pass:
 # The very first pass emulates ntsc color artifacting.
