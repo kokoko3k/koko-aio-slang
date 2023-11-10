@@ -37,6 +37,7 @@ void main() {
    in_glow_h = max(in_glow_h, MIN_IN_GLOW_SHARP);
    float sharp_sub = 0.8125 * in_glow_h;
    vSharp_sub = clamp(sharp_sub, 0.0,1.0);
+   vSharp_sub = -2*vSharp_sub+1;
 }
 
 

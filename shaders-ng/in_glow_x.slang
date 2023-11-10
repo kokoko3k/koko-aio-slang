@@ -30,6 +30,7 @@ void main() {
    in_glow_w = max(in_glow_w, MIN_IN_GLOW_SHARP);
    vSharp_sub = 0.8125 * in_glow_w;
    vSharp_sub = clamp(vSharp_sub, 0.0,1.0);
+   vSharp_sub = -2*vSharp_sub+1;
    
 }
 
@@ -116,7 +117,6 @@ void main() {
       in_glow_w_adapted = in_glow_w_adapted / NEW_SCALEMOD_X;
       
 
-      
    //Delta render?
       float DR_unchanged = 0.0;
       if (DELTA_RENDER == 1.0) {
@@ -125,7 +125,6 @@ void main() {
                                textureLod(shift_and_bleed_passFeedback, vTexCoord, DELTA_RENDER_CHECK_AREA).rgb);
       }
       
-
       
    //Finally blur horizontally 
    if (glow_w_inside_interval == 1.0)  {

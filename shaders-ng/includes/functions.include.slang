@@ -781,7 +781,7 @@ vec3 lanczos(sampler2D sampler_in, vec2 co, vec4 texsize, float sharpness ) {
 
 
 	vec3 blur9_x_box(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_x, float sharp_sub) {
-		sharp_sub = -2*sharp_sub+1;
+		//sharp_sub = -2*sharp_sub+1;
 		float resolution = sourcesize.x * sharpness_x;
 		vec3 color = vec3(0.0);
 		
@@ -798,7 +798,7 @@ vec3 lanczos(sampler2D sampler_in, vec2 co, vec4 texsize, float sharpness ) {
 	}
 
 	vec3 blur9_y_box(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_y, float sharp_sub) {
-		sharp_sub = -2*sharp_sub+1;
+		//sharp_sub = -2*sharp_sub+1;
 		float resolution = sourcesize.y * sharpness_y;
 		vec3 color = vec3(0.0);
 		vec2 off1 = vec2(0.0, 1.0 / resolution) ;
