@@ -69,15 +69,9 @@ float get_avglum() {
      * 0.75 -> smoothed_sampling, used to adapt fullscreen zoom
      * anything else: continuous sampling
      */
-
-    bool reduced_sampling_co =
-            vTexCoord.x > 0.24 && vTexCoord.x < 0.26 &&
-            vTexCoord.y > 0.24 && vTexCoord.y < 0.26 ;
-
-    bool smoothed_sampling_co =
-            vTexCoord.x > 0.74 && vTexCoord.x < 0.76 &&
-            vTexCoord.y > 0.74 && vTexCoord.y < 0.76 ;
-
+            
+    bool reduced_sampling_co  = is_first_inside_rect(vTexCoord, vec4(0.24,0.24 , 0.26,0.26) );
+    bool smoothed_sampling_co = is_first_inside_rect(vTexCoord, vec4(0.74,0.74 , 0.76,0.76) );
 
     #ifndef D3D_WORKAROUND
         if (reduced_sampling_co) {
