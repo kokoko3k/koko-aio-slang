@@ -284,6 +284,8 @@ void main() {
       vec3 feedback = texture(colortools_and_ntsc_passFeedback, vTexCoord).rgb;
       
       vec3 m_blur_adapted = vec3(DOT_M_MBLUR_STR);
+
+      //Dot matrix motion blur inertia on white or black (not both)?
       if (DOT_M_MBLUR_MODE > 0.0) {
          vec3 adaption = mix_step (pixel_out - feedback,
                                    feedback - pixel_out,
@@ -292,7 +294,7 @@ void main() {
          m_blur_adapted *= clamp( adaption, 0.0, 1.0 );
          m_blur_adapted = pow(m_blur_adapted, vec3(0.25));
       }
-      pixel_out = mix(pixel_out, feedback,          m_blur_adapted  );
+      pixel_out = mix(pixel_out, feedback, m_blur_adapted  );
    }
    
  /*  
