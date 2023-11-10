@@ -29,15 +29,17 @@ void main() {
    
    vGlow_Gain = mix(1.0, IN_GLOW_POWER, DO_CCORRECTION);
    
-   //Compute subtractive sharpening via blur sharpness strength:
-   //For sharpness 0.45, no unsharp mask
-   //For sharpness 0.8, 0.65 unsharp mask
-   //float sharp_sub = (1.857 * abs(IN_GLOW_W) - 0.836);
-   float in_glow_h = abs(IN_GLOW_H);
-   in_glow_h = max(in_glow_h, MIN_IN_GLOW_SHARP);
-   float sharp_sub = 0.8125 * in_glow_h;
-   vSharp_sub = clamp(sharp_sub, 0.0,1.0);
-   vSharp_sub = -2*vSharp_sub+1;
+  // if (IN_GLOW_H < 0.0) {
+      //Compute subtractive sharpening via blur sharpness strength:
+      //For sharpness 0.45, no unsharp mask
+      //For sharpness 0.8, 0.65 unsharp mask
+      //float sharp_sub = (1.857 * abs(IN_GLOW_W) - 0.836);
+      float in_glow_h = abs(IN_GLOW_H);
+      in_glow_h = max(in_glow_h, MIN_IN_GLOW_SHARP);
+      float sharp_sub = 0.8125 * in_glow_h;
+      vSharp_sub = clamp(sharp_sub, 0.0,1.0);
+      vSharp_sub = -2*vSharp_sub+1;
+   //}
 }
 
 
