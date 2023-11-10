@@ -124,12 +124,12 @@ vec4 deconvergence_shadow_wrap(vec2 coord) {
 }
 
 
-vec3 pixel_bleed_side_NTSC(vec3 pixel_in, vec2 co, float size, float side, sampler2D in_texture, vec4 sourcesize2) {
+vec3 pixel_bleed_side_NTSC(vec4 pixel_in, vec2 co, float size, float side, sampler2D in_texture, vec4 sourcesize2) {
    //apply strength modifier to blur ntsc artifacts more.
    
-   float strength_modifier = mix(1.0, texture(colortools_and_ntsc_pass,co).a, DO_NTSC_ARTIFACTS); 
+   float strength_modifier = mix(1.0, pixel_in.a, DO_NTSC_ARTIFACTS); 
    float w = SAT_BLEED_STRENGTH * clamp (strength_modifier, (1-NTSC_ARTF_NOBLEED), 1.0 ); 
-   vec3 blur_YIQ = pixel_in * mat3_RGB2YIQ;    //Work in YIQ space
+   vec3 blur_YIQ = pixel_in.rgb * mat3_RGB2YIQ;    //Work in YIQ space
    float i = 0.0;
    for ( i=1 ; i <= size ; i++ ){
        w=w/SAT_BLEED_FALLOFF;
@@ -169,8 +169,8 @@ vec4 pixel_bleed(vec4 pixel_in, vec2 co, sampler2D in_texture, vec4 sourcesize2)
       side_right = pixel_bleed_side_PAL(pixel_in.rgb, co, SAT_BLEED_SIZE_RIGHT, SIDE_RIGHT, in_texture, sourcesize2);
       side_left  = pixel_bleed_side_PAL(pixel_in.rgb, co, SAT_BLEED_SIZE_LEFT , SIDE_LEFT , in_texture, sourcesize2);
    } else {
-      side_right = pixel_bleed_side_NTSC(pixel_in.rgb, co, SAT_BLEED_SIZE_RIGHT, SIDE_RIGHT, in_texture, sourcesize2);
-      side_left  = pixel_bleed_side_NTSC(pixel_in.rgb, co, SAT_BLEED_SIZE_LEFT,  SIDE_LEFT,  in_texture, sourcesize2);
+      side_right = pixel_bleed_side_NTSC(pixel_in.rgba, co, SAT_BLEED_SIZE_RIGHT, SIDE_RIGHT, in_texture, sourcesize2);
+      side_left  = pixel_bleed_side_NTSC(pixel_in.rgba, co, SAT_BLEED_SIZE_LEFT,  SIDE_LEFT,  in_texture, sourcesize2);
    }
    //Clamping min to 0.0 is needed for nvidia to avoid bad graphical glitches, why? 
    return vec4( max( mix(side_left,side_right,0.5), 0.0),
