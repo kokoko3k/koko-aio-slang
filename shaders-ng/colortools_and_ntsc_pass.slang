@@ -39,9 +39,9 @@ layout(location = 1) in vec2 TexCoord;
 layout(location = 1) out vec3 vTemperature_rgb;
 layout(location = 0) out vec2 vTexCoord;
 layout(location = 2) out float vNTSC_FILTER_FC;
-layout(location = 3) out float vNTSC_FILTER_SCF;
+layout(location = 3) out float vSubcarrierFrequency_mul_size;
 layout(location = 4) out float vNTSC_weights[NTSC_FILTER_WIDTH_MAX];
-
+  
 
 #include "includes/functions.include.slang"
 
@@ -73,13 +73,16 @@ void main() {
 
    if (DO_NTSC_ARTIFACTS > 0.0) {
       vNTSC_FILTER_FC = NTSC_FILTER_FC * 0.1;
-      vNTSC_FILTER_SCF = NTSC_FILTER_SCF * 0.1;
+      vSubcarrierFrequency_mul_size = NTSC_FILTER_SCF * 0.1 * params.SourceSize.x;
       float sum = 0.0;
-      int N = int(NTSC_FILTER_WIDTH);
+      float N = NTSC_FILTER_WIDTH;
       //  Compute sampling weights
-      for (int n = 0; n < N; n++) {
-         vNTSC_weights[n] = hann(float(n), float(N)) * sinc(vNTSC_FILTER_FC * float(n-NTSC_FILTER_MIDDLE));
-         sum += vNTSC_weights[n];
+      int i = 0;
+      for (float n = 0.0 ; n < N; n++) {
+         int i = int(n);
+         vNTSC_weights[i] = hann(n, N) * sinc(vNTSC_FILTER_FC * (n-NTSC_FILTER_MIDDLE));
+         sum += vNTSC_weights[i];
+         
       }
       //  Normalize sampling weights
       for (int n = 0; n < N; n++) {
@@ -98,7 +101,7 @@ void main() {
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in vec3 vTemperature_rgb;
 layout(location = 2) in float vNTSC_FILTER_FC;
-layout(location = 3) in float vNTSC_FILTER_SCF;
+layout(location = 3) in float vSubcarrierFrequency_mul_size;
 layout(location = 4) in float vNTSC_weights[NTSC_FILTER_WIDTH_MAX];
 
 
@@ -132,7 +135,6 @@ const mat3 RGB2YIQ = mat3(
 #define pi10 pi*10
 #define PHASE_SHIFT_FOR_BLUR_K pi/3
 vec4 ntscdec(vec2 uv) {
-   vec2 size = params.SourceSize.xy;
    //	Sample composite signal and decode to YIQ
       vec3 YIQ_processed = vec3(0.0);
       vec3 YIQ_processed_shifted = vec3(0.0);
@@ -142,14 +144,12 @@ vec4 ntscdec(vec2 uv) {
          
       int N = int(NTSC_FILTER_WIDTH);
       for (int n=0; n < N; n++) {
-         vec2 pos = uv + vec2(float(n-NTSC_FILTER_MIDDLE) / size.x, 0.0);
-         float phase =  TAU * (vNTSC_FILTER_SCF * size.x * pos.x);
+         vec2 pos = uv + vec2(float(n-NTSC_FILTER_MIDDLE) * params.SourceSize.z, 0.0);
+         float phase =  TAU * (vSubcarrierFrequency_mul_size * pos.x);
          float phase_shift_for_blur = phase  + PHASE_SHIFT_FOR_BLUR_K;
          
          phase += ( pos.y * -pi10 ) * (NTSC_PHASE_SHIFT);
          
-         //float phase =  TAU * (vNTSC_FILTER_SCF * size.x * pos.x) + ( pos.y * -pi10 * NTSC_PHASE_SHIFT)
-         // ( pos.y * - 31.4);
          //Just sample luminance via yiq:
             vec3 smp = vec3((texture(Source, pos).rgb * RGB2YIQ).x);
             YIQ_processed += vec3(1.0, cos(phase), sin(phase)) * smp * vNTSC_weights[n];
@@ -245,12 +245,11 @@ void main() {
    vec3 pixel_out;
    float artifact_mask = 0.0;
 
-   
    if (DO_NTSC_ARTIFACTS > 0.5) {
       //Get ntsc picture
          vec4 ntsc_decoded = ntscdec(vTexCoord);
       //apply the minimum treshold to artifact mask
-         artifact_mask = smoothstep(NTSC_ARTF_TRSH, 1.0, ntsc_decoded.a)*1.0;
+         artifact_mask = smoothstep(NTSC_ARTF_TRSH, 1.0, ntsc_decoded.a);
 
       //Optionally completely cut-off artifacts under treshold:
          vec3 pixel_clean = texture(Source, vTexCoord).rgb;
@@ -272,11 +271,10 @@ void main() {
   
    
    #ifdef DEBUG
-      //Vant "debug" ntsc artifacts because it samples from source (original)
+      //Cant "debug" ntsc artifacts because it samples from source (original)
       pixel_out = debug();
    #endif
       
-  FragColor = vec4(pixel_out, 1.0);
    
    if (DO_CCORRECTION == 1.0)
       pixel_out = color_tools(pixel_out, vTemperature_rgb);
@@ -285,6 +283,8 @@ void main() {
       vec3 feedback = texture(colortools_and_ntsc_passFeedback, vTexCoord).rgb;
       
       vec3 m_blur_adapted = vec3(DOT_M_MBLUR_STR);
+
+      //Dot matrix motion blur inertia on white or black (not both)?
       if (DOT_M_MBLUR_MODE > 0.0) {
          vec3 adaption = mix_step (pixel_out - feedback,
                                    feedback - pixel_out,
@@ -293,7 +293,7 @@ void main() {
          m_blur_adapted *= clamp( adaption, 0.0, 1.0 );
          m_blur_adapted = pow(m_blur_adapted, vec3(0.25));
       }
-      pixel_out = mix(pixel_out, feedback,          m_blur_adapted  );
+      pixel_out = mix(pixel_out, feedback, m_blur_adapted  );
    }
    
  /*  
