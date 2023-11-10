@@ -157,9 +157,10 @@ vec3 pixel_bleed_side_PAL(vec3 pixel_in, vec2 co, float size, float side, sample
       w=w/SAT_BLEED_FALLOFF;
       //w=clamp(w,0.0,1.0);
       vec3 smp_YUV = texture(flick_and_noise_pass, co - side * vec2(sourcesize2.z*i,0.0)).rgb * mat3_RGB2YUV;
-      blur_YUV.x = mix(blur_YUV.x, smp_YUV.x, w/bandwidth_mhz_Y_pal);    // Blur Y
-      blur_YUV.y = mix(blur_YUV.y, smp_YUV.y, w/bandwidth_mhz_U     );   // Blur U
-      blur_YUV.z = mix(blur_YUV.z, smp_YUV.z, w/bandwidth_mhz_V     );   // Blur V
+      
+      //Blur Y, U, V
+      blur_YUV.xyz = mix(blur_YUV.xyz, smp_YUV.xyz, w/vec3( bandwidth_mhz_Y_pal, bandwidth_mhz_U, bandwidth_mhz_V));
+      
    }
    return blur_YUV.xyz * mat3_YUV2RGB; //return to RGB colorspace
 }
