@@ -136,9 +136,10 @@ vec3 pixel_bleed_side_NTSC(vec3 pixel_in, vec2 co, float size, float side, sampl
       //w = w * exp(i*i*(1-SAT_BLEED_FALLOFF)*0.1);
       //w=clamp(w,0.0,1.0);
       vec3 smp_YIQ = texture(flick_and_noise_pass, co - side * vec2(sourcesize2.z*i,0.0)).rgb * mat3_RGB2YIQ;
-      blur_YIQ.x = mix(blur_YIQ.x, smp_YIQ.x, w/bandwidth_mhz_Y_ntsc);   // Blur Y
-      blur_YIQ.y = mix(blur_YIQ.y, smp_YIQ.y, w/bandwidth_mhz_I     );   // Blur I
-      blur_YIQ.z = mix(blur_YIQ.z, smp_YIQ.z, w/bandwidth_mhz_Q     );   //  BlurQ
+      
+      //Blur Y, I and Q
+      blur_YIQ.xyz = mix(blur_YIQ.xyz, smp_YIQ.xyz, w/vec3( bandwidth_mhz_Y_ntsc, bandwidth_mhz_I, bandwidth_mhz_Q));
+      
       //Tried to optimize as follows to no avail:
       //vec3 vec3_mix = vec3(w/bandwidth_mhz_Y_ntsc, w/bandwidth_mhz_I, w/bandwidth_mhz_Q);
       //blur_YIQ = mix(blur_YIQ.xyz, smp_YIQ.xyz, vec3_mix);
