@@ -134,17 +134,11 @@ vec3 pixel_bleed_side_NTSC(vec3 pixel_in, vec2 co, float size, float side, sampl
    for ( i=1 ; i <= size ; i++ ){
        w=w/SAT_BLEED_FALLOFF;
       //w = w * exp(i*i*(1-SAT_BLEED_FALLOFF)*0.1);
-      //w=clamp(w,0.0,1.0);
       vec3 smp_YIQ = texture(flick_and_noise_pass, co - side * vec2(sourcesize2.z*i,0.0)).rgb * mat3_RGB2YIQ;
       
       //Blur Y, I and Q
       blur_YIQ.xyz = mix(blur_YIQ.xyz, smp_YIQ.xyz, w/vec3( bandwidth_mhz_Y_ntsc, bandwidth_mhz_I, bandwidth_mhz_Q));
-      
-      //Tried to optimize as follows to no avail:
-      //vec3 vec3_mix = vec3(w/bandwidth_mhz_Y_ntsc, w/bandwidth_mhz_I, w/bandwidth_mhz_Q);
-      //blur_YIQ = mix(blur_YIQ.xyz, smp_YIQ.xyz, vec3_mix);
    }
-   //blur_YIQ.z/=i;
    if (vShow_artifact_mask == 1.0) return vec3(strength_modifier);
    return blur_YIQ.xyz * mat3_YIQ2RGB; //return to RGB colorspace
 }
@@ -155,12 +149,10 @@ vec3 pixel_bleed_side_PAL(vec3 pixel_in, vec2 co, float size, float side, sample
    float i = 0.0;
    for ( i=1 ; i <= size ; i++ ){
       w=w/SAT_BLEED_FALLOFF;
-      //w=clamp(w,0.0,1.0);
       vec3 smp_YUV = texture(flick_and_noise_pass, co - side * vec2(sourcesize2.z*i,0.0)).rgb * mat3_RGB2YUV;
       
       //Blur Y, U, V
       blur_YUV.xyz = mix(blur_YUV.xyz, smp_YUV.xyz, w/vec3( bandwidth_mhz_Y_pal, bandwidth_mhz_U, bandwidth_mhz_V));
-      
    }
    return blur_YUV.xyz * mat3_YUV2RGB; //return to RGB colorspace
 }
@@ -227,5 +219,4 @@ void main() {
       pixel_out.rgb = pow(pixel_out.rgb, vec3(IN_GLOW_GAMMA));
  
    FragColor = pixel_out;
-
 }
