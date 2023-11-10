@@ -57,7 +57,7 @@ layout(set = 0, binding = 2) uniform sampler2D Source;
 
 #include "includes/functions.include.slang"
 
-vec3 pixel_flickering() {
+vec4 pixel_flickering() {
 /* Simulates the flickering effect of the interlaced screens.
  * As I remember, it was visible when a line and the next had high
  * luminosity differences.
@@ -79,36 +79,30 @@ vec3 pixel_flickering() {
  * to see the effect (the lcd panel would just mix the pixels by itself (meh).
  */
 
-   
-   vec3 pixel_cur = texture(Source,vTexCoord).rgb;   
+   vec4 pixel_cur = texture(Source,vTexCoord);   
    vec3 flickline = texture(Source,vFlickerCoords).rgb;
    
    float lumdiff = abs(flickline.r + flickline.g + flickline.b - pixel_cur.r - pixel_cur.g - pixel_cur.b);
 
    lumdiff = min(lumdiff * vFlickering_power, 1.0);
-   return mix(pixel_cur,flickline,lumdiff);
+   return vec4( mix(pixel_cur.rgb,flickline.rgb,lumdiff),
+                pixel_cur.a); //<-- wee need to return the alpha channel because it carries ntsc artifact mask
 }
 
 
 void main() {
    
-   vec3 pixel_out;
+   vec4 pixel_out;
+   
    if (vDo_flickering==1.0) 
-      pixel_out = pixel_flickering();
+      pixel_out = pixel_flickering(); //<-alpha carries ntsc artifacts mask
    else 
-      pixel_out = texture(Source, vTexCoord).rgb;
+      pixel_out = texture(Source, vTexCoord); //<-alpha carries ntsc artifacts mask
    
-   if (DO_RF_NOISE > 0.0) {
-      vec3 noise = vec3(random_fast(RF_NOISE_STRENGTH, vTexCoord * vDynamicSeed));
-      pixel_out += noise;
-   }
-   
-   //Here lies the blur modifier from ntsc pass to glow.
-   //I'm not expecting any performance hit, since the lookup should have been cached already
-      float pixel_alpha = texture(Source, vTexCoord).a;
-   
-   
-   FragColor = vec4(pixel_out, pixel_alpha);
+   if (DO_RF_NOISE > 0.0)
+      pixel_out.rgb += vec3(random_fast(RF_NOISE_STRENGTH, vTexCoord * vDynamicSeed));
+
+   FragColor = pixel_out;
 }
 
 
