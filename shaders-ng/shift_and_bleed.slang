@@ -89,33 +89,35 @@ const mat3 mat3_YUV2RGB = mat3(
 
 
 
-vec3 deconvergence_shadow(vec3 pixel_cur,vec2 coord, sampler2D in_texture, vec4 sourcesize2) {
+vec4 deconvergence_shadow(vec2 coords, sampler2D in_texture, vec4 sourcesize2) {
       //Emulates deconvergence or shadowing for dot matrix screens like Gameboy.
       //Since both effects should not coexist in real life, we use a singe function for both.
       //The function stays more or less the same, but rgb offsets calculated in vertex shader
       //will be the same for shadow mode. Hopefully shader texture cache will take care of
       //multiple sampling for the same tex coords.
+
+      vec4 pixel_cur = texture(in_texture, coords);
    
       vec2 d = -vec2(sourcesize2.z, sourcesize2.w)*0.5;
       vec3 pixel_offset;
       
-      pixel_offset.r=texture(in_texture,coord + vR_offset * d).r;
-      pixel_offset.g=texture(in_texture,coord + vG_offset * d).g;
-      pixel_offset.b=texture(in_texture,coord + vB_offset * d).b;
+      pixel_offset.r=texture(in_texture,coords + vR_offset * d).r;
+      pixel_offset.g=texture(in_texture,coords + vG_offset * d).g;
+      pixel_offset.b=texture(in_texture,coords + vB_offset * d).b;
       
-      vec3 deconvergence_mode = mix(pixel_cur, pixel_offset, OFFSET_STRENGTH);
-      vec3 shadow_mode = pixel_cur - max( (pixel_cur - pixel_offset), vec3(0.0) ) * DOT_M_SHADOW_STR;
+      vec3 deconvergence_mode = mix(pixel_cur.rgb, pixel_offset, OFFSET_STRENGTH);
+      vec3 shadow_mode = pixel_cur.rgb - max( (pixel_cur.rgb - pixel_offset), vec3(0.0) ) * DOT_M_SHADOW_STR;
       
-      return mix_step(deconvergence_mode, shadow_mode, vDo_shadow_mode);
-
+      return vec4( mix_step(deconvergence_mode, shadow_mode, vDo_shadow_mode),
+                   pixel_cur.a );
 }
 
 
-vec3 deconvergence_shadow_wrap (vec2 coord) {
+vec4 deconvergence_shadow_wrap(vec2 coord) {
    if ( DO_FXAA == 1.0)  {
-      return deconvergence_shadow(texture(FXAA_pass, vTexCoord).rgb,  vTexCoord, FXAA_pass, global.FXAA_passSize);
+      return deconvergence_shadow(coord, FXAA_pass, global.FXAA_passSize);
    } else {
-      return deconvergence_shadow(texture(flick_and_noise_pass, vTexCoord).rgb, vTexCoord, flick_and_noise_pass, global.flick_and_noise_passSize);
+      return deconvergence_shadow(coord, flick_and_noise_pass, global.flick_and_noise_passSize);
    }
 }
 
@@ -163,71 +165,63 @@ vec3 pixel_bleed_side_PAL(vec3 pixel_in, vec2 co, float size, float side, sample
 #define SIDE_LEFT -1
 
 
-vec3 pixel_bleed(vec3 pixel_in, vec2 co, sampler2D in_texture, vec4 sourcesize2) {
+vec4 pixel_bleed(vec4 pixel_in, vec2 co, sampler2D in_texture, vec4 sourcesize2) {
    vec3 side_left ; vec3 side_right;
    //Tried to unbranch the following, no gain (even worse) probably due to not using constants anymore.
    //Just dont try again.
    if (SAT_BLEED_PAL == 1.0) {
-      side_right = pixel_bleed_side_PAL(pixel_in, co, SAT_BLEED_SIZE_RIGHT, SIDE_RIGHT, in_texture, sourcesize2);
-      side_left = pixel_bleed_side_PAL(pixel_in, co, SAT_BLEED_SIZE_LEFT, SIDE_LEFT, in_texture, sourcesize2);
+      side_right = pixel_bleed_side_PAL(pixel_in.rgb, co, SAT_BLEED_SIZE_RIGHT, SIDE_RIGHT, in_texture, sourcesize2);
+      side_left  = pixel_bleed_side_PAL(pixel_in.rgb, co, SAT_BLEED_SIZE_LEFT , SIDE_LEFT , in_texture, sourcesize2);
    } else {
-      side_right = pixel_bleed_side_NTSC(pixel_in, co, SAT_BLEED_SIZE_RIGHT, SIDE_RIGHT, in_texture, sourcesize2);
-      side_left = pixel_bleed_side_NTSC(pixel_in, co, SAT_BLEED_SIZE_LEFT, SIDE_LEFT, in_texture, sourcesize2);
+      side_right = pixel_bleed_side_NTSC(pixel_in.rgb, co, SAT_BLEED_SIZE_RIGHT, SIDE_RIGHT, in_texture, sourcesize2);
+      side_left  = pixel_bleed_side_NTSC(pixel_in.rgb, co, SAT_BLEED_SIZE_LEFT,  SIDE_LEFT,  in_texture, sourcesize2);
    }
    //Clamping min to 0.0 is needed for nvidia to avoid bad graphical glitches, why? 
-   return max( mix(side_left,side_right,0.5), 0.0) ;  
-
+   return vec4( max( mix(side_left,side_right,0.5), 0.0),
+                pixel_in.a);  
 }
 void main() {
    float pixel_alpha_ntsc_artifacts; // <- this carries ntsc artifacts needed by glow to modulate blur there.
-   vec3 pixel_out;
+   vec4 pixel_out;
    
    //Handle case where both are needed:
    //First shift the right source, then pass it to bleed function.
-   
    if (vDecon_or_SatBleed_or_JustShadow > 0.0 )  {
       pixel_out = deconvergence_shadow_wrap(vTexCoord);
       if (DO_SAT_BLEED > 0.0) {      
          if ( DO_FXAA == 1.0)  {
             pixel_out = pixel_bleed(pixel_out, vTexCoord, FXAA_pass, global.FXAA_passSize);
-            pixel_alpha_ntsc_artifacts = texture(FXAA_pass, vTexCoord).a;
          } else {
             pixel_out = pixel_bleed(pixel_out, vTexCoord, flick_and_noise_pass, global.flick_and_noise_passSize);
-            pixel_alpha_ntsc_artifacts = texture(flick_and_noise_pass, vTexCoord).a;
          }
       }
    } else
-      //Handle case where only color shifting is requested
+      //Handle case where only deconvergence is requested
       if (vDecon_or_JustShadow > 0.0 ) {
          pixel_out = deconvergence_shadow_wrap(vTexCoord);
-         pixel_alpha_ntsc_artifacts = texture(flick_and_noise_pass, vTexCoord).a;
    } else 
       if (DO_SAT_BLEED > 0.0) {      
          //Handle case where only chroma bleed is requested
          if ( DO_FXAA == 1.0)  {
-            pixel_out = texture(FXAA_pass, vTexCoord).rgb;
-            pixel_alpha_ntsc_artifacts = texture(FXAA_pass, vTexCoord).a;
+            pixel_out = texture(FXAA_pass, vTexCoord);
             pixel_out = pixel_bleed(pixel_out, vTexCoord, FXAA_pass, global.FXAA_passSize);
             
          } else {
-            pixel_out = texture(flick_and_noise_pass, vTexCoord).rgb;
-            pixel_alpha_ntsc_artifacts = texture(flick_and_noise_pass, vTexCoord).a;
+            pixel_out = texture(flick_and_noise_pass, vTexCoord);
             pixel_out = pixel_bleed(pixel_out, vTexCoord, flick_and_noise_pass, global.flick_and_noise_passSize);
          }
    } else
       //Passthrough
       if ( DO_FXAA == 1.0)  {
-         pixel_out = texture(FXAA_pass, vTexCoord).rgb;
-         pixel_alpha_ntsc_artifacts = texture(FXAA_pass, vTexCoord).a;
+         pixel_out = texture(FXAA_pass, vTexCoord);
       } else {
-         pixel_out = texture(flick_and_noise_pass, vTexCoord).rgb;
-         pixel_alpha_ntsc_artifacts = texture(flick_and_noise_pass, vTexCoord).a;
+         pixel_out = texture(flick_and_noise_pass, vTexCoord);
       }
 
    //pre-gamma if needed by glow.
    if (DO_CCORRECTION > 0.5) 
-      pixel_out = pow(pixel_out, vec3(IN_GLOW_GAMMA));
+      pixel_out.rgb = pow(pixel_out.rgb, vec3(IN_GLOW_GAMMA));
  
-   FragColor = vec4(pixel_out,pixel_alpha_ntsc_artifacts);
+   FragColor = pixel_out;
 
 }
