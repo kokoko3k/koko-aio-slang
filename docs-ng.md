@@ -273,10 +273,12 @@
             You can draw slotmasks at screen coordinates to emulate real crts or choose to paint
             them at core coordinates to have a more defined slotmask
             ...if you like slotmasks so much :-)
-        Vertical shift (for use with core resolution):
+        Vertical shift (neg = auto):
             This parameter allows you to move the whole vertical mask along the Y axis.
-            It is intended to be used with core resolution(*1) and integer divider/multiplier(*2)
-            to clear weird patterns from the screen when using slotmasks (*3) alongside scanline emulation (*4).
+            * When used with screen resolution(*1), a negative value will auto-select a shift that gives the sharpest shape.
+            * When used with core resolution(*1) and integer divider/multiplier(*2), it is useful to mitigate
+              weird patterns from the screen when using slotmasks (*3) alongside scanline emulation (*4).
+            
         Steepness: 
             The more, the thinner they will be.
             Setting this to very high values, may make them disappear unevenly.

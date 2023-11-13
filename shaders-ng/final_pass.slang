@@ -53,6 +53,8 @@ layout(location = 23) out float vDo_pixelgrid_h;
 layout(location = 24) out float vDo_Curvature;
 layout(location = 25) out float vFake_scanline_period;
 layout(location = 26) out float vUse_Fake_scanlines;
+layout(location = 27) out float vPG_y_shift;
+
 
 layout(location = 31) out float I_am_a_placeholder_keep_reading;
 //..to remind you that location = 31 is the last accepted by vulkan
@@ -261,6 +263,14 @@ void main() {
         vFake_scanline_period = pi * fake_scanlines_numlines * vOutputCoord.y;
         if (PIXELGRID_INTR_DISABLE_Y == -2.0 && PIXELGRID_COREY_FAKE_SCAN == 0.0) vFake_scanline_period*=1.5;
     }
+    
+    //Select an y shift that gives the sharpest lines
+    if (vPG_y_shift <  0.0) {
+        vPG_y_shift = vPG_mask_height * pi / 4.0;
+    } else {
+        vPG_y_shift = PIXELGRID_Y_MASK_SHIFT * pi ;
+    }
+    
 }
 
 
@@ -294,7 +304,7 @@ layout(location = 23) in float vDo_pixelgrid_h;
 layout(location = 24) in float vDo_Curvature;
 layout(location = 25) in float vFake_scanline_period;
 layout(location = 26) in float vUse_Fake_scanlines;
-
+layout(location = 27) in float vPG_y_shift;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -703,8 +713,8 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 
             //Use abs(cos) (later 1-abs(cos) to get horizontal gaps, use pow to make them steep.
             //Stagger them by PH_MASH_OFFSET on even triads
-                
-                float mask_shape = abs(cos(  (PIXELGRID_Y_MASK_SHIFT * pi) + ph_mask_height  + (PH_MASH_OFFSET * is_even)) ) ;
+
+                float mask_shape = abs(cos(  vPG_y_shift  + ph_mask_height  + (PH_MASH_OFFSET * is_even)) ) ;
                 mask_shape = pow(mask_shape, PIXELGRID_Y_MASK_STEEP);
                 
                 // We can make the stagger dark line less pronunced
