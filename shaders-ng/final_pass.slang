@@ -265,7 +265,7 @@ void main() {
     }
     
     //Select an y shift that gives the sharpest lines
-    if (vPG_y_shift <  0.0) {
+    if (PIXELGRID_Y_MASK_SHIFT <  0.0) {
         vPG_y_shift = vPG_mask_height * pi / 4.0;
     } else {
         vPG_y_shift = PIXELGRID_Y_MASK_SHIFT * pi ;
