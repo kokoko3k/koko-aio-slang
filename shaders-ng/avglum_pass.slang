@@ -15,6 +15,9 @@ layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
 layout(location = 1) out float lod;
 layout(location = 2) out vec2 vFuzzy_main_pass_stage_1;
+layout(location = 3) out float vReduced_sample_time_is_now;
+layout(location = 4) out float vAvglum_needed;
+layout(location = 5) out float vBezel_or_Bloom;
 
 #include "includes/functions.include.slang"
 
@@ -30,12 +33,19 @@ void main() {
 	//Get fuzzy mul and pow factor
 		vFuzzy_main_pass_stage_1 = apply_fuzzy_main_pass_stage_1();    
 
+    vReduced_sample_time_is_now = mod(params.FrameCount,AMBI_AVGLUM_DIVIDER);
+    
+    vAvglum_needed = DO_AMBILIGHT + DO_BEZEL + DO_DYNZOOM + DO_BLOOM;
+    vBezel_or_Bloom = DO_BEZEL + DO_BLOOM;
 }
 
 #pragma stage fragment
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in float lod;
 layout(location = 2) in vec2 vFuzzy_main_pass_stage_1;
+layout(location = 3) in float vReduced_sample_time_is_now;
+layout(location = 4) in float vAvglum_needed;
+layout(location = 5) in float vBezel_or_Bloom;
 
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D flick_and_noise_pass;
@@ -76,9 +86,9 @@ float get_avglum() {
     #ifndef D3D_WORKAROUND
         if (reduced_sampling_co) {
             //in the reduced sampling zone, only update at right time; else return the previous frame.
-            bool reduced_sample_time_is_now = (mod(params.FrameCount,AMBI_AVGLUM_DIVIDER) == 1); // (== 0 may be problematic for flycast + nvidia + glcore)
-            if (reduced_sample_time_is_now)
+            if (vReduced_sample_time_is_now == 1.0) 
                 return get_avg_lum_from_mip();
+            
             float avglum_feedback = texture(avglum_passFeedback,vTexCoord).a;
             avglum_feedback = max(avglum_feedback, 0.0); // <- Sanitize input to avoid glitches when enabling the option runtime.
             return avglum_feedback;
@@ -92,7 +102,6 @@ float get_avglum() {
     //Outside specific areas, update continuously; this is used by bezel highlights.
     return get_avg_lum_from_mip();
 
-
 }
 
 void main() {
@@ -103,21 +112,18 @@ void main() {
       2 - sampled less often for scene detection logic at coordinate 0.25,0.25
       Put another small mipmap into the rgb channel to be used by the reflection code.
     */
-    //FIXME: see which is faster:
-    //if (DO_AMBILIGHT == 1.0 || DO_BEZEL == 1.0 || DO_DYNZOOM == 1.0) {
-    if ( DO_AMBILIGHT + DO_BEZEL + DO_DYNZOOM + DO_BLOOM == 0 ) return;
     
+    if ( vAvglum_needed == 0.0) return;
     
     vec4 pixel_out;
     pixel_out.a = get_avglum();
-    if (DO_BEZEL + DO_BLOOM > 0.0) {
-        //Create a small mipmap to be used to light the bezel corners
-        //and by the bloom pass to identify bright areas.
+    
+    //Create a small mipmap to be used to light the bezel corners
+    //and by the bloom pass to identify bright areas.
+    if (vBezel_or_Bloom > 0.0) 
         pixel_out.rgb = textureLod(flick_and_noise_pass, vTexCoord, mip_lod).rgb;
-    }
+
 
     FragColor = pixel_out;
-
-    //FragColor = texture(flick_and_noise_pass, vTexCoord);
     
 }
