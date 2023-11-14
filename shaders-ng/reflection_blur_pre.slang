@@ -49,7 +49,7 @@ void main() {
    
    if (DO_BEZEL == 0.0) return;
    
-   float skip_border = BEZEL_REFL_SKIP_SIZE;
+   #define skip_border BEZEL_REFL_SKIP_SIZE
    if (vTexCoord.x > skip_border && vTexCoord.x < 1.0 - skip_border &&
        vTexCoord.y > skip_border && vTexCoord.y < 1.0 - skip_border ) {
       return;
@@ -68,25 +68,16 @@ void main() {
 
    
   //Create a gradient near borders to modulate between blurred and sharp refection.
-      float smoothness = 0.15;
+      #define smoothness 0.15
       
       float shade_sharp_blur = borders_gradient(vCoords_shade, smoothness);
-      //shade_sharp_blur = 1.05 - (shade_sharp_blur + BEZEL_RFL_BLR_SHD); //Modulates between sharp and blur via user parameter
-   
       shade_sharp_blur =  shade_sharp_blur - BEZEL_RFL_BLR_SHD;
       
       shade_sharp_blur=clamp(shade_sharp_blur, 0.0,1.0);
-      float blur_radius=  (shade_sharp_blur) * 2.0  ;
-      float blur_quality = 1;
+      float blur_radius=(shade_sharp_blur) * 2.0  ;
       
+      vec3 pixel_out = bloom(flick_and_noise_pass, coords, global.FinalViewportSize, vec2(blur_radius), 1.0, 0.0, 1.0) ;
 
-
-      vec3 pixel_out = bloom(flick_and_noise_pass, coords, global.FinalViewportSize, vec2(blur_radius), blur_quality, 0.0, 1.0) ;
-
-      
-      
-   
-      
    FragColor = vec4(pixel_out,shade_sharp_blur );
 //FragColor = vec4(shade_sharp_blur );
    
