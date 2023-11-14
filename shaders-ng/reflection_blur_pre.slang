@@ -7,7 +7,7 @@ layout(location = 1) in vec2 TexCoord;
 
 layout(location = 0) out vec2 vTexCoord;
 layout(location = 1) out vec2 vCoordsAdapted;
-
+layout(location = 2) out vec2 vCoords_shade;
 #include "includes/functions.include.slang"
 
 
@@ -20,11 +20,15 @@ void main() {
       vCoordsAdapted = content_geom_override(vCoordsAdapted, GAME_GEOM_ASPECT, get_in_aspect(), GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
 
    vCoordsAdapted = zoomout_coords( vCoordsAdapted, BEZEL_RFL_ZOOM, 1.0);
+   
+   vCoords_shade = zoom(vTexCoord,1.05);
+   
 }
 
 #pragma stage fragment
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in vec2 vCoordsAdapted;
+layout(location = 2) in vec2 vCoords_shade;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -64,10 +68,11 @@ void main() {
    }
 
    
-  //Create a gradient near borders to modulate between blurrend and sharp refection.
+  //Create a gradient near borders to modulate between blurred and sharp refection.
       float smoothness = 0.15;
-      vec2 coords_shade = zoom(vTexCoord,1.05);
-      float shade_sharp_blur = borders_gradient(coords_shade, smoothness);
+      
+      float shade_sharp_blur = borders_gradient(vCoords_shade, smoothness);
+
       //shade_sharp_blur = 1.05 - (shade_sharp_blur + BEZEL_RFL_BLR_SHD); //Modulates between sharp and blur via user parameter
    
       shade_sharp_blur =  shade_sharp_blur - (BEZEL_RFL_BLR_SHD - 0.2);
