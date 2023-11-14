@@ -1,3 +1,21 @@
+vec3 smoothstep_fast(vec3 edge0, vec3 edge1, vec3 x) {
+  return clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);
+}
+
+float smoothstep_fast(float edge0, float edge1, float x) {
+  return clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);
+}
+
+vec2 smoothstep_fast(vec2 edge0, vec2 edge1, vec2 x) {
+  return clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);
+}
+
+
+float smoothstep_cos(float edge0, float edge1, float x) {
+  float t = clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);
+  return cos(t * pi) * -0.5 + 0.5;
+}
+
 vec3 texture_BILINEAR(sampler2D t, vec2 uv, vec4 texSize, float k) {
        uv = uv -texSize.zw*0.5*k;
        vec2 texelSize = texSize.zw * k;

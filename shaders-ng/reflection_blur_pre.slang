@@ -39,9 +39,8 @@ layout(set = 0, binding = 2) uniform sampler2D avglum_pass;
 #include "includes/blooms.include.slang"
 
 float borders_gradient(vec2 co, float smoothness) {
-   //Draws a square with smooth borders:
-   float size = 1.0;
-   vec4 rect = vec4(0.0+smoothness, 0.0+smoothness, size - smoothness, size - smoothness);
+   //Draws a square with smooth borders:   
+   vec4 rect = vec4(smoothness, smoothness, 1 - smoothness, 1 - smoothness);
    vec2 hv = smoothstep(rect.xy - smoothness, rect.xy, co) * smoothstep(co - smoothness, co, rect.zw);
    return  hv.x * hv.y;
 }
@@ -72,10 +71,9 @@ void main() {
       float smoothness = 0.15;
       
       float shade_sharp_blur = borders_gradient(vCoords_shade, smoothness);
-
       //shade_sharp_blur = 1.05 - (shade_sharp_blur + BEZEL_RFL_BLR_SHD); //Modulates between sharp and blur via user parameter
    
-      shade_sharp_blur =  shade_sharp_blur - (BEZEL_RFL_BLR_SHD - 0.2);
+      shade_sharp_blur =  shade_sharp_blur - BEZEL_RFL_BLR_SHD;
       
       shade_sharp_blur=clamp(shade_sharp_blur, 0.0,1.0);
       float blur_radius=  (shade_sharp_blur) * 2.0  ;
