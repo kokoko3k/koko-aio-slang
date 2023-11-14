@@ -55,18 +55,11 @@ void main() {
       #define CORNER_BLURRINESS 0.6
       float fcorners_shade = corners_shade(vTexCoord, 0.9) * CORNER_BLURRINESS * 0.9;
    
-      
-      
-      
       shade_sharp_blur = max(fcorners_shade, shade_sharp_blur);
 
       float blur_radius=   (shade_sharp_blur) * 3.5  ;
-      blur_radius = clamp(blur_radius, 1.0, 100.0);
-   //blur_radius = max(blur_radius, 1.0);
+      blur_radius = max(blur_radius, 1.0);
    
-   FragColor = vec4(blur_radius); return;
-   
-      
       float start_offset = (pi*2.0/8.0/4.0);
 
       vec3 pixel_out = bloom(Source, vCoords_zoomout, global.FinalViewportSize, vec2(blur_radius), 1.0, start_offset, 0.0) ;

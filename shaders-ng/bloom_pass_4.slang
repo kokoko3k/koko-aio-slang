@@ -111,10 +111,7 @@ float get_avg_lum_from_mip(sampler2D tex, vec2 co, float lod) {
     float luminance = mix(luminance_first_pass, luminance_from_feedback, eye_adaption_speed);
     
 
-    
     return luminance + eps;
-    
-  
     
 }
 

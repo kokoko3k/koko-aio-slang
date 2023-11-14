@@ -26,6 +26,7 @@ layout(location = 8) out float vAMBI_POWER;
 layout(location = 9) out float vSmpBorder_min;
 layout(location = 10) out float vSmpBorder_max;
 layout(location = 11) out float vSmp_step;
+layout(location = 12) out float vMod_FrameCount_FrameDivider;
 
 void main() {
     gl_Position = global.MVP * Position;
@@ -88,6 +89,11 @@ void main() {
     //Every cycle counts!
         vAMBI_POWER = AMBI_POWER -1;
 
+        
+    //3.0 makes scene detection not working.
+        #define FRAME_DIVIDER 2.0
+        vMod_FrameCount_FrameDivider = mod(params.FrameCount, FRAME_DIVIDER);
+        
 }
 
 #pragma stage fragment
@@ -103,6 +109,7 @@ layout(location = 8) in float vAMBI_POWER;
 layout(location = 9) in float vSmpBorder_min;
 layout(location = 10) in float vSmpBorder_max;
 layout(location = 11) in float vSmp_step;
+layout(location = 12) in float vMod_FrameCount_FrameDivider;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -257,8 +264,6 @@ vec4 pixel_ambilight(vec2 local_pre_pass_coords) {
     return vec4(ambi_step_rgb(past_pixel, present_pixel, mystep), scene_change_remaining);
 }
 
-//3.0 makes scene detection not working.
-#define FRAME_DIVIDER 2.0
 
 void main() {
     if (DO_AMBILIGHT != 1.0)
@@ -267,7 +272,8 @@ void main() {
     //Nvidia + flycast core + glcore goes crazy with modulo operation and instead of returning 0,1,2 0,1,2 they returns 1,2,3 1,2,3 and so on.
     //Don't check for != 0.0 here, but use != 1.0.
     //Also this particular bug does not seem to happen in the last pass.
-    if ( mod(params.FrameCount, FRAME_DIVIDER) != 1.0) { 
+    
+    if ( vMod_FrameCount_FrameDivider != 1.0) { 
         vec4 past_sampler = texture(PastSampler, vTexCoord);
         past_sampler = max(past_sampler, 0.0); // <- Sanitize input to avoid glitches when enabling the option runtime.
         FragColor = past_sampler;
