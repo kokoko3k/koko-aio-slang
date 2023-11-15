@@ -243,7 +243,7 @@ vec4 pixel_ambilight(vec2 local_pre_pass_coords) {
     float scene_change_remaining = past_pixel_vec4.a;
     
     #ifndef D3D_WORKAROUND
-        float past_avg_lum = texture(avglum_passFeedback,vec2(0.25,0.25)).a;
+        float past_avg_lum    = texture(avglum_passFeedback,vec2(0.25,0.25)).a;
         float present_avg_lum = texture(avglum_pass        ,vec2(0.25,0.25)).a;
         float diff_avg_lum = abs(past_avg_lum - present_avg_lum);
 
@@ -268,12 +268,12 @@ vec4 pixel_ambilight(vec2 local_pre_pass_coords) {
 void main() {
     if (DO_AMBILIGHT != 1.0)
         return;
-
+    
     //Nvidia + flycast core + glcore goes crazy with modulo operation and instead of returning 0,1,2 0,1,2 they returns 1,2,3 1,2,3 and so on.
     //Don't check for != 0.0 here, but use != 1.0.
     //Also this particular bug does not seem to happen in the last pass.
     
-    if ( vMod_FrameCount_FrameDivider != 1.0) { 
+    if ( vMod_FrameCount_FrameDivider != 1.0 ) { 
         vec4 past_sampler = texture(PastSampler, vTexCoord);
         past_sampler = max(past_sampler, 0.0); // <- Sanitize input to avoid glitches when enabling the option runtime.
         FragColor = past_sampler;
