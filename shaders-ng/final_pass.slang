@@ -1351,10 +1351,10 @@ void main() {
     if (canvas_bezel_screen > 0.5) {
         
         //Deband
-        float spot_vignette_noise = 0.0;
+        /*float spot_vignette_noise = 0.0;
         if (DO_VIGNETTE + DO_SPOT > 0.0) {
-            spot_vignette_noise = random_fast(NOISEPOWER, vOutputCoord) ;
-        }
+            spot_vignette_noise = random_fast(NOISEPOWER, vOutputCoord) *100.0;
+        }*/
         
         //Vignette
             if (DO_VIGNETTE == 1.0) {
@@ -1362,7 +1362,7 @@ void main() {
                 //vignette = smoothstep(V_SIZE,0.0,dist)*V_POWER;
                 vec2 sinco = (co_content-0.5) / V_SIZE ;
                 float vignette = cos(sinco.x) * cos(sinco.y) * V_POWER;
-                pixel_out = (pixel_out*vignette);
+                pixel_out = (pixel_out*vignette)*DO_VIGNETTE;
             } 
             
         //Spot
