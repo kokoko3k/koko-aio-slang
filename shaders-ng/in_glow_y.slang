@@ -113,16 +113,20 @@ vec3 antialias_blur_bias(sampler2D source_tex, vec2 co, vec3 pixel_glowed, float
 */
 
 void main() { 
-   if (DO_IN_GLOW == 0.0) {
-      if ( DELTA_RENDER == 1.0) {
-         float original_unchanged = texture(Source,vTexCoord).a;
-         vec3 color = texture(shift_and_bleed_pass, vTexCoord).rgb * vGlow_Gain;
-         FragColor = vec4(color, original_unchanged);
+   if  ( DELTA_RENDER == 1.0) {
+      bool reuse_old = texture(Source,vTexCoord).a > 0.9;
+      if (reuse_old) {
+         FragColor.a = 1.0;
          return;
       }
-      FragColor = texture(shift_and_bleed_pass, vTexCoord) * vGlow_Gain;
-      return;
    }
+   
+   
+  
+   
+   if (DO_IN_GLOW == 0.0)
+      return;
+
 
    vec3 pixel_glowed;
    
@@ -157,16 +161,8 @@ void main() {
             //pixel_glowed = antialias_blur_bias(shift_and_bleed_pass, vTexCoord, pixel_glowed, IN_GLOW_BIAS);
       }
    
-   //Previous pass compared previous and current source frame and exported that info in the alpha.
-   //Pass it through when we need delta rended.
-      if ( DELTA_RENDER == 1.0) {
-         float original_unchanged = texture(Source,vTexCoord).a;
-         FragColor = vec4(pixel_glowed, original_unchanged);
-         return;
-      }
-   
   
-   FragColor = vec4(pixel_glowed,1.0);
+   FragColor = vec4(pixel_glowed,0.0);
    
 }
 
