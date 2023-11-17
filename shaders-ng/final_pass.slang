@@ -48,8 +48,7 @@ layout(location = 18) out vec2 vPG_OutputCoord_tated;
 layout(location = 19) out float vDotMat_Grid_Sharpness;
 layout(location = 20) out float vfprintvalue;
 layout(location = 21) out float vPG_mask_height;
-
-
+layout(location = 22) out float vDeltaRenderOk;
 layout(location = 23) out float vDo_pixelgrid_h;
 layout(location = 24) out float vDo_Curvature;
 layout(location = 25) out float vFake_scanline_period;
@@ -249,7 +248,10 @@ void main() {
             vDotMat_Grid_Sharpness = clamp(vDotMat_Grid_Sharpness, 0.1, 20.0);
             //vfprintvalue = vDotMat_Grid_Sharpness;
         }
-
+                                                                                               // Delta render, mandatory conditions:
+    vDeltaRenderOk = float(  ( params.FrameCount % int(DELTA_RENDER_FORCE_REFRESH) != 0.0 ) && // - We are in a frame that is not forced for full refresh
+                             ( (! bIs_Interlaced) || PIXELGRID_INTR_DISABLE_Y == 1.0 || DO_PIXELGRID_H == 0.0)   // - screen is not interlaced or we disabled scanlines on interlaced content
+                           ); 
     
     //For use with interlacrd content, here we calculate an amount of lines that it integer multiple of the screen lines and that
     //is near to the real input/core lines
@@ -297,8 +299,7 @@ layout(location = 18) in vec2 vPG_OutputCoord_tated;
 layout(location = 19) in float vDotMat_Grid_Sharpness;
 layout(location = 20) in float vfprintvalue;
 layout(location = 21) in float vPG_mask_height;
-
-
+layout(location = 22) in float vDeltaRenderOk;
 layout(location = 23) in float vDo_pixelgrid_h;
 layout(location = 24) in float vDo_Curvature;
 layout(location = 25) in float vFake_scanline_period;
@@ -1281,7 +1282,7 @@ void main() {
         }
     #ifndef D3D_WORKAROUND
         if (DELTA_RENDER == 1.0) {
-            bool reuse_old =  bool( texture(in_glow_pass, co_content).a * canvas_busy ) ;
+            bool reuse_old =  bool( texture(in_glow_pass, co_content).a * canvas_busy * vDeltaRenderOk ) ;
             if (reuse_old) {
                 FragColor = texture(final_passFeedback, vOutputCoord) ;
                 return;
