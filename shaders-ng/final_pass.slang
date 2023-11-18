@@ -157,12 +157,15 @@ void main() {
         float fIsInterlaced = float(bIs_Interlaced);
             
         //Scanline period:
-            vScanlinePeriod = 1.0;
-            vScanlineAlternateOffset = 0.0;
+            vScanlinePeriod = 1.0; //Base 1x period
+            vScanlineAlternateOffset = 0.0; //No interlace
         
-            if (bIs_Interlaced) {
-                if (params.FrameCount % 2 == 0.0) vScanlineAlternateOffset = PI_15;
+            if (bIs_Interlaced && PIXELGRID_INTR_DISABLE_Y != 2.0) {
+                //Halve the scanline period, since they will interlace:
                 vScanlinePeriod = 0.5;
+                //Alternate scanlines on even/odd frames
+                if (params.FrameCount % 2 == 0.0)
+                    vScanlineAlternateOffset = PI_15;
             }
         
         //Calculate the maximum possible brightness of the input color by taking glow,
@@ -250,10 +253,10 @@ void main() {
         }
                                                                                                // Delta render, mandatory conditions:
     vDeltaRenderOk = float(  ( params.FrameCount % int(DELTA_RENDER_FORCE_REFRESH) != 0.0 ) && // - We are in a frame that is not forced for full refresh
-                             ( (! bIs_Interlaced) || PIXELGRID_INTR_DISABLE_Y == 1.0 || DO_PIXELGRID_H == 0.0)   // - screen is not interlaced or we disabled scanlines on interlaced content
+                             ( (! bIs_Interlaced) || PIXELGRID_INTR_DISABLE_Y >= 1.0 || DO_PIXELGRID_H == 0.0)   // - screen is not interlaced or we disabled scanlines on interlaced content
                            ); 
     
-    //For use with interlacrd content, here we calculate an amount of lines that it integer multiple of the screen lines and that
+    //For use with interlaced content, here we calculate an amount of lines that it integer multiple of the screen lines and that
     //is near to the real input/core lines
     vUse_Fake_scanlines = 0.0; 
 

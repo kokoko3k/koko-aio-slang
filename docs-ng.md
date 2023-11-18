@@ -236,22 +236,24 @@
             Use this parameter to clear it and use it only if needed or it would have counter-effects.
             Also, mutating dots to straight lines would make moiree more visible when using curvature.
 
-        
-        
-    Interlace + Scanline alternate above # lines:
-        koko-aio will mark a frame as interlaced and will alternate odd/even scanlines
-        at odd/even frames when the number or lines is above the configured value.
-    Interlaced Scanlines? (-1=faker, -1=fake, 0=yes, 1=no):
-       0=yes:   Use interlaced scanlines, may need >1080p screen to avoid moire or weavy artifacts
-       1=no:    You may want to avoid drawing scanlines gaps when interlaced content is found
-      -1=fake:  Use a number of scanlines that perfectly fits the screen, a good glitches free tradeoff.
-      -2=faker: Use a number of scanlines that perfectly fits the screen * 1.5, another good (almost) glitches free tradeoff.
-    Interlace Flicker (0=off,1=on,2=if interlaced):
-        Since we can emulate scanline appearence, here we deal with interlaced content too.
+
+    Hi-resolution scanlines handling:
+        There you can choose how to handle scanlines when a content is Hi-Resolution.
+        Special handling may be needed to mitigate glitches/moire at 1080p or lower resolutions.
+    Consider Hi-Resolution above # lines:
+        koko-aio will consider a frame as Hi-resolution if the lines number is above the configured value.
+    Hi-Res scanlines type
+      -1: Use a number of scanlines that perfectly fits the screen, a good glitches/moire free tradeoff.
+      -2: As above, but tighter (1.5x), another good (almost) glitches/moire free tradeoff.
+       0: Use interlaced scanlines, may need >1080p screen to avoid moire or weavy glitches
+       1: Avoid drawing scanlines gaps at all.
+       2: Use scanlines, but don't interlace them (bad for 1080p and lower resolutions)
+
+    Scanlines flicker (0=off,1=on,2=if Hi-res):
         This setting emulates the flickering issues present on crt interlaced screens
         where the brighter lines flickers when they are near dark ones.
         You can choose to produce the flickering: never, always or only 
-        when the input picture is considered interlaced.
+        when the input picture is considered High resolution.
     Interlace Flicker power: The strength of the effect.
 
     

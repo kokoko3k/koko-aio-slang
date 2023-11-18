@@ -391,11 +391,13 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 #pragma parameter BLANK12f " " 0.0 0.0 1.0 1.0
 
-#pragma parameter LABEL_INTERLACE           "      ★ Interlace Handling" 0.0 0.0 0.0 0.0
-#pragma parameter MIN_LINES_INTERLACED      "           . Interlace + Scanline alternate above # lines:"		380.0 	1.0 1024 1.0
-#pragma parameter PIXELGRID_INTR_DISABLE_Y  "           . Interlaced Scanlines (-2=faker,-1=fake,0=yes,1=no)"   -2.0    -2.0 1.0 1.0
-#pragma parameter PIXELGRID_INTR_FLICK_MODE "           . Interlace Flicker (0=off,1=on,2=if interlaced)"			2.0 	0.0 2.0 1.0
-#pragma parameter PIXELGRID_INTR_FLICK_POWR "           . Interlace Flicker power"		  		0.25 	0.0 8.0 0.01
+#pragma parameter LABEL_INTERLACE           "      ★ Hi-resolution scanlines handling" 0.0 0.0 0.0 0.0
+#pragma parameter MIN_LINES_INTERLACED      "        . Consider Hi-Resolution above # lines:"		380.0 	1.0 1024 1.0
+#pragma parameter PIXELGRID_INTR_DISABLE_Y  "        . Hi-Res scanlines type (read docs):"   -2.0 -2.0 2.0 1.0
+#pragma parameter LabelDescIntlScan1        "          (-2: Faker-Interlaced, -1: Fake-Interlaced)"          0.0 0.0 0.0 0.0
+#pragma parameter LabelDescIntlScan2        "          ( 0: Interlaced, 1: No scanlines, 2: Don't interlace)" 0.0 0.0 0.0 0.0
+#pragma parameter PIXELGRID_INTR_FLICK_MODE "          . Scanlines flicker (0=off,1=on,2=if Hi-Res)"			2.0 	0.0 2.0 1.0
+#pragma parameter PIXELGRID_INTR_FLICK_POWR "             . Flicker power"		  		0.25 	0.0 8.0 0.01
 
 
 #pragma parameter BLANK12e " " 0.0 0.0 1.0 1.0
