@@ -307,7 +307,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 // Dedithering
 #pragma parameter DO_DEDITHER         "★ Dedither enable? (not with NTSC artifacts) ==>"	0.0 	0.0 1.0 1.0
-#pragma parameter DEDITHER_STRENGTH   "        Strength"				0.5	0.0 1.0  0.1
+#pragma parameter DEDITHER_STRENGTH   "        Strength"				0.8	0.0 1.0  0.1
 #pragma parameter DEDITHER_TRESHMAX   "        Treshold"				1.2	0.0 3.0  0.1
 #pragma parameter BLANK_4 " " 0.0 0.0 1.0 1.0
 
