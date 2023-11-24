@@ -11,14 +11,14 @@
 #define CYELLOW  vec3(1.0,1.0,0.0)
 #define CCUSTOM vec3(0.3,0.5,0.1)
 
-#define DEBUG_COLOR vec3(1.0)
+#define DEBUG_COLOR vec3(0.3)
 #define DEBUG_BLINK_TIME 30
 #define DEBUG_GRADIENT_STEPS 64
 
 
 
 //#define DEBUG
-  // #define DEBUG_COLOR_CALIB
+   //#define DEBUG_COLOR_CALIB
    #define DEBUG_TIME_FADE
    //#define DEBUG_SOLID_COLOR
    //#define DEBUG_STEP_GRADIENT
@@ -243,6 +243,104 @@ vec3 debug() {
    return pixel_debug;
 }
 
+
+bool first_in_range(float a, float lo, float hi) {
+   return (a > lo) && (a < hi);
+}
+
+
+vec3 pixel_dedither(vec2 coords, vec4 sourcesize, float tmin, float tmax, float strength) {
+   #define DX sourcesize.z
+   #define DY sourcesize.w
+   float accum_div = 0.0;
+   
+   vec3 p0 = texture(Source, coords).rgb;
+
+//    Horizontal xoxox   
+      vec3 avg_x = vec3(0.0);
+      vec3 pxb = p0;                                                 // oxOxo
+      vec3 pxa = texture(Source, coords + vec2(-DX    ,0.0)).rgb; // oXoxo
+      vec3 pxc = texture(Source, coords + vec2(+DX    ,0.0)).rgb; // oxoXo
+      vec3 pxd = texture(Source, coords + vec2(-DX*2.0,0.0)).rgb; // Oxoxo
+      vec3 pxe = texture(Source, coords + vec2(+DX*2.0,0.0)).rgb; // oxoxO
+   
+      float dx1= dot(abs(pxb-pxa), vec3(1.0));
+//    float dx2= dot(abs(pxb-pxc), vec3(1.0));
+//    float dx3= dot(abs(pxc-pxd), vec3(1.0));
+//    float dx4= dot(abs(pxe-pxc), vec3(1.0));
+//    if (first_in_range(dx1,tmin,tmax) && dx1 == dx2 && (dx2 == dx3 || dx2 == dx4)) {
+      if (first_in_range(dx1,tmin,tmax) && pxa == pxc && (pxb == pxd || pxb == pxe)) {
+          avg_x = (pxa+pxb) /2.0;
+          accum_div += 1.0;
+       }
+ 
+//    Vertical
+      vec3 avg_y= vec3(0.0);
+      vec3 pyb = p0;
+      vec3 pya = texture(Source, coords + vec2(0.0, -DY    )).rgb;
+      vec3 pyc = texture(Source, coords + vec2(0.0, +DY    )).rgb;
+      vec3 pyd = texture(Source, coords + vec2(0.0, -DY*2.0)).rgb;
+      vec3 pye = texture(Source, coords + vec2(0.0, +DY*2.0)).rgb;
+   
+      float dy1= dot(abs(pya-pyb), vec3(1.0));
+//    float dy2= dot(abs(pyb-pyc), vec3(1.0));
+//    float dy3= dot(abs(pyd-pyc), vec3(1.0));
+//    float dy4= dot(abs(pye-pyc), vec3(1.0));
+//    if (first_in_range(dy1,tmin,tmax) && dy1 == dy2 && (dy2 == dy3 || dy2 == dy4)) {
+      if (first_in_range(dy1,tmin,tmax) && pya == pyc && (pyb == pyd || pyb == pye)) {
+          avg_y = (pya+pyb) /2.0;
+          accum_div += 1.0;
+       }
+
+//    Oblique '\'
+      vec3 avg_xy= vec3(0.0);
+      vec3 pxyb = p0;
+      vec3 pxya = texture(Source, coords + vec2(-DX,     -DY    )).rgb;
+      vec3 pxyc = texture(Source, coords + vec2(+DX,     +DY    )).rgb;
+      vec3 pxyd = texture(Source, coords + vec2(+DX*2.0, +DY*2.0)).rgb;
+      vec3 pxye = texture(Source, coords + vec2(-DX*2.0, -DY*2.0)).rgb;
+   
+      float dxy1= dot(abs(pxyb-pxya), vec3(1.0));
+//    float dxy2= dot(abs(pxyb-pxyc), vec3(1.0));
+//    float dxy3= dot(abs(pxyc-pxyd), vec3(1.0));
+//    float dxy4= dot(abs(pxye-pxyc), vec3(1.0));
+//    if (first_in_range(dxy12,tmin,tmax) && dxy1 == dxy2 && (dxy2 == dxy3 || dxy2 == dxy4) ) {
+      if (first_in_range(dxy1,tmin,tmax) && pxya == pxyc && (pxyb == pxyd || pxyb == pxye)) {
+          avg_xy = (pxya+pxyb) / 2.0;
+          accum_div += 1.0;
+       }
+
+   
+//    Obliquo '/'
+      vec3 avg_yx= vec3(0.0);
+      vec3 pxyb2 = p0;
+      vec3 pxya2 = texture(Source, coords + vec2(+DX,    -DY    )).rgb;
+      vec3 pxyc2 = texture(Source, coords + vec2(-DX,    +DY    )).rgb;
+      vec3 pxyd2 = texture(Source, coords + vec2(-DX*2.0,+DY*2.0)).rgb;
+      vec3 pxye2 = texture(Source, coords + vec2(+DX*2.0,-DY*2.0)).rgb;
+   
+      float dxy12= dot(abs(pxyb2-pxya2), vec3(1.0));
+//    float dxy22= dot(abs(pxyb2-pxyc2), vec3(1.0));
+//    float dxy32= dot(abs(pxyc2-pxyd2), vec3(1.0));
+//    float dxy42= dot(abs(pxye2-pxyc2), vec3(1.0));
+      
+//    if (first_in_range(dxy12,tmin,tmax) && dxy12 == dxy22 && (dxy22 == dxy32 || dxy22 == dxy42) ) {
+      if (first_in_range(dxy12,tmin,tmax) && pxya2 == pxyc2 && (pxyb2 == pxyd2 || pxyb2 == pxye)) {
+         avg_yx = (pxya2+pxyb2) / 2.0;
+         accum_div += 1.0;
+      }
+
+   vec3 pixel_out = vec3(0.0);
+   if (accum_div > 0.0)
+      //pixel_out = (pxb + pxa + pxc + pya + pyc + pxya + pxyc + pxya2 + pxyc2) / 9.0;
+      pixel_out = mix(p0, (avg_x + avg_y + avg_xy + avg_yx) / accum_div, strength);
+         else
+      pixel_out = p0;
+   
+   return pixel_out;
+}
+
+
 void main() {
    vec3 pixel_in = texture(Source, vTexCoord).rgb;
    vec3 pixel_out = pixel_in;
@@ -265,9 +363,16 @@ void main() {
             artifact_mask *= 2.0;
             
       pixel_out = ntsc_decoded.rgb;
+      
+   } else if (DO_DEDITHER > 0.5) {
+      //vec3 pixel_dedither(vec2 coords, vec4 sourcesize, float tmin, float tmax, float strength) {
+      float tmin = 0.0;
+      pixel_out = pixel_dedither(vTexCoord, params.SourceSize, tmin, DEDITHER_TRESHMAX, DEDITHER_STRENGTH);
    }
-
-  
+   
+   
+   
+   
    
    #ifdef DEBUG
       //Cant "debug" ntsc artifacts because it samples from source (original)

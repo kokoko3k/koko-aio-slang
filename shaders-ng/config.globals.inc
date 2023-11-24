@@ -49,6 +49,18 @@
     #define DO_FXAA	global.DO_FXAA
 #endif
 
+#ifndef DO_DEDITHER
+    #define DO_DEDITHER global.DO_DEDITHER
+#endif
+
+#ifndef DEDITHER_STRENGTH
+    #define DEDITHER_STRENGTH global.DEDITHER_STRENGTH
+#endif
+
+#ifndef DEDITHER_TRESHMAX
+    #define DEDITHER_TRESHMAX global.DEDITHER_TRESHMAX
+#endif
+
 #ifndef DO_NTSC_ARTIFACTS
     #define DO_NTSC_ARTIFACTS	global.DO_NTSC_ARTIFACTS
 #endif

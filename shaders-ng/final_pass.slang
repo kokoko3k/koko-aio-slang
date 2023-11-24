@@ -700,8 +700,19 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //Use abs(cos) (later 1-abs(cos) to get horizontal gaps, use pow to make them steep.
             //Stagger them by PH_MASH_OFFSET on even triads
 
+            
+                float anti_moire_freq = sin(vPG_freq_base_screen_unfloored.x * vPG_offsets_and_size.a );
+                float anti_moire_amp = PIXELGRID_H_ANTIMOIRE;
+            
                 float mask_shape = abs(cos(  vPG_y_shift  + ph_mask_height  + (PH_MASH_OFFSET * is_even)) ) ;
+                
+            
+
+               
+                
                 mask_shape = pow(mask_shape, PIXELGRID_Y_MASK_STEEP);
+                
+                
                 
                 // We can make the stagger dark line less pronunced
                 // on its sides so that lateral staggered color 

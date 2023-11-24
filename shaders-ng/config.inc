@@ -249,7 +249,10 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float DELTA_RENDER_FORCE_REFRESH;
 	float DELTA_RENDER_CHECK_AREA;
 	
-
+	float DO_DEDITHER;
+	float DEDITHER_STRENGTH;
+	float DEDITHER_TRESHMAX;
+	
 	float DO_NTSC_ARTIFACTS;
 	float NTSC_FILTER_WIDTH;
 	float NTSC_FILTER_SCF;
@@ -291,16 +294,22 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BLANK1 " " 0.0 0.0 1.0 1.0
 
 
-
 // FXAA
 // Apply an antialiasing filter via FXAA from Nvidia.
 #pragma parameter DO_FXAA "★ FXAA enable? (*f) ==>"	0.0 	0.0 1.0 1.0
 #pragma parameter BLANK2 " " 0.0 0.0 1.0 1.0
 
+
 // RF Noise
 #pragma parameter DO_RF_NOISE	 "★ RF Noise enable? (rf) ==>"			0.0 	0.0  1.0     1.0
 #pragma parameter RF_NOISE_STRENGTH "        Strength"				0.05	0.0 1.0 0.005
 #pragma parameter BLANK4 " " 0.0 0.0 1.0 1.0
+
+// Dedithering
+#pragma parameter DO_DEDITHER         "★ Dedither enable? (not with NTSC artifacts) ==>"	0.0 	0.0 1.0 1.0
+#pragma parameter DEDITHER_STRENGTH   "        Strength"				0.5	0.0 1.0  0.1
+#pragma parameter DEDITHER_TRESHMAX   "        Treshold"				1.2	0.0 3.0  0.1
+#pragma parameter BLANK_4 " " 0.0 0.0 1.0 1.0
 
 // NTSC color artifacting
 #pragma parameter DO_NTSC_ARTIFACTS "★ CVBS: NTSC color artifacts enable? (nt) ==>"	0.0 	0.0 1.0 1.0
