@@ -85,8 +85,8 @@ vec2 get_zooms_modifier() {
         co_scaled_min = get_scaled_coords_aspect(co_scaled_min, global.FinalViewportSize, vIn_aspect, bool(vIsRotated));
         co_scaled_max = get_scaled_coords_aspect(co_scaled_max, global.FinalViewportSize, vIn_aspect, bool(vIsRotated));
     } else {
-        co_scaled_min = integer_scale(co_scaled_min, vIn_aspect, bool(vIsRotated), GAME_GEOM_INT_SCALE-1.0 ) + vec2( GAME_GEOM_OFF_FIX /10000);
-        co_scaled_max = integer_scale(co_scaled_max, vIn_aspect, bool(vIsRotated), GAME_GEOM_INT_SCALE-1.0 ) + vec2( GAME_GEOM_OFF_FIX /10000);
+        co_scaled_min = integer_scale(co_scaled_min, vIn_aspect, bool(vIsRotated), GAME_GEOM_INT_SCALE-1.0 );
+        co_scaled_max = integer_scale(co_scaled_max, vIn_aspect, bool(vIsRotated), GAME_GEOM_INT_SCALE-1.0 );
     }
     
     
