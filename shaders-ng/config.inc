@@ -590,7 +590,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter DO_GAME_GEOM_OVERRIDE	  "★ Override content geometry enable? (ov)==>"	0.0   0.0  1.0 	  1.0
 #pragma parameter GAME_GEOM_INT_SCALE     "        Integer scale (disables inner zoom) 2=No keep aspect"	0.0   0.0  2.0    1.0
 #pragma parameter GAME_GEOM_INT_SCALE_MAX "        Maximum integer scale" 				10.0  1.0  100.0  1.0
-#pragma parameter LABEL_WARNING44         "    !! Please switch off luminosity tied zoom to use integer scaling"   1.0  1.0  1.0     1.0
+#pragma parameter LABEL_WARNING44         "    !! Switch off luminosity tied zoom to use integer scaling"   1.0  1.0  1.0     1.0
 #pragma parameter LABEL_WARNING4          "    !! The following will override integer scale" 1.0  1.0  1.0     1.0
 #pragma parameter GAME_GEOM_ASPECT	  "        Aspect (0 = unchanged)"		0.0    0.0  3.0	  0.005
 #pragma parameter GAME_GEOM_VSHIFT	  "        Vertical position"			0.0   -10.0 10.0  0.01
