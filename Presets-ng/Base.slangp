@@ -81,7 +81,7 @@ DO_DYNZOOM = "1.0"
 DO_SPOT = "1.0"
 	S_POSITION = "194.0"
 	S_SIZE = "0.4"
-	S_POWER = "0.1"
+	S_POWER = "0.05"
 
 DO_VIGNETTE = "1.0"
 	V_SIZE = "1.08"
