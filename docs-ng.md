@@ -1,7 +1,7 @@
 **koko-aio-slang documentation**
 
 **RETROARCH OUTPUT DRIVERS**
-    koko-aio does not work on d3d12 and glitches on d3d11 and d3d10.<br>
+    koko-aio does not work by on d3d12 and glitches on d3d11.<br>
     If you absolutely need it (Xbox?), you can edit the file 
     config\config-static.inc<br>
     and turn the line:
@@ -11,7 +11,9 @@
     <br>
     Vulkan ang Glcore have no problems, you can test both to see<br>
     which performs better.<br>
-
+    <br>
+    d3d10 is completely unsupported.
+    <br>
 
 **USEFUL LOCATIONS/FILES:**
 
