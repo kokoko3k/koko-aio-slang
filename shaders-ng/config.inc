@@ -503,7 +503,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 //Background Image
 #pragma parameter DO_BG_IMAGE	     "★ Back/Foreground image enable? (ba) ==>"				 0.0  0.0  1.0     1.0
-#pragma parameter LABEL_WARNING1     "    ⚠ RetroArch aspect needs to be set to Full! ⚠"	 1.0  1.0  1.0     1.0
+#pragma parameter LABEL_WARNING1     "    !! RetroArch aspect needs to be set to Full! !!"	 1.0  1.0  1.0     1.0
 #pragma parameter BG_IMAGE_OVER	     "        Image over content (alpha channel driven)?"	 0.0  0.0  1.0     1.0
 #pragma parameter BG_IMAGE_OFFX	     "        Shift Image over X axis"				 0.0  -1.0  1.0    0.0005
 #pragma parameter BG_IMAGE_OFFY	     "        Shift Image over Y axis"				 0.0  -1.0  1.0    0.0005
@@ -524,7 +524,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 //Back leds
 //Emulates leds under the monitor frame that slowly reacts to image contents
 #pragma parameter DO_AMBILIGHT	            "★ Ambient light leds enable? (am) ==> "				1.0  0.0  1.0     1.0
-#pragma parameter LABEL_WARNING3            "    ⚠ RetroArch aspect needs to be set to Full! ⚠"		1.0  1.0  1.0     1.0
+#pragma parameter LABEL_WARNING3            "    !! RetroArch aspect needs to be set to Full! !!"		1.0  1.0  1.0     1.0
 #pragma parameter AMBI_STEPS	            "        Slowness"						60.0 5.0  1000.0  5.0
 #pragma parameter AMBI_FALLOFF              "        Led power/falloff"			0.4  0.1  3.0     0.01
 #pragma parameter AMBI_POWER                "        Led Saturation"						1.8  0.0  100.0     0.05
@@ -538,17 +538,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter AMBI_ADD_ON_BLACK         "        Foggy (power on dark colors, add mode only)    "		1.0   0.0  1.0    0.05
 #pragma parameter AMBI_BG_IMAGE_FORCE       "        Always colorize Back/Foreground image (add mode only) "		0.0   0.0  1.0    0.1
 #pragma parameter BLANK17 " " 0.0 0.0 1.0 1.0
-
-
-
-//Full screen glowing
-//Modulate the image zooming depending on the image luminosity.
-//You can lower the effect power through the DYNZOOM_FACTOR parameter.
-#pragma parameter DO_DYNZOOM	     "★ Luminosity tied zoom (overrides integer scale)==>"		1.0   0.0   1.0  1.0
-//Ditched and hardcoded to 80 in config.globals.inc.
-	//#pragma parameter DYNZOOM_FACTOR     "        Narrowness"				80.0  15.0  120.0 0.5
-
-#pragma parameter BLANK18 " " 0.0 0.0 1.0 1.0
 
 
 
@@ -589,13 +578,20 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter label_aspect_preset6 "          (-6 = MAME rotated/TATE 0.75)" 0.0 0.0 0.0 1.0
 #pragma parameter BLANK23 " " 0.0 0.0 1.0 1.0
 
+//Modulate the image zooming depending on the image luminosity.
+//You can lower the effect power through the DYNZOOM_FACTOR parameter.
+#pragma parameter DO_DYNZOOM	     "★ Luminosity tied zoom (!!OBSTRUCTS integer scale!!) ==>"		1.0   0.0   1.0  1.0
+	//Ditched and hardcoded to 80 in config.globals.inc.
+	//#pragma parameter DYNZOOM_FACTOR     "        Narrowness"				80.0  15.0  120.0 0.5
+#pragma parameter BLANK18 " " 0.0 0.0 1.0 1.0
 
 
 //Content geomerty overrides
 #pragma parameter DO_GAME_GEOM_OVERRIDE	  "★ Override content geometry enable? (ov)==>"	0.0   0.0  1.0 	  1.0
 #pragma parameter GAME_GEOM_INT_SCALE     "        Integer scale (disables inner zoom) 2=No keep aspect"	0.0   0.0  2.0    1.0
 #pragma parameter GAME_GEOM_INT_SCALE_MAX "        Maximum integer scale" 				10.0  1.0  100.0  1.0
-#pragma parameter LABEL_WARNING4          "    ⚠ The following will override integer scale ⚠"	1.0  1.0  1.0     1.0
+#pragma parameter LABEL_WARNING44         "    !! Please switch off luminosity tied zoom to use integer scaling !!"   	1.0  1.0  1.0     1.0
+#pragma parameter LABEL_WARNING4          "    !! The following will override integer scale !!"	1.0  1.0  1.0     1.0
 #pragma parameter GAME_GEOM_ASPECT	  "        Aspect (0 = unchanged)"		0.0    0.0  3.0	  0.005
 #pragma parameter GAME_GEOM_VSHIFT	  "        Vertical position"			0.0   -10.0 10.0  0.01
 #pragma parameter GAME_GEOM_HSHIFT	  "        Horizontal position"			0.0   -10.0 10.0  0.01

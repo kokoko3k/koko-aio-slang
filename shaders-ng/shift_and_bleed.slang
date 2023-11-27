@@ -162,20 +162,30 @@ vec3 pixel_bleed_side_PAL(vec3 pixel_in, vec2 co, float size, float side, sample
 
 
 vec4 pixel_bleed(vec4 pixel_in, vec2 co, sampler2D in_texture, vec4 sourcesize2) {
-   vec3 side_left ; vec3 side_right;
+   float size_left = SAT_BLEED_SIZE_LEFT;
+   float size_right = SAT_BLEED_SIZE_RIGHT;
+   #ifdef D3D_WORKAROUND
+      // d3d11 compiler complains it is unable to unroll the loop because it is
+      // clueless about the maximum pragma value; d3d12 hangs somewhere.
+      size_left = min(40.0,SAT_BLEED_SIZE_LEFT) ;
+      size_right = min(40.0,SAT_BLEED_SIZE_RIGHT) ;
+   #endif
+
    //Tried to unbranch the following, no gain (even worse) probably due to not using constants anymore.
    //Just dont try again.
+   vec3 side_left ; vec3 side_right;
    if (SAT_BLEED_PAL == 1.0) {
-      side_right = pixel_bleed_side_PAL(pixel_in.rgb, co, SAT_BLEED_SIZE_RIGHT, SIDE_RIGHT, in_texture, sourcesize2);
-      side_left  = pixel_bleed_side_PAL(pixel_in.rgb, co, SAT_BLEED_SIZE_LEFT , SIDE_LEFT , in_texture, sourcesize2);
+      side_right = pixel_bleed_side_PAL(pixel_in.rgb, co, size_right, SIDE_RIGHT, in_texture, sourcesize2);
+      side_left  = pixel_bleed_side_PAL(pixel_in.rgb, co, size_left , SIDE_LEFT , in_texture, sourcesize2);
    } else {
-      side_right = pixel_bleed_side_NTSC(pixel_in.rgba, co, SAT_BLEED_SIZE_RIGHT, SIDE_RIGHT, in_texture, sourcesize2);
-      side_left  = pixel_bleed_side_NTSC(pixel_in.rgba, co, SAT_BLEED_SIZE_LEFT,  SIDE_LEFT,  in_texture, sourcesize2);
+      side_right = pixel_bleed_side_NTSC(pixel_in.rgba, co, size_right, SIDE_RIGHT, in_texture, sourcesize2);
+      side_left  = pixel_bleed_side_NTSC(pixel_in.rgba, co, size_left,  SIDE_LEFT,  in_texture, sourcesize2);
    }
-   //Clamping min to 0.0 is needed for nvidia to avoid bad graphical glitches, why? 
+   //Clamping min to 0.0 is needed for nvidia to avoid bad graphical glitches, why?
    return vec4( max( mix(side_left,side_right,0.5), 0.0),
-                pixel_in.a);  
+                pixel_in.a);
 }
+
 void main() {
    float pixel_alpha_ntsc_artifacts; // <- this carries ntsc artifacts needed by glow to modulate blur there.
    vec4 pixel_out;

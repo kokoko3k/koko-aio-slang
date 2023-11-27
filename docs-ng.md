@@ -513,9 +513,6 @@
         This internally works by adding the amount of your choice to the alpha channel
         of the foreground image.
         
-**Luminosity tied zoom:**<br>
-    On older CRT monitors, the picture gets bigger when the image was brighter.<br>
-
 **Vignette:**<br>
     Will cause uneven brightness of the image, more at the center,<br>
     less at the edges.<br>
@@ -547,6 +544,10 @@
 
 **Global shift/zoom image:**<br>
     Zoom and shift everything on screen, but background pictures.<br>
+
+**Luminosity tied zoom:**<br>
+    On older CRT monitors, the picture gets bigger when the image was brighter.<br>
+    Please turn this off if you want to use integer scaling, since this obstructs it.
 
 **Override content geometry:**<br>
     Contrary to the global aspect ratio control, this changes only the game geometry.<br>
