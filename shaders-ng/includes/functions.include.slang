@@ -1,3 +1,4 @@
+
 vec3 smoothstep_fast(vec3 edge0, vec3 edge1, vec3 x) {
   return clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);
 }

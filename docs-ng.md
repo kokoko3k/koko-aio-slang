@@ -39,8 +39,8 @@
         This is the image used to draw the bezel.
         Read further for details.
         
-    
-
+        
+        
 **Color corrections:**<br>
     Modify luminance, saturation, contrast, brightness and color temperature
     of the signal, at "input" stage.<br>
@@ -64,6 +64,13 @@
 
 ** RF Noise:**<br>
     Emulates radio frequency noise with a given strength<br>
+
+** Dedither:**<br>
+    Try to smooth dithering patterns.<br>
+    Enabling dedithering automatically disables  NTSC color artifacts:** generation.
+    
+    Strength: Blends dedithering and original image.
+    Treshold: Avoid to dedither "legit" zones by lowering this.
     
 **CVBS: NTSC color artifacts:**<br>
     Tries to emulate typical NTSC color artifacting without emulating<br>
