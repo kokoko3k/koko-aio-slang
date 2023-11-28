@@ -1196,7 +1196,9 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
     // Calculate Reflections, can be skipped if blue channel is 0:
         if (bezel_in.b > 0.0) {
         //Reflections: Calculate the bezel roughness to apply to the reflecting area. (bezel_in.g expresses the specularity)
-            float roughness = random_fast( 1/1080.0 * BEZEL_ROUGHNESS, vTexCoord );
+            float roughness = random_fast(vTexCoord);
+            float noise_power = 1/1080.0 * BEZEL_ROUGHNESS;
+            roughness = scale_to_range(roughness, -noise_power, noise_power);
             roughness *=  (1 - min(lut_specular * 10, 1.0)); // <-roughness over specular area looks bad.
             
         //Reflections:
@@ -1327,7 +1329,9 @@ void main() {
             if (DO_AMBILIGHT == 1.0) {
                 pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb;
                 if (DO_BG_IMAGE != 1.0) {
-                    float anoise = random_fast( NOISEPOWER * NOISEPOWER_AMBI_MUL, vTexCoord * vDynamicSeed);
+                    float noise_power = NOISEPOWER * NOISEPOWER_AMBI_MUL;
+                    float anoise = random_fast(vTexCoord * vDynamicSeed);
+                    anoise = scale_to_range(anoise, -noise_power, noise_power);
                     anoise *=  (1 - pixel_ambi.g);
                     pixel_ambi += anoise; 
                 }              
@@ -1365,19 +1369,14 @@ void main() {
 
     if (canvas_bezel_screen > 0.5) {
         
-        //Deband
-        /*float spot_vignette_noise = 0.0;
-        if (DO_VIGNETTE + DO_SPOT > 0.0) {
-            spot_vignette_noise = random_fast(NOISEPOWER, vOutputCoord) *100.0;
-        }*/
-        
         //Vignette
             if (DO_VIGNETTE == 1.0) {
-                //float dist = length(vec2((co_content.x-0.5)*vIn_aspect, co_content.y-0.5));
-                //vignette = smoothstep(V_SIZE,0.0,dist)*V_POWER;
+                float spot_vignette_noise = random_fast(vTexCoord);
+                spot_vignette_noise = scale_to_range(spot_vignette_noise, -NOISEPOWER, NOISEPOWER);
+                pixel_out += spot_vignette_noise;
                 vec2 sinco = (co_content-0.5) / V_SIZE ;
                 float vignette = cos(sinco.x) * cos(sinco.y) * V_POWER;
-                pixel_out = (pixel_out*vignette)*DO_VIGNETTE;
+                pixel_out = (pixel_out*vignette);
             } 
             
         //Spot

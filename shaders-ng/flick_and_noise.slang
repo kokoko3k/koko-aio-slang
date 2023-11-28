@@ -99,9 +99,11 @@ void main() {
    else 
       pixel_out = texture(Source, vTexCoord); //<-alpha carries ntsc artifacts mask
    
-   if (DO_RF_NOISE > 0.0)
-      pixel_out.rgb += vec3(random_fast(RF_NOISE_STRENGTH, vTexCoord * vDynamicSeed));
-
+   if (DO_RF_NOISE > 0.0) {
+      float anoise = random_fast(vTexCoord);
+      anoise = scale_to_range(anoise, -RF_NOISE_STRENGTH, RF_NOISE_STRENGTH);
+      pixel_out.rgb += vec3(anoise);
+   }
    FragColor = pixel_out;
 }
 

@@ -480,9 +480,8 @@ float random(float power, vec2 seed) {
 }
 
 //The following produces weird results when with dynamic seed like framecount.
-float random_fast(float power, vec2 seed) {
+float random_fast(vec2 seed) {
 	float noise_out = fract(sin(dot(seed.xy, VEC2_RND_A_B)) * RND_C);
-    noise_out = scale_to_range(noise_out, -power, power);
     return noise_out;
 }
 
