@@ -248,14 +248,15 @@ bool first_in_range(float a, float lo, float hi) {
    return (a > lo) && (a < hi);
 }
 
-vec3 pixel_dedither(sampler2D tex, vec2 coords, vec4 sourcesize, float tmin, float tmax, float strength) {
+vec3 pixel_dedither(sampler2D tex, vec2 coords, vec4 sourcesize, float tmin, float tmax, float strength1, float strength2) {
    #define DX sourcesize.z
    #define DY sourcesize.w
-   float accum_div = 0.0;
+   float accum_div1 = 0.0;
+   float accum_div2 = 0.0;
    
 
    vec3 p0 = texture(tex, coords).rgb;
-
+   
 //    Horizontal xoxox   
       vec3 avg_x = vec3(0.0);
       vec3 pxb = p0;                                                 // oxOxo
@@ -267,7 +268,7 @@ vec3 pixel_dedither(sampler2D tex, vec2 coords, vec4 sourcesize, float tmin, flo
       float dx1= dot(abs(pxb-pxa), vec3(1.0));
       if (first_in_range(dx1,tmin,tmax) && pxa == pxc && (pxb == pxd || pxb == pxe)) {
           avg_x = (pxa+pxb) /2.0;
-          accum_div += 1.0;
+          accum_div1 += 1.0;
        }
  
 //    Vertical
@@ -281,14 +282,13 @@ vec3 pixel_dedither(sampler2D tex, vec2 coords, vec4 sourcesize, float tmin, flo
       float dy1= dot(abs(pya-pyb), vec3(1.0));
       if (first_in_range(dy1,tmin,tmax) && pya == pyc && (pyb == pyd || pyb == pye)) {
           avg_y = (pya+pyb) /2.0;
-          accum_div += 1.0;
+          accum_div1 += 1.0;
        }
 
    vec3 avg_xy= vec3(0.0);
    vec3 avg_yx= vec3(0.0);
-   #define OBLIQUE_SEARCH 0.0
    
-   if (OBLIQUE_SEARCH == 1.0) {
+   if (DEDITHER_STRENGTH2 > 0.0) {
       vec3 pxyb = p0;
       vec3 pxya = texture(tex, coords + vec2(-DX,     -DY    )).rgb;
       vec3 pxyc = texture(tex, coords + vec2(+DX,     +DY    )).rgb;
@@ -298,7 +298,7 @@ vec3 pixel_dedither(sampler2D tex, vec2 coords, vec4 sourcesize, float tmin, flo
       float dxy1= dot(abs(pxyb-pxya), vec3(1.0));
       if (first_in_range(dxy1,tmin,tmax) && pxya == pxyc && (pxyb == pxyd || pxyb == pxye)) {
          avg_xy = (pxya+pxyb) / 2.0;
-         accum_div += 1.0;
+         accum_div2 += 1.0;
       }
 
       vec3 pxyb2 = p0;
@@ -311,18 +311,22 @@ vec3 pixel_dedither(sampler2D tex, vec2 coords, vec4 sourcesize, float tmin, flo
 
       if (first_in_range(dxy12,tmin,tmax) && pxya2 == pxyc2 && (pxyb2 == pxyd2 || pxyb2 == pxye)) {
          avg_yx = (pxya2+pxyb2) / 2.0;
-         accum_div += 1.0;
+         accum_div2 += 1.0;
       }
    }
 
-   vec3 pixel_out = vec3(0.0);
-   if (accum_div > 0.0) {
+   //if (accum_div1 > 0.0) {
       //pixel_out = (pxb + pxa + pxc + pya + pyc + pxya + pxyc + pxya2 + pxyc2) / 9.0;
-      pixel_out = mix(p0, (avg_x + avg_y + avg_xy + avg_yx) / accum_div, strength);
       //pixel_out = (pxb + pxa + pxc + pya + pyc ) / 5.0;
-   } else {
-      pixel_out = p0;
-   }
+      //pixel_out = mix(p0, (avg_x + avg_y + avg_xy + avg_yx) / accum_div, strength1);
+   //}
+   vec3 pixel_out = p0;
+   if (accum_div1 > 0.0)
+      pixel_out = mix(pixel_out, (avg_x + avg_y)   / accum_div1, strength1);
+   if (accum_div2 > 0.0)
+      pixel_out = mix(pixel_out, (avg_xy + avg_yx) / accum_div2, strength2);
+
+
    return pixel_out;
 }
 
@@ -354,7 +358,7 @@ void main() {
    } else if (DO_DEDITHER > 0.5) {
       //vec3 pixel_dedither(vec2 coords, vec4 sourcesize, float tmin, float tmax, float strength) {
       float tmin = 0.0;
-      pixel_out = pixel_dedither(Source, vTexCoord, params.SourceSize, tmin, DEDITHER_TRESHMAX, DEDITHER_STRENGTH);
+      pixel_out = pixel_dedither(Source, vTexCoord, params.SourceSize, tmin, DEDITHER_TRESHMAX, DEDITHER_STRENGTH, DEDITHER_STRENGTH2);
    }
    
    

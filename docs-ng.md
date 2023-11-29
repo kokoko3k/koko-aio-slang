@@ -69,8 +69,11 @@
     Try to smooth dithering patterns.<br>
     Enabling dedithering automatically disables  NTSC color artifacts:** generation.
     
-    Strength: Blends dedithering and original image.
-    Treshold: Avoid to dedither "legit" zones by lowering this.
+    Sensitivity: Avoid to dedither "legit" zones by lowering this.
+    Basic search strength: Blends basic dedithering and original image.
+    Extensive search strength: Blends extensive dedithering and original image .
+                               may produce posterization effects.
+    
     
 **CVBS: NTSC color artifacts:**<br>
     Tries to emulate typical NTSC color artifacting without emulating<br>
