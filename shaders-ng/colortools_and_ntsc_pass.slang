@@ -11,7 +11,7 @@
 #define CYELLOW  vec3(1.0,1.0,0.0)
 #define CCUSTOM vec3(0.3,0.5,0.1)
 
-#define DEBUG_COLOR vec3(0.2)
+#define DEBUG_COLOR vec3(0.25,1.0,0.5)
 #define DEBUG_BLINK_TIME 30
 #define DEBUG_GRADIENT_STEPS 64
 
@@ -20,11 +20,12 @@
 //#define DEBUG
    //#define DEBUG_COLOR_CALIB
    //#define DEBUG_TIME_FADE
-   #define DEBUG_SOLID_COLOR
+   //#define DEBUG_SOLID_COLOR
    //#define DEBUG_STEP_GRADIENT
    //#define DEBUG_STEP_GRADIENT_V
    //#define DEBUG_BLINK
    //#define DEBUG_BLINK_CIRCLE
+   #define DEBUG_WALKING_CIRCLE
    //#define DEBUG_COLORWHEEL
    
    
@@ -215,6 +216,14 @@ vec3 debug() {
       pixel_debug *= float( ( mod(params.FrameCount, DEBUG_BLINK_TIME * 2) < DEBUG_BLINK_TIME));
       pixel_debug *= DEBUG_COLOR;
       
+   #elif defined DEBUG_WALKING_CIRCLE
+      float speed = 4.0;
+      vec2 center = vec2(  mod(params.FrameCount*speed, params.SourceSize.x*1.2)/params.SourceSize.x  -0.1      , 0.5);
+      center = vTexCoord - center;
+      float radius = 0.05;
+      pixel_debug = vec3(1 - step(radius, length(center)));
+      pixel_debug *= DEBUG_COLOR;
+      
    #elif defined DEBUG_COLORWHEEL   
       pixel_debug = colorwheel(vTexCoord);   
    
@@ -332,6 +341,67 @@ vec3 pixel_dedither(sampler2D tex, vec2 coords, vec4 sourcesize, float tmin, flo
 
 
 
+vec3 persistence_v1(vec3 feedback, vec3 pixel_now, float start_decay, float end_decay, float motion_blur_cancel) {
+   //start_decay: is the initial decay, the fast one: 1.0 means instantaneous, try around 0.8
+   //end decay the higher, the more the persistance in the long run, try around 1.0;
+   //motion_blur_cancel: 0.0 means full blur on bright areas; try around 2.5
+
+   vec3 x=(feedback - pixel_now);
+   
+   vec3 a = vec3( 1 + start_decay );
+   vec3 b = vec3( end_decay );
+
+   //compute fade speed as an high gamma curve:
+   vec3 fade_speed=pow(a, pow(x,b) )-1;
+   
+   //higher speed is needed when composing over brighter colors to avoid motion blur
+   fade_speed = fade_speed + (pixel_now*motion_blur_cancel);
+   
+   //Ensure a minimum speed to reach 0.0 and clamp to 1.0 to avoid funky effects
+   float min_speed = 0.05  ;
+   fade_speed=clamp(fade_speed, min_speed, 1.0);
+   
+
+   //Compute the persistent light by mixing pixel current and previous one
+   vec3 pixel_persistent = mix(feedback, pixel_now, fade_speed );  
+   
+   //blend only if we are fading out
+      vec3 light_fading_out = vec3(greaterThan(feedback, pixel_now));
+      return mix(pixel_now, pixel_persistent, light_fading_out);
+   }
+   
+
+
+vec3 persistence(vec3 feedback, vec3 pixel_now, float start_decay, float late_persistence, float motion_blur_cancel) {
+   //start_decay: is the initial decay, the fast one: 1.0 means instantaneous, try around 0.8
+   //end decay the higher, the more the persistance in the long run, try around 1.0;
+   //motion_blur_cancel: 0.0 means full blur on bright areas; try around 2.5
+
+   vec3 diff=(feedback - pixel_now);
+
+   vec3 speed_fast = diff * start_decay;
+   vec3 speed_slow = diff / (late_persistence+eps);
+      
+   vec3 fade_speed = mix(speed_slow, speed_fast, diff );
+   
+   //higher speed is needed when composing over brighter colors to avoid motion blur
+   fade_speed = fade_speed + (pixel_now*motion_blur_cancel);
+   
+   //Ensure a minimum speed to reach 0.0 and clamp to 1.0 to avoid funky effects
+   float min_speed = 0.05  ;
+   fade_speed=clamp(fade_speed, min_speed, 1.0);
+   
+
+   //Compute the persistent light by mixing pixel current and previous one
+   vec3 pixel_persistent = mix(feedback, pixel_now, fade_speed );  
+   
+   //blend only if we are fading out
+      vec3 light_fading_out = vec3(greaterThan(feedback, pixel_now));
+      return mix(pixel_now, pixel_persistent, light_fading_out);
+   }
+   
+
+
 void main() {
    vec3 pixel_in = texture(Source, vTexCoord).rgb;
    vec3 pixel_out = pixel_in;
@@ -360,10 +430,7 @@ void main() {
       float tmin = 0.0;
       pixel_out = pixel_dedither(Source, vTexCoord, params.SourceSize, tmin, DEDITHER_TRESHMAX, DEDITHER_STRENGTH, DEDITHER_STRENGTH2);
    }
-   
-   
-   
-   
+
    
    #ifdef DEBUG
       //Cant "debug" ntsc artifacts because it samples from source (original)
@@ -405,7 +472,15 @@ void main() {
       pixel_out = pixel_out - square_wave_time_vec3;
     }
 */
-   
+
+
+   if (DO_PPERSISTENCE == 1.0) {
+      //persistence(vec3 feedback, vec3 pixel_now, float start_decay, float end_decay, float motion_blur_cancel) {
+      vec3 feedback = texture(colortools_and_ntsc_passFeedback, vTexCoord).rgb;
+      float motion_blur_cancel = 2.5;
+      pixel_out = persistence(feedback, pixel_out, PPERSISTENCE_START, PPERSISTENCE_END, motion_blur_cancel);
+   }
+ 
    FragColor = vec4(pixel_out, artifact_mask);
    //FragColor = vec4(artifacts);
 }

@@ -797,6 +797,18 @@
     #define DELTA_RENDER_CHECK_AREA    global.DELTA_RENDER_CHECK_AREA
 #endif
 
+#ifndef DO_PPERSISTENCE
+	#define DO_PPERSISTENCE		global.DO_PPERSISTENCE
+#endif
+
+#ifndef PPERSISTENCE_START
+	#define PPERSISTENCE_START	global.PPERSISTENCE_START
+#endif
+
+#ifndef PPERSISTENCE_END
+	#define PPERSISTENCE_END	global.PPERSISTENCE_END
+#endif
+
 #ifndef SERVICE1
     #define SERVICE1 global.SERVICE1
 #endif

@@ -78,9 +78,10 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float SAT_BLEED_STRENGTH;
 	float SAT_BLEED_PAL;
 	
-
+	float DO_PPERSISTENCE;
+	float PPERSISTENCE_START;
+	float PPERSISTENCE_END;
 	
-
 	float GAMMA_OUT ;
 	float SATURATION;
 	float LUMINANCE;
@@ -341,6 +342,11 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BLANK5 " " 0.0 0.0 1.0 1.0
 
 
+//Phosphor persistence
+#pragma parameter DO_PPERSISTENCE       "★ Persistence of phosphors enable? (ppe) ==>"	0.0	 0.0 1.0 1.0
+#pragma parameter PPERSISTENCE_START    "        Early decay"			0.8 	 0.0 1.0 0.05
+#pragma parameter PPERSISTENCE_END      "        Late Persistence"		1.0 	 0.0 2.0 0.05
+#pragma parameter BLANK5a " " 0.0 0.0 1.0 1.0
 
 //Deconvergence
 #pragma parameter DO_SHIFT_RGB       "★ Deconvergence enable? (de) ==>"	0.0	 0.0 1.0 1.0
