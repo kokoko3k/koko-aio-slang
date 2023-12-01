@@ -741,6 +741,12 @@ float random_fast(vec2 seed) {
 	}
 
 	vec2 content_geom_override(vec2 co, float aspect, float in_aspect, float vshift, float hshift, float out_zoom){
+		
+		
+		//cheap cardboard emulation:
+        //co = co*2.0 - vec2(0.0,0.5);
+        //if (co.x > 1.0) co.x -= 1;
+		
 		//Aspect
 		//float bUse_original_aspect = float(aspect < 0.01);
 		float bUse_custom_aspect = step(0.01, aspect);
