@@ -107,6 +107,13 @@
     It can be used with RGB shifting and image blurring to give the picture<br>
     an ntsc look without dealing with specific encoding/decoding stuffs. <br>
 
+**Persistence of phosphors:**<br>
+    This emulates the unexcited phosphors that continue to emit light.
+
+    Early decay: is the immediate light cut after the phosphor is no more/less excited.
+    Late persistence: modulates the time the residual light will stay on screen
+    
+    
 **Deconvergence:**<br>
     Shift R,G,B components separately to mimic channel deconvergence.<br>
     By varying Red, Green and Blue offsets, the relative component will be<br>
