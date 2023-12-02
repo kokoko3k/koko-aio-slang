@@ -472,7 +472,7 @@ void main() {
 
     //TEST adaptive strobe:
 
-    float range = ALT_BLANK_STRENGTH;
+    /*float range = ALT_BLANK_STRENGTH;
     float square_wave_time = float(mod(params.FrameCount,  2.0) == 1.0);
     square_wave_time = square_wave_time*2-1;
     vec3 square_wave_time_vec3 = vec3(square_wave_time);
@@ -481,7 +481,7 @@ void main() {
       pixel_out = pixel_out + square_wave_time_vec3;
     } else {
       pixel_out = pixel_out - square_wave_time_vec3;
-    }
+    }*/
 
 
 
