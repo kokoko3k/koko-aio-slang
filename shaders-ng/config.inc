@@ -345,7 +345,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 //Phosphor persistence
 #pragma parameter DO_PPERSISTENCE       "★ Persistence of phosphors enable? (ppe) ==>"	0.0	 0.0 1.0 1.0
 #pragma parameter PPERSISTENCE_START    "        Early decay"			0.9 	 0.0 1.0 0.05
-#pragma parameter PPERSISTENCE_END      "        Late Persistence"		0.45 	 0.0 2.0 0.05
+#pragma parameter PPERSISTENCE_END      "        Late Persistence"		0.5 	 0.0 2.0 0.05
 #pragma parameter BLANK5a " " 0.0 0.0 1.0 1.0
 
 //Deconvergence
