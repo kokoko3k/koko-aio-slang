@@ -166,7 +166,9 @@ vec4 pixel_bleed(vec4 pixel_in, vec2 co, sampler2D in_texture, vec4 sourcesize2)
    #ifdef D3D_WORKAROUND
       // d3d11 compiler complains it is unable to unroll the loop because it is
       // clueless about the maximum pragma value; d3d12 hangs somewhere.
-      size = min(20.0,SAT_BLEED_SIZE_LEFT) ;
+      size = min(5.0,SAT_BLEED_SIZE) ;
+   #else 
+      size = min(20.0,SAT_BLEED_SIZE) ;
    #endif
 
    //Tried to unbranch the following, no gain (even worse) probably due to not using constants anymore.
