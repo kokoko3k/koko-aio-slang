@@ -84,8 +84,7 @@
 // #define DO_SAT_BLEED  0.0
 // #define SAT_BLEED_PAL  0.0
 // #define SAT_BLEED_STRENGTH  1.0
-// #define SAT_BLEED_SIZE_LEFT  5.0
-// #define SAT_BLEED_SIZE_RIGHT  5.0
+// #define SAT_BLEED_SIZE  5.0
 // #define SAT_BLEED_FALLOFF  1.7
 
 

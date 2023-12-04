@@ -121,12 +121,8 @@
     #define DO_SAT_BLEED		global.DO_SAT_BLEED
 #endif
 
-#ifndef SAT_BLEED_SIZE_LEFT
-    #define SAT_BLEED_SIZE_LEFT	global.SAT_BLEED_SIZE_LEFT
-#endif
-
-#ifndef SAT_BLEED_SIZE_RIGHT
-    #define SAT_BLEED_SIZE_RIGHT	global.SAT_BLEED_SIZE_RIGHT
+#ifndef SAT_BLEED_SIZE
+    #define SAT_BLEED_SIZE	global.SAT_BLEED_SIZE
 #endif
 
 #ifndef SAT_BLEED_FALLOFF

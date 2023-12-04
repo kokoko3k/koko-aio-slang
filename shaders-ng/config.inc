@@ -72,8 +72,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float DO_FXAA;
 	
 	float DO_SAT_BLEED;
-	float SAT_BLEED_SIZE_LEFT;
-	float SAT_BLEED_SIZE_RIGHT;
+	float SAT_BLEED_SIZE;
 	float SAT_BLEED_FALLOFF;
 	float SAT_BLEED_STRENGTH;
 	float SAT_BLEED_PAL;
@@ -336,8 +335,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter DO_SAT_BLEED "★ CVBS: Bandwidth limited chroma enable? (cv) ==>"	0.0 	0.0 1.0 1.0
 #pragma parameter SAT_BLEED_PAL           "        Use PAL colorspace, not NTSC"	0.0 	 0.0 1.0 1.0
 #pragma parameter SAT_BLEED_STRENGTH      "        Strength"				1.0	 0.0 5.0  0.01
-#pragma parameter SAT_BLEED_SIZE_LEFT     "        Size Left"				5.0 	 1.0 40.0  1.0
-#pragma parameter SAT_BLEED_SIZE_RIGHT    "        Size Right"				5.0 	 1.0 40.0  1.0
+#pragma parameter SAT_BLEED_SIZE          "        Size"				5.0 	 1.0 20.0  1.0
 #pragma parameter SAT_BLEED_FALLOFF  	  "        Falloff"				1.7 	 1.0 2.0 0.01
 #pragma parameter BLANK5 " " 0.0 0.0 1.0 1.0
 
