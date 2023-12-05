@@ -44,14 +44,14 @@ echo Removing duplicate fields, get field from pragma parameters file
 cat "$pragma_parameter_file" |sed -e "s/[[:space:]]\+/ /g"|grep -vi "//#pragma\|// #pragma"|grep "#pragma parameter" | while read line ; do
         FIELD=$(echo $line | cut -d " " -f 3)
         #take only the first field and append it to dest file
-        grep "$FIELD =" $out_file | head -n 1 | xargs >> "$out_file2"
+        grep "$FIELD =" $out_file | head -n 1 |sed -e "s/[[:space:]]\+/ /g" >> "$out_file2"
 done
 
 IFS=$'\n'
 
 echo creating defines
 for l in $(cat $out_file2 | tr -d "=") ; do
-    echo '#define' $l
+    echo '#define' $l | xargs
 done
 
 
