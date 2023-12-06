@@ -751,15 +751,27 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         //FIXME: test with coore or fuzzy coords how it works when using variable width phosphors, maybe 
         //it would need to be: vec3 mask = min((rgb_w * rgb_h), darklines_mask * rgb_h * rgb_w); =
 
-
+    float TEST_OVERMASK_NEW = 0.0;
     //Apply Overmask:
-        vec3 mask_overmask = PIXELGRID_OVERMASK * (mask - 0.5) + 0.5;
-        vec3 pixel_in_overmask = mix(pixel_in, pixel_in * PIXELGRID_OVERMASK, PIXELGRID_OVERMASK);
-
+        if (TEST_OVERMASK_NEW == 1.0) {
+            vec3 mask_overmask = PIXELGRID_OVERMASK * (mask - 0.5) + 0.5;
+            vec3 pixel_in_overmask = mix(pixel_in, pixel_in * PIXELGRID_OVERMASK, PIXELGRID_OVERMASK);
+            
         //Adaptive overmask experiment
-        //mask = mix(mask, mask_overmask, abs(mask - vec3(0.5)) );
-        //pixel_in = mix(pixel_in, pixel_in_overmask,  abs( pixel_in - vec3(0.5)  )      );
-    
+            //different mix levels:
+                mask = mix(mask_overmask, mask, abs(mask - vec3(0.5)) );
+                pixel_in = mix(pixel_in_overmask, pixel_in,  abs( pixel_in - vec3(0.5)  )      );
+            //Same mix levels:
+                //mask = mix(mask, mask_overmask,  abs( pixel_in - vec3(0.5)  )      );
+                //pixel_in = mix(pixel_in, pixel_in_overmask,  abs( pixel_in - vec3(0.5)  )      );
+            //Mix level applied to overmask:
+                //vec3 overmask_adapted = mix(vec3(1.0), vec3(PIXELGRID_OVERMASK), abs(pixel_in - 0.5) );
+                //mask_overmask = overmask_adapted * (mask - 0.5) + 0.5;
+                //pixel_in_overmask = mix(pixel_in, pixel_in * overmask_adapted, overmask_adapted);
+        } else {
+            mask = PIXELGRID_OVERMASK * (mask - 0.5) + 0.5;
+            pixel_in = mix(pixel_in, pixel_in * PIXELGRID_OVERMASK, PIXELGRID_OVERMASK);
+        }
     //Apply the mask to pixel_in and clamp the minimum to the unexcited grille.
         vec3 mask_and_grille = max(mask * pixel_in, rgb_grille * PIXELGRID_BASAL_GRID*0.0025);
 
