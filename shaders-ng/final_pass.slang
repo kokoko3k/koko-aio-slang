@@ -753,8 +753,12 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
 
 
     //Apply Overmask:
-        mask = PIXELGRID_OVERMASK * (mask - 0.5) + 0.5;
-        pixel_in = mix(pixel_in, pixel_in * PIXELGRID_OVERMASK, PIXELGRID_OVERMASK);
+        vec3 mask_overmask = PIXELGRID_OVERMASK * (mask - 0.5) + 0.5;
+        vec3 pixel_in_overmask = mix(pixel_in, pixel_in * PIXELGRID_OVERMASK, PIXELGRID_OVERMASK);
+
+        //Adaptive overmask experiment
+        //mask = mix(mask, mask_overmask, abs(mask - vec3(0.5)) );
+        //pixel_in = mix(pixel_in, pixel_in_overmask,  abs( pixel_in - vec3(0.5)  )      );
     
     //Apply the mask to pixel_in and clamp the minimum to the unexcited grille.
         vec3 mask_and_grille = max(mask * pixel_in, rgb_grille * PIXELGRID_BASAL_GRID*0.0025);

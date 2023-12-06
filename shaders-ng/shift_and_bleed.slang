@@ -123,43 +123,61 @@ vec4 deconvergence_shadow_wrap(vec2 coord) {
    }
 }
 
+#define SIDE_RIGHT 1
+#define SIDE_LEFT -1
 
-vec3 pixel_bleed_side_NTSC(vec4 pixel_in, vec2 co, float size, float side, sampler2D in_texture, vec4 sourcesize2) {
+vec3 pixel_bleed_side_NTSC(vec4 pixel_in, vec2 co, float size, sampler2D in_texture, vec4 sourcesize2) {
    //apply strength modifier to blur ntsc artifacts more.
    
    float strength_modifier = mix(1.0, pixel_in.a, DO_NTSC_ARTIFACTS); 
    float w = SAT_BLEED_STRENGTH * clamp (strength_modifier, (1-NTSC_ARTF_NOBLEED), 1.0 ); 
-   vec3 blur_YIQ = pixel_in.rgb * mat3_RGB2YIQ;    //Work in YIQ space
+   vec3 blur_YIQ_l = pixel_in.rgb * mat3_RGB2YIQ;    //Work in YIQ space
+   vec3 blur_YIQ_r = blur_YIQ_l;
    float i = 0.0;
+   if (vShow_artifact_mask == 1.0) return vec3(strength_modifier);
+   
    for ( i=1 ; i <= size ; i++ ){
        w=w/SAT_BLEED_FALLOFF;
+       
       //w = w * exp(i*i*(1-SAT_BLEED_FALLOFF)*0.1);
-      vec3 smp_YIQ = texture(flick_and_noise_pass, co - side * vec2(sourcesize2.z*i,0.0)).rgb * mat3_RGB2YIQ;
-      
+      vec3 smp_YIQ = texture(flick_and_noise_pass, co - SIDE_LEFT * vec2(sourcesize2.z*i,0.0)).rgb * mat3_RGB2YIQ;
       //Blur Y, I and Q
-      blur_YIQ.xyz = mix(blur_YIQ.xyz, smp_YIQ.xyz, w/vec3( bandwidth_mhz_Y_ntsc, bandwidth_mhz_I, bandwidth_mhz_Q));
+      blur_YIQ_l = mix(blur_YIQ_l.xyz, smp_YIQ.xyz, w/vec3( bandwidth_mhz_Y_ntsc, bandwidth_mhz_I, bandwidth_mhz_Q));
+      
+      smp_YIQ = texture(flick_and_noise_pass, co - SIDE_RIGHT * vec2(sourcesize2.z*i,0.0)).rgb * mat3_RGB2YIQ;
+      //Blur Y, I and Q
+      blur_YIQ_r = mix(blur_YIQ_r.xyz, smp_YIQ.xyz, w/vec3( bandwidth_mhz_Y_ntsc, bandwidth_mhz_I, bandwidth_mhz_Q));
    }
-   if (vShow_artifact_mask == 1.0) return vec3(strength_modifier);
-   return blur_YIQ.xyz * mat3_YIQ2RGB; //return to RGB colorspace
+   vec3 blur_RGB_l = blur_YIQ_l * mat3_YIQ2RGB; //return to RGB colorspace
+   vec3 blur_RGB_r = blur_YIQ_r * mat3_YIQ2RGB; //return to RGB colorspace
+   
+   // Clamping min to 0.0 is needed for nvidia to avoid bad graphical glitches, why?
+   return max(mix(blur_RGB_l,blur_RGB_r,0.5), 0.0);
 }
 
-vec3 pixel_bleed_side_PAL(vec3 pixel_in, vec2 co, float size, float side, sampler2D in_texture, vec4 sourcesize2) {
+vec3 pixel_bleed_side_PAL(vec3 pixel_in, vec2 co, float size, sampler2D in_texture, vec4 sourcesize2) {
    float w = SAT_BLEED_STRENGTH;
-   vec3 blur_YUV = pixel_in * mat3_RGB2YUV;    //Work in YIQ space
+   vec3 blur_YUV_l = pixel_in * mat3_RGB2YUV;    //Work in YIQ space                                        //FIXME can i use pixel_in here?
+   vec3 blur_YUV_r = blur_YUV_l;
    float i = 0.0;
    for ( i=1 ; i <= size ; i++ ){
       w=w/SAT_BLEED_FALLOFF;
-      vec3 smp_YUV = texture(flick_and_noise_pass, co - side * vec2(sourcesize2.z*i,0.0)).rgb * mat3_RGB2YUV;
       
+      vec3 smp_YUV = texture(flick_and_noise_pass, co - SIDE_LEFT * vec2(sourcesize2.z*i,0.0)).rgb * mat3_RGB2YUV;
       //Blur Y, U, V
-      blur_YUV.xyz = mix(blur_YUV.xyz, smp_YUV.xyz, w/vec3( bandwidth_mhz_Y_pal, bandwidth_mhz_U, bandwidth_mhz_V));
+      blur_YUV_l = mix(blur_YUV_l.xyz, smp_YUV.xyz, w/vec3( bandwidth_mhz_Y_pal, bandwidth_mhz_U, bandwidth_mhz_V));
+      
+      smp_YUV = texture(flick_and_noise_pass, co - SIDE_RIGHT * vec2(sourcesize2.z*i,0.0)).rgb * mat3_RGB2YUV;
+      //Blur Y, U, V
+      blur_YUV_r = mix(blur_YUV_r.xyz, smp_YUV.xyz, w/vec3( bandwidth_mhz_Y_pal, bandwidth_mhz_U, bandwidth_mhz_V));
    }
-   return blur_YUV.xyz * mat3_YUV2RGB; //return to RGB colorspace
+   vec3 blur_RGB_l = blur_YUV_l * mat3_YUV2RGB; //return to RGB colorspace
+   vec3 blur_RGB_r = blur_YUV_r * mat3_YUV2RGB; //return to RGB colorspace
+   
+   // Clamping min to 0.0 is needed for nvidia to avoid bad graphical glitches, why?
+   return max(mix(blur_RGB_l,blur_RGB_r,0.5), 0.0);
+
 }
-
-#define SIDE_RIGHT 1
-#define SIDE_LEFT -1
-
 
 vec4 pixel_bleed(vec4 pixel_in, vec2 co, sampler2D in_texture, vec4 sourcesize2) {
    float size = SAT_BLEED_SIZE;
@@ -170,20 +188,12 @@ vec4 pixel_bleed(vec4 pixel_in, vec2 co, sampler2D in_texture, vec4 sourcesize2)
    #else 
       size = min(20.0,SAT_BLEED_SIZE) ;
    #endif
-
-   //Tried to unbranch the following, no gain (even worse) probably due to not using constants anymore.
-   //Just dont try again.
-   vec3 side_left ; vec3 side_right;
+   
    if (SAT_BLEED_PAL == 1.0) {
-      side_right = pixel_bleed_side_PAL(pixel_in.rgb, co, size, SIDE_RIGHT, in_texture, sourcesize2);
-      side_left  = pixel_bleed_side_PAL(pixel_in.rgb, co, size , SIDE_LEFT , in_texture, sourcesize2);
+         return vec4 (  pixel_bleed_side_PAL(pixel_in.rgb, co, size, in_texture, sourcesize2), pixel_in.a);
    } else {
-      side_right = pixel_bleed_side_NTSC(pixel_in.rgba, co, size, SIDE_RIGHT, in_texture, sourcesize2);
-      side_left  = pixel_bleed_side_NTSC(pixel_in.rgba, co, size,  SIDE_LEFT,  in_texture, sourcesize2);
+         return vec4 ( pixel_bleed_side_NTSC(pixel_in.rgba, co, size, in_texture, sourcesize2), pixel_in.a);
    }
-   //Clamping min to 0.0 is needed for nvidia to avoid bad graphical glitches, why?
-   return vec4( max( mix(side_left,side_right,0.5), 0.0),
-                pixel_in.a);
 }
 
 void main() {
