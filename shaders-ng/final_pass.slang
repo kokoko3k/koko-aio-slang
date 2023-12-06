@@ -742,7 +742,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 pixel_in *= 1 + ((PG_spark*4) * dedot_mix_inverted);
                 
             //Dedot darklines mask:
-                darklines_mask = mix(vec3(1.0), darklines_mask, dedot_mix_inverted );
+              //  darklines_mask = mix(vec3(1.0), darklines_mask, dedot_mix_inverted );
         }
 
 
