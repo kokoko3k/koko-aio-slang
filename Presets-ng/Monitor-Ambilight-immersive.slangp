@@ -1,5 +1,4 @@
 #reference "Base.slangp"
-TEMPERATURE = "7500.000000"
 
 IN_GLOW_POWER = "1.3"
 GAMMA_OUT = "0.43"
