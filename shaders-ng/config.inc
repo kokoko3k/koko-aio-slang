@@ -402,7 +402,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter PIXELGRID_DECON_R_H       "           . Deconvergence Y: R phosphor" 0.0 -1.6 1.6 0.1
 #pragma parameter PIXELGRID_DECON_G_H       "           . Deconvergence Y: G phosphor" 0.0 -1.6 1.6 0.1
 #pragma parameter PIXELGRID_DECON_B_H       "           . Deconvergence Y: B phosphor" 0.0   -1.6 1.6 0.1
-#pragma parameter PIXELGRID_H_DEDOT			"           . Dedot mask between scanlines (use only if needed!)"	0.0 0.0 1.0 0.1
+#pragma parameter PIXELGRID_H_DEDOT			"           . Dedot mask between scanlines (use only if needed!)"	0.0 0.0 2.0 0.1
 
 
 #pragma parameter BLANK12f " " 0.0 0.0 1.0 1.0
