@@ -133,18 +133,19 @@ vec3 pixel_bleed_side_NTSC(vec4 pixel_in, vec2 co, float size, sampler2D in_text
    float w = SAT_BLEED_STRENGTH * clamp (strength_modifier, (1-NTSC_ARTF_NOBLEED), 1.0 ); 
    vec3 blur_YIQ_l = pixel_in.rgb * mat3_RGB2YIQ;    //Work in YIQ space
    vec3 blur_YIQ_r = blur_YIQ_l;
-   float i = 0.0;
+
    if (vShow_artifact_mask == 1.0) return vec3(strength_modifier);
    
-   for ( i=1 ; i <= size ; i++ ){
-       w=w/SAT_BLEED_FALLOFF;
-       
+   vec2 off_l = vec2(SIDE_LEFT  * sourcesize2.z,0.0);
+   vec2 off_r = vec2(SIDE_RIGHT * sourcesize2.z,0.0);   
+   for ( float i=1 ; i <= size ; i++ ){
+      w=w/SAT_BLEED_FALLOFF;
       //w = w * exp(i*i*(1-SAT_BLEED_FALLOFF)*0.1);
-      vec3 smp_YIQ = texture(flick_and_noise_pass, co - SIDE_LEFT * vec2(sourcesize2.z*i,0.0)).rgb * mat3_RGB2YIQ;
+      vec3 smp_YIQ = texture(flick_and_noise_pass, co - i*off_l ).rgb * mat3_RGB2YIQ;
       //Blur Y, I and Q
       blur_YIQ_l = mix(blur_YIQ_l.xyz, smp_YIQ.xyz, w/vec3( bandwidth_mhz_Y_ntsc, bandwidth_mhz_I, bandwidth_mhz_Q));
       
-      smp_YIQ = texture(flick_and_noise_pass, co - SIDE_RIGHT * vec2(sourcesize2.z*i,0.0)).rgb * mat3_RGB2YIQ;
+      smp_YIQ = texture(flick_and_noise_pass, co - i*off_r ).rgb * mat3_RGB2YIQ;
       //Blur Y, I and Q
       blur_YIQ_r = mix(blur_YIQ_r.xyz, smp_YIQ.xyz, w/vec3( bandwidth_mhz_Y_ntsc, bandwidth_mhz_I, bandwidth_mhz_Q));
    }
@@ -157,17 +158,19 @@ vec3 pixel_bleed_side_NTSC(vec4 pixel_in, vec2 co, float size, sampler2D in_text
 
 vec3 pixel_bleed_side_PAL(vec3 pixel_in, vec2 co, float size, sampler2D in_texture, vec4 sourcesize2) {
    float w = SAT_BLEED_STRENGTH;
-   vec3 blur_YUV_l = pixel_in * mat3_RGB2YUV;    //Work in YIQ space                                        //FIXME can i use pixel_in here?
+   vec3 blur_YUV_l = pixel_in * mat3_RGB2YUV;    //Work in YIQ space
    vec3 blur_YUV_r = blur_YUV_l;
-   float i = 0.0;
-   for ( i=1 ; i <= size ; i++ ){
+   
+   vec2 off_l = vec2(SIDE_LEFT  * sourcesize2.z,0.0);
+   vec2 off_r = vec2(SIDE_RIGHT * sourcesize2.z,0.0);   
+   for ( float i=1 ; i <= size ; i++ ){
       w=w/SAT_BLEED_FALLOFF;
-      
-      vec3 smp_YUV = texture(flick_and_noise_pass, co - SIDE_LEFT * vec2(sourcesize2.z*i,0.0)).rgb * mat3_RGB2YUV;
+      vec2 off = vec2(sourcesize2.z*i,0.0);
+      vec3 smp_YUV = texture(flick_and_noise_pass, co - i*off_l ).rgb * mat3_RGB2YUV;
       //Blur Y, U, V
       blur_YUV_l = mix(blur_YUV_l.xyz, smp_YUV.xyz, w/vec3( bandwidth_mhz_Y_pal, bandwidth_mhz_U, bandwidth_mhz_V));
       
-      smp_YUV = texture(flick_and_noise_pass, co - SIDE_RIGHT * vec2(sourcesize2.z*i,0.0)).rgb * mat3_RGB2YUV;
+      smp_YUV = texture(flick_and_noise_pass, co - i*off_r ).rgb * mat3_RGB2YUV;
       //Blur Y, U, V
       blur_YUV_r = mix(blur_YUV_r.xyz, smp_YUV.xyz, w/vec3( bandwidth_mhz_Y_pal, bandwidth_mhz_U, bandwidth_mhz_V));
    }
