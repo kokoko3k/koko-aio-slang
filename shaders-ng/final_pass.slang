@@ -570,7 +570,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         
     //Scanlines and fake slotmask =========================================================================
         vec3 rgb_h = vec3(1.0);
-        float dedot_mix_inverted = 1.0;
+        vec3 dedot_mix_inverted = vec3(1.0);
 
         //Pixelgrid: do horizontal if enabled, but skip it if user doesn't want it on interlaced content.
         //if (DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0)) { //103.1
@@ -599,9 +599,10 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 rgb_h_sin = (rgb_h_sin * rgb_h_sin);
                         
             //Compute dedot mix here for use in h mask and vmask2 later             
-                dedot_mix_inverted = (1-rgb_h_sin.g) * PIXELGRID_H_DEDOT ;
-                dedot_mix_inverted = dedot_mix_inverted * (max(max(pixel_in.r, pixel_in.g), pixel_in.b)/max_inLum);
+                dedot_mix_inverted = vec3((1-rgb_h_sin.x) * PIXELGRID_H_DEDOT) ;
+                //dedot_mix_inverted = dedot_mix_inverted * (max(max(pixel_in.r, pixel_in.g), pixel_in.b)/max_inLum);
                 //dedot_mix_inverted = dedot_mix_inverted * dot(pixel_in, vec3(0.33333) )/max_inLum;
+                dedot_mix_inverted = dedot_mix_inverted * (pixel_in/max_inLum);
                 dedot_mix_inverted = 1-dedot_mix_inverted;
             
             // Compute each phosphor height according to input luminance, 
@@ -743,6 +744,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 
             //Dedot darklines mask:
               //  darklines_mask = mix(vec3(1.0), darklines_mask, dedot_mix_inverted );
+              //  darklines_mask = mix(darklines_mask, vec3(1.0), (1- dedot_mix_inverted)*0.25 ); //dedot less?
         }
 
 
