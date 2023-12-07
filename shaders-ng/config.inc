@@ -369,9 +369,38 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BLANK7a " " 0.0 0.0 1.0 1.0
 
 
+
+#pragma parameter LABEL_INTERLACE           "      ★ Hi-resolution scanlines handling" 0.0 0.0 0.0 0.0
+#pragma parameter MIN_LINES_INTERLACED      "        . Consider Hi-Resolution above # lines:"		380.0 	1.0 1024 1.0
+#pragma parameter PIXELGRID_INTR_DISABLE_Y  "        . Hi-Res scanlines type (read docs):"   -2.0 -2.0 2.0 1.0
+#pragma parameter LabelDescIntlScan1        "          (-2: Faker-Interlaced, -1: Fake-Interlaced)"          0.0 0.0 0.0 0.0
+#pragma parameter LabelDescIntlScan2        "          ( 0: Interlaced, 1: No scanlines, 2: Don't interlace)" 0.0 0.0 0.0 0.0
+#pragma parameter PIXELGRID_INTR_FLICK_MODE "          . Scanlines flicker (0=off,1=on,2=if Hi-Res)"			2.0 	0.0 2.0 1.0
+#pragma parameter PIXELGRID_INTR_FLICK_POWR "             . Flicker power"		  		0.25 	0.0 8.0 0.01
+
+#pragma parameter BLANK12e " " 0.0 0.0 1.0 1.0
+
+
 // pixel Grid
 #pragma parameter DO_PIXELGRID		 "★  Low level Phosphor grid enable? (ph) ==>"	0.0 0.0 1.0 1.0
 #pragma parameter PIXELGRID_OVERMASK "      Overmask (1.0 = neutral)"	1.0 0.0 2.0 0.02
+#pragma parameter BLANK12ff " " 0.0 0.0 1.0 1.0
+
+#pragma parameter DO_PIXELGRID_H            "      ★ Scanlines (0 to disable)"    	1.0 0.0 1.25 0.05
+#pragma parameter PIXELGRID_COREY_FAKE_SCAN "           . Use fake integer scanlines"   0.0 0.0 1.0 1.0
+#pragma parameter PIXELGRID_MIN_H	        "           . Phosphors height Min"			0.2 0.00 1.0 0.05
+#pragma parameter PIXELGRID_MAX_H           "           . Phosphors height Max"			0.6 0.0 1.5 0.05
+#pragma parameter PIXELGRID_GAMMA_H         "           . Phosphors height min->max gamma:"	4.2 1.0 8.00 0.1
+#pragma parameter PIXELGRID_NO_INTERBLEED_H	"           . Inter line extra steepness"		0.0 0.0 10.0 0.1
+#pragma parameter PIXELGRID_H_ANTIMOIRE     "           . Anti-moire sweet spot (disables Y deconvergence)"  0.0 0.0 1.0 0.01
+#pragma parameter PIXELGRID_OFFSET_CORE     "           . Slotmask(fake) offset (not with anti-moire) " 0.0 0.0 1.0 0.01
+#pragma parameter PIXELGRID_DECON_R_H       "           . Deconvergence Y: R phosphor" 0.0 -1.6 1.6 0.1
+#pragma parameter PIXELGRID_DECON_G_H       "           . Deconvergence Y: G phosphor" 0.0 -1.6 1.6 0.1
+#pragma parameter PIXELGRID_DECON_B_H       "           . Deconvergence Y: B phosphor" 0.0   -1.6 1.6 0.1
+#pragma parameter PIXELGRID_H_DEDOT			"           . Dedot mask between scanlines (use only if needed!)"	0.0 0.0 2.0 0.1
+
+#pragma parameter BLANK12f " " 0.0 0.0 1.0 1.0
+
 
 #pragma parameter DO_PIXELGRID_W     "      ★ Horizontal mask (0 to disable)"    	1.0 0.0 1.0 0.05
 #pragma parameter PIXELGRID_SIZE_W   "           . Resolution: (core or screen)"	1.0 0.0 1.0 1.0
@@ -389,35 +418,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter PIXELGRID_BASAL_GRID  "           . Black level of the unexcided phosphor grid"	0.0 0.0 10.0 0.01
 #pragma parameter BLANK12fs " " 0.0 0.0 1.0 1.0
 
-
-
-#pragma parameter DO_PIXELGRID_H            "      ★ Scanlines (0 to disable)"    	1.0 0.0 1.25 0.05
-#pragma parameter PIXELGRID_COREY_FAKE_SCAN "           . Use fake integer scanlines"   0.0 0.0 1.0 1.0
-#pragma parameter PIXELGRID_MIN_H	        "           . Phosphors height Min"			0.2 0.00 1.0 0.05
-#pragma parameter PIXELGRID_MAX_H           "           . Phosphors height Max"			0.6 0.0 1.5 0.05
-#pragma parameter PIXELGRID_GAMMA_H         "           . Phosphors height min->max gamma:"	4.2 1.0 8.00 0.1
-#pragma parameter PIXELGRID_NO_INTERBLEED_H	"           . Inter line extra steepness"		0.0 0.0 10.0 0.1
-#pragma parameter PIXELGRID_H_ANTIMOIRE     "           . Anti-moire sweet spot (disables Y deconvergence)"  0.0 0.0 1.0 0.01
-#pragma parameter PIXELGRID_OFFSET_CORE     "           . Slotmask(fake) offset (not with anti-moire) " 0.0 0.0 1.0 0.01
-#pragma parameter PIXELGRID_DECON_R_H       "           . Deconvergence Y: R phosphor" 0.0 -1.6 1.6 0.1
-#pragma parameter PIXELGRID_DECON_G_H       "           . Deconvergence Y: G phosphor" 0.0 -1.6 1.6 0.1
-#pragma parameter PIXELGRID_DECON_B_H       "           . Deconvergence Y: B phosphor" 0.0   -1.6 1.6 0.1
-#pragma parameter PIXELGRID_H_DEDOT			"           . Dedot mask between scanlines (use only if needed!)"	0.0 0.0 2.0 0.1
-
-
-#pragma parameter BLANK12f " " 0.0 0.0 1.0 1.0
-
-#pragma parameter LABEL_INTERLACE           "      ★ Hi-resolution scanlines handling" 0.0 0.0 0.0 0.0
-#pragma parameter MIN_LINES_INTERLACED      "        . Consider Hi-Resolution above # lines:"		380.0 	1.0 1024 1.0
-#pragma parameter PIXELGRID_INTR_DISABLE_Y  "        . Hi-Res scanlines type (read docs):"   -2.0 -2.0 2.0 1.0
-#pragma parameter LabelDescIntlScan1        "          (-2: Faker-Interlaced, -1: Fake-Interlaced)"          0.0 0.0 0.0 0.0
-#pragma parameter LabelDescIntlScan2        "          ( 0: Interlaced, 1: No scanlines, 2: Don't interlace)" 0.0 0.0 0.0 0.0
-#pragma parameter PIXELGRID_INTR_FLICK_MODE "          . Scanlines flicker (0=off,1=on,2=if Hi-Res)"			2.0 	0.0 2.0 1.0
-#pragma parameter PIXELGRID_INTR_FLICK_POWR "             . Flicker power"		  		0.25 	0.0 8.0 0.01
-
-
-#pragma parameter BLANK12e " " 0.0 0.0 1.0 1.0
-
 #pragma parameter PIXELGRID_Y_MASK           "      ★ Vertical cell Mask (0 to disable)"	0.5 0.0 1.0 0.05
 #pragma parameter PIXELGRID_Y_MASK_COORDS    "           . Resolution: (core or screen)"	1.0 0.0 1.0 1.0
 #pragma parameter PIXELGRID_Y_MASK_HEIGHT    "           . Height divider (neg = multiplier):"	0.5 -8.0 8.0 0.125
@@ -428,8 +428,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter PIXELGRID_Y_SPARK          "           . Sparkling look punch"	0.0 0.0 1.0 0.05
 
 #pragma parameter BLANK12d " " 0.0 0.0 1.0 1.0
-
-
 
 
 // Dot matrix emulation

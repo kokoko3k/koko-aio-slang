@@ -397,13 +397,13 @@ vec2 zoomout_coords(vec2 in_coords, float zoom_out, float aspect) {
    return (in_coords * zoom) - offset;
 }
 
-bool scanline_have_to_flicker(bool is_interlaced) {
-	float scanline_flickering = DO_PIXELGRID * PIXELGRID_INTR_FLICK_MODE;	
-    return ((scanline_flickering == 1.0) || ((scanline_flickering==2.0) && is_interlaced ));
-}
-
 bool is_interlaced() {
 	return (params.OriginalSize.y > MIN_LINES_INTERLACED);
+}
+
+bool scanline_have_to_flicker(bool is_interlaced) {
+	float scanline_flickering = PIXELGRID_INTR_FLICK_MODE;	
+    return ((scanline_flickering == 1.0) || ((scanline_flickering==2.0) && is_interlaced ));
 }
 
 bool pixelgrid_h_needed() {
@@ -424,6 +424,7 @@ vec3 scale_to_range_vec3(vec3 x, vec3 dmin, vec3 dmax) {
     //Scales 0..1 range to a..b range
     return ( (dmax-dmin) * x ) + dmin;
 }
+
 vec2 scale_to_range_vec2(vec2 x, float dmin, float dmax) {
     //Scales 0..1 range to a..b range
     return ( (dmax-dmin) * x ) + dmin;

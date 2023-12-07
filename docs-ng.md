@@ -143,6 +143,27 @@
 **Tate mode:**<br>
     Rotates mask and scanlines by 90°<br>
         
+**Hi-resolution scanlines handling:**<br>
+        There you can choose how to handle scanlines when a content is Hi-Resolution.
+        Special handling may be needed to mitigate glitches/moire at 1080p or lower resolutions.
+        
+    Consider Hi-Resolution above # lines:
+        koko-aio will consider a frame as Hi-resolution if the lines number is above the configured value.
+    Hi-Res scanlines type
+      -1: Use a number of scanlines that perfectly fits the screen, a good glitches/moire free tradeoff.
+      -2: As above, but tighter (1.5x), another good (almost) glitches/moire free tradeoff.
+       0: Use interlaced scanlines, may need >1080p screen to avoid moire or weavy glitches
+       1: Avoid drawing scanlines gaps at all.
+       2: Use scanlines, but don't interlace them (bad for 1080p and lower resolutions)
+
+    Scanlines flicker (0=off,1=on,2=if Hi-res):
+        This setting emulates the flickering issues present on crt interlaced screens
+        where the brighter lines flickers when they are near dark ones.
+        You can choose to produce the flickering: never, always or only 
+        when the input picture is considered High resolution.
+    Interlace Flicker power: The strength of the effect.
+        
+        
 **Low level phosphor grid:**<br>
     This is a way to produce horizontal masks, scanlines and aperturegrille/slotmasks.<br>
     Parameters are tricky to setup, but possibilities are mny more quality is good at 1080p<br>
@@ -155,56 +176,7 @@
           It may cause moiree if combined with curvature, dedot, or sparkling look punch.
         Values < 1.0 tend to nullify the whole mask effect.
         
-    
-    Horizontal mask (rgb subpixel mask strength)
-        X resolution: (core or screen) (**):
-            0: Phosphors width will be relative to the pixel width of the core (game).
-            1: Phosphors width will be relative to the pixel width of the screen.
-        Cell size multiplier x (neg=divider):
-            Multiply (or divide if the parameter is < 0) the mask (cell) size by a factor.
-            As stated(**), the size may be relative to screen or core, this allow you to
-            "zoom" the cell horizontally and can be useful if you have an HiDPI screen.
-            For example, you may choose to use screen sized masks and zoom them by a factor
-            of 2 or 3 to make room for phosphors and see them visually grow in width.
-            Likewise, you can use core/game(**) sized masks and divide them by a factor
-            if they appear too big.
-        Mask type preset:
-            You can have the shader generate a preconfigured mask for you:
-            1:gm 2:gmx 3:rgb 4:rgbx 5:rbg 6:rbgx 7:wx
-            1:GreenMagenta, 2:GreenMagentaGap, 3:RedGreenBlue, 4:RedGreenBlueGap, 5:RedBlueGreen, 6:RedBlueGreenGap
-            7:WhiteGap (means r,g and b phosphors are completely overlapped, nice with scanline deconvergence)
-            
-            (beware that due to limitations of the actual implementation, masks ending in "x")
-            works reliable when emulating slotmasks only at screen coordinates with multiplier = 1.0)
-            bh selecting preset = 0, you can draft your own by using the following knobs:
-                Phosphors+gap count (mask size):
-                    How much phosphors or blank spaces the final mask will have.
-                R,G,B, Phosphor position:
-                    The position of every phosphor.
-                Example 1: Phosphors+gap count=4 and R=0 G=1 B=2
-                ...will give you a mask with red,green,blue and a blank space.
-                Example 2: Phosphors+gap count=2 and R=1 G=0 B=1
-                ...will give a mask with green + a mix of blue and red (magenta)
-                Example 3: Phosphors+gap count=3 and R=1 G=1 B=1
-                ...will give a mask with a blank space, the neutral white color and another blank space
-                Example 4: Phosphors+gap count=1 and R=0 G=0 B=0
-                ...like the previous one, but without any blank spaces.
-        Phosphors width Min, Max:
-            The width of each phosphors can grow or shrink, depending on the
-            luminosity of the underlying pixel luminance.
-            1.0 refers to the full mask width, so stay around 0.2 if you want
-            avoid them to blend.
-            Use Min and Max parameter to limit the minimum and maximum size
-            they can reach.
-        Phosphors width min->max gamma:
-                Since emulating phosphors with high Min-Max range changes the apparent gamma of the final image,
-                it is advised, if needed, to use this option to compensate, instead of the main gamma correction.
-                It is also a quick way to make the image brighter or darker.
-        Black level of the unexcided phosphor grid
-            Draw the vertical grid that hosts phosphors.
-            This is likely to produce moiree when using X resolution = core
-            
-            
+        
     Scanlines (*4)
             Scanlines emulation, set the strength of the effect here.
         Use fake integer scanlines
@@ -254,27 +226,56 @@
             scanlines, that's the residual of horizontal mask.
             Use this parameter to clear it and use it only if needed or it would have counter-effects.
             Also, mutating dots to straight lines would make moiree more visible when using curvature.
-
-
-    Hi-resolution scanlines handling:
-        There you can choose how to handle scanlines when a content is Hi-Resolution.
-        Special handling may be needed to mitigate glitches/moire at 1080p or lower resolutions.
-    Consider Hi-Resolution above # lines:
-        koko-aio will consider a frame as Hi-resolution if the lines number is above the configured value.
-    Hi-Res scanlines type
-      -1: Use a number of scanlines that perfectly fits the screen, a good glitches/moire free tradeoff.
-      -2: As above, but tighter (1.5x), another good (almost) glitches/moire free tradeoff.
-       0: Use interlaced scanlines, may need >1080p screen to avoid moire or weavy glitches
-       1: Avoid drawing scanlines gaps at all.
-       2: Use scanlines, but don't interlace them (bad for 1080p and lower resolutions)
-
-    Scanlines flicker (0=off,1=on,2=if Hi-res):
-        This setting emulates the flickering issues present on crt interlaced screens
-        where the brighter lines flickers when they are near dark ones.
-        You can choose to produce the flickering: never, always or only 
-        when the input picture is considered High resolution.
-    Interlace Flicker power: The strength of the effect.
-
+    
+    
+    Horizontal mask (rgb subpixel mask strength)
+        X resolution: (core or screen) (**):
+            0: Phosphors width will be relative to the pixel width of the core (game).
+            1: Phosphors width will be relative to the pixel width of the screen.
+        Cell size multiplier x (neg=divider):
+            Multiply (or divide if the parameter is < 0) the mask (cell) size by a factor.
+            As stated(**), the size may be relative to screen or core, this allow you to
+            "zoom" the cell horizontally and can be useful if you have an HiDPI screen.
+            For example, you may choose to use screen sized masks and zoom them by a factor
+            of 2 or 3 to make room for phosphors and see them visually grow in width.
+            Likewise, you can use core/game(**) sized masks and divide them by a factor
+            if they appear too big.
+        Mask type preset:
+            You can have the shader generate a preconfigured mask for you:
+            1:gm 2:gmx 3:rgb 4:rgbx 5:rbg 6:rbgx 7:wx
+            1:GreenMagenta, 2:GreenMagentaGap, 3:RedGreenBlue, 4:RedGreenBlueGap, 5:RedBlueGreen, 6:RedBlueGreenGap
+            7:WhiteGap (means r,g and b phosphors are completely overlapped, nice with scanline deconvergence)
+            
+            (beware that due to limitations of the actual implementation, masks ending in "x")
+            works reliable when emulating slotmasks only at screen coordinates with multiplier = 1.0)
+            bh selecting preset = 0, you can draft your own by using the following knobs:
+                Phosphors+gap count (mask size):
+                    How much phosphors or blank spaces the final mask will have.
+                R,G,B, Phosphor position:
+                    The position of every phosphor.
+                Example 1: Phosphors+gap count=4 and R=0 G=1 B=2
+                ...will give you a mask with red,green,blue and a blank space.
+                Example 2: Phosphors+gap count=2 and R=1 G=0 B=1
+                ...will give a mask with green + a mix of blue and red (magenta)
+                Example 3: Phosphors+gap count=3 and R=1 G=1 B=1
+                ...will give a mask with a blank space, the neutral white color and another blank space
+                Example 4: Phosphors+gap count=1 and R=0 G=0 B=0
+                ...like the previous one, but without any blank spaces.
+        Phosphors width Min, Max:
+            The width of each phosphors can grow or shrink, depending on the
+            luminosity of the underlying pixel luminance.
+            1.0 refers to the full mask width, so stay around 0.2 if you want
+            avoid them to blend.
+            Use Min and Max parameter to limit the minimum and maximum size
+            they can reach.
+        Phosphors width min->max gamma:
+                Since emulating phosphors with high Min-Max range changes the apparent gamma of the final image,
+                it is advised, if needed, to use this option to compensate, instead of the main gamma correction.
+                It is also a quick way to make the image brighter or darker.
+        Black level of the unexcided phosphor grid
+            Draw the vertical grid that hosts phosphors.
+            This is likely to produce moiree when using X resolution = core
+            
     
     Vertical cell Mask:
         The shape of the mask generated ny this function is "boxed", while the one
