@@ -38,7 +38,7 @@ void main() {
       //Export flicker coords for Fragment shader here:
          vFlickerCoords =  vec2(TexCoord.x, TexCoord.y + FlickerOffset);
          
-      vFlickering_power = DO_PIXELGRID * PIXELGRID_INTR_FLICK_POWR;
+      vFlickering_power = PIXELGRID_INTR_FLICK_POWR;
    }
 
 }

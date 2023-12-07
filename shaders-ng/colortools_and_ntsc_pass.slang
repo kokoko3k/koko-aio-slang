@@ -17,7 +17,7 @@
 
 
 
-//#define DEBUG
+//pk#define DEBUG
    //#define DEBUG_COLOR_CALIB
    //#define DEBUG_TIME_FADE
    //#define DEBUG_SOLID_COLOR
@@ -25,8 +25,8 @@
    //#define DEBUG_STEP_GRADIENT_V
    //#define DEBUG_BLINK
    //#define DEBUG_BLINK_CIRCLE
-   //#define DEBUG_WALKING_CIRCLE
-   #define DEBUG_COLORWHEEL
+   #define DEBUG_WALKING_CIRCLE
+   //#define DEBUG_COLORWHEEL
    
    
 #include "config.inc"
@@ -458,15 +458,15 @@ void main() {
       pixel_out = mix(pixel_out, feedback, m_blur_adapted  );
    }
    
-/*
-   if (mod(  floor(vTexCoord.y * params.OutputSize.y) , 2.0) == 0.0)
+
+   /*if (mod(  floor(vTexCoord.y * params.OutputSize.y) , 2.0) == 0.0)
       if (mod(params.FrameCount , 2.0) == 0.0)
       pixel_out = vec3(0.0);
       
      if (mod( floor(vTexCoord.y * params.OutputSize.y), 2.0) != 0.0)
       if (mod(params.FrameCount , 2.0) != 0.0)
       pixel_out = vec3(0.0);    
-*/
+   */
 
    if (DO_PPERSISTENCE == 1.0) {
       //persistence(vec3 feedback, vec3 pixel_now, float start_decay, float end_decay, float motion_blur_cancel) {
