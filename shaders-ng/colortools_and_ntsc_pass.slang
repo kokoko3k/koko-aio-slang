@@ -489,8 +489,8 @@ void main() {
       pixel_out = pixel_out - square_wave_time_vec3;
     }*/
 
-
-
+    
+    
    FragColor = vec4(pixel_out, artifact_mask);
    //FragColor = vec4(artifacts);
 }

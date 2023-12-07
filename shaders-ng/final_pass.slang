@@ -129,7 +129,7 @@ void main() {
         else
             vTexCoord = integer_scale(TexCoord, vIn_aspect, bool(vIsRotated), GAME_GEOM_INT_SCALE-1.0 ) + vec2( GAME_GEOM_OFF_FIX /10000);
 
-    
+    vTexCoord.y = vTexCoord.y + 0.00001;
     
     //if (DO_GLOBAL_SHZO >0.5)
     //    vTexCoord = zoom(vTexCoord + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM );
@@ -1323,12 +1323,20 @@ void main() {
             }
         }
     #endif
-              
+
+   
     vec3 pixel_ambi = vec3(0.0);
     vec3 pixel_under_content = vec3(0.0);
     //Draw content only over the alpha mask, and sample ambientlight outside it to spare gpu cycles.
         if (canvas_busy > 0.5) {
             pixel_out = fn_pixel_content(co_content) * canvas_busy;
+            
+            if (LCD_ANTIGHOSTING > 0.0) {
+                vec3 feedback = texture(final_passFeedback, vOutputCoord).rgb;
+                vec3 diff=(feedback - pixel_out);
+                pixel_out = mix(pixel_out, pixel_out-diff, LCD_ANTIGHOSTING );  
+            }
+            
         } else {
             
             //Can we halve refresh rate in the outside border to spare some cycles?
@@ -1495,10 +1503,10 @@ void main() {
     #endif
             
     
-    //pixel_out = texture(halo_pass,co_content).rgb;
-    //pixel_out = texture_NEAREST(halo_pass,co_content, global.in_glow_passSize).rgb;
-    
-    
+
+
+    //pixel_out = pixel_out -diff;
+   
     
     
     FragColor = vec4(pixel_out, 1.0);

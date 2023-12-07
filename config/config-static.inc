@@ -22,8 +22,19 @@
 //Halve rendering refresh on bezel and ambilight set to 1.0 to spare gpu cycles:
 #define HALVE_BORDER_UPDATE 0.0
 
-//Allow texture wrapping as a shader parameter, prepend // to gain some performance: 
-#define ALLOW_BG_IMAGE_TEXTURE_WRAP_IN_SHADER
+
+// STATIC FEATURES ENABLE/DISABLE
+
+// Allow texture wrapping as a shader parameter, prepend // to gain some performance: 
+	#define ALLOW_BG_IMAGE_TEXTURE_WRAP_IN_SHADER
+
+//Experimental alternating blanking you can enable it by uncommenting the following line:
+	//#define ALLOW_ALT_BLANK
+	
+// Enable lcd antighosting by using values > 0.0 (try around 0.25)
+	#define LCD_ANTIGHOSTING 0.0
+
+
 
 
 
@@ -146,10 +157,6 @@
 
 
 // MISC STATIC CONFIG ##########################################################################################
-
-	//Experimental alternating blanking feature has been disabled by default, you can enable it by
-	//uncommenting the following line:
-//#define ALLOW_ALT_BLANK
 
 
 	//Static dithering applied over vignette and spot

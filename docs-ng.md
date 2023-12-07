@@ -20,6 +20,7 @@
     config/config-static.inc:
         Some shader parameters can't be changed within retroarch,
         use this file instead.
+        Notable one is lcd antighosting feature.
         
     config/config-user.txt:
         shader parameters that can be changed within Retroarch.
