@@ -42,22 +42,23 @@ Shots from v 0.1:<br>
 
 # Easy install
 
-Step 1: Take the entire zip package as provided in the Release section and replace the koko-aio folder that comes with RetroArch: /shaders/shaders_slang/bezel/koko-aio; for the backdrop presets, the parallel version of koko-aio-backdrops is *as of v 0.3 no longer* required!!!<br>
-Step 2: Move all .slangp-presets to the respective core configuration directory, i.e. /config/FinalBurn Neo/ and/or /config/Mame 2003 (0.78) and/or /config/MAME 2003-plus; with this, the right artwork launches automatically<br>
+Step 1: Take the entire zip package as provided in the Release section and replace the koko-aio folder that comes with RetroArch: /shaders/shaders_slang/bezel/koko-aio<br>
+Step 2: Move all .slangp-presets to the respective core configuration directory, i.e. /config/FinalBurn Neo/ and/or /config/MAME/ and/or /config/Mame 2003 (0.78) and/or /config/MAME 2003-plus; with this, the right artwork launches automatically<br>
 <br>
-Note: The FinalBurn Neo.cfg/Mame 2003 (0.78).cfg/MAME 2003-plus.cfg files contain just one line that secures that the Aspect Ratio is set to 'Full'. Without this option, the background will not appear.<br>
+Note: The FinalBurn Neo.cfg/MAME.cfg/Mame 2003 (0.78).cfg/MAME 2003-plus.cfg files contain just one line that secures that the Aspect Ratio is set to 'Full'. Without this option, the background will not appear.<br>
 
 # Dedicated install of only the additional Arcade Artwork
+(actually not needed, as I am fully in line with koko-aio upstream - but just mentioning this for completeness)
 
-If you want to stay with koko-aio for some reason:
+But if you want to stay with koko-aio for some other reason and do a partial install:
 Step 1: Take the entire folder /textures/arcade_textures and move it locally to /shaders/shaders_slang/bezel/koko-aio/textures.<br>
-Step 2: Move the content of the directory koko-aio/presets/arcade-koko-aio to /config/FinalBurn Neo/ and/or /config/Mame 2003 (0.78) -> by this, the game launches the right shader configuration automatically.<br>
+Step 2: Move the content of the directory koko-aio/presets/arcade-koko-aio to /config/FinalBurn Neo/ etc...as above -> by this, the game launches the right shader configuration automatically.<br>
 <br>
 Please also refer to the instructions contained in the ReadMe.md of these folders.<br>
 
 # Manual installation from the Github repository
 
-Update November 2023: In the new ng shader environment, it will be sufficient to move the koko-aio folder structure as is into the local RetroArch shader environment. Migration is still ongoing.
+Update November 2023: In the new ng shader environment, it will be sufficient to move the koko-aio folder structure as is into the local RetroArch shader environment. So you can download the repository as well, but be sure to delete the hidden .git files that contain massive data.
 <br>
 
 # Further clones of the same game
@@ -66,7 +67,7 @@ Please see the Moon Patrol example - you can just duplicate the .slangp preset a
 
 # Backdrop support
 
-With latest Github (30 March 2023) and Release 0.3, backdrop support landed in koko-aio as a dynamic option. A separate shader repository is no longer required, and I have merged the backdrop presets into koko-aio - this is a great simplification for backdrops. 
+Since Release 0.3, backdrop support landed in koko-aio as a dynamic option. A separate shader repository for backdrops is no longer required, and I have merged the backdrop presets into koko-aio. 
 
 # Technical Information
 
