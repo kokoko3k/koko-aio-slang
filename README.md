@@ -1,4 +1,5 @@
-# Koko-aio fork for arcade Artwork (now ng presets for FinalBurnNeo, MAME current and MAME 2003/2003plus)
+# Koko-aio fork for arcade Artwork 
+(now ng presets for FinalBurnNeo, MAME current and MAME 2003/2003plus)
 
 Repository for game-specific Arcade Artwork by using the Koko-aio slang shader. Successfully tested under MacOS, Windows (limited) and iPadOS. Currently the Koko-aio shader provides superior performance on all reasonably powered desktops (including Macs), while providing enhanced shader functions, including bezel reflections, immersive ambient lights, halo/glow effects and many more. It embeds game-specific artwork seamlessly and scales according to resolution. The koko-aio shader is currently under steady development, thus it is a clear aim to stay in line with the Upstream changes.<br>
 <br>
