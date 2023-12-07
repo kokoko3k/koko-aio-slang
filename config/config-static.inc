@@ -7,6 +7,39 @@
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
+// D3D/XBOX users should enable Direct3D workarounds to avoid glitches or crashes
+// by removing the leading "//" from the following line:
+
+// #define D3D_WORKAROUND
+
+
+
+// PERFORMANCE SETTINGS /////////////////////////////////////////////////////////
+
+//Renders only changed parts of screen, set to 1.0 to lower power consumption:
+#define DELTA_RENDER 0.0
+
+//Halve rendering refresh on bezel and ambilight set to 1.0 to spare gpu cycles:
+#define HALVE_BORDER_UPDATE 0.0
+
+
+// STATIC FEATURES ENABLE/DISABLE
+
+// Allow texture wrapping as a shader parameter, prepend // to gain some performance: 
+	#define ALLOW_BG_IMAGE_TEXTURE_WRAP_IN_SHADER
+
+//Experimental alternating blanking you can enable it by uncommenting the following line:
+	//#define ALLOW_ALT_BLANK
+	
+// Enable lcd antighosting by using values > 0.0 (try around 0.25)
+	#define LCD_ANTIGHOSTING 0.0
+
+
+
+
+
+
+// APPEARANCE SETTINGS ////////////////////////////////////////////////////////
 
 // Haloing happens on a scanlined/gapped image or not
 	#define HALO_PRE_SCANLINE_GAP 0.0
@@ -14,7 +47,11 @@
 // The higher, the more the image will alter its size depending on the scene luminance.
 	#define DYNZOOM_FACTOR		80
 	
-// BEZEL STATIC CONFIG ##############################################################################################
+	
+	
+	
+// BEZEL STATIC CONFIG ////////////////////////////////////////////////////////
+
 	//The following defines the monitor frame resolution in textures/monitor_body_[curved/straight].png
 	//and are used to calculate the sampling lod.
 	//Change if you change the texture resolution or
@@ -121,24 +158,13 @@
 
 // MISC STATIC CONFIG ##########################################################################################
 
-	//Experimental alternating blanking feature has been disabled by default, you can enable it by
-	//uncommenting the following line:
-//#define ALLOW_ALT_BLANK
-
-	//Halve rendering refresh on bezel and ambilight to spare gpu cycles:
-#define HALVE_BORDER_UPDATE 1.0
-
-	//Renders only changed parts of screen.
-#define DELTA_RENDER 0.0
 
 	//Static dithering applied over vignette and spot
 #define NOISEPOWER 5/1000.0
-	//Temporal noise strength applied on green over ambient lights (multiplied by NOISEPOWER)
-#define NOISEPOWER_AMBI_MUL 8.0
+	//Temporal noise strength applied on green channel when green is dark over ambient lights (multiplied by NOISEPOWER)
+#define NOISEPOWER_AMBI_MUL 3.0
 	
-	//Should texture wrapping be allowed as a shader parameter?
-	//since it causes branching, better set it as a static value.
-#define ALLOW_BG_IMAGE_TEXTURE_WRAP_IN_SHADER
+
 
 
 // STATIC CONFIG ENDS HERE ##########################################################################################

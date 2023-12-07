@@ -49,6 +49,22 @@
     #define DO_FXAA	global.DO_FXAA
 #endif
 
+#ifndef DO_DEDITHER
+    #define DO_DEDITHER global.DO_DEDITHER
+#endif
+
+#ifndef DEDITHER_STRENGTH
+    #define DEDITHER_STRENGTH global.DEDITHER_STRENGTH
+#endif
+
+#ifndef DEDITHER_STRENGTH2
+    #define DEDITHER_STRENGTH2 global.DEDITHER_STRENGTH2
+#endif
+
+#ifndef DEDITHER_TRESHMAX
+    #define DEDITHER_TRESHMAX global.DEDITHER_TRESHMAX
+#endif
+
 #ifndef DO_NTSC_ARTIFACTS
     #define DO_NTSC_ARTIFACTS	global.DO_NTSC_ARTIFACTS
 #endif
@@ -105,12 +121,8 @@
     #define DO_SAT_BLEED		global.DO_SAT_BLEED
 #endif
 
-#ifndef SAT_BLEED_SIZE_LEFT
-    #define SAT_BLEED_SIZE_LEFT	global.SAT_BLEED_SIZE_LEFT
-#endif
-
-#ifndef SAT_BLEED_SIZE_RIGHT
-    #define SAT_BLEED_SIZE_RIGHT	global.SAT_BLEED_SIZE_RIGHT
+#ifndef SAT_BLEED_SIZE
+    #define SAT_BLEED_SIZE	global.SAT_BLEED_SIZE
 #endif
 
 #ifndef SAT_BLEED_FALLOFF
@@ -633,6 +645,10 @@
     #define DO_PIXELGRID_H				global.DO_PIXELGRID_H
 #endif
 
+#ifndef PIXELGRID_H_ANTIMOIRE
+	#define PIXELGRID_H_ANTIMOIRE  global.PIXELGRID_H_ANTIMOIRE
+#endif
+	
 #ifndef PIXELGRID_COREY_FAKE_SCAN
     #define PIXELGRID_COREY_FAKE_SCAN 	global.PIXELGRID_COREY_FAKE_SCAN
 #endif
@@ -671,10 +687,6 @@
 
 #ifndef PIXELGRID_MUL_X
     #define PIXELGRID_MUL_X 	global.PIXELGRID_MUL_X
-#endif
-
-#ifndef PIXELGRID_NO_INTERBLEED_W
-    #define PIXELGRID_NO_INTERBLEED_W global.PIXELGRID_NO_INTERBLEED_W
 #endif
 
 #ifndef PIXELGRID_NO_INTERBLEED_H
@@ -779,6 +791,18 @@
 
 #ifndef DELTA_RENDER_CHECK_AREA
     #define DELTA_RENDER_CHECK_AREA    global.DELTA_RENDER_CHECK_AREA
+#endif
+
+#ifndef DO_PPERSISTENCE
+	#define DO_PPERSISTENCE		global.DO_PPERSISTENCE
+#endif
+
+#ifndef PPERSISTENCE_START
+	#define PPERSISTENCE_START	global.PPERSISTENCE_START
+#endif
+
+#ifndef PPERSISTENCE_END
+	#define PPERSISTENCE_END	global.PPERSISTENCE_END
 #endif
 
 #ifndef SERVICE1

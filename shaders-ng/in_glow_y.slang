@@ -11,7 +11,7 @@ layout(location = 0) out vec2 vTexCoord;
 layout(location = 1) out float glow_h_inside_interval;
 layout(location = 2) out float vDoInGlowBias;
 layout(location = 3) out float vGlow_Gain;
-
+layout(location = 4) out float vSharp_sub;
 
 void main() {
    gl_Position = global.MVP * Position;
@@ -28,6 +28,18 @@ void main() {
    glow_h_inside_interval = float(IN_GLOW_H < GLOW_SHARP_MAX  && IN_GLOW_H > GLOW_SHARP_MAX_ALTERNATE);
    
    vGlow_Gain = mix(1.0, IN_GLOW_POWER, DO_CCORRECTION);
+   
+  // if (IN_GLOW_H < 0.0) {
+      //Compute subtractive sharpening via blur sharpness strength:
+      //For sharpness 0.45, no unsharp mask
+      //For sharpness 0.8, 0.65 unsharp mask
+      //float sharp_sub = (1.857 * abs(IN_GLOW_W) - 0.836);
+      float in_glow_h = abs(IN_GLOW_H);
+      in_glow_h = max(in_glow_h, MIN_IN_GLOW_SHARP);
+      float sharp_sub = 0.8125 * in_glow_h;
+      vSharp_sub = clamp(sharp_sub, 0.0,1.0);
+      vSharp_sub = -2*vSharp_sub+1;
+   //}
 }
 
 
@@ -37,6 +49,7 @@ layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in float glow_h_inside_interval;
 layout(location = 2) in float vDoInGlowBias;
 layout(location = 3) in float vGlow_Gain;
+layout(location = 4) in float vSharp_sub;
 
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 5) uniform sampler2D shift_and_bleed_pass;
@@ -51,12 +64,9 @@ vec3 glow_blur_bias(sampler2D source_tex, vec2 co, vec3 pixel_glowed, float bias
    pixel_source  = pixel_source * vGlow_Gain;
    
    vec3 glow_light = pixel_glowed - pixel_source;
-   
    glow_light = clamp(glow_light * IN_GLOW_SPREAD, 0.0, 1.0);
   
    //glow_light = pow(glow_light, vec3(SERVICE1));
-   
-   
    
    vec3 proper_glow = glow_light * glow_light + pixel_source;  
    return mix(proper_glow, pixel_glowed, max(0.0, bias));      
@@ -66,20 +76,7 @@ vec3 blur_select_wrap(sampler2D texture_in, vec2 co, vec4 sourcesize, float shar
    if (use_gauss)
       return blur9_y(texture_in, co, sourcesize.xy, sharpness);
          else
-      {  
-         //Compute subtractive sharpening via blur sharpness strength:
-         //For sharpness 0.45, no unsharp mask
-         //For sharpness 0.8, 0.65 unsharp mask
-         //float sharp_sub = (1.857 * abs(IN_GLOW_W) - 0.836);
-
-         float in_glow_h = abs(IN_GLOW_H);
-         in_glow_h = max(in_glow_h, MIN_IN_GLOW_SHARP);
-
-         float sharp_sub = 0.8125 * in_glow_h;
-         sharp_sub = clamp(sharp_sub, 0.0,1.0);
-
-         return blur9_y_box(texture_in, co, sourcesize.xy, sharpness, sharp_sub);
-      }
+      return blur9_y_box(texture_in, co, sourcesize.xy, sharpness, vSharp_sub);      
 }
 
 /*

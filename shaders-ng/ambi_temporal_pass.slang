@@ -26,6 +26,7 @@ layout(location = 8) out float vAMBI_POWER;
 layout(location = 9) out float vSmpBorder_min;
 layout(location = 10) out float vSmpBorder_max;
 layout(location = 11) out float vSmp_step;
+layout(location = 12) out float vMod_FrameCount_FrameDivider;
 
 void main() {
     gl_Position = global.MVP * Position;
@@ -88,6 +89,11 @@ void main() {
     //Every cycle counts!
         vAMBI_POWER = AMBI_POWER -1;
 
+        
+    //3.0 makes scene detection not working.
+        #define FRAME_DIVIDER 2.0
+        vMod_FrameCount_FrameDivider = mod(params.FrameCount, FRAME_DIVIDER);
+        
 }
 
 #pragma stage fragment
@@ -103,6 +109,7 @@ layout(location = 8) in float vAMBI_POWER;
 layout(location = 9) in float vSmpBorder_min;
 layout(location = 10) in float vSmpBorder_max;
 layout(location = 11) in float vSmp_step;
+layout(location = 12) in float vMod_FrameCount_FrameDivider;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -234,15 +241,17 @@ vec4 pixel_ambilight(vec2 local_pre_pass_coords) {
     vec3 past_pixel =     past_pixel_vec4.rgb;
 
     float scene_change_remaining = past_pixel_vec4.a;
+    
+    #ifndef D3D_WORKAROUND
+        float past_avg_lum    = texture(avglum_passFeedback,vec2(0.25,0.25)).a;
+        float present_avg_lum = texture(avglum_pass        ,vec2(0.25,0.25)).a;
+        float diff_avg_lum = abs(past_avg_lum - present_avg_lum);
 
-    float past_avg_lum = texture(avglum_passFeedback,vec2(0.25,0.25)).a;
-    float present_avg_lum = texture(avglum_pass        ,vec2(0.25,0.25)).a;
-    float diff_avg_lum = abs(past_avg_lum - present_avg_lum);
-
-    if (diff_avg_lum >= AMBI_SCENE_CHG_THRSHLD) {
-        scene_change_remaining = 1/AMBI_FAST_STEP;
-    }
-
+        if (diff_avg_lum >= AMBI_SCENE_CHG_THRSHLD) {
+            scene_change_remaining = 1/AMBI_FAST_STEP;
+        }
+    #endif 
+    
     // Are we changing scene?
     vec3 mystep;
     if (scene_change_remaining > 0.0) {
@@ -251,21 +260,20 @@ vec4 pixel_ambilight(vec2 local_pre_pass_coords) {
     } else {
         mystep = abs((past_pixel - present_pixel) / MAX_STEPS); //OK
     }
-
+    
     return vec4(ambi_step_rgb(past_pixel, present_pixel, mystep), scene_change_remaining);
 }
 
-//3.0 makes scene detection not working.
-#define FRAME_DIVIDER 2.0
 
 void main() {
     if (DO_AMBILIGHT != 1.0)
         return;
-
+    
     //Nvidia + flycast core + glcore goes crazy with modulo operation and instead of returning 0,1,2 0,1,2 they returns 1,2,3 1,2,3 and so on.
     //Don't check for != 0.0 here, but use != 1.0.
     //Also this particular bug does not seem to happen in the last pass.
-    if ( mod(params.FrameCount, FRAME_DIVIDER) != 1.0) { 
+    
+    if ( vMod_FrameCount_FrameDivider != 1.0 ) { 
         vec4 past_sampler = texture(PastSampler, vTexCoord);
         past_sampler = max(past_sampler, 0.0); // <- Sanitize input to avoid glitches when enabling the option runtime.
         FragColor = past_sampler;

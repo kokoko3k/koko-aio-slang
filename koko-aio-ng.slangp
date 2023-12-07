@@ -65,6 +65,8 @@ shaders = 17
 # It also does motion blur for dot matrix.
            shader0 = shaders-ng/colortools_and_ntsc_pass.slang
             alias0 = "colortools_and_ntsc_pass"
+#float_framebuffer needed by phosphor persistance
+float_framebuffer0 = true
     filter_linear0 = false
        scale_type0 = source
             scale0 = 1.0

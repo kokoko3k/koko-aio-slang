@@ -1,7 +1,6 @@
 #reference "monitor-slotmask-bloom-bezelwider.slangp"
 
 SATURATION = "1.00000"
-TEMPERATURE = "7000.000000"
 GAMMA_OUT = "0.56"
 
 DO_NTSC_ARTIFACTS = "1.0"
@@ -11,8 +10,7 @@ DO_SHIFT_RGB = "1.0"
 DO_SAT_BLEED = "1.000000"
 	SAT_BLEED_PAL = "0.0"
 	SAT_BLEED_STRENGTH   = "1.0"
-	SAT_BLEED_SIZE_LEFT  = "5.0"
-	SAT_BLEED_SIZE_RIGHT = "5.0"
+	SAT_BLEED_SIZE  = "5.0"
 	SAT_BLEED_FALLOFF    = "1.7"
 
 IN_GLOW_POWER = "2.0"

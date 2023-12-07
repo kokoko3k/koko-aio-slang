@@ -34,7 +34,6 @@ layout(set = 0, binding = 1) uniform sampler2D colortools_and_ntsc_pass;
 void main() {
     if (DO_BLOOM == 0.0) return;
     
-    
     vec3 bloomed = bloom_gamma_power(
         colortools_and_ntsc_pass,
         vTexCoord,
@@ -47,5 +46,4 @@ void main() {
     );
     bloomed = apply_fuzzy_main_pass_stage_2(bloomed, vFuzzy_main_pass_stage_1);
     FragColor = vec4(bloomed, 1.0);
-    
 }
