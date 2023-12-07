@@ -1,21 +1,23 @@
-# Koko-aio Fork for Arcade Artwork (currently FinalBurn Neo and MAME 2003/2003plus)
+# Koko-aio fork for arcade Artwork 
+(now ng presets for FinalBurnNeo, MAME current and MAME 2003/2003plus)
 
-Repository for game-specific Arcade Artwork by using the Koko-aio slang shader. Successfully tested under MacOS, Windows and iPadOS. Currently the Koko-aio shader provides superior performance on all reasonably powered desktops (including Macs), while providing enhanced shader functions, including bezel reflections,halo/glow effects and many more. It embeds game-specific artwork seamlessly and scales according to resolution. The koko-aio shader is currently under steady development, thus it is a clear aim to stay in line with the Upstream changes.<br>
+Repository for game-specific Arcade Artwork by using the Koko-aio slang shader. Successfully tested under MacOS, Windows (limited) and iPadOS. Currently the Koko-aio shader provides superior performance on all reasonably powered desktops (including Macs), while providing enhanced shader functions, including bezel reflections, immersive ambient lights, halo/glow effects and many more. It embeds game-specific artwork seamlessly and scales according to resolution. The koko-aio shader is currently under steady development, thus it is a clear aim to stay in line with the Upstream changes.<br>
 <br>
-Main source of this artwork comes from John Merrit, who set a benchmark for realistic arcade artwork. I still very much like them, and they shine even more in combination with Koko-aio. My selection of the artwork is arbitrary, but I try to publish eye candys earlier :-). Version 0.2 and following releases see the inclusion of some breathtaking 4K artwork provided by Ars Invictus.<br>
+Main source of this artwork comes from John Merrit, who set a benchmark for realistic arcade artwork. I still very much like them, and they shine even more in combination with Koko-aio. My selection of the artwork is arbitrary, but I try to publish eye candys earlier :-). Version 0.2 and following releases see the inclusion of some breathtaking 4K artwork provided by Ars Invictus. Version 0.4ng moves to the new ng presets and upscales all artwork to 4K<br>
 <br>
-Requirements: RetroArch 1.5.0 or a newer RetroArch Nightly Build that support Vulkan. Tested with FinalBurn Neo (mainly) and MAME 2003/2003plus. MAME (current) now works out of the box, as the rotation of this core has been adjusted. Having said that, the MAME (current) core is still buggy, at least for me.<br>
+Requirements: RetroArch 1.6.0 or a newer RetroArch Nightly Build that support Vulkan. Tested with FinalBurn Neo (mainly) and MAME 2003/2003plus. MAME (current) now works out of the box, as the rotation of this core has been adjusted. Having said that, I still prefer FinalBurnNeo over MAME (current).<br>
 <br>
-Update October 2023: Moving this repository to the 'ng' shaders (ambient preset) requires more work - basically new presets. Currently the last version of this repository does not provide for working presets, please bear with me. Presets marked with 'ng update' are already working.<br> 
-<br>
-Update June 2023: I have successfully moved this repository to the 'ng' shaders that provide another quality increase. Until release 0.4, I would like to nightify all presets to the extent required. This release will also see usage of the new ambilight functionalities, if it makes sense. So stay tuned.
-<br>
-# Release 0.3 contains 52 game-specific presets - download here!
-Backdrop games and 4k artwork included in this release.
-Please see the list of game presets in the Release Notes.
+# Release 0.4ng finally completss migration to the 'ng' shaders. It was really worth the work - download here!
 
 # Screenshots
-Screenshots are taken under MacOS with HDR enabled.
+
+Screenshots from release 0.4:
+
+<img width="669" alt="Bildschirmfoto 2023-11-01 um 22 08 41" src="https://github.com/estefan3112/koko-aio-slang/assets/24915559/3b171d0f-009f-4c66-a0bd-83944513a7b6">
+
+<img width="638" alt="Bildschirmfoto 2023-11-01 um 20 01 44" src="https://github.com/estefan3112/koko-aio-slang/assets/24915559/5e1161de-5e51-4211-a47a-d7b7a62f45ba">
+
+<img width="613" alt="Bildschirmfoto 2023-11-01 um 23 35 12" src="https://github.com/estefan3112/koko-aio-slang/assets/24915559/47263a70-17dd-4af1-b64f-a037853738fa">
 
 <img width="750" alt="Bildschirmfoto 2023-04-08 um 21 03 47" src="https://user-images.githubusercontent.com/24915559/230785582-e364fa18-e0ea-4908-a912-c3de18bfe70c.png">
 
@@ -40,22 +42,23 @@ Shots from v 0.1:<br>
 
 # Easy install
 
-Step 1: Take the entire zip package as provided in the Release section and replace the koko-aio folder that comes with RetroArch: /shaders/shaders_slang/bezel/koko-aio; for the backdrop presets, the parallel version of koko-aio-backdrops is *as of v 0.3 no longer* required!!!<br>
-Step 2: Move all .slangp-presets to the respective core configuration directory, i.e. /config/FinalBurn Neo/ and/or /config/Mame 2003 (0.78) and/or /config/MAME 2003-plus; with this, the right artwork launches automatically<br>
+Step 1: Take the entire zip package as provided in the Release section and replace the koko-aio folder that comes with RetroArch: /shaders/shaders_slang/bezel/koko-aio<br>
+Step 2: Move all .slangp-presets to the respective core configuration directory, i.e. /config/FinalBurn Neo/ and/or /config/MAME/ and/or /config/Mame 2003 (0.78) and/or /config/MAME 2003-plus; with this, the right artwork launches automatically<br>
 <br>
-Note: The FinalBurn Neo.cfg/Mame 2003 (0.78).cfg/MAME 2003-plus.cfg files contain just one line that secures that the Aspect Ratio is set to 'Full'. Without this option, the background will not appear.<br>
+Note: The FinalBurn Neo.cfg/MAME.cfg/Mame 2003 (0.78).cfg/MAME 2003-plus.cfg files contain just one line that secures that the Aspect Ratio is set to 'Full'. Without this option, the background will not appear.<br>
 
 # Dedicated install of only the additional Arcade Artwork
+(actually not needed, as I am fully in line with koko-aio upstream - but just mentioning this for completeness)
 
-If you want to stay with koko-aio for some reason:
+But if you want to stay with koko-aio for some other reason and do a partial install:
 Step 1: Take the entire folder /textures/arcade_textures and move it locally to /shaders/shaders_slang/bezel/koko-aio/textures.<br>
-Step 2: Move the content of the directory koko-aio/presets/arcade-koko-aio to /config/FinalBurn Neo/ and/or /config/Mame 2003 (0.78) -> by this, the game launches the right shader configuration automatically.<br>
+Step 2: Move the content of the directory koko-aio/presets/arcade-koko-aio to /config/FinalBurn Neo/ etc...as above -> by this, the game launches the right shader configuration automatically.<br>
 <br>
 Please also refer to the instructions contained in the ReadMe.md of these folders.<br>
 
 # Manual installation from the Github repository
 
-Update November 2023: In the new ng shader environment, it will be sufficient to move the koko-aio folder structure as is into the local RetroArch shader environment. Migration is still ongoing.
+Update November 2023: In the new ng shader environment, it will be sufficient to move the koko-aio folder structure as is into the local RetroArch shader environment. So you can download the repository as well, but be sure to delete the hidden .git files that contain massive data.
 <br>
 
 # Further clones of the same game
@@ -64,7 +67,7 @@ Please see the Moon Patrol example - you can just duplicate the .slangp preset a
 
 # Backdrop support
 
-With latest Github (30 March 2023) and Release 0.3, backdrop support landed in koko-aio as a dynamic option. A separate shader repository is no longer required, and I have merged the backdrop presets into koko-aio - this is a great simplification for backdrops. 
+Since Release 0.3, backdrop support landed in koko-aio as a dynamic option. A separate shader repository for backdrops is no longer required, and I have merged the backdrop presets into koko-aio. 
 
 # Technical Information
 
