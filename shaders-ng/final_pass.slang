@@ -1330,12 +1330,13 @@ void main() {
     //Draw content only over the alpha mask, and sample ambientlight outside it to spare gpu cycles.
         if (canvas_busy > 0.5) {
             pixel_out = fn_pixel_content(co_content) * canvas_busy;
-            
-            if (LCD_ANTIGHOSTING > 0.0) {
-                vec3 feedback = texture(final_passFeedback, vOutputCoord).rgb;
-                vec3 diff=(feedback - pixel_out);
-                pixel_out = mix(pixel_out, pixel_out-diff, LCD_ANTIGHOSTING );  
-            }
+            #ifndef D3D_WORKAROUND
+                if (LCD_ANTIGHOSTING > 0.0) {
+                    vec3 feedback = texture(final_passFeedback, vOutputCoord).rgb;
+                    vec3 diff=(feedback - pixel_out);
+                    pixel_out = mix(pixel_out, pixel_out-diff, LCD_ANTIGHOSTING );
+                }
+            #endif
             
         } else {
             
