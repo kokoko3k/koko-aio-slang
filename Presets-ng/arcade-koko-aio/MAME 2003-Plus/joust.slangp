@@ -1,0 +1,17 @@
+#reference "../../shaders/shaders_slang/bezel/koko-aio/Presets-ng/Monitor-Ambilight-immersive.slangp"
+GEOM_CORNER_SIZE = "0.020000"
+BEZEL_R = "-0.220000"
+BEZEL_G = "-0.220000"
+BEZEL_B = "-0.220000"
+BG_IMAGE_NIGHTIFY = "0.500000"
+AMBI_STRETCH = "0.400000"
+GLOBAL_OFFX = "-0.002000"
+GLOBAL_OFFY = "0.073000"
+GLOBAL_ZOOM = "0.915496"
+bg_under = "../../shaders/shaders_slang/bezel/koko-aio/textures/arcade_textures/joust.png"
+bg_over = "../../shaders/shaders_slang/bezel/koko-aio/textures/arcade_textures/joust.png"
+
+// Credits
+// shader by kokoko3k - https://github.com/kokoko3k/koko-aio-slang
+// artwork by Ars Invictus
+// preset and artwork adjustments by estefan3112 - https://github.com/estefan3112/koko-aio-slang
