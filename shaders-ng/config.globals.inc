@@ -525,6 +525,10 @@
     #define GAME_GEOM_INT_SCALE	global.GAME_GEOM_INT_SCALE
 #endif
 
+#ifndef GAME_GEOM_INT_SCALE_OVR
+    #define GAME_GEOM_INT_SCALE_OVR global.GAME_GEOM_INT_SCALE_OVR
+#endif
+
 #ifndef GAME_GEOM_INT_SCALE_MAX
     #define GAME_GEOM_INT_SCALE_MAX global.GAME_GEOM_INT_SCALE_MAX
 #endif

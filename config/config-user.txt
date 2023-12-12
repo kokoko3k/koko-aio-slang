@@ -277,6 +277,7 @@
 // #define DO_GAME_GEOM_OVERRIDE  0.0
 // #define GAME_GEOM_INT_SCALE  0.0
 // #define GAME_GEOM_INT_SCALE_MAX  10.0
+// #define GAME_GEOM_INT_SCALE_OVR 1.0
 
 
 // #define GAME_GEOM_ASPECT  0.0

@@ -568,7 +568,7 @@
 
 **Luminosity tied zoom:**<br>
     On older CRT monitors, the picture gets bigger when the image was brighter.<br>
-    Please turn this off if you want to use integer scaling, since this obstructs it.
+    Please TURN THIS OFF if you want to use integer scaling, since this obstructs it.
 
 **Override content geometry:**<br>
     Contrary to the global aspect ratio control, this changes only the game geometry.<br>
@@ -576,9 +576,11 @@
     
     Integer scale:
         Game content zoom height is rounded to nearest integer.
-    Maximum integer scale: 
-        Dont allow integer scaling more than this
-        * beware: the following options in this group overrides the integer scale.
+        Maximum integer scale: 
+            Dont allow integer scaling more than this
+            * beware: the following options in this group overrides the integer scale.
+        Permit integer overscale by:
+            When doing integer scaling, allow the image to be slightly overscanned (goes off screen).
     Aspect:
         Change aspect ratio.
     Vertical/Horizontal position:
