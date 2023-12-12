@@ -289,7 +289,6 @@
 
 // #define DO_TILT  0.0
 // #define TILT_X  0.0
-// #define TILT_Y  0.0
 // #define TILT_FOV  0.7
 // #define TILT_BEZEL_K  1.0
 

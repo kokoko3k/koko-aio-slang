@@ -1049,11 +1049,43 @@ float get_dyn_zoom(sampler2D tex) {
 }
 
 
-vec2 tilt(vec2 co, float is_rotated, vec2 tilt) {
+vec2 tilt2D(vec2 co, float is_rotated, vec2 tilt) {
 
 	vec2 r_tilt = vec2( mix_step(tilt.x, tilt.y, is_rotated),
 	                    mix_step(tilt.y, -tilt.x, is_rotated)
-);
+					);
+	
+	vec2 tilt_min = 1 - r_tilt;
+	vec2 tilt_max = 1 + r_tilt;
+	
+	// X Tilt
+		float tilt_x_range = scale_to_range(co.y, tilt_min.x, tilt_max.x);
+		co = vec2( zoom1D(co.x, tilt_x_range),
+		           zoom1D(co.y, tilt_x_range)
+			);
+
+		
+	// Y Tilt
+		float tilt_y_range = scale_to_range(co.x, tilt_min.y, tilt_max.y);
+		co = vec2( zoom1D(co.x, tilt_y_range),
+		           zoom1D(co.y, tilt_y_range)
+			);
+	
+	// Aply FOV;
+		vec2 fov = mix(vec2(1.0), vec2(TILT_FOV), abs( tilt.xy ));
+		co = zoomxy(co, mix_step(fov.yx, fov.xy, is_rotated));
+
+		co.xy += mix_step(tilt.yx, -tilt.xy, is_rotated) * 0.5;
+		
+	return co;
+
+}
+	
+vec2 tilt(vec2 co, float is_rotated, float tilt) {
+	
+	vec2 r_tilt = vec2( mix_step(tilt, 0.0, is_rotated),
+	                    mix_step(0.0, -tilt, is_rotated)
+					);
 	
 	vec2 tilt_min = 1 - r_tilt;
 	vec2 tilt_max = 1 + r_tilt;
@@ -1071,14 +1103,15 @@ vec2 tilt(vec2 co, float is_rotated, vec2 tilt) {
 			);
 	
 	// Aply FOV;
-		vec2 fov = mix(vec2(1.0), vec2(TILT_FOV), abs( tilt.xy ));
-		co = zoomxy(co, mix_step(fov.yx, fov.xy, is_rotated));
+		float fov = mix( 1.0, TILT_FOV, abs( tilt ));
+		co = zoomxy(co, vec2(fov) );
 
-		co.xy += mix_step(tilt.yx, -tilt.xy, is_rotated) * 0.4;
+		co.xy += mix_step(  vec2(0.0, tilt),   -vec2(tilt, 0.0), is_rotated) * 0.5;
 		
 	return co;
-
 }
+	
+
 	
 /*bool is_first_outside_rect(vec2 point, vec4 rect) {
 	return (point.x < rect.x || point.x > rect.z ||

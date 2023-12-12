@@ -601,7 +601,7 @@
     results when tilting alongside a single axis or when<br>
     using both, but with small values.<br>
     
-    Tilt along X(Y) axis:
+    Tilt along X axis:
         Rotate the image in space
     Fov: Modulates the field of view
     Bezel multiplier:

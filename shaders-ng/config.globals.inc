@@ -561,10 +561,6 @@
     #define TILT_X			global.TILT_X
 #endif
 
-#ifndef TILT_Y
-    #define TILT_Y			global.TILT_Y
-#endif
-
 #ifndef TILT_FOV
     #define TILT_FOV		global.TILT_FOV
 #endif
