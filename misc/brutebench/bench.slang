@@ -97,7 +97,7 @@ vec4 sub_bench7(vec2 point){
 }
 	
 void main() {
-	int iterations = 300;
+/*	int iterations = 1;
 	vec4 pixel_out = vec4(0.0);
 	for (int i=0 ; i <= iterations ; i++) {
 		//pixel_out += pixel_out; //115.1 //45.15
@@ -109,11 +109,14 @@ void main() {
 		//pixel_out += sub_bench5(vTexCoord); //113.3 //112.8			44.82
 		//pixel_out += sub_bench6(vTexCoord); //113.3 //112.8			44.82
 		
-		pixel_out += sub_bench7(vTexCoord);
+		//pixel_out += sub_bench7(vTexCoord);
 		
-	}
-	FragColor = pixel_out ; 
-	//FragColor = texture(Source, vTexCoord); 
+		
+		pixel_out = vec4(vTexCoord.x*0.12345678);
+	}*/
+	FragColor.x = pow(vTexCoord.x, vTexCoord.y);
+	FragColor.y = pow(vTexCoord.y, vTexCoord.x);
+
 }
  
   
