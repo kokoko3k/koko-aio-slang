@@ -86,7 +86,7 @@ vec2 get_bg_image_coords(vec2 in_vOutputCoord) {
     }
 
 
-    //Image is rotated by core and user selected a negative value,
+    //User say image is rotated (selected a negative value),
     //flip coords but allow user customization.
     //This is needed for correct aspect handling on rotated games.
     if (BG_IMAGE_ROTATION < 0.0) {
