@@ -17,16 +17,16 @@
 
 
 
-//#define DEBUG
+#define DEBUG
    //#define DEBUG_COLOR_CALIB
    //#define DEBUG_TIME_FADE
-   #define DEBUG_SOLID_COLOR
+   //#define DEBUG_SOLID_COLOR
    //#define DEBUG_STEP_GRADIENT
    //#define DEBUG_STEP_GRADIENT_V
    //#define DEBUG_BLINK
    //#define DEBUG_BLINK_CIRCLE
    //#define DEBUG_WALKING_CIRCLE
-   //#define DEBUG_COLORWHEEL
+   #define DEBUG_COLORWHEEL
    
    
 #include "config.inc"
