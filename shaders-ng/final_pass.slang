@@ -24,7 +24,7 @@ layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
 layout(location = 1) out vec2 vOutputCoord;
-                                        //layout(location = 2) out vec2 spot_offset;
+layout(location = 2) out vec2 vBg_img_coords;
 layout(location = 3) out float vIsRotated;
 //Scanlines:
 
@@ -68,6 +68,46 @@ layout(location = 31) out float I_am_a_placeholder_keep_reading;
 
 #define PI_15 4.71238898038469 //pi*1.5
 
+
+vec2 get_bg_image_coords(vec2 in_vOutputCoord) {
+    vec2 bg_img_coords = in_vOutputCoord; 
+   
+    if (BG_IMAGE_ROTATION < 0.0 && bool(vIsRotated) ) {
+        //handle automatic rotation of bg image for rotated games
+        bg_img_coords.xy = bg_img_coords.yx;
+        bg_img_coords.y = 1 - bg_img_coords.y;
+    }
+   
+    if (BG_IMAGE_ROTATION == 0.0) // identity 
+        bg_img_coords.xy = bg_img_coords.xy;
+
+    else if (BG_IMAGE_ROTATION == 1.0) // +180 
+       bg_img_coords.xy =   vec2(1-bg_img_coords.x, 1 - bg_img_coords.y); 
+    
+    else if (BG_IMAGE_ROTATION == 2.0) // 0 mirror x
+       bg_img_coords.xy =   vec2( 1 - bg_img_coords.x, bg_img_coords.y);
+    
+    else if (BG_IMAGE_ROTATION == 3.0) // 0 mirror y
+       bg_img_coords.xy =   vec2( bg_img_coords.x, 1 - bg_img_coords.y);
+        
+    else if (BG_IMAGE_ROTATION == 4.0) // +90
+        bg_img_coords.xy = vec2(bg_img_coords.y, 1- bg_img_coords.x);
+        
+    else if (BG_IMAGE_ROTATION == 5.0) // +270
+       bg_img_coords.xy =   vec2( 1- bg_img_coords.y, bg_img_coords.x);
+    
+    else if (BG_IMAGE_ROTATION == 6.0) // 90 mirror x
+       bg_img_coords.xy =   vec2(bg_img_coords.y, bg_img_coords.x);
+    
+    else if (BG_IMAGE_ROTATION == 7.0) // +90 mirror y
+        bg_img_coords.xy = vec2(1-bg_img_coords.y, 1- bg_img_coords.x);
+    
+    bg_img_coords += vec2( BG_IMAGE_OFFX,BG_IMAGE_OFFY);
+    
+    bg_img_coords=zoom(bg_img_coords, BG_IMAGE_ZOOM);
+    
+    return bg_img_coords;
+}
 
 vec2 get_zooms_modifier() {
     // This function is meant to live in vertex shader; its purpose is to
@@ -139,6 +179,7 @@ void main() {
 
     vOutputCoord = TexCoord ;
 
+    vBg_img_coords =  get_bg_image_coords(vOutputCoord);
 
     vec2 vFragCoord = vec2( floor(vOutputCoord.x * params.OutputSize.x),
                             floor(vOutputCoord.y * params.OutputSize.y));
@@ -279,7 +320,7 @@ void main() {
 #pragma stage fragment
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in vec2 vOutputCoord;
-                                                                //layout(location = 2) in vec2 spot_offset;
+layout(location = 2) in vec2 vBg_img_coords;
 layout(location = 3) in float vIsRotated;
 
 layout(location = 4) in float vScanlinePeriod;
@@ -991,32 +1032,21 @@ vec2 get_scaled_coords_for_bezel() {
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-vec4 fn_pixel_fgbg_image(sampler2D smp) {
-    vec2 fg_image_offset=vec2(BG_IMAGE_OFFX,BG_IMAGE_OFFY);
+vec4 fn_pixel_fgbg_image(sampler2D smp) {    
     vec2 tex_size = textureSize(smp, 0); // * BG_ZOOM;
+    //if (BG_IMAGE_ROTATION > 0.0  || ( BG_IMAGE_ROTATION < 0.0 && bool(vIsRotated) )  ) tex_size.xy = tex_size.yx;
+    
+    //FIXME isrotated deve essere true anche quando l'immagine di sfondo è ruotata.
+    //vec2 fg_image_offset=vec2(BG_IMAGE_OFFX,BG_IMAGE_OFFY);
+    //back_coords = get_scaled_coords_aspect(vBg_img_coords + fg_image_offset, global.FinalViewportSize, tex_size.x/tex_size.y, bool(vIsRotated));
+    
+    bool rotated = bool(vIsRotated) || BG_IMAGE_ROTATION > 3.5;
+    rotated = BG_IMAGE_ROTATION > 3.5;
+    
+    vec2 back_coords = get_scaled_coords_aspect(vBg_img_coords, global.FinalViewportSize, tex_size.x/tex_size.y, rotated);
+        
+
     float bg_over_lod = log2(tex_size.y * global.FinalViewportSize.w);
-
-    if (BG_IMAGE_ROTATION > 0.0  || ( BG_IMAGE_ROTATION < 0.0 && bool(vIsRotated) )  ) tex_size.xy = tex_size.yx;
-
-    vec2 back_coords = get_scaled_coords_aspect(vOutputCoord + fg_image_offset, global.FinalViewportSize, tex_size.x/tex_size.y, bool(vIsRotated));
-
-    if (BG_IMAGE_ROTATION < 0.0 && bool(vIsRotated) ) {
-        //handle automatic rotation of bg image for rotated games
-        back_coords.xy = back_coords.yx;
-        back_coords.y = 1 - back_coords.y;
-    } else if (BG_IMAGE_ROTATION > 0.0) {
-        //rotate as user prefs
-        back_coords.xy = back_coords.yx;
-        if (BG_IMAGE_ROTATION == 1.0) back_coords.y = 1 - back_coords.y;
-        if (BG_IMAGE_ROTATION == 2.0) back_coords.x = 1 - back_coords.x;
-    }
-
-    
-    //back_coords.xy = vec2(back_coords.y, 1- back_coords.x); //+90 ok
-    //back_coords.xy = vec2(   1 - back_coords.x, 1 - back_coords.y) ; //180 ok
-    //back_coords.xy = vec2(  1 - back_coords.y, back_coords.x) ; //-90
-    
-    back_coords=zoom(back_coords, BG_IMAGE_ZOOM);
     vec4 pixel_bgover = textureLod_wrap(smp, back_coords, bg_over_lod, BG_IMAGE_WRAP_MODE);
     return pixel_bgover;
 }
@@ -1415,6 +1445,7 @@ void main() {
                     //spot = smoothstep_fast(S_SIZE,0.0,dist)*S_POWER;
                     //spot = smoothstep_cos(S_SIZE,0.0,dist)*S_POWER;
                     pixel_out += smoothstep(S_SIZE,0.0,dist) * S_POWER * canvas_bezel_screen;      
+                    //pixel_out = mix(pixel_out, vec3(1.0), smoothstep(S_SIZE,0.0,dist) * S_POWER * canvas_bezel_screen); //<-- this is a bit slower, but more realistic.
             }
     }
         //Background image have, no need to paint if not in the outer border:
