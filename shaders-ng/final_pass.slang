@@ -24,7 +24,7 @@ layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
 layout(location = 1) out vec2 vOutputCoord;
-layout(location = 2) out vec2 spot_offset;
+                                        //layout(location = 2) out vec2 spot_offset;
 layout(location = 3) out float vIsRotated;
 //Scanlines:
 
@@ -148,10 +148,7 @@ void main() {
     vBEZEL_INNER_ZOOM_adapted = get_BEZEL_INNER_ZOOM() * DO_BEZEL;
     
 
-    //SPOT
-        spot_offset = offsets_from_float(S_POSITION+420.0,40);
-        spot_offset = spot_offset / 10.0 + vec2(0.0,1.0);
-        
+      
     //Help scanline/pixelgrid code too:
         bool bIs_Interlaced = is_interlaced();
         float fIsInterlaced = float(bIs_Interlaced);
@@ -282,7 +279,7 @@ void main() {
 #pragma stage fragment
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in vec2 vOutputCoord;
-layout(location = 2) in vec2 spot_offset;
+                                                                //layout(location = 2) in vec2 spot_offset;
 layout(location = 3) in float vIsRotated;
 
 layout(location = 4) in float vScanlinePeriod;
@@ -1013,6 +1010,12 @@ vec4 fn_pixel_fgbg_image(sampler2D smp) {
         if (BG_IMAGE_ROTATION == 1.0) back_coords.y = 1 - back_coords.y;
         if (BG_IMAGE_ROTATION == 2.0) back_coords.x = 1 - back_coords.x;
     }
+
+    
+    //back_coords.xy = vec2(back_coords.y, 1- back_coords.x); //+90 ok
+    //back_coords.xy = vec2(   1 - back_coords.x, 1 - back_coords.y) ; //180 ok
+    //back_coords.xy = vec2(  1 - back_coords.y, back_coords.x) ; //-90
+    
     back_coords=zoom(back_coords, BG_IMAGE_ZOOM);
     vec4 pixel_bgover = textureLod_wrap(smp, back_coords, bg_over_lod, BG_IMAGE_WRAP_MODE);
     return pixel_bgover;
@@ -1407,7 +1410,8 @@ void main() {
             
         //Spot
             if (DO_SPOT == 1.0) {
-                    float dist = length(vec2((co_content.x-0.5) * vIn_aspect, co_content.y-0.5) + spot_offset);
+                    float dist = length( vec2(  (co_content.x-0.5) * vIn_aspect, co_content.y-0.5) + 
+                                         vec2(   S_POSITION_X      * vIn_aspect, S_POSITION_Y) );
                     //spot = smoothstep_fast(S_SIZE,0.0,dist)*S_POWER;
                     //spot = smoothstep_cos(S_SIZE,0.0,dist)*S_POWER;
                     pixel_out += smoothstep(S_SIZE,0.0,dist) * S_POWER * canvas_bezel_screen;      

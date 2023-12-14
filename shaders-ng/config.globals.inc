@@ -353,8 +353,12 @@
     #define DO_SPOT		global.DO_SPOT
 #endif
 
-#ifndef S_POSITION
-    #define S_POSITION	global.S_POSITION
+#ifndef S_POSITION_X
+    #define S_POSITION_X	global.S_POSITION_X
+#endif
+
+#ifndef S_POSITION_Y
+    #define S_POSITION_Y	global.S_POSITION_Y
 #endif
 
 #ifndef S_SIZE

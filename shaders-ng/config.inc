@@ -111,7 +111,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float BEZEL_CORNER_DARK;
 	
 	float DO_SPOT;
-	float S_POSITION; 
+	float S_POSITION_X; 
+	float S_POSITION_Y; 
 	float S_SIZE;
 	float S_POWER;
 
@@ -552,7 +553,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter V_POWER	"        Power"			1.0  0.05 1.0  0.01
 
 #pragma parameter DO_SPOT	"★ Spot enable? (sp) ==>"		0.0   0.0   1.0 1.0
-#pragma parameter S_POSITION 	"        Position"		194.0   -420.0 378.0 1
+#pragma parameter S_POSITION_X 	"        X Position"	   -0.5   -2.0 2.0 0.05
+#pragma parameter S_POSITION_Y 	"        Y Position"		0.5   -2.0 2.0 0.05
 #pragma parameter S_SIZE	"        Size"			0.4   0.0   1.0 0.01
 #pragma parameter S_POWER	"        Power" 		0.1   0.05  2.0 0.01
 #pragma parameter BLANK19 " " 0.0 0.0 1.0 1.0

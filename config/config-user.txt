@@ -256,7 +256,8 @@
 // #define V_POWER  1.00
 
 // #define DO_SPOT  1.0
-// #define S_POSITION  194.0
+// #define S_POSITION_X  1.0
+// #define S_POSITION_Y  1.0
 // #define S_SIZE  0.4
 // #define S_POWER  0.05
 

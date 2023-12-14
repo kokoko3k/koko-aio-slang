@@ -79,7 +79,8 @@ DO_PIXELGRID = "1.0"
 DO_DYNZOOM = "1.0"
 
 DO_SPOT = "1.0"
-	S_POSITION = "194.0"
+    S_POSITION_X = "-0.5"
+    S_POSITION_Y = "0.5"
 	S_SIZE = "0.4"
 	S_POWER = "0.05"
 
