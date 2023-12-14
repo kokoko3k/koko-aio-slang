@@ -466,9 +466,10 @@
         let you view the underlying content.
     Shift(Zoom) Image over X(Y) axis:
         move or zoom the whole background image.
-    Rotate image mode
-        This could be needed when dealing with vertical games.
-        Use -1 to let the shader try to guess if the rotation is needed.
+    Rotate/mirror image
+        This could be needed when dealing with vertical games
+        or when the core flips the image for whatever reason.
+        Use -1 to let the shader try to guess if the game content is rotated.
     Wrap mode:      
         What to do outside the image:
         0  Mirrored repeat because so is configured in main .slangp.
