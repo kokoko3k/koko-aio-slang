@@ -1477,8 +1477,8 @@ void main() {
             if (DO_BG_IMAGE + BG_IMAGE_OVER == 2.0) {
                 vec4 pixel_fg_image = fn_pixel_fgbg_image(bg_over);
                 // if geometry content is overridden, ambientlight may have not been sample yet due to some skip logic
-                if (DO_AMBILIGHT == 1.0 && (pixel_fg_image.a+AMBI_BG_IMAGE_FORCE) > 0.0 )
-                    pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb;
+                if (DO_AMBILIGHT == 1.0 && (pixel_fg_image.a+AMBI_BG_IMAGE_FORCE) > 0.0  && canvas_busy < 0.01)
+                    pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb * (1- canvas_busy );
 
                 vec3 anti_nightify_ambi = (pixel_ambi * AMBI_BG_IMAGE_BLEND_MODE) *
                                            max(AMBI_BG_IMAGE_FORCE, 1-pixel_fg_image.a) ;
