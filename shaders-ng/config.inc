@@ -48,7 +48,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 	float DO_HALO ;
 	float DO_CCORRECTION;
-	float DO_ALT_BLANK;
 	float IN_GLOW_BIAS ;
 	float IN_GLOW_SPREAD ;
 
@@ -66,8 +65,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float BLOOM_POWER;
 	float BLOOM_OVER_WHITE;
   	float BLOOM_GAMMA_OUT;
-  	float ALT_BLANK_STRENGTH;
-  	float ALT_BLANK_PERIOD;
 	
 	float DO_FXAA;
 	
@@ -615,22 +612,14 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BLANK_01 " " 0.0 0.0 1.0 1.0
 
 //Delta render
-#pragma parameter label_alt_blank    "  !THE FOLLOWING FEATURES ARE STATIC, SEE docs-ng.md TO ENABLE"    0.0 0.0 0.0 1.0
+#pragma parameter label_dr11    "  !THE FOLLOWING FEATURES ARE STATIC, SEE docs-ng.md TO ENABLE"    0.0 0.0 0.0 1.0
 #pragma parameter DELTA_RENDER_FORCE_REFRESH    "★ Delta render force refresh interval ? ==>"	4.0 1.0 3600.0 1.0
 #pragma parameter DELTA_RENDER_CHECK_AREA       "        Delta render area size"			1.0 0.0 10.0 1.0
 #pragma parameter BLANK_DR " " 0.0 0.0 1.0 1.0
 
-// Alternative blanking, needs to be statically enabled, see docs.md.
-#pragma parameter DO_ALT_BLANK       "★ Alternate line blanking enable? ==>"			0.0 0.0 1.0 1.0
-#pragma parameter ALT_BLANK_STRENGTH "        Alternate black frame insertion strength" 	0.5 0.0 1.0 0.1
-#pragma parameter ALT_BLANK_PERIOD   "        Blank lines period" 				4.0 1.0 30.0 1.0
-#pragma parameter BLANK_02 " " 0.0 0.0 1.0 1.0
-
-
 #pragma parameter SERVICE1 "Don't use me, for debug purposes only" 	0.5 0.0 1.0 0.01
 //#pragma parameter SERVICE2 "Don't use me, for debug purposes only" 	0.5 -1.0 1.0 0.01
 //#pragma parameter SERVICE3 "Don't use me, for debug purposes only" 	0.5 -1.0 1.0 0.01
-
 
 
 

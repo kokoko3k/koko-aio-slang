@@ -493,18 +493,6 @@
     #define DO_DYNZOOM		global.DO_DYNZOOM
 #endif
 
-#ifndef DO_ALT_BLANK
-    #define DO_ALT_BLANK		global.DO_ALT_BLANK
-#endif
-
-#ifndef ALT_BLANK_STRENGTH
-    #define ALT_BLANK_STRENGTH	global.ALT_BLANK_STRENGTH
-#endif
-
-#ifndef ALT_BLANK_PERIOD
-    #define ALT_BLANK_PERIOD	global.ALT_BLANK_PERIOD
-#endif
-
 #ifndef DO_GLOBAL_SHZO
     #define DO_GLOBAL_SHZO	global.DO_GLOBAL_SHZO
 #endif

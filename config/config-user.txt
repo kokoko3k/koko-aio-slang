@@ -298,12 +298,6 @@
 // #define DELTA_RENDER_CHECK_AREA  1.0
 
 
-// #define DO_ALT_BLANK  0.0
-// #define ALT_BLANK_STRENGTH  0.5
-// #define ALT_BLANK_PERIOD  4.0
-
-
-
 // Developer reminder: bash script to partially convert a shader preset 
 // edit: obsolete and incomplete since it does not recur references.
 // for l in $(cat /koko/.config/retroarch/shaders/test.slangp |grep ^[A-Z] ) ; do p=$(echo $l|cut -d " " -f 1) ; v=$(echo $l | cut -d \" -f 2); echo \// #define $p $v; done

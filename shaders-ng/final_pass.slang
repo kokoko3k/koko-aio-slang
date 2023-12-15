@@ -938,7 +938,7 @@ vec4 textureLod_wrap(sampler2D tex, vec2 co, float lod, float wrap_mode) {
 
 
 
-vec3 pixel_blank_alternate_v2(vec2 co, vec4 texsize, float strength, vec3 c) {
+/*vec3 pixel_blank_alternate_v2(vec2 co, vec4 texsize, float strength, vec3 c) {
 
 	c = pow(c, vec3(2.2));
 
@@ -997,7 +997,7 @@ vec3 pixel_blank_alternate(vec3 strength, vec3 pixel_in) {
     }
 
 }
-
+*/
 
 vec3 bezel_color(float lum)  {
 
@@ -1138,17 +1138,6 @@ vec3 fn_pixel_content(vec2 coords) {
         pixel_out = pixel_glowed;
     #endif
 
-
-    //Black frame insertion, made static, enable it in config.inc.
-        #ifdef ALLOW_ALT_BLANK
-            vec3 alt_blank_power = vec3(1.0);
-            //Calculate if line has to be blanked
-                if (DO_ALT_BLANK == 1.0 ) alt_blank_power = pixel_blank_alternate( vec3(ALT_BLANK_STRENGTH), pixel_glowed);
-
-            //If we completely blanked the line, there is no need to process it further.
-                if (alt_blank_power == vec3(0.0)) return vec3(0.0);
-        #endif
-
     //Pixel grid
         if (DO_PIXELGRID == 1.0) {
             vec4 pixel_grid = fn_pixel_grid(coords, pixel_out, 0.0, vMax_inLum);
@@ -1212,12 +1201,6 @@ vec3 fn_pixel_content(vec2 coords) {
             pixel_out = float(BLOOM_BYPASS < 0.5) * pixel_out + bloomed;
         }
 
-    //Black frame insertion, made static, enable it in config.inc.
-        #ifdef ALLOW_ALT_BLANK
-            if (DO_ALT_BLANK == 1.0 )
-                //apply the blank power we calculated earlier in the code.
-                pixel_out.rgb = clamp(pixel_out.rgb,0.0,1.0) *  alt_blank_power;
-        #endif
 
     return pixel_out;
 }
