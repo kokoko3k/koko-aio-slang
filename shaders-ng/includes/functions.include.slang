@@ -1,3 +1,10 @@
+float need_tate(bool is_rotated) {
+    if ( (TATE == 1.0 && is_rotated) || TATE == 2.0)
+        return 1.0;
+            else
+        return 0.0;
+    //return float(TATE+vIsRotated > 1.001); //<<-- reported problems with amd (?)
+}
 
 vec3 smoothstep_fast(vec3 edge0, vec3 edge1, vec3 x) {
   return clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);
@@ -698,26 +705,37 @@ float random_fast(vec2 seed) {
 		return scale_coord;
 	}
 	
-	vec2 integer_scale(vec2 in_coords, float target_aspect, bool is_rotated, float uncorrected_aspect) {
-		
-		float raw_in_aspect = params.OriginalSize.x/params.OriginalSize.y;
+	vec2 integer_scale(vec2 in_coords, float target_aspect, bool is_rotated, float do_tate, float uncorrected_aspect) {
+
+		float raw_in_aspect;
+
+		if (do_tate == 1.0) {
+			target_aspect = 1/target_aspect;
+			raw_in_aspect = params.OriginalSize.y/params.OriginalSize.x;
+		} else {
+			raw_in_aspect = params.OriginalSize.x/params.OriginalSize.y;
+		}
+
 		float adapted_aspect = target_aspect / raw_in_aspect;
-		
-		//Keep aspect?
+
+	//Keep aspect?
 			adapted_aspect = mix_step(adapted_aspect, 1.0, uncorrected_aspect);
-			in_coords.x = zoom1D(in_coords.x, adapted_aspect);
+			if (do_tate == 0.0)
+				in_coords.x = zoom1D(in_coords.x, adapted_aspect);
+					else
+				in_coords.y = zoom1D(in_coords.y, adapted_aspect);
 
 		vec2 izoom;
 		if (!is_rotated) {
 			//This is 1X integer zoom:
 			izoom = params.OriginalSize.xy / global.FinalViewportSize.xy;
 			//Find the maximum zoom allowed
-			float int_zoom = floor(global.FinalViewportSize.y / params.OriginalSize.y );
+			float int_zoom = floor(global.FinalViewportSize.y / (params.OriginalSize.y/GAME_GEOM_INT_SCALE_OVR ));
 			int_zoom = clamp(int_zoom, 1.0, GAME_GEOM_INT_SCALE_MAX);
 			izoom *= int_zoom;
 		} else {
 			izoom = params.OriginalSize.xy / global.FinalViewportSize.yx;
-			float int_zoom = floor(global.FinalViewportSize.y / (params.OriginalSize.x * adapted_aspect) );
+			float int_zoom = floor(global.FinalViewportSize.y / (  (params.OriginalSize.x*adapted_aspect)/GAME_GEOM_INT_SCALE_OVR ));
 			int_zoom = clamp(int_zoom, 1.0, GAME_GEOM_INT_SCALE_MAX);
 			izoom *= int_zoom;
 		}
@@ -1049,11 +1067,43 @@ float get_dyn_zoom(sampler2D tex) {
 }
 
 
-vec2 tilt(vec2 co, float is_rotated, vec2 tilt) {
+vec2 tilt2D(vec2 co, float is_rotated, vec2 tilt) {
 
 	vec2 r_tilt = vec2( mix_step(tilt.x, tilt.y, is_rotated),
 	                    mix_step(tilt.y, -tilt.x, is_rotated)
-);
+					);
+	
+	vec2 tilt_min = 1 - r_tilt;
+	vec2 tilt_max = 1 + r_tilt;
+	
+	// X Tilt
+		float tilt_x_range = scale_to_range(co.y, tilt_min.x, tilt_max.x);
+		co = vec2( zoom1D(co.x, tilt_x_range),
+		           zoom1D(co.y, tilt_x_range)
+			);
+
+		
+	// Y Tilt
+		float tilt_y_range = scale_to_range(co.x, tilt_min.y, tilt_max.y);
+		co = vec2( zoom1D(co.x, tilt_y_range),
+		           zoom1D(co.y, tilt_y_range)
+			);
+	
+	// Aply FOV;
+		vec2 fov = mix(vec2(1.0), vec2(TILT_FOV), abs( tilt.xy ));
+		co = zoomxy(co, mix_step(fov.yx, fov.xy, is_rotated));
+
+		co.xy += mix_step(tilt.yx, -tilt.xy, is_rotated) * 0.5;
+		
+	return co;
+
+}
+	
+vec2 tilt(vec2 co, float is_rotated, float tilt) {
+	
+	vec2 r_tilt = vec2( mix_step(tilt, 0.0, is_rotated),
+	                    mix_step(0.0, -tilt, is_rotated)
+					);
 	
 	vec2 tilt_min = 1 - r_tilt;
 	vec2 tilt_max = 1 + r_tilt;
@@ -1071,14 +1121,15 @@ vec2 tilt(vec2 co, float is_rotated, vec2 tilt) {
 			);
 	
 	// Aply FOV;
-		vec2 fov = mix(vec2(1.0), vec2(TILT_FOV), abs( tilt.xy ));
-		co = zoomxy(co, mix_step(fov.yx, fov.xy, is_rotated));
+		float fov = mix( 1.0, TILT_FOV, abs( tilt ));
+		co = zoomxy(co, vec2(fov) );
 
-		co.xy += mix_step(tilt.yx, -tilt.xy, is_rotated) * 0.4;
+		co.xy += mix_step(  vec2(0.0, tilt),   -vec2(tilt, 0.0), is_rotated) * 0.5;
 		
 	return co;
-
 }
+	
+
 	
 /*bool is_first_outside_rect(vec2 point, vec4 rect) {
 	return (point.x < rect.x || point.x > rect.z ||

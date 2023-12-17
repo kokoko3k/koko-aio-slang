@@ -48,7 +48,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 	float DO_HALO ;
 	float DO_CCORRECTION;
-	float DO_ALT_BLANK;
 	float IN_GLOW_BIAS ;
 	float IN_GLOW_SPREAD ;
 
@@ -66,8 +65,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float BLOOM_POWER;
 	float BLOOM_OVER_WHITE;
   	float BLOOM_GAMMA_OUT;
-  	float ALT_BLANK_STRENGTH;
-  	float ALT_BLANK_PERIOD;
 	
 	float DO_FXAA;
 	
@@ -111,7 +108,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float BEZEL_CORNER_DARK;
 	
 	float DO_SPOT;
-	float S_POSITION; 
+	float S_POSITION_X; 
+	float S_POSITION_Y; 
 	float S_SIZE;
 	float S_POWER;
 
@@ -161,6 +159,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	
 	float DO_GAME_GEOM_OVERRIDE;
 	float GAME_GEOM_INT_SCALE;
+	float GAME_GEOM_INT_SCALE_OVR;
 	float GAME_GEOM_INT_SCALE_MAX;
 	float GAME_GEOM_ASPECT;
 	float GAME_GEOM_VSHIFT;
@@ -170,7 +169,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	
 	float DO_TILT;
 	float TILT_X;
-	float TILT_Y;
 	float TILT_BEZEL_K;
 	float TILT_FOV;
 	
@@ -281,17 +279,17 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 // Color correction
 #pragma parameter DO_CCORRECTION "★ Color corrections enable? (co) ==>" 		0.0 	0.0 1.0 1.0
 #pragma parameter IN_GLOW_POWER  "       Input signal gain (was in glow section):"					1.0 	0.0 5.0 0.05
-#pragma parameter LUMINANCE       "       Luminance push (>1.0=clip)"		0.0	 0.0 1.5 0.05
-#pragma parameter BRIGHTNESS     "        Brightness in   (0.0=off)"		0.0	-1.0 1.0 0.01
-#pragma parameter CONTRAST       "        Contrast in     (0.0=off)"		0.0	-1.0 1.0 0.01
-#pragma parameter TEMPERATURE    "        Temperature in (6500=off)"		6500.0	3000 14000.0 50.0
-#pragma parameter IN_GLOW_GAMMA  "        Gamma In  (applied at the beginning)"		1.0 	1.0 	10.0 0.1
-#pragma parameter GAMMA_OUT      "        Gamma out (applied at the end)"			0.69	0.1 	4.0  0.01
-#pragma parameter COLOR_MONO_COLORIZE	"        Monochrome screen colorization"	0.0  0.0 1.0 0.1
-#pragma parameter COLOR_MONO_HUE1        "           . Hue bright"					0.25 0.0 1.0 0.01
-#pragma parameter COLOR_MONO_HUE2        "           . Hue dark"						0.3  0.0 1.0 0.01
-#pragma parameter COLOR_MONO_HUE_BIAS    "           . Hue bright-dark bias"		0.0	-2.0 2.0 0.01
-#pragma parameter SATURATION     "        Saturation in   (1.0=off)"		1.0	0.0  2.0 0.01
+#pragma parameter LUMINANCE      "       Luminance push (>1.0=clip)"		0.0	 0.0 1.5 0.05
+#pragma parameter BRIGHTNESS     "       Brightness in   (0.0=off)"		0.0	-1.0 1.0 0.01
+#pragma parameter CONTRAST       "       Contrast in     (0.0=off)"		0.0	-1.0 1.0 0.01
+#pragma parameter TEMPERATURE    "       Temperature in (6500=off)"		6500.0	3000 14000.0 50.0
+#pragma parameter IN_GLOW_GAMMA  "       Gamma In  (applied at the beginning)"		1.0 	1.0 	10.0 0.1
+#pragma parameter GAMMA_OUT             "       Gamma out (applied at the end)"			0.69	0.1 	4.0  0.01
+#pragma parameter COLOR_MONO_COLORIZE	"       Monochrome screen colorization"	0.0  0.0 1.0 0.1
+#pragma parameter COLOR_MONO_HUE1       "          . Hue bright"					0.25 0.0 1.0 0.01
+#pragma parameter COLOR_MONO_HUE2       "          . Hue dark"						0.3  0.0 1.0 0.01
+#pragma parameter COLOR_MONO_HUE_BIAS   "          . Hue bright-dark bias"		0.0	-2.0 2.0 0.01
+#pragma parameter SATURATION            "       Saturation in   (1.0=off)"		1.0	0.0  2.0 0.01
 #pragma parameter BLANK1 " " 0.0 0.0 1.0 1.0
 
 
@@ -372,7 +370,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 #pragma parameter LABEL_INTERLACE           "★ Hi-resolution scanlines handling" 0.0 0.0 0.0 0.0
 #pragma parameter MIN_LINES_INTERLACED      "    . Consider Hi-Resolution above # lines:"		380.0 	1.0 1024 1.0
-#pragma parameter PIXELGRID_INTR_DISABLE_Y  "    . Hi-Res scanlines type (read docs):"   -2.0 -2.0 2.0 1.0
+#pragma parameter PIXELGRID_INTR_DISABLE_Y  "    . Hi-Res scanlines type (read docs):"   -1.0 -2.0 2.0 1.0
 #pragma parameter LabelDescIntlScan1        "      (-2: Faker-Interlaced, -1: Fake-Interlaced)"          0.0 0.0 0.0 0.0
 #pragma parameter LabelDescIntlScan2        "      ( 0: Interlaced, 1: No scanlines, 2: Don't interlace)" 0.0 0.0 0.0 0.0
 #pragma parameter PIXELGRID_INTR_FLICK_MODE "      . Scanlines flicker (0=off,1=on,2=if Hi-Res)"			2.0 	0.0 2.0 1.0
@@ -508,14 +506,14 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 //Background Image
 #pragma parameter DO_BG_IMAGE	     "★ Back/Foreground image enable? (ba) ==>"				 0.0  0.0  1.0     1.0
-#pragma parameter LABEL_WARNING1     "    !! RetroArch aspect needs to be set to Full"	 1.0  1.0  1.0     1.0
-#pragma parameter BG_IMAGE_OVER	     "        Image over content (alpha channel driven)?"	 0.0  0.0  1.0     1.0
-#pragma parameter BG_IMAGE_OFFX	     "        Shift Image over X axis"				 0.0  -1.0  1.0    0.0005
-#pragma parameter BG_IMAGE_OFFY	     "        Shift Image over Y axis"				 0.0  -1.0  1.0    0.0005
-#pragma parameter BG_IMAGE_ZOOM	     "        Zoom Image"					 1.0  -1.0  3.0    0.0005
-#pragma parameter BG_IMAGE_ROTATION  "        Rotate image mode (-1 for auto)"	     		 -1.0  -1.0  2.0    1.0
-#pragma parameter BG_IMAGE_NIGHTIFY  "        Nightify image"                                 0.0   0.0  1.0    0.1
-#pragma parameter BG_IMAGE_WRAP_MODE "        Wrap mode: default, clamp to border, edge, repeat" 0.0  0.0    3.0    1.0
+#pragma parameter LABEL_WARNING1     "   !! RetroArch aspect needs to be set to Full"	 1.0  1.0  1.0     1.0
+#pragma parameter BG_IMAGE_OVER	     "      Image over content (alpha channel driven)?"	 0.0  0.0  1.0     1.0
+#pragma parameter BG_IMAGE_OFFX	     "      Shift Image over X axis"				 0.0  -1.0  1.0    0.0005
+#pragma parameter BG_IMAGE_OFFY	     "      Shift Image over Y axis"				 0.0  -1.0  1.0    0.0005
+#pragma parameter BG_IMAGE_ZOOM	     "      Zoom Image"					 1.0  -1.0  3.0    0.0005
+#pragma parameter BG_IMAGE_ROTATION  "      Rotate/flip (0=auto,1/-1=no change,<0 for rotated games)"  0.0  -8.0  8.0    1.0
+#pragma parameter BG_IMAGE_NIGHTIFY  "      Nightify image"                                 0.0   0.0  1.0    0.1
+#pragma parameter BG_IMAGE_WRAP_MODE "      Wrap mode: default, clamp to border, edge, repeat" 0.0  0.0    3.0    1.0
 #pragma parameter BLANK16 " " 0.0 0.0 1.0 1.0
 
 //Backdrop image
@@ -538,7 +536,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter AMBI_STRETCH_VERTICAL     "        Widen lights (vertical games)"		0.5  0.0  1.0     0.01
 #pragma parameter AMBI_GAMMA                "        Output Gamma"						1.3  0.1  8.0     0.1
 #pragma parameter AMBI_OVER_BEZEL           "        Colorize Bezel"					0.2  0.0  5.0     0.05
-#pragma parameter AMBI_OVER_BEZEL_SIZE      "           . Colorization size"			0.15  0.0  0.5    0.001
+#pragma parameter AMBI_OVER_BEZEL_SIZE      "           . Colorization size"			0.15 0.001  0.5   0.001 ///hacky, but keep min to 0.001 plz.
 #pragma parameter AMBI_BG_IMAGE_BLEND_MODE  "        Back/Foreground image alpha blend (0=mix, 1=add)"	0.0   0.0  1.0    1.0
 #pragma parameter AMBI_ADD_ON_BLACK         "        Foggy (power on dark colors, add mode only)    "		1.0   0.0  1.0    0.05
 #pragma parameter AMBI_BG_IMAGE_FORCE       "        Always colorize Back/Foreground image (add mode only) "		0.0   0.0  1.0    0.1
@@ -552,7 +550,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter V_POWER	"        Power"			1.0  0.05 1.0  0.01
 
 #pragma parameter DO_SPOT	"★ Spot enable? (sp) ==>"		0.0   0.0   1.0 1.0
-#pragma parameter S_POSITION 	"        Position"		194.0   -420.0 378.0 1
+#pragma parameter S_POSITION_X 	"        X Position"	   -0.5   -2.0 2.0 0.05
+#pragma parameter S_POSITION_Y 	"        Y Position"		0.5   -2.0 2.0 0.05
 #pragma parameter S_SIZE	"        Size"			0.4   0.0   1.0 0.01
 #pragma parameter S_POWER	"        Power" 		0.1   0.05  2.0 0.01
 #pragma parameter BLANK19 " " 0.0 0.0 1.0 1.0
@@ -594,7 +593,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 //Content geomerty overrides
 #pragma parameter DO_GAME_GEOM_OVERRIDE	  "★ Override content geometry enable? (ov)==>"	0.0   0.0  1.0 	  1.0
 #pragma parameter GAME_GEOM_INT_SCALE     "        Integer scale (disables inner zoom) 2=No keep aspect"	0.0   0.0  2.0    1.0
-#pragma parameter GAME_GEOM_INT_SCALE_MAX "        Maximum integer scale" 				10.0  1.0  100.0  1.0
+#pragma parameter GAME_GEOM_INT_SCALE_MAX "        .    Maximum integer scale" 			10.0  1.0  100.0  1.0
+#pragma parameter GAME_GEOM_INT_SCALE_OVR "        .    Permit integer overscale by" 			1.04   1.00  1.1  0.01
 #pragma parameter LABEL_WARNING44         "    !! Switch off luminosity tied zoom to use integer scaling"   1.0  1.0  1.0     1.0
 #pragma parameter LABEL_WARNING4          "    !! The following will override integer scale" 1.0  1.0  1.0     1.0
 #pragma parameter GAME_GEOM_ASPECT	  "        Aspect (0 = unchanged)"		0.0    0.0  3.0	  0.005
@@ -607,28 +607,19 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 //Tilt
 #pragma parameter DO_TILT	  	"★ Tilt enable? (ti) ==>"				0.0   0.0  1.0 	  1.0
 #pragma parameter TILT_X	  	"        Tilt along X axis"		0.0    -0.5  0.5  0.01
-#pragma parameter TILT_Y	  	"        Tilt along Y axis"		0.0    -0.5  0.5  0.01
 #pragma parameter TILT_FOV	  	"        Fov"					0.7    0.1	1.5   0.05
 #pragma parameter TILT_BEZEL_K	"        Bezel multiplier"		1.0    0.0  1.5  0.01
 #pragma parameter BLANK_01 " " 0.0 0.0 1.0 1.0
 
 //Delta render
-#pragma parameter label_alt_blank    "  !THE FOLLOWING FEATURES ARE STATIC, SEE docs-ng.md TO ENABLE"    0.0 0.0 0.0 1.0
+#pragma parameter label_dr11    "  !THE FOLLOWING FEATURES ARE STATIC, SEE docs-ng.md TO ENABLE"    0.0 0.0 0.0 1.0
 #pragma parameter DELTA_RENDER_FORCE_REFRESH    "★ Delta render force refresh interval ? ==>"	4.0 1.0 3600.0 1.0
 #pragma parameter DELTA_RENDER_CHECK_AREA       "        Delta render area size"			1.0 0.0 10.0 1.0
 #pragma parameter BLANK_DR " " 0.0 0.0 1.0 1.0
 
-// Alternative blanking, needs to be statically enabled, see docs.md.
-#pragma parameter DO_ALT_BLANK       "★ Alternate line blanking enable? ==>"			0.0 0.0 1.0 1.0
-#pragma parameter ALT_BLANK_STRENGTH "        Alternate black frame insertion strength" 	0.5 0.0 1.0 0.1
-#pragma parameter ALT_BLANK_PERIOD   "        Blank lines period" 				4.0 1.0 30.0 1.0
-#pragma parameter BLANK_02 " " 0.0 0.0 1.0 1.0
-
-
 #pragma parameter SERVICE1 "Don't use me, for debug purposes only" 	0.5 0.0 1.0 0.01
 //#pragma parameter SERVICE2 "Don't use me, for debug purposes only" 	0.5 -1.0 1.0 0.01
 //#pragma parameter SERVICE3 "Don't use me, for debug purposes only" 	0.5 -1.0 1.0 0.01
-
 
 
 

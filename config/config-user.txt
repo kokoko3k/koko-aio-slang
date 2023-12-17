@@ -256,7 +256,8 @@
 // #define V_POWER  1.00
 
 // #define DO_SPOT  1.0
-// #define S_POSITION  194.0
+// #define S_POSITION_X  1.0
+// #define S_POSITION_Y  1.0
 // #define S_SIZE  0.4
 // #define S_POWER  0.05
 
@@ -277,6 +278,7 @@
 // #define DO_GAME_GEOM_OVERRIDE  0.0
 // #define GAME_GEOM_INT_SCALE  0.0
 // #define GAME_GEOM_INT_SCALE_MAX  10.0
+// #define GAME_GEOM_INT_SCALE_OVR 1.0
 
 
 // #define GAME_GEOM_ASPECT  0.0
@@ -288,19 +290,12 @@
 
 // #define DO_TILT  0.0
 // #define TILT_X  0.0
-// #define TILT_Y  0.0
 // #define TILT_FOV  0.7
 // #define TILT_BEZEL_K  1.0
 
 
 // #define DELTA_RENDER_FORCE_REFRESH  4.0
 // #define DELTA_RENDER_CHECK_AREA  1.0
-
-
-// #define DO_ALT_BLANK  0.0
-// #define ALT_BLANK_STRENGTH  0.5
-// #define ALT_BLANK_PERIOD  4.0
-
 
 
 // Developer reminder: bash script to partially convert a shader preset 

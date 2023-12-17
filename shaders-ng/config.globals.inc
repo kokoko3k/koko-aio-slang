@@ -353,8 +353,12 @@
     #define DO_SPOT		global.DO_SPOT
 #endif
 
-#ifndef S_POSITION
-    #define S_POSITION	global.S_POSITION
+#ifndef S_POSITION_X
+    #define S_POSITION_X	global.S_POSITION_X
+#endif
+
+#ifndef S_POSITION_Y
+    #define S_POSITION_Y	global.S_POSITION_Y
 #endif
 
 #ifndef S_SIZE
@@ -489,18 +493,6 @@
     #define DO_DYNZOOM		global.DO_DYNZOOM
 #endif
 
-#ifndef DO_ALT_BLANK
-    #define DO_ALT_BLANK		global.DO_ALT_BLANK
-#endif
-
-#ifndef ALT_BLANK_STRENGTH
-    #define ALT_BLANK_STRENGTH	global.ALT_BLANK_STRENGTH
-#endif
-
-#ifndef ALT_BLANK_PERIOD
-    #define ALT_BLANK_PERIOD	global.ALT_BLANK_PERIOD
-#endif
-
 #ifndef DO_GLOBAL_SHZO
     #define DO_GLOBAL_SHZO	global.DO_GLOBAL_SHZO
 #endif
@@ -523,6 +515,10 @@
 
 #ifndef GAME_GEOM_INT_SCALE
     #define GAME_GEOM_INT_SCALE	global.GAME_GEOM_INT_SCALE
+#endif
+
+#ifndef GAME_GEOM_INT_SCALE_OVR
+    #define GAME_GEOM_INT_SCALE_OVR global.GAME_GEOM_INT_SCALE_OVR
 #endif
 
 #ifndef GAME_GEOM_INT_SCALE_MAX
@@ -555,10 +551,6 @@
 
 #ifndef TILT_X
     #define TILT_X			global.TILT_X
-#endif
-
-#ifndef TILT_Y
-    #define TILT_Y			global.TILT_Y
 #endif
 
 #ifndef TILT_FOV

@@ -68,11 +68,13 @@ void main() {
    //Scale to the original aspect
     float in_aspect = get_in_aspect();
 
+    float Do_Tate = need_tate(isrotated);
+
     
     if ( need_NO_integer_scale() )
         pre_pass_coords = get_scaled_coords_aspect(TexCoord,global.FinalViewportSize, in_aspect, isrotated) + vec2(0.00001);
             else
-        pre_pass_coords = integer_scale(TexCoord, in_aspect, isrotated, GAME_GEOM_INT_SCALE-1.0 ) ;
+        pre_pass_coords = integer_scale(TexCoord, in_aspect, isrotated, Do_Tate, GAME_GEOM_INT_SCALE-1.0 ) ;
 
 
     if (DO_GLOBAL_SHZO >0.5)
@@ -140,7 +142,7 @@ float fcircle_smooth(vec2 coords, vec2 middle, float f_radius, float FALLOFF) {
 
 vec3 ambi_pre_pass(vec2 coords) {
     if (DO_TILT == 1.0)
-        coords = tilt(coords, vIs_rotated, vec2(TILT_X, TILT_Y));
+        coords = tilt(coords, vIs_rotated, TILT_X);
 
     //Skip coords in the rect "under the tube"
     if (coords.x > tol_start &&

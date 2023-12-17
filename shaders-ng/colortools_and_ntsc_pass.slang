@@ -20,19 +20,24 @@
 //#define DEBUG
    //#define DEBUG_COLOR_CALIB
    //#define DEBUG_TIME_FADE
-   #define DEBUG_SOLID_COLOR
+   //#define DEBUG_SOLID_COLOR
    //#define DEBUG_STEP_GRADIENT
    //#define DEBUG_STEP_GRADIENT_V
    //#define DEBUG_BLINK
    //#define DEBUG_BLINK_CIRCLE
    //#define DEBUG_WALKING_CIRCLE
-   //#define DEBUG_COLORWHEEL
+   #define DEBUG_COLORWHEEL
    
    
 #include "config.inc"
 
-#define NTSC_FILTER_WIDTH_MAX 25
+#define NTSC_FILTER_WIDTH_MIN 5
+#define NTSC_FILTER_WIDTH_MAX 21
+
 #define NTSC_FILTER_MIDDLE NTSC_FILTER_WIDTH/2
+
+//Clamp min and max artifacts loop to unroll loops? Can't observe any speed increase (maybe a bit lower)
+//#define UNROLL_N
 
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
@@ -79,6 +84,9 @@ void main() {
       float N = NTSC_FILTER_WIDTH;
       //  Compute sampling weights
       int i = 0;
+      #ifdef UNROLL_N
+         N = clamp(N, NTSC_FILTER_WIDTH_MIN, NTSC_FILTER_WIDTH_MAX); //Hopefully help compiler to unroll better here
+      #endif
       for (float n = 0.0 ; n < N; n++) {
          int i = int(n);
          vNTSC_weights[i] = hann(n, N) * sinc(vNTSC_FILTER_FC * (n-NTSC_FILTER_MIDDLE));
@@ -146,6 +154,9 @@ vec4 ntscdec(vec2 uv, vec3 RGB_ori) {
          float phase_shift_for_blur;
          
       int N = int(NTSC_FILTER_WIDTH);
+      #ifdef UNROLL_N
+         N = clamp(N, NTSC_FILTER_WIDTH_MIN, NTSC_FILTER_WIDTH_MAX); //Hopefully help compiler to unroll better here
+      #endif
       for (int n=0; n < N; n++) {
          vec2 pos = uv + vec2((n-NTSC_FILTER_MIDDLE) * params.SourceSize.z, 0.0);
          vec3 smp_mul_weight = vec3((texture(Source, pos).rgb * RGB2YIQ).x) * vNTSC_weights[n] ;
