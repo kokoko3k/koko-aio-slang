@@ -315,10 +315,22 @@ void main() {
     vUse_Fake_scanlines = 0.0;
 
     if ( (PIXELGRID_INTR_DISABLE_Y <= -1.0 && bIs_Interlaced) || (PIXELGRID_COREY_FAKE_SCAN == 1.0)) {
+        //vec2 outsize = global.FinalViewportSize.xy;
+        vec2 out_size = params.OutputSize.xy;
+        vec4 ori_size = params.OriginalSize;
+        vec2 out_coord = vOutputCoord;
+        vec2 zoom_modifier = get_zooms_modifier();
+        if (vDo_Tate == 1.0) {
+            out_size.xy = out_size.yx;
+            ori_size.xyzw = ori_size.yxwz;
+            out_coord.xy = out_coord.yx;
+            zoom_modifier.xy = zoom_modifier.yx;
+        }
+
         vUse_Fake_scanlines = 1.0;
-        float fake_scanlines_numlines = global.FinalViewportSize.y/
-              round( (global.FinalViewportSize.y*get_zooms_modifier().y) * params.OriginalSize.w);
-        vFake_scanline_period = pi * fake_scanlines_numlines * vOutputCoord.y;
+        float fake_scanlines_numlines = out_size.y/
+              round( (out_size.y*zoom_modifier.y) * ori_size.w);
+        vFake_scanline_period = pi * fake_scanlines_numlines * out_coord.y;
         if (PIXELGRID_INTR_DISABLE_Y == -2.0 && PIXELGRID_COREY_FAKE_SCAN == 0.0) vFake_scanline_period*=1.5;
     }
 
