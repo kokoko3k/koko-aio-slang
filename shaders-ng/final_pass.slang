@@ -1488,11 +1488,11 @@ void main() {
 
                 // tl:dr: dont "black" the transparent areas outside the game content.
                 // long explaination:
-                // We want to show the underlying game content when the image is transparent.
-                // This mean that alpha channel reveals the underlying content, but doing that even
-                // when the underlyinig content is void is not only pointless, but even counterproductive.
-                // Think at when we want to use ambient lights to *light* the part of the image
-                // that have a low alpha channel, that part would be black.
+//                 We want to show the underlying game content when the image is transparent.
+//                 This mean that alpha channel reveals the underlying content, but doing that even
+//                 when the underlyinig content is void is not only pointless, but even counterproductive.
+//                 Think at when we want to use ambient lights to *light* the part of the image
+//                 that have a low alpha channel, that part would be black.
                 float alpha_selective = clamp(  pixel_fg_image.a + ( 1- canvas_busy) , 0.0, 1.0);
 
 
