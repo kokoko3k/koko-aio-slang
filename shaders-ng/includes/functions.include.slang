@@ -1,3 +1,10 @@
+float need_tate(bool is_rotated) {
+    if ( (TATE == 1.0 && is_rotated) || TATE == 2.0)
+        return 1.0;
+            else
+        return 0.0;
+    //return float(TATE+vIsRotated > 1.001); //<<-- reported problems with amd (?)
+}
 
 vec3 smoothstep_fast(vec3 edge0, vec3 edge1, vec3 x) {
   return clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);
@@ -698,14 +705,25 @@ float random_fast(vec2 seed) {
 		return scale_coord;
 	}
 	
-	vec2 integer_scale(vec2 in_coords, float target_aspect, bool is_rotated, float uncorrected_aspect) {
-		
-		float raw_in_aspect = params.OriginalSize.x/params.OriginalSize.y;
+	vec2 integer_scale(vec2 in_coords, float target_aspect, bool is_rotated, float do_tate, float uncorrected_aspect) {
+
+		float raw_in_aspect;
+
+		if (do_tate == 1.0) {
+			target_aspect = 1/target_aspect;
+			raw_in_aspect = params.OriginalSize.y/params.OriginalSize.x;
+		} else {
+			raw_in_aspect = params.OriginalSize.x/params.OriginalSize.y;
+		}
+
 		float adapted_aspect = target_aspect / raw_in_aspect;
-		
-		//Keep aspect?
+
+	//Keep aspect?
 			adapted_aspect = mix_step(adapted_aspect, 1.0, uncorrected_aspect);
-			in_coords.x = zoom1D(in_coords.x, adapted_aspect);
+			if (do_tate == 0.0)
+				in_coords.x = zoom1D(in_coords.x, adapted_aspect);
+					else
+				in_coords.y = zoom1D(in_coords.y, adapted_aspect);
 
 		vec2 izoom;
 		if (!is_rotated) {
