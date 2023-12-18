@@ -9,7 +9,7 @@
 
 #define smp_internalness 0.07  //The distance between the screen border and the color sampling point
 #define leds_per_strip 8   //How many leds per border
-#define radius 0.001       //The base radius of the emitted light (tuned by user parameter later)
+#define RADIUS 0.001       //The base radius of the emitted light (tuned by user parameter later)
 
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
@@ -27,6 +27,8 @@ layout(location = 9) out float vSmpBorder_min;
 layout(location = 10) out float vSmpBorder_max;
 layout(location = 11) out float vSmp_step;
 layout(location = 12) out float vMod_FrameCount_FrameDivider;
+layout(location = 13) out vec2 coords_for_bezel_shade;
+layout(location = 14) out vec2 vDo_bezel_shade;
 
 void main() {
     gl_Position = global.MVP * Position;
@@ -71,10 +73,11 @@ void main() {
     float Do_Tate = need_tate(isrotated);
 
     
-    if ( need_NO_integer_scale() )
+    if ( need_NO_integer_scale() ) {
         pre_pass_coords = get_scaled_coords_aspect(TexCoord,global.FinalViewportSize, in_aspect, isrotated) + vec2(0.00001);
-            else
+    } else {
         pre_pass_coords = integer_scale(TexCoord, in_aspect, isrotated, Do_Tate, GAME_GEOM_INT_SCALE-1.0 ) ;
+    }
 
 
     if (DO_GLOBAL_SHZO >0.5)
@@ -83,7 +86,11 @@ void main() {
     if (DO_GAME_GEOM_OVERRIDE > 0.5)
         pre_pass_coords = content_geom_override(pre_pass_coords, GAME_GEOM_ASPECT, get_in_aspect(), GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
 
-
+    // We need pre_pass_coords here, before zommed-out by -get_BEZEL_INNER_ZOOM()
+    // Wee need this to calculate the internal ambientlight shade to black
+    // Needed if we want to (partially) colorize the bezel frame.
+        coords_for_bezel_shade = get_scaled_coords_for_bezel(pre_pass_coords, vIs_rotated);
+    
     if (DO_BEZEL > 0.5)
         pre_pass_coords = zoomout_coords(pre_pass_coords, -get_BEZEL_INNER_ZOOM() , 1.0);
 
@@ -112,6 +119,7 @@ layout(location = 9) in float vSmpBorder_min;
 layout(location = 10) in float vSmpBorder_max;
 layout(location = 11) in float vSmp_step;
 layout(location = 12) in float vMod_FrameCount_FrameDivider;
+layout(location = 13) in vec2 coords_for_bezel_shade;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -169,7 +177,7 @@ vec3 ambi_pre_pass(vec2 coords) {
     led_point = vec2(vLedBorder_min);
     smp_point = vec2(vSmpBorder_min);
     for (int i=1 ; i <= leds_per_strip ; i++) {
-        float circle_shape = fcircle_smooth(coords, led_point, radius, lAMBI_FALLOFF);
+        float circle_shape = fcircle_smooth(coords, led_point, RADIUS, lAMBI_FALLOFF);
         vec3  circle_color = ambi_push_pass(smp_point, lod);
         pixel_out += circle_shape * circle_color;
         led_point.y += vLed_step;
@@ -180,7 +188,7 @@ vec3 ambi_pre_pass(vec2 coords) {
     led_point = vec2(vLedBorder_max, vLedBorder_min);
     smp_point = vec2(vSmpBorder_max, vSmpBorder_min);
     for (int i=1 ; i <= leds_per_strip ; i++) {
-        float circle_shape = fcircle_smooth(coords, led_point, radius, lAMBI_FALLOFF);
+        float circle_shape = fcircle_smooth(coords, led_point, RADIUS, lAMBI_FALLOFF);
         vec3  circle_color = ambi_push_pass(smp_point, lod);
         pixel_out += circle_shape * circle_color;
         led_point.y += vLed_step;
@@ -191,7 +199,7 @@ vec3 ambi_pre_pass(vec2 coords) {
     led_point = vec2(vLedBorder_min + vLed_step, vLedBorder_min);
     smp_point = vec2(vSmpBorder_min + vSmp_step, vSmpBorder_min);
     for (int i=1 ; i <= leds_per_strip-2 ; i++) {
-        float circle_shape = fcircle_smooth(coords, led_point, radius, lAMBI_FALLOFF);
+        float circle_shape = fcircle_smooth(coords, led_point, RADIUS, lAMBI_FALLOFF);
         vec3  circle_color = ambi_push_pass(smp_point, lod);
         pixel_out += circle_shape * circle_color;
         led_point.x += vLed_step;
@@ -202,7 +210,7 @@ vec3 ambi_pre_pass(vec2 coords) {
     led_point = vec2(vLedBorder_min + vLed_step, vLedBorder_max);
     smp_point = vec2(vSmpBorder_min + vSmp_step, vSmpBorder_max);
     for (int i=1 ; i <= leds_per_strip-2 ; i++) {
-        float circle_shape = fcircle_smooth(coords, led_point, radius, lAMBI_FALLOFF);
+        float circle_shape = fcircle_smooth(coords, led_point, RADIUS, lAMBI_FALLOFF);
         vec3  circle_color = ambi_push_pass(smp_point, lod);
         pixel_out += circle_shape * circle_color;
         led_point.x += vLed_step;
@@ -236,8 +244,21 @@ vec3 ambi_step_rgb(vec3 s,vec3 d, vec3 mystep){
 }
 
 
-vec4 pixel_ambilight(vec2 local_pre_pass_coords) {
+float fuzzyrect(vec2 uv, vec2 size, float radius, float blur) {
+    vec2 hSize = size / 2.0 - radius;
+    float d = length(max(abs(uv - vec2(0.5)),hSize)-hSize);
+    return smoothstep(-radius-blur, -radius+blur, -d);
+}
 
+float create_ambi_colorize_shade(vec2 co) {
+    float blur = AMBI_OVER_BEZEL_SIZE;
+    vec2 size = vec2(1.0, 2 - AMBI_OVER_BEZEL_AR_CORRECTION)-blur;
+    float radius = 0.0;
+    return  1 - min ( fuzzyrect(co, size,  radius,  blur) * 2, 1.0);
+}
+
+vec4 pixel_ambilight(vec2 local_pre_pass_coords) {
+    
     vec4 past_pixel_vec4 = texture(PastSampler, vTexCoord);
     vec3 present_pixel =  ambi_pre_pass(local_pre_pass_coords).rgb;
     vec3 past_pixel =     past_pixel_vec4.rgb;
@@ -252,7 +273,11 @@ vec4 pixel_ambilight(vec2 local_pre_pass_coords) {
         if (diff_avg_lum >= AMBI_SCENE_CHG_THRSHLD) {
             scene_change_remaining = 1/AMBI_FAST_STEP;
         }
-    #endif 
+    #endif
+    
+    //progressively blank the ambient light near the bezel:
+    if (DO_BEZEL == 1.0)
+        present_pixel *= create_ambi_colorize_shade(coords_for_bezel_shade);
     
     // Are we changing scene?
     vec3 mystep;
@@ -263,25 +288,39 @@ vec4 pixel_ambilight(vec2 local_pre_pass_coords) {
         mystep = abs((past_pixel - present_pixel) / MAX_STEPS); //OK
     }
     
-    return vec4(ambi_step_rgb(past_pixel, present_pixel, mystep), scene_change_remaining);
+
+    return vec4( ambi_step_rgb(past_pixel, present_pixel, mystep) ,
+                  scene_change_remaining);
 }
 
 
 void main() {
     if (DO_AMBILIGHT != 1.0)
         return;
+        
+    
+    vec4 pixel_ambi = vec4(0.0);
     
     //Nvidia + flycast core + glcore goes crazy with modulo operation and instead of returning 0,1,2 0,1,2 they returns 1,2,3 1,2,3 and so on.
     //Don't check for != 0.0 here, but use != 1.0.
     //Also this particular bug does not seem to happen in the last pass.
     
-    if ( vMod_FrameCount_FrameDivider != 1.0 ) { 
+
+    
+  /*  if ( vMod_FrameCount_FrameDivider != 1.0 ) { 
         vec4 past_sampler = texture(PastSampler, vTexCoord);
         past_sampler = max(past_sampler, 0.0); // <- Sanitize input to avoid glitches when enabling the option runtime.
-        FragColor = past_sampler;
-        return;
-    }
+        pixel_ambi = past_sampler;
+    } else {
+        pixel_ambi = pixel_ambilight(pre_pass_coords);
+    }*/
+  
+  pixel_ambi = pixel_ambilight(pre_pass_coords);
+    
+        
+   
+    pixel_ambi.rgb =  pixel_ambi.rgb;
 
-
-    FragColor = pixel_ambilight(pre_pass_coords);
+    
+    FragColor = pixel_ambi;
 }

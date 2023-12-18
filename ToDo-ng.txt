@@ -139,3 +139,4 @@ TODO:
 	[ ] Antimoiree to 0.17 works not so good in (eg) super cars 2, can we find a correlation betweeb scanline numbers and the sweet spot?
 	    on super cars 2 it is better set to 0.19.
 	[ ] Why bezel does not scale correctly when using integert scale?
+	[ ] why blink debug iption des not trig scene change when going from 0.2 to 1.0?

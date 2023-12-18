@@ -11,8 +11,8 @@
 #define CYELLOW  vec3(1.0,1.0,0.0)
 #define CCUSTOM vec3(0.3,0.5,0.1)
 
-#define DEBUG_COLOR vec3(1,1,1)
-#define DEBUG_BLINK_TIME 30
+#define DEBUG_COLOR vec3(1.0)
+#define DEBUG_BLINK_TIME 100
 #define DEBUG_GRADIENT_STEPS 64
 
 
@@ -216,7 +216,7 @@ vec3 debug() {
       
    #elif defined DEBUG_BLINK
       if (mod(params.FrameCount, DEBUG_BLINK_TIME*2) < DEBUG_BLINK_TIME) 
-         pixel_debug = vec3(0.2) ;
+         pixel_debug = vec3(0.0) ;
       else 
          pixel_debug = DEBUG_COLOR;
    
