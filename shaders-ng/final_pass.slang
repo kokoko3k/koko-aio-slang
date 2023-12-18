@@ -1031,6 +1031,7 @@ float fuzzyrect(vec2 uv, vec2 size, float radius, float blur) {
     return smoothstep(-radius-blur, -radius+blur, -d);
 }
 
+
 float create_ambi_colorize_shade(vec2 co) {
     float blur = AMBI_OVER_BEZEL_SIZE;
     vec2 size = vec2(1.0, 2 - AMBI_OVER_BEZEL_AR_CORRECTION)-blur;
