@@ -1475,22 +1475,23 @@ void main() {
 
                 pixel_fg_image.rgb = fn_pixel_nightify(pixel_fg_image.rgb, BG_IMAGE_NIGHTIFY, anti_nightify_ambi );
 
-                // tl:dr: dont "black" the transparent areas outside the game content.
+                // tl:dr:
+                //   dont "black" the transparent areas outside the game content when we use AMBI_BG_IMAGE_BLEND_MODE ADD blend mode.
+                //   Do only for add mode, since some inplace presets relies on the blackness with AMBI_BG_IMAGE_BLEND_MODE mix mode.
                 // long explaination:
-//                 We want to show the underlying game content when the image is transparent.
-//                 This mean that alpha channel reveals the underlying content, but doing that even
-//                 when the underlyinig content is void is not only pointless, but even counterproductive.
-//                 Think at when we want to use ambient lights to *light* the part of the image
-//                 that have a low alpha channel, that part would be black.
-                float alpha_selective = clamp(  pixel_fg_image.a + ( 1- canvas_busy) , 0.0, 1.0);
-
-
-                pixel_out = mix(pixel_out, pixel_fg_image.rgb, alpha_selective );
-
+                //   We want to show the underlying game content when the image is transparent.
+                //   This mean that alpha channel reveals the underlying content, but doing that even
+                //   when the underlyinig content is void is not only pointless, but even counterproductive.
+                //   Think at when we want to use ambient lights to *light* the part of the image
+                //   that have a low alpha channel, that part would be black.
                 if (DO_AMBILIGHT + AMBI_BG_IMAGE_BLEND_MODE == 2.0) {
+                    float alpha_selective = clamp(  pixel_fg_image.a + ( 1- canvas_busy) , 0.0, 1.0);
+                    pixel_out = mix(pixel_out, pixel_fg_image.rgb, alpha_selective );
                     float fg_image_alpha_adapted = max(pixel_fg_image.a - AMBI_BG_IMAGE_FORCE, 0.0);
                     vec3 light = pixel_ambi.rgb * (1- fg_image_alpha_adapted);
                     pixel_out = light_over_image(light, pixel_out, AMBI_ADD_ON_BLACK);
+                } else {
+                    pixel_out = mix(pixel_out, pixel_fg_image.rgb, pixel_fg_image.a);
                 }
             }
 
