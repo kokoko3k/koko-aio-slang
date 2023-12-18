@@ -1302,18 +1302,3 @@ vec4 PG_get_hmask_preset_unfloored() {
 
 }
 
-vec2 get_scaled_coords_for_bezel(vec2 co, float isrotated) {
-    //This function is here because compiler gets mad if i calc coords_for_bezel
-    //outside the main branch "if DO_BEZEL then compose_bezel_over"
-    //performances falls down for no apparent reason.
-    //But still, i need to access it twice in the code.
-    //So this is a function that ensures me that i always calc it the same way.
-
-    co = zoomout_coords(co, -BEZEL_FRAME_ZOOM, 1.0);
-    co.y = zoom1D(co.y, BEZEL_ASPECT_CORRECTION);
-
-    if (DO_TILT == 1.0)
-        return tilt(co, isrotated, TILT_X * TILT_BEZEL_K);
-            else
-        return co;
-}

@@ -1031,6 +1031,31 @@ float fuzzyrect(vec2 uv, vec2 size, float radius, float blur) {
     return smoothstep(-radius-blur, -radius+blur, -d);
 }
 
+float create_ambi_colorize_shade(vec2 co) {
+    float blur = AMBI_OVER_BEZEL_SIZE;
+    vec2 size = vec2(1.0, 2 - AMBI_OVER_BEZEL_AR_CORRECTION)-blur;
+    float radius = 0.0;
+
+    return  1 - min ( fuzzyrect(co, size,  radius,  blur) * 2, 1.0);
+}
+
+vec2 get_scaled_coords_for_bezel(vec2 co, float isrotated) {
+    //This function is here because compiler gets mad if i calc coords_for_bezel
+    //outside the main branch "if DO_BEZEL then compose_bezel_over"
+    //performances falls down for no apparent reason.
+    //But still, i need to access it twice in the code.
+    //So this is a function that ensures me that i always calc it the same way.
+
+    co = zoomout_coords(co, -BEZEL_FRAME_ZOOM, 1.0);
+    co.y = zoom1D(co.y, BEZEL_ASPECT_CORRECTION);
+
+    if (DO_TILT == 1.0)
+        return tilt(co, isrotated, TILT_X * TILT_BEZEL_K);
+            else
+        return co;
+}
+
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -1257,8 +1282,13 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
             pixel_ambilight = texture(ambi_temporal_pass, vOutputCoord).rgb;
 
     //Apply nightification, the strength is modulated by ambient light.
-            vec3 ambi_over_bezel =  (AMBI_OVER_BEZEL * pixel_ambilight) *
-                                    (bezel_in.a * (1-reflection_modifier));
+        //Use a shaded box to apply ambilight on external borders only
+            float ambi_colorize_shade = create_ambi_colorize_shade(coords_for_bezel);
+
+
+            vec3 ambi_over_bezel =  ( (AMBI_OVER_BEZEL * pixel_ambilight) *
+                                    (bezel_in.a * ambi_colorize_shade) *
+                                    (1-reflection_modifier) );
 
         bezel_out.rgb = fn_pixel_nightify(bezel_out.rgb, nightify_str, ambi_over_bezel )   ;
 
@@ -1485,10 +1515,11 @@ void main() {
                 //   Think at when we want to use ambient lights to *light* the part of the image
                 //   that have a low alpha channel, that part would be black.
                 if (DO_AMBILIGHT + AMBI_BG_IMAGE_BLEND_MODE == 2.0) {
+                    float ambi_mask = create_ambi_colorize_shade(co_bezel);
                     float alpha_selective = clamp(  pixel_fg_image.a + ( 1- canvas_busy) , 0.0, 1.0);
                     pixel_out = mix(pixel_out, pixel_fg_image.rgb, alpha_selective );
                     float fg_image_alpha_adapted = max(pixel_fg_image.a - AMBI_BG_IMAGE_FORCE, 0.0);
-                    vec3 light = pixel_ambi.rgb * (1- fg_image_alpha_adapted);
+                    vec3 light = pixel_ambi.rgb * (ambi_mask) * (1- fg_image_alpha_adapted);
                     pixel_out = light_over_image(light, pixel_out, AMBI_ADD_ON_BLACK);
                 } else {
                     pixel_out = mix(pixel_out, pixel_fg_image.rgb, pixel_fg_image.a);
