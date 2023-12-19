@@ -52,8 +52,7 @@ layout(location = 22) out float vDeltaRenderOk;
 layout(location = 23) out float vDo_pixelgrid_h;
 layout(location = 24) out float vDo_Curvature;
 layout(location = 25) out float vFake_scanline_period;
-layout(location = 26) out float vUse_Fake_scanlines;
-layout(location = 27) out float vPG_y_shift;
+layout(location = 26) out float vPG_y_shift;
 
 
 layout(location = 31) out float I_am_a_placeholder_keep_reading;
@@ -315,8 +314,8 @@ void main() {
 
     //For use with interlaced content, here we calculate an amount of lines that it integer multiple of the screen lines and that
     //is near to the real input/core lines
-    vUse_Fake_scanlines = 0.0;
-
+    vFake_scanline_period = 0.0;
+    
     if ( (PIXELGRID_INTR_DISABLE_Y <= -1.0 && bIs_Interlaced) || (PIXELGRID_COREY_FAKE_SCAN == 1.0)) {
         //vec2 outsize = global.FinalViewportSize.xy;
         vec2 out_size = params.OutputSize.xy;
@@ -330,7 +329,6 @@ void main() {
             zoom_modifier.xy = zoom_modifier.yx;
         }
 
-        vUse_Fake_scanlines = 1.0;
         float fake_scanlines_numlines = out_size.y/
               round( (out_size.y*zoom_modifier.y) * ori_size.w);
         vFake_scanline_period = pi * fake_scanlines_numlines * out_coord.y;
@@ -376,8 +374,7 @@ layout(location = 22) in float vDeltaRenderOk;
 layout(location = 23) in float vDo_pixelgrid_h;
 layout(location = 24) in float vDo_Curvature;
 layout(location = 25) in float vFake_scanline_period;
-layout(location = 26) in float vUse_Fake_scanlines;
-layout(location = 27) in float vPG_y_shift;
+layout(location = 26) in float vPG_y_shift;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -597,7 +594,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         vec2 freq_base_core = in_coords * vPG_OriginalSize_tated_mul_pi ;
 
         //Use fake scanlines?
-        if (vUse_Fake_scanlines == 1.0)
+        if (vFake_scanline_period > 0.0)
             freq_base_core.y = vFake_scanline_period;
 
     //Screen coords:
