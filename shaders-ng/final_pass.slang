@@ -46,16 +46,18 @@ layout(location = 16) out vec2 vPG_OriginalSize_tated_mul_pi;
 layout(location = 17) out vec2 vPG_OutputSize_tated;
 layout(location = 18) out vec2 vPG_OutputCoord_tated;
 layout(location = 19) out float vDotMat_Grid_Sharpness;
-layout(location = 20) out float vfprintvalue;
-layout(location = 21) out float vPG_mask_height;
-layout(location = 22) out float vDeltaRenderOk;
-layout(location = 23) out float vDo_pixelgrid_h;
-layout(location = 24) out float vDo_Curvature;
-layout(location = 25) out float vFake_scanline_period;
-layout(location = 26) out float vPG_y_shift;
+layout(location = 20) out float vPG_mask_height;
+layout(location = 21) out float vDeltaRenderOk;
+layout(location = 22) out float vDo_pixelgrid_h;
+layout(location = 23) out float vDo_Curvature;
+layout(location = 24) out float vFake_scanline_period;
+layout(location = 25) out float vPG_y_shift;
 
+#ifdef DEBUG_PRINT_VALUE
+    layout(location = 31) out float vfprintvalue; 
+#endif
 
-layout(location = 31) out float I_am_a_placeholder_keep_reading;
+// I_am_a_placeholder_keep_reading;
 //..to remind you that location = 31 is the last accepted by vulkan
 //or Retroarch crashes or nvidia starts to give Xids.
 //unsure if the issue is with retroarch or with vulkan specs.
@@ -301,7 +303,9 @@ void main() {
             float zooms_modifier  = get_zooms_modifier(vDo_Tate).y;
             float dotmat_insize  = global.flick_and_noise_passSize.y;
             float dotmat_outsize = global.FinalViewportSize.y  * zooms_modifier;
-            vfprintvalue = dotmat_outsize / dotmat_insize;
+            #ifdef DEBUG_PRINT_VALUE
+                vfprintvalue = dotmat_outsize / dotmat_insize;
+            #endif
             vDotMat_Grid_Sharpness = (dotmat_outsize / dotmat_insize);
             vDotMat_Grid_Sharpness = vDotMat_Grid_Sharpness * 3.6 - 3.1;
             vDotMat_Grid_Sharpness = clamp(vDotMat_Grid_Sharpness, 0.1, 20.0);
@@ -368,13 +372,16 @@ layout(location = 16) in vec2 vPG_OriginalSize_tated_mul_pi;
 layout(location = 17) in vec2 vPG_OutputSize_tated;
 layout(location = 18) in vec2 vPG_OutputCoord_tated;
 layout(location = 19) in float vDotMat_Grid_Sharpness;
-layout(location = 20) in float vfprintvalue;
-layout(location = 21) in float vPG_mask_height;
-layout(location = 22) in float vDeltaRenderOk;
-layout(location = 23) in float vDo_pixelgrid_h;
-layout(location = 24) in float vDo_Curvature;
-layout(location = 25) in float vFake_scanline_period;
-layout(location = 26) in float vPG_y_shift;
+layout(location = 20) in float vPG_mask_height;
+layout(location = 21) in float vDeltaRenderOk;
+layout(location = 22) in float vDo_pixelgrid_h;
+layout(location = 23) in float vDo_Curvature;
+layout(location = 24) in float vFake_scanline_period;
+layout(location = 25) in float vPG_y_shift;
+
+#ifdef DEBUG_PRINT_VALUE
+    layout(location = 31) in float vfprintvalue;
+#endif
 
 layout(location = 0) out vec4 FragColor;
 
