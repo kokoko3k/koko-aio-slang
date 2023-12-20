@@ -158,10 +158,14 @@ vec4 ntscdec(vec2 uv, vec3 RGB_ori) {
          N = clamp(N, NTSC_FILTER_WIDTH_MIN, NTSC_FILTER_WIDTH_MAX); //Hopefully help compiler to unroll better here
       #endif
       for (int n=0; n < N; n++) {
-         vec2 pos = uv + vec2((n-NTSC_FILTER_MIDDLE) * params.SourceSize.z, 0.0);
+         vec2 pos = uv + vec2( (n-NTSC_FILTER_MIDDLE)  * params.SourceSize.z  , 0.0);
          vec3 smp_mul_weight = vec3((texture(Source, pos).rgb * RGB2YIQ).x) * vNTSC_weights[n] ;
          
          float phase =  vSubcarrierFrequency_mul_size_mul_TAU * pos.x;
+
+
+         float carrier = (pos.x*params.SourceSize.x * NTSC_FILTER_SCF ) - (pos.y*params.SourceSize.y * NTSC_PHASE_SHIFT);
+         phase = carrier * (pi * (2/3.0));
          float phase_shift_for_blur = phase  + PHASE_SHIFT_FOR_BLUR_K;
          
          phase += ( pos.y * -pi10 ) * (NTSC_PHASE_SHIFT);
@@ -425,6 +429,7 @@ void main() {
          vec4 ntsc_decoded = ntscdec(vTexCoord, pixel_in);
       //apply the minimum treshold to artifact mask
          artifact_mask = smoothstep(NTSC_ARTF_TRSH, 1.0, ntsc_decoded.a);
+         ntsc_decoded = clamp(ntsc_decoded, vec4(0.0), vec4(1.0));
 
       //Optionally completely cut-off artifacts under treshold:
          ntsc_decoded = mix(ntsc_decoded, vec4(pixel_in, 0.0) , (1-artifact_mask)*NTSC_ARTF_ZAP );
