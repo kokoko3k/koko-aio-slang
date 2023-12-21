@@ -316,7 +316,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter DO_NTSC_ARTIFACTS "★ CVBS: NTSC color artifacts enable? (nt) ==>"	0.0 	0.0 1.0 1.0
 #pragma parameter NTSC_MIX          "        Strength"				0.5	0.0 3.0  0.1
 #pragma parameter NTSC_FILTER_WIDTH "        Filter width"			17.0	5.0 21.0 4.0
-#pragma parameter NTSC_FILTER_SCF   "        Subcarrier Frequency"		5.30	0.0 10.0 0.01
+#pragma parameter NTSC_FILTER_SCF   "        Subcarrier Frequency mul"		4.57	1.0 10.0 0.01
 #pragma parameter NTSC_FILTER_FC    "        Frequency cutoff"			2.5	0.0 10.0 0.1
 #pragma parameter NTSC_PHASE_SHIFT  "        Phase shift"			0.0	0.0 1.0  1.0
 #pragma parameter label_blut_ntsc   "        1 and 2 need Glow or Bandwidth Limited chroma" 0.0 0.0 0.0 0.0
@@ -535,8 +535,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter AMBI_STRETCH              "        Widen lights (horizontal games)"	0.0  0.0  1.0     0.01
 #pragma parameter AMBI_STRETCH_VERTICAL     "        Widen lights (vertical games)"		0.5  0.0  1.0     0.01
 #pragma parameter AMBI_GAMMA                "        Output Gamma"						1.3  0.1  8.0     0.1
-#pragma parameter AMBI_OVER_BEZEL           "        Colorize Bezel"					0.2  0.0  5.0     0.05
-#pragma parameter AMBI_OVER_BEZEL_SIZE      "           . Colorization size"			0.15 0.001  0.5   0.001 ///hacky, but keep min to 0.001 plz.
+#pragma parameter AMBI_OVER_BEZEL           "        Bezel Colorization intensity"		0.2  0.0  5.0     0.05
+#pragma parameter AMBI_OVER_BEZEL_SIZE      "        Bezel Colorization size"			0.15 0.001  0.5   0.001 ///hacky, but keep min to 0.001 plz.
 #pragma parameter AMBI_BG_IMAGE_BLEND_MODE  "        Back/Foreground image alpha blend (0=mix, 1=add)"	0.0   0.0  1.0    1.0
 #pragma parameter AMBI_ADD_ON_BLACK         "        Foggy (power on dark colors, add mode only)    "		1.0   0.0  1.0    0.05
 #pragma parameter AMBI_BG_IMAGE_FORCE       "        Always colorize Back/Foreground image (add mode only) "		0.0   0.0  1.0    0.1

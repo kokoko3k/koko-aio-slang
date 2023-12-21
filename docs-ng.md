@@ -516,9 +516,10 @@
         Dumb stretch of the visible texture, operates on the whole content, instead of the
         single led.
         Note: To avoid burn-in effects, keep Light Falloff + Led power not too high.
-    Colorize Bezel;
+    Bezel Colorization intensity:
         Allow to add an amount of the ambient light over the bezel frame
-    Colorization size:
+        Please use this only if you are using a bezel.
+    Bezel Colorization Size:
         How much the ambient light should bleed over the monitor.
         Pushing this too high would make it bleed over the tube.
         This is not supported.

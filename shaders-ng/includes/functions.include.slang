@@ -1,3 +1,5 @@
+
+
 float need_tate(bool is_rotated) {
     if ( (TATE == 1.0 && is_rotated) || TATE == 2.0)
         return 1.0;
@@ -403,6 +405,8 @@ vec2 zoomout_coords(vec2 in_coords, float zoom_out, float aspect) {
                      );
    return (in_coords * zoom) - offset;
 }
+
+
 
 bool is_interlaced() {
 	return (params.OriginalSize.y > MIN_LINES_INTERLACED);
@@ -1297,3 +1301,4 @@ vec4 PG_get_hmask_preset_unfloored() {
         return vec4( vec3(0.0), 2); //WX, mask size 2
 
 }
+

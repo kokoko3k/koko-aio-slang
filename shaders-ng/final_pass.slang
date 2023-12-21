@@ -46,17 +46,18 @@ layout(location = 16) out vec2 vPG_OriginalSize_tated_mul_pi;
 layout(location = 17) out vec2 vPG_OutputSize_tated;
 layout(location = 18) out vec2 vPG_OutputCoord_tated;
 layout(location = 19) out float vDotMat_Grid_Sharpness;
-layout(location = 20) out float vfprintvalue;
-layout(location = 21) out float vPG_mask_height;
-layout(location = 22) out float vDeltaRenderOk;
-layout(location = 23) out float vDo_pixelgrid_h;
-layout(location = 24) out float vDo_Curvature;
-layout(location = 25) out float vFake_scanline_period;
-layout(location = 26) out float vUse_Fake_scanlines;
-layout(location = 27) out float vPG_y_shift;
+layout(location = 20) out float vPG_mask_height;
+layout(location = 21) out float vDeltaRenderOk;
+layout(location = 22) out float vDo_pixelgrid_h;
+layout(location = 23) out float vDo_Curvature;
+layout(location = 24) out float vFake_scanline_period;
+layout(location = 25) out float vPG_y_shift;
 
+#ifdef DEBUG_PRINT_VALUE
+    layout(location = 31) out float vfprintvalue; 
+#endif
 
-layout(location = 31) out float I_am_a_placeholder_keep_reading;
+// I_am_a_placeholder_keep_reading;
 //..to remind you that location = 31 is the last accepted by vulkan
 //or Retroarch crashes or nvidia starts to give Xids.
 //unsure if the issue is with retroarch or with vulkan specs.
@@ -302,7 +303,9 @@ void main() {
             float zooms_modifier  = get_zooms_modifier(vDo_Tate).y;
             float dotmat_insize  = global.flick_and_noise_passSize.y;
             float dotmat_outsize = global.FinalViewportSize.y  * zooms_modifier;
-            vfprintvalue = dotmat_outsize / dotmat_insize;
+            #ifdef DEBUG_PRINT_VALUE
+                vfprintvalue = dotmat_outsize / dotmat_insize;
+            #endif
             vDotMat_Grid_Sharpness = (dotmat_outsize / dotmat_insize);
             vDotMat_Grid_Sharpness = vDotMat_Grid_Sharpness * 3.6 - 3.1;
             vDotMat_Grid_Sharpness = clamp(vDotMat_Grid_Sharpness, 0.1, 20.0);
@@ -315,8 +318,8 @@ void main() {
 
     //For use with interlaced content, here we calculate an amount of lines that it integer multiple of the screen lines and that
     //is near to the real input/core lines
-    vUse_Fake_scanlines = 0.0;
-
+    vFake_scanline_period = 0.0;
+    
     if ( (PIXELGRID_INTR_DISABLE_Y <= -1.0 && bIs_Interlaced) || (PIXELGRID_COREY_FAKE_SCAN == 1.0)) {
         //vec2 outsize = global.FinalViewportSize.xy;
         vec2 out_size = params.OutputSize.xy;
@@ -330,7 +333,6 @@ void main() {
             zoom_modifier.xy = zoom_modifier.yx;
         }
 
-        vUse_Fake_scanlines = 1.0;
         float fake_scanlines_numlines = out_size.y/
               round( (out_size.y*zoom_modifier.y) * ori_size.w);
         vFake_scanline_period = pi * fake_scanlines_numlines * out_coord.y;
@@ -370,14 +372,16 @@ layout(location = 16) in vec2 vPG_OriginalSize_tated_mul_pi;
 layout(location = 17) in vec2 vPG_OutputSize_tated;
 layout(location = 18) in vec2 vPG_OutputCoord_tated;
 layout(location = 19) in float vDotMat_Grid_Sharpness;
-layout(location = 20) in float vfprintvalue;
-layout(location = 21) in float vPG_mask_height;
-layout(location = 22) in float vDeltaRenderOk;
-layout(location = 23) in float vDo_pixelgrid_h;
-layout(location = 24) in float vDo_Curvature;
-layout(location = 25) in float vFake_scanline_period;
-layout(location = 26) in float vUse_Fake_scanlines;
-layout(location = 27) in float vPG_y_shift;
+layout(location = 20) in float vPG_mask_height;
+layout(location = 21) in float vDeltaRenderOk;
+layout(location = 22) in float vDo_pixelgrid_h;
+layout(location = 23) in float vDo_Curvature;
+layout(location = 24) in float vFake_scanline_period;
+layout(location = 25) in float vPG_y_shift;
+
+#ifdef DEBUG_PRINT_VALUE
+    layout(location = 31) in float vfprintvalue;
+#endif
 
 layout(location = 0) out vec4 FragColor;
 
@@ -597,7 +601,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         vec2 freq_base_core = in_coords * vPG_OriginalSize_tated_mul_pi ;
 
         //Use fake scanlines?
-        if (vUse_Fake_scanlines == 1.0)
+        if (vFake_scanline_period > 0.0)
             freq_base_core.y = vFake_scanline_period;
 
     //Screen coords:
@@ -1031,6 +1035,7 @@ float fuzzyrect(vec2 uv, vec2 size, float radius, float blur) {
     return smoothstep(-radius-blur, -radius+blur, -d);
 }
 
+
 float create_ambi_colorize_shade(vec2 co) {
     float blur = AMBI_OVER_BEZEL_SIZE;
     vec2 size = vec2(1.0, 2 - AMBI_OVER_BEZEL_AR_CORRECTION)-blur;
@@ -1039,22 +1044,18 @@ float create_ambi_colorize_shade(vec2 co) {
     return  1 - min ( fuzzyrect(co, size,  radius,  blur) * 2, 1.0);
 }
 
-
-
-vec2 get_scaled_coords_for_bezel() {
+vec2 get_scaled_coords_for_bezel(vec2 co, float isrotated) {
     //This function is here because compiler gets mad if i calc coords_for_bezel
     //outside the main branch "if DO_BEZEL then compose_bezel_over"
     //performances falls down for no apparent reason.
     //But still, i need to access it twice in the code.
     //So this is a function that ensures me that i always calc it the same way.
 
-    vec2 co = vTexCoord;
-
     co = zoomout_coords(co, -BEZEL_FRAME_ZOOM, 1.0);
     co.y = zoom1D(co.y, BEZEL_ASPECT_CORRECTION);
 
     if (DO_TILT == 1.0)
-        return tilt(co, vIsRotated, TILT_X * TILT_BEZEL_K);
+        return tilt(co, isrotated, TILT_X * TILT_BEZEL_K);
             else
         return co;
 }
@@ -1330,7 +1331,7 @@ void main() {
         vec2 co_bezel = vec2(0.0);
         if (DO_BEZEL == 1.0) {
             co_content = zoomout_coords(co_content, -vBEZEL_INNER_ZOOM_adapted , 1.0);
-            co_bezel = get_scaled_coords_for_bezel();
+            co_bezel = get_scaled_coords_for_bezel(vTexCoord, vIsRotated);
         }
 
 
@@ -1374,6 +1375,13 @@ void main() {
 
     vec3 pixel_ambi = vec3(0.0);
     vec3 pixel_under_content = vec3(0.0);
+    
+    
+    
+                                                                                            //  pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb ;
+                                                                                            //  FragColor = pixel_ambi.rgbr; return;
+    
+    
     //Draw content only over the alpha mask, and sample ambientlight outside it to spare gpu cycles.
         if (canvas_busy > 0.5) {
             pixel_out = fn_pixel_content(co_content) * canvas_busy;
@@ -1401,6 +1409,7 @@ void main() {
             //Ambient light
             if (DO_AMBILIGHT == 1.0) {
                 pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb ;
+                
                 if (DO_BG_IMAGE != 1.0) {
                     float noise_power = NOISEPOWER * NOISEPOWER_AMBI_MUL;
                     float anoise = random_fast(vTexCoord * vDynamicSeed);
@@ -1501,24 +1510,24 @@ void main() {
 
                 pixel_fg_image.rgb = fn_pixel_nightify(pixel_fg_image.rgb, BG_IMAGE_NIGHTIFY, anti_nightify_ambi );
 
-                // tl:dr: dont "black" the transparent areas outside the game content.
+                // tl:dr:
+                //   dont "black" the transparent areas outside the game content when we use AMBI_BG_IMAGE_BLEND_MODE ADD blend mode.
+                //   Do only for add mode, since some inplace presets relies on the blackness with AMBI_BG_IMAGE_BLEND_MODE mix mode.
                 // long explaination:
-//                 We want to show the underlying game content when the image is transparent.
-//                 This mean that alpha channel reveals the underlying content, but doing that even
-//                 when the underlyinig content is void is not only pointless, but even counterproductive.
-//                 Think at when we want to use ambient lights to *light* the part of the image
-//                 that have a low alpha channel, that part would be black.
-                float alpha_selective = clamp(  pixel_fg_image.a + ( 1- canvas_busy) , 0.0, 1.0);
-
-
-                pixel_out = mix(pixel_out, pixel_fg_image.rgb, alpha_selective );
-
+                //   We want to show the underlying game content when the image is transparent.
+                //   This mean that alpha channel reveals the underlying content, but doing that even
+                //   when the underlyinig content is void is not only pointless, but even counterproductive.
+                //   Think at when we want to use ambient lights to *light* the part of the image
+                //   that have a low alpha channel, that part would be black.
                 if (DO_AMBILIGHT + AMBI_BG_IMAGE_BLEND_MODE == 2.0) {
                     float ambi_mask = create_ambi_colorize_shade(co_bezel);
+                    float alpha_selective = clamp(  pixel_fg_image.a + ( 1- canvas_busy) , 0.0, 1.0);
+                    pixel_out = mix(pixel_out, pixel_fg_image.rgb, alpha_selective );
                     float fg_image_alpha_adapted = max(pixel_fg_image.a - AMBI_BG_IMAGE_FORCE, 0.0);
-                    //pixel_out = pixel_out + (pixel_ambi.rgb * (ambi_mask) * (1- fg_image_alpha_adapted));
                     vec3 light = pixel_ambi.rgb * (ambi_mask) * (1- fg_image_alpha_adapted);
                     pixel_out = light_over_image(light, pixel_out, AMBI_ADD_ON_BLACK);
+                } else {
+                    pixel_out = mix(pixel_out, pixel_fg_image.rgb, pixel_fg_image.a);
                 }
             }
 
