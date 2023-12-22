@@ -201,6 +201,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float DO_PIXELGRID_H;
 	float PIXELGRID_H_ANTIMOIRE;
 	float PIXELGRID_COREY_FAKE_SCAN;
+	float PIXELGRID_DOUBLESCAN;
 	float PIXELGRID_MIN_H;
 	float PIXELGRID_MIN_W;
 	float PIXELGRID_MAX_H;
@@ -385,17 +386,18 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BLANK12ff " " 0.0 0.0 1.0 1.0
 
 #pragma parameter DO_PIXELGRID_H            "      ★ Scanlines (0 to disable)"    	1.0 0.0 1.25 0.05
-#pragma parameter PIXELGRID_COREY_FAKE_SCAN "           . Use fake integer scanlines"   0.0 0.0 1.0 1.0
-#pragma parameter PIXELGRID_MIN_H	        "           . Phosphors height Min"			0.2 0.00 1.0 0.05
-#pragma parameter PIXELGRID_MAX_H           "           . Phosphors height Max"			0.6 0.0 1.5 0.05
-#pragma parameter PIXELGRID_GAMMA_H         "           . Phosphors height min->max gamma:"	4.2 1.0 8.00 0.1
-#pragma parameter PIXELGRID_NO_INTERBLEED_H	"           . Inter line extra steepness"		0.0 0.0 10.0 0.1
-#pragma parameter PIXELGRID_H_ANTIMOIRE     "           . Anti-moire sweet spot (disables Y deconvergence)"  0.0 0.0 1.0 0.01
-#pragma parameter PIXELGRID_OFFSET_CORE     "           . Slotmask(fake) offset (not with anti-moire) " 0.0 0.0 1.0 0.01
-#pragma parameter PIXELGRID_DECON_R_H       "           . Deconvergence Y: R phosphor" 0.0 -1.6 1.6 0.1
-#pragma parameter PIXELGRID_DECON_G_H       "           . Deconvergence Y: G phosphor" 0.0 -1.6 1.6 0.1
-#pragma parameter PIXELGRID_DECON_B_H       "           . Deconvergence Y: B phosphor" 0.0   -1.6 1.6 0.1
-#pragma parameter PIXELGRID_H_DEDOT			"           . Dedot mask between scanlines (use only if needed!)"	0.0 0.0 2.0 0.1
+#pragma parameter PIXELGRID_DOUBLESCAN      "         . Double-scan low input resolutions"   0.0 0.0 1.0 1.0
+#pragma parameter PIXELGRID_COREY_FAKE_SCAN "         . Fake integer scanlines"			0.0 0.0 1.0 1.0
+#pragma parameter PIXELGRID_MIN_H	        "         . Phosphors height Min"			0.2 0.00 1.0 0.05
+#pragma parameter PIXELGRID_MAX_H           "         . Phosphors height Max"			0.6 0.0 1.5 0.05
+#pragma parameter PIXELGRID_GAMMA_H         "         . Phosphors height min->max gamma:"	4.2 1.0 8.00 0.1
+#pragma parameter PIXELGRID_NO_INTERBLEED_H	"         . Inter line extra steepness"		0.0 0.0 10.0 0.1
+#pragma parameter PIXELGRID_H_ANTIMOIRE     "         . Anti-moire sweet spot (disables Y deconvergence)"  0.0 0.0 1.0 0.01
+#pragma parameter PIXELGRID_OFFSET_CORE     "         . Slotmask(fake) offset (not with anti-moire) " 0.0 0.0 1.0 0.01
+#pragma parameter PIXELGRID_DECON_R_H       "         . Deconvergence Y: R phosphor" 0.0 -1.6 1.6 0.1
+#pragma parameter PIXELGRID_DECON_G_H       "         . Deconvergence Y: G phosphor" 0.0 -1.6 1.6 0.1
+#pragma parameter PIXELGRID_DECON_B_H       "         . Deconvergence Y: B phosphor" 0.0   -1.6 1.6 0.1
+#pragma parameter PIXELGRID_H_DEDOT			"         . Dedot mask between scanlines (use only if needed!)"	0.0 0.0 2.0 0.1
 
 #pragma parameter BLANK12f " " 0.0 0.0 1.0 1.0
 

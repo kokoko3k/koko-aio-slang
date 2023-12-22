@@ -183,6 +183,12 @@
         
     Scanlines (*4)
             Scanlines emulation, set the strength of the effect here.
+        Double-scan low input resolutions
+            Activate this if you want to double the number of scanlines when the content is low-res.
+            "low-res is defined via "Consider Hi-Resolution above # lines" parameter above.
+            This option is useful if you want to emulate 30khz VGA CRT monitors.
+            If you are on 1080p or lower, consider to activate Fake integer scanlines or
+            integer scaling too.
         Use fake integer scanlines
             Use a number of scanlines that perfectly fits the lines on the screen, not accurate,
             but avoids moire and weavy artifacts.

@@ -645,6 +645,12 @@
     #define PIXELGRID_COREY_FAKE_SCAN 	global.PIXELGRID_COREY_FAKE_SCAN
 #endif
 
+#ifndef PIXELGRID_DOUBLESCAN
+    #define PIXELGRID_DOUBLESCAN 	global.PIXELGRID_DOUBLESCAN
+#endif
+
+
+
 #ifndef PIXELGRID_MIN_H
     #define PIXELGRID_MIN_H 			global.PIXELGRID_MIN_H
 #endif

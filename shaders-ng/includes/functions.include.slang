@@ -408,9 +408,20 @@ vec2 zoomout_coords(vec2 in_coords, float zoom_out, float aspect) {
 
 
 
-bool is_interlaced() {
-	return (params.OriginalSize.y > MIN_LINES_INTERLACED) && (MIN_LINES_INTERLACED != 0.0);
+bool need_doublescan() {
+	return
+		(PIXELGRID_DOUBLESCAN == 1.0) && 
+		(params.OriginalSize.y < MIN_LINES_INTERLACED ) ;
 }
+
+
+
+bool is_interlaced() {
+	return  // Content is interlaced if:
+		(MIN_LINES_INTERLACED) != 0.0 &&  // user wants interlacing
+		(params.OriginalSize.y > MIN_LINES_INTERLACED); //content has a lot of lines
+}
+
 
 bool scanline_have_to_flicker(bool is_interlaced) {
 	float scanline_flickering = PIXELGRID_INTR_FLICK_MODE;	
