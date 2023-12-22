@@ -409,7 +409,7 @@ vec2 zoomout_coords(vec2 in_coords, float zoom_out, float aspect) {
 
 
 bool is_interlaced() {
-	return (params.OriginalSize.y > MIN_LINES_INTERLACED);
+	return (params.OriginalSize.y > MIN_LINES_INTERLACED) && (MIN_LINES_INTERLACED != 0.0);
 }
 
 bool scanline_have_to_flicker(bool is_interlaced) {

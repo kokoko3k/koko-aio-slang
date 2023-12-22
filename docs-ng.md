@@ -149,7 +149,10 @@
         Special handling may be needed to mitigate glitches/moire at 1080p or lower resolutions.
         
     Consider Hi-Resolution above # lines:
-        koko-aio will consider a frame as Hi-resolution if the lines number is above the configured value.
+        A value of 0.0 means that it will never consider anything hi-res.
+        A value of 1.0 means that it will always consider content hi-res.
+        With values > 1.0, it will consider a frame as Hi-resolution if the lines number is above the configured value.
+
     Hi-Res scanlines type
       -1: Use a number of scanlines that perfectly fits the screen, a good glitches/moire free tradeoff.
       -2: As above, but tighter (1.5x), another good (almost) glitches/moire free tradeoff.
