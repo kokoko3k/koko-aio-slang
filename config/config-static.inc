@@ -161,7 +161,7 @@
 #define NOISEPOWER 5/1000.0
 	//Temporal noise strength applied on green channel when green is dark over ambient lights (multiplied by NOISEPOWER)
 #define NOISEPOWER_AMBI_MUL 3.0
-	
+
 
 
 

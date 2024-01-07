@@ -29,7 +29,7 @@ layout(location = 3) out float vIsRotated;
 //Scanlines:
 
 layout(location = 4) out float vScanlinePeriod;
-layout(location = 5) out float vScanlineAlternateOffset;
+layout(location = 5) out float vOffset;
 layout(location = 6) out float vMax_inLum;
 //Vignette, spot:
 layout(location = 7) out float vIn_aspect;
@@ -216,14 +216,14 @@ void main() {
 
         //Scanline period:
             vScanlinePeriod = 1.0; //Base 1x period
-            vScanlineAlternateOffset = 0.0; //No interlace
+            vOffset = 0.0; //No interlace
 
             if (bIs_Interlaced && PIXELGRID_INTR_DISABLE_Y != 2.0) {
                 //Halve the scanline period, since they will interlace:
                 vScanlinePeriod = 0.5;
                 //Alternate scanlines on even/odd frames
                 if (params.FrameCount % 2 == 0.0)
-                    vScanlineAlternateOffset = PI_15;
+                    vOffset = PI_15;
             }
 
         //Calculate the maximum possible brightness of the input color by taking glow,
@@ -258,7 +258,7 @@ void main() {
         #define PG_H_COUNT vPG_offsets_and_size.a
         vPG_offsets_and_size.rgb *= (pi / PG_H_COUNT);
 
-    //Pixelgrid: Calc freq_base_screen
+    //Pixelgrid: Calc base freqs
         //Tate ?
             vPG_OutputSize_tated   = params.OutputSize.xy;
             vPG_OutputCoord_tated  = vOutputCoord.xy + vec2(0.00001);
@@ -279,7 +279,9 @@ void main() {
             //the following unfloored coords are needed by sin/cos later to understand if we are on an even or odd mask
                 vPG_freq_base_screen_unfloored = pi * vec2(1/PG_H_COUNT, 0.5) * (vPG_OutputCoord_tated * vPG_OutputSize_tated);
 
-
+    //pixelgrid: doublescan?
+                if (need_doublescan() )
+                    vPG_OriginalSize_tated_mul_pi *= 2.0;
 
     //Pixelgrid: adapt period multiplier
         if (vPG_period_multiplier_x < 0.0) vPG_period_multiplier_x = 1/-vPG_period_multiplier_x;
@@ -316,13 +318,24 @@ void main() {
                              ( (! bIs_Interlaced) || PIXELGRID_INTR_DISABLE_Y >= 1.0 || DO_PIXELGRID_H == 0.0)   // - screen is not interlaced or we disabled scanlines on interlaced content
                            );
 
-    //For use with interlaced content, here we calculate an amount of lines that it integer multiple of the screen lines and that
+    //For use with interlaced content, here we calculate an amount of lines that is integer multiple of the screen lines and that
     //is near to the real input/core lines
     vFake_scanline_period = 0.0;
     
-    if ( (PIXELGRID_INTR_DISABLE_Y <= -1.0 && bIs_Interlaced) || (PIXELGRID_COREY_FAKE_SCAN == 1.0)) {
+    //Conditions for fake scanlines are: 
+    // - user wants fake/faker integer scanlines when content is interlaced
+    //   or
+    // - user always wants fake integer scanlines.
+    //   or
+    // - user wants fake integer scanlines when content is double-scanned // <-- edit, ditched as it seem useless to me.
+    
+    bool fake_scanlines_needed =  (PIXELGRID_INTR_DISABLE_Y <= -1.0 && bIs_Interlaced) ||
+                                  (PIXELGRID_COREY_FAKE_SCAN == 1.0); // ||
+                                  //(PIXELGRID_COREY_FAKE_SCAN == 2.0 &&  need_doublescan() );
+    
+    if ( fake_scanlines_needed ) {
         //vec2 outsize = global.FinalViewportSize.xy;
-        vec2 out_size = params.OutputSize.xy;
+        vec4 out_size = params.OutputSize;
         vec4 ori_size = params.OriginalSize;
         vec2 out_coord = vOutputCoord;
         vec2 zoom_modifier = get_zooms_modifier(vDo_Tate);
@@ -333,10 +346,23 @@ void main() {
             zoom_modifier.xy = zoom_modifier.yx;
         }
 
+        float target_line_size = ori_size.w ;
+  
+        if ( need_doublescan() )
+            target_line_size /= 2.0;
+        else if (PIXELGRID_INTR_DISABLE_Y == -2.0 && PIXELGRID_COREY_FAKE_SCAN == 0.0)
+            target_line_size /= 1.5;
+        
+        target_line_size = max(target_line_size, out_size.w*2.0); //why 3.0 and not 2.0?
+        
         float fake_scanlines_numlines = out_size.y/
-              round( (out_size.y*zoom_modifier.y) * ori_size.w);
+              round( (out_size.y*zoom_modifier.y) * target_line_size);
+
+              
         vFake_scanline_period = pi * fake_scanlines_numlines * out_coord.y;
-        if (PIXELGRID_INTR_DISABLE_Y == -2.0 && PIXELGRID_COREY_FAKE_SCAN == 0.0) vFake_scanline_period*=1.5;
+        
+        //This somehow aligns better the scanline to the screen line:
+        vOffset+=1.0;
     }
 
     //Select an y shift that gives the sharpest lines
@@ -357,7 +383,7 @@ layout(location = 2) in vec2 vBg_img_coords;
 layout(location = 3) in float vIsRotated;
 
 layout(location = 4) in float vScanlinePeriod;
-layout(location = 5) in float vScanlineAlternateOffset;
+layout(location = 5) in float vOffset;
 layout(location = 6) in float vMax_inLum;
 layout(location = 7) in float vIn_aspect;
 layout(location = 8) in float vDynamicSeed;
@@ -663,9 +689,9 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             if (PIXELGRID_H_ANTIMOIRE > 0.0) {
                 float anti_moire_freq = sin(vPG_freq_base_screen_unfloored.x * vPG_offsets_and_size.a );
                 float anti_moire_amp = PIXELGRID_H_ANTIMOIRE;
-                rgb_h_sin = sin( (freq_base_core.yyy * interlacing_adapt_period) + ( anti_moire_freq * anti_moire_amp ) + vScanlineAlternateOffset);
+                rgb_h_sin = sin( (freq_base_core.yyy * interlacing_adapt_period) + ( anti_moire_freq * anti_moire_amp ) + vOffset);
             } else {
-                   rgb_h_sin = sin( (freq_base_core.y * interlacing_adapt_period) + triad_stagger_offset - decon_stagger + vScanlineAlternateOffset);
+                   rgb_h_sin = sin( (freq_base_core.y * interlacing_adapt_period) + triad_stagger_offset - decon_stagger + vOffset);
             }
 
             //make it positve with doubled frequency:

@@ -14,7 +14,7 @@ layout(location = 1) out vec2 vFuzzy_main_pass_stage_1;
 layout(location = 2) out vec3 vTemperature_rgb;
 layout(location = 3) out vec3 vTemperature_rgb_gamma_in;
 layout(location = 4) out float vIn_aspect;
-layout(location = 5) out vec2 vCo_avglum;
+//layout(location = 5) out vec2 vCo_avglum;
 
 void main() {
     gl_Position = global.MVP * Position;
@@ -25,9 +25,9 @@ void main() {
     //Since avglum pass moves itself to follow content_geom_override() because it is needed by
     //specularity code in final pass, we have to revert that here, or strength on white zones
     //will break when using content geometry override.
-    vCo_avglum = vTexCoord;
-    if (DO_GAME_GEOM_OVERRIDE == 1.0)
-        vCo_avglum = content_geom_override(vTexCoord, 1/(GAME_GEOM_ASPECT+eps), vIn_aspect, -GAME_GEOM_VSHIFT, -GAME_GEOM_HSHIFT, 1/GAME_GEOM_ZOOM);
+    //vCo_avglum = vTexCoord;
+    //if (DO_GAME_GEOM_OVERRIDE == 1.0)
+    //    vCo_avglum = content_geom_override(vTexCoord, 1/(GAME_GEOM_ASPECT+eps), vIn_aspect, -GAME_GEOM_VSHIFT, -GAME_GEOM_HSHIFT, 1/GAME_GEOM_ZOOM);
 
     
     //Get fuzzy mul and pow factor
@@ -63,12 +63,12 @@ layout(location = 1) in vec2 vFuzzy_main_pass_stage_1;
 layout(location = 2) in vec3 vTemperature_rgb;
 layout(location = 3) in vec3 vTemperature_rgb_gamma_in;
 layout(location = 4) in float vIn_aspect;
-layout(location = 5) in vec2 vCo_avglum;
+//layout(location = 5) in vec2 vCo_avglum;
 
 layout(location = 0) out vec4 FragColor;
 
 layout(set = 0, binding = 1) uniform sampler2D Source;
-layout(set = 0, binding = 2) uniform sampler2D avglum_pass;
+//layout(set = 0, binding = 2) uniform sampler2D avglum_pass;
 layout(set = 0, binding = 3) uniform sampler2D flick_and_noise_pass;
 layout(set = 0, binding = 4) uniform sampler2D bloom_pass_finalFeedback;
 
@@ -146,7 +146,11 @@ void main() {
 
     //Apply other content coords modifiers        
         //Use mipmap available in avglum_pass to identify bright areas.
-        vec3 avglum = texture(avglum_pass,vCo_avglum).rgb;
+        //vec3 avglum = texture(avglum_pass,vCo_avglum).rgb;
+        
+        #define ZONE_LUMINANCE_LOD 5.0
+        
+        vec3 avglum = textureLod(flick_and_noise_pass, vTexCoord, ZONE_LUMINANCE_LOD).rgb;
         float b_brightness = max(avglum.b,max(avglum.r,avglum.g));
         b_brightness *= 1-BLOOM_OVER_WHITE;
         over_white_correction =1- b_brightness;

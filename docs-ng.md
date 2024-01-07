@@ -149,7 +149,10 @@
         Special handling may be needed to mitigate glitches/moire at 1080p or lower resolutions.
         
     Consider Hi-Resolution above # lines:
-        koko-aio will consider a frame as Hi-resolution if the lines number is above the configured value.
+        A value of 0.0 means that it will never consider anything hi-res.
+        A value of 1.0 means that it will always consider content hi-res.
+        With values > 1.0, it will consider a frame as Hi-resolution if the lines number is above the configured value.
+
     Hi-Res scanlines type
       -1: Use a number of scanlines that perfectly fits the screen, a good glitches/moire free tradeoff.
       -2: As above, but tighter (1.5x), another good (almost) glitches/moire free tradeoff.
@@ -180,6 +183,12 @@
         
     Scanlines (*4)
             Scanlines emulation, set the strength of the effect here.
+        Double-scan low input resolutions
+            Activate this if you want to double the number of scanlines when the content is low-res.
+            "low-res is defined via "Consider Hi-Resolution above # lines" parameter above.
+            This option is useful if you want to emulate 30khz VGA CRT monitors.
+            If you are on 1080p or lower, consider to activate Fake integer scanlines or
+            integer scaling too.
         Use fake integer scanlines
             Use a number of scanlines that perfectly fits the lines on the screen, not accurate,
             but avoids moire and weavy artifacts.

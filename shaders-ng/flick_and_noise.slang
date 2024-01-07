@@ -29,7 +29,7 @@ void main() {
       
       //Compute y flicker offset:
          float FlickerOffset = 0.0;
-         float line_tick = (params.OriginalSize.y > MIN_LINES_INTERLACED ) ? 1 : 2 ;
+         float line_tick = is_interlaced() ? 1 : 2 ;
          if (ModFlicker == 1.0 )
             FlickerOffset = params.OriginalSize.w/line_tick;
          else if (ModFlicker == 2.0)
