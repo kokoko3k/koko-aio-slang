@@ -672,7 +672,6 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             freq_base_screen = vPG_freq_base_screen_unfloored;
         }
 
-
     //Switch frequency between core and screen and apply asked multipliers
         vec2 freq_base = freq_base_core * vec2(vPG_period_multiplier_x, 1.0) ;
         vec2 freq_base_unfloored = freq_base_core;
@@ -680,7 +679,16 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             freq_base.x = freq_base_screen.x * vPG_period_multiplier_x;
             freq_base_unfloored.x = vPG_freq_base_screen_unfloored.x * vPG_period_multiplier_x;
         }
+    
+    //shadowmask
+    //works by staggering odd rows by 1.5X triad
+    PG_offsets = vPG_offsets_and_size.rgb + //base offsets staggered (+)
+                float( 
+                PIXELGRID_DO_SHADOWMASK *                                // user wants shadowmask
+                sin(freq_base_screen.y * 2.0 / PIXELGRID_SHADOWMASK_H ) > 0.0   // sin > 0.0 means the row is even
+                ) * PIXELGRID_SHADOWMASK_SHIFT ;                                                // stagger by 1.5
 
+        
     vec3 freq_rgb = freq_base.xxx - PG_offsets;
 
     //The following is needed by scanlines and vertical mask

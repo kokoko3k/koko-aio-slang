@@ -320,7 +320,17 @@
             Makes the "Vertical cell Mask" effect more pronunced and "pinchy/Sparky" by highering its contrast.
             Beware, this may produce moiree.
 
+    Shadowmask:
+            Emulates crt's shadowmask, it is advised to turn off "Vertical cell Mask above" for accurate results
+        X staggering
+            how much even rows have to be shifted, probably you want 1.0 or 1.5 here
+            for 2 or 4 sized masks (gm,rgbx,rbgx,wx) use 1.5
+            for 3 sized masks (gmx,rgb,rbg) use 1.0
+        Phosphor height
+            If you are using a very High definition screen, you may want to set this higher than 1.0
+            I also observed nice results byu setting this to 3 when using 4 sized masks like rgbx or rbgx.
 
+            
 **Dot matrix emulation:**<br>
     Emulates low refresh "boxed" screens used in old handheld consoles.<br>
     
