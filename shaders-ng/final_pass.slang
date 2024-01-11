@@ -361,18 +361,9 @@ void main() {
             
             float fake_scanlines_numlines = out_size.y / rounded_denominator;
             
-
-        // to see fake scanlines for low output size, we have to use at most 0.5 * screen lines.
-        //fake_scanlines_numlines = min(fake_scanlines_numlines, out_size.y * 0.5); 
         
-        vFake_scanline_period = pi * fake_scanlines_numlines * out_coord.y; //FIXME, come può vFake_scanline_period essere 0?
-        
-        
-                                                                        if (fake_scanlines_numlines == 0.0) {
-                                                                            vFake_scanline_period = pi * 100.0 * out_coord.y; 
-                                                                        } //non va, allora fake_scanlines_numlines > 0.0
-                                                                        
-        
+        vFake_scanline_period = pi * fake_scanlines_numlines * out_coord.y; //FIXME, 
+                
         //This somehow aligns better the scanline to the screen line:
         vOffset+=1.0;
     }
