@@ -361,19 +361,20 @@ void main() {
             
             float fake_scanlines_numlines = out_size.y / rounded_denominator;
             
-        
-        vFake_scanline_period = pi * fake_scanlines_numlines * out_coord.y;
+        //Compute the final fake scanline period
+            vFake_scanline_period = pi * fake_scanlines_numlines * out_coord.y;
                 
         //This somehow aligns better the scanline to the screen line:
-        vOffset+=1.0;
+            vOffset+=1.0;
     }
-//vFake_scanline_period = pi * 100 * vOutputCoord.y;
+    
+
     //Select an y shift that gives the sharpest lines
-    if (PIXELGRID_Y_MASK_SHIFT <  0.0) {
-        vPG_y_shift = vPG_mask_height * pi / 4.0;
-    } else {
-        vPG_y_shift = PIXELGRID_Y_MASK_SHIFT * pi ;
-    }
+        if (PIXELGRID_Y_MASK_SHIFT <  0.0) {
+            vPG_y_shift = vPG_mask_height * pi / 4.0;
+        } else {
+            vPG_y_shift = PIXELGRID_Y_MASK_SHIFT * pi ;
+        }
 
 }
 
