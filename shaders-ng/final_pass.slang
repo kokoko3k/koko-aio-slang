@@ -384,7 +384,8 @@ void main() {
             
         // compute a rounded number of lines that integer fits the screen
             float rounded_denominator = round( (out_size.y*zoom_modifier.y) * target_line_size);
-                  rounded_denominator = max(rounded_denominator, 1.0); // avoid division by 0
+                  rounded_denominator = max(rounded_denominator, 2.0); // avoid division by 0  and ensure (, 2.0)
+                                                                       // scanline gaps are drawn even on tiny output sizes.
             
             float fake_scanlines_numlines = out_size.y / rounded_denominator;
             
