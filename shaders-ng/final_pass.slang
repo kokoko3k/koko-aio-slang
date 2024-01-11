@@ -327,12 +327,13 @@ void main() {
     //   or
     // - user always wants fake integer scanlines.
     //   or
-    // - user wants fake integer scanlines when content is double-scanned // <-- edit, ditched as it seem useless to me.
+    // - user wants fake integer scanlines when content is double-scanned // <-- edit, ditched as it seems useless to me.
     
     bool fake_scanlines_needed =  (PIXELGRID_INTR_DISABLE_Y <= -1.0 && bIs_Interlaced) ||
                                   (PIXELGRID_COREY_FAKE_SCAN == 1.0); // ||
                                   //(PIXELGRID_COREY_FAKE_SCAN == 2.0 &&  need_doublescan() );
-    
+                                  
+                                  
     if ( fake_scanlines_needed ) {
         //vec2 outsize = global.FinalViewportSize.xy;
         vec4 out_size = params.OutputSize;
@@ -353,12 +354,14 @@ void main() {
         else if (PIXELGRID_INTR_DISABLE_Y == -2.0 && PIXELGRID_COREY_FAKE_SCAN == 0.0)
             target_line_size /= 1.5;
         
-        target_line_size = max(target_line_size, out_size.w*2.0); //why 3.0 and not 2.0?
+    
         
         float fake_scanlines_numlines = out_size.y/
               round( (out_size.y*zoom_modifier.y) * target_line_size);
 
-              
+        // to see fake scanlines for low output size, we have to use at most 0.5 * screen lines.
+        fake_scanlines_numlines = min(fake_scanlines_numlines, out_size.y * 0.5); 
+        
         vFake_scanline_period = pi * fake_scanlines_numlines * out_coord.y;
         
         //This somehow aligns better the scanline to the screen line:
