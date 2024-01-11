@@ -126,7 +126,7 @@ vec2 get_bg_image_coords(vec2 in_vOutputCoord) {
     return bg_img_coords;
 }
 
-vec2 get_zooms_modifier(float do_tate) {
+vec2 get_zooms_modifier(float do_tate, bool bNeed_NO_integer_scale) {
     // This function is meant to live in vertex shader; its purpose is to
     // give the final scale factor by taking in consideration various zoom modifiers.
     //It works by calculating the new 0.0 and 1.0 coords then measuring the new distance between them
@@ -138,7 +138,7 @@ vec2 get_zooms_modifier(float do_tate) {
     vec2 co_scaled_min = vec2(0.0);
     vec2 co_scaled_max = vec2(1.0);
 
-    if ( need_NO_integer_scale() ) {
+    if ( bNeed_NO_integer_scale ) {
         co_scaled_min = get_scaled_coords_aspect(co_scaled_min, global.FinalViewportSize, vIn_aspect, bool(vIsRotated));
         co_scaled_max = get_scaled_coords_aspect(co_scaled_max, global.FinalViewportSize, vIn_aspect, bool(vIsRotated));
     } else {
@@ -184,7 +184,8 @@ void main() {
     vIn_aspect = get_in_aspect();
 
     //Calculate vTexcoord as fractional or integer scaled?
-        if ( need_NO_integer_scale() )
+        bool bNeed_NO_integer_scale = need_NO_integer_scale();
+        if ( bNeed_NO_integer_scale )
             vTexCoord = get_scaled_coords_aspect(TexCoord,global.FinalViewportSize, vIn_aspect, bool(vIsRotated));
         else
             vTexCoord = integer_scale(TexCoord, vIn_aspect, bool(vIsRotated), vDo_Tate, GAME_GEOM_INT_SCALE-1.0 ) + vec2( GAME_GEOM_OFF_FIX /10000);
@@ -302,7 +303,7 @@ void main() {
     //For simplicity and (my) mental health, take only y into account.
         vDotMat_Grid_Sharpness = DOT_M_G_SHARP;
         if (DOT_M_G_SHARP == 0.0) {
-            float zooms_modifier  = get_zooms_modifier(vDo_Tate).y;
+            float zooms_modifier  = get_zooms_modifier(vDo_Tate, bNeed_NO_integer_scale).y;
             float dotmat_insize  = global.flick_and_noise_passSize.y;
             float dotmat_outsize = global.FinalViewportSize.y  * zooms_modifier;
             #ifdef DEBUG_PRINT_VALUE
@@ -318,28 +319,54 @@ void main() {
                              ( (! bIs_Interlaced) || PIXELGRID_INTR_DISABLE_Y >= 1.0 || DO_PIXELGRID_H == 0.0)   // - screen is not interlaced or we disabled scanlines on interlaced content
                            );
 
-    //For use with interlaced content, here we calculate an amount of lines that is integer multiple of the screen lines and that
-    //is near to the real input/core lines
+    // Fake or Faker integer scanlines:
+    // We are going to compute an amount of lines that is integer multiple of the screen lines and that
+    // is near to the real input/core lines
     vFake_scanline_period = 0.0;
     
-    //Conditions for fake scanlines are: 
-    // - user wants fake/faker integer scanlines when content is interlaced
-    //   or
-    // - user always wants fake integer scanlines.
-    //   or
-    // - user wants fake integer scanlines when content is double-scanned // <-- edit, ditched as it seems useless to me.
     
-    bool fake_scanlines_needed =  (PIXELGRID_INTR_DISABLE_Y <= -1.0 && bIs_Interlaced) ||
-                                  (PIXELGRID_COREY_FAKE_SCAN == 1.0); // ||
-                                  //(PIXELGRID_COREY_FAKE_SCAN == 2.0 &&  need_doublescan() );
+    // For automatic Fake scanline managment, we compute a treshold under which
+    // fake integer scanlines will be used.
+    // (Logic is skipped if integer scaling is requested.)
+        bool very_lowres_y = false;
+        #define MIN_SCREEN_CORE_RATIO 4.0 //We want at least that screen lines per single scanline.
+        if ( bNeed_NO_integer_scale ) {
+            vec4 out_size = params.OutputSize;
+            vec4 ori_size = params.OriginalSize;
+            vec2 zoom_modifier = get_zooms_modifier(vDo_Tate, bNeed_NO_integer_scale);
+            if (vDo_Tate == 1.0) {
+                out_size.xy = out_size.yx;
+                ori_size.xyzw = ori_size.yxwz;
+                zoom_modifier.xy = zoom_modifier.yx;
+            }
+            float OutputHeightZoomed = out_size.y*zoom_modifier.y;
+            float screen_core_ratio = OutputHeightZoomed / params.OriginalSize.y;
+            if (screen_core_ratio < MIN_SCREEN_CORE_RATIO)
+                very_lowres_y = true;
+        }
+    
+    //Conditions for fake scanlines are: 
+    // - user wants fake/faker integer scanlines when content is interlaced (*1)
+    //   or
+    // - user always wants fake integer scanlines. (*2)
+    //   or
+    // - user wants automatic fake integer scanlines managment and screen is too low res (*3)
+    //   or
+    // - user wants fake integer scanlines when content is double-scanned (*4) // <-- edit, ditched as it seems useless to me.
+    
+
+    
+    bool fake_scanlines_needed =  (PIXELGRID_INTR_DISABLE_Y <= -1.0 && bIs_Interlaced) || //(*1)
+                                  (PIXELGRID_COREY_FAKE_SCAN == 1.0) ||                   //(*2)
+                                  (PIXELGRID_COREY_FAKE_SCAN == -1.0 && very_lowres_y);    //(*3)
+                                  //(PIXELGRID_COREY_FAKE_SCAN == 2.0 &&  need_doublescan() ); //(*4)
                 
                                   
     if ( fake_scanlines_needed ) {
-        //vec2 outsize = global.FinalViewportSize.xy;
         vec4 out_size = params.OutputSize;
         vec4 ori_size = params.OriginalSize;
         vec2 out_coord = vOutputCoord;
-        vec2 zoom_modifier = get_zooms_modifier(vDo_Tate);
+        vec2 zoom_modifier = get_zooms_modifier(vDo_Tate, bNeed_NO_integer_scale);
         if (vDo_Tate == 1.0) {
             out_size.xy = out_size.yx;
             ori_size.xyzw = ori_size.yxwz;

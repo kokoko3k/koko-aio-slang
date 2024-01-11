@@ -187,11 +187,13 @@
             Activate this if you want to double the number of scanlines when the content is low-res.
             "low-res is defined via "Consider Hi-Resolution above # lines" parameter above.
             This option is useful if you want to emulate 30khz VGA CRT monitors.
-            If you are on 1080p or lower, consider to activate Fake integer scanlines or
-            integer scaling too.
+            If you are on 1080p or lower, consider to activate 
+            Fake integer scanlines or integer scaling.
         Use fake integer scanlines
             Use a number of scanlines that perfectly fits the lines on the screen, not accurate,
             but avoids moire and weavy artifacts.
+            A negative value will cause the shader to choose when it is appropriate to activate them.
+              The decision will be based on the ratio of output dimensions and the core.
         Phosphors height Min, Max:
             Try to keep scanline height between those values, depending on content brightness.
         Phosphors width min->max gamma:
