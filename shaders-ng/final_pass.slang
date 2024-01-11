@@ -332,7 +332,7 @@ void main() {
     bool fake_scanlines_needed =  (PIXELGRID_INTR_DISABLE_Y <= -1.0 && bIs_Interlaced) ||
                                   (PIXELGRID_COREY_FAKE_SCAN == 1.0); // ||
                                   //(PIXELGRID_COREY_FAKE_SCAN == 2.0 &&  need_doublescan() );
-                                  
+                
                                   
     if ( fake_scanlines_needed ) {
         //vec2 outsize = global.FinalViewportSize.xy;
@@ -347,27 +347,36 @@ void main() {
             zoom_modifier.xy = zoom_modifier.yx;
         }
 
-        float target_line_size = ori_size.w ;
-  
-        if ( need_doublescan() )
-            target_line_size /= 2.0;
-        else if (PIXELGRID_INTR_DISABLE_Y == -2.0 && PIXELGRID_COREY_FAKE_SCAN == 0.0)
-            target_line_size /= 1.5;
-        
-    
-        
-        float fake_scanlines_numlines = out_size.y/
-              round( (out_size.y*zoom_modifier.y) * target_line_size);
+        // Modify the y line size ?
+            float target_line_size = ori_size.w ;
+            if ( need_doublescan() ) {
+                target_line_size /= 2.0; //halve line size for doublescan
+            } else if (PIXELGRID_INTR_DISABLE_Y == -2.0 && PIXELGRID_COREY_FAKE_SCAN == 0.0) {
+                target_line_size /= 1.5; //reduce line size for fakER scanlines
+            }
+            
+        // compute a rounded number of lines that integer fits the screen
+            float rounded_denominator = round( (out_size.y*zoom_modifier.y) * target_line_size);
+                  rounded_denominator = max(rounded_denominator, 1.0); // avoid division by 0
+            
+            float fake_scanlines_numlines = out_size.y / rounded_denominator;
+            
 
         // to see fake scanlines for low output size, we have to use at most 0.5 * screen lines.
-        fake_scanlines_numlines = min(fake_scanlines_numlines, out_size.y * 0.5); 
+        //fake_scanlines_numlines = min(fake_scanlines_numlines, out_size.y * 0.5); 
         
-        vFake_scanline_period = pi * fake_scanlines_numlines * out_coord.y;
+        vFake_scanline_period = pi * fake_scanlines_numlines * out_coord.y; //FIXME, come può vFake_scanline_period essere 0?
+        
+        
+                                                                        if (fake_scanlines_numlines == 0.0) {
+                                                                            vFake_scanline_period = pi * 100.0 * out_coord.y; 
+                                                                        } //non va, allora fake_scanlines_numlines > 0.0
+                                                                        
         
         //This somehow aligns better the scanline to the screen line:
         vOffset+=1.0;
     }
-
+//vFake_scanline_period = pi * 100 * vOutputCoord.y;
     //Select an y shift that gives the sharpest lines
     if (PIXELGRID_Y_MASK_SHIFT <  0.0) {
         vPG_y_shift = vPG_mask_height * pi / 4.0;
