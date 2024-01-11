@@ -328,7 +328,7 @@
             for 3 sized masks (gmx,rgb,rbg) use 1.0
         Phosphor height
             If you are using a very High definition screen, you may want to set this higher than 1.0
-            I also observed nice results byu setting this to 3 when using 4 sized masks like rgbx or rbgx.
+            I also observed nice results by setting this to 3 when using 4 sized masks like rgbx or rbgx.
 
             
 **Dot matrix emulation:**<br>
