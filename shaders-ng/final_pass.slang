@@ -362,7 +362,7 @@ void main() {
             float fake_scanlines_numlines = out_size.y / rounded_denominator;
             
         
-        vFake_scanline_period = pi * fake_scanlines_numlines * out_coord.y; //FIXME, 
+        vFake_scanline_period = pi * fake_scanlines_numlines * out_coord.y;
                 
         //This somehow aligns better the scanline to the screen line:
         vOffset+=1.0;
