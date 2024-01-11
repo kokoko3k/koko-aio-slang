@@ -351,8 +351,8 @@ void main() {
             float target_line_size = ori_size.w ;
             if ( need_doublescan() ) {
                 target_line_size /= 2.0; //halve line size for doublescan
-            } else if (PIXELGRID_INTR_DISABLE_Y == -2.0 && PIXELGRID_COREY_FAKE_SCAN == 0.0) {
-                target_line_size /= 1.5; //reduce line size for fakER scanlines
+            } else if (PIXELGRID_INTR_DISABLE_Y == -2.0 && bIs_Interlaced) {
+                target_line_size /= 1.5; //reduce line size for fakeR scanlines on interlaced screens.
             }
             
         // compute a rounded number of lines that integer fits the screen

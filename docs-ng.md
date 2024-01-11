@@ -155,7 +155,7 @@
 
     Hi-Res scanlines type
       -1: Use a number of scanlines that perfectly fits the screen, a good glitches/moire free tradeoff.
-      -2: As above, but tighter (1.5x), another good (almost) glitches/moire free tradeoff.
+      -2: As above, but tighter (~1.5x), another good glitches/moire free tradeoff.
        0: Use interlaced scanlines, may need >1080p screen to avoid moire or weavy glitches
        1: Avoid drawing scanlines gaps at all.
        2: Use scanlines, but don't interlace them (bad for 1080p and lower resolutions)
