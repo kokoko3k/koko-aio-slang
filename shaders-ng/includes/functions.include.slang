@@ -245,7 +245,9 @@ vec3 PrintValueVec3( vec2 vStringCoords, vec2 FragCoord,  float fValue, float fM
 	}
 //REFLECTION RELATED ENDS
 
-	
+
+
+
 vec3 pixel_push_luminance(vec3 c, float strength) {
 	//if (strength == 0.0) return c; //lighter without the check.
 	float whiteness = max(max(c.r, c.g), c.b);
@@ -1168,6 +1170,29 @@ bool is_first_outside_rect(vec2 point, vec4 rect) {
 
 
 // COLOR TOOLS
+
+#define W_C_TO_GRAY vec3(0.2125, 0.7154, 0.0721)
+
+float saturation_get(vec3 rgb) {
+    float Cmax = max(max(rgb.r, rgb.g), rgb.b);
+    float Cmin = min(min(rgb.r, rgb.g), rgb.b);
+    return (Cmax - Cmin) / (Cmax+eps);
+}
+
+vec3 saturation_set_gain(vec3 c, float s) {
+    float gray = dot(c, W_C_TO_GRAY);
+    return mix( vec3(gray), c, s);
+}
+
+vec3 vibrance_set(vec3 c, float v) {
+    //Usefult v values from 0.0 to about 4.0
+    float start_saturation = saturation_get(c);
+    float saturation_compressed = pow(start_saturation, v+eps);
+    float saturation_gain = 2 - saturation_compressed;
+    return saturation_set_gain(c, saturation_gain );
+}
+
+
 	vec3 kelvin2rgb(float k) {
 	//Convert kelvin temperature to rgb factors
 	k = clamp(k,1000,40000);
@@ -1192,7 +1217,7 @@ bool is_first_outside_rect(vec2 point, vec4 rect) {
 	return pixel_out/255.0;
 	}
 
-	#define W vec3(0.2125, 0.7154, 0.0721)
+
 	vec3 color_tools(vec3 pixel_out, vec3 Temperature_rgb) {
 	//Apply color corrections to input signal.
 
@@ -1210,7 +1235,7 @@ bool is_first_outside_rect(vec2 point, vec4 rect) {
 		//Colorization for monochrome display on hsv colorspace.
 		//Select different hues for dark and bright pixels and mix them depending on the brightness
 		if (COLOR_MONO_COLORIZE > 0.01) {
-			vec3 pixel_grayscale = vec3(dot(pixel_out.rgb, W));
+			vec3 pixel_grayscale = vec3(dot(pixel_out.rgb, W_C_TO_GRAY));
 			vec3 pixel_in_hsv = rgb2hsv(pixel_grayscale); //FIXME needed? yes, checked.
 			float lum = pixel_in_hsv.z * pixel_in_hsv.z; //<-- looks way better!
 			vec2 bias = mix_step( vec2(0.0, COLOR_MONO_HUE_BIAS), vec2(COLOR_MONO_HUE_BIAS, 0.0), float(COLOR_MONO_HUE_BIAS > 0.0));
@@ -1227,9 +1252,14 @@ bool is_first_outside_rect(vec2 point, vec4 rect) {
 				pixel_out = mix(pixel_out, pixel_rgb_hue12, COLOR_MONO_COLORIZE);
 		}
 
+	//Modify Vibrance
+		if (VIBRANCE > 0.0) {
+			pixel_out.rgb = vibrance_set(pixel_out.rgb, VIBRANCE);
+		}
+		
 	//Modify saturation
 		if (SATURATION != 1.0) {
-			vec3 intensity = vec3(dot(pixel_out.rgb, W));
+			vec3 intensity = vec3(dot(pixel_out.rgb, W_C_TO_GRAY));
 			pixel_out.rgb = mix(intensity, pixel_out.rgb, SATURATION);
 		}
 

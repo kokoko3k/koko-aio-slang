@@ -13,6 +13,10 @@
     #define SATURATION	global.SATURATION
 #endif
 
+#ifndef VIBRANCE
+    #define VIBRANCE	global.VIBRANCE
+#endif
+
 #ifndef LUMINANCE
     #define LUMINANCE	global.LUMINANCE
 #endif

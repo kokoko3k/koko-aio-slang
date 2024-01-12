@@ -43,7 +43,7 @@
         
         
 **Color corrections:**<br>
-    Modify luminance, saturation, contrast, brightness and color temperature
+    Modify luminance, saturation, contrast, brightness, color temperature and vibrance
     of the signal, at "input" stage.<br>
     Gamma in correction is applied at ti beginning of the chain,<br>
     Gamma out correction is applied to the final processed picture.<br>

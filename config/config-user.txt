@@ -53,6 +53,7 @@
 // #define COLOR_MONO_HUE2  0.3
 // #define COLOR_MONO_HUE_BIAS  0.0
 // #define SATURATION  1.0
+// #define VIBRANCE 0.0
 
 
 // #define DO_FXAA  0.0
