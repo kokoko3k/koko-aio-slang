@@ -99,9 +99,6 @@ void main() {
    }
    if (TEMPERATURE != 6500)
       vTemperature_rgb = kelvin2rgb(TEMPERATURE);
-   
-   vTexCoord.y+=0.1;
-   
 }
 
 
