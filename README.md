@@ -17,7 +17,7 @@ Several presets are included.<br>
 * https://github.com/kokoko3k/koko-aio-slang-presets-and-overlays
 
 ***Actually, it provides emulation/support for:***
-* Color corrections (Gamma, contrast, saturation, luminance, vubrance, color temperature adjustments)
+* Color corrections (Gamma, contrast, saturation, luminance, vibrance, color temperature adjustments)
 * B/W display "colorization"
 * FXAA Antialiasing
 * RF Noise
