@@ -56,13 +56,14 @@
 
 shaders = 17
 
-# NTSC Color artifacts pass:
-# The very first pass emulates ntsc color artifacting.
-# Being a fast single pass process, don't expect it to be 100% accurate
-# It is able to drag rainbows as seen in Megadrive games with an option
-# To make it oblique.
-# It also does input color corrections to the input signal (saturation,brightness,contrast...)
-# It also does motion blur for dot matrix.
+
+
+# The very first pass emulates:
+# Ntsc color artifacting
+# Color tools
+# Ghosting
+# Phosphor persistance
+
            shader0 = shaders-ng/colortools_and_ntsc_pass.slang
             alias0 = "colortools_and_ntsc_pass"
 #float_framebuffer needed by phosphor persistance
@@ -74,7 +75,7 @@ float_framebuffer0 = true
 
 
         
-# This pass, emulates the flickering observed on crts when the input signal is interlaced
+# This pass emulates the flickering observed on crts when the input signal is interlaced
 # and there is high brightness difference between adiacent scanlines.
 # This pass is able to generate mipmaps because the next pass has mipmap_input true.
 #
