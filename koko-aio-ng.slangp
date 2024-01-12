@@ -71,7 +71,7 @@ float_framebuffer0 = true
     filter_linear0 = false
        scale_type0 = source
             scale0 = 1.0
-        wrap_mode0 = "mirrored_repeat"
+        wrap_mode0 = "clamp_to_border"
 
 
         
@@ -100,7 +100,7 @@ float_framebuffer0 = true
        scale_type1 = source
           scale_x1 = 2.0
           scale_y1 = 2.0  
-        wrap_mode1 = "clamp_to_border"
+        wrap_mode1 = "mirrored_repeat"
 
 
 
