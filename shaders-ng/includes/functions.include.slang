@@ -1,4 +1,12 @@
+//	Colorspace conversion matrix for YIQ-to-RGB
+const mat3 YIQ2RGB = mat3(1.000, 1.000, 1.000,
+                          0.956,-0.272,-1.106,
+                          0.621,-0.647, 1.703);
 
+const mat3 RGB2YIQ = mat3(
+         0.2989, 0.5959, 0.2115,
+         0.5870, -0.2744, -0.5229,
+         0.1140, -0.3216, 0.3114);
 
 float need_tate(bool is_rotated) {
     if ( (TATE == 1.0 && is_rotated) || TATE == 2.0)
