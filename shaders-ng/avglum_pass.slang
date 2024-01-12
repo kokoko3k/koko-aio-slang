@@ -127,13 +127,18 @@ void main() {
     if ( vAvglum_needed == 0.0) return;
     
     vec4 pixel_out;
+    
     //We also reserve a sampling point in alpha channel to store if the resolution has changed.
     //The value stored will be used by the first pass as an argument to sin() to shake the image.
     if (is_first_inside_rect(vTexCoord, vec4(RESSWITCH_SAMPLING_POINT-0.01 , RESSWITCH_SAMPLING_POINT+0.01) )) {
         if (vResSwitch_res_changed == 1.0 ) {
             pixel_out.a = 1;  
         } else {
-            pixel_out.a = max(texture(avglum_passFeedback,vTexCoord).a - RESSWITCH_SHAKE_SPEED, 0.0);
+            #ifndef D3D_WORKAROUND
+                pixel_out.a = max(texture(avglum_passFeedback,vTexCoord).a - RESSWITCH_SHAKE_SPEED, 0.0);
+            #else
+                 pixel_out.a = 0.0;
+            #endif
         }
         
     } else {

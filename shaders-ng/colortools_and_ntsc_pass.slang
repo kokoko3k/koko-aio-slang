@@ -410,8 +410,10 @@ vec3 persistence(vec3 feedback, vec3 pixel_now, float start_decay, float late_pe
 
 void main() {
    vec2 co = vTexCoord;
-   float shake = texture(avglum_passFeedback, RESSWITCH_SAMPLING_POINT).a;
-   co.y += sin(shake * 2 * pi) * RESSWITCH_GLITCH_SIZE;
+   #ifndef D3D_WORKAROUND
+      float shake = texture(avglum_passFeedback, RESSWITCH_SAMPLING_POINT).a;
+      co.y += sin(shake * 2 * pi) * RESSWITCH_GLITCH_SIZE;
+   #endif
 
    vec3 pixel_in = texture(Source, co).rgb;
    vec3 pixel_out = pixel_in;
