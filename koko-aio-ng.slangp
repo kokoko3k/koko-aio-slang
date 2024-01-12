@@ -57,13 +57,13 @@
 shaders = 17
 
 
-
 # The very first pass emulates:
 # Ntsc color artifacting
 # Color tools
 # Ghosting
 # Phosphor persistance
-
+# Also, it carries a series of debug patterns that need to be activated by modifying 
+# some #defines in the pass itself
            shader0 = shaders-ng/colortools_and_ntsc_pass.slang
             alias0 = "colortools_and_ntsc_pass"
 #float_framebuffer needed by phosphor persistance
@@ -100,7 +100,7 @@ float_framebuffer0 = true
        scale_type1 = source
           scale_x1 = 2.0
           scale_y1 = 2.0  
-        wrap_mode1 = "mirrored_repeat"
+        wrap_mode1 = "clamp_to_border"
 
 
 
@@ -137,7 +137,7 @@ float_framebuffer3 = true
 
         
         
-# Blur and/or glows the image as requested 
+# Blur and/or glows and/or sharpens the image as requested 
 # This passes aims to simulate the signal input power.
            shader4 = shaders-ng/in_glow_x.slang
             alias4 = "in_glow_pass_x"
