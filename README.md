@@ -16,28 +16,36 @@ Several presets are included.<br>
 ***Additional artwork:***
 * https://github.com/kokoko3k/koko-aio-slang-presets-and-overlays
 
-***Actually, it provides emulation for:***
+***Actually, it provides emulation/support for:***
+* Color corrections (Gamma, contrast, saturation, luminance, vubrance, color temperature adjustments)
+* B/W display "colorization"
+* FXAA Antialiasing
+* RF Noise
+* Dedithering
+* NTSC/PAL CVBS color bleeding and Artifacts
+* Phosphor persistance
+* Deconvergence
+* Gaussian blurring/sharpening
+* Phosphor Glow
+* Tate mode
 * Scanlines
-* Screenlines
-* RGB phosphors
-* RGB deconvergence
-* NTSC/PAL CVBS color bleeding
-* NTSC color artifacting (early stage)
-* Aperture grille and slot mask.
-* Input signal glowing
-* Output signal glowing
-* Blooming
-* Gamma, contrast, saturation, luminance, color temperature adjustments
-* Black frame insertions through alternate blanking
-* Interlace flickering, forcing and emulation
-* Antialiasing
+* Interlacing
+* Double scanning
+* Multiple phosphors layout
+* Aperture grille, slot mask, shadow mask.
+* Moire mitigation strategies
+* Dot martix with ghosting
+* Haloing, Blooming
 * Curvature
-* Ambient lights
-* Vignette and Spotlight
-* Bezel (Thank you HyperspaceMadness for allowing me to rip his automagically generated bezel!)
-  https://github.com/HyperspaceMadness/
-* Background images
+* Bezels with realistic reflections  (Thank you HyperspaceMadness for allowing me to rip his automagically generated bezel!)
+* Background, Foreground and Backdrop images
+* Ambient lighting with realistic illumination
+* Vignette, spotlight
 * Full screen glowing
+* Integer Scaling 
+* Tilting
+* Light on power consumption 
+
 
 ***External code by:***
 * Nvidia (FXAA)
