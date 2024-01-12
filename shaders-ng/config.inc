@@ -5,12 +5,11 @@
 #define TAU 6.28318530717958647693
 #define alpha_mark 0.1
 
-
 layout(push_constant) uniform Push {
 	vec4 SourceSize;
 	vec4 OriginalSize;
 	vec4 OutputSize;
-	vec4 final_passSize;
+	vec4 avglum_passFeedbackSize;
 	uint FrameCount;
 
 	float HALO_SHARPNESS ;
@@ -178,7 +177,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float BACKDROP_OFFY;
 	float BACKDROP_ZOOM;
 	
-	
+	float RESSWITCH_GLITCH_SIZE;
 	float TATE;
 
 	float DO_DOT_MATRIX;
@@ -372,7 +371,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter TATE                     "★ Tate mode (0:disabled 1:auto 2:forced)"		1.0 	0.0 2.0 1.0
 #pragma parameter BLANK7a " " 0.0 0.0 1.0 1.0
 
-
+#pragma parameter RESSWITCH_GLITCH_SIZE		"★ Glitch if vertical resolution changes"		0.1		0.0 0.5 0.05
+#pragma parameter BLANK71aa " " 0.0 0.0 1.0 1.0
 
 #pragma parameter LABEL_INTERLACE           "★ Hi-resolution scanlines handling" 0.0 0.0 0.0 0.0
 #pragma parameter MIN_LINES_INTERLACED      "    . Consider Hi-Resolution above # lines (0=never):"		380.0 	0.0 1024 1.0

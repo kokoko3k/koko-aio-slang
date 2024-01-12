@@ -109,7 +109,7 @@
 
 
 // #define TATE  1.0
-
+// #define RESSWITCH_GLITCH_SIZE 0.1
 
 // #define DO_PIXELGRID  1.000000
 // #define PIXELGRID_OVERMASK  1.00000

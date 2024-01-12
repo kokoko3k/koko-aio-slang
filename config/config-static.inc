@@ -153,15 +153,20 @@
 #define NEW_SCALEMOD_Y (global.flick_and_noise_passSize.y/(270.0*2.0) / 2.2)
 
 
+// RESOLUTION SWITCH GLITCH EMULATION ##########################################################################################
+	//Where to sample alpha from avglum pass to understand if resolution has changed (very internal setting) 
+#define RESSWITCH_SAMPLING_POINT vec2(0.95) 
+	//How much the resolution have to change for shake to be activated (in relation to the old size).
+#define RESSWITCH_GLITCH_TRESHOLD 0.1
+	//How fast is the shake [0.01 -> 1]
+#define RESSWITCH_SHAKE_SPEED 0.3
+
 
 // MISC STATIC CONFIG ##########################################################################################
-
-
 	//Static dithering applied over vignette and spot
 #define NOISEPOWER 5/1000.0
 	//Temporal noise strength applied on green channel when green is dark over ambient lights (multiplied by NOISEPOWER)
 #define NOISEPOWER_AMBI_MUL 3.0
-
 
 
 

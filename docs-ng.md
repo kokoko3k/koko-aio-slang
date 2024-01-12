@@ -144,8 +144,13 @@
 **Tate mode:**<br>
     Rotates mask and scanlines by 90°<br>
         
+**Glitch if vertical resolution changes:**<br>
+    Emulates the crt circuits syncing to the new signal timing.<br>
+    Will shake the screen for a while when the resolution changes.<br>
+    The Hiher the value, the more the amplitude.
+    
 **Hi-resolution scanlines handling:**<br>
-        There you can choose how to handle scanlines when a content is Hi-Resolution.
+        There you can choose how to handle scanlines when a content is Hi-Resolution.<br>
         Special handling may be needed to mitigate glitches/moire at 1080p or lower resolutions.
         
     Consider Hi-Resolution above # lines:

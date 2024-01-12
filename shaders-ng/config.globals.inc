@@ -569,6 +569,10 @@
     #define TATE	global.TATE
 #endif
 
+#ifndef RESSWITCH_GLITCH_SIZE
+    #define RESSWITCH_GLITCH_SIZE	global.RESSWITCH_GLITCH_SIZE
+#endif
+
 #ifndef DO_DOT_MATRIX
     #define DO_DOT_MATRIX	global.DO_DOT_MATRIX
 #endif

@@ -18,6 +18,7 @@ layout(location = 2) out vec2 vFuzzy_main_pass_stage_1;
 layout(location = 3) out float vReduced_sample_time_is_now;
 layout(location = 4) out float vAvglum_needed;
 layout(location = 5) out float vBezel_or_Bloom;
+layout(location = 6) out float vResSwitch_res_changed;
 
 #include "includes/functions.include.slang"
 
@@ -37,6 +38,12 @@ void main() {
     
     vAvglum_needed = DO_AMBILIGHT + DO_BEZEL + DO_DYNZOOM + DO_BLOOM;
     vBezel_or_Bloom = DO_BEZEL + DO_BLOOM;
+    
+    //RESSWITCH shaking:
+        vResSwitch_res_changed = 0.0;
+        if (abs(params.OutputSize.y - params.avglum_passFeedbackSize.y) / params.OutputSize.y > RESSWITCH_GLITCH_TRESHOLD)
+            if (params.FrameCount > 30) //needed to avoid shaking at start
+                vResSwitch_res_changed = 1.0;
 }
 
 #pragma stage fragment
@@ -46,6 +53,7 @@ layout(location = 2) in vec2 vFuzzy_main_pass_stage_1;
 layout(location = 3) in float vReduced_sample_time_is_now;
 layout(location = 4) in float vAvglum_needed;
 layout(location = 5) in float vBezel_or_Bloom;
+layout(location = 6) in float vResSwitch_res_changed;
 
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D flick_and_noise_pass;
@@ -74,9 +82,11 @@ float get_avg_lum_from_mip() {
 #define SMOOTHNESS_SPEED 0.1
 
 float get_avglum() {
-    /* avglum alpha has 3 zones::
+    /* avglum alpha has some zones:
      * 0.25 -> reduced sampling, used for to aid scene detection
      * 0.75 -> smoothed_sampling, used to adapt fullscreen zoom
+     * RESSWITCH_SAMPLING_POINT (0.9) -> resolution change detection
+     * 
      * anything else: continuous sampling
      */
             
@@ -104,6 +114,7 @@ float get_avglum() {
 
 }
 
+
 void main() {
     /*Grab a mipmap from the flick_and_noise_pass.
       Calculate the average luminance from the smallest mipmap and put into the alpha channel
@@ -116,7 +127,20 @@ void main() {
     if ( vAvglum_needed == 0.0) return;
     
     vec4 pixel_out;
-    pixel_out.a = get_avglum();
+    //We also reserve a sampling point in alpha channel to store if the resolution has changed.
+    //The value stored will be used by the first pass as an argument to sin() to shake the image.
+    if (is_first_inside_rect(vTexCoord, vec4(RESSWITCH_SAMPLING_POINT-0.01 , RESSWITCH_SAMPLING_POINT+0.01) )) {
+        if (vResSwitch_res_changed == 1.0 ) {
+            pixel_out.a = 1;  
+        } else {
+            pixel_out.a = max(texture(avglum_passFeedback,vTexCoord).a - RESSWITCH_SHAKE_SPEED, 0.0);
+        }
+        
+    } else {
+        pixel_out.a = get_avglum();
+    }
+    
+
     
     //Create a small mipmap to be used to light the bezel corners
     //and by the bloom pass to identify bright areas.
