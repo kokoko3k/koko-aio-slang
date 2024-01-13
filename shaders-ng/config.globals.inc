@@ -13,6 +13,10 @@
     #define SATURATION	global.SATURATION
 #endif
 
+#ifndef VIBRANCE
+    #define VIBRANCE	global.VIBRANCE
+#endif
+
 #ifndef LUMINANCE
     #define LUMINANCE	global.LUMINANCE
 #endif
@@ -565,6 +569,10 @@
     #define TATE	global.TATE
 #endif
 
+#ifndef RESSWITCH_GLITCH_SIZE
+    #define RESSWITCH_GLITCH_SIZE	global.RESSWITCH_GLITCH_SIZE
+#endif
+
 #ifndef DO_DOT_MATRIX
     #define DO_DOT_MATRIX	global.DO_DOT_MATRIX
 #endif
@@ -721,6 +729,18 @@
 
 #ifndef PIXELGRID_Y_MASK_OFFSET
     #define PIXELGRID_Y_MASK_OFFSET global.PIXELGRID_Y_MASK_OFFSET
+#endif
+
+#ifndef PIXELGRID_DO_SHADOWMASK
+    #define PIXELGRID_DO_SHADOWMASK global.PIXELGRID_DO_SHADOWMASK
+#endif
+
+#ifndef PIXELGRID_SHADOWMASK_H
+    #define PIXELGRID_SHADOWMASK_H global.PIXELGRID_SHADOWMASK_H
+#endif
+
+#ifndef PIXELGRID_SHADOWMASK_SHIFT
+    #define PIXELGRID_SHADOWMASK_SHIFT global.PIXELGRID_SHADOWMASK_SHIFT
 #endif
 
 #ifndef PIXELGRID_Y_MASK_STEEP

@@ -43,7 +43,7 @@
         
         
 **Color corrections:**<br>
-    Modify luminance, saturation, contrast, brightness and color temperature
+    Modify luminance, saturation, contrast, brightness, color temperature and vibrance
     of the signal, at "input" stage.<br>
     Gamma in correction is applied at ti beginning of the chain,<br>
     Gamma out correction is applied to the final processed picture.<br>
@@ -144,8 +144,13 @@
 **Tate mode:**<br>
     Rotates mask and scanlines by 90°<br>
         
+**Glitch if vertical resolution changes:**<br>
+    Emulates the crt circuits syncing to the new signal timing.<br>
+    Will shake the screen for a while when the resolution changes.<br>
+    The Hiher the value, the more the amplitude.
+    
 **Hi-resolution scanlines handling:**<br>
-        There you can choose how to handle scanlines when a content is Hi-Resolution.
+        There you can choose how to handle scanlines when a content is Hi-Resolution.<br>
         Special handling may be needed to mitigate glitches/moire at 1080p or lower resolutions.
         
     Consider Hi-Resolution above # lines:
@@ -155,7 +160,7 @@
 
     Hi-Res scanlines type
       -1: Use a number of scanlines that perfectly fits the screen, a good glitches/moire free tradeoff.
-      -2: As above, but tighter (1.5x), another good (almost) glitches/moire free tradeoff.
+      -2: As above, but tighter (~1.5x), another good glitches/moire free tradeoff.
        0: Use interlaced scanlines, may need >1080p screen to avoid moire or weavy glitches
        1: Avoid drawing scanlines gaps at all.
        2: Use scanlines, but don't interlace them (bad for 1080p and lower resolutions)
@@ -187,11 +192,13 @@
             Activate this if you want to double the number of scanlines when the content is low-res.
             "low-res is defined via "Consider Hi-Resolution above # lines" parameter above.
             This option is useful if you want to emulate 30khz VGA CRT monitors.
-            If you are on 1080p or lower, consider to activate Fake integer scanlines or
-            integer scaling too.
+            If you are on 1080p or lower, consider to activate 
+            Fake integer scanlines or integer scaling.
         Use fake integer scanlines
             Use a number of scanlines that perfectly fits the lines on the screen, not accurate,
             but avoids moire and weavy artifacts.
+            A negative value will cause the shader to choose when it is appropriate to activate them.
+              The decision will be based on the ratio of output dimensions and the core.
         Phosphors height Min, Max:
             Try to keep scanline height between those values, depending on content brightness.
         Phosphors width min->max gamma:
@@ -318,7 +325,17 @@
             Makes the "Vertical cell Mask" effect more pronunced and "pinchy/Sparky" by highering its contrast.
             Beware, this may produce moiree.
 
+    Shadowmask:
+            Emulates crt's shadowmask, it is advised to turn off "Vertical cell Mask above" for accurate results
+        X staggering
+            how much even rows have to be shifted, probably you want 1.0 or 1.5 here
+            for 2 or 4 sized masks (gm,rgbx,rbgx,wx) use 1.5
+            for 3 sized masks (gmx,rgb,rbg) use 1.0
+        Phosphor height
+            If you are using a very High definition screen, you may want to set this higher than 1.0
+            I also observed nice results by setting this to 3 when using 4 sized masks like rgbx or rbgx.
 
+            
 **Dot matrix emulation:**<br>
     Emulates low refresh "boxed" screens used in old handheld consoles.<br>
     

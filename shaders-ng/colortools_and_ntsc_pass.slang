@@ -20,13 +20,13 @@
 //#define DEBUG
    //#define DEBUG_COLOR_CALIB
    //#define DEBUG_TIME_FADE
-   //#define DEBUG_SOLID_COLOR
+   #define DEBUG_SOLID_COLOR
    //#define DEBUG_STEP_GRADIENT
    //#define DEBUG_STEP_GRADIENT_V
    //#define DEBUG_BLINK
    //#define DEBUG_BLINK_CIRCLE
    //#define DEBUG_WALKING_CIRCLE
-   #define DEBUG_COLORWHEEL
+   //#define DEBUG_COLORWHEEL
    
    
 #include "config.inc"
@@ -117,6 +117,7 @@ layout(location = 0) out vec4 FragColor;
 
 layout(set = 0, binding = 2) uniform sampler2D Source;
 layout(set = 0, binding = 3) uniform sampler2D colortools_and_ntsc_passFeedback;
+layout(set = 0, binding = 4) uniform sampler2D avglum_passFeedback;
 
 
 vec3 colorwheel(vec2 uv){
@@ -128,16 +129,6 @@ vec3 colorwheel(vec2 uv){
    vec3 colHSV = vec3(ang, 1.0, dist);
    return hsv2rgb(colHSV);
 }
-
-//	Colorspace conversion matrix for YIQ-to-RGB
-const mat3 YIQ2RGB = mat3(1.000, 1.000, 1.000,
-                          0.956,-0.272,-1.106,
-                          0.621,-0.647, 1.703);
-
-const mat3 RGB2YIQ = mat3(
-         0.2989, 0.5959, 0.2115,
-         0.5870, -0.2744, -0.5229,
-         0.1140, -0.3216, 0.3114);
 
 
 #define pi10 pi*10
@@ -418,7 +409,13 @@ vec3 persistence(vec3 feedback, vec3 pixel_now, float start_decay, float late_pe
 
 
 void main() {
-   vec3 pixel_in = texture(Source, vTexCoord).rgb;
+   vec2 co = vTexCoord;
+   #ifndef D3D_WORKAROUND
+      float shake = texture(avglum_passFeedback, RESSWITCH_SAMPLING_POINT).a;
+      co.y += sin(shake * 2 * pi) * RESSWITCH_GLITCH_SIZE;
+   #endif
+
+   vec3 pixel_in = texture(Source, co).rgb;
    vec3 pixel_out = pixel_in;
    //This will go into alpha channel to make glow aware of it and blur more.
    //It could be configurable.
@@ -426,7 +423,7 @@ void main() {
 
    if (DO_NTSC_ARTIFACTS > 0.5) {
       //Get ntsc picture
-         vec4 ntsc_decoded = ntscdec(vTexCoord, pixel_in);
+         vec4 ntsc_decoded = ntscdec(co, pixel_in);
       //apply the minimum treshold to artifact mask
          artifact_mask = smoothstep(NTSC_ARTF_TRSH, 1.0, ntsc_decoded.a);
          ntsc_decoded = clamp(ntsc_decoded, vec4(0.0), vec4(1.0));
@@ -444,7 +441,7 @@ void main() {
    } else if (DO_DEDITHER > 0.5) {
       //vec3 pixel_dedither(vec2 coords, vec4 sourcesize, float tmin, float tmax, float strength) {
       float tmin = 0.0;
-      pixel_out = pixel_dedither(Source, vTexCoord, params.SourceSize, tmin, DEDITHER_TRESHMAX, DEDITHER_STRENGTH, DEDITHER_STRENGTH2);
+      pixel_out = pixel_dedither(Source, co, params.SourceSize, tmin, DEDITHER_TRESHMAX, DEDITHER_STRENGTH, DEDITHER_STRENGTH2);
    }
 
    
@@ -458,7 +455,7 @@ void main() {
       pixel_out = color_tools(pixel_out, vTemperature_rgb);
 
    if (DO_DOT_MATRIX + DOT_M_MBLUR_STR > 1.0) {
-      vec3 feedback = texture(colortools_and_ntsc_passFeedback, vTexCoord).rgb;
+      vec3 feedback = texture(colortools_and_ntsc_passFeedback, co).rgb;
       
       vec3 m_blur_adapted = vec3(DOT_M_MBLUR_STR);
 
@@ -475,18 +472,18 @@ void main() {
    }
    
 
-   /*if (mod(  floor(vTexCoord.y * params.OutputSize.y) , 2.0) == 0.0)
+   /*if (mod(  floor(co.y * params.OutputSize.y) , 2.0) == 0.0)
       if (mod(params.FrameCount , 2.0) == 0.0)
       pixel_out = vec3(0.0);
       
-     if (mod( floor(vTexCoord.y * params.OutputSize.y), 2.0) != 0.0)
+     if (mod( floor(co.y * params.OutputSize.y), 2.0) != 0.0)
       if (mod(params.FrameCount , 2.0) != 0.0)
       pixel_out = vec3(0.0);    
    */
 
    if (DO_PPERSISTENCE == 1.0) {
       //persistence(vec3 feedback, vec3 pixel_now, float start_decay, float end_decay, float motion_blur_cancel) {
-      vec3 feedback = texture(colortools_and_ntsc_passFeedback, vTexCoord).rgb;
+      vec3 feedback = texture(colortools_and_ntsc_passFeedback, co).rgb;
       float motion_blur_cancel = 2.5;
       pixel_out = persistence(feedback, pixel_out, PPERSISTENCE_START, PPERSISTENCE_END, motion_blur_cancel);
    }
@@ -499,7 +496,7 @@ void main() {
     square_wave_time = square_wave_time*2-1;
     vec3 square_wave_time_vec3 = vec3(square_wave_time);
     square_wave_time_vec3 *= min( pixel_out, 1-pixel_out) * ALT_BLANK_STRENGTH;
-    if (mod(vTexCoord.y * params.OriginalSize.y, ALT_BLANK_PERIOD) >= ALT_BLANK_PERIOD / 2.0) {;
+    if (mod(co.y * params.OriginalSize.y, ALT_BLANK_PERIOD) >= ALT_BLANK_PERIOD / 2.0) {;
       pixel_out = pixel_out + square_wave_time_vec3;
     } else {
       pixel_out = pixel_out - square_wave_time_vec3;

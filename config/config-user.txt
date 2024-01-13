@@ -53,6 +53,7 @@
 // #define COLOR_MONO_HUE2  0.3
 // #define COLOR_MONO_HUE_BIAS  0.0
 // #define SATURATION  1.0
+// #define VIBRANCE 0.0
 
 
 // #define DO_FXAA  0.0
@@ -108,7 +109,7 @@
 
 
 // #define TATE  1.0
-
+// #define RESSWITCH_GLITCH_SIZE 0.1
 
 // #define DO_PIXELGRID  1.000000
 // #define PIXELGRID_OVERMASK  1.00000
@@ -141,10 +142,9 @@
 // #define PIXELGRID_DECON_B_H  0.0
 // #define PIXELGRID_H_DEDOT  0.0
 
-
 // #define LABEL_INTERLACE  0.0
 // #define MIN_LINES_INTERLACED  380.0
-// #define PIXELGRID_INTR_DISABLE_Y  -2.0
+// #define PIXELGRID_INTR_DISABLE_Y  -1.0
 // #define LabelDescIntlScan1  0.0
 // #define LabelDescIntlScan2  0.0
 // #define PIXELGRID_INTR_FLICK_MODE  2.0
@@ -160,6 +160,9 @@
 // #define PIXELGRID_Y_MASK_ON_WHITE  0.000000
 // #define PIXELGRID_Y_SPARK  1.000000
 
+// #define PIXELGRID_DO_SHADOWMASK  0.0
+// #define PIXELGRID_SHADOWMASK_H  0.0
+// #define PIXELGRID_SHADOWMASK_SHIFT 1.0
 
 // #define DO_DOT_MATRIX  0.0
 // #define DOT_M_G_STR  0.0

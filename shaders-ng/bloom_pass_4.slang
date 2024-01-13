@@ -22,14 +22,6 @@ void main() {
     
     vIn_aspect = get_in_aspect();
     
-    //Since avglum pass moves itself to follow content_geom_override() because it is needed by
-    //specularity code in final pass, we have to revert that here, or strength on white zones
-    //will break when using content geometry override.
-    //vCo_avglum = vTexCoord;
-    //if (DO_GAME_GEOM_OVERRIDE == 1.0)
-    //    vCo_avglum = content_geom_override(vTexCoord, 1/(GAME_GEOM_ASPECT+eps), vIn_aspect, -GAME_GEOM_VSHIFT, -GAME_GEOM_HSHIFT, 1/GAME_GEOM_ZOOM);
-
-    
     //Get fuzzy mul and pow factor
         vFuzzy_main_pass_stage_1 = apply_fuzzy_main_pass_stage_1();
 
