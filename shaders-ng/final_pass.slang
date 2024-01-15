@@ -792,8 +792,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
 
 
     //Vertical mask .:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.
-    // can be used for slotmask,aperturegrille, not scanlines.
-    //...well technically yes, but they would have a boxed shape.
+    // can be used for slotmask,aperturegrille ... or scanlines, but they would have a boxed shape.
         vec3 darklines_mask=vec3(1.0);
         float PG_spark;
         vec3 pixel_in_unsparkled = pixel_in;
@@ -806,25 +805,14 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 else
                     ph_mask_height = freq_base_core.y * vPG_mask_height;
 
-
             //phosphors mask stagger
                 #define PH_MASH_OFFSET  (PIXELGRID_Y_MASK_OFFSET * HALF_PI )
 
+                
             //Use abs(cos) (later 1-abs(cos) to get horizontal gaps, use pow to make them steep.
             //Stagger them by PH_MASH_OFFSET on even triads
-
-
-                float anti_moire_freq = sin(vPG_freq_base_screen_unfloored.x * vPG_offsets_and_size.a );
-                float anti_moire_amp = PIXELGRID_H_ANTIMOIRE;
-
                 float mask_shape = abs(cos(  vPG_y_shift  + ph_mask_height  + (PH_MASH_OFFSET * is_even)) ) ;
-
-
-
-
-
                 mask_shape = pow(mask_shape, PIXELGRID_Y_MASK_STEEP);
-
 
 
                 // We can make the stagger dark line less pronunced
