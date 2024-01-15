@@ -787,8 +787,6 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 rgb_w = sin(freq_rgb);
             //make them always positive and double frequency:
                 rgb_w = (rgb_w * rgb_w);
-            //"export" naked vertical grille
-                rgb_grille_basal = (rgb_w * rgb_w) * (rgb_w * rgb_w) * (PIXELGRID_BASAL_GRID*0.0025);
             //Scale Max width according to pre-gains:
                 vec3 phosphor_width = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
             //Get final phosphor width:
@@ -804,6 +802,10 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
 
             //lower strength via user parameter?
                 rgb_w = mix(vec3(1.0), rgb_w, DO_PIXELGRID_W);
+                
+            //"export" naked vertical grille
+                rgb_grille_basal = (rgb_w * rgb_w) * (rgb_w * rgb_w) * (PIXELGRID_BASAL_GRID*0.0025);
+                
         }
 
     //1%
