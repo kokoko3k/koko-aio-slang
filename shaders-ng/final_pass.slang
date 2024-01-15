@@ -756,24 +756,6 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 rgb_h = mix(vec3(1.0), rgb_h, DO_PIXELGRID_H);
                 rgb_h = clamp(rgb_h, 0.0,1.0);
 
-
-             /*   float punch_y = sin(freq_base_core.y);
-                punch_y = pow(punch_y,32.0);
-                float punch_x = sin(freq_base.x);
-                punch_x = pow(punch_x,32.0);
-                rgb_h +=vec3(punch_x * punch_y ) * SERVICE1 * 50;
-                //return vec4(punch_x * punch_y );*/
-
-                //Scanline "mangler"
-                    //float t = 0.2;
-                    //t = - (-0.6 * 0.3 - 0.12);
-                    //t = 0.3;
-                    //float t = SERVICE1;
-                    //rgb_h = smoothstep(t, t+0.2, phosphor_height) * rgb_h;
-
-                //Mask Gamma "out"
-                    //rgb_h = pow(rgb_h, vec3(PIXELGRID_GAMMA_OUT_H));
-                    //if (phosphor_height.r < 0.1) rgb_h = vec3(0.0);
         }
 
 
@@ -808,18 +790,6 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 
         }
 
-    //1%
-        //Mask strength modifiers for hmask, performs way better outside the main if then ^^ up there ^^
-
-        /*
-            vec3 rgb_w_weakness = (pixel_in * PIXELGRID_HMASK_NO_BRIGHT) ;
-            rgb_w_weakness = clamp(rgb_w_weakness,0.0,1.0);
-
-            rgb_w = mix( rgb_w, vec3(1.0), rgb_w_weakness);
-            rgb_w = mix( vec3(1.0), rgb_w, DO_PIXELGRID_W);
-            //The following should be equivalent to ^ ^ but it seems slower.
-            //    rgb_w = mix( vec3(1.0), rgb_w, DO_PIXELGRID_W * (1-rgb_w_weakness)  );
-        */
 
     //Vertical mask .:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.
     // can be used for slotmask,aperturegrille, not scanlines.
