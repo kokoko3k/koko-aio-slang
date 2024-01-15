@@ -780,7 +780,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
 
     //Horizontal Triad Mask: ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
         vec3 rgb_w = vec3(1.0);
-        vec3 rgb_grille = vec3(0.0);
+        vec3 rgb_grille_basal = vec3(0.0);
 
         if (DO_PIXELGRID_W > 0.0) { //4%
             //get 3 sines in black/white
@@ -788,7 +788,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //make them always positive and double frequency:
                 rgb_w = (rgb_w * rgb_w);
             //"export" naked vertical grille
-                rgb_grille = (rgb_w * rgb_w) * (rgb_w * rgb_w);
+                rgb_grille_basal = (rgb_w * rgb_w) * (rgb_w * rgb_w) * (PIXELGRID_BASAL_GRID*0.0025);
             //Scale Max width according to pre-gains:
                 vec3 phosphor_width = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
             //Get final phosphor width:
@@ -913,7 +913,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             pixel_in = mix(pixel_in, pixel_in * PIXELGRID_OVERMASK, PIXELGRID_OVERMASK);
         }
     //Apply the mask to pixel_in and clamp the minimum to the unexcited grille.
-        vec3 mask_and_grille = max(mask * pixel_in, rgb_grille * PIXELGRID_BASAL_GRID*0.0025);
+        vec3 mask_and_grille = max(mask * pixel_in, rgb_grille_basal);
 
     //return it with alpha channel containing the mask itself, so that halo can selectively light it.
         return vec4( mask_and_grille , dot(rgb_h, vec3(0.3333)));
