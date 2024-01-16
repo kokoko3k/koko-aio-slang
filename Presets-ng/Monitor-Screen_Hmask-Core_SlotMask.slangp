@@ -1,7 +1,7 @@
 #reference "Base.slangp"
 
-IN_GLOW_POWER = "1.500000"
-GAMMA_OUT = "0.350000"
+IN_GLOW_POWER = "2.15"
+GAMMA_OUT = "0.385"
 
 
 

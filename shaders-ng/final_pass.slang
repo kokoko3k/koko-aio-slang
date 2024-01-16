@@ -794,7 +794,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
     //Vertical mask .:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.
     // can be used for slotmask,aperturegrille ... or scanlines, but they would have a boxed shape.
         vec3 darklines_mask=vec3(1.0);
-        float PG_spark;
+        vec3 PG_spark;
         vec3 pixel_in_unsparkled = pixel_in;
         if (PIXELGRID_Y_MASK > 0.0) {
 
@@ -836,10 +836,8 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 darklines_mask = 1-(mask_shape*V);
             //Try to get a more brillant/sparkling look by highering the darklines
             //effect (sub) and pushing the source color, useful for slotmasks.
-                PG_spark = PIXELGRID_Y_SPARK * PIXELGRID_Y_MASK;
-                darklines_mask -= PG_spark;
-
-                pixel_in *= 1 + ((PG_spark*4) * dedot_mix_inverted);
+                PG_spark = PIXELGRID_Y_SPARK * V * (0.5/vPG_mask_height);         
+                darklines_mask = (( 1-(mask_shape*V))-0.5) * (1+PG_spark) + 0.5 ; 
 
             //Dedot darklines mask:
               //  darklines_mask = mix(vec3(1.0), darklines_mask, dedot_mix_inverted );
@@ -848,9 +846,8 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
 
 
     //Finally put H mask, Scanlines and darklines masks together:
-        vec3 mask = min( rgb_w * rgb_h, darklines_mask * rgb_h); //<- this way it does not interfree with scanline height!
-        //FIXME: test with coore or fuzzy coords how it works when using variable width phosphors, maybe
-        //it would need to be: vec3 mask = min((rgb_w * rgb_h), darklines_mask * rgb_h * rgb_w); =
+        vec3 mask = rgb_w * rgb_h * darklines_mask;
+
 
     float TEST_OVERMASK_NEW = 0.0;
     //Apply Overmask:
