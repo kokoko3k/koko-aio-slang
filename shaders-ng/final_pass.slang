@@ -837,7 +837,8 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //Try to get a more brillant/sparkling look by highering the darklines
             //effect (sub) and pushing the source color, useful for slotmasks.
                 PG_spark = PIXELGRID_Y_SPARK * V * (0.5/vPG_mask_height);         
-                darklines_mask = (( 1-(mask_shape*V))-0.5) * (1+PG_spark) + 0.5 ; 
+                darklines_mask = (darklines_mask-0.5) * (1+PG_spark) + 0.5 ; 
+
 
             //Dedot darklines mask:
               //  darklines_mask = mix(vec3(1.0), darklines_mask, dedot_mix_inverted );
