@@ -33,6 +33,7 @@ layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 1) uniform sampler2D Source;
 layout(set = 0, binding = 2) uniform sampler2D flick_and_noise_pass;
 layout(set = 0, binding = 3) uniform sampler2D reflected_blurred_passFeedback;
+layout(set = 0, binding = 4) uniform sampler2D shift_and_bleed_pass;
 
 #include "includes/functions.include.slang"
 #include "includes/blooms.include.slang"
@@ -66,7 +67,7 @@ void main() {
       pixel_out *= BEZEL_REFL_STRENGTH;
  
    //Next simulate a diffused light
-      vec3 pixel_diffused = textureLod( flick_and_noise_pass, vCoords_zoomout, 6.0).rgb;
+      vec3 pixel_diffused = textureLod( shift_and_bleed_pass, vCoords_zoomout, 6.0).rgb;
       pixel_out = mix( pixel_out, pixel_diffused, BEZEL_DIFFUSION_STR);
       
 
