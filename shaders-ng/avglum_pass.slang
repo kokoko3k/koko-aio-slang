@@ -19,15 +19,16 @@ layout(location = 3) out float vReduced_sample_time_is_now;
 layout(location = 4) out float vAvglum_needed;
 layout(location = 5) out float vBezel_or_Bloom;
 layout(location = 6) out float vResSwitch_res_changed;
+layout(location = 7) out vec2 vTexCoord_unscaled;
 
 #include "includes/functions.include.slang"
 
 
 void main() {
-   gl_Position = global.MVP * Position;
+    gl_Position = global.MVP * Position;
    
-   vTexCoord = TexCoord;
-
+    vTexCoord = TexCoord;
+    vTexCoord_unscaled = TexCoord;
     if (DO_GAME_GEOM_OVERRIDE > 0.5)
         vTexCoord = content_geom_override(vTexCoord, GAME_GEOM_ASPECT, get_in_aspect(), GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
 
@@ -54,6 +55,7 @@ layout(location = 3) in float vReduced_sample_time_is_now;
 layout(location = 4) in float vAvglum_needed;
 layout(location = 5) in float vBezel_or_Bloom;
 layout(location = 6) in float vResSwitch_res_changed;
+layout(location = 7) in vec2 vTexCoord_unscaled;
 
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D flick_and_noise_pass;
@@ -130,12 +132,12 @@ void main() {
     
     //We also reserve a sampling point in alpha channel to store if the resolution has changed.
     //The value stored will be used by the first pass as an argument to sin() to shake the image.
-    if (is_first_inside_rect(vTexCoord, vec4(RESSWITCH_SAMPLING_POINT-0.01 , RESSWITCH_SAMPLING_POINT+0.01) )) {
+    if (is_first_inside_rect(vTexCoord_unscaled, vec4(RESSWITCH_SAMPLING_POINT-0.01 , RESSWITCH_SAMPLING_POINT+0.01) )) {
         if (vResSwitch_res_changed == 1.0 ) {
             pixel_out.a = 1;  
         } else {
             #ifndef D3D_WORKAROUND
-                pixel_out.a = max(texture(avglum_passFeedback,vTexCoord).a - RESSWITCH_SHAKE_SPEED, 0.0);
+                pixel_out.a = max(texture(avglum_passFeedback,vTexCoord_unscaled).a - RESSWITCH_SHAKE_SPEED, 0.0);
             #else
                  pixel_out.a = 0.0;
             #endif
