@@ -756,39 +756,19 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 rgb_h = mix(vec3(1.0), rgb_h, DO_PIXELGRID_H);
                 rgb_h = clamp(rgb_h, 0.0,1.0);
 
-
-             /*   float punch_y = sin(freq_base_core.y);
-                punch_y = pow(punch_y,32.0);
-                float punch_x = sin(freq_base.x);
-                punch_x = pow(punch_x,32.0);
-                rgb_h +=vec3(punch_x * punch_y ) * SERVICE1 * 50;
-                //return vec4(punch_x * punch_y );*/
-
-                //Scanline "mangler"
-                    //float t = 0.2;
-                    //t = - (-0.6 * 0.3 - 0.12);
-                    //t = 0.3;
-                    //float t = SERVICE1;
-                    //rgb_h = smoothstep(t, t+0.2, phosphor_height) * rgb_h;
-
-                //Mask Gamma "out"
-                    //rgb_h = pow(rgb_h, vec3(PIXELGRID_GAMMA_OUT_H));
-                    //if (phosphor_height.r < 0.1) rgb_h = vec3(0.0);
         }
 
 
 
     //Horizontal Triad Mask: ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
         vec3 rgb_w = vec3(1.0);
-        vec3 rgb_grille = vec3(0.0);
+        vec3 rgb_grille_basal = vec3(0.0);
 
         if (DO_PIXELGRID_W > 0.0) { //4%
             //get 3 sines in black/white
                 rgb_w = sin(freq_rgb);
             //make them always positive and double frequency:
                 rgb_w = (rgb_w * rgb_w);
-            //"export" naked vertical grille
-                rgb_grille = (rgb_w * rgb_w) * (rgb_w * rgb_w);
             //Scale Max width according to pre-gains:
                 vec3 phosphor_width = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
             //Get final phosphor width:
@@ -804,26 +784,17 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
 
             //lower strength via user parameter?
                 rgb_w = mix(vec3(1.0), rgb_w, DO_PIXELGRID_W);
+                
+            //"export" naked vertical grille
+                rgb_grille_basal = (rgb_w * rgb_w) * (rgb_w * rgb_w) * (PIXELGRID_BASAL_GRID*0.0025);
+                
         }
 
-    //1%
-        //Mask strength modifiers for hmask, performs way better outside the main if then ^^ up there ^^
-
-        /*
-            vec3 rgb_w_weakness = (pixel_in * PIXELGRID_HMASK_NO_BRIGHT) ;
-            rgb_w_weakness = clamp(rgb_w_weakness,0.0,1.0);
-
-            rgb_w = mix( rgb_w, vec3(1.0), rgb_w_weakness);
-            rgb_w = mix( vec3(1.0), rgb_w, DO_PIXELGRID_W);
-            //The following should be equivalent to ^ ^ but it seems slower.
-            //    rgb_w = mix( vec3(1.0), rgb_w, DO_PIXELGRID_W * (1-rgb_w_weakness)  );
-        */
 
     //Vertical mask .:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.
-    // can be used for slotmask,aperturegrille, not scanlines.
-    //...well technically yes, but they would have a boxed shape.
+    // can be used for slotmask,aperturegrille ... or scanlines, but they would have a boxed shape.
         vec3 darklines_mask=vec3(1.0);
-        float PG_spark;
+        vec3 PG_spark;
         vec3 pixel_in_unsparkled = pixel_in;
         if (PIXELGRID_Y_MASK > 0.0) {
 
@@ -834,25 +805,14 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 else
                     ph_mask_height = freq_base_core.y * vPG_mask_height;
 
-
             //phosphors mask stagger
                 #define PH_MASH_OFFSET  (PIXELGRID_Y_MASK_OFFSET * HALF_PI )
 
+                
             //Use abs(cos) (later 1-abs(cos) to get horizontal gaps, use pow to make them steep.
             //Stagger them by PH_MASH_OFFSET on even triads
-
-
-                float anti_moire_freq = sin(vPG_freq_base_screen_unfloored.x * vPG_offsets_and_size.a );
-                float anti_moire_amp = PIXELGRID_H_ANTIMOIRE;
-
                 float mask_shape = abs(cos(  vPG_y_shift  + ph_mask_height  + (PH_MASH_OFFSET * is_even)) ) ;
-
-
-
-
-
                 mask_shape = pow(mask_shape, PIXELGRID_Y_MASK_STEEP);
-
 
 
                 // We can make the stagger dark line less pronunced
@@ -876,10 +836,9 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 darklines_mask = 1-(mask_shape*V);
             //Try to get a more brillant/sparkling look by highering the darklines
             //effect (sub) and pushing the source color, useful for slotmasks.
-                PG_spark = PIXELGRID_Y_SPARK * PIXELGRID_Y_MASK;
-                darklines_mask -= PG_spark;
+                PG_spark = PIXELGRID_Y_SPARK * V * (0.5/vPG_mask_height);         
+                darklines_mask = (darklines_mask-0.5) * (1+PG_spark) + 0.5 ; 
 
-                pixel_in *= 1 + ((PG_spark*4) * dedot_mix_inverted);
 
             //Dedot darklines mask:
               //  darklines_mask = mix(vec3(1.0), darklines_mask, dedot_mix_inverted );
@@ -888,9 +847,8 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
 
 
     //Finally put H mask, Scanlines and darklines masks together:
-        vec3 mask = min( rgb_w * rgb_h, darklines_mask * rgb_h); //<- this way it does not interfree with scanline height!
-        //FIXME: test with coore or fuzzy coords how it works when using variable width phosphors, maybe
-        //it would need to be: vec3 mask = min((rgb_w * rgb_h), darklines_mask * rgb_h * rgb_w); =
+        vec3 mask = rgb_w * rgb_h * darklines_mask;
+
 
     float TEST_OVERMASK_NEW = 0.0;
     //Apply Overmask:
@@ -913,7 +871,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             pixel_in = mix(pixel_in, pixel_in * PIXELGRID_OVERMASK, PIXELGRID_OVERMASK);
         }
     //Apply the mask to pixel_in and clamp the minimum to the unexcited grille.
-        vec3 mask_and_grille = max(mask * pixel_in, rgb_grille * PIXELGRID_BASAL_GRID*0.0025);
+        vec3 mask_and_grille = max(mask * pixel_in, rgb_grille_basal);
 
     //return it with alpha channel containing the mask itself, so that halo can selectively light it.
         return vec4( mask_and_grille , dot(rgb_h, vec3(0.3333)));

@@ -117,9 +117,9 @@ float_framebuffer0 = true
        scale_type2 = source
             scale2 = 1.0
      mipmap_input2 = true
-      //This *has* to be mirrored_repeat reflection_blur uses high lods
-      //from first_pass to emulate light diffusion 
-        wrap_mode2 = "mirrored_repeat"
+      //this *has* to be clamp_to_border because  specular reflections need to turn to black
+      //if geometry content override is shifting/zooming out the image.
+        wrap_mode2 = "clamp_to_border"
 
         
 
@@ -145,6 +145,9 @@ float_framebuffer3 = true
             scale4 = 1.0
        scale_type4 = source    
 float_framebuffer4 = true
+//This has to be mipmap true and mirrored true
+//mipmaps and mirrored are used to emulate light diffusion from reflection blur pass
+//mipmaps are also used by deltarender
         wrap_mode4 = "mirrored_repeat"
      mipmap_input4 = true
         

@@ -392,7 +392,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 #pragma parameter DO_PIXELGRID_H            "      ★ Scanlines (0 to disable)"    	1.0 0.0 1.25 0.05
 #pragma parameter PIXELGRID_DOUBLESCAN      "         . Double-scan low input resolutions"   0.0 0.0 1.0 1.0
-#pragma parameter PIXELGRID_COREY_FAKE_SCAN "         . Fake integer scanlines (-1=auto)"	0.0 -1.0 1.0 1.0
+#pragma parameter PIXELGRID_COREY_FAKE_SCAN "         . Fake integer scanlines (-1=auto)"	-1.0 -1.0 1.0 1.0
 #pragma parameter PIXELGRID_MIN_H	        "         . Phosphors height Min"			0.2 0.00 1.0 0.05
 #pragma parameter PIXELGRID_MAX_H           "         . Phosphors height Max"			0.6 0.0 1.5 0.05
 #pragma parameter PIXELGRID_GAMMA_H         "         . Phosphors height min->max gamma:"	4.2 1.0 8.00 0.1
@@ -430,7 +430,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter PIXELGRID_Y_MASK_SHIFT     "           . Vertical shift (neg = auto)"	-0.01 -0.01 1.0 0.01
 #pragma parameter PIXELGRID_Y_MASK_STEEP     "           . Steepness"	2.0 1.0 30.0 1.0
 #pragma parameter PIXELGRID_Y_MASK_ON_WHITE  "           . Fadeout under light"	0.5 0.0 2.0 0.01
-#pragma parameter PIXELGRID_Y_SPARK          "           . Sparkling look punch"	0.0 0.0 1.0 0.05
+#pragma parameter PIXELGRID_Y_SPARK          "           . Sparkling look punch"	0.0 0.0 8.0 0.1
 
 #pragma parameter BLANK12d " " 0.0 0.0 1.0 1.0
 
