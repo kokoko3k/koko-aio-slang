@@ -289,10 +289,22 @@ void main() {
 
 
 
-    //Pixelgrid: adapt mask height
+    //Pixelgrid Y mask: adapt mask height
         vPG_mask_height = PIXELGRID_Y_MASK_HEIGHT;
         if (vPG_mask_height < 0.0) vPG_mask_height = 1/-vPG_mask_height;
 
+    //Pixelgrid Y mask: Select an y shift that gives the sharpest lines
+        bool y_mask_align_to_screen_lines = (PIXELGRID_Y_MASK_SHIFT < 0.0)      && //Engage when param is < 0.0 (auto) and
+                                            (PIXELGRID_Y_MASK_COORDS == 1.0)    && //only when when using screen coords and
+                                            (fract(1.0/vPG_mask_height) == 0.0);   //only when the multiplier is integer
+    
+        if (y_mask_align_to_screen_lines ) {
+            vPG_y_shift = vPG_mask_height * pi / 4.0;
+        } else {
+            vPG_y_shift = PIXELGRID_Y_MASK_SHIFT * pi ;
+        }
+        
+        
     //Pixelgrid: do horizontal if enabled, but skip it if user doesn't want it on interlaced content.
         vDo_pixelgrid_h = float( pixelgrid_h_needed() );
 
@@ -396,13 +408,6 @@ void main() {
             vOffset+=1.0;
     }
     
-
-    //Select an y shift that gives the sharpest lines
-        if (PIXELGRID_Y_MASK_SHIFT <  0.0) {
-            vPG_y_shift = vPG_mask_height * pi / 4.0;
-        } else {
-            vPG_y_shift = PIXELGRID_Y_MASK_SHIFT * pi ;
-        }
 
 }
 
