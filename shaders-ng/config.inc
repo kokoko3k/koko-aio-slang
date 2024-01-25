@@ -636,14 +636,28 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 //#pragma parameter SERVICE3 "Don't use me, for debug purposes only" 	0.5 -1.0 1.0 0.01
 
 
-
-
-
-
 //User parameters goes here, they overrides almost everything:
 #include "../config/config-user.txt"
 
 //Following translates global.PARAMETER to PARAMETER
 #include "config.globals.inc"
 
+
+// 2014-Jan-25
+// Since we moved some mandatory defines from config-static.inc to config-user.txt
+// It is possible that users overriding config-user.txt will run into errors
+// if they don't check for updated config-user.
+// Brave users don't deserve any headaches, so put some safety checks here.
+
+#ifndef DELTA_RENDER
+	#define DELTA_RENDER 0.0 
+#endif
+
+#ifndef HALVE_BORDER_UPDATE
+	#define HALVE_BORDER_UPDATE 0.0 
+#endif
+
+#ifndef SKIP_RANDOM
+	#define SKIP_RANDOM 0.0 
+#endif
 
