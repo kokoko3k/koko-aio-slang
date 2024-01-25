@@ -13,16 +13,6 @@
 // #define D3D_WORKAROUND
 
 
-
-// PERFORMANCE SETTINGS /////////////////////////////////////////////////////////
-
-//Renders only changed parts of screen, set to 1.0 to lower power consumption:
-#define DELTA_RENDER 0.0
-
-//Halve rendering refresh on bezel and ambilight set to 1.0 to spare gpu cycles:
-#define HALVE_BORDER_UPDATE 0.0
-
-
 // STATIC FEATURES ENABLE/DISABLE
 
 // Allow texture wrapping as a shader parameter, prepend // to gain some performance: 
@@ -31,9 +21,6 @@
 	
 // Enable lcd antighosting by using values > 0.0 (try around 0.25)
 	#define LCD_ANTIGHOSTING 0.0
-
-
-
 
 
 

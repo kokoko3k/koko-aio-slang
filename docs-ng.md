@@ -646,7 +646,7 @@
     leading to a measurable power consumption reduction.<br>
     This feature can, however, produce artifacts in some cases, so the feature<br>
     is statically disabled by default by now.<br>
-    To use it, you have to manually switch, in file config-static.inc: <br>
+    To use it, you have to manually set to 1.0, in file config-user.txt: <br>
     #define DELTA_RENDER 0.0 <br>
     to <br>
     #define DELTA_RENDER 1.0 <br>
