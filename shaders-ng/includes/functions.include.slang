@@ -499,6 +499,7 @@ float round_step(float f, float p) {
 #define RND_C 43758.5453
 
 float random(float power, vec2 seed) {
+	if (SKIP_RANDOM == 1.0) return 0.0;
     //From pal-singlepass.slang 
     //https://github.com/svofski/CRT
     //Copyright (c) 2016, Viacheslav Slavinsky
@@ -514,6 +515,8 @@ float random(float power, vec2 seed) {
 
 //The following produces weird results when with dynamic seed like framecount.
 float random_fast(vec2 seed) {
+	if (SKIP_RANDOM == 1.0) return 0.0;
+	
 	float noise_out = fract(sin(dot(seed.xy, VEC2_RND_A_B)) * RND_C);
     return noise_out;
 }

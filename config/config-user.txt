@@ -316,7 +316,9 @@
 //Halve rendering refresh on bezel and ambilight set to 1.0 to spare gpu cycles:
 #define HALVE_BORDER_UPDATE 0.0
 
-
+//Skip random() function used for noise/debanding/bezel roughness, 
+//set to 1.0 to spare gpu cycles:
+#define SKIP_RANDOM 0.0
 
 // Developer reminder: bash script to partially convert a shader preset 
 // edit: obsolete and incomplete since it does not recur references.
