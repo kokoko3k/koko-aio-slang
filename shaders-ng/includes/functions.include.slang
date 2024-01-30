@@ -1229,6 +1229,7 @@ vec3 vibrance_set(vec3 c, float v) {
 	}
 
 
+
 	vec3 color_tools(vec3 pixel_out, vec3 Temperature_rgb) {
 	//Apply color corrections to input signal.
 

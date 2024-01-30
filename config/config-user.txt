@@ -276,7 +276,7 @@
 // #define ASPECT_Y  3.0
 
 
-// #define DO_DYNZOOM  1.0
+// #define DO_DYNZOOM  0.015
 
 
 // #define DO_GAME_GEOM_OVERRIDE  0.0
