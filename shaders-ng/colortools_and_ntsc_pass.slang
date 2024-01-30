@@ -17,7 +17,7 @@
 
 
 
-//#define DEBUG
+#define DEBUG
    //#define DEBUG_COLOR_CALIB
    //#define DEBUG_TIME_FADE
    //#define DEBUG_SOLID_COLOR
@@ -510,7 +510,7 @@ void main() {
     }*/
 
     
-    
+   pixel_out = max(pixel_out, vec3(0.0));
    FragColor = vec4(pixel_out, artifact_mask);
    //FragColor = vec4(artifacts);
 }
