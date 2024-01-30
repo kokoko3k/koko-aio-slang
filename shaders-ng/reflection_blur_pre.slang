@@ -57,7 +57,7 @@ void main() {
    
    vec2 coords = vCoordsAdapted;
 
-   if (DO_DYNZOOM == 1.0) 
+   if (DO_DYNZOOM > 0.0)
       coords = zoom(coords, get_dyn_zoom(avglum_pass));
  
    //eventually return black pixel

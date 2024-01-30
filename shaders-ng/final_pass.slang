@@ -1381,7 +1381,7 @@ void main() {
 
     //Dynamic lum dependant full screen zoom?
     #ifndef D3D_WORKAROUND
-        if (DO_DYNZOOM == 1.0)
+        if (DO_DYNZOOM > 0.0)
             co_content = zoom(co_content, get_dyn_zoom(avglum_pass) );
     #endif
 

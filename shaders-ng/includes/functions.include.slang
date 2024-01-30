@@ -1091,7 +1091,7 @@ vec3 rgb2hsv(vec3 c){
 }
 	
 float get_dyn_zoom(sampler2D tex) {
-	return 1.0 + (texture(tex, vec2(0.75,0.75)    ).a/ DYNZOOM_FACTOR) ;
+	return texture(tex, vec2(0.75,0.75)).a * DO_DYNZOOM + 1.0 ;
 }
 
 

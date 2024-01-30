@@ -87,7 +87,6 @@ DO_SPOT = "1.0"
 	S_SIZE = "0.4"
 	S_POWER = "0.1"
 
-DO_DYNZOOM = "1.0"
-	DYNZOOM_FACTOR = "80"
+DO_DYNZOOM = "0.015"
 
 

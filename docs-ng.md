@@ -602,6 +602,7 @@
 **Luminosity tied zoom:**<br>
     On older CRT monitors, the picture gets bigger when the image was brighter.<br>
     Please TURN THIS OFF if you want to use integer scaling, since this obstructs it.
+    The higher, the more prominent the effect.
 
 **Override content geometry:**<br>
     Contrary to the global aspect ratio control, this changes only the game geometry.<br>

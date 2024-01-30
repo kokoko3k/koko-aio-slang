@@ -28,11 +28,6 @@
 
 // Haloing happens on a scanlined/gapped image or not
 	#define HALO_PRE_SCANLINE_GAP 0.0
-
-// The higher, the more the image will alter its size depending on the scene luminance.
-	#define DYNZOOM_FACTOR		80
-	
-	
 	
 	
 // BEZEL STATIC CONFIG ////////////////////////////////////////////////////////
