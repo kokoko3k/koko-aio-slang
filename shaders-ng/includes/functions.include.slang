@@ -1354,3 +1354,26 @@ vec4 PG_get_hmask_preset_unfloored() {
 
 }
 
+vec3 adaptive_strobe( vec3 c) {
+    #define STRENGTH 1.0; //effect strength
+    #define BRIGHT_BIAS 1.0 //brightness compensation
+    #define CONTRAST_COMPENSATION 0.5 //maximum contrast compensation
+    #define GAIN_COMPENSATION 0.5 //maximum gain compensation
+
+    vec3 c_temp = c.rgb;
+    c_temp = clamp(c_temp, vec3(0.0), vec3(1.0));
+    vec3 room = (0.5 - abs(0.5-c_temp)) * STRENGTH;
+
+    vec3 contrast_adj = mix(vec3(0.0), vec3(-CONTRAST_COMPENSATION), room);
+    vec3 gain_adj = mix(vec3(1.0), vec3(GAIN_COMPENSATION), room);
+
+     //Adjust brightness/contrast
+    c = ( (1+contrast_adj+contrast_adj)* c)-contrast_adj;
+    c *= gain_adj;
+
+    if (mod(params.FrameCount, 2.0 ) == 0.0) {
+       return c +  room / BRIGHT_BIAS;
+    }else {
+       return c -  room * BRIGHT_BIAS;
+    }
+}
