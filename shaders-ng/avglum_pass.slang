@@ -86,7 +86,7 @@ float get_avg_lum_from_mip() {
 float get_avglum() {
     /* avglum alpha has some zones:
      * 0.25 -> reduced sampling, used for to aid scene detection
-     * 0.75 -> smoothed_sampling, used to adapt fullscreen zoom
+     * 0.75 -> smoothed_sampling, used to adapt fullscreen zoom and adaptive black
      * RESSWITCH_SAMPLING_POINT (0.9) -> resolution change detection
      * 
      * anything else: continuous sampling

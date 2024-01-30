@@ -43,12 +43,21 @@
         
         
 **Color corrections:**<br>
-    Modify luminance, saturation, contrast, brightness, color temperature and vibrance
-    of the signal, at "input" stage.<br>
-    Gamma in correction is applied at ti beginning of the chain,<br>
-    Gamma out correction is applied to the final processed picture.<br>
-    Input signal gain is applied in the chain just before the crt emulation stages.<br>
-    
+    Modify signal color at "input" stage.<br>
+
+    Luminance, brightness, contrast and temperature:
+        self explanatory.
+    Input signal gain:
+        Gain applied in the chain just before the crt emulation stages.
+    Gamma in:
+        Gamma correction applied at the beginning of the chain.
+    Gamma out:
+        Gamma correction applied to the final processed picture.
+    Adaptive black level range:
+        On old CRTs the contrast was higher on high luminosity content,
+        and lower on low luminosity content.
+        This setting modulate the range of the effect; 0.0 disables it.
+
     It is also possible to emulate a monochrome display with custom colors:
     
         Monochrome screen colorization:
