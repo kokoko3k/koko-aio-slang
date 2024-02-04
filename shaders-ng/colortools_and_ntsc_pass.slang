@@ -451,8 +451,15 @@ void main() {
    #endif
       
 
-   if (DO_CCORRECTION == 1.0)
+   if (DO_CCORRECTION == 1.0) {
       pixel_out = color_tools(pixel_out, vTemperature_rgb);
+      #ifndef D3D_WORKAROUND
+         if (ADAPTIVE_BLACK > 0.0) {
+            float avglum = texture(avglum_passFeedback, vec2(0.5,0.5)).a ;
+            pixel_out = adaptive_black(pixel_out,  avglum, ADAPTIVE_BLACK);
+         }
+      #endif
+	}
 
    if (DO_DOT_MATRIX + DOT_M_MBLUR_STR > 1.0) {
       vec3 feedback = texture(colortools_and_ntsc_passFeedback, co).rgb;
@@ -503,7 +510,7 @@ void main() {
     }*/
 
     
-    
+   pixel_out = max(pixel_out, vec3(0.0));
    FragColor = vec4(pixel_out, artifact_mask);
    //FragColor = vec4(artifacts);
 }

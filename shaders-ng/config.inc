@@ -82,6 +82,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float LUMINANCE;
 	float VIBRANCE;
 	float CONTRAST;
+	float ADAPTIVE_BLACK;
 	float BRIGHTNESS;
 	float TEMPERATURE;
 	
@@ -286,6 +287,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter LUMINANCE      "       Luminance push (>1.0=clip)"		0.0	 0.0 1.5 0.05
 #pragma parameter BRIGHTNESS     "       Brightness in   (0.0=off)"		0.0	-1.0 1.0 0.01
 #pragma parameter CONTRAST       "       Contrast in     (0.0=off)"		0.0	-1.0 1.0 0.01
+#pragma parameter ADAPTIVE_BLACK "       Adaptive black level range"	0.0 0.0  1.0 0.01
 #pragma parameter TEMPERATURE    "       Temperature in (6500=off)"		6500.0	3000 14000.0 50.0
 #pragma parameter IN_GLOW_GAMMA  "       Gamma In  (applied at the beginning)"		1.0 	1.0 	10.0 0.1
 #pragma parameter GAMMA_OUT             "       Gamma out (applied at the end)"			0.69	0.1 	4.0  0.01
@@ -598,7 +600,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 //Modulate the image zooming depending on the image luminosity.
 //You can lower the effect power through the DYNZOOM_FACTOR parameter.
-#pragma parameter DO_DYNZOOM	     "★ Luminosity tied zoom (!!OBSTRUCTS integer scale!!) ==>"		1.0   0.0   1.0  1.0
+#pragma parameter DO_DYNZOOM	     "★ Luminosity tied zoom (!!OBSTRUCTS integer scale!!) ==>"		0.015   0.0   1.0  0.005
 	//Ditched and hardcoded to 80 in config.globals.inc.
 	//#pragma parameter DYNZOOM_FACTOR     "        Narrowness"				80.0  15.0  120.0 0.5
 #pragma parameter BLANK18 " " 0.0 0.0 1.0 1.0
@@ -636,14 +638,28 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 //#pragma parameter SERVICE3 "Don't use me, for debug purposes only" 	0.5 -1.0 1.0 0.01
 
 
-
-
-
-
 //User parameters goes here, they overrides almost everything:
 #include "../config/config-user.txt"
 
 //Following translates global.PARAMETER to PARAMETER
 #include "config.globals.inc"
 
+
+// 2014-Jan-25
+// Since we moved some mandatory defines from config-static.inc to config-user.txt
+// It is possible that users overriding config-user.txt will run into errors
+// if they don't check for updated config-user.
+// Brave users don't deserve any headaches, so put some safety checks here.
+
+#ifndef DELTA_RENDER
+	#define DELTA_RENDER 0.0 
+#endif
+
+#ifndef HALVE_BORDER_UPDATE
+	#define HALVE_BORDER_UPDATE 0.0 
+#endif
+
+#ifndef SKIP_RANDOM
+	#define SKIP_RANDOM 0.0 
+#endif
 

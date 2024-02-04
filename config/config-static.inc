@@ -13,16 +13,6 @@
 // #define D3D_WORKAROUND
 
 
-
-// PERFORMANCE SETTINGS /////////////////////////////////////////////////////////
-
-//Renders only changed parts of screen, set to 1.0 to lower power consumption:
-#define DELTA_RENDER 0.0
-
-//Halve rendering refresh on bezel and ambilight set to 1.0 to spare gpu cycles:
-#define HALVE_BORDER_UPDATE 0.0
-
-
 // STATIC FEATURES ENABLE/DISABLE
 
 // Allow texture wrapping as a shader parameter, prepend // to gain some performance: 
@@ -34,18 +24,10 @@
 
 
 
-
-
-
 // APPEARANCE SETTINGS ////////////////////////////////////////////////////////
 
 // Haloing happens on a scanlined/gapped image or not
 	#define HALO_PRE_SCANLINE_GAP 0.0
-
-// The higher, the more the image will alter its size depending on the scene luminance.
-	#define DYNZOOM_FACTOR		80
-	
-	
 	
 	
 // BEZEL STATIC CONFIG ////////////////////////////////////////////////////////

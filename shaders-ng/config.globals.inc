@@ -25,6 +25,10 @@
     #define CONTRAST	global.CONTRAST
 #endif
 
+#ifndef ADAPTIVE_BLACK
+    #define ADAPTIVE_BLACK  global.ADAPTIVE_BLACK
+#endif
+
 #ifndef BRIGHTNESS
     #define BRIGHTNESS	global.BRIGHTNESS
 #endif

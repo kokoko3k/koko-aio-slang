@@ -499,6 +499,7 @@ float round_step(float f, float p) {
 #define RND_C 43758.5453
 
 float random(float power, vec2 seed) {
+	if (SKIP_RANDOM == 1.0) return 0.0;
     //From pal-singlepass.slang 
     //https://github.com/svofski/CRT
     //Copyright (c) 2016, Viacheslav Slavinsky
@@ -514,6 +515,8 @@ float random(float power, vec2 seed) {
 
 //The following produces weird results when with dynamic seed like framecount.
 float random_fast(vec2 seed) {
+	if (SKIP_RANDOM == 1.0) return 0.0;
+	
 	float noise_out = fract(sin(dot(seed.xy, VEC2_RND_A_B)) * RND_C);
     return noise_out;
 }
@@ -1088,7 +1091,7 @@ vec3 rgb2hsv(vec3 c){
 }
 	
 float get_dyn_zoom(sampler2D tex) {
-	return 1.0 + (texture(tex, vec2(0.75,0.75)    ).a/ DYNZOOM_FACTOR) ;
+	return texture(tex, vec2(0.75,0.75)).a * DO_DYNZOOM + 1.0 ;
 }
 
 
@@ -1225,6 +1228,12 @@ vec3 vibrance_set(vec3 c, float v) {
 	return pixel_out/255.0;
 	}
 
+	vec3 adaptive_black(vec3 c_in, float lum_in, float range) {
+		float luminance_adapt = mix( 1-range, 1+range, lum_in);
+		return c_in * luminance_adapt - luminance_adapt + 1;
+		//return apply_contrast_brightness(c_in.rgb, luminance_adapt, 0.0);
+		//return pow(c_in.rgb, vec3(1.0+luminance_adapt));
+	}
 
 	vec3 color_tools(vec3 pixel_out, vec3 Temperature_rgb) {
 	//Apply color corrections to input signal.
@@ -1351,3 +1360,26 @@ vec4 PG_get_hmask_preset_unfloored() {
 
 }
 
+vec3 adaptive_strobe( vec3 c) {
+    #define STRENGTH 1.0; //effect strength
+    #define BRIGHT_BIAS 1.0 //brightness compensation
+    #define CONTRAST_COMPENSATION 0.5 //maximum contrast compensation
+    #define GAIN_COMPENSATION 0.5 //maximum gain compensation
+
+    vec3 c_temp = c.rgb;
+    c_temp = clamp(c_temp, vec3(0.0), vec3(1.0));
+    vec3 room = (0.5 - abs(0.5-c_temp)) * STRENGTH;
+
+    vec3 contrast_adj = mix(vec3(0.0), vec3(-CONTRAST_COMPENSATION), room);
+    vec3 gain_adj = mix(vec3(1.0), vec3(GAIN_COMPENSATION), room);
+
+     //Adjust brightness/contrast
+    c = ( (1+contrast_adj+contrast_adj)* c)-contrast_adj;
+    c *= gain_adj;
+
+    if (mod(params.FrameCount, 2.0 ) == 0.0) {
+       return c +  room / BRIGHT_BIAS;
+    }else {
+       return c -  room * BRIGHT_BIAS;
+    }
+}
