@@ -40,7 +40,10 @@
         This is the image used to draw the bezel.
         Read further for details.
         
-        
+Texture "sources", including the main gimp project file for the default curved and straight monitor frame
+are on the following repo:
+https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
+
         
 **Color corrections:**<br>
     Modify signal color at "input" stage.<br>
