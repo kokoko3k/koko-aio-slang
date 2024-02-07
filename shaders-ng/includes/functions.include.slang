@@ -513,9 +513,27 @@ float random(float power, vec2 seed) {
     return noise_out;
 }
 
+
+float deband_static(vec2 co, float power) {
+	#define PI_HALF 1.5707963267949
+	vec2 d = sin(co* PI_HALF * params.OutputSize.xy);
+	float r = d.x * d.y * power;
+	return r;
+}
+
+float deband_temporal(vec2 co, float power) {
+	#define PI_HALF 1.5707963267949
+	vec2 d = sin(co* PI_HALF * params.OutputSize.xy);
+	float r = d.x * d.y * power;
+	r= mix(r,-r, mod(params.FrameCount, 2.0));
+	return r;
+}
+
 //The following produces weird results when with dynamic seed like framecount.
 float random_fast(vec2 seed) {
 	if (SKIP_RANDOM == 1.0) return 0.0;
+	//return 0.0;
+	//return deband_static(seed, 0.001);
 	
 	float noise_out = fract(sin(dot(seed.xy, VEC2_RND_A_B)) * RND_C);
     return noise_out;
