@@ -175,12 +175,6 @@ void main() {
 
     vDo_Tate = need_tate(bIsRotated);
 
-    if ( (TATE == 1.0 && bIsRotated) || TATE == 2.0)
-        vDo_Tate = 1.0;
-            else
-        vDo_Tate = 0.0;
-
-
     vIn_aspect = get_in_aspect();
 
     //Calculate vTexcoord as fractional or integer scaled?
