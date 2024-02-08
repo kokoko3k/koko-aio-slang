@@ -198,11 +198,8 @@ void main() {
 
     vBEZEL_INNER_ZOOM_adapted = get_BEZEL_INNER_ZOOM() * DO_BEZEL;
 
-
-
     //Help scanline/pixelgrid code too:
         bool bIs_Interlaced = is_interlaced();
-        float fIsInterlaced = float(bIs_Interlaced);
 
         //Scanline period:
             vScanlinePeriod = 1.0; //Base 1x period
