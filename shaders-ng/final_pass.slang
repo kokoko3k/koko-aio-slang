@@ -284,7 +284,7 @@ void main() {
                                             (fract(1.0/vPG_mask_height) == 0.0);   //only when the multiplier is integer
     
         if (y_mask_align_to_screen_lines ) {
-            vPG_y_shift = vPG_mask_height * pi / 4.0;
+            vPG_y_shift = vPG_mask_height * (pi / 4.0);
         } else {
             vPG_y_shift = PIXELGRID_Y_MASK_SHIFT * pi ;
         }
