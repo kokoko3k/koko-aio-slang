@@ -126,7 +126,7 @@ vec2 get_bg_image_coords(vec2 in_vOutputCoord, bool isrotated) {
     return bg_img_coords;
 }
 
-vec2 get_zooms_modifier(float do_tate, bool bNeed_NO_integer_scale) {
+vec2 get_zooms_modifier(float do_tate, bool bNeed_NO_integer_scale, bool isrotated) {
     // This function is meant to live in vertex shader; its purpose is to
     // give the final scale factor by taking in consideration various zoom modifiers.
     //It works by calculating the new 0.0 and 1.0 coords then measuring the new distance between them
@@ -139,11 +139,11 @@ vec2 get_zooms_modifier(float do_tate, bool bNeed_NO_integer_scale) {
     vec2 co_scaled_max = vec2(1.0);
 
     if ( bNeed_NO_integer_scale ) {
-        co_scaled_min = get_scaled_coords_aspect(co_scaled_min, global.FinalViewportSize, vIn_aspect, bool(vIsRotated));
-        co_scaled_max = get_scaled_coords_aspect(co_scaled_max, global.FinalViewportSize, vIn_aspect, bool(vIsRotated));
+        co_scaled_min = get_scaled_coords_aspect(co_scaled_min, global.FinalViewportSize, vIn_aspect, isrotated);
+        co_scaled_max = get_scaled_coords_aspect(co_scaled_max, global.FinalViewportSize, vIn_aspect, isrotated);
     } else {
-        co_scaled_min = integer_scale(co_scaled_min, vIn_aspect, bool(vIsRotated), do_tate, GAME_GEOM_INT_SCALE-1.0 );
-        co_scaled_max = integer_scale(co_scaled_max, vIn_aspect, bool(vIsRotated), do_tate, GAME_GEOM_INT_SCALE-1.0 );
+        co_scaled_min = integer_scale(co_scaled_min, vIn_aspect, isrotated, do_tate, GAME_GEOM_INT_SCALE-1.0 );
+        co_scaled_max = integer_scale(co_scaled_max, vIn_aspect, isrotated, do_tate, GAME_GEOM_INT_SCALE-1.0 );
     }
 
 
@@ -315,7 +315,7 @@ void main() {
     //For simplicity and (my) mental health, take only y into account.
         vDotMat_Grid_Sharpness = DOT_M_G_SHARP;
         if (DOT_M_G_SHARP == 0.0) {
-            float zooms_modifier  = get_zooms_modifier(vDo_Tate, bNeed_NO_integer_scale).y;
+            float zooms_modifier  = get_zooms_modifier(vDo_Tate, bNeed_NO_integer_scale, bIsRotated).y;
             float dotmat_insize  = global.flick_and_noise_passSize.y;
             float dotmat_outsize = global.FinalViewportSize.y  * zooms_modifier;
             #ifdef DEBUG_PRINT_VALUE
@@ -345,7 +345,7 @@ void main() {
         if ( bNeed_NO_integer_scale ) {
             vec4 out_size = params.OutputSize;
             vec4 ori_size = params.OriginalSize;
-            vec2 zoom_modifier = get_zooms_modifier(vDo_Tate, bNeed_NO_integer_scale);
+            vec2 zoom_modifier = get_zooms_modifier(vDo_Tate, bNeed_NO_integer_scale,bIsRotated);
             if (vDo_Tate == 1.0) {
                 out_size.xy = out_size.yx;
                 ori_size.xyzw = ori_size.yxwz;
@@ -378,7 +378,7 @@ void main() {
         vec4 out_size = params.OutputSize;
         vec4 ori_size = params.OriginalSize;
         vec2 out_coord = vOutputCoord;
-        vec2 zoom_modifier = get_zooms_modifier(vDo_Tate, bNeed_NO_integer_scale);
+        vec2 zoom_modifier = get_zooms_modifier(vDo_Tate, bNeed_NO_integer_scale,bIsRotated);
         if (vDo_Tate == 1.0) {
             out_size.xy = out_size.yx;
             ori_size.xyzw = ori_size.yxwz;
