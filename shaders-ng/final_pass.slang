@@ -186,9 +186,9 @@ void main() {
     //Calculate vTexcoord as fractional or integer scaled?
         bool bNeed_NO_integer_scale = need_NO_integer_scale();
         if ( bNeed_NO_integer_scale )
-            vTexCoord = get_scaled_coords_aspect(TexCoord,global.FinalViewportSize, vIn_aspect, bool(vIsRotated));
+            vTexCoord = get_scaled_coords_aspect(TexCoord,global.FinalViewportSize, vIn_aspect, bIsRotated);
         else
-            vTexCoord = integer_scale(TexCoord, vIn_aspect, bool(vIsRotated), vDo_Tate, GAME_GEOM_INT_SCALE-1.0 ) + vec2( GAME_GEOM_OFF_FIX /10000);
+            vTexCoord = integer_scale(TexCoord, vIn_aspect, bIsRotated, vDo_Tate, GAME_GEOM_INT_SCALE-1.0 ) + vec2( GAME_GEOM_OFF_FIX /10000);
 
     vTexCoord.y = vTexCoord.y + 0.00001;
 
