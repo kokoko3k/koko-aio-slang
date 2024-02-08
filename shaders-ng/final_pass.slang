@@ -247,24 +247,23 @@ void main() {
 
     //Pixelgrid: Calc base freqs
         //Tate ?
-            vPG_OutputSize_tated   = params.OutputSize.xy;
-            vPG_OutputCoord_tated  = vOutputCoord.xy + vec2(0.00001);
-            vPG_OriginalSize_tated_mul_pi = params.OriginalSize.xy;
-
-            if (vDo_Tate == 1.0) {
+            if (vDo_Tate == 0.0) { 
+                vPG_OutputSize_tated   = params.OutputSize.xy;
+                vPG_OutputCoord_tated  = vOutputCoord.xy + vec2(0.00001);
+                vPG_OriginalSize_tated_mul_pi = params.OriginalSize.xy * pi;
+            } else {
                 vPG_OutputSize_tated   = params.OutputSize.yx;
                 vPG_OutputCoord_tated  = vOutputCoord.yx;
-                vPG_OriginalSize_tated_mul_pi = params.OriginalSize.yx;
+                vPG_OriginalSize_tated_mul_pi = params.OriginalSize.yx * pi;
             }
 
-            vPG_OriginalSize_tated_mul_pi *= pi;
 
-            // screen coords needs flooring, but unfortunately floor() does not work well in vertex shader, so calc as much as possible without floor()
-                vPG_period_multiplier_x = 1/PIXELGRID_MUL_X;
-                vPG_freq_base_screen = pi * vec2(1/PG_H_COUNT, 0.5);
+        // screen coords needs flooring, but unfortunately floor() does not work well in vertex shader, so calc as much as possible without floor()
+            vPG_period_multiplier_x = 1/PIXELGRID_MUL_X;
+            vPG_freq_base_screen = pi * vec2(1/PG_H_COUNT, 0.5);
 
-            //the following unfloored coords are needed by sin/cos later to understand if we are on an even or odd mask
-                vPG_freq_base_screen_unfloored = pi * vec2(1/PG_H_COUNT, 0.5) * (vPG_OutputCoord_tated * vPG_OutputSize_tated);
+        //the following unfloored coords are needed by sin/cos later to understand if we are on an even or odd mask
+            vPG_freq_base_screen_unfloored = pi * vec2(1/PG_H_COUNT, 0.5) * (vPG_OutputCoord_tated * vPG_OutputSize_tated);
 
     //pixelgrid: doublescan?
                 if (need_doublescan() )
