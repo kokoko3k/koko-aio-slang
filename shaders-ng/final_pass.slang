@@ -196,11 +196,6 @@ void main() {
 
     vBg_img_coords =  get_bg_image_coords(vOutputCoord, bIsRotated);
 
-    vec2 vFragCoord = vec2( floor(vOutputCoord.x * params.OutputSize.x),
-                            floor(vOutputCoord.y * params.OutputSize.y));
-
-
-
     vBEZEL_INNER_ZOOM_adapted = get_BEZEL_INNER_ZOOM() * DO_BEZEL;
 
 
