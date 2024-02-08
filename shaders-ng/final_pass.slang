@@ -942,7 +942,7 @@ float get_clamped_white_reference(vec3 pixel_in){
     return white_reference;
 }
 
-vec3 pixel_backdrop_image() {
+vec3 pixel_backdrop_image(float isrotated) {
     vec2 backdrop_offset=vec2(BACKDROP_OFFX,BACKDROP_OFFY);
 
     vec2 backdrop_tex_size = textureSize(backdrop, 0);
@@ -952,7 +952,7 @@ vec3 pixel_backdrop_image() {
                             vOutputCoord+backdrop_offset,
                             global.FinalViewportSize,
                             backdrop_tex_size.x/backdrop_tex_size.y,
-                            bool(vIsRotated));
+                            bool(isrotated));
 
     backdrop_coords=zoom(backdrop_coords, BACKDROP_ZOOM);
     return textureLod(backdrop, backdrop_coords, backdrop_lod).rgb;
@@ -1523,7 +1523,7 @@ void main() {
 
         //Backdrop
             if (DO_BACKDROP == 1.0)
-                pixel_out += pixel_backdrop_image();
+                pixel_out += pixel_backdrop_image(vIsRotated);
 
 
         //Foreground image
