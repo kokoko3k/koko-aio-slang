@@ -184,7 +184,7 @@ void main() {
         else
             vTexCoord = integer_scale(TexCoord, vIn_aspect, bIsRotated, vDo_Tate, GAME_GEOM_INT_SCALE-1.0 ) + vec2( GAME_GEOM_OFF_FIX /10000);
 
-    vTexCoord.y = vTexCoord.y + 0.00001;
+    vTexCoord.y += 0.00001;
 
     //if (DO_GLOBAL_SHZO >0.5)
     //    vTexCoord = zoom(vTexCoord + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM );
@@ -644,8 +644,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
     //in_coords = in_coords - global.flick_and_noise_passSize.zw*0.5; //<-- needed if for whatever reason you want to draw scanlines and vgaps in first_pass
 
     //Get preset masks on ".rgb" and mask size on ".a" , mask and period for every phosphor done in vertex shader.
-        float PG_h_count = vPG_offsets_and_size.a;
-        vec3  PG_offsets = vPG_offsets_and_size.rgb;
+        vec3 PG_offsets = vPG_offsets_and_size.rgb;
 
         vec2 freq_base_core = in_coords * vPG_OriginalSize_tated_mul_pi ;
 
