@@ -11,7 +11,8 @@ layout(push_constant) uniform Push {
 	vec4 OutputSize;
 	vec4 avglum_passFeedbackSize;
 	uint FrameCount;
-
+	uint Rotation;
+	
 	float HALO_SHARPNESS ;
 	float HALO_NO_PREGAIN;
 	float HALO_POWER ;

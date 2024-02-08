@@ -1145,8 +1145,12 @@ vec2 tilt2D(vec2 co, float is_rotated, vec2 tilt) {
 
 }
 	
-vec2 tilt(vec2 co, float is_rotated, float tilt) {
+/*float is_rotated_fake() {
+	return params.Rotation & 1;
+}*/
 	
+vec2 tilt(vec2 co, float is_rotated, float tilt) {
+
 	vec2 r_tilt = vec2( mix_step(tilt, 0.0, is_rotated),
 	                    mix_step(0.0, -tilt, is_rotated)
 					);

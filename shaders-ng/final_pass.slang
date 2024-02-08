@@ -70,7 +70,7 @@ layout(location = 25) out float vPG_y_shift;
 #define PI_15 4.71238898038469 //pi*1.5
 
 
-vec2 get_bg_image_coords(vec2 in_vOutputCoord) {
+vec2 get_bg_image_coords(vec2 in_vOutputCoord, bool isrotated) {
     vec2 bg_img_coords = in_vOutputCoord;
 
     //   0 = auto
@@ -79,7 +79,7 @@ vec2 get_bg_image_coords(vec2 in_vOutputCoord) {
     // <-1 = manual rotation for rotated games
 
     //Auto rotation, no user change allowed:
-    if (BG_IMAGE_ROTATION == 0.0 && bool(vIsRotated) ) {
+    if (BG_IMAGE_ROTATION == 0.0 && isrotated ) {
         //handle automatic rotation of bg image for rotated games
         bg_img_coords.xy = bg_img_coords.yx;
         bg_img_coords.y = 1 - bg_img_coords.y;
@@ -200,7 +200,7 @@ void main() {
 
     vOutputCoord = TexCoord ;
 
-    vBg_img_coords =  get_bg_image_coords(vOutputCoord);
+    vBg_img_coords =  get_bg_image_coords(vOutputCoord, bIsRotated);
 
     vec2 vFragCoord = vec2( floor(vOutputCoord.x * params.OutputSize.x),
                             floor(vOutputCoord.y * params.OutputSize.y));
