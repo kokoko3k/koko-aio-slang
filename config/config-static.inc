@@ -48,8 +48,8 @@
 
 	//This is the blank area (Including any potential shadows) surrounding the bezel frame.
 	//BEZEL_FRAME_SURROUND_MARGIN = margin in px / bezel_texture_size in px.
-	//It is used to skip drawing bg/fg or ambient light over the tube, set it to a value that allow for them to be 
-	//set it to the minimum value which allow you to see ambient lights and background image around the frame.
+	//It is used to skip drawing bg/fg or ambient light over the tube.
+	//set it to the minimum value which allows you to see ambient lights and background image around the frame.
 #define BEZEL_FRAME_SURROUND_MARGIN 0.06
 
 	//to speedup things, bezel rende logic can be completely skipped in the inner tube, if we
