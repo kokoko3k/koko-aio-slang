@@ -46,19 +46,11 @@
 	//set it to minimum value that allows you to see reflection entirely
 #define BEZEL_REFL_SKIP_SIZE 0.08
 
-	//This is the size (in 0..1 range) of the bezel texture that does
-	//not include the center tube, including reflection area, and the shadow.
-	//It is actually used to skip drawing game content under the bezel or
-	//over its shadow.
-	//Set it to the maximum size as long as you see the full game content
-	//in the bezel.
-#define BEZEL_BORDER_SIZE vec2(0.07, 0.07)
-
-	//This is the blank area or shadow size (one side, in percent) at the sides of the bezel as defined by the bezel texture
-	//BEZEL_SHADOW_SIZE = max shadow or blank side size / bezel_texture_size.
+	//This is the blank area (Including any potential shadows) surrounding the bezel frame.
+	//BEZEL_FRAME_SURROUND_MARGIN = margin in px / bezel_texture_size in px.
 	//It is used to skip drawing bg/fg or ambient light over the tube, set it to a value that allow for them to be 
-	//shown over the bezel blank/shadowed sides but not on the tube (ie: value too big)
-#define BEZEL_SHADOW_SIZE 0.06
+	//set it to the minimum value which allow you to see ambient lights and background image around the frame.
+#define BEZEL_FRAME_SURROUND_MARGIN 0.06
 
 	//to speedup things, bezel rende logic can be completely skipped in the inner tube, if we
 	//already know it is completely transparent.

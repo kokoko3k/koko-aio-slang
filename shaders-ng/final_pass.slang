@@ -1455,10 +1455,10 @@ void main() {
             //Update alpha mask.
             //We can't use the bezel alpha channel to update the alpha mask since it is transparent ù
             //on the tube and we don't want to paint anything there, so use a dumb rect and add it to canvas_busy:
-                float rect_bezel = float(is_first_inside_rect(co_bezel, vec4(BEZEL_SHADOW_SIZE, BEZEL_SHADOW_SIZE, 1.0 - BEZEL_SHADOW_SIZE, 1.0 - BEZEL_SHADOW_SIZE)));
+                float rect_bezel = float(is_first_inside_rect(co_bezel, vec4(BEZEL_FRAME_SURROUND_MARGIN, BEZEL_FRAME_SURROUND_MARGIN, 1.0 - BEZEL_FRAME_SURROUND_MARGIN, 1.0 - BEZEL_FRAME_SURROUND_MARGIN)));
                 canvas_busy = max(pixel_bezel.a, rect_bezel);
 
-                //FragColor = vec4(canvas_busy); return; // <- uncomment to debug BEZEL_SHADOW_SIZE
+                //FragColor = vec4(canvas_busy); return; // <- uncomment to debug BEZEL_FRAME_SURROUND_MARGIN
 
                 //Intersect rect_bezel and bezel alpha to get the inner tube alpha
                 canvas_bezel_screen = (1 - pixel_bezel.a) * rect_bezel;
@@ -1589,8 +1589,6 @@ void main() {
 
 
     //pixel_out = pixel_out -diff;
-
-
 
     FragColor = vec4(pixel_out, 1.0);
 
