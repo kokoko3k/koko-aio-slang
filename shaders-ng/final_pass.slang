@@ -960,8 +960,12 @@ vec4 textureLod_wrap(sampler2D tex, vec2 co, float lod, float wrap_mode) {
 
         if (wrap_mode == 1.0) {
             //Clamp to border, black.
-            bool bOutside = (co.x < 0.0 || co.x > 1.0 || co.y < 0.0 || co.y > 1.0 ) ;
-            if (bOutside) return vec4(0.0,0.0,0.0,1.0);
+            //bool bOutside = (co.x < 0.0 || co.x > 1.0 || co.y < 0.0 || co.y > 1.0 ) ;
+            //if (bOutside) return vec4(0.0,0.0,0.0,1.0);
+            
+            if (is_first_outside_rect(co, vec4(0.0,0.0,1.0,1.0))) //ASM PROOF, FASTER.
+                return vec4(0.0,0.0,0.0,1.0);
+
         } else if (wrap_mode == 2.0) {
             //Clamp to edge:
             co = clamp(co, 0.00, 1.0);
