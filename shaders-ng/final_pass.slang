@@ -513,7 +513,8 @@ vec3 morph_shape_full_vec3(vec3 shape, vec3 l, float steep, float gamma ) {
     vec3 l_pow = pow(l,vec3(gamma));
     vec3 l2 = min(l_pow * 16, 1+steep);
     vec3 s1 = pow(shape, 1/sqrt(l2));
-    vec3 s2 = (1-s1) * l_pow;
+    //vec3 s2 = (1-s1) * l_pow;
+    vec3 s2 = l_pow - s1*l_pow;
     return (s2/(1+steep)) + s1;
 }
 
@@ -674,8 +675,8 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
     //works by staggering odd rows by 1.5X triad
     PG_offsets = vPG_offsets_and_size.rgb + //base offsets staggered (+)
                 float( 
-                PIXELGRID_DO_SHADOWMASK *                                // user wants shadowmask
-                sin(freq_base_screen.y * 2.0 / PIXELGRID_SHADOWMASK_H ) > 0.0   // sin > 0.0 means the row is even
+                       PIXELGRID_DO_SHADOWMASK *                                        // user wants shadowmask
+                       sin(freq_base_screen.y * 2.0 / PIXELGRID_SHADOWMASK_H ) > 0.0   // sin > 0.0 means the row is even
                 ) * PIXELGRID_SHADOWMASK_SHIFT ;                                                // stagger by 1.5
 
         
@@ -731,7 +732,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 dedot_mix_inverted = vec3((1-rgb_h_sin.x) * PIXELGRID_H_DEDOT) ;
                 //dedot_mix_inverted = dedot_mix_inverted * (max(max(pixel_in.r, pixel_in.g), pixel_in.b)/max_inLum);
                 //dedot_mix_inverted = dedot_mix_inverted * dot(pixel_in, vec3(0.33333) )/max_inLum;
-                dedot_mix_inverted = dedot_mix_inverted * (pixel_in/max_inLum);
+                dedot_mix_inverted = dedot_mix_inverted *(pixel_in/max_inLum);
                 dedot_mix_inverted = 1-dedot_mix_inverted;
 
             // Compute each phosphor height according to input luminance,
@@ -1481,8 +1482,8 @@ void main() {
             if (DO_SPOT == 1.0) {
                     float dist = length( vec2(  (co_content.x-0.5) * vIn_aspect, co_content.y-0.5) +
                                          vec2(   S_POSITION_X      * vIn_aspect, S_POSITION_Y) );
-                    //spot = smoothstep_fast(S_SIZE,0.0,dist)*S_POWER;
-                    //spot = smoothstep_cos(S_SIZE,0.0,dist)*S_POWER;
+                    //pixel_out += smoothstep_fast(S_SIZE,0.0,dist) * (S_POWER * canvas_bezel_screen); //ASM PROOF FASTER
+                    //pixel_out += smoothstep_cos(S_SIZE,0.0,dist) * (S_POWER * canvas_bezel_screen); //ASM PROOF MORE INSTRUCTIONS, LESS CYCLES
                     pixel_out += smoothstep(S_SIZE,0.0,dist) * (S_POWER * canvas_bezel_screen);
                     //pixel_out = mix(pixel_out, vec3(1.0), smoothstep(S_SIZE,0.0,dist) * S_POWER * canvas_bezel_screen); //<-- this is a bit slower, but more realistic.
             }

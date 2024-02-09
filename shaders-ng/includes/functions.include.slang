@@ -413,6 +413,7 @@ vec2 zoomout_coords(vec2 in_coords, float zoom_out, float aspect) {
    vec2 offset = vec2( (zoom.x-1.0) / 2.0,
                        (zoom.y-1.0) / 2.0 
                      );
+   
    return (in_coords * zoom) - offset;
 }
 
