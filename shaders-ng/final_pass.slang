@@ -510,19 +510,23 @@ float morph_shape_full(float shape, float power, float steep ) {
 }
 
 vec3 morph_shape_full_vec3(vec3 shape, vec3 l, float steep, float gamma ) {
+    float steep_plus_1 = 1+steep;
     vec3 l_pow = pow(l,vec3(gamma));
     vec3 l2 = min(l_pow * 16, 1+steep);
-    vec3 s1 = pow(shape, 1/sqrt(l2));
+    //vec3 s1 = pow(shape, 1/sqrt(l2));
+    vec3 s1 = pow(shape, inversesqrt(l2));
     //vec3 s2 = (1-s1) * l_pow;
-    vec3 s2 = l_pow - s1*l_pow;
+    vec3 s2 = l_pow - s1*l_pow; //ASM PROOF, faster.
     return (s2/(1+steep)) + s1;
 }
 
 vec3 morph_shape_full_no_steepness_vec3(vec3 shape, vec3 l, float gamma ) {
     vec3 l_pow = pow(l,vec3(gamma));
     vec3 l2 = min(l_pow * 16, 1);
-    vec3 s1 = pow(shape, 1/sqrt(l2));
+    //vec3 s1 = pow(shape, 1/sqrt(l2));
+    vec3 s1 = pow(shape, inversesqrt(l2));
     vec3 s2 = (1-s1) * l_pow;
+    //vec3 s2 = l_pow - s1*l_pow; //ASM PROOF, slower (WTH).
     return s2 + s1;
 }
 
@@ -785,10 +789,9 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
     //Vertical mask .:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.
     // can be used for slotmask,aperturegrille ... or scanlines, but they would have a boxed shape.
         vec3 darklines_mask=vec3(1.0);
-        vec3 PG_spark;
+
         vec3 pixel_in_unsparkled = pixel_in;
         if (PIXELGRID_Y_MASK > 0.0) {
-
             //Compute phosphors height mask with the right reference coords.
                 float ph_mask_height;
                 if ( PIXELGRID_Y_MASK_COORDS == 1.0 )
@@ -827,7 +830,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 darklines_mask = 1-(mask_shape*V);
             //Try to get a more brillant/sparkling look by highering the darklines
             //effect (sub) and pushing the source color, useful for slotmasks.
-                PG_spark = PIXELGRID_Y_SPARK * V * (0.5/vPG_mask_height);         
+                vec3 PG_spark = (PIXELGRID_Y_SPARK * V) * (0.5/vPG_mask_height);         
                 darklines_mask = (darklines_mask-0.5) * (1+PG_spark) + 0.5 ; 
 
 
