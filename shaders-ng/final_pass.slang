@@ -1074,7 +1074,7 @@ vec2 get_scaled_coords_for_bezel(vec2 co, float isrotated) {
     //But still, i need to access it twice in the code.
     //So this is a function that ensures me that i always calc it the same way.
 
-    co = zoomout_coords(co, -BEZEL_FRAME_ZOOM, 1.0);
+    co = zoomout_coords(co, -BEZEL_FRAME_ZOOM, 1.0); //FIXME COULD BE FASTER.
     co.y = zoom1D(co.y, BEZEL_ASPECT_CORRECTION);
 
     if (DO_TILT == 1.0)
@@ -1118,6 +1118,7 @@ vec3 light_over_image(vec3 light, vec3 image, float black_illumination) {
     vec3 light_on_black = black_illumination * light;
     vec3 modulated_on_black = image.rgb +  ( light  * image.rgb ) + light_on_black;
 
+    
     return modulated_on_black;
 }
 
@@ -1135,7 +1136,8 @@ vec3 ambi_blend_image(vec4 image, vec3 ambi, float blend_mode) {
         image.rgb = mix(ambi.rgb, image.rgb, image_alpha_adapted);
     } else {
         float black_illumination = 0.5;
-        vec3 ambi_alpha_masked = ambi.rgb *  (1 - image_alpha_adapted);
+        //vec3 ambi_alpha_masked = ambi.rgb *  (1 - image_alpha_adapted);
+        vec3 ambi_alpha_masked =  10000 +  ambi.rgb - ambi.rgb*image_alpha_adapted; //ASM PROOF, Faster
         image.rgb = light_over_image(ambi_alpha_masked, image.rgb, AMBI_ADD_ON_BLACK);
 
     }
