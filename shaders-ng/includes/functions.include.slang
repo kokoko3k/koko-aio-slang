@@ -812,18 +812,17 @@ float random_fast(vec2 seed) {
         //co = co*2.0 - vec2(0.0,0.5);
         //if (co.x > 1.0) co.x -= 1;
 		
-		//Aspect
-		//float bUse_original_aspect = float(aspect < 0.01);
-		float bUse_custom_aspect = step(0.01, aspect);
-
+		//Aspect (ASM PROOF: IFTHEN is better)
 		float scale_y;
-		/*if (aspect > 0.01) 
+		if (aspect > 0.01) 
 			scale_y = aspect/in_aspect;
 				else
 			scale_y = 1.0;
-		*/
+		
 		//Unbranched previous:
-		scale_y = mix_step(1.0, aspect/in_aspect, bUse_custom_aspect );
+		//float bUse_custom_aspect = float(aspect > 0.01);
+		//float bUse_custom_aspect = step(0.01, aspect);
+		//scale_y = mix_step(1.0, aspect/in_aspect, bUse_custom_aspect );
 		
 		float offset_y = (0.5 * scale_y ) - 0.5 ;
 		co.y = co.y*scale_y - offset_y;
@@ -1151,12 +1150,14 @@ vec2 tilt2D(vec2 co, float is_rotated, vec2 tilt) {
 	
 vec2 tilt(vec2 co, float is_rotated, float tilt) {
 
+	//ASM PROOF: if then is worse.
 	vec2 r_tilt = vec2( mix_step(tilt, 0.0, is_rotated),
 	                    mix_step(0.0, -tilt, is_rotated)
 					);
 	
 	vec2 tilt_min = 1 - r_tilt;
 	vec2 tilt_max = 1 + r_tilt;
+
 	
 	// X Tilt
 		float tilt_x_range = scale_to_range(co.y, tilt_min.x, tilt_max.x);
@@ -1174,7 +1175,11 @@ vec2 tilt(vec2 co, float is_rotated, float tilt) {
 		float fov = mix( 1.0, TILT_FOV, abs( tilt ));
 		co = zoomxy(co, vec2(fov) );
 
-		co.xy += mix_step(  vec2(0.0, tilt),   -vec2(tilt, 0.0), is_rotated) * 0.5;
+	if (is_rotated > 0.5) //ASM PROOF
+		co.xy += -vec2(tilt, 0.0) * 0.5;
+	else
+		co.xy += vec2(0.0, tilt) * 0.5;
+	//	co.xy += mix_step(  vec2(0.0, tilt),   -vec2(tilt, 0.0), is_rotated) * 0.5;
 		
 	return co;
 }
@@ -1191,6 +1196,8 @@ bool is_first_inside_rect(vec2 point, vec4 rect) {
 			point.y >= rect.y && point.y < rect.w) ;
 }
 */
+
+//Following is faster (ASM proof)
 bool is_first_inside_rect(vec2 point, vec4 rect) {
 	vec2 bounded = clamp(point, rect.xy, rect.zw);
 	return point == bounded;
