@@ -1,5 +1,6 @@
 #version 450
 
+
 /* This pass:
  * Composes the previous passes
  * Does masks, spot, bezel, vignette, background image (anything else?)
@@ -1424,11 +1425,11 @@ void main() {
                 pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb ;
                 
                 if (DO_BG_IMAGE != 1.0) {
-                    float noise_power = NOISEPOWER * NOISEPOWER_AMBI_MUL;
-                    float anoise = random_fast(vTexCoord * vDynamicSeed);
-                    anoise = scale_to_range(anoise, -noise_power, noise_power);
-                    anoise *=  (1 - pixel_ambi.g);
-                    pixel_ambi += anoise;
+                        float noise_power = NOISEPOWER * NOISEPOWER_AMBI_MUL;
+                        float anoise = random_fast(vTexCoord * vDynamicSeed);
+                        anoise = scale_to_range(anoise, -noise_power, noise_power);
+                        anoise *=  (1 - pixel_ambi.g);
+                        pixel_ambi += anoise;
                 }
                 //pixel_under_content = clamp(pixel_ambi, 0.0,1.0) * (1-canvas_busy); //<-- this one is better because will antialias borders
                                                                                       //    better (via canvas-busy) when ambientlight > 0.0
@@ -1468,8 +1469,9 @@ void main() {
 
         //Vignette
             if (DO_VIGNETTE == 1.0) {
-                pixel_out += deband_static(vTexCoord, NOISEPOWER);
-                
+                float spot_vignette_noise = random_fast(vTexCoord);
+                spot_vignette_noise = scale_to_range(spot_vignette_noise, -NOISEPOWER, NOISEPOWER);
+                pixel_out += spot_vignette_noise;
                 vec2 sinco = (co_content-0.5) / V_SIZE ;
                 float vignette = cos(sinco.x) * cos(sinco.y) * V_POWER;
                 pixel_out = (pixel_out*vignette);
@@ -1481,7 +1483,7 @@ void main() {
                                          vec2(   S_POSITION_X      * vIn_aspect, S_POSITION_Y) );
                     //spot = smoothstep_fast(S_SIZE,0.0,dist)*S_POWER;
                     //spot = smoothstep_cos(S_SIZE,0.0,dist)*S_POWER;
-                    pixel_out += smoothstep(S_SIZE,0.0,dist) * S_POWER * canvas_bezel_screen;
+                    pixel_out += smoothstep(S_SIZE,0.0,dist) * (S_POWER * canvas_bezel_screen);
                     //pixel_out = mix(pixel_out, vec3(1.0), smoothstep(S_SIZE,0.0,dist) * S_POWER * canvas_bezel_screen); //<-- this is a bit slower, but more realistic.
             }
     }
