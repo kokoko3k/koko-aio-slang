@@ -47,7 +47,8 @@
 #define BEZEL_REFL_SKIP_SIZE 0.08
 
 	//This is the blank area (Including any potential shadows) surrounding the bezel frame.
-	//BEZEL_FRAME_SURROUND_MARGIN = margin in px / bezel_texture_size in px.
+	//Supposing a centered bezel:
+	//  BEZEL_FRAME_SURROUND_MARGIN = left margin in px / bezel_texture_size width in px.
 	//It is used to skip drawing bg/fg or ambient light over the tube.
 	//set it to the minimum value which allows you to see ambient lights and background image around the frame.
 #define BEZEL_FRAME_SURROUND_MARGIN 0.06
