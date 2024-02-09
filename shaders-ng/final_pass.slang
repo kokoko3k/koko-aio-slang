@@ -1054,7 +1054,8 @@ vec3 bezel_color(float lum)  {
 float fuzzyrect(vec2 uv, vec2 size, float radius, float blur) {
     vec2 hSize = size / 2.0 - radius;
     float d = length(max(abs(uv - vec2(0.5)),hSize)-hSize);
-    return smoothstep(-radius-blur, -radius+blur, -d);
+    //return smoothstep(-radius-blur, -radius+blur, -d);
+    return smoothstep_fast(-radius-blur, -radius+blur, -d);
 }
 
 
