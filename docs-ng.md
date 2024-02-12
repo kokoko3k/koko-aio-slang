@@ -675,24 +675,3 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
         into account.
         Power comsumption benefits will be lower.
     
-**Alternate line blanking:**<br>
-    CRT monitors \*real\* refresh was amazing, today is just "meh" in most cases.<br>
-    This emulates the low pixel persistance of CRT monitors <br>
-    and reduces the motion blur, typical of LCD displays, by blanking even/odd<br>
-    screen lines on even/odd frames, by sacrificing image brightness, ofc.<br>
-    
-    This feature is static, to use it 
-    you have to manually enable it by removing the leading: "//"
-    from "//#define ALLOW_ALT_BLANK" in config-static.inc
-    
-    Frame insertion strength:
-        How much the line will be blanked.
-    Dark lines period:
-        You can blank single line or a group of them at once.
-        See what performs better on your display.
-
-
-
-
-
-

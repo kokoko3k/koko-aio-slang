@@ -1290,8 +1290,8 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
             float roughness = (1 - min(lut_specular * 10, 1.0)) * //Skip drawing roughness over specular, it looks bad
                               (random_fast(vTexCoord) * ROUGHNESS_ADAPT) - ROUGHNESS_ADAPT*0.5;
                 
-        //Reflections:
-            reflection_modifier = bezel_in.b; //bezel_in.b expresses how much the area is reflective
+            //Reflections:
+                reflection_modifier = bezel_in.b; //bezel_in.b expresses how much the area is reflective
 
             //Sample the reflection pass with small offset to simulate the roughness
                 pixel_mirrored = texture(reflected_blurred_pass, coords_for_mirror + roughness);
@@ -1315,14 +1315,14 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
             float ambi_colorize_shade = create_ambi_colorize_shade(coords_for_bezel);
 
 
-            vec3 ambi_over_bezel =  ( (AMBI_OVER_BEZEL * pixel_ambilight) *
-                                    (bezel_in.a * ambi_colorize_shade) *
-                                    (1-reflection_modifier) );
+            vec3 ambi_over_bezel = (AMBI_OVER_BEZEL * pixel_ambilight) *
+                                   (bezel_in.a * ambi_colorize_shade) *
+                                   (1-reflection_modifier) ;
 
         bezel_out.rgb = fn_pixel_nightify(bezel_out.rgb, nightify_str, ambi_over_bezel )   ;
 
 
-    //Apply reflections
+    //Add reflections after nightification
             bezel_out += (pixel_mirrored.rgb * reflection_modifier);
 
         //Apply ambient light over the bezel
