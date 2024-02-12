@@ -714,7 +714,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 float interlacing_adapt_period = vScanlinePeriod;
 
             //We can offset trias to emulate fake core level slotmask by applying the optional offset to emulate the slotmask on even cells
-                float triad_stagger_offset =  (is_even * pi) * (PIXELGRID_OFFSET_CORE);
+                float triad_stagger_offset =  is_even * PIXELGRID_OFFSET_CORE * pi;
             //get 3 sines with applied the optional staggered offset for slotmask, and single phosphors staggering for y deconvergence.
                 vec3 decon_stagger = vec3( PIXELGRID_DECON_R_H, PIXELGRID_DECON_G_H, PIXELGRID_DECON_B_H);
 
@@ -733,7 +733,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 rgb_h_sin = (rgb_h_sin * rgb_h_sin);
 
             //Compute dedot mix here for use in h mask and vmask2 later
-                dedot_mix = vec3(  PIXELGRID_H_DEDOT - PIXELGRID_H_DEDOT* rgb_h_sin.x); //ASM PROOF FASTER
+                dedot_mix = vec3(  PIXELGRID_H_DEDOT - PIXELGRID_H_DEDOT * rgb_h_sin.x); //ASM PROOF FASTER
                 dedot_mix = dedot_mix *(pixel_in/max_inLum);
                 
             // Compute each phosphor height according to input luminance,
@@ -1103,8 +1103,8 @@ vec3 light_over_image(vec3 light, vec3 image, float black_illumination) {
     //It will add less light on dark colors (
 
     //mitigate clipping by lowering light on bright images:
-    light = light * (1 - (max(image.r,image.g),image.b)       )     ;
-
+      //light = light * (1 - (max(image.r,image.g),image.b) )   ;
+      light =   light - light*(max(image.r,image.g),image.b); //ASM PROOF FASTER
 
     vec3 light_on_black = black_illumination * light;
     vec3 modulated_on_black = image.rgb +  ( light  * image.rgb ) + light_on_black;
