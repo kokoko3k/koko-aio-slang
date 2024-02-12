@@ -1307,7 +1307,7 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
 
     //Yes, we already passed ambilight as parameter, but if geometry content is overridden
     //then ambientlight may have not been sampled yet due to some skip logic made in the main()
-        if (DO_AMBILIGHT == 1.0)
+        if (DO_AMBILIGHT == 1.0) 
             pixel_ambilight = texture(ambi_temporal_pass, vOutputCoord).rgb;
 
     //Apply nightification, the strength is modulated by ambient light.
@@ -1457,7 +1457,7 @@ void main() {
         vec4 pixel_bezel;
         //SKIP LOGIC is inside fn_pixel_bezel
         if (DO_BEZEL == 1.0) {
-            pixel_bezel = fn_pixel_bezel(co_bezel, co_mirror, BG_IMAGE_NIGHTIFY, pixel_ambi);
+            pixel_bezel = fn_pixel_bezel(co_bezel, co_mirror, BG_IMAGE_NIGHTIFY * DO_BG_IMAGE, pixel_ambi);
             //If we used a smooth_border, canvas_busy is it, but since the content is in the bezel,
             //we can safely use it to smooth/darken the game border
             pixel_out *= canvas_busy;
