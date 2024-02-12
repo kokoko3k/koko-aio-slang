@@ -1133,13 +1133,6 @@ vec3 ambi_blend_image(vec4 image, vec3 ambi, float blend_mode) {
 
     }
     return image.rgb;
-
-    /*image.rgb = (AMBI_BG_IMAGE_BLEND_MODE == 0.0) ?
-        mix(ambi.rgb, image.rgb, image_alpha_adapted)
-            :
-        image.rgb + (ambi.rgb * (1 - image_alpha_adapted));
-
-    return image.rgb;*/
 }
 
 float gaussian_coefficient(float x, float sigma) {
@@ -1149,15 +1142,11 @@ float gaussian_coefficient(float x, float sigma) {
     return coefficient * exp(exponent);
 }
 
-
-
-
 vec3 fn_pixel_content(vec2 coords) {
 
     vec3 pixel_out;
     vec3 pixel_glowed;
     float dot_mat_or_pixelgrid = 1.0; //init dot grid or scanline mask to 1.0
-
 
 
     //#define USE_QUILEZ
@@ -1198,6 +1187,7 @@ vec3 fn_pixel_content(vec2 coords) {
             if (HALO_PRE_SCANLINE_GAP == 1.0 &&  vDo_pixelgrid_h == 1.0) {
                 //FIXME dot_mat lasciato indietro
                 halo_coords.y +=  (DO_PIXELGRID_H  * global.in_glow_passSize.w) * ( 0.5 * (0.75-HALO_VS_SCAN) );
+                //halo_coords.y +=  (DO_PIXELGRID_H  * global.in_glow_passSize.w) * ( 0.375-0.5*HALO_VS_SCAN ); //ASM PROOF SLOWER
                 vec3 pixel_haloed = texture(halo_pass, halo_coords).rgb;
 
                 //pixel_haloed = blur_px(halo_pre_gamma_pass, halo_coords, vec2(SERVICE1*0.1)) ;
@@ -1254,7 +1244,8 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
             vec2 bezel_lut_size = textureSize(monitor_body_curved, 0);
             float bezel_frame_lod = log2(bezel_lut_size.y * (BEZEL_FRAME_ZOOM+1.0) * global.FinalViewportSize.w);
         #else
-            float bezel_frame_lod = log2( BEZEL_RES.y * (BEZEL_FRAME_ZOOM+1.0) * global.FinalViewportSize.w);
+            //float bezel_frame_lod = log2( (BEZEL_RES.y + BEZEL_RES.y * BEZEL_FRAME_ZOOM) * global.FinalViewportSize.w); //ASM PROOF: UNDECIDED
+            float bezel_frame_lod = log2( BEZEL_RES.y * (BEZEL_FRAME_ZOOM+1.0) * global.FinalViewportSize.w); 
         #endif
 
         if (BEZEL_USE_STRAIGHT < 0.5)
@@ -1292,8 +1283,8 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
                 pixel_mirrored.rgb *= fcorners_shade;
 
             //Push it over the specular areas and apply the reflection modifier
-                pixel_mirrored.rgb = pixel_mirrored.rgb * (1 + lut_specular);
-
+                //pixel_mirrored.rgb = pixel_mirrored.rgb * (1 + lut_specular);
+                pixel_mirrored.rgb = pixel_mirrored.rgb + pixel_mirrored.rgb * lut_specular; //ASM PROOF: FASTER
         }
 
     //Yes, we already passed ambilight as parameter, but if geometry content is overridden
@@ -1435,7 +1426,8 @@ void main() {
                 }
                 //pixel_under_content = clamp(pixel_ambi, 0.0,1.0) * (1-canvas_busy); //<-- this one is better because will antialias borders
                                                                                       //    better (via canvas-busy) when ambientlight > 0.0
-                pixel_under_content = pixel_ambi * (1-canvas_busy);
+                //pixel_under_content = pixel_ambi * (1-canvas_busy);
+                pixel_under_content = pixel_ambi - canvas_busy * pixel_ambi; //ASM PROOF: FASTER
             }
         }
 
