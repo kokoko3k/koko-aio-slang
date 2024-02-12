@@ -386,19 +386,16 @@ bool vec2_similar(vec2 a, vec2 b, float threshold) {
 }
 
 
-vec2 zoom(vec2 in_coords, float zoom_factor) {
-   float off = 1.0/(zoom_factor*2.0) - 0.5;
-   return (in_coords/zoom_factor)-off;
+vec2 zoom(vec2 co, float zoom_factor) {
+	return  0.5 + (co - 0.5) / zoom_factor;
 }
 
-float zoom1D(float in_coord, float zoom_factor) {
-   float off = 1.0/(zoom_factor*2.0) - 0.5;
-   return (in_coord/zoom_factor)-off;
+float zoom1D(float co, float zoom_factor) {
+	return  0.5 + (co - 0.5) / zoom_factor;
 }
 
-vec2 zoomxy(vec2 in_coords, vec2 zoom_factor) {
-   vec2 off = 1.0/(zoom_factor*2.0) - 0.5;
-   return (in_coords/zoom_factor)-off;
+vec2 zoomxy(vec2 co, vec2 zoom_factor) {
+	return  0.5 + (co - 0.5) / zoom_factor;
 }
 
 vec2 zoomout_coords_aspect(vec2 in_coords, float zoom_out, float aspect) {

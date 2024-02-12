@@ -1075,7 +1075,7 @@ vec2 get_scaled_coords_for_bezel(vec2 co, float isrotated) {
     //So this is a function that ensures me that i always calc it the same way.
 
     co = zoomout_coords(co, -BEZEL_FRAME_ZOOM); //FIXME COULD BE FASTER.
-    co.y = zoom1D(co.y, BEZEL_ASPECT_CORRECTION);
+    co.y = zoom1D(co.y, BEZEL_ASPECT_CORRECTION );
 
     if (DO_TILT == 1.0)
         return tilt(co, isrotated, TILT_X * TILT_BEZEL_K);
