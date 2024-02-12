@@ -1457,6 +1457,7 @@ void main() {
 
                 //Intersect rect_bezel and bezel alpha to get the inner tube alpha
                 canvas_bezel_screen = (1 - pixel_bezel.a) * rect_bezel;
+                //canvas_bezel_screen = rect_bezel - rect_bezel* pixel_bezel.a; //ASM PROOF: SLOWER
         }
 
     if (canvas_bezel_screen > 0.5) {
@@ -1510,9 +1511,9 @@ void main() {
             if (DO_BG_IMAGE + BG_IMAGE_OVER == 2.0) {
                 vec4 pixel_fg_image = fn_pixel_fgbg_image(bg_over);
                 // if geometry content is overridden, ambientlight may have not been sample yet due to some skip logic
-                if (DO_AMBILIGHT == 1.0 && (pixel_fg_image.a+AMBI_BG_IMAGE_FORCE) > 0.0  && canvas_busy < 0.01)
-                    pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb * (1- canvas_busy );
-
+                if (DO_AMBILIGHT == 1.0 && (pixel_fg_image.a+AMBI_BG_IMAGE_FORCE) > 0.0  && canvas_busy < 0.01) {
+                    pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb * (1- canvas_busy ); //ALREADY TRIED COMMON fma() optimization, failed.
+                }
                 vec3 anti_nightify_ambi = (pixel_ambi * AMBI_BG_IMAGE_BLEND_MODE) *
                                            max(AMBI_BG_IMAGE_FORCE, 1-pixel_fg_image.a) ;
 
@@ -1529,7 +1530,7 @@ void main() {
                 //   that have a low alpha channel, that part would be black.
                 if (DO_AMBILIGHT + AMBI_BG_IMAGE_BLEND_MODE == 2.0) {
                     float ambi_mask = create_ambi_colorize_shade(co_bezel);
-                    float alpha_selective = clamp(  pixel_fg_image.a + ( 1- canvas_busy) , 0.0, 1.0);
+                    float alpha_selective = clamp(  pixel_fg_image.a + (1- canvas_busy) , 0.0, 1.0); 
                     pixel_out = mix(pixel_out, pixel_fg_image.rgb, alpha_selective );
                     float fg_image_alpha_adapted = max(pixel_fg_image.a - AMBI_BG_IMAGE_FORCE, 0.0);
                     vec3 light = pixel_ambi.rgb * (ambi_mask) * (1- fg_image_alpha_adapted);
