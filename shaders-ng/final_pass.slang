@@ -704,14 +704,8 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
 
     //Scanlines and fake slotmask =========================================================================
         vec3 rgb_h = vec3(1.0);
-        #define USE_NEW
-        
-        
-        #ifdef USE_NEW
-        vec3 dedot_mix_inverted = vec3(0.0);
-        #else
-        vec3 dedot_mix_inverted = vec3(1.0);
-        #endif
+        vec3 dedot_mix = vec3(0.0);
+
         //Pixelgrid: do horizontal if enabled, but skip it if user doesn't want it on interlaced content.
         //if (DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0)) { //103.1
         if (vDo_pixelgrid_h > 0.5) {
@@ -739,16 +733,9 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 rgb_h_sin = (rgb_h_sin * rgb_h_sin);
 
             //Compute dedot mix here for use in h mask and vmask2 later
-                //dedot_mix_inverted = vec3((1-rgb_h_sin.x) * PIXELGRID_H_DEDOT) ;
-                dedot_mix_inverted = vec3(  PIXELGRID_H_DEDOT - PIXELGRID_H_DEDOT* rgb_h_sin.x); //ASM PROOF FASTER
+                dedot_mix = vec3(  PIXELGRID_H_DEDOT - PIXELGRID_H_DEDOT* rgb_h_sin.x); //ASM PROOF FASTER
+                dedot_mix = dedot_mix *(pixel_in/max_inLum);
                 
-                //dedot_mix_inverted = dedot_mix_inverted * (max(max(pixel_in.r, pixel_in.g), pixel_in.b)/max_inLum);
-                //dedot_mix_inverted = dedot_mix_inverted * dot(pixel_in, vec3(0.33333) )/max_inLum;
-                dedot_mix_inverted = dedot_mix_inverted *(pixel_in/max_inLum);
-                
-                #ifndef USE_NEW
-                dedot_mix_inverted = 1-dedot_mix_inverted;
-                #endif
             // Compute each phosphor height according to input luminance,
             // Moved outside the branch to help parallelism a bit
                 //float extragain_h = max(PIXELGRID_MAX_H, 1.0); //Handle
@@ -784,12 +771,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //This work only when there are dots and have the countereffect when there are not.
             //This happen because flattening the rgb mask will make unflattened rgb triads
             //more evident, so this has to be used only when needed.
-                //rgb_w = mix(rgb_h, rgb_w, dedot_mix_inverted);
-                #ifndef USE_NEW
-                    rgb_w = mix(phosphor_width, rgb_w, dedot_mix_inverted);
-                #else
-                    rgb_w = mix(rgb_w, phosphor_width, dedot_mix_inverted);
-                #endif
+                rgb_w = mix(rgb_w, phosphor_width, dedot_mix);
 
             //lower strength via user parameter?
                 rgb_w = mix(vec3(1.0), rgb_w, DO_PIXELGRID_W);
@@ -846,11 +828,6 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //effect (sub) and pushing the source color, useful for slotmasks.
                 vec3 PG_spark = (PIXELGRID_Y_SPARK * V) * (0.5/vPG_mask_height);         
                 darklines_mask = (darklines_mask-0.5) * (1+PG_spark) + 0.5 ; 
-
-
-            //Dedot darklines mask:
-              //  darklines_mask = mix(vec3(1.0), darklines_mask, dedot_mix_inverted );
-              //  darklines_mask = mix(darklines_mask, vec3(1.0), (1- dedot_mix_inverted)*0.25 ); //dedot less?
         }
 
 
