@@ -154,8 +154,8 @@ vec2 get_zooms_modifier(float do_tate, bool bNeed_NO_integer_scale, bool isrotat
                 (co_scaled_max * (1-DO_GLOBAL_SHZO) );
 
     if (DO_BEZEL == 1.0) {
-        co_scaled_min = zoomout_coords(co_scaled_min, -vBEZEL_INNER_ZOOM_adapted , 1.0);
-        co_scaled_max = zoomout_coords(co_scaled_max, -vBEZEL_INNER_ZOOM_adapted , 1.0);
+        co_scaled_min = zoomout_coords(co_scaled_min, -vBEZEL_INNER_ZOOM_adapted);
+        co_scaled_max = zoomout_coords(co_scaled_max, -vBEZEL_INNER_ZOOM_adapted);
     }
  	if (DO_GAME_GEOM_OVERRIDE == 1.0) {
 		co_scaled_min = content_geom_override(co_scaled_min, GAME_GEOM_ASPECT, vIn_aspect, GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
@@ -1074,7 +1074,7 @@ vec2 get_scaled_coords_for_bezel(vec2 co, float isrotated) {
     //But still, i need to access it twice in the code.
     //So this is a function that ensures me that i always calc it the same way.
 
-    co = zoomout_coords(co, -BEZEL_FRAME_ZOOM, 1.0); //FIXME COULD BE FASTER.
+    co = zoomout_coords(co, -BEZEL_FRAME_ZOOM); //FIXME COULD BE FASTER.
     co.y = zoom1D(co.y, BEZEL_ASPECT_CORRECTION);
 
     if (DO_TILT == 1.0)
@@ -1263,10 +1263,8 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
             vec2 bezel_lut_size = textureSize(monitor_body_curved, 0);
             float bezel_frame_lod = log2(bezel_lut_size.y * (BEZEL_FRAME_ZOOM+1.0) * global.FinalViewportSize.w);
         #else
-            float bezel_frame_lod = log2( BEZEL_RES.y * (BEZEL_FRAME_ZOOM + 1.0) * global.FinalViewportSize.w);
+            float bezel_frame_lod = log2( BEZEL_RES.y * (BEZEL_FRAME_ZOOM+1.0) * global.FinalViewportSize.w);
         #endif
-
-//MICROOTTIMIZATO FINO A QUA
 
         if (BEZEL_USE_STRAIGHT < 0.5)
             bezel_in = textureLod(monitor_body_curved,coords_for_bezel,bezel_frame_lod);
@@ -1356,7 +1354,7 @@ void main() {
     //Precalc Bezel coords, since it modifies content coords.
         vec2 co_bezel = vec2(0.0);
         if (DO_BEZEL == 1.0) {
-            co_content = zoomout_coords(co_content, -vBEZEL_INNER_ZOOM_adapted , 1.0);
+            co_content = zoomout_coords(co_content, -vBEZEL_INNER_ZOOM_adapted);
             co_bezel = get_scaled_coords_for_bezel(vTexCoord, vIsRotated);
         }
 

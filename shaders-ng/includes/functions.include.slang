@@ -401,7 +401,7 @@ vec2 zoomxy(vec2 in_coords, vec2 zoom_factor) {
    return (in_coords/zoom_factor)-off;
 }
 
-vec2 zoomout_coords(vec2 in_coords, float zoom_out, float aspect) {
+vec2 zoomout_coords_aspect(vec2 in_coords, float zoom_out, float aspect) {
    // to convert to standard zoom:
    // zoomout_coords(x) = zoom( 1/(x+1) );
 
@@ -417,6 +417,14 @@ vec2 zoomout_coords(vec2 in_coords, float zoom_out, float aspect) {
    return (in_coords * zoom) - offset;
 }
 
+
+vec2 zoomout_coords(vec2 in_coords, float zoom_out) {
+   // to convert to standard zoom:
+   // zoomout_coords(x) = zoom( 1/(x+1) );
+   float zoom =  1 + zoom_out;
+   float zoffset = zoom_out * 0.5;
+   return (in_coords * zoom) - zoffset;
+}
 
 
 bool need_doublescan() {
