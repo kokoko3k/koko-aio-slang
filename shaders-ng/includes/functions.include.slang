@@ -1418,3 +1418,44 @@ vec3 adaptive_strobe( vec3 c) {
        return c -  room * BRIGHT_BIAS;
     }
 }
+
+vec3 adaptive_strobe_checkerboard(vec3 pixel_out, vec2 co, vec2 outputsize) {
+
+	
+	float strength = 0.5;		//0.5 is good
+    float square_size = 3;      //checkerboard squares border size (1.0 = full screen blank)
+    float period_blank = 1.0;   //draw checkerboard every "period_blank" frames
+    float period_flip = 2.0 ;   //invert checkerboard colors every # frames, usually/try period_blank*2.
+    
+    
+    bool is_blank_time = (mod(params.FrameCount, period_blank) == 0.0);
+
+	if (is_blank_time) {
+		vec3 checkerboard = vec3(1.0);
+		if (mod( floor(co.x * outputsize.x), square_size) >= square_size/2.0)
+				checkerboard = vec3(1.0);
+					else
+				checkerboard = vec3(-1.0);
+
+		if (mod( floor(co.y * outputsize.y), square_size) >= square_size/2.0)
+			checkerboard = -checkerboard;
+		
+		if (mod(params.FrameCount, period_flip) >= period_flip/2.0) 
+			checkerboard = -checkerboard;
+
+		checkerboard *= min( pixel_out, 1-(pixel_out)  ) * strength;
+		
+		//#define SPLIT_SCREEN
+		#ifdef SPLIT_SCREEN
+		if (co.x > 0.5)
+			pixel_out.rgb = pixel_out.rgb+ checkerboard;
+		#else
+			pixel_out.rgb = pixel_out.rgb+ checkerboard;
+		#endif
+
+	}
+   
+    
+    return pixel_out;
+    
+}
