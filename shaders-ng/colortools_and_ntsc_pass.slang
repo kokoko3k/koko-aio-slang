@@ -412,7 +412,8 @@ void main() {
    vec2 co = vTexCoord;
    #ifndef D3D_WORKAROUND
       float shake = texture(avglum_passFeedback, RESSWITCH_SAMPLING_POINT).a;
-      co.y += sin(shake * 2 * pi) * RESSWITCH_GLITCH_SIZE;
+      //co.y += sin(shake * 2 * pi) * RESSWITCH_GLITCH_SIZE;
+      co.y = co.y + (sin(shake * 2 * pi) * RESSWITCH_GLITCH_SIZE);
    #endif
 
    vec3 pixel_in = texture(Source, co).rgb;
@@ -495,21 +496,7 @@ void main() {
       pixel_out = persistence(feedback, pixel_out, PPERSISTENCE_START, PPERSISTENCE_END, motion_blur_cancel);
    }
  
-
-    //TEST adaptive strobe:
-
-    /*float range = ALT_BLANK_STRENGTH;
-    float square_wave_time = float(mod(params.FrameCount,  2.0) == 1.0);
-    square_wave_time = square_wave_time*2-1;
-    vec3 square_wave_time_vec3 = vec3(square_wave_time);
-    square_wave_time_vec3 *= min( pixel_out, 1-pixel_out) * ALT_BLANK_STRENGTH;
-    if (mod(co.y * params.OriginalSize.y, ALT_BLANK_PERIOD) >= ALT_BLANK_PERIOD / 2.0) {;
-      pixel_out = pixel_out + square_wave_time_vec3;
-    } else {
-      pixel_out = pixel_out - square_wave_time_vec3;
-    }*/
-
-    
+  
    pixel_out = max(pixel_out, vec3(0.0));
    FragColor = vec4(pixel_out, artifact_mask);
    //FragColor = vec4(artifacts);
