@@ -259,9 +259,15 @@ vec3 debug() {
 }
 
 
-bool first_in_range(float a, float lo, float hi) {
-   return (a > lo) && (a < hi);
+bool first_in_range_lax(float point, float lo, float hi) {
+   // return point inside [lo...hi] (lo and hi included in range)
+   float bounded = clamp(point, lo+eps, hi-eps);
+   return point == bounded;
 }
+
+/*bool first_in_range_lax(float a, float lo, float hi) {
+   return (a >= lo) && (a <= hi);
+}*/
 
 vec3 pixel_dedither(sampler2D tex, vec2 coords, vec4 sourcesize, float tmin, float tmax, float strength1, float strength2) {
    #define DX sourcesize.z
@@ -281,7 +287,7 @@ vec3 pixel_dedither(sampler2D tex, vec2 coords, vec4 sourcesize, float tmin, flo
       vec3 pxe = texture(tex, coords + vec2(+DX*2.0,0.0)).rgb; // oxoxO
    
       float dx1= dot(abs(pxb-pxa), vec3(1.0));
-      if (first_in_range(dx1,tmin,tmax) && pxa == pxc && (pxb == pxd || pxb == pxe)) {
+      if (first_in_range_lax(dx1,tmin,tmax) && pxa == pxc && (pxb == pxd || pxb == pxe)) {
           avg_x = (pxa+pxb) /2.0;
           accum_div1 += 1.0;
        }
@@ -295,7 +301,7 @@ vec3 pixel_dedither(sampler2D tex, vec2 coords, vec4 sourcesize, float tmin, flo
       vec3 pye = texture(tex, coords + vec2(0.0, +DY*2.0)).rgb;
    
       float dy1= dot(abs(pya-pyb), vec3(1.0));
-      if (first_in_range(dy1,tmin,tmax) && pya == pyc && (pyb == pyd || pyb == pye)) {
+      if (first_in_range_lax(dy1,tmin,tmax) && pya == pyc && (pyb == pyd || pyb == pye)) {
           avg_y = (pya+pyb) /2.0;
           accum_div1 += 1.0;
        }
@@ -311,7 +317,7 @@ vec3 pixel_dedither(sampler2D tex, vec2 coords, vec4 sourcesize, float tmin, flo
       vec3 pxye = texture(tex, coords + vec2(-DX*2.0, -DY*2.0)).rgb;
 
       float dxy1= dot(abs(pxyb-pxya), vec3(1.0));
-      if (first_in_range(dxy1,tmin,tmax) && pxya == pxyc && (pxyb == pxyd || pxyb == pxye)) {
+      if (first_in_range_lax(dxy1,tmin,tmax) && pxya == pxyc && (pxyb == pxyd || pxyb == pxye)) {
          avg_xy = (pxya+pxyb) / 2.0;
          accum_div2 += 1.0;
       }
@@ -324,7 +330,7 @@ vec3 pixel_dedither(sampler2D tex, vec2 coords, vec4 sourcesize, float tmin, flo
 
       float dxy12= dot(abs(pxyb2-pxya2), vec3(1.0));
 
-      if (first_in_range(dxy12,tmin,tmax) && pxya2 == pxyc2 && (pxyb2 == pxyd2 || pxyb2 == pxye)) {
+      if (first_in_range_lax(dxy12,tmin,tmax) && pxya2 == pxyc2 && (pxyb2 == pxyd2 || pxyb2 == pxye)) {
          avg_yx = (pxya2+pxyb2) / 2.0;
          accum_div2 += 1.0;
       }
