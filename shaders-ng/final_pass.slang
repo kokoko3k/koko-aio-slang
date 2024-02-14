@@ -1195,7 +1195,7 @@ vec3 fn_pixel_content(vec2 coords) {
 
             if (HALO_PRE_SCANLINE_GAP == 1.0 &&  vDo_pixelgrid_h == 1.0) {
                 //FIXME dot_mat lasciato indietro
-                halo_coords.y +=  (DO_PIXELGRID_H  * global.in_glow_passSize.w) * ( 0.5 * (0.75-HALO_VS_SCAN) );
+                halo_coords.y += (DO_PIXELGRID_H  * global.in_glow_passSize.w) * ( 0.5 * (0.75-HALO_VS_SCAN) );
                 //halo_coords.y +=  (DO_PIXELGRID_H  * global.in_glow_passSize.w) * ( 0.375-0.5*HALO_VS_SCAN ); //ASM PROOF SLOWER
                 vec3 pixel_haloed = texture(halo_pass, halo_coords).rgb;
 
@@ -1253,7 +1253,7 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
             vec2 bezel_lut_size = textureSize(monitor_body_curved, 0);
             float bezel_frame_lod = log2(bezel_lut_size.y * (BEZEL_FRAME_ZOOM+1.0) * global.FinalViewportSize.w);
         #else
-            //float bezel_frame_lod = log2( (BEZEL_RES.y + BEZEL_RES.y * BEZEL_FRAME_ZOOM) * global.FinalViewportSize.w); //ASM PROOF: UNDECIDED
+            //float bezel_frame_lod = log2(    fma( BEZEL_RES.y,  BEZEL_FRAME_ZOOM,  BEZEL_RES.y) * global.FinalViewportSize.w); //ASM PROOF: UNDECIDED
             float bezel_frame_lod = log2( BEZEL_RES.y * (BEZEL_FRAME_ZOOM+1.0) * global.FinalViewportSize.w); 
         #endif
 
@@ -1293,7 +1293,9 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
 
             //Push it over the specular areas and apply the reflection modifier
                 //pixel_mirrored.rgb = pixel_mirrored.rgb * (1 + lut_specular);
-                pixel_mirrored.rgb = pixel_mirrored.rgb + pixel_mirrored.rgb * lut_specular; //ASM PROOF: FASTER
+                //pixel_mirrored.rgb = pixel_mirrored.rgb + pixel_mirrored.rgb * lut_specular; //ASM PROOF: FASTER
+                pixel_mirrored.rgb = fma( pixel_mirrored.rgb, vec3(lut_specular), +pixel_mirrored.rgb); //ASM PROOF: FASTER
+                
         }
 
     //Yes, we already passed ambilight as parameter, but if geometry content is overridden
