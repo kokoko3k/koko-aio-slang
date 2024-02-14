@@ -1440,7 +1440,8 @@ void main() {
                 //pixel_under_content = clamp(pixel_ambi, 0.0,1.0) * (1-canvas_busy); //<-- this one is better because will antialias borders
                                                                                       //    better (via canvas-busy) when ambientlight > 0.0
                 //pixel_under_content = pixel_ambi * (1-canvas_busy);
-                pixel_under_content = pixel_ambi - canvas_busy * pixel_ambi; //ASM PROOF: FASTER
+                //pixel_under_content = pixel_ambi - canvas_busy * pixel_ambi; //ASM PROOF: FASTER
+                pixel_under_content = fma(vec3(-canvas_busy), pixel_ambi, pixel_ambi); //ASM PROOF: FASTER
             }
         }
 
