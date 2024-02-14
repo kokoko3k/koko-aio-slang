@@ -497,9 +497,12 @@ void main() {
    }
  
   
+   //Clamp artifacts to 0..1
+   //Clamp RGB to 0..1000.0
    pixel_out = max(pixel_out, vec3(0.0));
+   artifact_mask = clamp(artifact_mask, 0.0, 1.0);
    FragColor = vec4(pixel_out, artifact_mask);
-   //FragColor = vec4(artifacts);
+
 }
 
 
