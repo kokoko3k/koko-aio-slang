@@ -261,7 +261,7 @@ vec3 pixel_push_luminance(vec3 c, float strength) {
 	float whiteness = max(max(c.r, c.g), c.b);
 	whiteness = clamp(whiteness, 0.0, 1.0);
 	//return c * (1 + ( (1-whiteness) * strength)	);
-	return fma(c,   vec3(fma(strength, -whiteness, strength)), c); //ASM PROOF: FASTER
+	return fma(c,   vec3(fma(strength, -whiteness, strength)), c); //ASM PROOF: F
 	
 	
 }
@@ -458,7 +458,7 @@ float scale_to_range(float x, float dmin, float dmax) {
 
 vec3 scale_to_range_vec3(vec3 x, float dmin, float dmax) {
     //Scales 0..1 range to a..b range
-    return ( (dmax-dmin) * x ) + dmin;
+    return ( x * (dmax-dmin)   ) + dmin; //ASM PROOF (fma slower)
 }
 
 vec3 scale_to_range_vec3(vec3 x, vec3 dmin, vec3 dmax) {
@@ -1293,8 +1293,17 @@ vec3 vibrance_set(vec3 c, float v) {
 			vec3 pixel_grayscale = vec3(dot(pixel_out.rgb, W_C_TO_GRAY));
 			vec3 pixel_in_hsv = rgb2hsv(pixel_grayscale); //FIXME needed? yes, checked.
 			float lum = pixel_in_hsv.z * pixel_in_hsv.z; //<-- looks way better!
-			vec2 bias = mix_step( vec2(0.0, COLOR_MONO_HUE_BIAS), vec2(COLOR_MONO_HUE_BIAS, 0.0), float(COLOR_MONO_HUE_BIAS > 0.0));
-			bias = abs(bias);
+
+			//vec2 bias = mix_step( vec2(0.0, abs(COLOR_MONO_HUE_BIAS)), vec2(abs(COLOR_MONO_HUE_BIAS), 0.0), float(COLOR_MONO_HUE_BIAS > 0.0));
+
+			vec2 bias;
+			if (COLOR_MONO_HUE_BIAS > 0.0) 
+				bias = vec2(abs(COLOR_MONO_HUE_BIAS),0.0);
+			else
+				bias = vec2(0.0,abs(COLOR_MONO_HUE_BIAS));
+				
+
+
 
 			lum=scale_to_range(lum, 0.0-bias.x, 1.0+bias.y);
 			pixel_in_hsv.y=1.0; //sat
