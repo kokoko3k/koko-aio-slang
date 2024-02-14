@@ -17,14 +17,14 @@
 
 
 
-//#define DEBUG
+#define DEBUG
    //#define DEBUG_COLOR_CALIB
    //#define DEBUG_TIME_FADE
    //#define DEBUG_SOLID_COLOR
-   #define DEBUG_STEP_GRADIENT
+   //#define DEBUG_STEP_GRADIENT
    //#define DEBUG_STEP_GRADIENT_V
    //#define DEBUG_BLINK
-   //#define DEBUG_BLINK_CIRCLE
+   #define DEBUG_BLINK_CIRCLE
    //#define DEBUG_WALKING_CIRCLE
    //#define DEBUG_COLORWHEEL
    
@@ -217,7 +217,7 @@ vec3 debug() {
    
    #elif defined DEBUG_BLINK_CIRCLE
       vec2 center = vTexCoord - vec2(0.5,0.5);
-      float radius = 0.1;
+      float radius = 0.2;
       pixel_debug = vec3(1 - step(radius, length(center)));
       pixel_debug *= float( ( mod(params.FrameCount, DEBUG_BLINK_TIME * 2) < DEBUG_BLINK_TIME));
       pixel_debug *= DEBUG_COLOR;
