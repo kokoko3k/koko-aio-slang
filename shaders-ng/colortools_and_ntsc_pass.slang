@@ -318,7 +318,8 @@ vec3 pixel_dedither(sampler2D tex, vec2 coords, vec4 sourcesize, float tmin, flo
 
       float dxy1= dot(abs(pxyb-pxya), vec3(1.0));
       if (first_in_range_strict(dxy1,tmin,tmax) && pxya == pxyc && (pxyb == pxyd || pxyb == pxye)) {
-         avg_xy = (pxya+pxyb) / 2.0;
+         //avg_xy = (pxya+pxyb) / 2.0;
+         avg_xy = fma(pxya, vec3(0.5), pxyb*vec3(0.5));
          accum_div2 += 1.0;
       }
 
@@ -331,7 +332,8 @@ vec3 pixel_dedither(sampler2D tex, vec2 coords, vec4 sourcesize, float tmin, flo
       float dxy12= dot(abs(pxyb2-pxya2), vec3(1.0));
 
       if (first_in_range_strict(dxy12,tmin,tmax) && pxya2 == pxyc2 && (pxyb2 == pxyd2 || pxyb2 == pxye)) {
-         avg_yx = (pxya2+pxyb2) / 2.0;
+         //avg_yx = (pxya2+pxyb2) / 2.0;
+         avg_yx = fma(pxya2, vec3(0.5), pxyb2*vec3(0.5));
          accum_div2 += 1.0;
       }
    }
@@ -342,11 +344,14 @@ vec3 pixel_dedither(sampler2D tex, vec2 coords, vec4 sourcesize, float tmin, flo
       //pixel_out = mix(p0, (avg_x + avg_y + avg_xy + avg_yx) / accum_div, strength1);
    //}
    vec3 pixel_out = p0;
-   if (accum_div1 > 0.0)
-      pixel_out = mix(pixel_out, (avg_x + avg_y)   / accum_div1, strength1);
-   if (accum_div2 > 0.0)
-      pixel_out = mix(pixel_out, (avg_xy + avg_yx) / accum_div2, strength2);
-
+   if (accum_div1 > 0.0) {
+      //pixel_out = mix(pixel_out, (avg_x + avg_y)   / accum_div1, strength1);
+      pixel_out = mix(pixel_out, fma(avg_x, vec3(1.0)/accum_div1, avg_y / accum_div1) , strength1); //ASM PROOF FASTER
+   }
+   if (accum_div2 > 0.0) {
+      //pixel_out = mix(pixel_out, (avg_xy + avg_yx) / accum_div2, strength2);
+      pixel_out = mix(pixel_out, fma(avg_xy, vec3(1.0)/accum_div2, avg_yx / accum_div2 ) , strength2); //ASM PROOF FASTER
+   }
 
    return pixel_out;
 }
