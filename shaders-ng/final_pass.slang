@@ -1432,7 +1432,9 @@ void main() {
                     float anoise1 = random_fast(vTexCoord * vDynamicSeed);
                     anoise1 = scale_to_range(anoise1, -noise_power, noise_power);
                     // anoise1 *=  (1 - pixel_ambi.g);
-                    anoise1 =  (anoise1 - anoise1 * pixel_ambi.g); //ASM PROOF FASTER
+                    //anoise1 =  (anoise1 - anoise1 * pixel_ambi.g); //ASM PROOF FASTER
+                    anoise1 =  fma(-anoise1, pixel_ambi.g, anoise1); //ASM PROOF FASTER
+                    
                     pixel_ambi += anoise1;
                 }
                 //pixel_under_content = clamp(pixel_ambi, 0.0,1.0) * (1-canvas_busy); //<-- this one is better because will antialias borders
