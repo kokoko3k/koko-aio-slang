@@ -516,7 +516,9 @@ vec3 morph_shape_full_vec3(vec3 shape, vec3 l, float steep, float gamma ) {
     //vec3 s1 = pow(shape, 1/sqrt(l2));
     vec3 s1 = pow(shape, inversesqrt(l2));
     //vec3 s2 = (1-s1) * l_pow;
-    vec3 s2 = fma(-s1, l_pow, l_pow); //ASM PROOF, faster.
+        //==  lpow - lpow * s1;
+        //== -lpow * s1 + lpow;
+    vec3 s2 = fma(-l_pow, s1,  l_pow); //ASM PROOF, faster.
 
     return (s2/(1+steep)) + s1;
 }
@@ -527,7 +529,9 @@ vec3 morph_shape_full_no_steepness_vec3(vec3 shape, vec3 l, float gamma ) {
     //vec3 s1 = pow(shape, 1/sqrt(l2));
     vec3 s1 = pow(shape, inversesqrt(l2));
     vec3 s2 = (1-s1) * l_pow;
-    //vec3 s2 = l_pow - s1*l_pow; //ASM PROOF, slower (WTH).
+        // == 1*l_pow  - s1*l_pow
+        // == -l_pow*s1 + l_pow
+    //vec3 s2 = fma(s1, -l_pow, l_pow); //ASM PROOF, slower.
     return s2 + s1;
 }
 
@@ -734,7 +738,8 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 rgb_h_sin = (rgb_h_sin * rgb_h_sin);
 
             //Compute dedot mix here for use in h mask and vmask2 later
-                dedot_mix = vec3(  PIXELGRID_H_DEDOT - PIXELGRID_H_DEDOT * rgb_h_sin.x); //ASM PROOF FASTER
+                //dedot_mix = vec3(  PIXELGRID_H_DEDOT - PIXELGRID_H_DEDOT * rgb_h_sin.x);
+                dedot_mix = vec3( fma( -PIXELGRID_H_DEDOT, rgb_h_sin.x, PIXELGRID_H_DEDOT)); //ASM PROOF: SAME
                 dedot_mix = dedot_mix *(pixel_in/max_inLum);
                 
             // Compute each phosphor height according to input luminance,
@@ -1104,13 +1109,17 @@ vec3 light_over_image(vec3 light, vec3 image, float black_illumination) {
     //It will add less light on dark colors (
 
     //mitigate clipping by lowering light on bright images:
-      //light = light * (1 - (max(image.r,image.g),image.b) )   ;
-      light =   light - light*(max(image.r,image.g),image.b); //ASM PROOF FASTER
+    //light = light * (1 - max(max(image.r,image.g),image.b) )   ; //1313/20079
+    //light =   light - light*max(max(image.r,image.g),image.b); //ASM PROOF FASTER 1310 20046
+    //light = -light * max(max(image.r,image.g),image.b) + light ; //ASM PROOF FASTER
+    light = fma(vec3(max(max(image.r,image.g),image.b)),
+            -light, 
+            light );
 
     vec3 light_on_black = black_illumination * light;
     vec3 modulated_on_black = image.rgb +  ( light  * image.rgb ) + light_on_black;
 
-    
+
     return modulated_on_black;
 }
 
