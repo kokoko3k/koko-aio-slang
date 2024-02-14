@@ -1136,11 +1136,10 @@ vec3 ambi_blend_image(vec4 image, vec3 ambi, float blend_mode) {
     if (AMBI_BG_IMAGE_BLEND_MODE == 0.0) {
         image.rgb = mix(ambi.rgb, image.rgb, image_alpha_adapted);
     } else {
-        float black_illumination = 0.5;
-        //vec3 ambi_alpha_masked = ambi.rgb *  (1 - image_alpha_adapted);
-        vec3 ambi_alpha_masked =   ambi.rgb - ambi.rgb*image_alpha_adapted; //ASM PROOF, Faster
+        //vec3 ambi_alpha_masked = ambi.rgb *  (1 -image_alpha_adapted);
+            // (ambi.rgb * -image_alpha_adapted) + (ambi * 1)
+        vec3 ambi_alpha_masked = fma(ambi.rgb, vec3(-image_alpha_adapted),  ambi.rgb) ; //ASM PROOF: FASTER
         image.rgb = light_over_image(ambi_alpha_masked, image.rgb, AMBI_ADD_ON_BLACK);
-
     }
     return image.rgb;
 }
