@@ -17,15 +17,15 @@
 
 
 
-#define DEBUG
+//#define DEBUG
    //#define DEBUG_COLOR_CALIB
    //#define DEBUG_TIME_FADE
    //#define DEBUG_SOLID_COLOR
    //#define DEBUG_STEP_GRADIENT
    //#define DEBUG_STEP_GRADIENT_V
    //#define DEBUG_BLINK
-   #define DEBUG_BLINK_CIRCLE
-   //#define DEBUG_WALKING_CIRCLE
+   //#define DEBUG_BLINK_CIRCLE
+   #define DEBUG_WALKING_CIRCLE
    //#define DEBUG_COLORWHEEL
    
    
@@ -397,12 +397,13 @@ vec3 persistence(vec3 feedback, vec3 pixel_now, float start_decay, float late_pe
    vec3 diff=(feedback - pixel_now);
 
    vec3 speed_fast = diff * start_decay;
-   vec3 speed_slow = diff / (late_persistence+eps);
+   vec3 speed_slow = diff / (late_persistence+eps); //fma() not usable pr slower. 
       
    vec3 fade_speed = mix(speed_slow, speed_fast, diff );
    
    //higher speed is needed when composing over brighter colors to avoid motion blur
    fade_speed = fade_speed + (pixel_now*motion_blur_cancel);
+   //fade_speed = fma(pixel_now, vec3(motion_blur_cancel), vec3(fade_speed)); //ASM PROOF: SLOWER
    
    //Ensure a minimum speed to reach 0.0 and clamp to 1.0 to avoid funky effects
    float min_speed = 0.05  ;
@@ -484,6 +485,7 @@ void main() {
          vec3 adaption = mix_step (pixel_out - feedback,
                                    feedback - pixel_out,
                                    DOT_M_MBLUR_MODE -1);
+            
          //adaption = mix_step(adaption, -adaption, DOT_M_MBLUR_MODE -1);
          m_blur_adapted *= clamp( adaption, 0.0, 1.0 );
          m_blur_adapted = pow(m_blur_adapted, vec3(0.25));
