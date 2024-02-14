@@ -426,7 +426,8 @@ void main() {
       //Get ntsc picture
          vec4 ntsc_decoded = ntscdec(co, pixel_in);
       //apply the minimum treshold to artifact mask
-         artifact_mask = smoothstep(NTSC_ARTF_TRSH, 1.0, ntsc_decoded.a);
+         artifact_mask = smoothstep_fast(NTSC_ARTF_TRSH , 1.0, ntsc_decoded.a);
+
          ntsc_decoded = clamp(ntsc_decoded, vec4(0.0), vec4(1.0));
 
       //Optionally completely cut-off artifacts under treshold:
