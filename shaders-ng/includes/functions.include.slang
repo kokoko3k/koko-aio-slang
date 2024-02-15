@@ -1431,7 +1431,7 @@ vec3 adaptive_strobe_checkerboard(vec3 pixel_out, vec2 co, vec2 outputsize) {
 
 	
 	float strength = 0.5;		//0.5 is good
-    float square_size = 2;      //checkerboard squares border size (1.0 = full screen blank)
+    float square_size = 3;      //checkerboard squares border size (1.0 = full screen blank)
     float period_blank = 1.0;   //draw checkerboard every "period_blank" frames
     float period_flip = 2.0 ;   //invert checkerboard colors every # frames, usually/try period_blank*2.
     
@@ -1467,3 +1467,5 @@ vec3 adaptive_strobe_checkerboard(vec3 pixel_out, vec2 co, vec2 outputsize) {
     return pixel_out;
     
 }
+
+
