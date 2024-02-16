@@ -103,12 +103,20 @@ void main() {
       }
       
 
-   float in_glow_w_adapted = abs(IN_GLOW_W);
+
             
 
    //Modulate glow power via ntsc artifact mask:
    //"add" them to the configured sharpness (-> less blur)
-         in_glow_w_adapted = in_glow_w_adapted +  DO_NTSC_ARTIFACTS * ((1-ntsc_artifacts) * NTSC_ARTF_NOBLUR);
+         //float in_glow_w_adapted = abs(IN_GLOW_W);
+         //in_glow_w_adapted = in_glow_w_adapted +  DO_NTSC_ARTIFACTS * ((1-ntsc_artifacts) * NTSC_ARTF_NOBLUR);
+         //Same as before, but faster (ASM PROOF)
+         float in_glow_w_adapted = fma(
+                                        DO_NTSC_ARTIFACTS,
+                                        fma(-NTSC_ARTF_NOBLUR, ntsc_artifacts, NTSC_ARTF_NOBLUR),
+                                        abs(IN_GLOW_W)
+                                    );
+      
 
    //don't allow lower values that look bad:
       //in_glow_w_adapted = max(in_glow_w_adapted, MIN_IN_GLOW_SHARP);

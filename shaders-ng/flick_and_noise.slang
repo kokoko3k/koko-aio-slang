@@ -103,8 +103,7 @@ void main() {
    
    if (DO_RF_NOISE > 0.0) {
       float anoise = random_fast(vTexCoord * vDynamicSeed);
-      anoise = scale_to_range(anoise, -RF_NOISE_STRENGTH, RF_NOISE_STRENGTH);
-      pixel_out.rgb += vec3(anoise);
+       pixel_out.rgb += scale_to_range(anoise, -RF_NOISE_STRENGTH, RF_NOISE_STRENGTH);
    }
    FragColor = pixel_out;
 }
