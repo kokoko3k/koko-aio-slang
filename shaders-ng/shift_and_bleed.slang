@@ -35,6 +35,13 @@ void main()
       vB_offset=offsets_from_float(SHIFT_B+210.0,RGB_SHIFT_RANGE);
    }
    
+   
+   vec2 d = -params.OutputSize.zw * 0.5;
+   vR_offset *= d;
+   vG_offset *= d;
+   vB_offset *= d;
+   
+   
    //Precalc some conditions:
    vDecon_or_SatBleed_or_JustShadow =  float(DO_SHIFT_RGB + DO_SAT_BLEED > 1.0 || DOT_M_SHADOW_STR > 0.0 );
    vDecon_or_JustShadow =  float(DO_SHIFT_RGB > 0.0 || DOT_M_SHADOW_STR > 0.0);
@@ -91,7 +98,7 @@ const mat3 mat3_YUV2RGB = mat3(
 
 
 
-vec4 deconvergence_shadow(vec2 coords, sampler2D in_texture, vec4 sourcesize2) {
+vec4 deconvergence_shadow(vec2 coords, sampler2D in_texture) {
       //Emulates deconvergence or shadowing for dot matrix screens like Gameboy.
       //Since both effects should not coexist in real life, we use a singe function for both.
       //The function stays more or less the same, but rgb offsets calculated in vertex shader
@@ -100,12 +107,12 @@ vec4 deconvergence_shadow(vec2 coords, sampler2D in_texture, vec4 sourcesize2) {
 
       vec4 pixel_cur = texture(in_texture, coords);
    
-      vec2 d = -vec2(sourcesize2.z, sourcesize2.w)*0.5;
+
       
       vec3 pixel_offset;
-      pixel_offset.r=texture(in_texture,coords + vR_offset * d).r;
-      pixel_offset.g=texture(in_texture,coords + vG_offset * d).g;
-      pixel_offset.b=texture(in_texture,coords + vB_offset * d).b;
+      pixel_offset.r=texture(in_texture,coords + vR_offset).r;
+      pixel_offset.g=texture(in_texture,coords + vG_offset).g;
+      pixel_offset.b=texture(in_texture,coords + vB_offset).b;
       
       vec3 deconvergence_mode = mix(pixel_cur.rgb, pixel_offset, OFFSET_STRENGTH);
       vec3 shadow_mode = pixel_cur.rgb - max( (pixel_cur.rgb - pixel_offset), vec3(0.0) ) * DOT_M_SHADOW_STR;
@@ -117,9 +124,8 @@ vec4 deconvergence_shadow(vec2 coords, sampler2D in_texture, vec4 sourcesize2) {
 
 vec4 deconvergence_shadow_wrap(vec2 coord) {
    if ( DO_FXAA == 1.0)  {
-      return deconvergence_shadow(coord, FXAA_pass, global.FXAA_passSize);
-   } else {
-      return deconvergence_shadow(coord, flick_and_noise_pass, global.flick_and_noise_passSize);
+      return deconvergence_shadow(coord, FXAA_pass);
+      return deconvergence_shadow(coord, flick_and_noise_pass);
    }
 }
 
