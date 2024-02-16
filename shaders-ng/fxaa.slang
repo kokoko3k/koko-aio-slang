@@ -106,8 +106,10 @@ vec3 FxaaLerp3(vec3 a, vec3 b, float amountOfA) {
 }
 
 vec4 FxaaTexOff(sampler2D tex, vec2 pos, ivec2 off, vec2 rcpFrame) {
-    float x = pos.x + float(off.x) * rcpFrame.x;
-    float y = pos.y + float(off.y) * rcpFrame.y;
+    //float x = pos.x + float(off.x) * rcpFrame.x;
+    //float y = pos.y + float(off.y) * rcpFrame.y;
+    float x = fma(float(off.x), rcpFrame.x, pos.x); //ASM PROOF: SAME
+    float y = fma(float(off.y), rcpFrame.y, pos.y); //ASM PROOF: SAME
     return textureLod(tex, vec2(x, y),0);
 }
 
@@ -136,7 +138,7 @@ vec3 FxaaPixelShader(vec2 pos, sampler2D tex, vec2 rcpFrame)
         return rgbM;
     }
     
-    vec3 rgbL = rgbN + rgbW + rgbM + rgbE + rgbS;
+    vec3 rgbL = rgbN + rgbW + rgbM + rgbE + rgbS; //ASM_PROOV: 
     
     float lumaL = (lumaN + lumaW + lumaE + lumaS) * 0.25;
     float rangeL = abs(lumaL - lumaM);
