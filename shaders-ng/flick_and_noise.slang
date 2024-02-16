@@ -83,13 +83,9 @@ vec4 pixel_flickering() {
    vec3 flickline = texture(Source,vFlickerCoords).rgb;
    
    //float lumdiff = abs( flickline.r + flickline.g + flickline.b - pixel_cur.r - pixel_cur.g - pixel_cur.b);
-   float lumdiff = abs( (flickline.r + flickline.g) + (flickline.b - pixel_cur.r) - (pixel_cur.g + pixel_cur.b) ); //40.82.40.1687.2946.1754   ASM PROOF: FASTER
-   float lumdiff2 = abs( dot(flickline.rgb, vec3(1.0)) - dot(pixel_cur.rgb, vec3(1.0)));// 40.82.40.1685.2948.1750
-   
-   
-   if (lumdiff != lumdiff2) 
-      return vec4(1,0,0,0);
-   
+   //float lumdiff = abs( (flickline.r + flickline.g) + (flickline.b - pixel_cur.r) - (pixel_cur.g + pixel_cur.b) ); //1687 1754 2946   ASM PROOF: FASTER
+   float lumdiff = abs( dot(flickline.rgb, vec3(1.0)) - dot(pixel_cur.rgb, vec3(1.0)));// 1685 1750 2948 //ASM PROOF: Faster on SIMD8 and SIMD16, slower on SIMD32
+      
    lumdiff = min(lumdiff * vFlickering_power, 1.0);
    return vec4( mix(pixel_cur.rgb,flickline.rgb,lumdiff),
                 pixel_cur.a); //<-- wee need to return the alpha channel because it carries ntsc artifact mask
