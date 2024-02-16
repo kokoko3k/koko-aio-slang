@@ -107,8 +107,6 @@ vec4 deconvergence_shadow(vec2 coords, sampler2D in_texture) {
 
       vec4 pixel_cur = texture(in_texture, coords);
    
-
-      
       vec3 pixel_offset;
       pixel_offset.r=texture(in_texture,coords + vR_offset).r;
       pixel_offset.g=texture(in_texture,coords + vG_offset).g;
@@ -123,10 +121,10 @@ vec4 deconvergence_shadow(vec2 coords, sampler2D in_texture) {
 
 
 vec4 deconvergence_shadow_wrap(vec2 coord) {
-   if ( DO_FXAA == 1.0)  {
+   if ( DO_FXAA == 1.0)
       return deconvergence_shadow(coord, FXAA_pass);
+   else
       return deconvergence_shadow(coord, flick_and_noise_pass);
-   }
 }
 
 #define SIDE_RIGHT 1
