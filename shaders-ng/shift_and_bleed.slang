@@ -197,7 +197,7 @@ vec4 pixel_bleed(vec4 pixel_in, vec2 co, sampler2D in_texture, vec4 sourcesize2)
    #endif
    
    if (SAT_BLEED_PAL == 1.0) {
-         return vec4 (  pixel_bleed_side_PAL(pixel_in.rgb, co, size, in_texture, sourcesize2), pixel_in.a);
+         return vec4 ( pixel_bleed_side_PAL(pixel_in.rgb, co, size, in_texture, sourcesize2), pixel_in.a);
    } else {
          return vec4 ( pixel_bleed_side_NTSC(pixel_in.rgba, co, size, in_texture, sourcesize2), pixel_in.a);
    }
@@ -212,11 +212,7 @@ void main() {
    if (vDecon_or_SatBleed_or_JustShadow > 0.0 )  {
       pixel_out = deconvergence_shadow_wrap(vTexCoord);
       if (DO_SAT_BLEED > 0.0) {      
-         if ( DO_FXAA == 1.0)  {
-            pixel_out = pixel_bleed(pixel_out, vTexCoord, FXAA_pass, global.FXAA_passSize);
-         } else {
-            pixel_out = pixel_bleed(pixel_out, vTexCoord, flick_and_noise_pass, global.flick_and_noise_passSize);
-         }
+         pixel_out = pixel_bleed(pixel_out, vTexCoord, flick_and_noise_pass, global.flick_and_noise_passSize);
       }
    } else
       //Handle case where only deconvergence is requested
@@ -224,23 +220,23 @@ void main() {
          pixel_out = deconvergence_shadow_wrap(vTexCoord);
    } else 
       if (DO_SAT_BLEED > 0.0) {      
-         //Handle case where only chroma bleed is requested
-         if ( DO_FXAA == 1.0)  {
-            pixel_out = texture(FXAA_pass, vTexCoord);
-            pixel_out = pixel_bleed(pixel_out, vTexCoord, FXAA_pass, global.FXAA_passSize);
-            
-         } else {
-            pixel_out = texture(flick_and_noise_pass, vTexCoord);
+            //Handle case where only chroma bleed is requested
+            if ( DO_FXAA == 1.0) {
+               pixel_out = texture(FXAA_pass, vTexCoord);
+            } else {
+               pixel_out = texture(flick_and_noise_pass, vTexCoord);
+            }
             pixel_out = pixel_bleed(pixel_out, vTexCoord, flick_and_noise_pass, global.flick_and_noise_passSize);
-         }
-   } else
+
+   } else {
       //Passthrough
       if ( DO_FXAA == 1.0)  {
          pixel_out = texture(FXAA_pass, vTexCoord);
       } else {
          pixel_out = texture(flick_and_noise_pass, vTexCoord);
       }
-
+   }
+   
    //pre-gamma if needed by glow.
    if (DO_CCORRECTION > 0.5) 
       pixel_out.rgb = pow(pixel_out.rgb, vec3(IN_GLOW_GAMMA));
