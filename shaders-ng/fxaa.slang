@@ -138,7 +138,7 @@ vec3 FxaaPixelShader(vec2 pos, sampler2D tex, vec2 rcpFrame)
         return rgbM;
     }
     
-    vec3 rgbL = rgbN + rgbW + rgbM + rgbE + rgbS; //ASM_PROOV: 
+    vec3 rgbL = rgbN + rgbW + rgbM + rgbE + rgbS; //ASM_PROOF: USELESS parenthesis
     
     float lumaL = (lumaN + lumaW + lumaE + lumaS) * 0.25;
     float rangeL = abs(lumaL - lumaM);
