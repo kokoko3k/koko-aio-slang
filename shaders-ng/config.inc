@@ -31,8 +31,6 @@ layout(push_constant) uniform Push {
 layout(std140, set = 0, binding = 0) uniform UBO {
 	mat4 MVP;
 	
-	vec4 OutputSize;
-	
 	vec4 FinalViewportSize;
 	vec4 in_glow_passSize;
 	vec4 FXAA_passSize;

@@ -14,7 +14,6 @@ layout(location = 4) out float vDo_shadow_mode;
 layout(location = 5) out float vDecon_or_SatBleed_or_JustShadow;
 layout(location = 6) out float vDecon_or_JustShadow;
 layout(location = 7) out float vShow_artifact_mask;
-layout(location = 8) out vec4 VOutputSize;
 #include "includes/functions.include.slang"
 
 void main()
@@ -40,8 +39,6 @@ void main()
    vDecon_or_SatBleed_or_JustShadow =  float(DO_SHIFT_RGB + DO_SAT_BLEED > 1.0 || DOT_M_SHADOW_STR > 0.0 );
    vDecon_or_JustShadow =  float(DO_SHIFT_RGB > 0.0 || DOT_M_SHADOW_STR > 0.0);
    vShow_artifact_mask = float(NTSC_SHOW_ARTF_MASK + DO_NTSC_ARTIFACTS == 2.0);
-   
-   VOutputSize = params.OutputSize;
 }
 
 
@@ -55,7 +52,6 @@ layout(location = 4) in float vDo_shadow_mode;
 layout(location = 5) in float vDecon_or_SatBleed_or_JustShadow;
 layout(location = 6) in float vDecon_or_JustShadow;
 layout(location = 7) in float vShow_artifact_mask;
-layout(location = 8) in vec4 VOutputSize;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -104,7 +100,8 @@ vec4 deconvergence_shadow(vec2 coords, sampler2D in_texture, vec4 sourcesize2) {
 
       vec4 pixel_cur = texture(in_texture, coords);
    
-      vec2 d = -vec2(sourcesize2.z, sourcesize2.w)*0.5;
+      //vec2 d = -vec2(sourcesize2.z, sourcesize2.w)*0.5;
+      vec2 d = -sourcesize2.zw*0.5;
       
       vec3 pixel_offset;
       pixel_offset.r=texture(in_texture,coords + vR_offset * d).r;
@@ -121,9 +118,9 @@ vec4 deconvergence_shadow(vec2 coords, sampler2D in_texture, vec4 sourcesize2) {
 
 vec4 deconvergence_shadow_wrap(vec2 coord) {
    if ( DO_FXAA == 1.0)  {
-      return deconvergence_shadow(coord, FXAA_pass, VOutputSize); //
+      return deconvergence_shadow(coord, FXAA_pass, global.flick_and_noise_passSize);
    } else {
-      return deconvergence_shadow(coord, flick_and_noise_pass, VOutputSize);
+      return deconvergence_shadow(coord, flick_and_noise_pass, global.flick_and_noise_passSize);
    }
 }
 
@@ -213,9 +210,9 @@ void main() {
       pixel_out = deconvergence_shadow_wrap(vTexCoord);
       if (DO_SAT_BLEED > 0.0) {      
          if ( DO_FXAA == 1.0)  {
-            pixel_out = pixel_bleed(pixel_out, vTexCoord, FXAA_pass, VOutputSize);
+            pixel_out = pixel_bleed(pixel_out, vTexCoord, FXAA_pass, global.FXAA_passSize);
          } else {
-            pixel_out = pixel_bleed(pixel_out, vTexCoord, flick_and_noise_pass, VOutputSize);
+            pixel_out = pixel_bleed(pixel_out, vTexCoord, flick_and_noise_pass,  global.FXAA_passSize);
          }
       }
    } else
@@ -227,11 +224,11 @@ void main() {
          //Handle case where only chroma bleed is requested
          if ( DO_FXAA == 1.0)  {
             pixel_out = texture(FXAA_pass, vTexCoord);
-            pixel_out = pixel_bleed(pixel_out, vTexCoord, FXAA_pass, VOutputSize);
+            pixel_out = pixel_bleed(pixel_out, vTexCoord, FXAA_pass, global.FXAA_passSize);
             
          } else {
             pixel_out = texture(flick_and_noise_pass, vTexCoord);
-            pixel_out = pixel_bleed(pixel_out, vTexCoord, flick_and_noise_pass, VOutputSize);
+            pixel_out = pixel_bleed(pixel_out, vTexCoord, flick_and_noise_pass,  global.FXAA_passSize);
          }
    } else
       //Passthrough
