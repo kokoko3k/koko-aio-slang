@@ -100,7 +100,8 @@ vec4 deconvergence_shadow(vec2 coords, sampler2D in_texture, vec4 sourcesize2) {
 
       vec4 pixel_cur = texture(in_texture, coords);
    
-      vec2 d = -vec2(sourcesize2.z, sourcesize2.w)*0.5;
+      //vec2 d = -vec2(sourcesize2.z, sourcesize2.w)*0.5;
+      vec2 d = -sourcesize2.zw*0.5;
       
       vec3 pixel_offset;
       pixel_offset.r=texture(in_texture,coords + vR_offset * d).r;
@@ -117,7 +118,7 @@ vec4 deconvergence_shadow(vec2 coords, sampler2D in_texture, vec4 sourcesize2) {
 
 vec4 deconvergence_shadow_wrap(vec2 coord) {
    if ( DO_FXAA == 1.0)  {
-      return deconvergence_shadow(coord, FXAA_pass, global.FXAA_passSize);
+      return deconvergence_shadow(coord, FXAA_pass, global.flick_and_noise_passSize);
    } else {
       return deconvergence_shadow(coord, flick_and_noise_pass, global.flick_and_noise_passSize);
    }
@@ -211,7 +212,7 @@ void main() {
          if ( DO_FXAA == 1.0)  {
             pixel_out = pixel_bleed(pixel_out, vTexCoord, FXAA_pass, global.FXAA_passSize);
          } else {
-            pixel_out = pixel_bleed(pixel_out, vTexCoord, flick_and_noise_pass, global.flick_and_noise_passSize);
+            pixel_out = pixel_bleed(pixel_out, vTexCoord, flick_and_noise_pass,  global.FXAA_passSize);
          }
       }
    } else
@@ -227,7 +228,7 @@ void main() {
             
          } else {
             pixel_out = texture(flick_and_noise_pass, vTexCoord);
-            pixel_out = pixel_bleed(pixel_out, vTexCoord, flick_and_noise_pass, global.flick_and_noise_passSize);
+            pixel_out = pixel_bleed(pixel_out, vTexCoord, flick_and_noise_pass,  global.FXAA_passSize);
          }
    } else
       //Passthrough
