@@ -97,7 +97,8 @@ FXAA_SUBPIX_CAP - Insures fine detail is not completely removed.
 // skipping normalization and tossing out blue.
 // FxaaLuma() will range 0.0 to 2.963210702.
 float FxaaLuma(vec3 rgb) {
-    return rgb.y * (0.587/0.299) + rgb.x;
+    //return rgb.y * (0.587/0.299) + rgb.x;
+    return fma( rgb.y, (0.587/0.299), rgb.x ); //ASM_PROOF: SAME
 }
 
 vec3 FxaaLerp3(vec3 a, vec3 b, float amountOfA) {
