@@ -85,7 +85,7 @@ void main() {
 
 
     if (DO_BEZEL > 0.5)
-        pre_pass_coords = zoomout_coords(pre_pass_coords, -get_BEZEL_INNER_ZOOM() , 1.0);
+        pre_pass_coords = zoomout_coords(pre_pass_coords, -get_BEZEL_INNER_ZOOM());
 
 
     //Every cycle counts!
