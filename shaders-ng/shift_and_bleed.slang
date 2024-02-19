@@ -204,7 +204,7 @@ void main() {
    vec4 pixel_out;
 
       if ( DO_FXAA == 1.0)  {
-         pixel_out = texture(FXAA_pass, vTexCoord);
+         pixel_out = texture(FXAA_pass, vTexCoord );
       } else {
          pixel_out = texture(flick_and_noise_pass, vTexCoord);
       }

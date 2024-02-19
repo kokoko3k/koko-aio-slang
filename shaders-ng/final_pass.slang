@@ -185,7 +185,10 @@ void main() {
         else
             vTexCoord = integer_scale(TexCoord, vIn_aspect, bIsRotated, vDo_Tate, GAME_GEOM_INT_SCALE-1.0 ) + vec2( GAME_GEOM_OFF_FIX /10000);
 
-    vTexCoord.y += 0.00001;
+    vTexCoord += 0.00001;
+    
+
+    
 
     //if (DO_GLOBAL_SHZO >0.5)
     //    vTexCoord = zoom(vTexCoord + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM );
