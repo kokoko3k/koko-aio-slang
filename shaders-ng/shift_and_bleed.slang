@@ -43,8 +43,11 @@ void main()
    
    
    //Precalc some conditions:
-   vDecon_or_SatBleed_or_JustShadow =  float(DO_SHIFT_RGB + DO_SAT_BLEED > 1.0 || DOT_M_SHADOW_STR > 0.0 );
-   vDecon_or_JustShadow =  float(DO_SHIFT_RGB > 0.0 || DOT_M_SHADOW_STR > 0.0);
+   bool do_shadow = (DO_DOT_MATRIX == 1.0 && DOT_M_SHADOW_STR > 0.0);
+   
+   
+   vDecon_or_SatBleed_or_JustShadow =  float(DO_SHIFT_RGB + DO_SAT_BLEED > 1.0 || do_shadow );
+   vDecon_or_JustShadow =  float(DO_SHIFT_RGB > 0.0 || do_shadow    );
    vShow_artifact_mask = float(NTSC_SHOW_ARTF_MASK + DO_NTSC_ARTIFACTS == 2.0);
 }
 
@@ -104,7 +107,6 @@ vec4 deconvergence_shadow(vec2 coords, sampler2D in_texture) {
       //The function stays more or less the same, but rgb offsets calculated in vertex shader
       //will be the same for shadow mode. Hopefully shader texture cache will take care of
       //multiple sampling for the same tex coords.
-
       vec4 pixel_cur = texture(in_texture, coords);
    
       vec3 pixel_offset;
