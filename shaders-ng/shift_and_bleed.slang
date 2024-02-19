@@ -141,10 +141,10 @@ vec3 pixel_bleed_side_NTSC(vec4 pixel_in, vec2 co, float size, sampler2D in_text
    if (vShow_artifact_mask == 1.0) return vec3(strength_modifier);
    
    vec2 off_l = vec2(SIDE_LEFT  * sourcesize2.z,0.0);
-   vec2 off_r = vec2(SIDE_RIGHT * sourcesize2.z,0.0);   
+   vec2 off_r = vec2(SIDE_RIGHT * sourcesize2.z,0.0);
+   
    for ( float i=1 ; i <= size ; i++ ){
-      w=w/SAT_BLEED_FALLOFF;
-      //w = w * exp(i*i*(1-SAT_BLEED_FALLOFF)*0.1);
+      w=w/SAT_BLEED_FALLOFF;  //w = w * exp(i*i*(1-SAT_BLEED_FALLOFF)*0.1);
       vec3 smp_YIQ = texture(in_texture, co - i*off_l ).rgb * mat3_RGB2YIQ;
       //Blur Y, I and Q
       blur_YIQ_l = mix(blur_YIQ_l.xyz, smp_YIQ.xyz, w/vec3( bandwidth_mhz_Y_ntsc, bandwidth_mhz_I, bandwidth_mhz_Q));
