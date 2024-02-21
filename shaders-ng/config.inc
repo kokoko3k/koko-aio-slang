@@ -25,6 +25,7 @@ layout(push_constant) uniform Push {
 	float AMBI_STRETCH;
 	float AMBI_STRETCH_VERTICAL;
 	float AMBI_INT_OFFSET ;
+	float AMBI_SMP_INT_OFFSET ;
 	
 } params;
 
@@ -548,7 +549,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter AMBI_STEPS	            "        Slowness"						60.0 5.0  1000.0  5.0
 #pragma parameter AMBI_FALLOFF              "        Led power/falloff"			0.4  0.1  3.0     0.01
 #pragma parameter AMBI_POWER                "        Led Saturation"						1.8  0.0  100.0     0.05
-#pragma parameter AMBI_INT_OFFSET           "        Led internalness"              0.07 -1.0 1.0 0.01
+#pragma parameter AMBI_INT_OFFSET           "        Internalness (Led position)"      0.07 -1.0 1.0 0.01
+#pragma parameter AMBI_SMP_INT_OFFSET       "        Internalness (Sampling point) "   0.07 0.07 1.0 0.01 
 #pragma parameter AMBI_STRETCH              "        Widen lights (horizontal games)"	0.0  0.0  1.0     0.01
 #pragma parameter AMBI_STRETCH_VERTICAL     "        Widen lights (vertical games)"		0.5  0.0  1.0     0.01
 #pragma parameter AMBI_GAMMA                "        Output Gamma"						1.3  0.1  8.0     0.1

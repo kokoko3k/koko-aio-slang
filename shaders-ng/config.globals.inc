@@ -489,6 +489,10 @@
     #define AMBI_INT_OFFSET			params.AMBI_INT_OFFSET
 #endif
 
+#ifndef AMBI_SMP_INT_OFFSET
+    #define AMBI_SMP_INT_OFFSET params.AMBI_SMP_INT_OFFSET
+#endif
+
 #ifndef ASPECT_X
     #define ASPECT_X		global.ASPECT_X
 #endif

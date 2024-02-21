@@ -246,6 +246,7 @@
 // #define AMBI_FALLOFF  0.40
 // #define AMBI_POWER  1.8
 // #define AMBI_INT_OFFSET  0.07
+// #define AMBI_SMP_INT_OFFSET 0.07
 // #define AMBI_STRETCH  0.0
 // #define AMBI_STRETCH_VERTICAL  0.5
 // #define AMBI_GAMMA  1.3

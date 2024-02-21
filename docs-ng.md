@@ -547,10 +547,14 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
         How input gain is applied to a single led, affects light wideness.
     Led saturation:
         Leds saturation post gain.      
-    Led internalness:
+    Internalness (Led position):
         The distance between the virtual led strip and the content.
         High values will move leds behind it, while lower values will move
         leds around it.
+    Internalness (Sampling point):
+        Where the leds should take their color from, highering the value will make the color
+        follow the color of what is in the center of the screen, lowering the value will
+        color the leds as the edge of the screen.
     Widen lights:
         Dumb stretch of the visible texture, operates on the whole content, instead of the
         single led.

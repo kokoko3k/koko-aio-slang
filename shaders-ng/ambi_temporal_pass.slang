@@ -7,7 +7,7 @@
 
 #define PastSampler ambi_temporal_passFeedback
 
-#define smp_internalness 0.07  //The distance between the screen border and the color sampling point
+#define smp_internalness AMBI_SMP_INT_OFFSET  //The distance between the screen border and the color sampling point
 #define leds_per_strip 8   //How many leds per border
 #define radius 0.001       //The base radius of the emitted light (tuned by user parameter later)
 
