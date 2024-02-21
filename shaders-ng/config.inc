@@ -210,8 +210,9 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float PIXELGRID_MAX_H;
 	float PIXELGRID_MAX_W;
 	float PIXELGRID_SIZE_W;
-	float PIXELGRID_SMOOTH_H;
-	float PIXELGRID_SMOOTH_W;
+	
+													float PLACEHOLDER1; //2fps lost if deleted (!)
+													float PLACEHOLDER2; //2fps lost if deleted (!)
 
 	float PIXELGRID_MUL_X;
 													

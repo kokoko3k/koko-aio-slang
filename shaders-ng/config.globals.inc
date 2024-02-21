@@ -691,14 +691,6 @@
     #define PIXELGRID_GAMMA_H	global.PIXELGRID_GAMMA_H
 #endif
 
-#ifndef PIXELGRID_SMOOTH_W
-    #define PIXELGRID_SMOOTH_W 	global.PIXELGRID_SMOOTH_W
-#endif
-
-#ifndef PIXELGRID_SMOOTH_H
-    #define PIXELGRID_SMOOTH_H 	global.PIXELGRID_SMOOTH_H
-#endif
-
 #ifndef PIXELGRID_MUL_X
     #define PIXELGRID_MUL_X 	global.PIXELGRID_MUL_X
 #endif
