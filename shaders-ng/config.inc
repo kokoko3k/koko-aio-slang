@@ -356,7 +356,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 //Deconvergence
 #pragma parameter DO_SHIFT_RGB       "★ Deconvergence enable? (de) ==>"	0.0	 0.0 1.0 1.0
-#pragma parameter OFFSET_STRENGTH "        Strength"			0.6 	 0.0 1.0 0.05
+#pragma parameter OFFSET_STRENGTH "        Strength"			0.6 	 0.0 3.0 0.05
 #pragma parameter SHIFT_R         "        Red offset"			-40.0 	-210.0 189.0 1
 #pragma parameter SHIFT_G         "        Green offset"		2.0 	-210.0 189.0 1
 #pragma parameter SHIFT_B         "        Blue offset"			40.0 	-210.0 189.0 1
