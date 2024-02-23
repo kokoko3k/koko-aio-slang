@@ -104,6 +104,9 @@ vec4 deconvergence_shadow(vec2 coords, sampler2D in_texture, vec4 source_pixel) 
       //multiple sampling for the same tex coords.
    
       vec3 pixel_offset;
+      //Since we are sampling from a "clamp-to-border" texture, ensure we've no black bleeding
+      //by clamping the texture coords
+      coords = clamp(coords,params.SourceSize.zw*1 ,1.0-params.SourceSize.zw);
       pixel_offset.r=texture(in_texture,coords + vR_offset).r;
       pixel_offset.g=texture(in_texture,coords + vG_offset).g;
       pixel_offset.b=texture(in_texture,coords + vB_offset).b;
