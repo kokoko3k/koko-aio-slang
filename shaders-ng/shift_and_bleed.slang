@@ -120,7 +120,7 @@ vec4 deconvergence_shadow_wrap(vec2 coord, vec4 source_pixel) {
    if ( DO_FXAA == 1.0)
       return deconvergence_shadow(coord, FXAA_pass, source_pixel);
    else
-      return deconvergence_shadow(coord, colortools_and_ntsc_pass, source_pixel);
+      return deconvergence_shadow(coord, flick_and_noise_pass, source_pixel);
 }
 
 #define SIDE_RIGHT 1

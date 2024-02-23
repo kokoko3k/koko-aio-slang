@@ -100,9 +100,6 @@ float_framebuffer0 = true
        scale_type1 = source
           scale_x1 = 2.0
           scale_y1 = 2.0  
-// This CANNOT BE clamp_to_border, since shadow(dotmatric) function samples from 
-// colortools_and_ntsc_pass (previous pass) and clamp to border would produce
-// a black line on the sides with clamp_to_border
         wrap_mode1 = "mirrored_repeat"
      float_framebuffer1 = true
 
