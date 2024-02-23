@@ -212,15 +212,15 @@ void main() {
          pixel_out = texture(flick_and_noise_pass, vTexCoord);
       }
 
-      
-   //shift
-   if (vDecon_or_JustShadow > 0.0 )
-      pixel_out = deconvergence_shadow_wrap(vTexCoord, pixel_out);
-   
-   //..and bleed
+   //bleed
    if (DO_SAT_BLEED > 0.0)
       pixel_out = pixel_bleed(pixel_out, vTexCoord, flick_and_noise_pass, global.flick_and_noise_passSize);
 
+   
+   //...and shift
+   if (vDecon_or_JustShadow > 0.0 )
+      pixel_out = deconvergence_shadow_wrap(vTexCoord, pixel_out);
+   
    
    //pre-gamma if needed by glow.
    if (DO_CCORRECTION > 0.5) 
