@@ -117,8 +117,9 @@ layout(location = 0) out vec4 FragColor;
 
 layout(set = 0, binding = 2) uniform sampler2D Source;
 layout(set = 0, binding = 3) uniform sampler2D colortools_and_ntsc_passFeedback;
+#ifndef D3D_WORKAROUND
 layout(set = 0, binding = 4) uniform sampler2D avglum_passFeedback;
-
+#endif
 
 vec3 colorwheel(vec2 uv){
    float timeoffset = params.FrameCount / 120.0;
