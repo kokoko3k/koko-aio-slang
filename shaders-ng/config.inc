@@ -636,6 +636,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 #pragma parameter SERVICE1 "Don't use me, for debug purposes only" 	0.5 0.0 1.0 0.01
 
+// This is for a patched retroarch version I'm testing (24/03/04)
+#pragma inject_preset_code DEFINES_FROM_PRESET
 
 //User parameters goes here, they overrides almost everything:
 #include "../config/config-user.txt"
