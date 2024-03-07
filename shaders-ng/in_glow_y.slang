@@ -57,11 +57,11 @@ layout(set = 0, binding = 6) uniform sampler2D Source;
 
 
 
-#include "includes/functions.include.slang" 
+#include "includes/functions.include.slang"  
 
 vec3 glow_blur_bias(sampler2D source_tex, vec2 co, vec3 pixel_glowed, float bias){
    vec3 pixel_source = texture(source_tex, co).rgb;
-   pixel_source  = pixel_source * vGlow_Gain;
+   pixel_source  = pixel_source;
    
    vec3 glow_light = pixel_glowed - pixel_source;
    glow_light = clamp(glow_light * IN_GLOW_SPREAD, 0.0, 1.0);
@@ -116,8 +116,8 @@ void main() {
    if (DO_IN_GLOW == 0.0) {
       if ( DELTA_RENDER == 1.0) {
          float original_unchanged = texture(Source,vTexCoord).a;
-         vec3 color = texture(shift_and_bleed_pass, vTexCoord).rgb * vGlow_Gain;
-         FragColor = vec4(color, original_unchanged);
+         vec3 color = texture(shift_and_bleed_pass, vTexCoord).rgb;
+         FragColor = vec4(color * vGlow_Gain, original_unchanged);
          return;
       }
       FragColor = vec4(texture(shift_and_bleed_pass, vTexCoord).rgb * vGlow_Gain, 1.0);
@@ -144,10 +144,10 @@ void main() {
    
    //It over the max sharp, then just passthrough, else do the blur.
       if (glow_h_inside_interval == 1.0) {
-         pixel_glowed = blur_select_wrap(Source, vTexCoord, global.flick_and_noise_passSize, IN_GLOW_H_ADAPTED, (IN_GLOW_H >= 0.0) ) * vGlow_Gain;
-         //pixel_glowed = blur9_y(Source, vTexCoord, params.SourceSize.xy, IN_GLOW_H_ADAPTED) * vGlow_Gain;
+         pixel_glowed = blur_select_wrap(Source, vTexCoord, global.flick_and_noise_passSize, IN_GLOW_H_ADAPTED, (IN_GLOW_H >= 0.0) );
+         //pixel_glowed = blur9_y(Source, vTexCoord, params.SourceSize.xy, IN_GLOW_H_ADAPTED);
       } else {
-         pixel_glowed = texture(Source, vTexCoord).rgb * vGlow_Gain;
+         pixel_glowed = texture(Source, vTexCoord).rgb;
       }
    
    
@@ -161,12 +161,12 @@ void main() {
    //Pass it through when we need delta rended.
       if ( DELTA_RENDER == 1.0) {
          float original_unchanged = texture(Source,vTexCoord).a;
-         FragColor = vec4(pixel_glowed, original_unchanged);
+         FragColor = vec4(pixel_glowed * vGlow_Gain, original_unchanged);
          return;
       }
    
   
-   FragColor = vec4(pixel_glowed,1.0);
+   FragColor = vec4(pixel_glowed * vGlow_Gain,1.0);
    
 }
 
