@@ -175,6 +175,11 @@
 
 #ifndef IN_GLOW_SPREAD
     #define IN_GLOW_SPREAD			global.IN_GLOW_SPREAD
+    
+#endif
+
+#ifndef IN_GLOW_SPREAD_SHARPNESS
+    #define IN_GLOW_SPREAD_SHARPNESS    global.IN_GLOW_SPREAD_SHARPNESS
 #endif
 
 #ifndef IN_GLOW_W

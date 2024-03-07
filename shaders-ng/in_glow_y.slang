@@ -61,15 +61,78 @@ layout(set = 0, binding = 6) uniform sampler2D Source;
 
 vec3 glow_blur_bias(sampler2D source_tex, vec2 co, vec3 pixel_glowed, float bias){
    vec3 pixel_source = texture(source_tex, co).rgb;
-   pixel_source  = pixel_source;
    
+   /* 
+   //Take originale
    vec3 glow_light = pixel_glowed - pixel_source;
    glow_light = clamp(glow_light * IN_GLOW_SPREAD, 0.0, 1.0);
-  
-   //glow_light = pow(glow_light, vec3(SERVICE1));
-   
    vec3 proper_glow = glow_light * glow_light + pixel_source;  
    return mix(proper_glow, pixel_glowed, max(0.0, bias));      
+   */
+   
+   //Take 2: come originale, ma permetti di poware a piacere,            //Buono, per ora la scelta safe.
+   //Sembra funzionare nalogamente a Take4, forse più semplice da impostare.
+   //buono con sx,sx=1.3; light gain 2.7, light sharpness 1.1
+   vec3 glow_light = pixel_glowed - pixel_source;
+   glow_light = clamp(glow_light * IN_GLOW_SPREAD, 0.0, 1.0);
+   glow_light = pow(glow_light, vec3(IN_GLOW_SPREAD_SHARPNESS));
+   vec3 proper_glow = glow_light  + pixel_source;  
+   return mix(proper_glow, pixel_glowed, max(0.0, bias));         
+   
+   
+   //Take 2.5: come Take 2, ma usiamo smoothstep al posto di pow.
+   //melio take 2.
+   /*vec3 glow_light = pixel_glowed - pixel_source;
+   glow_light = smoothstep(vec3(0.0), vec3(SERVICE1*2), glow_light);
+   glow_light = clamp(glow_light * IN_GLOW_SPREAD, 0.0, 1.0);
+   vec3 proper_glow = glow_light  + pixel_source;  
+   return mix(proper_glow, pixel_glowed, max(0.0, bias));       
+   */
+
+   //Take 2: come Take2, ma facciamo anche smoothstep prevenfivo su glow light
+   //Sembra funzionare nalogamente a Take4, forse più semplice da impostare.
+   /*vec3 glow_light = pixel_glowed - pixel_source;
+   glow_light = clamp(glow_light * IN_GLOW_SPREAD, 0.0, 1.0);
+   
+   glow_light = pow(glow_light, vec3(SERVICE1*2));
+   glow_light = smoothstep(vec3(0.7), vec3(1.0), glow_light);
+   vec3 proper_glow = glow_light  + pixel_source;  
+   return mix(proper_glow, pixel_glowed, max(0.0, bias));         
+   */
+   
+   //Take 3: come take 2 ma con smoothstep finale                   //Non saprei se è utile oppure no.
+   /*vec3 glow_light = pixel_glowed - pixel_source;
+   glow_light = clamp(glow_light * IN_GLOW_SPREAD, 0.0, 1.0);
+   glow_light = pow(glow_light, vec3(SERVICE1*2));
+   glow_light = smoothstep(vec3(0.4), vec3(0.8), glow_light);
+   vec3 proper_glow = glow_light  + pixel_source; 
+   return mix(proper_glow, pixel_glowed, max(0.0, bias));         
+   */
+   
+   //Take4: Il gain viene dato alla luce glow che poi diventa il valore di mix tra pixel sharp e il glow originale.
+   //Da meno problemi di pixel scuri che diventano troppo chiari, ma è anche più sfocato in generale.
+   //Bene con gamma service1 a 0.001, sharpx,y = 2, light 3.6
+   /*vec3 pixel_glowed_ori = pixel_glowed;
+   vec3 glow_light = pixel_glowed - pixel_source ; 
+   glow_light = max(glow_light, 0.0);
+   pixel_glowed = pow(pixel_glowed, vec3(SERVICE1)) * IN_GLOW_SPREAD; 
+   vec3 proper_glow = mix(pixel_source, pixel_glowed, glow_light);
+   proper_glow = mix(proper_glow, pixel_glowed_ori, max(0.0, bias));      
+   return proper_glow;*/
+   
+   //Take5: Come take4, speriamo di riuscire a fare uno sharp tramite smoothstep.
+   //..no.
+   /*vec3 pixel_glowed_ori = pixel_glowed;
+   vec3 glow_light = pixel_glowed - pixel_source ; 
+   glow_light = max(glow_light, 0.0);
+   pixel_glowed = pow(pixel_glowed, vec3(SERVICE1)) * IN_GLOW_SPREAD; 
+   pixel_glowed = smoothstep(vec3(0.3), vec3(0.7), pixel_glowed);
+   //return pixel_glowed;
+   vec3 proper_glow = mix(pixel_source, pixel_glowed, glow_light);
+   proper_glow = mix(proper_glow, pixel_glowed_ori, max(0.0, bias));      
+   return proper_glow;*/
+
+   
 }
 
 vec3 blur_select_wrap(sampler2D texture_in, vec2 co, vec4 sourcesize, float sharpness, bool use_gauss) {
