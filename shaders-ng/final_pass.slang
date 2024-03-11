@@ -341,7 +341,7 @@ void main() {
                 zoom_modifier.xy = zoom_modifier.yx;
             }
             float OutputHeightZoomed = out_size.y*zoom_modifier.y;
-            float screen_core_ratio = OutputHeightZoomed / params.OriginalSize.y;
+            float screen_core_ratio = OutputHeightZoomed / ori_size.y;
             if (screen_core_ratio < MIN_SCREEN_CORE_RATIO)
                 very_lowres_y = true;
         }
