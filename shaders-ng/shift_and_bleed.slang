@@ -203,7 +203,6 @@ vec4 pixel_bleed(vec4 pixel_in, vec2 co, sampler2D in_texture, vec4 sourcesize2)
 }
 
 void main() {
-   float pixel_alpha_ntsc_artifacts; // <- this carries ntsc artifacts needed by glow to modulate blur there.
    vec4 pixel_out;
 
       if ( DO_FXAA == 1.0)  {
