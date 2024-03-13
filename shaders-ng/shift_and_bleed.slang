@@ -60,9 +60,8 @@ layout(location = 6) in float vShow_artifact_mask;
 
 layout(location = 0) out vec4 FragColor;
 
-layout(set = 0, binding = 3) uniform sampler2D FXAA_pass;
-layout(set = 0, binding = 4) uniform sampler2D flick_and_noise_pass;
-layout(set = 0, binding = 5) uniform sampler2D colortools_and_ntsc_pass;
+layout(set = 0, binding = 1) uniform sampler2D FXAA_pass;
+layout(set = 0, binding = 2) uniform sampler2D flick_and_noise_pass;
 
 
 #define bandwidth_mhz_Y_ntsc 4.2
