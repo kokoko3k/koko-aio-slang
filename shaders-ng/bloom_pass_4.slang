@@ -61,7 +61,7 @@ layout(location = 0) out vec4 FragColor;
 
 layout(set = 0, binding = 1) uniform sampler2D Source;
 //layout(set = 0, binding = 2) uniform sampler2D avglum_pass;
-layout(set = 0, binding = 3) uniform sampler2D flick_and_noise_pass;
+layout(set = 0, binding = 3) uniform sampler2D shift_and_bleed_pass;
 layout(set = 0, binding = 4) uniform sampler2D bloom_pass_finalFeedback;
 
 
@@ -81,7 +81,7 @@ layout(set = 0, binding = 4) uniform sampler2D bloom_pass_finalFeedback;
 
 
 float get_avg_lum_from_mip(sampler2D tex, vec2 co, float lod) {
-    vec3 mip = textureLod(flick_and_noise_pass, co, lod).rgb;
+    vec3 mip = textureLod(shift_and_bleed_pass, co, lod).rgb;
     mip = apply_fuzzy_main_pass_stage_2(mip, vFuzzy_main_pass_stage_1);
     //return (mip.r+mip.g+mip.b)/3.0;
     float luminance_from_feedback = rgb_to_gray(mip);
@@ -142,7 +142,7 @@ void main() {
         
         #define ZONE_LUMINANCE_LOD 5.0
         
-        vec3 avglum = textureLod(flick_and_noise_pass, vTexCoord, ZONE_LUMINANCE_LOD).rgb;
+        vec3 avglum = textureLod(shift_and_bleed_pass, vTexCoord, ZONE_LUMINANCE_LOD).rgb;
         float b_brightness = max(avglum.b,max(avglum.r,avglum.g));
         b_brightness *= 1-BLOOM_OVER_WHITE;
         over_white_correction =1- b_brightness;
@@ -153,7 +153,7 @@ void main() {
     //                                                  (Branching with (if BLOOM_EYE_ADPT_SRT == 0.0) does not gain anything.)
     // Modulate exposure over time too.
     //Smooth luminance with specified lod in this alpha channel
-    float zone_luminance = get_avg_lum_from_mip(flick_and_noise_pass, vTexCoord, BLOOM_PUPIL_LUM_ZONE_W);
+    float zone_luminance = get_avg_lum_from_mip(shift_and_bleed_pass, vTexCoord, BLOOM_PUPIL_LUM_ZONE_W);
     float smoothed_avglum = zone_luminance * BLOOM_EYE_ADPT_SRT;
     bloom_mix_adapted = max(0.0, BLOOM_MIX - smoothed_avglum);
     

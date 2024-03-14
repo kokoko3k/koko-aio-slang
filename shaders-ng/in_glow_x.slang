@@ -79,7 +79,7 @@ void main() {
    };
 
    //Modulate glow power via ntsc artifact mask:
-      float ntsc_artifacts = texture(shift_and_bleed_pass, vTexCoord).a;
+      float ntsc_artifacts = texture(shift_and_bleed_pass, vTexCoord).a; //compiler is smart enough to reuse this lookup, no need to branch.
       
       //To debug ntsc artifacts mask:
       if (vShowArtifactsMask == 1.0) {
