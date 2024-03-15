@@ -517,7 +517,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BEZEL_ROUGHNESS     "        Reflections roughness"			1.0    0.0 5.0 0.1
 #pragma parameter BEZEL_DIFFUSION_STR "        Diffusion strength"             0.0     0.0 1.0 0.01
 #pragma parameter BEZEL_SPCL_STRENGTH "        Specularity strength"			0.5    0.0 3.0 0.05
-#pragma parameter BEZEL_CORNER_DARK   "        Darken corners"					0.8    0.0 1.0 0.05
+#pragma parameter BEZEL_CORNER_DARK   "        Darken corners"					0.8    0.0 2.0 0.05
 
 
 #pragma parameter LABEL0024 " " 0.0 0.0 1.0 1.0

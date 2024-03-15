@@ -72,8 +72,9 @@
 
 	// Define the size and the smoothness of the rectangle 
 	// in the bezel corners that will hide and blur the reflections 
-#define BEZEL_REFL_CORNER_BLANK_SIZE 0.091
-#define BEZEL_REFL_CORNER_BLANK_SHADE 0.055  // keep it > 0.0
+#define BEZEL_REFL_CORNER_BLANK_SIZE 0.12
+#define BEZEL_REFL_CORNER_BLANK_SHADE 0.075  // keep it > 0.0
+
 
 
 	//When colorizing the bezel via ambient light, it is possible to choose where 
