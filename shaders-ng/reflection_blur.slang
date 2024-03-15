@@ -77,6 +77,8 @@ void main() {
    pixel_out = mix(pixel_out_fb.rgb, pixel_out, 0.5 );
    
    FragColor = vec4(pixel_out, 1.0); 
+ 
+   //FragColor = vec4(shade_sharp_blur);
    
 }
  

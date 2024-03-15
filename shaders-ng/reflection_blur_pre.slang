@@ -39,10 +39,16 @@ layout(set = 0, binding = 2) uniform sampler2D avglum_pass;
 #include "includes/blooms.include.slang"
 
 float borders_gradient(vec2 co, float smoothness) {
+   
+   vec2 hv = smoothstep_fast( vec2(0.0), vec2(smoothness), co) * 
+             (1-smoothstep_fast( vec2(1-smoothness), vec2(1.0), co));
+    return  min(hv.x, hv.y)*4.0-1;
+
+   
    //Draws a square with smooth borders:   
-   vec4 rect = vec4(smoothness, smoothness, 1 - smoothness, 1 - smoothness);
+   /*vec4 rect = vec4(smoothness, smoothness, 1 - smoothness, 1 - smoothness);
    vec2 hv = smoothstep(rect.xy - smoothness, rect.xy, co) * smoothstep(co - smoothness, co, rect.zw);
-   return  hv.x * hv.y;
+   return  hv.x * hv.y;*/
 }
 
 void main() {
