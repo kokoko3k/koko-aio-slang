@@ -229,13 +229,17 @@ vec3 PrintValueVec3( vec2 vStringCoords, vec2 FragCoord,  float fValue, float fM
 	vec4 circles;
 	float circle_radius = BEZEL_REFL_CORNER_BLANK_SIZE * size_multiplier;
 	float circle_falloff = BEZEL_REFL_CORNER_BLANK_SHADE * size_multiplier;
-	float circle_power =1.0;
 	circles.x = circle_smooth(co, vec2(0.0,0.0), circle_radius, circle_falloff) ;
 	circles.y = circle_smooth(co, vec2(0.0,1.0), circle_radius, circle_falloff) ;
 	circles.z = circle_smooth(co, vec2(1.0,0.0), circle_radius, circle_falloff) ;
 	circles.w = circle_smooth(co, vec2(1.0,1.0), circle_radius, circle_falloff) ;
 		
-	float circle = max(max(max(circles.x, circles.y), circles.z), circles.w);
+	//float circle = max(max(max(circles.x, circles.y), circles.z), circles.w);
+	
+	//float circle = circles.x+circles.y+circles.z+circles.w;
+	float circle = dot(circles, vec4(1.0));
+	
+	
 	//circle = min(circle, 1.0);
 	//circle = 1-circle;
 	
