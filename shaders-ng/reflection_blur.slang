@@ -56,7 +56,7 @@ void main() {
       #define CORNER_BLURRINESS 0.6
       float fcorners_shade = corners_shade(vTexCoord, 0.9) * CORNER_BLURRINESS * 0.9;
    
-      shade_sharp_blur = max(fcorners_shade, shade_sharp_blur);
+      shade_sharp_blur = max(fcorners_shade, shade_sharp_blur) * 10.0;
 
       float blur_radius=   (shade_sharp_blur) * 3.5  ;
       blur_radius = max(blur_radius, 1.0);
