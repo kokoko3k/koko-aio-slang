@@ -559,21 +559,16 @@ float random_fast(vec2 seed) {
 
 	#define corner_aspect vec2(1.0,  0.75)
 	float fn_border(vec2 coord) {
-
 		//coord*=corner_aspect;
 		//float l = length(max(abs(coord - 0.5) - 0.5 + GEOM_CORNER_SIZE, 0.0));
 		//return clamp( (GEOM_CORNER_SIZE - l)*GEOM_CORNER_SMOOTH, 0.0, 1.0);
 		//return 1- smoothstep_fast(GEOM_CORNER_SIZE-GEOM_CORNER_SMOOTH,GEOM_CORNER_SIZE, l);
-		
-			
-		coord = (coord - vec2(0.5)) + vec2(0.5, 0.5);
-		coord = min(coord, vec2(1.0) - coord); // * corner_aspect;
-		vec2 cdist = vec2(GEOM_CORNER_SIZE);
-		coord = (cdist - min(coord, cdist));
-		float dist = sqrt(dot(coord, coord));
-		return clamp((cdist.x - dist)/GEOM_CORNER_SMOOTH, 0.0, 1.0);
-		
 
+		coord = min(coord, vec2(1.0) - coord); // * corner_aspect;
+		coord = GEOM_CORNER_SIZE - min(coord, GEOM_CORNER_SIZE);
+		float dist = length(coord);
+		return clamp((GEOM_CORNER_SIZE - dist)*GEOM_CORNER_SMOOTH, 0.0, 1.0);
+		
 	}
 	
 	float border(vec2 coord) {
