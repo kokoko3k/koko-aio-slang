@@ -563,6 +563,15 @@ float random_fast(vec2 seed) {
 		coord = (cdist - min(coord, cdist));
 		float dist = sqrt(dot(coord, coord));
 		return clamp((cdist.x - dist)*GEOM_CORNER_SMOOTH, 0.0, 1.0);
+		
+		/*
+		vec2 size = vec2(1.0 - GEOM_CORNER_SIZE) * 0.5;
+		vec2 roundedCoord = abs(coord - vec2(0.5)) - size;
+		float dist = length(max(roundedCoord, -0.0));
+		float shade = 1/GEOM_CORNER_SMOOTH;
+		float soft_clamped = 1-smoothstep_fast(GEOM_CORNER_SIZE*0.5-shade, GEOM_CORNER_SIZE*0.5+shade, dist);
+		return soft_clamped;
+		*/
 	}
 	
 	float border(vec2 coord) {
