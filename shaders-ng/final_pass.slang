@@ -1486,10 +1486,8 @@ void main() {
             if (DO_VIGNETTE == 1.0) {
                 float spot_vignette_noise = random_fast(vTexCoord);
                 spot_vignette_noise = scale_to_range(spot_vignette_noise, -NOISEPOWER, NOISEPOWER);
-                pixel_out += spot_vignette_noise;
-                vec2 sinco = (co_content-0.5) / V_SIZE ;
-                float vignette = cos(sinco.x) * cos(sinco.y) * V_POWER;
-                pixel_out = (pixel_out*vignette);
+                vec2 sinco = cos((co_content-0.5) / V_SIZE) ;
+                pixel_out = (pixel_out * V_POWER) * (sinco.y * sinco.x) + spot_vignette_noise;
             }
 
         //Spot
