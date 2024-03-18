@@ -11,13 +11,13 @@
 #define CYELLOW  vec3(1.0,1.0,0.0)
 #define CCUSTOM vec3(0.3,0.5,0.1)
 
-#define DEBUG_COLOR vec3(1,0,0)
+#define DEBUG_COLOR vec3(1,1,1)
 #define DEBUG_BLINK_TIME 100
 #define DEBUG_GRADIENT_STEPS 64
 
 
 
-//#define DEBUG
+#define DEBUG
    //#define DEBUG_COLOR_CALIB
    //#define DEBUG_TIME_FADE
    #define DEBUG_SOLID_COLOR

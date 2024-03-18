@@ -223,28 +223,27 @@ vec3 PrintValueVec3( vec2 vStringCoords, vec2 FragCoord,  float fValue, float fM
 
 	float corners_shade(vec2 co, float size_multiplier){
 	//Draws 4 smooth squares or circles in the corners.
-	//They are intended to modulate the blur radius and the strength of the reflection.
+
+	#define GRAD_START (BEZEL_REFL_CORNER_BLANK_SIZE*size_multiplier)
+	#define GRAD_END (GRAD_START+BEZEL_REFL_CORNER_BLANK_SHADE*size_multiplier)	
+	float gradient_start = (1-GRAD_END);
+	float gradient_end = (1-GRAD_START);
+    vec2 gradients = smoothstep(gradient_start-0.5, gradient_end-0.5,abs(co-0.5));
+    float circles = gradients.x * gradients.y;		
+	return circles;
+		
 	
-	
-	vec4 circles;
+	/*vec4 circles;
 	float circle_radius = BEZEL_REFL_CORNER_BLANK_SIZE * size_multiplier;
 	float circle_falloff = BEZEL_REFL_CORNER_BLANK_SHADE * size_multiplier;
 	circles.x = circle_smooth(co, vec2(0.0,0.0), circle_radius, circle_falloff) ;
 	circles.y = circle_smooth(co, vec2(0.0,1.0), circle_radius, circle_falloff) ;
 	circles.z = circle_smooth(co, vec2(1.0,0.0), circle_radius, circle_falloff) ;
 	circles.w = circle_smooth(co, vec2(1.0,1.0), circle_radius, circle_falloff) ;
-		
-	//float circle = max(max(max(circles.x, circles.y), circles.z), circles.w);
-	
-	//float circle = circles.x+circles.y+circles.z+circles.w;
 	float circle = dot(circles, vec4(1.0));
-	
-	
-	//circle = min(circle, 1.0);
-	//circle = 1-circle;
-	
 	return circle;
-	      
+	*/  
+	
 	/*vec4 squares;
 	float squaresize = BEZEL_REFL_CORNER_BLANK_SIZE * size_multiplier;
 	float squarefade = BEZEL_REFL_CORNER_BLANK_SHADE * size_multiplier;
