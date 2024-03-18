@@ -497,7 +497,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter GEOM_WARP_X        "        Warp X"				0.28   0.0 6.0 0.01
 #pragma parameter GEOM_WARP_Y        "        Warp Y"				0.32   0.0 6.0 0.01
 #pragma parameter GEOM_CORNER_SIZE   "        Corner radius"			0.005  0.005 0.1 0.001
-#pragma parameter GEOM_CORNER_SMOOTH "        Border sharpness"			350.0 15.0 1000.0 1.0
+#pragma parameter GEOM_CORNER_SMOOTH "        Edge sharpness"			350.0 15.0 1000.0 1.0
 #pragma parameter LABEL0023 " " 0.0 0.0 1.0 1.0
 
 
