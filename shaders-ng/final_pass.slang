@@ -498,20 +498,6 @@ vec3 fn_pixel_nightify(vec3 color_in, float strength, vec3 ambilight) {
 }
 
 
-
-float morph_shape_full(float shape, float power, float steep ) {
-    float lum_scaled = power;
-    float l = lum_scaled; // (already clamped)
-    if (lum_scaled <= 0.5+steep) {
-        float l1 = pow(l, 4) * 15;
-        shape = pow(shape, 1/sqrt(l1));
-    } else {
-        float l2 = (l-0.5)*2.0;
-        shape = mix(shape, 1.0, l2);    //shape = shape * (1-l2) + l2;
-    }
-    return shape;
-}
-
 vec3 morph_shape_full_vec3(vec3 shape, vec3 l, float steep, float gamma ) {    
     float steep_plus_1 = 1+steep;
     vec3 l_pow = pow(l,vec3(gamma));
@@ -538,51 +524,10 @@ vec3 morph_shape_full_no_steepness_vec3(vec3 shape, vec3 l, float gamma ) {
     return s2 + s1;
 }
 
-/*vec3 morph_shape_full_vec3(vec3 shape, vec3 l, float steep ) {
-    vec3 l_pow = pow(l,vec3(4.2));
-    vec3 l2 = l_pow * 16;
-    l2 = clamp(l2, 0.0, 1+steep);
-    vec3 s1 = pow(shape, 1/sqrt(l2));
-    vec3 s2 = (1-s1) * l_pow;
-    return s1+(s2/(l+steep));
-}*/
-
-/*vec3 morph_shape_full_vec3(vec3 shape, vec3 l, float steep ) {
-    vec3 l_pow = pow(l,vec3(4.1));
-    vec3 l2 = l_pow * 16;
-    l2 = clamp(l2, 0.0,1.0);
-    vec3 s1 = pow(shape, 1/sqrt(l2));
-    vec3 s2 = (1-s1) * l_pow * (l*l);
-    return s1+(s2/(1+steep));
-}*/
 
 vec3 morph_shape(vec3 shape, vec3 power, float steep, float gamma ) {
    return morph_shape_full_vec3(shape, power, steep, gamma);
-
-    return vec3(
-      morph_shape_full(shape.x, power.x, steep),
-      morph_shape_full(shape.y, power.y, steep),
-      morph_shape_full(shape.z, power.z, steep)
-    );
-
-
-    //Use this to compare different methods
-    if (params.FrameCount % 2 == 0.0)
-        return morph_shape_full_vec3(shape, power, steep, gamma);
-            else
-    return vec3(
-      morph_shape_full(shape.x, power.x, steep),
-      morph_shape_full(shape.y, power.y, steep),
-      morph_shape_full(shape.z, power.z, steep)
-    );
 }
-
-/*float morph_shape(float shape, float power, float steep ) {
-    return morph_shape_full(shape, power, steep);
-}*/
-
-
-
 
 vec3 downsample( sampler2D tex, vec2 uv, vec4 sourcesize,  float sharpness_add ) {
     vec2 sharpness = vec2(1.0)+sharpness_add;
