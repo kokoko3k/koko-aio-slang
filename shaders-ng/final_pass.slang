@@ -499,23 +499,19 @@ vec3 fn_pixel_nightify(vec3 color_in, float strength, vec3 ambilight) {
 
 
 vec3 morph_shape_full_vec3(vec3 shape, vec3 l, float steep, float gamma ) {    
-    float steep_plus_1 = 1+steep;
     vec3 l_pow = pow(l,vec3(gamma));
-    vec3 l2 = min(l_pow * 16, 1+steep);
-    //vec3 s1 = pow(shape, 1/sqrt(l2));
+    vec3 l2 = min(l_pow * 16, steep);
     vec3 s1 = pow(shape, inversesqrt(l2));
     //vec3 s2 = (1-s1) * l_pow;
         //==  lpow - lpow * s1;
         //== -lpow * s1 + lpow;
     vec3 s2 = fma(-l_pow, s1,  l_pow); //ASM PROOF, faster.
-
-    return (s2/(1+steep)) + s1;
+    return (s2/(steep)) + s1;
 }
 
 vec3 morph_shape_full_no_steepness_vec3(vec3 shape, vec3 l, float gamma ) {
     vec3 l_pow = pow(l,vec3(gamma));
     vec3 l2 = min(l_pow * 16, 1);
-    //vec3 s1 = pow(shape, 1/sqrt(l2));
     vec3 s1 = pow(shape, inversesqrt(l2));
     vec3 s2 = (1-s1) * l_pow;
         // == 1*l_pow  - s1*l_pow

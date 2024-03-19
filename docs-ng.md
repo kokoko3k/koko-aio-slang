@@ -217,10 +217,10 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
             Since emulating phosphors with high Min-Max range changes the apparent gamma of the final image,
             it is advised, if needed, to use this option to compensate, instead of the main gamma correction.
             It is also a quick way to make the image brighter or darker.
-        Inter-line extra steepness (for integer scaling)
+        Inter-line extra steepness (good for integer scaling, nice when Phosphors height max > 1.0)
             When you set maximum height to anything > 0.5, the phosphor light will bleed over
             the adiacent (up/down) ones so that they will start to blend togheter.
-            This option will avoid the bleeding.
+            Setting this option to anything >1.0 will avoid the bleeding.
             You may want them to blend or not, depending on your preference to keep scanlines separated.
             This function is useful when you want to emulate handhelds screens using integer scaling, 
             where cells are well separated.
