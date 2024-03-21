@@ -28,6 +28,9 @@ vec2 smoothstep_fast(vec2 edge0, vec2 edge1, vec2 x) {
   return clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);
 }
 
+vec2 smoothstep_fast(float edge0, float edge1, vec2 x) {
+  return clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);
+}
 
 float smoothstep_cos(float edge0, float edge1, float x) {
   float t = clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);
@@ -228,7 +231,7 @@ vec3 PrintValueVec3( vec2 vStringCoords, vec2 FragCoord,  float fValue, float fM
 		#define GRAD_END (GRAD_START+BEZEL_REFL_CORNER_BLANK_SHADE*size_multiplier)	
 		float gradient_start = (1-GRAD_END);
 		float gradient_end = (1-GRAD_START);
-		vec2 gradients = smoothstep(gradient_start-0.5, gradient_end-0.5,abs(co-0.5));
+		vec2 gradients = smoothstep_fast(gradient_start-0.5, gradient_end-0.5,abs(co-0.5));
 		float squares = gradients.x * gradients.y;		
 		return squares;
 			
