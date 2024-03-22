@@ -40,7 +40,7 @@ layout(set = 0, binding = 2) uniform sampler2D avglum_pass;
 
 float borders_gradient(vec2 co, float smoothness) {
    vec2 gradients = 1-smoothstep_fast( vec2(0.5-smoothness), vec2(0.5), abs(co-0.5));
-   return  (gradients.x * gradients.y * 4.0 - 1.0 ); 
+   return  (gradients.x * gradients.y * 2.5 - 0.5 ); 
    
    
    /*vec2 hv = smoothstep_fast( vec2(0.0), vec2(smoothness), co) * 
