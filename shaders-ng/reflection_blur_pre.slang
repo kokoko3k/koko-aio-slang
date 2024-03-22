@@ -32,7 +32,7 @@ layout(location = 2) in vec2 vCoords_shade;
 
 layout(location = 0) out vec4 FragColor;
 
-layout(set = 0, binding = 1) uniform sampler2D flick_and_noise_pass;
+layout(set = 0, binding = 1) uniform sampler2D shift_and_bleed_pass;
 layout(set = 0, binding = 2) uniform sampler2D avglum_pass;
 
 #include "includes/functions.include.slang"
@@ -85,7 +85,7 @@ void main() {
       shade_sharp_blur=clamp(shade_sharp_blur, 0.0,1.0);
       float blur_radius=(shade_sharp_blur) * 2.0  ;
       
-      vec3 pixel_out = bloom(flick_and_noise_pass, coords, global.FinalViewportSize, vec2(blur_radius), 1.0, 0.0, 1.0) ;
+      vec3 pixel_out = bloom(shift_and_bleed_pass, coords, global.FinalViewportSize, vec2(blur_radius), 1.0, 0.0, 1.0) ;
 
    FragColor = vec4(pixel_out,shade_sharp_blur );
 //FragColor = vec4(shade_sharp_blur );

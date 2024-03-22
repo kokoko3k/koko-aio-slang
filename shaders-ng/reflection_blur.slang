@@ -31,9 +31,8 @@ layout(location = 2) in vec2 vCoords_zoomout;
 layout(location = 0) out vec4 FragColor;
 
 layout(set = 0, binding = 1) uniform sampler2D Source;
-layout(set = 0, binding = 2) uniform sampler2D flick_and_noise_pass;
-layout(set = 0, binding = 3) uniform sampler2D reflected_blurred_passFeedback;
-layout(set = 0, binding = 4) uniform sampler2D shift_and_bleed_pass;
+layout(set = 0, binding = 2) uniform sampler2D reflected_blurred_passFeedback;
+layout(set = 0, binding = 3) uniform sampler2D shift_and_bleed_pass;
 
 #include "includes/functions.include.slang"
 #include "includes/blooms.include.slang"
@@ -71,7 +70,7 @@ void main() {
       pixel_out = mix( pixel_out, pixel_diffused, BEZEL_DIFFUSION_STR);
       
 
-   pixel_out = apply_fuzzy_main_pass_stage_2(pixel_out, vFuzzy_main_pass_stage_1);
+   pixel_out = apply_fuzzy_main_pass_stage_2( pow(pixel_out, vec3(1/IN_GLOW_GAMMA)), vFuzzy_main_pass_stage_1);
    
    vec3 pixel_out_fb =  texture(reflected_blurred_passFeedback, vTexCoord).rgb;
    pixel_out = mix(pixel_out_fb.rgb, pixel_out, 0.5 );

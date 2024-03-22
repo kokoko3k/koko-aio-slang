@@ -118,13 +118,14 @@ layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 1) uniform sampler2D PastSampler;
 layout(set = 0, binding = 2) uniform sampler2D avglum_pass;
 layout(set = 0, binding = 3) uniform sampler2D avglum_passFeedback;
-layout(set = 0, binding = 4) uniform sampler2D flick_and_noise_pass;
+layout(set = 0, binding = 4) uniform sampler2D shift_and_bleed_pass;
 
 
 
 vec3 ambi_push_pass(vec2 coords, float f_lod) {
-   vec3 pixel_out = textureLod(flick_and_noise_pass, coords, f_lod).rgb;
-   pixel_out = pow(pixel_out, vec3(AMBI_GAMMA) );
+   vec3 pixel_out = textureLod(shift_and_bleed_pass, coords, f_lod).rgb;
+   pixel_out = pow(pixel_out, vec3(AMBI_GAMMA)); 
+
    pixel_out = pixel_push_luminance(pixel_out, vAMBI_POWER);
    return pixel_out;
 }

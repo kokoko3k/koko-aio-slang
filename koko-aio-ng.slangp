@@ -123,7 +123,7 @@ float_framebuffer0 = true
     filter_linear2 = true
        scale_type2 = source
             scale2 = 1.0
-     mipmap_input2 = true
+     mipmap_input2 = false
       //this *has* to be clamp_to_border because  specular reflections need to turn to black
       //if geometry content override is shifting/zooming out the image.
         wrap_mode2 = "clamp_to_border"
