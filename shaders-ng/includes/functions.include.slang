@@ -28,6 +28,9 @@ vec2 smoothstep_fast(vec2 edge0, vec2 edge1, vec2 x) {
   return clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);
 }
 
+vec2 smoothstep_fast(float edge0, float edge1, vec2 x) {
+  return clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);
+}
 
 float smoothstep_cos(float edge0, float edge1, float x) {
   float t = clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);
@@ -210,7 +213,7 @@ vec3 PrintValueVec3( vec2 vStringCoords, vec2 FragCoord,  float fValue, float fM
 	float circle_smooth(vec2 coords, vec2 middle, float f_radius, float FALLOFF) {
 	//Draw a circle with smoothed borders:
 	float fdistance=distance(middle, vec2(coords.x, coords.y));
-	float circle = (1-smoothstep(f_radius-FALLOFF, f_radius+FALLOFF, fdistance));
+	float circle = (1-smoothstep(f_radius, f_radius+FALLOFF, fdistance));
 	return circle;
 	}
 
@@ -222,34 +225,38 @@ vec3 PrintValueVec3( vec2 vStringCoords, vec2 FragCoord,  float fValue, float fM
 	}
 
 	float corners_shade(vec2 co, float size_multiplier){
-	//Draws 4 smooth squares or circles in the corners.
-	//They are intended to modulate the blur radius and the strength of the reflection.
-	
-	/*
-	vec4 circles;
-	float circle_radius = size; //0.13?
-	float circle_falloff = smoothsize; //0.05?
-	float circle_power =2.0;
-	circles.x = circle_smooth(co, vec2(0.0,0.0), circle_radius, circle_falloff) * circle_power;
-	circles.y = circle_smooth(co, vec2(0.0,1.0), circle_radius, circle_falloff) * circle_power;
-	circles.z = circle_smooth(co, vec2(1.0,0.0), circle_radius, circle_falloff) * circle_power;
-	circles.w = circle_smooth(co, vec2(1.0,1.0), circle_radius, circle_falloff) * circle_power;
+		//Draw 4 smooth squares or circles in the corners.
+
+		#define GRAD_START (BEZEL_REFL_CORNER_BLANK_SIZE*size_multiplier)
+		#define GRAD_END (GRAD_START+BEZEL_REFL_CORNER_BLANK_SHADE*size_multiplier)	
+		float gradient_start = (1-GRAD_END);
+		float gradient_end = (1-GRAD_START);
+		vec2 gradients = smoothstep_fast(gradient_start-0.5, gradient_end-0.5,abs(co-0.5));
+		float squares = gradients.x * gradients.y;		
+		return squares;
+			
 		
-	float circle = max(max(max(circles.x, circles.y), circles.z), circles.w);
-	circle = min(circle, 1.0);
-	circle = 1-circle;
-	
-	return circle;
-	*/      
-	vec4 squares;
-	float squaresize = BEZEL_REFL_CORNER_BLANK_SIZE * size_multiplier;
-	float squarefade = BEZEL_REFL_CORNER_BLANK_SHADE * size_multiplier;
-	//(vec2 co, vec2 corner, float size, float smoothshade) {
-	squares.x = square_smooth(co, vec2(0.0,0.0), squaresize, squarefade);
-	squares.y = square_smooth(co, vec2(1.0 - squaresize, 0.0), squaresize, squarefade);
-	squares.z = square_smooth(co, vec2(0.0, 1-squaresize), squaresize, squarefade);
-	squares.w = square_smooth(co, vec2(1-squaresize, 1-squaresize), squaresize, squarefade);
-	return max(max(max(squares.x, squares.y), squares.z), squares.w);
+		/*vec4 circles;
+		float circle_radius = BEZEL_REFL_CORNER_BLANK_SIZE * size_multiplier;
+		float circle_falloff = BEZEL_REFL_CORNER_BLANK_SHADE * size_multiplier;
+		circles.x = circle_smooth(co, vec2(0.0,0.0), circle_radius, circle_falloff) ;
+		circles.y = circle_smooth(co, vec2(0.0,1.0), circle_radius, circle_falloff) ;
+		circles.z = circle_smooth(co, vec2(1.0,0.0), circle_radius, circle_falloff) ;
+		circles.w = circle_smooth(co, vec2(1.0,1.0), circle_radius, circle_falloff) ;
+		float circle = dot(circles, vec4(1.0));
+		return circle;
+		*/
+		
+		/*vec4 squares;
+		float squaresize = BEZEL_REFL_CORNER_BLANK_SIZE * size_multiplier;
+		float squarefade = BEZEL_REFL_CORNER_BLANK_SHADE * size_multiplier;
+		//(vec2 co, vec2 corner, float size, float smoothshade) {
+		squares.x = square_smooth(co, vec2(0.0,0.0), squaresize, squarefade);
+		squares.y = square_smooth(co, vec2(1.0 - squaresize, 0.0), squaresize, squarefade);
+		squares.z = square_smooth(co, vec2(0.0, 1-squaresize), squaresize, squarefade);
+		squares.w = square_smooth(co, vec2(1-squaresize, 1-squaresize), squaresize, squarefade);
+		return max(max(max(squares.x, squares.y), squares.z), squares.w);
+		*/
 	}
 //REFLECTION RELATED ENDS
 
@@ -551,14 +558,20 @@ float random_fast(vec2 seed) {
 
 
 //CURVATURE
+
+
 	#define corner_aspect vec2(1.0,  0.75)
 	float fn_border(vec2 coord) {
-		coord = (coord - vec2(0.5)) + vec2(0.5, 0.5);
-		coord = min(coord, vec2(1.0) - coord) * corner_aspect;
-		vec2 cdist = vec2(GEOM_CORNER_SIZE);
-		coord = (cdist - min(coord, cdist));
-		float dist = sqrt(dot(coord, coord));
-		return clamp((cdist.x - dist)*GEOM_CORNER_SMOOTH, 0.0, 1.0);
+		//coord*=corner_aspect;
+		//float l = length(max(abs(coord - 0.5) - 0.5 + GEOM_CORNER_SIZE, 0.0));
+		//return clamp( (GEOM_CORNER_SIZE - l)*GEOM_CORNER_SMOOTH, 0.0, 1.0);
+		//return 1- smoothstep_fast(GEOM_CORNER_SIZE-GEOM_CORNER_SMOOTH,GEOM_CORNER_SIZE, l);
+
+		coord = min(coord, vec2(1.0) - coord); // * corner_aspect;
+		coord = GEOM_CORNER_SIZE - min(coord, GEOM_CORNER_SIZE);
+		float dist = length(coord);
+		return clamp((GEOM_CORNER_SIZE - dist)*GEOM_CORNER_SMOOTH, 0.0, 1.0);
+		
 	}
 	
 	float border(vec2 coord) {

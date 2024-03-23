@@ -81,8 +81,8 @@ DO_DYNZOOM = "0.015"
 DO_SPOT = "1.0"
     S_POSITION_X = "-0.5"
     S_POSITION_Y = "0.5"
-	S_SIZE = "0.4"
-	S_POWER = "0.05"
+	S_SIZE = "0.36"
+	S_POWER = "0.06"
 
 DO_VIGNETTE = "1.0"
 	V_SIZE = "1.08"
@@ -90,7 +90,9 @@ DO_VIGNETTE = "1.0"
 	
 DO_AMBILIGHT = 1.0
 	AMBI_FALLOFF = "0.40"
-	AMBI_POWER = "1.8"
+	AMBI_POWER = "2.1"
+	AMBI_STRETCH = "0.05"
+	AMBI_GAMMA = "1.0"
 	AMBI_STEPS = "60.0"
 	AMBI_OVER_BEZEL = "0.2"
 	

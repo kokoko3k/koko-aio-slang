@@ -37,7 +37,7 @@ void main() {
 
     vReduced_sample_time_is_now = mod(params.FrameCount,AMBI_AVGLUM_DIVIDER);
     
-    vAvglum_needed = DO_AMBILIGHT + DO_BEZEL + (DO_DYNZOOM*10.0) + DO_BLOOM;
+    vAvglum_needed = DO_AMBILIGHT + DO_BEZEL + (DO_DYNZOOM*10.0) + DO_BLOOM + (RESSWITCH_GLITCH_SIZE*10.0) ;
     vBezel_or_Bloom = DO_BEZEL + DO_BLOOM;
     
     //RESSWITCH shaking:
@@ -58,7 +58,7 @@ layout(location = 6) in float vResSwitch_res_changed;
 layout(location = 7) in vec2 vTexCoord_unscaled;
 
 layout(location = 0) out vec4 FragColor;
-layout(set = 0, binding = 2) uniform sampler2D flick_and_noise_pass;
+layout(set = 0, binding = 2) uniform sampler2D shift_and_bleed_pass;
 layout(set = 0, binding = 3) uniform sampler2D avglum_passFeedback;
 
 /* The following will allow to sample at reduced interval
@@ -72,14 +72,14 @@ layout(set = 0, binding = 3) uniform sampler2D avglum_passFeedback;
 
 #define RGB_TO_GRAYSCALE = vec3(0.299, 0.587, 0.114)
 float get_avg_lum_from_mip() {
-    vec3 mip = textureLod(flick_and_noise_pass, vec2(0.5,0.5),20.0).rgb;
+    vec3 mip = textureLod(shift_and_bleed_pass, vec2(0.5,0.5),20.0).rgb;
      mip = apply_fuzzy_main_pass_stage_2(mip, vFuzzy_main_pass_stage_1);
     //return (mip.r+mip.g+mip.b)/3.0;
     return rgb_to_gray(mip);
 }
 
 float get_avg_lum_from_mip_nocc() {
-    vec3 mip = textureLod(flick_and_noise_pass, vec2(0.5,0.5),20.0).rgb;
+    vec3 mip = textureLod(shift_and_bleed_pass, vec2(0.5,0.5),20.0).rgb;
     return rgb_to_gray(mip);
 }
 
@@ -161,7 +161,7 @@ void main() {
     //Create a small mipmap to be used to light the bezel corners
     //and by the bloom pass to identify bright areas.
     if (vBezel_or_Bloom > 0.0) 
-        pixel_out.rgb = textureLod(flick_and_noise_pass, vTexCoord, mip_lod).rgb;
+        pixel_out.rgb = textureLod(shift_and_bleed_pass, vTexCoord, mip_lod).rgb;
 
 
     FragColor = pixel_out;

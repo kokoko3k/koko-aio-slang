@@ -47,11 +47,12 @@ DO_CURVATURE = "1.0"
 
 //From Base.slangp
     DO_AMBILIGHT = 1.0
-        AMBI_FALLOFF = "0.40"
-        AMBI_POWER = "1.8"
+        AMBI_FALLOFF = "0.35"
+        AMBI_POWER = "1.7"
         AMBI_STEPS = "60.0"
         AMBI_OVER_BEZEL = "0.2"
-        AMBI_STRETCH = "0.3"
+        AMBI_STRETCH = "0.1"
+        AMBI_GAMMA = "1.0"
 
 DO_DYNZOOM = "0.000000"
 DO_VIGNETTE = "1.000000"

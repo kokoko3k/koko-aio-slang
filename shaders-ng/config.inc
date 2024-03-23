@@ -25,6 +25,7 @@ layout(push_constant) uniform Push {
 	float AMBI_STRETCH;
 	float AMBI_STRETCH_VERTICAL;
 	float AMBI_INT_OFFSET ;
+	float AMBI_SMP_INT_OFFSET ;
 	
 } params;
 
@@ -209,8 +210,9 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float PIXELGRID_MAX_H;
 	float PIXELGRID_MAX_W;
 	float PIXELGRID_SIZE_W;
-	float PIXELGRID_SMOOTH_H;
-	float PIXELGRID_SMOOTH_W;
+	
+													float PLACEHOLDER1; //2fps lost if deleted (!)
+	float IN_GLOW_SPREAD_SHARPNESS;
 
 	float PIXELGRID_MUL_X;
 													
@@ -284,7 +286,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 // Color correction
 #pragma parameter DO_CCORRECTION "★ Color corrections enable? (co) ==>" 		0.0 	0.0 1.0 1.0
-#pragma parameter IN_GLOW_POWER  "       Input signal gain (was in glow section):"					1.0 	0.0 5.0 0.05
+#pragma parameter IN_GLOW_POWER  "       Input signal gain"					1.0 	0.0 5.0 0.05
 #pragma parameter LUMINANCE      "       Luminance push (>1.0=clip)"		0.0	 0.0 1.5 0.05
 #pragma parameter BRIGHTNESS     "       Brightness in   (0.0=off)"		0.0	-1.0 1.0 0.01
 #pragma parameter CONTRAST       "       Contrast in     (0.0=off)"		0.0	-1.0 1.0 0.01
@@ -364,8 +366,9 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 // Input Blur / light glowing
 #pragma parameter DO_IN_GLOW               "★ Glow/Blur enable? (gl) ==>"	 					0.0	0.0 1.0 1.0
-#pragma parameter IN_GLOW_BIAS             "        Glow to blur bias"							1.0     0.0 1.0 0.05
-#pragma parameter IN_GLOW_SPREAD           "        Glow spread amount"		0.6 	0.0 4.0 0.05
+#pragma parameter IN_GLOW_BIAS             "        Glow to blur bias"							1.0     0.0 1.0 0.1
+#pragma parameter IN_GLOW_SPREAD           "        Glow light gain"		0.6 	0.0 4.0 0.05
+#pragma parameter IN_GLOW_SPREAD_SHARPNESS "        Glow light sharpness"	2.0 	0.01 2.0 0.01
 #pragma parameter IN_GLOW_W                "        Sharp X (neg=use BOX unsharp)"		2.5	-2.0 7.0 0.05
 #pragma parameter IN_GLOW_H                "        Sharp Y (neg=use BOX unsharp)"		2.5	-2.0 7.0 0.05
 #pragma parameter LABEL0011 " " 0.0 0.0 1.0 1.0
@@ -399,7 +402,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter PIXELGRID_MIN_H	        "         . Phosphors height Min"			0.2 0.00 1.0 0.05
 #pragma parameter PIXELGRID_MAX_H           "         . Phosphors height Max"			0.6 0.0 1.5 0.05
 #pragma parameter PIXELGRID_GAMMA_H         "         . Phosphors height min->max gamma:"	4.2 1.0 8.00 0.1
-#pragma parameter PIXELGRID_NO_INTERBLEED_H	"         . Inter line extra steepness"		0.0 0.0 10.0 0.1
+#pragma parameter PIXELGRID_NO_INTERBLEED_H	"         . Inter line extra steepness (1.0 to disable)"	1.0 1.0 11.0 0.1
 #pragma parameter PIXELGRID_H_ANTIMOIRE     "         . Anti-moire sweet spot (disables Y deconvergence)"  0.0 0.0 1.0 0.01
 #pragma parameter PIXELGRID_OFFSET_CORE     "         . Slotmask(fake) offset (not with anti-moire) " 0.0 0.0 1.0 0.01
 #pragma parameter PIXELGRID_DECON_R_H       "         . Deconvergence Y: R phosphor" 0.0 -1.6 1.6 0.1
@@ -494,7 +497,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter GEOM_WARP_X        "        Warp X"				0.28   0.0 6.0 0.01
 #pragma parameter GEOM_WARP_Y        "        Warp Y"				0.32   0.0 6.0 0.01
 #pragma parameter GEOM_CORNER_SIZE   "        Corner radius"			0.005  0.005 0.1 0.001
-#pragma parameter GEOM_CORNER_SMOOTH "        Corner sharpness"			350.0 15.0 1000.0 1.0
+#pragma parameter GEOM_CORNER_SMOOTH "        Edge sharpness"			350.0 15.0 1000.0 1.0
 #pragma parameter LABEL0023 " " 0.0 0.0 1.0 1.0
 
 
@@ -509,12 +512,12 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BEZEL_B             "        Color: Blue"				-0.3   -1.0 1.0  0.005
 #pragma parameter BEZEL_CON           "        Contrast"				1.3   0.0  10.0 0.01
 #pragma parameter BEZEL_RFL_ZOOM      "        Reflections zoom"			0.0   -1.5 0.5 0.005
-#pragma parameter BEZEL_REFL_STRENGTH "        Reflections strength"			0.65    0.0 2.0 0.01
-#pragma parameter BEZEL_RFL_BLR_SHD   "        Reflections sharpness"			-0.2  -0.7 0.8 0.01
+#pragma parameter BEZEL_REFL_STRENGTH "        Reflections strength"			0.35    0.0 2.0 0.01
+#pragma parameter BEZEL_RFL_BLR_SHD   "        Reflections sharpness"			-0.2  -1.5 0.8 0.01
 #pragma parameter BEZEL_ROUGHNESS     "        Reflections roughness"			1.0    0.0 5.0 0.1
 #pragma parameter BEZEL_DIFFUSION_STR "        Diffusion strength"             0.0     0.0 1.0 0.01
 #pragma parameter BEZEL_SPCL_STRENGTH "        Specularity strength"			0.5    0.0 3.0 0.05
-#pragma parameter BEZEL_CORNER_DARK   "        Darken corners"					0.8    0.0 1.0 0.05
+#pragma parameter BEZEL_CORNER_DARK   "        Darken corners"					0.85    0.0 2.0 0.05
 
 
 #pragma parameter LABEL0024 " " 0.0 0.0 1.0 1.0
@@ -548,7 +551,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter AMBI_STEPS	            "        Slowness"						60.0 5.0  1000.0  5.0
 #pragma parameter AMBI_FALLOFF              "        Led power/falloff"			0.4  0.1  3.0     0.01
 #pragma parameter AMBI_POWER                "        Led Saturation"						1.8  0.0  100.0     0.05
-#pragma parameter AMBI_INT_OFFSET           "        Led internalness"              0.07 -1.0 1.0 0.01
+#pragma parameter AMBI_INT_OFFSET           "        Internalness (Led position)"      0.07 -1.0 1.0 0.01
+#pragma parameter AMBI_SMP_INT_OFFSET       "        Internalness (Sampling point) "   0.07 0.07 1.0 0.01 
 #pragma parameter AMBI_STRETCH              "        Widen lights (horizontal games)"	0.0  0.0  1.0     0.01
 #pragma parameter AMBI_STRETCH_VERTICAL     "        Widen lights (vertical games)"		0.5  0.0  1.0     0.01
 #pragma parameter AMBI_GAMMA                "        Output Gamma"						1.3  0.1  8.0     0.1
@@ -569,8 +573,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter DO_SPOT	"★ Spot enable? (sp) ==>"		0.0   0.0   1.0 1.0
 #pragma parameter S_POSITION_X 	"        X Position"	   -0.5   -2.0 2.0 0.05
 #pragma parameter S_POSITION_Y 	"        Y Position"		0.5   -2.0 2.0 0.05
-#pragma parameter S_SIZE	"        Size"			0.4   0.0   1.0 0.01
-#pragma parameter S_POWER	"        Power" 		0.1   0.05  2.0 0.01
+#pragma parameter S_SIZE	"        Size"			0.36    0.0   3.0 0.01
+#pragma parameter S_POWER	"        Power" 		0.11   0.01  1.0 0.01
 #pragma parameter LABEL0028 " " 0.0 0.0 1.0 1.0
 
 
@@ -633,6 +637,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 #pragma parameter SERVICE1 "Don't use me, for debug purposes only" 	0.5 0.0 1.0 0.01
 
+// This is for a patched retroarch version I'm testing (24/03/04)
+#pragma inject_preset_code DEFINES_FROM_PRESET
 
 //User parameters goes here, they overrides almost everything:
 #include "../config/config-user.txt"

@@ -217,10 +217,10 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
             Since emulating phosphors with high Min-Max range changes the apparent gamma of the final image,
             it is advised, if needed, to use this option to compensate, instead of the main gamma correction.
             It is also a quick way to make the image brighter or darker.
-        Inter-line extra steepness (for integer scaling)
+        Inter-line extra steepness (good for integer scaling, nice when Phosphors height max > 1.0)
             When you set maximum height to anything > 0.5, the phosphor light will bleed over
             the adiacent (up/down) ones so that they will start to blend togheter.
-            This option will avoid the bleeding.
+            Setting this option to anything >1.0 will avoid the bleeding.
             You may want them to blend or not, depending on your preference to keep scanlines separated.
             This function is useful when you want to emulate handhelds screens using integer scaling, 
             where cells are well separated.
@@ -442,8 +442,8 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
     
     WARP X, WARP Y:
         control how much the display is curved along its axes.
-    Corner radius, Corner sharpness:
-        Control the "smoothness" of the display corners.
+    Corner radius, Edge sharpness:
+        Control the "smoothness" of the display edges.
     Cut curvature ears;
         If you see weird image repetition try this.
         
@@ -547,10 +547,14 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
         How input gain is applied to a single led, affects light wideness.
     Led saturation:
         Leds saturation post gain.      
-    Led internalness:
+    Internalness (Led position):
         The distance between the virtual led strip and the content.
         High values will move leds behind it, while lower values will move
         leds around it.
+    Internalness (Sampling point):
+        Where the leds should take their color from, highering the value will make the color
+        follow the color of what is in the center of the screen, lowering the value will
+        color the leds as the edge of the screen.
     Widen lights:
         Dumb stretch of the visible texture, operates on the whole content, instead of the
         single led.

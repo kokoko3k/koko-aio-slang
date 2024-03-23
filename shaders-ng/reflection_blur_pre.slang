@@ -32,17 +32,26 @@ layout(location = 2) in vec2 vCoords_shade;
 
 layout(location = 0) out vec4 FragColor;
 
-layout(set = 0, binding = 1) uniform sampler2D flick_and_noise_pass;
+layout(set = 0, binding = 1) uniform sampler2D shift_and_bleed_pass;
 layout(set = 0, binding = 2) uniform sampler2D avglum_pass;
 
 #include "includes/functions.include.slang"
 #include "includes/blooms.include.slang"
 
 float borders_gradient(vec2 co, float smoothness) {
+   vec2 gradients = 1-smoothstep_fast( vec2(0.5-smoothness), vec2(0.5), abs(co-0.5));
+   return  (gradients.x * gradients.y * 2.5 - 0.5 ); 
+   
+   
+   /*vec2 hv = smoothstep_fast( vec2(0.0), vec2(smoothness), co) * 
+             (1-smoothstep_fast( vec2(1-smoothness), vec2(1.0), co));
+   return  min(hv.x, hv.y)*4.0-1;
+   */
+   
    //Draws a square with smooth borders:   
-   vec4 rect = vec4(smoothness, smoothness, 1 - smoothness, 1 - smoothness);
+   /*vec4 rect = vec4(smoothness, smoothness, 1 - smoothness, 1 - smoothness);
    vec2 hv = smoothstep(rect.xy - smoothness, rect.xy, co) * smoothstep(co - smoothness, co, rect.zw);
-   return  hv.x * hv.y;
+   return  hv.x * hv.y;*/
 }
 
 void main() {
@@ -76,7 +85,7 @@ void main() {
       shade_sharp_blur=clamp(shade_sharp_blur, 0.0,1.0);
       float blur_radius=(shade_sharp_blur) * 2.0  ;
       
-      vec3 pixel_out = bloom(flick_and_noise_pass, coords, global.FinalViewportSize, vec2(blur_radius), 1.0, 0.0, 1.0) ;
+      vec3 pixel_out = bloom(shift_and_bleed_pass, coords, global.FinalViewportSize, vec2(blur_radius), 1.0, 0.0, 1.0) ;
 
    FragColor = vec4(pixel_out,shade_sharp_blur );
 //FragColor = vec4(shade_sharp_blur );

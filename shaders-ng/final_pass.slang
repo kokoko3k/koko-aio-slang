@@ -185,7 +185,10 @@ void main() {
         else
             vTexCoord = integer_scale(TexCoord, vIn_aspect, bIsRotated, vDo_Tate, GAME_GEOM_INT_SCALE-1.0 ) + vec2( GAME_GEOM_OFF_FIX /10000);
 
-    vTexCoord.y += 0.00001;
+    vTexCoord += 0.00001;
+    
+
+    
 
     //if (DO_GLOBAL_SHZO >0.5)
     //    vTexCoord = zoom(vTexCoord + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM );
@@ -338,7 +341,7 @@ void main() {
                 zoom_modifier.xy = zoom_modifier.yx;
             }
             float OutputHeightZoomed = out_size.y*zoom_modifier.y;
-            float screen_core_ratio = OutputHeightZoomed / params.OriginalSize.y;
+            float screen_core_ratio = OutputHeightZoomed / ori_size.y;
             if (screen_core_ratio < MIN_SCREEN_CORE_RATIO)
                 very_lowres_y = true;
         }
@@ -495,38 +498,20 @@ vec3 fn_pixel_nightify(vec3 color_in, float strength, vec3 ambilight) {
 }
 
 
-
-float morph_shape_full(float shape, float power, float steep ) {
-    float lum_scaled = power;
-    float l = lum_scaled; // (already clamped)
-    if (lum_scaled <= 0.5+steep) {
-        float l1 = pow(l, 4) * 15;
-        shape = pow(shape, 1/sqrt(l1));
-    } else {
-        float l2 = (l-0.5)*2.0;
-        shape = mix(shape, 1.0, l2);    //shape = shape * (1-l2) + l2;
-    }
-    return shape;
-}
-
 vec3 morph_shape_full_vec3(vec3 shape, vec3 l, float steep, float gamma ) {    
-    float steep_plus_1 = 1+steep;
     vec3 l_pow = pow(l,vec3(gamma));
-    vec3 l2 = min(l_pow * 16, 1+steep);
-    //vec3 s1 = pow(shape, 1/sqrt(l2));
+    vec3 l2 = min(l_pow * 16, steep);
     vec3 s1 = pow(shape, inversesqrt(l2));
     //vec3 s2 = (1-s1) * l_pow;
         //==  lpow - lpow * s1;
         //== -lpow * s1 + lpow;
     vec3 s2 = fma(-l_pow, s1,  l_pow); //ASM PROOF, faster.
-
-    return (s2/(1+steep)) + s1;
+    return (s2/(steep)) + s1;
 }
 
 vec3 morph_shape_full_no_steepness_vec3(vec3 shape, vec3 l, float gamma ) {
     vec3 l_pow = pow(l,vec3(gamma));
     vec3 l2 = min(l_pow * 16, 1);
-    //vec3 s1 = pow(shape, 1/sqrt(l2));
     vec3 s1 = pow(shape, inversesqrt(l2));
     vec3 s2 = (1-s1) * l_pow;
         // == 1*l_pow  - s1*l_pow
@@ -535,51 +520,10 @@ vec3 morph_shape_full_no_steepness_vec3(vec3 shape, vec3 l, float gamma ) {
     return s2 + s1;
 }
 
-/*vec3 morph_shape_full_vec3(vec3 shape, vec3 l, float steep ) {
-    vec3 l_pow = pow(l,vec3(4.2));
-    vec3 l2 = l_pow * 16;
-    l2 = clamp(l2, 0.0, 1+steep);
-    vec3 s1 = pow(shape, 1/sqrt(l2));
-    vec3 s2 = (1-s1) * l_pow;
-    return s1+(s2/(l+steep));
-}*/
-
-/*vec3 morph_shape_full_vec3(vec3 shape, vec3 l, float steep ) {
-    vec3 l_pow = pow(l,vec3(4.1));
-    vec3 l2 = l_pow * 16;
-    l2 = clamp(l2, 0.0,1.0);
-    vec3 s1 = pow(shape, 1/sqrt(l2));
-    vec3 s2 = (1-s1) * l_pow * (l*l);
-    return s1+(s2/(1+steep));
-}*/
 
 vec3 morph_shape(vec3 shape, vec3 power, float steep, float gamma ) {
    return morph_shape_full_vec3(shape, power, steep, gamma);
-
-    return vec3(
-      morph_shape_full(shape.x, power.x, steep),
-      morph_shape_full(shape.y, power.y, steep),
-      morph_shape_full(shape.z, power.z, steep)
-    );
-
-
-    //Use this to compare different methods
-    if (params.FrameCount % 2 == 0.0)
-        return morph_shape_full_vec3(shape, power, steep, gamma);
-            else
-    return vec3(
-      morph_shape_full(shape.x, power.x, steep),
-      morph_shape_full(shape.y, power.y, steep),
-      morph_shape_full(shape.z, power.z, steep)
-    );
 }
-
-/*float morph_shape(float shape, float power, float steep ) {
-    return morph_shape_full(shape, power, steep);
-}*/
-
-
-
 
 vec3 downsample( sampler2D tex, vec2 uv, vec4 sourcesize,  float sharpness_add ) {
     vec2 sharpness = vec2(1.0)+sharpness_add;
@@ -1483,10 +1427,8 @@ void main() {
             if (DO_VIGNETTE == 1.0) {
                 float spot_vignette_noise = random_fast(vTexCoord);
                 spot_vignette_noise = scale_to_range(spot_vignette_noise, -NOISEPOWER, NOISEPOWER);
-                pixel_out += spot_vignette_noise;
-                vec2 sinco = (co_content-0.5) / V_SIZE ;
-                float vignette = cos(sinco.x) * cos(sinco.y) * V_POWER;
-                pixel_out = (pixel_out*vignette);
+                vec2 sinco = cos((co_content-0.5) / V_SIZE) ;
+                pixel_out = (pixel_out * V_POWER) * (sinco.y * sinco.x) + spot_vignette_noise;
             }
 
         //Spot
@@ -1495,7 +1437,8 @@ void main() {
                                          vec2(   S_POSITION_X      * vIn_aspect, S_POSITION_Y) );
                     //pixel_out += smoothstep_fast(S_SIZE,0.0,dist) * (S_POWER * canvas_bezel_screen); //ASM PROOF FASTER
                     //pixel_out += smoothstep_cos(S_SIZE,0.0,dist) * (S_POWER * canvas_bezel_screen); //ASM PROOF MORE INSTRUCTIONS, LESS CYCLES
-                    pixel_out += smoothstep(S_SIZE,0.0,dist) * (S_POWER * canvas_bezel_screen);
+                    //pixel_out += smoothstep(S_SIZE,0.0,dist) * (S_POWER * canvas_bezel_screen);
+                    pixel_out += smoothstep_fast(S_SIZE * 0.90 ,0.0,dist) * (S_POWER * 1.125 * canvas_bezel_screen);
                     //pixel_out = mix(pixel_out, vec3(1.0), smoothstep(S_SIZE,0.0,dist) * S_POWER * canvas_bezel_screen); //<-- this is a bit slower, but more realistic.
             }
     }

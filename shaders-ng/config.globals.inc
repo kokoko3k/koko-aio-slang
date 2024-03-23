@@ -175,6 +175,11 @@
 
 #ifndef IN_GLOW_SPREAD
     #define IN_GLOW_SPREAD			global.IN_GLOW_SPREAD
+    
+#endif
+
+#ifndef IN_GLOW_SPREAD_SHARPNESS
+    #define IN_GLOW_SPREAD_SHARPNESS    global.IN_GLOW_SPREAD_SHARPNESS
 #endif
 
 #ifndef IN_GLOW_W
@@ -489,6 +494,10 @@
     #define AMBI_INT_OFFSET			params.AMBI_INT_OFFSET
 #endif
 
+#ifndef AMBI_SMP_INT_OFFSET
+    #define AMBI_SMP_INT_OFFSET params.AMBI_SMP_INT_OFFSET
+#endif
+
 #ifndef ASPECT_X
     #define ASPECT_X		global.ASPECT_X
 #endif
@@ -685,14 +694,6 @@
 
 #ifndef PIXELGRID_GAMMA_H
     #define PIXELGRID_GAMMA_H	global.PIXELGRID_GAMMA_H
-#endif
-
-#ifndef PIXELGRID_SMOOTH_W
-    #define PIXELGRID_SMOOTH_W 	global.PIXELGRID_SMOOTH_W
-#endif
-
-#ifndef PIXELGRID_SMOOTH_H
-    #define PIXELGRID_SMOOTH_H 	global.PIXELGRID_SMOOTH_H
 #endif
 
 #ifndef PIXELGRID_MUL_X

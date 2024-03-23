@@ -11,7 +11,7 @@
 #define CYELLOW  vec3(1.0,1.0,0.0)
 #define CCUSTOM vec3(0.3,0.5,0.1)
 
-#define DEBUG_COLOR vec3(1,0,0)
+#define DEBUG_COLOR vec3(1,1,1)
 #define DEBUG_BLINK_TIME 100
 #define DEBUG_GRADIENT_STEPS 64
 
@@ -20,13 +20,13 @@
 //#define DEBUG
    //#define DEBUG_COLOR_CALIB
    //#define DEBUG_TIME_FADE
-   #define DEBUG_SOLID_COLOR
+   //#define DEBUG_SOLID_COLOR
    //#define DEBUG_STEP_GRADIENT
    //#define DEBUG_STEP_GRADIENT_V
    //#define DEBUG_BLINK
    //#define DEBUG_BLINK_CIRCLE
    //#define DEBUG_WALKING_CIRCLE
-   //#define DEBUG_COLORWHEEL
+   #define DEBUG_COLORWHEEL
    
    
 #include "config.inc"
@@ -117,8 +117,9 @@ layout(location = 0) out vec4 FragColor;
 
 layout(set = 0, binding = 2) uniform sampler2D Source;
 layout(set = 0, binding = 3) uniform sampler2D colortools_and_ntsc_passFeedback;
+#ifndef D3D_WORKAROUND
 layout(set = 0, binding = 4) uniform sampler2D avglum_passFeedback;
-
+#endif
 
 vec3 colorwheel(vec2 uv){
    float timeoffset = params.FrameCount / 120.0;
