@@ -1,5 +1,5 @@
 #reference "../../shaders/shaders_slang/bezel/koko-aio/Presets-ng/Monitor-New_slotmask_gm.slangp"
-
+	IN_GLOW_SPREAD_SHARPNESS = "1.000001"
 	IN_GLOW_W = "1.00000"
 
 BEZEL_INNER_ZOOM = "-0.110000"

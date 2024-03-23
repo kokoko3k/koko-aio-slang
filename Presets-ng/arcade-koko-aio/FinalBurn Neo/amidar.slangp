@@ -1,4 +1,5 @@
 #reference "../../shaders/shaders_slang/bezel/koko-aio/Presets-ng/Monitor-Ambilight-immersive.slangp"
+IN_GLOW_SPREAD_SHARPNESS = "1.000001"
 BEZEL_INNER_ZOOM = "-0.265000"
 BEZEL_FRAME_ZOOM = "-0.045000"
 BEZEL_R = "-0.250000"
