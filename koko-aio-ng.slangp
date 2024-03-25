@@ -62,6 +62,8 @@ shaders = 17
 # Color tools
 # Ghosting
 # Phosphor persistance
+# Geometry override shifting (so it needs clamp_to _border)
+# It generates mipmaps to be used by several passes afterwards
 # Also, it carries a series of debug patterns that need to be activated by modifying 
 # some #defines in the pass itself
 
@@ -79,14 +81,13 @@ float_framebuffer0 = true
         
 # This pass emulates the flickering observed on crts when the input signal is interlaced
 # and there is high brightness difference between adiacent scanlines.
-# This pass is able to generate mipmaps because the next pass has mipmap_input true.
 #
 # Note that the wrap_mode is set to "mirrored_repeat".
 # This allow to cheaply generate a mirrored image that will be used later on to
 # draw reflections on the bezel.
 #
 # Also, it upscales the input signal to 2X.
-# This is needed because FXAA, the glow and the halo pass works best at at least 640x480 resolution.
+# This is needed because FXAA, the glow and the halo pass works best with at least 640x480 resolution.
 # Note that this is needed only for lowres content, but if the input signal is already at that
 # size, there is no need to scale to 2x, and it is possible to gain performance by turning
 # scale_x1 and scale_y1 from 2.0 to 1.0.
@@ -155,9 +156,6 @@ float_framebuffer3 = true
             scale4 = 1.0
        scale_type4 = source    
 float_framebuffer4 = true
-//This has to be mipmap true and mirrored true
-//mipmaps and mirrored are used to emulate light diffusion from reflection blur pass
-//mipmaps are also used by deltarender
         wrap_mode4 = "mirrored_repeat"
      
 # ASMDEBUG: GLSL42
@@ -195,22 +193,18 @@ float_framebuffer7 = true
 
 
 
-# Get the average luminance needed by ambilight here, because:
-#   * mipmap_input only works on "Source" texture
-#   * the following pass does not use the previous one 
-#   * the previous pass represents scene changes.
-
+# Get the average luminance needed by ambilight here.
 #   The rgb channels of the following pass contains luminance info
 #   Used by the bezel code to light up the bezel corners.
 #   The alpha channel contains the sum/3.0 of rgb channels
 #   used to detect scene changes.
 
 # This pass computes the average luminance of the image
-# by grabbing a mipmap from first_pass.
+# by grabbing a mipmap from colortools_and_ntsc_pass.
 # It stores at:
 # alpha@coords 0.25,0.25 at reduced sampling to aid ambient light scene change detection
 # alpha@coords 0.75,0.75 temporally smoother for use with bloom exposure and dynamic zoom
-# rgb: it puts a small mipmap from first_pass that will be used to light-up the bezel highlights
+# rgb: it puts a small mipmap from colortools_and_ntsc_pass used to light-up the bezel highlights.
 # alpha@other coords: simple continuous sampling used to modulate bezel highlights strength.
         
 # ASMDEBUG: GLSL51
@@ -283,7 +277,7 @@ float_framebuffer7 = true
 
 
 
-# Gather mipmaps from first_pass and use them to light virtual leds under the virtual monitor 
+# Use mipmaps from colortools_and_ntsc_pass to light virtual leds under the virtual monitor 
 # and temporally smooth led lights.
 # Extra logic makes it possible to lower the led reaction time when a scene change is detected.
 # this is achieved through average luminance sampling from avglum_pass
