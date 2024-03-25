@@ -106,6 +106,7 @@ float_framebuffer0 = true
           scale_y1 = 2.0  
         wrap_mode1 = "mirrored_repeat"
      float_framebuffer1 = true
+     mipmap_input1 = "true"
 
 
 
@@ -123,7 +124,6 @@ float_framebuffer0 = true
     filter_linear2 = true
        scale_type2 = source
             scale2 = 1.0
-     mipmap_input2 = false
       //this *has* to be clamp_to_border because  specular reflections need to turn to black
       //if geometry content override is shifting/zooming out the image.
         wrap_mode2 = "clamp_to_border"
@@ -141,7 +141,6 @@ float_framebuffer0 = true
             scale3 = 1.0
        scale_type3 = source
 float_framebuffer3 = true
-     mipmap_input3 = false
         wrap_mode3 = "mirrored_repeat"
 
         
@@ -160,7 +159,6 @@ float_framebuffer4 = true
 //mipmaps and mirrored are used to emulate light diffusion from reflection blur pass
 //mipmaps are also used by deltarender
         wrap_mode4 = "mirrored_repeat"
-     mipmap_input4 = true
      
 # ASMDEBUG: GLSL42
            shader5 = shaders-ng/in_glow_y.slang
@@ -184,7 +182,6 @@ float_framebuffer5 = true
             scale6 = 1.0
        scale_type6 = source
 float_framebuffer6 = true
-     mipmap_input6 = false
         wrap_mode6 = "clamp_to_edge"
         
 # ASMDEBUG: GLSL48
@@ -194,7 +191,6 @@ float_framebuffer6 = true
             scale7 = 1.0
        scale_type7 = source
 float_framebuffer7 = true
-     mipmap_input7 = false
         wrap_mode7 = "clamp_to_edge"
 
 
@@ -224,7 +220,6 @@ float_framebuffer7 = true
            scale_type8 = source
                 scale8 = 0.5
             wrap_mode8 = "mirrored_repeat"
-         mipmap_input8 = false
     float_framebuffer8 = "true"
          
          
@@ -245,7 +240,6 @@ float_framebuffer7 = true
         filter_linear10 = true
            scale_type10 = source
                 scale10 = 1.0
-         mipmap_input10 = false
             wrap_mode10 = "mirrored_repeat"
 
 # In the following passes we emulate bloom effect.

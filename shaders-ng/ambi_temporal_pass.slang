@@ -62,7 +62,7 @@ void main() {
     vSmp_step = (vSmpBorder_max - vSmpBorder_min)  / (leds_per_strip-1);
 
     //Calc a lod for a texture sized led_strip x led_strip
-        lod = log2(global.flick_and_noise_passSize.y / leds_per_strip);
+        lod = log2(global.flick_and_noise_passSize.y / leds_per_strip) - 1;
 
 
    //Scale to the original aspect
@@ -81,7 +81,7 @@ void main() {
         pre_pass_coords = zoom(pre_pass_coords + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM );
 
     if (DO_GAME_GEOM_OVERRIDE > 0.5)
-        pre_pass_coords = content_geom_override(pre_pass_coords, GAME_GEOM_ASPECT, get_in_aspect(), GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
+        pre_pass_coords = content_geom_override_zoom(pre_pass_coords, GAME_GEOM_ASPECT, get_in_aspect(), GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
 
 
     if (DO_BEZEL > 0.5)
@@ -118,12 +118,12 @@ layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 1) uniform sampler2D PastSampler;
 layout(set = 0, binding = 2) uniform sampler2D avglum_pass;
 layout(set = 0, binding = 3) uniform sampler2D avglum_passFeedback;
-layout(set = 0, binding = 4) uniform sampler2D shift_and_bleed_pass;
+layout(set = 0, binding = 4) uniform sampler2D colortools_and_ntsc_pass;
 
 
 
 vec3 ambi_push_pass(vec2 coords, float f_lod) {
-   vec3 pixel_out = textureLod(shift_and_bleed_pass, coords, f_lod).rgb;
+   vec3 pixel_out = textureLod(colortools_and_ntsc_pass, coords, f_lod).rgb;
    pixel_out = pow(pixel_out, vec3(AMBI_GAMMA)); 
 
    pixel_out = pixel_push_luminance(pixel_out, vAMBI_POWER);

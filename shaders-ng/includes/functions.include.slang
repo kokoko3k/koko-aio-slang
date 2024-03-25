@@ -827,13 +827,7 @@ float random_fast(vec2 seed) {
 		return BEZEL_INNER_ZOOM * float( !need_integer_scale() );
 	}
 
-	vec2 content_geom_override(vec2 co, float aspect, float in_aspect, float vshift, float hshift, float out_zoom){
-		
-		
-		//cheap cardboard emulation:
-        //co = co*2.0 - vec2(0.0,0.5);
-        //if (co.x > 1.0) co.x -= 1;
-		
+	vec2 content_geom_override_shift(vec2 co, float aspect, float in_aspect, float vshift, float hshift, float out_zoom){
 		//Aspect (ASM PROOF: IFTHEN is better)
 		float scale_y;
 		if (aspect > 0.01) 
@@ -841,18 +835,26 @@ float random_fast(vec2 seed) {
 				else
 			scale_y = 1.0;
 		
-		//Unbranched previous:
-		//float bUse_custom_aspect = float(aspect > 0.01);
-		//float bUse_custom_aspect = step(0.01, aspect);
-		//scale_y = mix_step(1.0, aspect/in_aspect, bUse_custom_aspect );
-		
 		float offset_y = (0.5 * scale_y ) - 0.5 ;
 		co.y = co.y*scale_y - offset_y;
 		//shift
 		co.y -= vshift/10.0;
 		co.x -= hshift/10.0;
+		return co;
+	}
+	
+	vec2 content_geom_override_zoom(vec2 co, float aspect, float in_aspect, float vshift, float hshift, float out_zoom){
 		//zoom
 		return zoom(co, out_zoom);
+	}	
+	
+	vec2 content_geom_override(vec2 co, float aspect, float in_aspect, float vshift, float hshift, float out_zoom){
+		//cheap cardboard emulation:
+        //co = co*2.0 - vec2(0.0,0.5);
+        //if (co.x > 1.0) co.x -= 1;
+		vec2 co_shifted = content_geom_override_shift( co,  aspect,  in_aspect,  vshift,  hshift,  out_zoom);
+		vec2 co_shifted_zoomed = content_geom_override_zoom( co_shifted,  aspect,  in_aspect,  vshift,  hshift,  out_zoom);
+		return co_shifted_zoomed;
 	}
 	
 //Blur/Glow

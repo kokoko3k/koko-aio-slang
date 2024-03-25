@@ -7,7 +7,7 @@
 
 //The mipmap wideness needed by the highlights on the bezel.
 //the higher, the smoother.
-#define mip_lod 5
+#define mip_lod 4
 
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
@@ -30,7 +30,7 @@ void main() {
     vTexCoord = TexCoord;
     vTexCoord_unscaled = TexCoord;
     if (DO_GAME_GEOM_OVERRIDE > 0.5)
-        vTexCoord = content_geom_override(vTexCoord, GAME_GEOM_ASPECT, get_in_aspect(), GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
+        vTexCoord = content_geom_override_zoom(vTexCoord, GAME_GEOM_ASPECT, get_in_aspect(), GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
 
 	//Get fuzzy mul and pow factor
 		vFuzzy_main_pass_stage_1 = apply_fuzzy_main_pass_stage_1();    
@@ -58,7 +58,7 @@ layout(location = 6) in float vResSwitch_res_changed;
 layout(location = 7) in vec2 vTexCoord_unscaled;
 
 layout(location = 0) out vec4 FragColor;
-layout(set = 0, binding = 2) uniform sampler2D shift_and_bleed_pass;
+layout(set = 0, binding = 2) uniform sampler2D colortools_and_ntsc_pass;
 layout(set = 0, binding = 3) uniform sampler2D avglum_passFeedback;
 
 /* The following will allow to sample at reduced interval
@@ -72,14 +72,14 @@ layout(set = 0, binding = 3) uniform sampler2D avglum_passFeedback;
 
 #define RGB_TO_GRAYSCALE = vec3(0.299, 0.587, 0.114)
 float get_avg_lum_from_mip() {
-    vec3 mip = textureLod(shift_and_bleed_pass, vec2(0.5,0.5),20.0).rgb;
+    vec3 mip = textureLod(colortools_and_ntsc_pass, vec2(0.5,0.5),20.0).rgb;
      mip = apply_fuzzy_main_pass_stage_2(mip, vFuzzy_main_pass_stage_1);
     //return (mip.r+mip.g+mip.b)/3.0;
     return rgb_to_gray(mip);
 }
 
 float get_avg_lum_from_mip_nocc() {
-    vec3 mip = textureLod(shift_and_bleed_pass, vec2(0.5,0.5),20.0).rgb;
+    vec3 mip = textureLod(colortools_and_ntsc_pass, vec2(0.5,0.5),20.0).rgb;
     return rgb_to_gray(mip);
 }
 
@@ -161,7 +161,7 @@ void main() {
     //Create a small mipmap to be used to light the bezel corners
     //and by the bloom pass to identify bright areas.
     if (vBezel_or_Bloom > 0.0) 
-        pixel_out.rgb = textureLod(shift_and_bleed_pass, vTexCoord, mip_lod).rgb;
+        pixel_out.rgb = textureLod(colortools_and_ntsc_pass, vTexCoord, mip_lod).rgb;
 
 
     FragColor = pixel_out;
