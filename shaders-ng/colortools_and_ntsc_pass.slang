@@ -146,7 +146,7 @@ vec4 ntscdec(vec2 uv, vec3 RGB_ori) {
    //	Sample composite signal and decode to YIQ
       vec2 YIQ_processed = vec2(0.0);
       vec2 YIQ_processed_shifted = vec2(0.0);
-      //by doing another ntsc filtering with this histed phase, we're able to better identify
+      //by doing another ntsc filtering with this shifted phase, we're able to better identify
       //artifacts that will drive the blur modulation.
          float phase_shift_for_blur;
          
