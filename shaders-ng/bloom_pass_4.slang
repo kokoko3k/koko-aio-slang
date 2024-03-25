@@ -74,7 +74,7 @@ layout(set = 0, binding = 4) uniform sampler2D bloom_pass_finalFeedback;
 #define BLOOM_PUPIL_EXPOSURE_CURVE_SHOULDER 0.33
 
 //How big is the zone in which the luminance will be computed for puple temporal adaption (range 2..20)
-#define BLOOM_PUPIL_LUM_ZONE_W 7
+#define BLOOM_PUPIL_LUM_ZONE_W 6
 
 //The speed of the pupil adaption
 #define BLOOM_PUPIL_ADAPTION_SPEED 0.2

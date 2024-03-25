@@ -100,7 +100,7 @@ float_framebuffer0 = true
 # ASMDEBUG: GLSL30
            shader1 = shaders-ng/flick_and_noise.slang
             alias1 = "flick_and_noise_pass"
-    filter_linear1 = false
+    filter_linear1 = true
        scale_type1 = source
           scale_x1 = 2.0
           scale_y1 = 2.0  
