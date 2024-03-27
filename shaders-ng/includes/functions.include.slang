@@ -829,6 +829,13 @@ float random_fast(vec2 seed) {
 
 	vec2 content_geom_override_shift(vec2 co, float aspect, float in_aspect, float vshift, float hshift, float out_zoom){
 		//Aspect (ASM PROOF: IFTHEN is better)
+		//shift
+		co.y -= vshift/10.0;
+		co.x -= hshift/10.0;
+		return co;
+	}
+	
+	vec2 content_geom_override_zoom(vec2 co, float aspect, float in_aspect, float vshift, float hshift, float out_zoom){
 		float scale_y;
 		if (aspect > 0.01) 
 			scale_y = aspect/in_aspect;
@@ -837,13 +844,6 @@ float random_fast(vec2 seed) {
 		
 		float offset_y = (0.5 * scale_y ) - 0.5 ;
 		co.y = co.y*scale_y - offset_y;
-		//shift
-		co.y -= vshift/10.0;
-		co.x -= hshift/10.0;
-		return co;
-	}
-	
-	vec2 content_geom_override_zoom(vec2 co, float aspect, float in_aspect, float vshift, float hshift, float out_zoom){
 		//zoom
 		return zoom(co, out_zoom);
 	}	

@@ -354,6 +354,10 @@
     #define BEZEL_DIFFUSION_STR global.BEZEL_DIFFUSION_STR
 #endif
 
+#ifndef BEZEL_LIGHT_NO_FADEOUT
+    #define BEZEL_LIGHT_NO_FADEOUT global.BEZEL_LIGHT_NO_FADEOUT
+#endif
+
 #ifndef BEZEL_CORNER_DARK
     #define BEZEL_CORNER_DARK   global.BEZEL_CORNER_DARK
 #endif

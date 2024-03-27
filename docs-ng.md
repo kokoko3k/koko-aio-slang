@@ -480,6 +480,8 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
         The amount of material roughness in reflection area
     Diffusion strength
         Mix an amount of high blurred reflection to simulate light diffusion
+    Light fadeout distance
+        Modulates the reflected and diffused light fadeout. higher numbers -> no fadeout.
     Specularity strength
         The amount of specular reflection
     Darken corners
