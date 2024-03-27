@@ -53,7 +53,7 @@
 	//set it to the minimum value which allows you to see ambient lights and background image around the frame.
 #define BEZEL_FRAME_SURROUND_MARGIN 0.06
 
-	//to speedup things, bezel rende logic can be completely skipped in the inner tube, if we
+	//to speedup things, bezel render logic can be completely skipped in the inner tube, if we
 	//already know it is completely transparent.
 	//Set the following to the maximum value that allow you to see 
 	//bezel borders and, if present in the source bezel texture, inner content/border shades
@@ -82,6 +82,11 @@
 	//same shade amount.
 #define AMBI_OVER_BEZEL_AR_CORRECTION 0.98
 
+
+	//This is used to fadeout reflection and diffusion strength
+	//It alters the start of the gradient
+	//Set it roughly to  (tube size / bezel total size)
+#define BEZEL_REFL_FADEOUT_START 0.90
 
 
 // AMBIENT LIGHT STATIC CONFIG ##########################################################################################

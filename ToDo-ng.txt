@@ -135,5 +135,5 @@ TODO:
 	    on super cars 2 it is better set to 0.19.
 	[ ] Why bezel does not scale correctly when using integer scale?
 	[ ] why blink debug option does not trig scene change when going from 0.2 to 1.0?
-	
+	[ ] joind dynamic zoom and override zoom into one zoom?
 	

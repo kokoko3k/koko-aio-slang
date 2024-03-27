@@ -158,8 +158,8 @@ vec2 get_zooms_modifier(float do_tate, bool bNeed_NO_integer_scale, bool isrotat
         co_scaled_max = zoomout_coords(co_scaled_max, -vBEZEL_INNER_ZOOM_adapted);
     }
  	if (DO_GAME_GEOM_OVERRIDE == 1.0) {
-		co_scaled_min = content_geom_override(co_scaled_min, GAME_GEOM_ASPECT, vIn_aspect, GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
-        co_scaled_max = content_geom_override(co_scaled_max, GAME_GEOM_ASPECT, vIn_aspect, GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
+		co_scaled_min = content_geom_override_zoom(co_scaled_min, GAME_GEOM_ASPECT, vIn_aspect, GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
+        co_scaled_max = content_geom_override_zoom(co_scaled_max, GAME_GEOM_ASPECT, vIn_aspect, GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
     }
 
     //vfprintvalue = 1/(co_scaled_max.y - co_scaled_min.y);
@@ -1309,8 +1309,16 @@ void main() {
 
     //Apply other content coords modifiers
         if (DO_GAME_GEOM_OVERRIDE == 1.0)
-            co_content = content_geom_override(co_content, GAME_GEOM_ASPECT, vIn_aspect, GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
+            co_content = content_geom_override_zoom(co_content, GAME_GEOM_ASPECT, vIn_aspect, GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
 
+    
+  /*  float anaborderstart = 0.5;
+    float anabordersize = anaborderstart + SERVICE1;
+    float side_zoom = 1-smoothstep_fast(anaborderstart-0.5, anabordersize-0.5,abs(co_content.x-0.5)) ;
+    co_content.x = zoom1D(co_content.x, 1/side_zoom);
+    //FragColor = vec4(side_zoom) ; return;
+    */
+    
     //Dynamic lum dependant full screen zoom?
     #ifndef D3D_WORKAROUND
         if (DO_DYNZOOM > 0.0)
@@ -1549,5 +1557,5 @@ void main() {
 
     FragColor = vec4(pixel_out, 1.0);
 
-    //FragColor = texture(halo_pass, vOutputCoord);
+    //FragColor = texture(reflected_blurred_pass, co_mirror);
 }

@@ -211,7 +211,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float PIXELGRID_MAX_W;
 	float PIXELGRID_SIZE_W;
 	
-													float PLACEHOLDER1; //2fps lost if deleted (!)
+	float BEZEL_LIGHT_NO_FADEOUT;
 	float IN_GLOW_SPREAD_SHARPNESS;
 
 	float PIXELGRID_MUL_X;
@@ -512,12 +512,13 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BEZEL_B             "        Color: Blue"				-0.3   -1.0 1.0  0.005
 #pragma parameter BEZEL_CON           "        Contrast"				1.3   0.0  10.0 0.01
 #pragma parameter BEZEL_RFL_ZOOM      "        Reflections zoom"			0.0   -1.5 0.5 0.005
-#pragma parameter BEZEL_REFL_STRENGTH "        Reflections strength"			0.35    0.0 2.0 0.01
+#pragma parameter BEZEL_REFL_STRENGTH "        Reflections strength"			0.75    0.0 2.0 0.01
 #pragma parameter BEZEL_RFL_BLR_SHD   "        Reflections sharpness"			-0.2  -1.5 0.8 0.01
 #pragma parameter BEZEL_ROUGHNESS     "        Reflections roughness"			1.0    0.0 5.0 0.1
 #pragma parameter BEZEL_DIFFUSION_STR "        Diffusion strength"             0.0     0.0 1.0 0.01
 #pragma parameter BEZEL_SPCL_STRENGTH "        Specularity strength"			0.5    0.0 3.0 0.05
-#pragma parameter BEZEL_CORNER_DARK   "        Darken corners"					0.85    0.0 2.0 0.05
+#pragma parameter BEZEL_LIGHT_NO_FADEOUT "        Light fadeout distance"				0.48    0.0 1.0 0.01
+#pragma parameter BEZEL_CORNER_DARK   "        Darken corners"					0.8    0.0 2.0 0.05
 
 
 #pragma parameter LABEL0024 " " 0.0 0.0 1.0 1.0

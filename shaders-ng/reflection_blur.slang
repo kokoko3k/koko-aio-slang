@@ -32,10 +32,18 @@ layout(location = 0) out vec4 FragColor;
 
 layout(set = 0, binding = 1) uniform sampler2D Source;
 layout(set = 0, binding = 2) uniform sampler2D reflected_blurred_passFeedback;
-layout(set = 0, binding = 3) uniform sampler2D shift_and_bleed_pass;
+layout(set = 0, binding = 3) uniform sampler2D colortools_and_ntsc_pass;
 
 #include "includes/functions.include.slang"
 #include "includes/blooms.include.slang"
+
+
+float light_fadeout(vec2 co) {
+   const float shade_start = 1-BEZEL_REFL_FADEOUT_START ;  
+   vec2 gradients = smoothstep_fast( vec2(BEZEL_LIGHT_NO_FADEOUT), vec2(0.5-(shade_start)   ), abs(co-0.5));
+   return  (gradients.x * gradients.y ); 
+}
+
 
 void main() {
    
@@ -50,7 +58,7 @@ void main() {
       }
 
    float shade_sharp_blur = texture(Source, vCoords_zoomout).a;
-      
+   
    //Create gradients in the corners to blur more more near corners:
       #define CORNER_BLURRINESS 0.6
       float fcorners_shade = corners_shade(vTexCoord, 0.9) * CORNER_BLURRINESS * 0.9;
@@ -64,16 +72,23 @@ void main() {
 
       vec3 pixel_out = bloom(Source, vCoords_zoomout, global.FinalViewportSize, vec2(blur_radius), 1.0, start_offset, 0.0) ;
       pixel_out *= BEZEL_REFL_STRENGTH;
- 
+
    //Next simulate a diffused light
-      vec3 pixel_diffused = textureLod( shift_and_bleed_pass, vCoords_zoomout, 6.0).rgb;
+      vec3 pixel_diffused = textureLod( colortools_and_ntsc_pass, vCoords_zoomout, 5.0).rgb;
       pixel_out = mix( pixel_out, pixel_diffused, BEZEL_DIFFUSION_STR);
+
+   //Border Reflection strength modulation
+      pixel_out *= vec3(light_fadeout(vTexCoord));
       
 
-   pixel_out = apply_fuzzy_main_pass_stage_2( pow(pixel_out, vec3(1/IN_GLOW_GAMMA)), vFuzzy_main_pass_stage_1);
+   pixel_out = apply_fuzzy_main_pass_stage_2(pixel_out, vFuzzy_main_pass_stage_1);
    
-   vec3 pixel_out_fb =  texture(reflected_blurred_passFeedback, vTexCoord).rgb;
-   pixel_out = mix(pixel_out_fb.rgb, pixel_out, 0.5 );
+  // vec3 pixel_out_fb =  texture(reflected_blurred_passFeedback, vTexCoord).rgb;
+  // pixel_out = mix(pixel_out_fb.rgb, pixel_out, 0.5 );
+   
+
+   
+
    
    FragColor = vec4(pixel_out, 1.0); 
  

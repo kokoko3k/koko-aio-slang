@@ -77,6 +77,11 @@ void main() {
    gl_Position = global.MVP * Position;
    vTexCoord = TexCoord * 1.0001;
 
+    if (DO_GAME_GEOM_OVERRIDE > 0.5)
+        vTexCoord = content_geom_override_shift(vTexCoord, GAME_GEOM_ASPECT, get_in_aspect(), GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
+
+   
+   
    if (DO_NTSC_ARTIFACTS > 0.0) {
       vNTSC_FILTER_FC = NTSC_FILTER_FC * 0.1;
       vSubcarrierFrequency_mul_size_mul_TAU = NTSC_FILTER_SCF * 0.1 * params.SourceSize.x * TAU;
@@ -141,7 +146,7 @@ vec4 ntscdec(vec2 uv, vec3 RGB_ori) {
    //	Sample composite signal and decode to YIQ
       vec2 YIQ_processed = vec2(0.0);
       vec2 YIQ_processed_shifted = vec2(0.0);
-      //by doing another ntsc filtering with this histed phase, we're able to better identify
+      //by doing another ntsc filtering with this shifted phase, we're able to better identify
       //artifacts that will drive the blur modulation.
          float phase_shift_for_blur;
          
