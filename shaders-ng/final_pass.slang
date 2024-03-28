@@ -298,7 +298,7 @@ void main() {
         vDo_pixelgrid_h = float( pixelgrid_h_needed() );
 
 
-    vDo_Curvature = DO_CURVATURE * (GEOM_WARP_X + GEOM_WARP_Y);
+    vDo_Curvature = curvature_needed();
 
     //Dot matrix: measure the final picture size to choose a right sharpness level
     //For simplicity and (my) mental health, take only y into account.

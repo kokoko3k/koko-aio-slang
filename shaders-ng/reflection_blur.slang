@@ -8,6 +8,7 @@ layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
 layout(location = 1) out vec2 vFuzzy_main_pass_stage_1;
 layout(location = 2) out vec2 vCoords_zoomout;
+layout(location = 3) out float vDo_Curvature;
 
 #include "includes/functions.include.slang"
 #include "includes/blooms.include.slang"
@@ -21,12 +22,15 @@ void main() {
       
    //Zoom out the image coordinates by the bezel border size to make room for reflections:
       vCoords_zoomout = zoom(vTexCoord, BEZEL_REFL_ZOOMOUT_ROOM);
+      
+   vDo_Curvature = curvature_needed();
 }
 
 #pragma stage fragment
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in vec2 vFuzzy_main_pass_stage_1;
 layout(location = 2) in vec2 vCoords_zoomout;
+layout(location = 3) in float vDo_Curvature;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -78,7 +82,12 @@ void main() {
       pixel_out = mix( pixel_out, pixel_diffused, BEZEL_DIFFUSION_STR);
 
    //Border Reflection strength modulation
-      pixel_out *= vec3(light_fadeout(vTexCoord));
+      if (vDo_Curvature > 0.0) {
+         vec2 curvedco = Warp_koko(vTexCoord, vec2(-GEOM_WARP_X, -GEOM_WARP_Y), 0.5);
+         pixel_out *= vec3(light_fadeout(curvedco));
+      } else {
+         pixel_out *= vec3(light_fadeout(vTexCoord));
+      }
       
 
    pixel_out = apply_fuzzy_main_pass_stage_2(pixel_out, vFuzzy_main_pass_stage_1);

@@ -558,7 +558,9 @@ float random_fast(vec2 seed) {
 
 
 //CURVATURE
-
+	float curvature_needed() {
+		return DO_CURVATURE * (GEOM_WARP_X + GEOM_WARP_Y);
+	}
 
 	#define corner_aspect vec2(1.0,  0.75)
 	float fn_border(vec2 coord) {
