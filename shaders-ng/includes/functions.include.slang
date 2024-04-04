@@ -362,6 +362,53 @@ vec2 apply_fuzzy_main_pass_stage_1() {
 	return vec2(color_out/color_in, gamma_out );
 }
 
+
+vec2 apply_fuzzy_main_pass_stage_1_no_gamma_in() {
+	//This simulates the final pass pixel processing so that previous passes like 
+	//reflections, full screen luminance zoom and ambient light 
+	//can react accordingly without doing the same thing twice.
+	//For speed reasons, this lives in vertex shader and will output
+	//a vec2(mul factor, pow factor)
+	//in fragment shader one will pow(pow factor)*multiply factor;
+	
+	float color_in = 1.0;
+	float color_out = 1.0;
+	float gamma_out = 1.0;
+	
+	float halo_power_adapted;
+	halo_power_adapted = HALO_POWER;
+	if (HALO_NO_PREGAIN == 1.0) {
+		halo_power_adapted /= get_halo_ungain_factor();
+	}
+	if (HALO_POWER < 0.0) 
+		halo_power_adapted = -halo_power_adapted/10.0;
+	
+	if (DO_CCORRECTION == 1.0) {
+		color_out = pow(color_in, GAMMA_OUT); //<- nonsense
+		gamma_out = gamma_out * GAMMA_OUT;
+		color_out = color_out * IN_GLOW_POWER;
+	}
+	
+	if (DO_PIXELGRID == 1.0) {
+		color_out *= 1- DO_PIXELGRID_H * 0.5   ; //Half color if scanline.
+		color_out *= 1- DO_PIXELGRID_W * 0.5   ; //Half color if Hmask.
+		color_out *= 1- PIXELGRID_Y_MASK * 0.2 ; //Strip at most 20% if level 2 ymask.
+	}
+
+
+	if (DO_HALO == 1.0) {
+		color_out += color_in*halo_power_adapted / HALO_GAMMA;
+		gamma_out = gamma_out * mix(1.0, HALO_GAMMA_OUT, halo_power_adapted*0.25) ;
+	}
+	
+	if (DO_VIGNETTE == 1.0)
+		color_out *= 0.8 * (V_POWER);
+	
+
+	
+	return vec2(color_out/color_in, gamma_out );
+}
+
 vec3 apply_fuzzy_main_pass_stage_2(vec3 pixel_in, vec2 stage1 ) {
 	//This gets the output of stage_1 to apply its pow and mul.
 	return pow(pixel_in, vec3(stage1.y)) * stage1.x;

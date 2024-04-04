@@ -18,7 +18,7 @@ void main() {
    vTexCoord = TexCoord;
 
    //Get fuzzy mul and pow factor
-      vFuzzy_main_pass_stage_1 = apply_fuzzy_main_pass_stage_1();   
+      vFuzzy_main_pass_stage_1 = apply_fuzzy_main_pass_stage_1_no_gamma_in();   
       
    //Zoom out the image coordinates by the bezel border size to make room for reflections:
       vCoords_zoomout = zoom(vTexCoord, BEZEL_REFL_ZOOMOUT_ROOM);
@@ -77,10 +77,14 @@ void main() {
       vec3 pixel_out = bloom(Source, vCoords_zoomout, global.FinalViewportSize, vec2(blur_radius), 1.0, start_offset, 0.0) ;
       pixel_out *= BEZEL_REFL_STRENGTH;
 
+      
    //Next simulate a diffused light
       vec3 pixel_diffused = textureLod( colortools_and_ntsc_pass, vCoords_zoomout, 5.0).rgb;
       pixel_out = mix( pixel_out, pixel_diffused, BEZEL_DIFFUSION_STR);
 
+   //Apply gamma out to reflections here to so that we don't need to do it in final pass (heavier).
+      pixel_out = apply_fuzzy_main_pass_stage_2(pixel_out, vFuzzy_main_pass_stage_1);
+      
    //Border Reflection strength modulation
       if (vDo_Curvature > 0.0) {
          vec2 curvedco = Warp_koko(vTexCoord, vec2(-GEOM_WARP_X, -GEOM_WARP_Y), 0.5);
@@ -90,12 +94,10 @@ void main() {
       }
       
 
-   pixel_out = apply_fuzzy_main_pass_stage_2(pixel_out, vFuzzy_main_pass_stage_1);
+   
    
   // vec3 pixel_out_fb =  texture(reflected_blurred_passFeedback, vTexCoord).rgb;
   // pixel_out = mix(pixel_out_fb.rgb, pixel_out, 0.5 );
-   
-
    
 
    
