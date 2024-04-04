@@ -76,7 +76,6 @@ void main() {
 
       vec3 pixel_out = bloom(Source, vCoords_zoomout, global.FinalViewportSize, vec2(blur_radius), 1.0, start_offset, 0.0) ;
       pixel_out *= BEZEL_REFL_STRENGTH;
-
       
    //Next simulate a diffused light
       vec3 pixel_diffused = textureLod( colortools_and_ntsc_pass, vCoords_zoomout, 6.0).rgb;
