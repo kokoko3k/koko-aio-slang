@@ -1319,18 +1319,20 @@ void main() {
     //FragColor = vec4(side_zoom) ; return;
     */
     
-    //Dynamic lum dependant full screen zoom?
-    #ifndef D3D_WORKAROUND
-        if (DO_DYNZOOM > 0.0)
-            co_content = zoom(co_content, get_dyn_zoom(avglum_pass) );
-    #endif
-
     //Create an alpha mask to write content into, it holds opacity info that will be used to compose:
         if (DO_CURVATURE == 1.0)  {
             canvas_busy = fn_border(co_content);
         } else {
             canvas_busy = float(is_first_inside_rect(co_content, RECT01)); //FIXME: is step() faster?
         }
+  
+    //Dynamic lum dependant full screen zoom?
+    #ifndef D3D_WORKAROUND
+        if (DO_DYNZOOM > 0.0)
+            co_content = zoom(co_content, get_dyn_zoom(avglum_pass) );
+    #endif
+
+
     #ifndef D3D_WORKAROUND
         if (DELTA_RENDER == 1.0) {
             bool reuse_old =  bool( texture(in_glow_pass, co_content).a * canvas_busy * vDeltaRenderOk ) ;
