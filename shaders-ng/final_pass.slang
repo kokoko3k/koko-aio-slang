@@ -330,7 +330,7 @@ void main() {
     // fake integer scanlines will be used.
     // (Logic is skipped if integer scaling is requested.)
         bool very_lowres_y = false;
-        #define MIN_SCREEN_CORE_RATIO 4.0 //We want at least that screen lines per single scanline.
+        #define MIN_SCREEN_CORE_RATIO 3.5 //We want at least that screen lines per single scanline.
         if ( bNeed_NO_integer_scale ) {
             vec4 out_size = params.OutputSize;
             vec4 ori_size = params.OriginalSize;
