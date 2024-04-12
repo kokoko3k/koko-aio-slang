@@ -582,6 +582,14 @@
     #define TILT_BEZEL_K	global.TILT_BEZEL_K
 #endif
 
+#ifndef AUTOCROP_MAX
+    #define AUTOCROP_MAX global.AUTOCROP_MAX
+#endif
+
+#ifndef AUTOCROP_PRECISION
+    #define AUTOCROP_PRECISION global.AUTOCROP_PRECISION
+#endif
+
 #ifndef TATE
     #define TATE	global.TATE
 #endif

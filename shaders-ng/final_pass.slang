@@ -1306,12 +1306,11 @@ void main() {
     //Mirror coords needs to be calculated here, before geom override, but after curvature.
     //It is still not perfect but a reasonable tradeoff by now.
         vec2 co_mirror = zoom(co_content, 1/BEZEL_REFL_ZOOMOUT_ROOM);
-
+        
     //Apply other content coords modifiers
         if (DO_GAME_GEOM_OVERRIDE == 1.0)
             co_content = content_geom_override_zoom(co_content, GAME_GEOM_ASPECT, vIn_aspect, GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
 
-    
   /*  float anaborderstart = 0.5;
     float anabordersize = anaborderstart + SERVICE1;
     float side_zoom = 1-smoothstep_fast(anaborderstart-0.5, anabordersize-0.5,abs(co_content.x-0.5)) ;
@@ -1325,11 +1324,14 @@ void main() {
         } else {
             canvas_busy = float(is_first_inside_rect(co_content, RECT01)); //FIXME: is step() faster?
         }
-  
-    //Dynamic lum dependant full screen zoom?
+ 
+        //Dynamic lum dependant full screen zoom?
     #ifndef D3D_WORKAROUND
         if (DO_DYNZOOM > 0.0)
             co_content = zoom(co_content, get_dyn_zoom(avglum_pass) );
+    
+        if (AUTOCROP_MAX > 0.0)
+            co_content = zoom(co_content, get_autocrop_zoom(avglum_pass) );
     #endif
 
 
@@ -1560,4 +1562,8 @@ void main() {
     FragColor = vec4(pixel_out, 1.0);
 
     //FragColor = texture(reflected_blurred_pass, co_mirror);
+    
+    
+    
+    
 }

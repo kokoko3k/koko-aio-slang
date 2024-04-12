@@ -1184,6 +1184,10 @@ float get_dyn_zoom(sampler2D tex) {
 	return texture(tex, vec2(0.75,0.75)).a * DO_DYNZOOM + 1.0 ;
 }
 
+float get_autocrop_zoom(sampler2D tex) {
+	return texture(tex, AUTOCROP_SAMPLING_POINT).a;
+}
+
 
 vec2 tilt2D(vec2 co, float is_rotated, vec2 tilt) {
 
@@ -1532,4 +1536,9 @@ vec3 adaptive_strobe_checkerboard(vec3 pixel_out, vec2 co, vec2 outputsize) {
     
 }
 
+vec2 r2(vec2 p0, int n) {
+    
+    //return fract(p0 + float(n)*vec2(0.754877669, 0.569840296));
+    return fract(p0 + vec2(n*12664745, n*9560333)/exp2(24.));	// integer mul to avoid round-off
+}
 

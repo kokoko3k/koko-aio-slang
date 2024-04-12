@@ -175,6 +175,9 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float TILT_BEZEL_K;
 	float TILT_FOV;
 	
+	float AUTOCROP_MAX;
+	float AUTOCROP_PRECISION;
+	
 	float DO_BACKDROP; 
 	float BACKDROP_OFFX;
 	float BACKDROP_OFFY;
@@ -608,33 +611,37 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter DO_DYNZOOM	     "★ Luminosity tied zoom (!!OBSTRUCTS integer scale!!) ==>"		0.015   0.0   1.0  0.005
 #pragma parameter LABEL0032 " " 0.0 0.0 1.0 1.0
 
+//Autocrop
+#pragma parameter AUTOCROP_MAX	     "★ Maximum autocrop amount (!!OBSTRUCTS integer scale!!) ==>"   0.0   0.0   0.5  0.01
+#pragma parameter AUTOCROP_PRECISION "        Samples per frame (faster response, higher gpu use)"     10.0   0.0   300.0 1.0
+#pragma parameter LABEL0033 " " 0.0 0.0 1.0 1.0
 
 //Content geomerty overrides
 #pragma parameter DO_GAME_GEOM_OVERRIDE	  "★ Override content geometry enable? (ov)==>"	0.0   0.0  1.0 	  1.0
 #pragma parameter GAME_GEOM_INT_SCALE     "        Integer scale (disables inner zoom) 2=No keep aspect"	0.0   0.0  2.0    1.0
 #pragma parameter GAME_GEOM_INT_SCALE_MAX "        .    Maximum integer scale" 			10.0  1.0  100.0  1.0
 #pragma parameter GAME_GEOM_INT_SCALE_OVR "        .    Permit integer overscale by" 			1.04   1.00  1.1  0.01
-#pragma parameter LABEL0041         "    !! Switch off luminosity tied zoom to use integer scaling"   1.0  1.0  1.0     1.0
-#pragma parameter LABEL0052          "    !! The following will override integer scale" 1.0  1.0  1.0     1.0
+#pragma parameter LABEL0052           "    !! The following will override integer scale" 1.0  1.0  1.0     1.0
 #pragma parameter GAME_GEOM_ASPECT	  "        Aspect (0 = unchanged)"		0.0    0.0  3.0	  0.005
 #pragma parameter GAME_GEOM_VSHIFT	  "        Vertical position"			0.0   -10.0 10.0  0.01
 #pragma parameter GAME_GEOM_HSHIFT	  "        Horizontal position"			0.0   -10.0 10.0  0.01
 #pragma parameter GAME_GEOM_ZOOM	  "        Zoom"					1.0    0.0  2.0  0.01
 #pragma parameter GAME_GEOM_OFF_FIX	  "        Sharp hack through offset (0.0=disable)"	0.0    0.0  100.0  1
-#pragma parameter LABEL0033 " " 0.0 0.0 1.0 1.0
+#pragma parameter LABEL0034 " " 0.0 0.0 1.0 1.0
+
 
 //Tilt
 #pragma parameter DO_TILT	  	"★ Tilt enable? (ti) ==>"				0.0   0.0  1.0 	  1.0
 #pragma parameter TILT_X	  	"        Tilt along X axis"		0.0    -0.5  0.5  0.01
 #pragma parameter TILT_FOV	  	"        Fov"					0.7    0.1	1.5   0.05
 #pragma parameter TILT_BEZEL_K	"        Bezel multiplier"		1.0    0.0  1.5  0.01
-#pragma parameter LABEL0034 " " 0.0 0.0 1.0 1.0
+#pragma parameter LABEL0035 " " 0.0 0.0 1.0 1.0
 
 //Delta render
 #pragma parameter LABEL0053    "  !THE FOLLOWING FEATURES ARE STATIC, SEE docs-ng.md TO ENABLE"    0.0 0.0 0.0 1.0
 #pragma parameter DELTA_RENDER_FORCE_REFRESH    "★ Delta render force refresh interval ? ==>"	4.0 1.0 3600.0 1.0
 #pragma parameter DELTA_RENDER_CHECK_AREA       "        Delta render area size"			1.0 0.0 10.0 1.0
-#pragma parameter LABEL0035 " " 0.0 0.0 1.0 1.0
+#pragma parameter LABEL0041 " " 0.0 0.0 1.0 1.0
 
 #pragma parameter SERVICE1 "Don't use me, for debug purposes only" 	0.5 0.0 1.0 0.01
 

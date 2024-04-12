@@ -1,5 +1,9 @@
 #version 450
 
+#define AUTOCROP_TOLERANCE (1.0/255.0) 
+//How many pseudorandom samplings per line
+
+
 /* In this pass we calculate the average luminance of the scene.
  * It is cheaply obtained by the use of mipmaps. */
 
@@ -37,7 +41,7 @@ void main() {
 
     vReduced_sample_time_is_now = mod(params.FrameCount,AMBI_AVGLUM_DIVIDER);
     
-    vAvglum_needed = DO_AMBILIGHT + DO_BEZEL + (DO_DYNZOOM*10.0) + DO_BLOOM + (RESSWITCH_GLITCH_SIZE*10.0) ;
+    vAvglum_needed = DO_AMBILIGHT + DO_BEZEL + (DO_DYNZOOM*10.0) + DO_BLOOM + (RESSWITCH_GLITCH_SIZE*10.0) + AUTOCROP_MAX ;
     vBezel_or_Bloom = DO_BEZEL + DO_BLOOM;
     
     //RESSWITCH shaking:
@@ -58,8 +62,10 @@ layout(location = 6) in float vResSwitch_res_changed;
 layout(location = 7) in vec2 vTexCoord_unscaled;
 
 layout(location = 0) out vec4 FragColor;
+layout(set = 0, binding = 1) uniform sampler2D  colortools_and_ntsc_passFeedback;
 layout(set = 0, binding = 2) uniform sampler2D colortools_and_ntsc_pass;
 layout(set = 0, binding = 3) uniform sampler2D avglum_passFeedback;
+layout(set = 0, binding = 4) uniform sampler2D Original;
 
 /* The following will allow to sample at reduced interval
    The scene change detection logic will take advantage of it
@@ -70,7 +76,7 @@ layout(set = 0, binding = 3) uniform sampler2D avglum_passFeedback;
 #include "includes/functions.include.slang"
 
 
-#define RGB_TO_GRAYSCALE = vec3(0.299, 0.587, 0.114)
+#define RGB_TO_GRAYSCALE vec3(0.299, 0.587, 0.114)
 float get_avg_lum_from_mip() {
     vec3 mip = textureLod(colortools_and_ntsc_pass, vec2(0.5,0.5),20.0).rgb;
      mip = apply_fuzzy_main_pass_stage_2(mip, vFuzzy_main_pass_stage_1);
@@ -90,10 +96,10 @@ float get_avg_lum_from_mip_nocc() {
 float get_avglum() {
     /* avglum alpha has some zones:
      * 0.25 -> reduced sampling, used for to aid scene detection
-     * 0.75 -> smoothed_sampling, used to adapt fullscreen zoom and adaptive black
      * 0.50 -> smoothed_sampling, no color corrections.
-     * RESSWITCH_SAMPLING_POINT (0.9) -> resolution change detection
-     * 
+     * 0.75 -> smoothed_sampling, used to adapt fullscreen zoom and adaptive black
+     * AUTOCROP_SAMPLING_POINT (0.825) -> autocrop zoom value pixked up by final pass.
+     * RESSWITCH_SAMPLING_POINT (0.900) -> resolution change detection
      * anything else: continuous sampling
      */
             
@@ -126,6 +132,152 @@ float get_avglum() {
 }
 
 
+float quasirandom(float n) {
+    //n has to be integer for this to work.
+	// https://extremelearning.com.au/unreasonable-effectiveness-of-quasirandom-sequences/
+	return fract(n*0.754877626895905);
+    //return abs(sin(n));
+}
+
+float get_next_autocrop_amount(float max_autocrop_amount) {
+
+    // Skip logic for solid screens
+    /*vec3 avg_lum =   textureLod(colortools_and_ntsc_pass, vec2(0.5,0.5),20.0).rgb;
+    vec3 pixel_lum = textureLod(colortools_and_ntsc_pass, vec2(0.5,0.5),2.0).rgb;
+    float diff_lum = dot( abs(avg_lum - pixel_lum), vec3(1/3.0) );
+    if (diff_lum < 1/256.0)
+        return 0.0;
+    */
+
+
+   
+    //Implementation requires the line_step to be the same for vertical and horizontal sampling.
+    //This could be a bit inefficient tho.
+        const float size_max = max(params.OriginalSize.x,params.OriginalSize.y) ;
+        const float next_line_step = 1/size_max;
+        
+    //This is needed to avoid sampling edges which may return out out of range values.
+        const vec2 d = params.OriginalSize.zw*0.5; 
+    //Reference color, topleft.
+        vec3 ref = texture(Original, vec2(d)).rgb; 
+        float ref_lum = ref.r + ref.g + ref.b ;
+    
+    //convert zoom back to maximum cropped lines
+        const float max_crop_lines = ( size_max * (max_autocrop_amount -1) )  / ( 2*max_autocrop_amount) ;
+    
+    
+    //Sample top,bottom,left,right lines; stop when a line sum contain a different pixel color than the reference
+    for (float croppedlines = 0.0 ; croppedlines < max_crop_lines ; croppedlines++) {
+        
+        vec3 smp_sum;
+        float line_lum;
+        
+        //Top
+        smp_sum = vec3(0.0);
+        for ( float x = params.FrameCount ; x < params.FrameCount+AUTOCROP_PRECISION ;  x ++ ) {
+            smp_sum += texture(Original, vec2( scale_to_range( quasirandom(x), d.x, 1-d.x )  , 0.0 + next_line_step * croppedlines)).rgb;
+            // One should skip already sampled zones, but benchmarks say that for 20 to 50 samples gain is low or even less than 1.0
+            // Probably because computing ranges is time consuming per se.
+            //float start = croppedlines*params.OriginalSize.z+d.x;
+            //float end = 1-(croppedlines*params.OriginalSize.z)-d.x;
+            //smp_sum += texture(Original, vec2( scale_to_range( quasirandom(x), start, end)  , d.y + next_line_step * croppedlines)).rgb;
+        }
+        
+        line_lum = (smp_sum.r + smp_sum.g + smp_sum.b) / (AUTOCROP_PRECISION);
+        
+        if ( abs(ref_lum - line_lum) > AUTOCROP_TOLERANCE)
+            return size_max / (size_max - (croppedlines) * 2) ;
+
+        //BOTTOM
+        smp_sum = vec3(0.0);
+        for ( float x = params.FrameCount ; x < params.FrameCount+AUTOCROP_PRECISION ; x ++ )  {   
+            smp_sum += texture(Original, vec2(  scale_to_range( quasirandom(x), d.x, 1-d.x )  , (1.0-eps)-next_line_step*croppedlines)).rgb;
+            // One should skip already sampled zones, but benchmarks say that for 20 to 50 samples gain is low or even less than 1.0
+            // Probably because computing ranges is time consuming per se.
+            //float start = croppedlines*params.OriginalSize.z+d.x;
+            //float end = 1-(croppedlines*params.OriginalSize.z)-d.x;
+            //smp_sum += texture(Original, vec2( scale_to_range( quasirandom(x), start, end)  , (1.0-d.y)-next_line_step*croppedlines)).rgb;
+        }
+
+        line_lum = (smp_sum.r + smp_sum.g + smp_sum.b) / (AUTOCROP_PRECISION);
+        
+        if (abs( ref_lum - line_lum) > AUTOCROP_TOLERANCE) {
+            return size_max / (size_max - (croppedlines) * 2) ;
+        }
+        
+        //LEFT
+        smp_sum = vec3(0.0);
+        for ( float y = params.FrameCount; y < params.FrameCount+AUTOCROP_PRECISION; y ++ ) {
+            smp_sum += texture(Original, vec2(0.0+next_line_step*croppedlines, scale_to_range( quasirandom(y), d.y, 1-d.y )  )).rgb;
+            // One should skip already sampled zones, but benchmarks say that for 20 to 50 samples gain is low or even less than 1.0
+            // Probably because computing ranges is time consuming per se.
+            //float start = (croppedlines+1)*params.OriginalSize.w+d.y;
+            //float end = 1-(croppedlines+1)*params.OriginalSize.w-d.y;
+            //smp_sum += texture(Original, vec2(d.x+next_line_step*croppedlines, scale_to_range( quasirandom(y), start, end )  )).rgb;
+        }
+        
+        line_lum = (smp_sum.r + smp_sum.g + smp_sum.b) / (AUTOCROP_PRECISION);
+
+        if (abs( ref_lum - line_lum) > AUTOCROP_TOLERANCE)
+            return size_max / (size_max - (croppedlines) * 2)     ;
+
+        //RIGHT
+        smp_sum = vec3(0.0);
+        for ( float y = params.FrameCount; y < params.FrameCount+AUTOCROP_PRECISION; y ++ ) {
+            smp_sum += texture(Original, vec2((1.0-eps)-next_line_step*croppedlines, scale_to_range( quasirandom(y), d.y, 1-d.y )    )).rgb;
+            // One should skip already sampled zones, but benchmarks say that for 20 to 50 samples gain is low or even less than 1.0
+            // Probably because computing ranges is time consuming per se.
+            //float start = (croppedlines+1)*params.OriginalSize.w+d.y;
+            //float end = 1-(croppedlines+1)*params.OriginalSize.w-d.y;
+            //smp_sum += texture(Original, vec2((1.0-d.x)-next_line_step*croppedlines, scale_to_range( quasirandom(y), d.y, 1-d.y )    )).rgb;
+        }
+
+        line_lum = (smp_sum.r + smp_sum.g + smp_sum.b) / (AUTOCROP_PRECISION);
+
+        if (abs( ref_lum - line_lum) > AUTOCROP_TOLERANCE)
+            return size_max / (size_max - (croppedlines) * 2);
+
+    }
+
+    return max_autocrop_amount;
+
+}
+
+
+float get_autocrop() {
+    // This return a value that will be used  in the final pass to zoom the picture.
+    float previous_autocrop_amount = AUTOCROP_MAX+1;
+    if (params.FrameCount < 30.0) {
+        previous_autocrop_amount =  AUTOCROP_MAX+1; //Good start point.
+    } else {
+        previous_autocrop_amount = texture(avglum_passFeedback,AUTOCROP_SAMPLING_POINT).a;
+        previous_autocrop_amount = min(previous_autocrop_amount, 1.0);
+    }
+
+    //next_autocrop_amount = get_next_autocrop_amount(AUTOCROP_MAX);
+                
+
+    // Reset crop if scene has changed?
+        vec3 pre_avglum = textureLod( colortools_and_ntsc_pass, vec2(0.5), 20.0).rgb;
+        vec3 cur_avglum = textureLod( colortools_and_ntsc_passFeedback, vec2(0.5), 20.0).rgb;
+        
+        vec3 diff_avglum_vec3 = abs(pre_avglum - cur_avglum);
+        float diff_avglum = diff_avglum_vec3.r + diff_avglum_vec3.g + diff_avglum_vec3.b ;
+
+    float next_autocrop_amount;
+    #define AUTOCROP_STEADINESS 0.15 //the lower, the more it search for a new auto
+    if (diff_avglum >= AUTOCROP_STEADINESS) {
+        //scene change, reset
+        next_autocrop_amount = get_next_autocrop_amount(AUTOCROP_MAX+1);
+        return next_autocrop_amount;
+    } else {
+        previous_autocrop_amount = texture(avglum_passFeedback,AUTOCROP_SAMPLING_POINT).a;
+        next_autocrop_amount = get_next_autocrop_amount(previous_autocrop_amount);
+        return mix( texture(avglum_passFeedback,AUTOCROP_SAMPLING_POINT).a  , next_autocrop_amount, AUTOCROP_TRANSITION_SPEED);
+    }
+}
+
+
 void main() {
     /*Grab a mipmap from the flick_and_noise_pass.
       Calculate the average luminance from the smallest mipmap and put into the alpha channel
@@ -139,6 +291,8 @@ void main() {
     
     vec4 pixel_out;
     
+    
+    
     //We also reserve a sampling point in alpha channel to store if the resolution has changed.
     //The value stored will be used by the first pass as an argument to sin() to shake the image.
     if (is_first_inside_rect(vTexCoord_unscaled, vec4(RESSWITCH_SAMPLING_POINT-0.01 , RESSWITCH_SAMPLING_POINT+0.01) )) {
@@ -151,6 +305,11 @@ void main() {
                  pixel_out.a = 0.0;
             #endif
         }
+        
+
+    } else if (is_first_inside_rect(vTexCoord_unscaled, vec4(AUTOCROP_SAMPLING_POINT-0.01, AUTOCROP_SAMPLING_POINT+0.01) ))  {
+        if (AUTOCROP_MAX > 0.001)
+            pixel_out.a = get_autocrop();
         
     } else {
         pixel_out.a = get_avglum();

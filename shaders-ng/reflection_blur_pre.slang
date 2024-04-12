@@ -68,7 +68,10 @@ void main() {
 
    if (DO_DYNZOOM > 0.0)
       coords = zoom(coords, get_dyn_zoom(avglum_pass));
- 
+
+   if (AUTOCROP_MAX > 0.0)
+      coords = zoom(coords, get_autocrop_zoom(avglum_pass));
+   
    //eventually return black pixel
    if (coords.y < 0.0 || coords.y > 1.0 || coords.x < 0.0 || coords.x > 1.0) {
       FragColor = vec4(0.0);
