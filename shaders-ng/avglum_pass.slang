@@ -266,8 +266,10 @@ float get_autocrop() {
     float next_autocrop_amount;
     if (diff_avglum >= AUTOCROP_STEADINESS) {
         //scene change, reset
+        previous_autocrop_amount = texture(avglum_passFeedback,AUTOCROP_SAMPLING_POINT).a;
         next_autocrop_amount = get_next_autocrop_amount(AUTOCROP_MAX+1);
-        return next_autocrop_amount;
+        float r = mix( previous_autocrop_amount , next_autocrop_amount, AUTOCROP_TRANSITION_SPEED);
+        return r;
     } else {
         previous_autocrop_amount = texture(avglum_passFeedback,AUTOCROP_SAMPLING_POINT).a;
         next_autocrop_amount = get_next_autocrop_amount(previous_autocrop_amount);

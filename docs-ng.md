@@ -634,6 +634,12 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
         Fortunately even low/lighter values like 10 will work good if you're ok
         in waiting 2..3 seconds for the final crop value to be found.
         
+    Scene change treshold
+        When autocrop finds a maximum crop value, it only tries to crop more when the scene changes.
+        By lowering this value, you tell the shader to try higher the crop more often.
+        
+    Transition speed
+        This modulates the smoothness of the animation between various crop values.
 
 **Override content geometry:**<br>
     Contrary to the global aspect ratio control, this changes only the game geometry.<br>

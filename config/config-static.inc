@@ -135,10 +135,6 @@
 	// AUTOCROP
 //which coords holds the autocrop zoom value
 #define AUTOCROP_SAMPLING_POINT vec2(0.125)
-//The higher, the faster the autocrop transitions will be
-#define AUTOCROP_TRANSITION_SPEED 0.2
-//the lower, the more it search for a new auto
-#define AUTOCROP_STEADINESS 0.15 
 	
 	
 // RESOLUTION SWITCH GLITCH EMULATION ##########################################################################################
