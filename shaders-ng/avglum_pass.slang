@@ -264,7 +264,6 @@ float get_autocrop() {
         float diff_avglum = diff_avglum_vec3.r + diff_avglum_vec3.g + diff_avglum_vec3.b ;
 
     float next_autocrop_amount;
-    #define AUTOCROP_STEADINESS 0.15 //the lower, the more it search for a new auto
     if (diff_avglum >= AUTOCROP_STEADINESS) {
         //scene change, reset
         next_autocrop_amount = get_next_autocrop_amount(AUTOCROP_MAX+1);
@@ -273,7 +272,7 @@ float get_autocrop() {
         previous_autocrop_amount = texture(avglum_passFeedback,AUTOCROP_SAMPLING_POINT).a;
         next_autocrop_amount = get_next_autocrop_amount(previous_autocrop_amount);
         float r =  mix( previous_autocrop_amount , next_autocrop_amount, AUTOCROP_TRANSITION_SPEED);
-        return max(r, 1.0); // needed to sanitize output when Feedback is unavailable (eg: just switched autocrop on)
+        return clamp(r, 1.0, AUTOCROP_MAX+1); // needed to sanitize output when Feedback is unavailable (eg: just switched autocrop on)
     }
 }
 
