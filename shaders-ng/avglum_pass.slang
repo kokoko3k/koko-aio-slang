@@ -251,7 +251,6 @@ float get_autocrop() {
         previous_autocrop_amount =  AUTOCROP_MAX+1; //Good start point.
     } else {
         previous_autocrop_amount = texture(avglum_passFeedback,AUTOCROP_SAMPLING_POINT).a;
-        previous_autocrop_amount = min(previous_autocrop_amount, 1.0);
     }
 
     //next_autocrop_amount = get_next_autocrop_amount(AUTOCROP_MAX);
@@ -273,7 +272,8 @@ float get_autocrop() {
     } else {
         previous_autocrop_amount = texture(avglum_passFeedback,AUTOCROP_SAMPLING_POINT).a;
         next_autocrop_amount = get_next_autocrop_amount(previous_autocrop_amount);
-        return mix( texture(avglum_passFeedback,AUTOCROP_SAMPLING_POINT).a  , next_autocrop_amount, AUTOCROP_TRANSITION_SPEED);
+        float r =  mix( previous_autocrop_amount , next_autocrop_amount, AUTOCROP_TRANSITION_SPEED);
+        return max(r, 1.0); // needed to sanitize output when Feedback is unavailable (eg: just switched autocrop on)
     }
 }
 
