@@ -612,7 +612,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter LABEL0032 " " 0.0 0.0 1.0 1.0
 
 //Autocrop
-#pragma parameter AUTOCROP_MAX	     "★ Maximum autocrop amount (!!OBSTRUCTS integer scale!!) ==>"   0.0   0.0   0.5  0.01
+#pragma parameter AUTOCROP_MAX	     "★ Autocrop: maximum amount (!!OBSTRUCTS integer scale!!) ==>"   0.0   0.0   0.5  0.01
 #pragma parameter AUTOCROP_PRECISION "        Samples per frame (faster response, higher gpu use)"     10.0   0.0   300.0 1.0
 #pragma parameter LABEL0033 " " 0.0 0.0 1.0 1.0
 

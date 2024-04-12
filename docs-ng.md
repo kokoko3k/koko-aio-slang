@@ -622,6 +622,19 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
     Please TURN THIS OFF if you want to use integer scaling, since this obstructs it.
     The higher, the more prominent the effect.
 
+**Autocrop**: 
+    Clears solid bars around the frame.
+    
+    Autocrop maximum amount:
+        The higher, the more solid borders wil be cropped around the image.
+    
+    Samples per frame:
+        Higher values makes the shader search more in a single frame for solid areas.
+        This leads to more accurate result in less time, however it will also stress the gpu more.
+        Fortunately even low/lighter values like 10 will work good if you're ok
+        in waiting 2..3 seconds for the final crop value to be found.
+        
+
 **Override content geometry:**<br>
     Contrary to the global aspect ratio control, this changes only the game geometry.<br>
     Bezel stays the same.<br>

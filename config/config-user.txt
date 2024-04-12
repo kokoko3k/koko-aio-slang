@@ -282,6 +282,9 @@
 // #define DO_DYNZOOM  0.015
 
 
+// #define AUTOCROP_MAX 0.0
+// #define AUTOCROP_PRECISION 10
+
 // #define DO_GAME_GEOM_OVERRIDE  0.0
 // #define GAME_GEOM_INT_SCALE  0.0
 // #define GAME_GEOM_INT_SCALE_MAX  10.0
