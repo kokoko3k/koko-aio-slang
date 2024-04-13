@@ -143,15 +143,16 @@ bool scene_changed( vec3 pre_mip, vec3 cur_mip, float threshold) {
     //This should be optimal for Amiga games.
     if (vResChanged == 1.0) return true;
     
-    float cur_v = rgb_to_gray(cur_mip);
     float pre_v = rgb_to_gray(pre_mip);
+    float cur_v = rgb_to_gray(cur_mip);
+
     
     float diff_v = cur_v - pre_v;
     
     // fadein: if the previous image is almost black and 
     // image is fading in, trigger a scene scange 
     if (pre_v < 10.0/255.0)
-        if (diff_v > 0.0)
+        if (pre_v < cur_v)
             return true;
     
     float diff_v_abs = abs(diff_v);
@@ -293,8 +294,8 @@ float get_autocrop() {
                 
 
     // Reset crop if scene has changed?
-    vec3 pre_mip = textureLod( colortools_and_ntsc_pass, vec2(0.5), 20.0).rgb;
-    vec3 cur_mip = textureLod( colortools_and_ntsc_passFeedback, vec2(0.5), 20.0).rgb;
+    vec3 pre_mip = textureLod( colortools_and_ntsc_passFeedback, vec2(0.5), 20.0).rgb;
+    vec3 cur_mip = textureLod( colortools_and_ntsc_pass, vec2(0.5), 20.0).rgb;
 
     float next_autocrop_amount;
     
