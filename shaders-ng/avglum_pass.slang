@@ -194,6 +194,7 @@ float get_next_autocrop_amount(float max_autocrop_amount) {
         const vec2 d = params.OriginalSize.zw*0.5; 
     //Reference color, topleft.
         vec3 ref = texture(Original, vec2(d)).rgb; 
+        ref = textureLod(colortools_and_ntsc_pass, vec2(d), 0.0).rgb;
         float ref_lum = ref.r + ref.g + ref.b ;
     
     //convert zoom back to maximum cropped lines
@@ -205,35 +206,36 @@ float get_next_autocrop_amount(float max_autocrop_amount) {
         
         vec3 smp_sum;
         float line_lum;
+        float fuzzy = AUTOCROP_SAMPLE_SIZE;
         
         //Top
         smp_sum = vec3(0.0);
-        for ( float x = params.FrameCount ; x < params.FrameCount+AUTOCROP_PRECISION ;  x ++ ) {
-            smp_sum += texture(Original, vec2( scale_to_range( quasirandom(x), d.x, 1-d.x )  , 0.0 + next_line_step * croppedlines)).rgb;
+        for ( float x = params.FrameCount ; x < params.FrameCount+AUTOCROP_SAMPLES ;  x ++ ) {
+            smp_sum += textureLod(colortools_and_ntsc_pass, vec2( scale_to_range( quasirandom(x), d.x, 1-d.x )  , 0.0 + next_line_step * croppedlines), fuzzy).rgb;
             // One should skip already sampled zones, but benchmarks say that for 20 to 50 samples gain is low or even less than 1.0
             // Probably because computing ranges is time consuming per se.
             //float start = croppedlines*params.OriginalSize.z+d.x;
             //float end = 1-(croppedlines*params.OriginalSize.z)-d.x;
-            //smp_sum += texture(Original, vec2( scale_to_range( quasirandom(x), start, end)  , d.y + next_line_step * croppedlines)).rgb;
+            //smp_sum += textureLod(colortools_and_ntsc_pass, vec2( scale_to_range( quasirandom(x), start, end)  , d.y + next_line_step * croppedlines)).rgb;
         }
         
-        line_lum = (smp_sum.r + smp_sum.g + smp_sum.b) / (AUTOCROP_PRECISION);
+        line_lum = (smp_sum.r + smp_sum.g + smp_sum.b) / (AUTOCROP_SAMPLES);
         
         if ( abs(ref_lum - line_lum) > AUTOCROP_TOLERANCE)
             return size_max / (size_max - (croppedlines) * 2) ;
 
         //BOTTOM
         smp_sum = vec3(0.0);
-        for ( float x = params.FrameCount ; x < params.FrameCount+AUTOCROP_PRECISION ; x ++ )  {   
-            smp_sum += texture(Original, vec2(  scale_to_range( quasirandom(x), d.x, 1-d.x )  , (1.0-eps)-next_line_step*croppedlines)).rgb;
+        for ( float x = params.FrameCount ; x < params.FrameCount+AUTOCROP_SAMPLES ; x ++ )  {   
+            smp_sum += textureLod(colortools_and_ntsc_pass, vec2(  scale_to_range( quasirandom(x), d.x, 1-d.x )  , (1.0-eps)-next_line_step*croppedlines), fuzzy).rgb;
             // One should skip already sampled zones, but benchmarks say that for 20 to 50 samples gain is low or even less than 1.0
             // Probably because computing ranges is time consuming per se.
             //float start = croppedlines*params.OriginalSize.z+d.x;
             //float end = 1-(croppedlines*params.OriginalSize.z)-d.x;
-            //smp_sum += texture(Original, vec2( scale_to_range( quasirandom(x), start, end)  , (1.0-d.y)-next_line_step*croppedlines)).rgb;
+            //smp_sum += textureLod(colortools_and_ntsc_pass, vec2( scale_to_range( quasirandom(x), start, end)  , (1.0-d.y)-next_line_step*croppedlines)).rgb;
         }
 
-        line_lum = (smp_sum.r + smp_sum.g + smp_sum.b) / (AUTOCROP_PRECISION);
+        line_lum = (smp_sum.r + smp_sum.g + smp_sum.b) / (AUTOCROP_SAMPLES);
         
         if (abs( ref_lum - line_lum) > AUTOCROP_TOLERANCE) {
             return size_max / (size_max - (croppedlines) * 2) ;
@@ -241,32 +243,32 @@ float get_next_autocrop_amount(float max_autocrop_amount) {
         
         //LEFT
         smp_sum = vec3(0.0);
-        for ( float y = params.FrameCount; y < params.FrameCount+AUTOCROP_PRECISION; y ++ ) {
-            smp_sum += texture(Original, vec2(0.0+next_line_step*croppedlines, scale_to_range( quasirandom(y), d.y, 1-d.y )  )).rgb;
+        for ( float y = params.FrameCount; y < params.FrameCount+AUTOCROP_SAMPLES; y ++ ) {
+            smp_sum += textureLod(colortools_and_ntsc_pass, vec2(0.0+next_line_step*croppedlines, scale_to_range( quasirandom(y), d.y, 1-d.y )  ), fuzzy).rgb;
             // One should skip already sampled zones, but benchmarks say that for 20 to 50 samples gain is low or even less than 1.0
             // Probably because computing ranges is time consuming per se.
             //float start = (croppedlines+1)*params.OriginalSize.w+d.y;
             //float end = 1-(croppedlines+1)*params.OriginalSize.w-d.y;
-            //smp_sum += texture(Original, vec2(d.x+next_line_step*croppedlines, scale_to_range( quasirandom(y), start, end )  )).rgb;
+            //smp_sum += textureLod(colortools_and_ntsc_pass, vec2(d.x+next_line_step*croppedlines, scale_to_range( quasirandom(y), start, end )  )).rgb;
         }
         
-        line_lum = (smp_sum.r + smp_sum.g + smp_sum.b) / (AUTOCROP_PRECISION);
+        line_lum = (smp_sum.r + smp_sum.g + smp_sum.b) / (AUTOCROP_SAMPLES);
 
         if (abs( ref_lum - line_lum) > AUTOCROP_TOLERANCE)
             return size_max / (size_max - (croppedlines) * 2)     ;
 
         //RIGHT
         smp_sum = vec3(0.0);
-        for ( float y = params.FrameCount; y < params.FrameCount+AUTOCROP_PRECISION; y ++ ) {
-            smp_sum += texture(Original, vec2((1.0-eps)-next_line_step*croppedlines, scale_to_range( quasirandom(y), d.y, 1-d.y )    )).rgb;
+        for ( float y = params.FrameCount; y < params.FrameCount+AUTOCROP_SAMPLES; y ++ ) {
+            smp_sum += textureLod(colortools_and_ntsc_pass, vec2((1.0-eps)-next_line_step*croppedlines, scale_to_range( quasirandom(y), d.y, 1-d.y )    ), fuzzy).rgb;
             // One should skip already sampled zones, but benchmarks say that for 20 to 50 samples gain is low or even less than 1.0
             // Probably because computing ranges is time consuming per se.
             //float start = (croppedlines+1)*params.OriginalSize.w+d.y;
             //float end = 1-(croppedlines+1)*params.OriginalSize.w-d.y;
-            //smp_sum += texture(Original, vec2((1.0-d.x)-next_line_step*croppedlines, scale_to_range( quasirandom(y), d.y, 1-d.y )    )).rgb;
+            //smp_sum += textureLod(colortools_and_ntsc_pass, vec2((1.0-d.x)-next_line_step*croppedlines, scale_to_range( quasirandom(y), d.y, 1-d.y )    )).rgb;
         }
 
-        line_lum = (smp_sum.r + smp_sum.g + smp_sum.b) / (AUTOCROP_PRECISION);
+        line_lum = (smp_sum.r + smp_sum.g + smp_sum.b) / (AUTOCROP_SAMPLES);
 
         if (abs( ref_lum - line_lum) > AUTOCROP_TOLERANCE)
             return size_max / (size_max - (croppedlines) * 2);

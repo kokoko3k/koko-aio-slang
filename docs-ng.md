@@ -634,6 +634,10 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
         Fortunately even low/lighter values like 10 will work good if you're ok
         in waiting 2..3 seconds for the final crop value to be found.
         
+    Sample size:
+        Search multiple pixels at once, this provide a big performance boost, but less accuracy.
+        It means that some solid bar could remain around the image.
+    
     Scene change treshold
         When autocrop finds a maximum crop value, it only tries to crop more when the scene changes.
         By lowering this value, you tell the shader to try higher the crop more often.
