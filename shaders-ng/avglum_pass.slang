@@ -23,7 +23,8 @@ layout(location = 3) out float vReduced_sample_time_is_now;
 layout(location = 4) out float vAvglum_needed;
 layout(location = 5) out float vBezel_or_Bloom;
 layout(location = 6) out float vResSwitch_res_changed;
-layout(location = 7) out vec2 vTexCoord_unscaled;
+layout(location = 7) out float vResChanged;
+layout(location = 8) out vec2 vTexCoord_unscaled;
 
 #include "includes/functions.include.slang"
 
@@ -49,6 +50,9 @@ void main() {
         if (abs(params.OutputSize.y - params.avglum_passFeedbackSize.y) / params.OutputSize.y > RESSWITCH_GLITCH_TRESHOLD)
             if (params.FrameCount > 30) //needed to avoid shaking at start
                 vResSwitch_res_changed = 1.0;
+    
+    //AID Scene chnge detection
+        vResChanged =  float(params.OutputSize.xy - params.avglum_passFeedbackSize.xy != vec2(0.0));
 }
 
 #pragma stage fragment
@@ -59,7 +63,8 @@ layout(location = 3) in float vReduced_sample_time_is_now;
 layout(location = 4) in float vAvglum_needed;
 layout(location = 5) in float vBezel_or_Bloom;
 layout(location = 6) in float vResSwitch_res_changed;
-layout(location = 7) in vec2 vTexCoord_unscaled;
+layout(location = 7) in float vResChanged;
+layout(location = 8) in vec2 vTexCoord_unscaled;
 
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 1) uniform sampler2D  colortools_and_ntsc_passFeedback;
@@ -131,6 +136,35 @@ float get_avglum() {
 
 }
 
+
+bool scene_changed( vec3 pre_mip, vec3 cur_mip, float threshold) {
+    
+    //If resolution changes, we definitely need to change scene.
+    //This should be optimal for Amiga games.
+    if (vResChanged == 1.0) return true;
+    
+    float cur_v = rgb_to_gray(cur_mip);
+    float pre_v = rgb_to_gray(pre_mip);
+    
+    float diff_v = cur_v - pre_v;
+    
+    // fadein: if the previous image is almost black and 
+    // image is fading in, trigger a scene scange 
+    if (pre_v < 10.0/255.0)
+        if (diff_v > 0.0)
+            return true;
+    
+    float diff_v_abs = abs(diff_v);
+        
+    // if lum is different enough trigger scene change
+    if (diff_v_abs > threshold)
+        return true;
+    
+    
+    return false;
+    
+    
+}
 
 float quasirandom(float n) {
     //n has to be integer for this to work.
@@ -257,19 +291,19 @@ float get_autocrop() {
                 
 
     // Reset crop if scene has changed?
-        vec3 pre_avglum = textureLod( colortools_and_ntsc_pass, vec2(0.5), 20.0).rgb;
-        vec3 cur_avglum = textureLod( colortools_and_ntsc_passFeedback, vec2(0.5), 20.0).rgb;
-        
-        vec3 diff_avglum_vec3 = abs(pre_avglum - cur_avglum);
-        float diff_avglum = diff_avglum_vec3.r + diff_avglum_vec3.g + diff_avglum_vec3.b ;
+    vec3 pre_mip = textureLod( colortools_and_ntsc_pass, vec2(0.5), 20.0).rgb;
+    vec3 cur_mip = textureLod( colortools_and_ntsc_passFeedback, vec2(0.5), 20.0).rgb;
 
     float next_autocrop_amount;
-    if (diff_avglum >= AUTOCROP_STEADINESS) {
+    
+    if (scene_changed( pre_mip, cur_mip, AUTOCROP_STEADINESS) ) {
         //scene change, reset
-        previous_autocrop_amount = texture(avglum_passFeedback,AUTOCROP_SAMPLING_POINT).a;
+        //previous_autocrop_amount = texture(avglum_passFeedback,AUTOCROP_SAMPLING_POINT).a;
         next_autocrop_amount = get_next_autocrop_amount(AUTOCROP_MAX+1);
-        float r = mix( previous_autocrop_amount , next_autocrop_amount, AUTOCROP_TRANSITION_SPEED);
-        return r;
+        //cant mix here, it needs to be instant.
+        //float r = mix( previous_autocrop_amount , next_autocrop_amount, AUTOCROP_TRANSITION_SPEED);
+        //return r;
+        return next_autocrop_amount;
     } else {
         previous_autocrop_amount = texture(avglum_passFeedback,AUTOCROP_SAMPLING_POINT).a;
         next_autocrop_amount = get_next_autocrop_amount(previous_autocrop_amount);
