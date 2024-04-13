@@ -195,7 +195,7 @@ float get_next_autocrop_amount(float max_autocrop_amount) {
         const vec2 d = params.OriginalSize.zw*0.5; 
     //Reference color, topleft.
         vec3 ref = texture(Original, vec2(d)).rgb; 
-        ref = textureLod(colortools_and_ntsc_pass, vec2(d), 0.0).rgb;
+        ref = textureLod(colortools_and_ntsc_pass, vec2(d), 0.0).rgb; // FIXME, ref sample needs to be fuzzy too?
         float ref_lum = ref.r + ref.g + ref.b ;
     
     //convert zoom back to maximum cropped lines
