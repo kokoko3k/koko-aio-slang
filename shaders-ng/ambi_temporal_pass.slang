@@ -161,11 +161,8 @@ vec3 ambi_pre_pass(vec2 coords) {
         coords = tilt(coords, vIs_rotated, TILT_X);
 
     //Skip coords in the rect "under the tube"
-    if (coords.x > tol_start &&
-        coords.x < tol_end   &&
-        coords.y > tol_start &&
-        coords.y < tol_end)
-    return vec3(0.0);
+    if (is_first_inside_rect(coords, vec4(tol_start, tol_start, tol_end ,tol_end)))
+        return vec3(0.0);
 
     //Stretch the lights?
         float z1=distance(vec2(0.5,0.5), coords);
