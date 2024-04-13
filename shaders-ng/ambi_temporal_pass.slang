@@ -132,11 +132,17 @@ layout(set = 0, binding = 4) uniform sampler2D colortools_and_ntsc_pass;
 
 
 vec3 ambi_push_pass(vec2 coords, float f_lod) {
-   vec3 pixel_out = textureLod(colortools_and_ntsc_pass, coords, f_lod).rgb;
-   pixel_out = pow(pixel_out, vec3(AMBI_GAMMA)); 
+    vec2 smp_coords = coords;
+    if (AUTOCROP_MAX > 0.0) {
+        float autocrop_zoom = texture(avglum_pass, AUTOCROP_SAMPLING_POINT).a;
+        smp_coords = zoom(smp_coords, autocrop_zoom);
+    }
+    
+    vec3 pixel_out = textureLod(colortools_and_ntsc_pass, smp_coords, f_lod).rgb;
+    pixel_out = pow(pixel_out, vec3(AMBI_GAMMA)); 
 
-   pixel_out = pixel_push_luminance(pixel_out, vAMBI_POWER);
-   return pixel_out;
+    pixel_out = pixel_push_luminance(pixel_out, vAMBI_POWER);
+    return pixel_out;
 }
 
 
