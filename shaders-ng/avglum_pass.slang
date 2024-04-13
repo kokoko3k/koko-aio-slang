@@ -298,11 +298,13 @@ float get_autocrop() {
     
     if (scene_changed( pre_mip, cur_mip, AUTOCROP_STEADINESS) ) {
         //scene change, reset
-        //previous_autocrop_amount = texture(avglum_passFeedback,AUTOCROP_SAMPLING_POINT).a;
+        previous_autocrop_amount = texture(avglum_passFeedback,AUTOCROP_SAMPLING_POINT).a;
         next_autocrop_amount = get_next_autocrop_amount(AUTOCROP_MAX+1);
-        //cant mix here, it needs to be instant.
-        //float r = mix( previous_autocrop_amount , next_autocrop_amount, AUTOCROP_TRANSITION_SPEED);
-        //return r;
+        //mix here or it needs to be instant? maybe an higher speed?
+            //float r = mix( previous_autocrop_amount , next_autocrop_amount, 0.75);
+            //return r;
+
+
         return next_autocrop_amount;
     } else {
         previous_autocrop_amount = texture(avglum_passFeedback,AUTOCROP_SAMPLING_POINT).a;

@@ -45,12 +45,21 @@ void main() {
             else
         vAMBI_STRETCH = AMBI_STRETCH;
 
-    //Move virtual leds position inside to compensate for widen effect
-       float  led_internalness = AMBI_INT_OFFSET + (vAMBI_STRETCH *0.025);
+        //Keep leds in place when content geometry zoom changes
+        float ambi_int_offset = AMBI_INT_OFFSET;
+        if (DO_GAME_GEOM_OVERRIDE + DO_BEZEL > 1.5) {
+            if (GAME_GEOM_ZOOM >= 1.0)
+                ambi_int_offset += (GAME_GEOM_ZOOM-1)/2.0;
+            else
+                ambi_int_offset -= (1-GAME_GEOM_ZOOM);// <<-- not 100% right (ok till 0.7), but almost never used.
+        }
+        
+        //Move virtual leds position inside to compensate for widen effect
+        float led_internalness = ambi_int_offset + (vAMBI_STRETCH *0.025);
 
        
     //less internalness when using bezel:
-       led_internalness -= 0.07 * DO_BEZEL;
+        led_internalness -= 0.07 * DO_BEZEL;
        
         //led_internalness = -0.18   ;
 
@@ -80,9 +89,9 @@ void main() {
     if (DO_GLOBAL_SHZO >0.5)
         pre_pass_coords = zoom(pre_pass_coords + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM );
 
-    if (DO_GAME_GEOM_OVERRIDE > 0.5)
+    if (DO_GAME_GEOM_OVERRIDE > 0.5) {
         pre_pass_coords = content_geom_override_zoom(pre_pass_coords, GAME_GEOM_ASPECT, get_in_aspect(), GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
-
+    }
 
     if (DO_BEZEL > 0.5)
         pre_pass_coords = zoomout_coords(pre_pass_coords, -get_BEZEL_INNER_ZOOM());
