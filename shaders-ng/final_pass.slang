@@ -1276,10 +1276,6 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
 
 
 void main() {
-    vec3 pixel_out = vec3(0.0);
-
-    float canvas_busy = 0.0; //<-- this allow for paint over not painted areas (spares gpu cycles)
-
     //Initial content coords
         vec2 co_content = vTexCoord;
 
@@ -1289,7 +1285,7 @@ void main() {
 
 
     //Precalc Bezel coords, since it modifies content coords.
-        vec2 co_bezel = vec2(0.0);
+        vec2 co_bezel = vec2(0.5);
         if (DO_BEZEL == 1.0) {
             co_content = zoomout_coords(co_content, -vBEZEL_INNER_ZOOM_adapted);
             co_bezel = get_scaled_coords_for_bezel(vTexCoord, vIsRotated);
@@ -1308,8 +1304,12 @@ void main() {
         vec2 co_mirror = zoom(co_content, 1/BEZEL_REFL_ZOOMOUT_ROOM);
         
     //Apply other content coords modifiers
-        if (DO_GAME_GEOM_OVERRIDE == 1.0)
+
+        float canvas_busy_bezel = 1.0;
+        if (DO_GAME_GEOM_OVERRIDE == 1.0) {
             co_content = content_geom_override_zoom(co_content, GAME_GEOM_ASPECT, vIn_aspect, GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
+            canvas_busy_bezel = float(is_first_inside_rect(co_bezel, vec4(BEZEL_FRAME_SURROUND_MARGIN, BEZEL_FRAME_SURROUND_MARGIN, 1.0 - BEZEL_FRAME_SURROUND_MARGIN, 1.0 - BEZEL_FRAME_SURROUND_MARGIN)));
+        }
 
   /*  float anaborderstart = 0.5;
     float anabordersize = anaborderstart + SERVICE1;
@@ -1319,10 +1319,11 @@ void main() {
     */
     
     //Create an alpha mask to write content into, it holds opacity info that will be used to compose:
+        float canvas_busy = 0.0; //<-- this allow for paint over not painted areas (spares gpu cycles)
         if (DO_CURVATURE == 1.0)  {
-            canvas_busy = fn_border(co_content);
+            canvas_busy = fn_border(co_content) * canvas_busy_bezel;
         } else {
-            canvas_busy = float(is_first_inside_rect(co_content, RECT01)); //FIXME: is step() faster?
+            canvas_busy = float(is_first_inside_rect(co_content, RECT01)) * canvas_busy_bezel;
         }
  
         //Dynamic lum dependant full screen zoom?
@@ -1351,11 +1352,11 @@ void main() {
     
     
     
-                                                                                            //  pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb ;
-                                                                                            //  FragColor = pixel_ambi.rgbr; return;
+                                                //  pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb ;
+                                                //  FragColor = pixel_ambi.rgbr; return;
     
-    
-    //Draw content only over the alpha mask, and sample ambientlight outside it to spare gpu cycles.
+    vec3 pixel_out = vec3(0.0);
+    //Draw content over the alpha mask only, and sample ambientlight outside it to spare gpu cycles.
         if (canvas_busy > 0.5) {
             pixel_out = fn_pixel_content(co_content) * canvas_busy;
             
