@@ -885,6 +885,7 @@ float random_fast(vec2 seed) {
 	}
 	
 	vec2 content_geom_override_zoom(vec2 co, float aspect, float in_aspect, float vshift, float hshift, float out_zoom){
+		// see next (**)
 		float scale_y;
 		if (aspect > 0.01) 
 			scale_y = aspect/in_aspect;
@@ -896,6 +897,21 @@ float random_fast(vec2 seed) {
 		//zoom
 		return zoom(co, out_zoom);
 	}	
+	
+	vec2 content_geom_override_zoom_inv(vec2 co, float aspect, float in_aspect, float vshift, float hshift, float out_zoom){
+		// (**) This has to be exactly has the not _inv version, it returns the same but with zoom counteracted, inverted. 
+		float scale_y;
+		if (aspect > 0.01) 
+			scale_y = aspect/in_aspect;
+				else
+			scale_y = 1.0;
+		
+		float offset_y = (0.5 * scale_y ) - 0.5 ;
+		co.y = co.y*scale_y - offset_y;
+		//zoom
+		return zoom(co, 1/out_zoom);
+	}	
+	
 	
 	vec2 content_geom_override(vec2 co, float aspect, float in_aspect, float vshift, float hshift, float out_zoom){
 		//cheap cardboard emulation:
