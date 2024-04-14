@@ -36,6 +36,10 @@ void main() {
         vSmpBorder_min = smp_internalness;
         vSmpBorder_max = 1.0-smp_internalness;
 
+        if (DO_GAME_GEOM_OVERRIDE > 0.5) {
+            vSmpBorder_min = content_geom_override_zoom(vec2(vSmpBorder_min), GAME_GEOM_ASPECT, get_in_aspect(), GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM).x;
+            vSmpBorder_max = content_geom_override_zoom(vec2(vSmpBorder_max), GAME_GEOM_ASPECT, get_in_aspect(), GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
+        }
 
     bool isrotated = is_rotated();
     vIs_rotated = float(isrotated);
