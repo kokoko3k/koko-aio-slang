@@ -38,7 +38,7 @@ void main() {
 
         if (DO_GAME_GEOM_OVERRIDE > 0.5) {
             vSmpBorder_min = content_geom_override_zoom(vec2(vSmpBorder_min), GAME_GEOM_ASPECT, get_in_aspect(), GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM).x;
-            vSmpBorder_max = content_geom_override_zoom(vec2(vSmpBorder_max), GAME_GEOM_ASPECT, get_in_aspect(), GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
+            vSmpBorder_max = content_geom_override_zoom(vec2(vSmpBorder_max), GAME_GEOM_ASPECT, get_in_aspect(), GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM).x;
         }
 
     bool isrotated = is_rotated();
@@ -52,10 +52,7 @@ void main() {
         //Keep leds in place when content geometry zoom changes
         float ambi_int_offset = AMBI_INT_OFFSET;
         if (DO_GAME_GEOM_OVERRIDE + DO_BEZEL > 1.5) {
-            if (GAME_GEOM_ZOOM >= 1.0)
-                ambi_int_offset += (GAME_GEOM_ZOOM-1)/2.0;
-            else
-                ambi_int_offset -= (1-GAME_GEOM_ZOOM);// <<-- not 100% right (ok till 0.7), but almost never used.
+                ambi_int_offset = content_geom_override_zoom    (vec2(ambi_int_offset), GAME_GEOM_ASPECT, get_in_aspect(), GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM).x;
         }
         
         //Move virtual leds position inside to compensate for widen effect
