@@ -648,6 +648,7 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
     Scene change treshold
         When autocrop finds a maximum crop value, it only tries to crop more when the scene changes.
         By lowering this value, you tell the shader to try higher the crop more often.
+        Use 0.0 is probably useful only to trigger a new search.
         
     Transition speed
         This modulates the smoothness of the animation between various crop values.

@@ -1567,3 +1567,7 @@ vec2 r2(vec2 p0, int n) {
     return fract(p0 + vec2(n*12664745, n*9560333)/exp2(24.));	// integer mul to avoid round-off
 }
 
+float lodmax(vec2 texsize) {
+	//lod needed to average all texture points.
+    return log2(max(texsize.x, texsize.y));
+}

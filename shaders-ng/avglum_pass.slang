@@ -25,7 +25,7 @@ layout(location = 5) out float vBezel_or_Bloom;
 layout(location = 6) out float vResSwitch_res_changed;
 layout(location = 7) out float vResChanged;
 layout(location = 8) out vec2 vTexCoord_unscaled;
-
+//layout(location = 9) out vec2 vLods;
 #include "includes/functions.include.slang"
 
 
@@ -53,6 +53,9 @@ void main() {
     
     //AID Scene chnge detection
         vResChanged =  float(params.OutputSize.xy - params.avglum_passFeedbackSize.xy != vec2(0.0));
+        //float lod_max = lodmax(params.OriginalSize.xy);
+        //vLods.x = lod_max/2.0;
+        //vLods.y = vLods.x/2.0;
 }
 
 #pragma stage fragment
@@ -65,6 +68,7 @@ layout(location = 5) in float vBezel_or_Bloom;
 layout(location = 6) in float vResSwitch_res_changed;
 layout(location = 7) in float vResChanged;
 layout(location = 8) in vec2 vTexCoord_unscaled;
+//layout(location = 9) in vec2 vLods;
 
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 1) uniform sampler2D  colortools_and_ntsc_passFeedback;
@@ -137,7 +141,10 @@ float get_avglum() {
 }
 
 
-bool scene_changed( vec3 pre_mip, vec3 cur_mip, float threshold) {
+bool scene_changed( sampler2D pre_smp, sampler2D cur_smp, float threshold) {
+    
+    vec3 pre_mip = textureLod( pre_smp, vec2(0.5), 20.0).rgb;
+    vec3 cur_mip = textureLod( cur_smp, vec2(0.5), 20.0).rgb;
     
     //If resolution changes, we definitely need to change scene.
     //This should be optimal for Amiga games.
@@ -158,6 +165,19 @@ bool scene_changed( vec3 pre_mip, vec3 cur_mip, float threshold) {
         
     // if lum is different enough trigger scene change
     if (diff_v_abs >= threshold)
+        return true;
+     
+    /*
+    // from blank screen to something else, trigger SC
+    // This compares different lod mipmaps from the same samplig point
+    // to guess if the screen is solid or not.
+    vec3 pre_mip_l20 = pre_mip;    
+    vec3 pre_mip_l1 =  textureLod( pre_smp, vec2(0.5), vLods.x).rgb;
+    vec3 pre_mip_l2 =  textureLod( pre_smp, vec2(0.5), vLods.y).rgb;
+
+    if ( pre_mip_l1 == pre_mip_l2 && pre_mip_l2 == pre_mip_l20 )
+        return true;
+    */  
     
     return false;
 }
@@ -170,16 +190,6 @@ float quasirandom(float n) {
 }
 
 float get_next_autocrop_amount(float max_autocrop_amount) {
-
-    // Skip logic for solid screens
-    /*vec3 avg_lum =   textureLod(colortools_and_ntsc_pass, vec2(0.5,0.5),20.0).rgb;
-    vec3 pixel_lum = textureLod(colortools_and_ntsc_pass, vec2(0.5,0.5),2.0).rgb;
-    float diff_lum = dot( abs(avg_lum - pixel_lum), vec3(1/3.0) );
-    if (diff_lum < 1/256.0)
-        return 0.0;
-    */
-
-
    
     //Implementation requires the line_step to be the same for vertical and horizontal sampling.
     //This could be a bit inefficient tho.
@@ -289,16 +299,21 @@ float get_autocrop() {
                 
 
     // Reset crop if scene has changed?
-    vec3 pre_mip = textureLod( colortools_and_ntsc_passFeedback, vec2(0.5), 20.0).rgb;
-    vec3 cur_mip = textureLod( colortools_and_ntsc_pass, vec2(0.5), 20.0).rgb;
-
     float next_autocrop_amount;
     
-    if (scene_changed( pre_mip, cur_mip, AUTOCROP_STEADINESS) ) {
-        //scene change, reset
-        previous_autocrop_amount = texture(avglum_passFeedback,AUTOCROP_SAMPLING_POINT).a;
-        next_autocrop_amount = get_next_autocrop_amount(AUTOCROP_MAX+1);
-        //mix here or it needs to be instant? maybe an higher speed?
+    if (scene_changed( colortools_and_ntsc_passFeedback, colortools_and_ntsc_pass, AUTOCROP_STEADINESS) ) {
+        //When a scene changes, we must release the maximum crop amount and find a new one.
+        
+        //For entrance effect:
+            //return AUTOCROP_MAX+1; //"entrance effect?
+        
+        //No frills way:
+            next_autocrop_amount = get_next_autocrop_amount(AUTOCROP_MAX+1);
+            return next_autocrop_amount;
+        
+        //Mix can't work in the long run if we don't track scene changing over multiple frames.
+            //next_autocrop_amount = get_next_autocrop_amount(AUTOCROP_MAX+1);
+            //previous_autocrop_amount = texture(avglum_passFeedback,AUTOCROP_SAMPLING_POINT).a;
             //float r = mix( previous_autocrop_amount , next_autocrop_amount, 0.75);
             //return r;
 
