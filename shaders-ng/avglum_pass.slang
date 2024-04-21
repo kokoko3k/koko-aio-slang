@@ -142,16 +142,15 @@ bool scene_changed( vec3 pre_mip, vec3 cur_mip, float threshold) {
     //If resolution changes, we definitely need to change scene.
     //This should be optimal for Amiga games.
     if (vResChanged == 1.0) return true;
-    
+            
     float pre_v = rgb_to_gray(pre_mip);
     float cur_v = rgb_to_gray(cur_mip);
 
-    
     float diff_v = cur_v - pre_v;
     
     // fadein: if the previous image is almost black and 
     // image is fading in, trigger a scene scange 
-    if (pre_v < 10.0/255.0)
+    if (pre_v < 2.0/255.0)
         if (pre_v < cur_v)
             return true;
     
@@ -159,12 +158,8 @@ bool scene_changed( vec3 pre_mip, vec3 cur_mip, float threshold) {
         
     // if lum is different enough trigger scene change
     if (diff_v_abs >= threshold)
-        return true;
-    
     
     return false;
-    
-    
 }
 
 float quasirandom(float n) {
