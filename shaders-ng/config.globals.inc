@@ -586,6 +586,10 @@
     #define AUTOCROP_MAX global.AUTOCROP_MAX
 #endif
 
+#ifndef AUTOCROP_MIN
+    #define AUTOCROP_MIN global.AUTOCROP_MIN
+#endif
+
 #ifndef AUTOCROP_SAMPLES
     #define AUTOCROP_SAMPLES global.AUTOCROP_SAMPLES
 #endif

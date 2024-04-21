@@ -158,7 +158,7 @@ bool scene_changed( vec3 pre_mip, vec3 cur_mip, float threshold) {
     float diff_v_abs = abs(diff_v);
         
     // if lum is different enough trigger scene change
-    if (diff_v_abs > threshold)
+    if (diff_v_abs >= threshold)
         return true;
     
     
@@ -192,7 +192,7 @@ float get_next_autocrop_amount(float max_autocrop_amount) {
         const float next_line_step = 1/size_max;
         
     //This is needed to avoid sampling edges which may return out out of range values.
-        const vec2 d = params.OriginalSize.zw*0.5; 
+        const vec2 d = params.OriginalSize.zw * 0.5 * (1+AUTOCROP_MIN*2);
     //Reference color, topleft.
         vec3 ref = texture(Original, vec2(d)).rgb; 
         ref = textureLod(colortools_and_ntsc_pass, vec2(d), 0.0).rgb; // FIXME, ref sample needs to be fuzzy too?
@@ -203,7 +203,7 @@ float get_next_autocrop_amount(float max_autocrop_amount) {
     
     
     //Sample top,bottom,left,right lines; stop when a line sum contain a different pixel color than the reference
-    for (float croppedlines = 0.0 ; croppedlines < max_crop_lines ; croppedlines++) {
+    for (float croppedlines = AUTOCROP_MIN ; croppedlines < max_crop_lines ; croppedlines++) {
         
         vec3 smp_sum;
         float line_lum;

@@ -176,6 +176,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float TILT_FOV;
 	
 	float AUTOCROP_MAX;
+	float AUTOCROP_MIN;
 	float AUTOCROP_SAMPLES;
 	float AUTOCROP_SAMPLE_SIZE;
 	float AUTOCROP_TRANSITION_SPEED;
@@ -616,6 +617,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 //Autocrop
 #pragma parameter AUTOCROP_MAX	     "★ Autocrop: maximum amount (!!OBSTRUCTS integer scale!!) ==>"   0.0   0.0   0.5  0.01
+#pragma parameter AUTOCROP_MIN	            "        Number of mandatory lines to crop"   1.0   0.0   10.0  1.0
 #pragma parameter AUTOCROP_SAMPLES          "        Samples per frame (faster response, higher gpu use)"     10.0   0.0   300.0 1.0
 #pragma parameter AUTOCROP_SAMPLE_SIZE      "        Sample size (big speedup, less accurate)" 2.0 0.0 5.0 1.0  
 #pragma parameter AUTOCROP_STEADINESS       "        Scene change treshold "     0.2   0.0   0.5 0.01

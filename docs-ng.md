@@ -627,6 +627,13 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
     
     Autocrop maximum amount:
         The higher, the more solid borders wil be cropped around the image.
+        0.3 means 30%
+    
+    Number of mandatory lines to crop:
+        The minimum lines to always crop; this is useful because sometimes
+        games have one or two "spurious" lines at the very edge of the screen that
+        won't allow autocrop to work at all.
+        This can be used to ignore them.
     
     Samples per frame:
         Higher values makes the shader search more in a single frame for solid areas.

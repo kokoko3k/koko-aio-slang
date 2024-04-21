@@ -283,6 +283,7 @@
 
 
 // #define AUTOCROP_MAX 0.0
+// #define AUTOCROP_MIN 1.0
 // #define AUTOCROP_SAMPLES 10
 // #define AUTOCROP_SAMPLE_SIZE 2.0
 // #define AUTOCROP_STEADINESS 0.01

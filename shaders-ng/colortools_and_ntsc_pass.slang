@@ -428,6 +428,11 @@ vec3 persistence(vec3 feedback, vec3 pixel_now, float start_decay, float late_pe
 
 void main() {
    vec2 co = vTexCoord;
+   
+   if (AUTOCROP_MAX > 0.0)
+      co = clamp(co,  params.OriginalSize.zw * AUTOCROP_MIN, 
+                    1-params.OriginalSize.zw * AUTOCROP_MIN );
+   
    #ifndef D3D_WORKAROUND
       float shake = texture(avglum_passFeedback, RESSWITCH_SAMPLING_POINT).a;
       //co.y += sin(shake * 2 * pi) * RESSWITCH_GLITCH_SIZE;
