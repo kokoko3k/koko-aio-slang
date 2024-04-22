@@ -1564,7 +1564,10 @@ void main() {
 
     //FragColor = texture(reflected_blurred_pass, co_mirror);
     
-    
-    
+    /*if  ( vOutputCoord.x < 0.75+global.FinalViewportSize.z*0.5001 && vOutputCoord.x > 0.75-global.FinalViewportSize.z*0.5001)
+        FragColor = vec4(1.0);
+    else
+        FragColor = vec4(0.0);
+    */
     
 }
