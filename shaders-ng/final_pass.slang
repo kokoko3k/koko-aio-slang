@@ -1320,12 +1320,8 @@ void main() {
     
     //Create an alpha mask to write content into, it holds opacity info that will be used to compose:
         float canvas_busy = 0.0; //<-- this allow for paint over not painted areas (spares gpu cycles)
-        if (DO_CURVATURE == 1.0)  {
-            canvas_busy = fn_border(co_content) * canvas_busy_bezel;
-        } else {
-            canvas_busy = float(is_first_inside_rect(co_content, RECT01)) * canvas_busy_bezel;
-        }
- 
+        canvas_busy = fn_border(co_content) * canvas_busy_bezel;
+        
         //Dynamic lum dependant full screen zoom?
     #ifndef D3D_WORKAROUND
         if (DO_DYNZOOM > 0.0)

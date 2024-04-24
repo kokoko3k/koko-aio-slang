@@ -442,10 +442,12 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
     
     WARP X, WARP Y:
         control how much the display is curved along its axes.
+        
+**Corners/Edges:**<br>
+
     Corner radius, Edge sharpness:
         Control the "smoothness" of the display edges.
-    Cut curvature ears;
-        If you see weird image repetition try this.
+
         
 **Bezel:**<br>
     Draws a monitor frame with simulated reflections from the game content.<br>
