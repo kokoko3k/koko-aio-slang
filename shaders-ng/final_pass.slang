@@ -1345,7 +1345,7 @@ void main() {
             }
         }
     #endif
-
+    
 
     vec3 pixel_ambi = vec3(0.0);
     vec3 pixel_under_content = vec3(0.0);
