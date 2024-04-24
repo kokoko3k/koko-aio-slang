@@ -164,7 +164,7 @@ vec3 ambi_pre_pass(vec2 coords) {
     //Skip coords in the rect "under the tube"
     vec2 skip_coords = coords;
     
-    if (DO_GAME_GEOM_OVERRIDE > 0.5)
+    if (DO_GAME_GEOM_OVERRIDE + DO_BEZEL > 1.5 )
         skip_coords = content_geom_override_zoom_inv(skip_coords, GAME_GEOM_ASPECT, get_in_aspect(), GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
     
     if (is_first_inside_rect(skip_coords, vec4(tol_start, tol_start, tol_end ,tol_end)))
