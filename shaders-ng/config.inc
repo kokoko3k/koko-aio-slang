@@ -507,8 +507,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 
 #pragma parameter LABEL_0055   "★ Corners/Edges"			0.0   0.0 1.0 1.0
-#pragma parameter GEOM_CORNER_SIZE   "        Corners radius"			0.01  0.01 0.1 0.001
-#pragma parameter GEOM_CORNER_SMOOTH "        Edges sharpness"			200.0 15.0 1000.0 1.0
+#pragma parameter GEOM_CORNER_SIZE   "        Corners radius"			0.005  0.002 0.1 0.001
+#pragma parameter GEOM_CORNER_SMOOTH "        Edges sharpness"			200.0 50.0 1000.0 10.0
 #pragma parameter LABEL0023 " " 0.0 0.0 1.0 1.0
 
 
@@ -521,7 +521,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BEZEL_G             "        Color: Green"				-0.35  -1.0 1.0  0.005
 #pragma parameter BEZEL_B             "        Color: Blue"				-0.35   -1.0 1.0  0.005
 #pragma parameter BEZEL_CON           "        Contrast"				1.3   0.0  10.0 0.01
-#pragma parameter BEZEL_RFL_ZOOM      "        Reflections zoom"			0.0   -1.5 0.5 0.005
+#pragma parameter BEZEL_RFL_ZOOM      "        Reflections zoom"			0.05   -1.5 0.5 0.01
 #pragma parameter BEZEL_REFL_STRENGTH "        Reflections strength"			0.5    0.0 2.0 0.01
 #pragma parameter BEZEL_RFL_BLR_SHD   "        Reflections sharpness"			-0.2  -1.5 0.8 0.01
 #pragma parameter BEZEL_ROUGHNESS     "        Reflections roughness"			1.0    0.0 5.0 0.1

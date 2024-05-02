@@ -213,7 +213,7 @@ float_framebuffer7 = true
         filter_linear8 = true
            scale_type8 = source
                 scale8 = 0.5
-            wrap_mode8 = "mirrored_repeat"
+            wrap_mode8 = "clamp_to_edge"
     float_framebuffer8 = "true"
          
          
