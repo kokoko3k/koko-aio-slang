@@ -1285,7 +1285,7 @@ void main() {
 
 
     //Precalc Bezel coords, since it modifies content coords.
-        vec2 co_bezel = vec2(0.5);
+        vec2 co_bezel = vec2(0.0);
         if (DO_BEZEL == 1.0) {
             co_content = zoomout_coords(co_content, -vBEZEL_INNER_ZOOM_adapted);
             co_bezel = get_scaled_coords_for_bezel(vTexCoord, vIsRotated);
@@ -1303,13 +1303,7 @@ void main() {
     //It is still not perfect but a reasonable tradeoff by now.
         vec2 co_mirror = zoom(co_content, 1/BEZEL_REFL_ZOOMOUT_ROOM);
         
-    //Apply other content coords modifiers
 
-        float canvas_busy_bezel = 1.0;
-        if (DO_GAME_GEOM_OVERRIDE == 1.0) {
-            co_content = content_geom_override_zoom(co_content, GAME_GEOM_ASPECT, vIn_aspect, GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
-            canvas_busy_bezel = float(is_first_inside_rect(co_bezel, vec4(BEZEL_FRAME_SURROUND_MARGIN, BEZEL_FRAME_SURROUND_MARGIN, 1.0 - BEZEL_FRAME_SURROUND_MARGIN, 1.0 - BEZEL_FRAME_SURROUND_MARGIN)));
-        }
 
   /*  float anaborderstart = 0.5;
     float anabordersize = anaborderstart + SERVICE1;
@@ -1318,10 +1312,19 @@ void main() {
     //FragColor = vec4(side_zoom) ; return;
     */
     
+    float canvas_busy = 0.0; //<-- this allow for paint over not painted areas (spares gpu cycles)
     //Create an alpha mask to write content into, it holds opacity info that will be used to compose:
-        float canvas_busy = 0.0; //<-- this allow for paint over not painted areas (spares gpu cycles)
-        canvas_busy = fn_border(co_content) * canvas_busy_bezel;
+        if (DO_CURVATURE == 1.0)  {
+            canvas_busy = fn_border(co_content);
+        } else {
+            canvas_busy = float(is_first_inside_rect(co_content, RECT01)); //FIXME: is step() faster?
+        }
         
+
+    //Apply other content coords modifiers
+        if (DO_GAME_GEOM_OVERRIDE == 1.0)
+            co_content = content_geom_override_zoom(co_content, GAME_GEOM_ASPECT, vIn_aspect, GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
+ 
         //Dynamic lum dependant full screen zoom?
     #ifndef D3D_WORKAROUND
         if (DO_DYNZOOM > 0.0)
@@ -1341,18 +1344,13 @@ void main() {
             }
         }
     #endif
-    
+
 
     vec3 pixel_ambi = vec3(0.0);
     vec3 pixel_under_content = vec3(0.0);
-    
-    
-    
-                                                //  pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb ;
-                                                //  FragColor = pixel_ambi.rgbr; return;
-    
     vec3 pixel_out = vec3(0.0);
-    //Draw content over the alpha mask only, and sample ambientlight outside it to spare gpu cycles.
+    
+    //Draw content only over the alpha mask, and sample ambientlight outside it to spare gpu cycles.
         if (canvas_busy > 0.5) {
             pixel_out = fn_pixel_content(co_content) * canvas_busy;
             
@@ -1551,19 +1549,6 @@ void main() {
             pixel_out = 1-pixel_out;//;-clip;
     #endif
 
-
-
-
-    //pixel_out = pixel_out -diff;
-
     FragColor = vec4(pixel_out, 1.0);
-
-    //FragColor = texture(reflected_blurred_pass, co_mirror);
-    
-    /*if  ( vOutputCoord.x < 0.75+global.FinalViewportSize.z*0.5001 && vOutputCoord.x > 0.75-global.FinalViewportSize.z*0.5001)
-        FragColor = vec4(1.0);
-    else
-        FragColor = vec4(0.0);
-    */
     
 }

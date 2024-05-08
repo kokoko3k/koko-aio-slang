@@ -156,7 +156,7 @@ float_framebuffer3 = true
             scale4 = 1.0
        scale_type4 = source    
 float_framebuffer4 = true
-        wrap_mode4 = "mirrored_repeat"
+        wrap_mode4 = "clamp_to_edge"
      
 # ASMDEBUG: GLSL42
            shader5 = shaders-ng/in_glow_y.slang
@@ -165,7 +165,7 @@ float_framebuffer4 = true
             scale5 = 1.0
        scale_type5 = source    
 float_framebuffer5 = true
-        wrap_mode5 = "mirrored_repeat"
+        wrap_mode5 = "clamp_to_border"
             
           
         
@@ -180,7 +180,10 @@ float_framebuffer5 = true
             scale6 = 1.0
        scale_type6 = source
 float_framebuffer6 = true
-        wrap_mode6 = "clamp_to_edge"
+        # This has to be clamp_to_border in order for the glow pass to return a black frame
+        # around it, which is needed so that when using geometry override and zooming out the content,
+        # it will have black surrounding.
+        wrap_mode6 = "clamp_to_border"
         
 # ASMDEBUG: GLSL48
            shader7 = shaders-ng/halo.slang
@@ -189,7 +192,7 @@ float_framebuffer6 = true
             scale7 = 1.0
        scale_type7 = source
 float_framebuffer7 = true
-        wrap_mode7 = "clamp_to_edge"
+        wrap_mode7 = "clamp_to_border"
 
 
 
@@ -213,7 +216,7 @@ float_framebuffer7 = true
         filter_linear8 = true
            scale_type8 = source
                 scale8 = 0.5
-            wrap_mode8 = "clamp_to_edge"
+            wrap_mode8 = "clamp_to_border"
     float_framebuffer8 = "true"
          
          
