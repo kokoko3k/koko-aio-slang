@@ -573,24 +573,10 @@ vec3 downsample_x( sampler2D tex, vec2 uv, vec4 sourcesize, float sharpness_add 
 }
 
 
-vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inLum  ) {
-    /*
-     This would provide an additional method to alter scanlines "inertia", but has a cost of 4fps
-     when using smoothstep_fast and 13fps(!) when using standard smoothstep.
-     It could replace glow_x for tight blurs.
-    */
-
-    //vec3 lum_h =  downsample(in_glow_pass, in_coords, global.flick_and_noise_passSize, 0.0).rgb;
-    //vec3 lum_h =  downsample_x(in_glow_pass, in_coords, global.flick_and_noise_passSize, 0.0).rgb;
-    //lum_h *= smoothstep_fast( vec3(SERVICE1-0.1) ,vec3(SERVICE1), lum_h);
-    //pixel_in = max(pixel_in, lum_h);
-
-    //pixel_in = blur9_x_box1tap(in_glow_pass, in_coords, params.OriginalSize.xy, abs(IN_GLOW_W)*2.0) ; //102.4
+vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inLum  ) {
 
     //Scanlines: compute each phosphor height according to input luminance, puttin it here helps parallelism a bit.
-
-        float extragain_h = max(PIXELGRID_MAX_H, 1.0);
-        vec3 phosphor_height = map_range(pixel_in*extragain_h, min_inLum, max_inLum, PIXELGRID_MIN_H, clamp(PIXELGRID_MAX_H, PIXELGRID_MIN_H, 1.0));
+        vec3 phosphor_height = map_range(pixel_in.rgb, min_inLum, max_inLum, PIXELGRID_MIN_H, clamp(PIXELGRID_MAX_H, PIXELGRID_MIN_H, 1.0));
 
     //Tate ? (other outputsize,originalsize and outputcoords "tated" in vertex shader.)
         if (vDo_Tate == 1.0) in_coords.xy = in_coords.yx;
@@ -647,6 +633,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
 
     //Moving it up there provides a small speed up due to
     //increased parallalism, I guess.
+    
         float sin_check_offset = sin(freq_base_unfloored.x);
         float is_even = step(sin_check_offset, 0.0);
 
@@ -658,7 +645,19 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         //Pixelgrid: do horizontal if enabled, but skip it if user doesn't want it on interlaced content.
         //if (DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0)) { //103.1
         if (vDo_pixelgrid_h > 0.5) {
-
+            
+            #define m 0.125
+            float d_y = global.flick_and_noise_passSize.w*m;
+            float overblow = PIXELGRID_MAX_H*global.flick_and_noise_passSize.w*0.5;
+    
+            vec3 gy = texture(in_glow_pass, vec2(in_coords.x, in_coords.y + d_y)).rgb
+                    - texture(in_glow_pass, vec2(in_coords.x, in_coords.y - d_y)).rgb; 
+            float warp_y = (gy.x+gy.y+gy.z)/max_inLum * (overblow*params.OutputSize.y);
+            //freq_base_core.y += warp_y;
+            
+            freq_base_core.y += pixel_in.a;
+            
+            
             //Since we emulate scanlines, take into account current scanline phase:
                 float interlacing_adapt_period = vScanlinePeriod;
 
@@ -684,12 +683,12 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //Compute dedot mix here for use in h mask and vmask2 later
                 //dedot_mix = vec3(  PIXELGRID_H_DEDOT - PIXELGRID_H_DEDOT * rgb_h_sin.x);
                 dedot_mix = vec3( fma( -PIXELGRID_H_DEDOT, rgb_h_sin.x, PIXELGRID_H_DEDOT)); //ASM PROOF: SAME
-                dedot_mix = dedot_mix *(pixel_in/max_inLum);
+                dedot_mix = dedot_mix *(pixel_in.rgb/max_inLum);
                 
             // Compute each phosphor height according to input luminance,
             // Moved outside the branch to help parallelism a bit
                 //float extragain_h = max(PIXELGRID_MAX_H, 1.0); //Handle
-                //vec3 phosphor_height = map_range(pixel_in*extragain_h, min_inLum, max_inLum, PIXELGRID_MIN_H, clamp(PIXELGRID_MAX_H, PIXELGRID_MIN_H, 1.0));
+                //vec3 phosphor_height = map_range(pixel_in.rgb*extragain_h, min_inLum, max_inLum, PIXELGRID_MIN_H, clamp(PIXELGRID_MAX_H, PIXELGRID_MIN_H, 1.0));
 
 
             //Finally get 3 sines out of the previous one by applying height modifiers
@@ -712,7 +711,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //make them always positive and double frequency:
                 rgb_w = (rgb_w * rgb_w);
             //Scale Max width according to pre-gains:
-                vec3 phosphor_width = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
+                vec3 phosphor_width = map_range(pixel_in.rgb, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
             //Get final phosphor width:
                 //rgb_w = morph_shape(rgb_w, phosphor_width, PIXELGRID_NO_INTERBLEED_W, PIXELGRID_GAMMA_W); //2%
                 rgb_w = morph_shape_full_no_steepness_vec3(rgb_w, phosphor_width, PIXELGRID_GAMMA_W); //2%
@@ -736,7 +735,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
     // can be used for slotmask,aperturegrille ... or scanlines, but they would have a boxed shape.
         vec3 darklines_mask=vec3(1.0);
 
-        vec3 pixel_in_unsparkled = pixel_in;
+        vec3 pixel_in_unsparkled = pixel_in.rgb;
         if (PIXELGRID_Y_MASK > 0.0) {
             //Compute phosphors height mask with the right reference coords.
                 float ph_mask_height;
@@ -767,7 +766,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 // return vec4(mask_shape);
 
             //Get per channel input luminance by clamping pixel_in and applying hmask
-                vec3 lum = clamp(pixel_in * rgb_w, 0.0, 1.0);
+                vec3 lum = clamp(pixel_in.rgb * rgb_w, 0.0, 1.0);
             //Adapt the luminance effect via input parameter
                 vec3 lum_adapted = (1-lum*PIXELGRID_Y_MASK_ON_WHITE);
             //Calc final mask visibility as the minimum between tha configured visibility and luminosity effect
@@ -789,11 +788,11 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
     //Apply Overmask:
         if (TEST_OVERMASK_NEW == 1.0) {
             vec3 mask_overmask = PIXELGRID_OVERMASK * (mask - 0.5) + 0.5;
-            vec3 pixel_in_overmask = mix(pixel_in, pixel_in * PIXELGRID_OVERMASK, PIXELGRID_OVERMASK);
+            vec3 pixel_in_overmask = mix(pixel_in.rgb, pixel_in.rgb * PIXELGRID_OVERMASK, PIXELGRID_OVERMASK);
         //Adaptive overmask experiment
             //different mix levels:
                 mask = mix(mask, mask_overmask, abs(mask - vec3(0.5)) );
-                pixel_in = mix(pixel_in, pixel_in_overmask, abs( pixel_in - vec3(0.5)  )      );
+                pixel_in.rgb = mix(pixel_in.rgb, pixel_in_overmask, abs( pixel_in.rgb - vec3(0.5)  )      );
             //Same mix levels:
                 //mask = mix(mask_overmask, mask,              pow( abs( pixel_in - vec3(0.5))*2.0, vec3(1.0))        );
                 //pixel_in = mix(pixel_in_overmask, pixel_in,  pow(abs( pixel_in - vec3(0.5))*2.0, vec3(1.0))        );
@@ -803,10 +802,10 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 //pixel_in = mix(pixel_in, pixel_in * overmask_adapted, overmask_adapted);
         } else {
             mask = PIXELGRID_OVERMASK * (mask - 0.5) + 0.5;
-            pixel_in = mix(pixel_in, pixel_in * PIXELGRID_OVERMASK, PIXELGRID_OVERMASK);
+            pixel_in.rgb = mix(pixel_in.rgb, pixel_in.rgb * PIXELGRID_OVERMASK, PIXELGRID_OVERMASK);
         }
     //Apply the mask to pixel_in and clamp the minimum to the unexcited grille.
-        vec3 mask_and_grille = max(mask * pixel_in, rgb_grille_basal);
+        vec3 mask_and_grille = max(mask * pixel_in.rgb, rgb_grille_basal);
 
     //return it with alpha channel containing the mask itself, so that halo can selectively light it.
         return vec4( mask_and_grille , dot(rgb_h, vec3(0.3333)));
@@ -1098,23 +1097,23 @@ float gaussian_coefficient(float x, float sigma) {
 vec3 fn_pixel_content(vec2 coords) {
 
     vec3 pixel_out;
-    vec3 pixel_glowed;
+    vec4 pixel_glowed;
     float dot_mat_or_pixelgrid = 1.0; //init dot grid or scanline mask to 1.0
 
 
     //#define USE_QUILEZ
 
     #ifdef USE_QUILEZ
-        pixel_glowed = texture(in_glow_pass, coords_QULEZ(coords, global.flick_and_noise_passSize)).rgb;
-        pixel_out = pixel_glowed;
+        pixel_glowed = texture(in_glow_pass, coords_QULEZ(coords, global.flick_and_noise_passSize));
+        pixel_out = pixel_glowed.rgb;
     #else
-        pixel_glowed = texture(in_glow_pass, coords).rgb;
-        pixel_out = pixel_glowed;
+        pixel_glowed = texture(in_glow_pass, coords);
+        pixel_out = pixel_glowed.rgb;
     #endif
 
     //Pixel grid
         if (DO_PIXELGRID == 1.0) {
-            vec4 pixel_grid = fn_pixel_grid(coords, pixel_out, 0.0, vMax_inLum);
+            vec4 pixel_grid = fn_pixel_grid(coords, pixel_glowed, 0.0, vMax_inLum);
             //grid mask only is needed by halo to selectively light the grid.
                 dot_mat_or_pixelgrid = pixel_grid.a;
                 pixel_out = pixel_grid.rgb;
@@ -1550,5 +1549,38 @@ void main() {
     #endif
 
     FragColor = vec4(pixel_out, 1.0);
+/*    
+float m = 1.0;
+    
+   vec2 d = global.flick_and_noise_passSize.zw*m;
+
+   vec2 sharpness = d*SERVICE1/m;
+   
+   vec3 gx = texture(in_glow_pass, vec2(vTexCoord.x + d.x, vTexCoord.y)).rgb - 
+             texture(in_glow_pass, vec2(vTexCoord.x - d.x, vTexCoord.y)).rgb;
+
+   vec3 gy = texture(in_glow_pass, vec2(vTexCoord.x, vTexCoord.y + d.y)).rgb - 
+             texture(in_glow_pass, vec2(vTexCoord.x, vTexCoord.y - d.y)).rgb;
+      
+  
+   float fgx = +(gx.x+gx.y+gx.z)/3.0;
+   float fgy = +(gy.x+gy.y+gy.z)/3.0;
+
+   
+//   fgx = clamp(fgx, -SERVICE1, SERVICE1);
+//   fgy = clamp(fgy, -SERVICE1, SERVICE1);
+   
+    vec2 warp = vec2(fgx, fgy) * sharpness;
+    
+
+    
+    vec2 warpedTexCoord = vTexCoord + warp;
+    
+    vec4 warpedColor = texture(in_glow_pass, warpedTexCoord);
+    
+    FragColor = vec4(fgx*fgy);
+    
+    FragColor = warpedColor;
+ */   
     
 }

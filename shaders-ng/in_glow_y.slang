@@ -54,6 +54,7 @@ layout(location = 4) in float vSharp_sub;
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 5) uniform sampler2D shift_and_bleed_pass;
 layout(set = 0, binding = 6) uniform sampler2D Source;
+layout(set = 0, binding = 7) uniform sampler2D Original;
 
 
 
@@ -175,7 +176,49 @@ vec3 antialias_blur_bias(sampler2D source_tex, vec2 co, vec3 pixel_glowed, float
 }
 */
 
+
+
+
+
+
+
+
 void main() { 
+
+/*   
+   vec2 d = params.OriginalSize.zw*2.0;
+
+   vec2 sharpness = d*SERVICE1;
+   
+   vec3 gx = texture(Original, vec2(vTexCoord.x + d.x, vTexCoord.y)).rgb - 
+             texture(Original, vec2(vTexCoord.x - d.x, vTexCoord.y)).rgb;
+
+   vec3 gy = texture(Original, vec2(vTexCoord.x, vTexCoord.y + d.y)).rgb - 
+             texture(Original, vec2(vTexCoord.x, vTexCoord.y - d.y)).rgb;
+      
+  
+   vec3 color = texture(Original, vTexCoord).rgb;
+   
+   float fgx = +(gx.x+gx.y+gx.z)/3.0;
+   float fgy = +(gy.x+gy.y+gy.z)/3.0;
+   
+
+   fgx = clamp(fgx, -SERVICE1, SERVICE1);
+   fgy = clamp(fgy, -SERVICE1, SERVICE1);
+   
+    vec2 warp = vec2(fgx, fgy) * sharpness;
+    vec2 warpedTexCoord = vTexCoord + warp;
+    
+    vec4 warpedColor = texture(Original, warpedTexCoord);
+    
+    FragColor = vec4(fgx*fgy);
+    
+    //FragColor = warpedColor;
+    
+    return;
+*/   
+   
+   
    if (DO_IN_GLOW == 0.0) {
       if ( DELTA_RENDER == 1.0) {
          float original_unchanged = texture(Source,vTexCoord).a;
@@ -227,9 +270,30 @@ void main() {
          FragColor = vec4(pixel_glowed * vGlow_Gain, original_unchanged);
          return;
       }
+      
+      
+      
+      
+      
+      
+      float max_inLum = max( 1.0, DO_CCORRECTION * apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS));
+                     
+      
+      #define m 0.5
+      //float d_y = global.flick_and_noise_passSize.w*m;
+      //float overblow = PIXELGRID_MAX_H*global.flick_and_noise_passSize.w*0.5;
+
+      float dy = global.flick_and_noise_passSize.w;
+      float overblow = PIXELGRID_INFLATION * 0.25 * dy * PIXELGRID_MAX_H;
+
+      
+      vec3 gy = texture(Source, vec2(vTexCoord.x, vTexCoord.y + dy)).rgb
+               - texture(Source, vec2(vTexCoord.x, vTexCoord.y - dy)).rgb; 
+      float warp_y = (gy.x+gy.y+gy.z)/max_inLum * (overblow*global.FinalViewportSize.y);
+
    
   
-   FragColor = vec4(pixel_glowed * vGlow_Gain,1.0);
+   FragColor = vec4(pixel_glowed * vGlow_Gain,warp_y);
    
 }
 

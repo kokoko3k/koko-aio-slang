@@ -213,6 +213,8 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
               The decision will be based on the ratio of output dimensions and the core.
         Phosphors height Min, Max:
             Try to keep scanline height between those values, depending on content brightness.
+        Inflation Strength:
+            Scanlines appear as inflated depending on the pixel brightness.
         Phosphors width min->max gamma:
             Since emulating phosphors with high Min-Max range changes the apparent gamma of the final image,
             it is advised, if needed, to use this option to compensate, instead of the main gamma correction.

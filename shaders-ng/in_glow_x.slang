@@ -53,6 +53,7 @@ layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 5) uniform sampler2D colortools_and_ntsc_pass;
 layout(set = 0, binding = 6) uniform sampler2D colortools_and_ntsc_passFeedback;
 layout(set = 0, binding = 7) uniform sampler2D shift_and_bleed_pass;
+layout(set = 0, binding = 8) uniform sampler2D Original;
 
 
 #include "includes/functions.include.slang" 
