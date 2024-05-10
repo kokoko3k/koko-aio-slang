@@ -315,11 +315,9 @@ void main() {
             vDotMat_Grid_Sharpness = clamp(vDotMat_Grid_Sharpness, 0.1, 20.0);
             //vfprintvalue = vDotMat_Grid_Sharpness;
         }
-                                                                                               // Delta render, mandatory conditions:
-    vDeltaRenderOk = float(  ( params.FrameCount % int(DELTA_RENDER_FORCE_REFRESH) != 0.0 ) && // - We are in a frame that is not forced for full refresh
-                             ( (! bIs_Interlaced) || PIXELGRID_INTR_DISABLE_Y >= 1.0 || DO_PIXELGRID_H == 0.0)   // - screen is not interlaced or we disabled scanlines on interlaced content
-                           );
-
+        
+    vDeltaRenderOk = is_deltarender_allowed(bIs_Interlaced); //carries DR mandatory conditions, including forced refreshed frames
+        
     // Fake or Faker integer scanlines:
     // We are going to compute an amount of lines that is integer multiple of the screen lines and that
     // is near to the real input/core lines
@@ -1324,6 +1322,19 @@ void main() {
         if (DO_GAME_GEOM_OVERRIDE == 1.0)
             co_content = content_geom_override_zoom(co_content, GAME_GEOM_ASPECT, vIn_aspect, GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
  
+    #ifndef D3D_WORKAROUND
+        if (DELTA_RENDER == 1.0) {
+            bool reuse_old =  bool( float(texture(in_glow_pass, co_content).a > 3.0) * canvas_busy * vDeltaRenderOk ) ;
+            // ^^ We have to check if alpha is > 3.0 because till 3.0 it means it is carrying the scanline
+            // ^^ inflation information from glow_y pass.
+            if (reuse_old) {
+                FragColor = texture(final_passFeedback, vOutputCoord);
+                return;
+            }
+        }
+    #endif
+    
+    
         //Dynamic lum dependant full screen zoom?
     #ifndef D3D_WORKAROUND
         if (DO_DYNZOOM > 0.0)
@@ -1334,15 +1345,7 @@ void main() {
     #endif
 
 
-    #ifndef D3D_WORKAROUND
-        if (DELTA_RENDER == 1.0) {
-            bool reuse_old =  bool( texture(in_glow_pass, co_content).a * canvas_busy * vDeltaRenderOk ) ;
-            if (reuse_old) {
-                FragColor = texture(final_passFeedback, vOutputCoord);
-                return;
-            }
-        }
-    #endif
+
 
 
     vec3 pixel_ambi = vec3(0.0);

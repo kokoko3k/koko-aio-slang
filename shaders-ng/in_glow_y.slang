@@ -185,7 +185,7 @@ vec3 antialias_blur_bias(sampler2D source_tex, vec2 co, vec3 pixel_glowed, float
 
 void main() { 
 
-/*   
+/*   warpsharp experiment
    vec2 d = params.OriginalSize.zw*2.0;
 
    vec2 sharpness = d*SERVICE1;
@@ -218,6 +218,19 @@ void main() {
     return;
 */   
    
+
+   //Scanlines (over)inflation.
+   //The result will be stored in the alpha channel to be consumed by final pass.
+      float max_inLum = max( 1.0, DO_CCORRECTION * apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS));
+
+      float dy = global.flick_and_noise_passSize.w;
+      float inflation = PIXELGRID_INFLATION * 0.25 * dy * PIXELGRID_MAX_H;
+
+      vec3 gy = texture(Source, vec2(vTexCoord.x, vTexCoord.y + dy)).rgb
+               - texture(Source, vec2(vTexCoord.x, vTexCoord.y - dy)).rgb; 
+      float warp_y = (gy.x+gy.y+gy.z)/max_inLum * (inflation*global.FinalViewportSize.y);
+
+
    
    if (DO_IN_GLOW == 0.0) {
       if ( DELTA_RENDER == 1.0) {
@@ -226,7 +239,7 @@ void main() {
          FragColor = vec4(color * vGlow_Gain, original_unchanged);
          return;
       }
-      FragColor = vec4(texture(shift_and_bleed_pass, vTexCoord).rgb * vGlow_Gain, 1.0);
+      FragColor = vec4(texture(shift_and_bleed_pass, vTexCoord).rgb * vGlow_Gain, warp_y);
       return;
    }
 
@@ -271,29 +284,7 @@ void main() {
          return;
       }
       
-      
-      
-      
-      
-      
-      float max_inLum = max( 1.0, DO_CCORRECTION * apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS));
-                     
-      
-      #define m 0.5
-      //float d_y = global.flick_and_noise_passSize.w*m;
-      //float overblow = PIXELGRID_MAX_H*global.flick_and_noise_passSize.w*0.5;
-
-      float dy = global.flick_and_noise_passSize.w;
-      float overblow = PIXELGRID_INFLATION * 0.25 * dy * PIXELGRID_MAX_H;
-
-      
-      vec3 gy = texture(Source, vec2(vTexCoord.x, vTexCoord.y + dy)).rgb
-               - texture(Source, vec2(vTexCoord.x, vTexCoord.y - dy)).rgb; 
-      float warp_y = (gy.x+gy.y+gy.z)/max_inLum * (overblow*global.FinalViewportSize.y);
-
-   
-  
-   FragColor = vec4(pixel_glowed * vGlow_Gain,warp_y);
+   FragColor = vec4(pixel_glowed * vGlow_Gain, warp_y);
    
 }
 

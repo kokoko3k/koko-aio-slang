@@ -1567,3 +1567,9 @@ float lodmax(vec2 texsize) {
 	//lod needed to average all texture points.
     return log2(max(texsize.x, texsize.y));
 }
+float is_deltarender_allowed(bool is_interlaced) {
+	// Delta render, mandatory conditions:
+    return float( ( params.FrameCount % int(DELTA_RENDER_FORCE_REFRESH) != 0.0 ) &&              // - We are in a frame that is not forced for full refresh
+    ( (! is_interlaced) || PIXELGRID_INTR_DISABLE_Y >= 1.0 || DO_PIXELGRID_H == 0.0)); // - screen is not interlaced or we disabled scanlines on interlaced content
+    
+}

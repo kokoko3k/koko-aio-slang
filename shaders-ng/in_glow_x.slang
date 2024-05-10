@@ -4,6 +4,8 @@
 //Dumbify glow under this treshold.
 #define GLOW_SHARP_MAX_ALTERNATE -2.0 
 
+#include "includes/functions.include.slang" 
+
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
@@ -12,6 +14,7 @@ layout(location = 1) out float glow_h_and_w_outside_interval;
 layout(location = 2) out float glow_w_inside_interval;
 layout(location = 3) out float vSharp_sub;
 layout(location = 4) out float vShowArtifactsMask;
+layout(location = 5) out float vDeltaRenderOk;
 
 void main() {
    gl_Position = global.MVP * Position;
@@ -37,6 +40,10 @@ void main() {
    //}
       
    vShowArtifactsMask = float(DO_NTSC_ARTIFACTS + NTSC_SHOW_ARTF_MASK > 1.5);
+   
+   bool bIs_Interlaced = is_interlaced();
+   vDeltaRenderOk = is_deltarender_allowed(bIs_Interlaced); //carries DR mandatory conditions, including forced refreshed frames
+   
 }
 
 
@@ -47,6 +54,7 @@ layout(location = 1) in float glow_h_and_w_outside_interval;
 layout(location = 2) in float glow_w_inside_interval;
 layout(location = 3) in float vSharp_sub;
 layout(location = 4) in float vShowArtifactsMask;
+layout(location = 5) in float vDeltaRenderOk;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -54,9 +62,6 @@ layout(set = 0, binding = 5) uniform sampler2D colortools_and_ntsc_pass;
 layout(set = 0, binding = 6) uniform sampler2D colortools_and_ntsc_passFeedback;
 layout(set = 0, binding = 7) uniform sampler2D shift_and_bleed_pass;
 layout(set = 0, binding = 8) uniform sampler2D Original;
-
-
-#include "includes/functions.include.slang" 
 
 
 
@@ -77,16 +82,22 @@ float delta_render_unchanged(sampler2D mip_past, sampler2D mip_now, float lod) {
    vec2 co_nearest = (integerCoords + 0.5) * params.OriginalSize.zw*pow(2,lod);
    vec3 p1 = textureLod(mip_now,  co_nearest, lod).rgb;
    vec3 p2 = textureLod(mip_past, co_nearest, lod).rgb;
-   return float(p1 == p2);
+   return float(p1 == p2)*1000.0; 
+   // ^^ we mul by 1000 because glow_y will sample this alpha and will multiplex it with the
+   // inflation/warp_y value.
+   // multiplying by 1000 will allow the final pass to understand if is a deltarender value or an inflation one.
+   // The number has to be high, to avoid lerp issues.
 }
 
 void main() { 
    if (DO_IN_GLOW == 0.0) {
       //Delta render?
       if (DELTA_RENDER == 1.0) {
-         float DR_unchanged = delta_render_unchanged(colortools_and_ntsc_passFeedback,  colortools_and_ntsc_pass, DELTA_RENDER_CHECK_AREA);
-         FragColor = vec4(0.0,0.0,0.0,DR_unchanged); 
-         return;
+         if (vDeltaRenderOk == 1.0) {
+            float DR_unchanged = delta_render_unchanged(colortools_and_ntsc_passFeedback,  colortools_and_ntsc_pass, DELTA_RENDER_CHECK_AREA);
+            FragColor = vec4(0.0,0.0,0.0,DR_unchanged); 
+            return;
+         }
       }
    };
 
@@ -105,9 +116,11 @@ void main() {
          vec4 passthrough = texture(shift_and_bleed_pass, vTexCoord);
          //Delta render?
          if (DELTA_RENDER == 1.0) {
-            float DR_unchanged = delta_render_unchanged(colortools_and_ntsc_passFeedback,  colortools_and_ntsc_pass, DELTA_RENDER_CHECK_AREA);
-            FragColor = vec4(passthrough.rgb, DR_unchanged);
-            return;
+            if (vDeltaRenderOk == 1.0) {
+               float DR_unchanged = delta_render_unchanged(colortools_and_ntsc_passFeedback,  colortools_and_ntsc_pass, DELTA_RENDER_CHECK_AREA);
+               FragColor = vec4(passthrough.rgb, DR_unchanged);
+               return;
+            }
          }
          FragColor = passthrough;
          return;
@@ -142,8 +155,10 @@ void main() {
    //Delta render?
       float DR_unchanged = 0.0;
       if (DELTA_RENDER == 1.0) {
-         //Keep track of changed pixels to speedup rendering in final pass   
-         DR_unchanged = delta_render_unchanged(colortools_and_ntsc_passFeedback,  colortools_and_ntsc_pass, DELTA_RENDER_CHECK_AREA);
+         if (vDeltaRenderOk == 1.0) {
+            //Keep track of changed pixels to speedup rendering in final pass   
+            DR_unchanged = delta_render_unchanged(colortools_and_ntsc_passFeedback,  colortools_and_ntsc_pass, DELTA_RENDER_CHECK_AREA);
+         }
       }
       
       
