@@ -643,18 +643,8 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
         //Pixelgrid: do horizontal if enabled, but skip it if user doesn't want it on interlaced content.
         //if (DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0)) { //103.1
         if (vDo_pixelgrid_h > 0.5) {
-            
-            #define m 0.125
-            float d_y = global.flick_and_noise_passSize.w*m;
-            float overblow = PIXELGRID_MAX_H*global.flick_and_noise_passSize.w*0.5;
-    
-            vec3 gy = texture(in_glow_pass, vec2(in_coords.x, in_coords.y + d_y)).rgb
-                    - texture(in_glow_pass, vec2(in_coords.x, in_coords.y - d_y)).rgb; 
-            float warp_y = (gy.x+gy.y+gy.z)/max_inLum * (overblow*params.OutputSize.y);
-            //freq_base_core.y += warp_y;
-            
-            freq_base_core.y += pixel_in.a;
-            
+            //Scanline Inflation:
+                freq_base_core.y += pixel_in.a;
             
             //Since we emulate scanlines, take into account current scanline phase:
                 float interlacing_adapt_period = vScanlinePeriod;
