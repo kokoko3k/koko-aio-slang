@@ -71,11 +71,21 @@ shaders = 17
            shader0 = shaders-ng/colortools_and_ntsc_pass.slang
             alias0 = "colortools_and_ntsc_pass"
 #float_framebuffer needed by phosphor persistance
-float_framebuffer0 = true
-    filter_linear0 = false
        scale_type0 = source
             scale0 = 1.0
-        wrap_mode0 = "clamp_to_border"
+            
+// (**Note 0)
+// Watch out for filter_linear0 and wrap_mode0
+// In retroarch, metadatas such as the followings, usually applies to the
+// previous pass (Original, in this case).
+// However it seems that those metadatas are applied to the feedback of the pass itself.
+// Now, since we need to compare colortools_and_ntsc_pass and colortools_and_ntsc_passFeedback
+// for Deltarender purposes, it is important that they share the same filtering and wrap mode.
+// Hence, we have to set the following as the same of float_framebuffer0,filter_linear0 and wrap_mode0
+float_framebuffer0 = "true"
+    filter_linear0 = "true"
+        wrap_mode0 = "mirrored_repeat"
+
 
 
         
@@ -101,13 +111,16 @@ float_framebuffer0 = true
 # ASMDEBUG: GLSL30
            shader1 = shaders-ng/flick_and_noise.slang
             alias1 = "flick_and_noise_pass"
-    filter_linear1 = true
        scale_type1 = source
           scale_x1 = 2.0
           scale_y1 = 2.0  
-        wrap_mode1 = "mirrored_repeat"
-     float_framebuffer1 = true
      mipmap_input1 = "true"
+     
+//(See **Note 0)
+        wrap_mode1 = "mirrored_repeat"
+float_framebuffer1 = "true"
+    filter_linear1 = "true"
+     
 
 
 

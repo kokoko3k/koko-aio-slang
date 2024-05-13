@@ -61,8 +61,6 @@ layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 5) uniform sampler2D colortools_and_ntsc_pass;
 layout(set = 0, binding = 6) uniform sampler2D colortools_and_ntsc_passFeedback;
 layout(set = 0, binding = 7) uniform sampler2D shift_and_bleed_pass;
-layout(set = 0, binding = 8) uniform sampler2D Original;
-
 
 
 vec3 blur_select_wrap(sampler2D texture_in, vec2 co, vec4 sourcesize, float sharpness, bool use_gauss) {
@@ -72,16 +70,10 @@ vec3 blur_select_wrap(sampler2D texture_in, vec2 co, vec4 sourcesize, float shar
       return blur9_x_box(texture_in, co, sourcesize.xy, sharpness, vSharp_sub);
 }
 
-float delta_render_unchanged(sampler2D mip_past, sampler2D mip_now, float lod) {
-   //A bug in retroarch causes the mipmap's feedback to always be nearest scaled, while the actual
-   //mipmap is linearly filtered or not depending on the slangp chain.
-   //A good workaround that would survive to a bugfix is to do a nearest sampling here for both the
-   //feedback and the actual mipmap.
-   //WW: The nearest coords have to be "snapped" according to the mipmap lod.
-   vec2 integerCoords = floor(vTexCoord.xy * params.OriginalSize.xy/pow(2,lod));
-   vec2 co_nearest = (integerCoords + 0.5) * params.OriginalSize.zw*pow(2,lod);
-   vec3 p1 = textureLod(mip_now,  co_nearest, lod).rgb;
-   vec3 p2 = textureLod(mip_past, co_nearest, lod).rgb;
+float delta_render_unchanged(sampler2D mip_past, sampler2D mip_now, vec2 co, float lod) {
+   vec3 p1 = textureLod(mip_now,  co, lod).rgb;
+   vec3 p2 = textureLod(mip_past, co, lod).rgb;
+   
    return float(p1 == p2)*1000.0; 
    // ^^ we mul by 1000 because glow_y will sample this alpha and will multiplex it with the
    // inflation/warp_y value.
@@ -90,11 +82,14 @@ float delta_render_unchanged(sampler2D mip_past, sampler2D mip_now, float lod) {
 }
 
 void main() { 
+
+   
    if (DO_IN_GLOW == 0.0) {
       //Delta render?
       if (DELTA_RENDER == 1.0) {
          if (vDeltaRenderOk == 1.0) {
-            float DR_unchanged = delta_render_unchanged(colortools_and_ntsc_passFeedback,  colortools_and_ntsc_pass, DELTA_RENDER_CHECK_AREA);
+            float DR_unchanged = delta_render_unchanged(colortools_and_ntsc_passFeedback, colortools_and_ntsc_pass,
+                                                        vTexCoord, DELTA_RENDER_CHECK_AREA);
             FragColor = vec4(0.0,0.0,0.0,DR_unchanged); 
             return;
          }
@@ -117,7 +112,8 @@ void main() {
          //Delta render?
          if (DELTA_RENDER == 1.0) {
             if (vDeltaRenderOk == 1.0) {
-               float DR_unchanged = delta_render_unchanged(colortools_and_ntsc_passFeedback,  colortools_and_ntsc_pass, DELTA_RENDER_CHECK_AREA);
+               float DR_unchanged = delta_render_unchanged(colortools_and_ntsc_passFeedback,  colortools_and_ntsc_pass, 
+                                                           vTexCoord, DELTA_RENDER_CHECK_AREA);
                FragColor = vec4(passthrough.rgb, DR_unchanged);
                return;
             }
@@ -157,7 +153,8 @@ void main() {
       if (DELTA_RENDER == 1.0) {
          if (vDeltaRenderOk == 1.0) {
             //Keep track of changed pixels to speedup rendering in final pass   
-            DR_unchanged = delta_render_unchanged(colortools_and_ntsc_passFeedback,  colortools_and_ntsc_pass, DELTA_RENDER_CHECK_AREA);
+            DR_unchanged = delta_render_unchanged(colortools_and_ntsc_passFeedback,  colortools_and_ntsc_pass, 
+                                                  vTexCoord, DELTA_RENDER_CHECK_AREA);
          }
       }
       

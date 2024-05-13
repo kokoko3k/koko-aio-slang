@@ -74,7 +74,7 @@ layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 1) uniform sampler2D  colortools_and_ntsc_passFeedback;
 layout(set = 0, binding = 2) uniform sampler2D colortools_and_ntsc_pass;
 layout(set = 0, binding = 3) uniform sampler2D avglum_passFeedback;
-layout(set = 0, binding = 4) uniform sampler2D Original;
+
 
 /* The following will allow to sample at reduced interval
    The scene change detection logic will take advantage of it
@@ -199,8 +199,7 @@ float get_next_autocrop_amount(float max_autocrop_amount) {
     //This is needed to avoid sampling edges which may return out out of range values.
         const vec2 d = params.OriginalSize.zw * 0.5 * (1+AUTOCROP_MIN*2);
     //Reference color, topleft.
-        vec3 ref = texture(Original, vec2(d)).rgb; 
-        ref = textureLod(colortools_and_ntsc_pass, vec2(d), 0.0).rgb; // FIXME, ref sample needs to be fuzzy too?
+        vec3 ref = textureLod(colortools_and_ntsc_pass, vec2(d), 0.0).rgb; // FIXME, ref sample needs to be fuzzy too?
         float ref_lum = ref.r + ref.g + ref.b ;
     
     //convert zoom back to maximum cropped lines
