@@ -1,5 +1,6 @@
 #version 450
 #include "config.inc"
+#include "includes/functions.include.slang"  
 
 //Dumbify glow under this treshold.
 #define GLOW_SHARP_MAX_ALTERNATE -2.0 
@@ -12,6 +13,7 @@ layout(location = 1) out float glow_h_inside_interval;
 layout(location = 2) out float vDoInGlowBias;
 layout(location = 3) out float vGlow_Gain;
 layout(location = 4) out float vSharp_sub;
+layout(location = 11) out float vDeltaRenderOk;
 
 void main() {
    gl_Position = global.MVP * Position;
@@ -40,6 +42,9 @@ void main() {
       vSharp_sub = clamp(sharp_sub, 0.0,1.0);
       vSharp_sub = -2*vSharp_sub+1;
    //}
+      
+   bool bIs_Interlaced = is_interlaced();
+   vDeltaRenderOk = is_deltarender_allowed(bIs_Interlaced); //carries DR mandatory conditions, including forced refreshed frames
 }
 
 
@@ -50,13 +55,12 @@ layout(location = 1) in float glow_h_inside_interval;
 layout(location = 2) in float vDoInGlowBias;
 layout(location = 3) in float vGlow_Gain;
 layout(location = 4) in float vSharp_sub;
+layout(location = 11) in float vDeltaRenderOk;
 
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 5) uniform sampler2D shift_and_bleed_pass;
 layout(set = 0, binding = 6) uniform sampler2D Source;
-
-
-#include "includes/functions.include.slang"  
+layout(set = 0, binding = 7) uniform sampler2D in_glow_passFeedback;
 
 vec3 glow_blur_bias(sampler2D source_tex, vec2 co, vec3 pixel_glowed, float bias){
    vec3 pixel_source = texture(source_tex, co).rgb;
@@ -216,6 +220,17 @@ void main() {
     return;
 */   
    
+   //Delta render?
+   if (DELTA_RENDER == 1.0) {
+      if (vDeltaRenderOk == 1.0) {
+         float DR_unchanged = texture(Source,vTexCoord).a;
+         if (DR_unchanged > 0.0) {
+            FragColor = vec4( texture(in_glow_passFeedback, vTexCoord).rgb,DR_unchanged); 
+            return;
+         }
+      }
+   }
+
 
    //Scanlines (over)inflation.
    //The result will be stored in the alpha channel to be consumed by final pass.
@@ -231,12 +246,6 @@ void main() {
 
    
    if (DO_IN_GLOW == 0.0) {
-      if ( DELTA_RENDER == 1.0) {
-         float original_unchanged = texture(Source,vTexCoord).a;
-         vec3 color = texture(shift_and_bleed_pass, vTexCoord).rgb;
-         FragColor = vec4(color * vGlow_Gain, original_unchanged + scanline_inflation);
-         return;
-      }
       FragColor = vec4(texture(shift_and_bleed_pass, vTexCoord).rgb * vGlow_Gain, scanline_inflation);
       return;
    }
@@ -274,14 +283,7 @@ void main() {
             //pixel_glowed = antialias_blur_bias(shift_and_bleed_pass, vTexCoord, pixel_glowed, IN_GLOW_BIAS);
       }
    
-   //Previous pass compared previous and current source frame and exported that info in the alpha.
-   //Pass it through when we need delta rended.
-      if ( DELTA_RENDER == 1.0) {
-         float original_unchanged = texture(Source,vTexCoord).a;
-         FragColor = vec4(pixel_glowed * vGlow_Gain, original_unchanged + scanline_inflation);
-         return;
-      }
-      
+
    FragColor = vec4(pixel_glowed * vGlow_Gain, scanline_inflation);
    
 }

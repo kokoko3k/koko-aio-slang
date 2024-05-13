@@ -70,31 +70,22 @@ vec3 blur_select_wrap(sampler2D texture_in, vec2 co, vec4 sourcesize, float shar
       return blur9_x_box(texture_in, co, sourcesize.xy, sharpness, vSharp_sub);
 }
 
-float delta_render_unchanged(sampler2D mip_past, sampler2D mip_now, vec2 co, float lod) {
-   vec3 p1 = textureLod(mip_now,  co, lod).rgb;
-   vec3 p2 = textureLod(mip_past, co, lod).rgb;
-   
-   return float(p1 == p2)*1000.0; 
-   // ^^ we mul by 1000 because glow_y will sample this alpha and will multiplex it with the
-   // inflation/warp_y value.
-   // multiplying by 1000 will allow the final pass to understand if is a deltarender value or an inflation one.
-   // The number has to be high, to avoid lerp issues.
-}
+
 
 void main() { 
 
    
-   if (DO_IN_GLOW == 0.0) {
-      //Delta render?
-      if (DELTA_RENDER == 1.0) {
-         if (vDeltaRenderOk == 1.0) {
-            float DR_unchanged = delta_render_unchanged(colortools_and_ntsc_passFeedback, colortools_and_ntsc_pass,
-                                                        vTexCoord, DELTA_RENDER_CHECK_AREA);
+   //Delta render?
+   if (DELTA_RENDER == 1.0) {
+      if (vDeltaRenderOk == 1.0) {
+         float DR_unchanged = delta_render_unchanged(colortools_and_ntsc_passFeedback, colortools_and_ntsc_pass,
+                                                      vTexCoord, DELTA_RENDER_CHECK_AREA);
+         if (DR_unchanged > 0.0) {
             FragColor = vec4(0.0,0.0,0.0,DR_unchanged); 
             return;
          }
       }
-   };
+   }
 
    //Modulate glow power via ntsc artifact mask:
       float ntsc_artifacts = texture(shift_and_bleed_pass, vTexCoord).a; //compiler is smart enough to reuse this lookup, no need to branch.
@@ -110,14 +101,6 @@ void main() {
       if ( glow_h_and_w_outside_interval == 1.0) {
          vec4 passthrough = texture(shift_and_bleed_pass, vTexCoord);
          //Delta render?
-         if (DELTA_RENDER == 1.0) {
-            if (vDeltaRenderOk == 1.0) {
-               float DR_unchanged = delta_render_unchanged(colortools_and_ntsc_passFeedback,  colortools_and_ntsc_pass, 
-                                                           vTexCoord, DELTA_RENDER_CHECK_AREA);
-               FragColor = vec4(passthrough.rgb, DR_unchanged);
-               return;
-            }
-         }
          FragColor = passthrough;
          return;
       }
@@ -148,23 +131,12 @@ void main() {
       in_glow_w_adapted = in_glow_w_adapted / NEW_SCALEMOD_X;
       
 
-   //Delta render?
-      float DR_unchanged = 0.0;
-      if (DELTA_RENDER == 1.0) {
-         if (vDeltaRenderOk == 1.0) {
-            //Keep track of changed pixels to speedup rendering in final pass   
-            DR_unchanged = delta_render_unchanged(colortools_and_ntsc_passFeedback,  colortools_and_ntsc_pass, 
-                                                  vTexCoord, DELTA_RENDER_CHECK_AREA);
-         }
-      }
-      
-      
    //Finally blur horizontally 
    if (glow_w_inside_interval == 1.0)  {
          FragColor = vec4(blur_select_wrap(shift_and_bleed_pass, vTexCoord, global.flick_and_noise_passSize, in_glow_w_adapted, (IN_GLOW_W >= 0.0) ), 
-                          DR_unchanged);
+                          0.0);
    } else {
-      FragColor = vec4(texture(shift_and_bleed_pass, vTexCoord).rgb, DR_unchanged);
+      FragColor = vec4(texture(shift_and_bleed_pass, vTexCoord).rgb, 0.0);
    }
 
    
