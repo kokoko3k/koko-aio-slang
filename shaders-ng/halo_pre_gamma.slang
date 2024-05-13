@@ -54,14 +54,15 @@ void main() {
     
     vec4 pixel_haloed = texture(in_glow_pass, vTexCoord);
     
-    if (DELTA_RENDER == 1.0) {
+/*    if (DELTA_RENDER == 1.0) {
          if (vDeltaRenderOk == 1.0) {
              //No need to process halo if we're using deltarender and content did not change.
+             //Produces glitches; disable by now.
              if (pixel_haloed.a > 3.0)
                  return;
          }
     }
-    
+*/  
     if (HALO_NO_PREGAIN == 1.0)  pixel_haloed.rgb/= vHALO_UNGAIN_FACTOR;
     
     pixel_haloed.rgb = pow(pixel_haloed.rgb, vHALO_GAMMA);
