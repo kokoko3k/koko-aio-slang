@@ -226,7 +226,7 @@ void main() {
 
       vec3 gy = texture(Source, vec2(vTexCoord.x, vTexCoord.y + dy)).rgb
                - texture(Source, vec2(vTexCoord.x, vTexCoord.y - dy)).rgb; 
-      float warp_y = (gy.x+gy.y+gy.z)/max_inLum * (inflation*global.FinalViewportSize.y);
+      float scanline_inflation = (gy.x+gy.y+gy.z)/max_inLum * (inflation*global.FinalViewportSize.y);
 
 
    
@@ -234,10 +234,10 @@ void main() {
       if ( DELTA_RENDER == 1.0) {
          float original_unchanged = texture(Source,vTexCoord).a;
          vec3 color = texture(shift_and_bleed_pass, vTexCoord).rgb;
-         FragColor = vec4(color * vGlow_Gain, original_unchanged);
+         FragColor = vec4(color * vGlow_Gain, original_unchanged + scanline_inflation);
          return;
       }
-      FragColor = vec4(texture(shift_and_bleed_pass, vTexCoord).rgb * vGlow_Gain, warp_y);
+      FragColor = vec4(texture(shift_and_bleed_pass, vTexCoord).rgb * vGlow_Gain, scanline_inflation);
       return;
    }
 
@@ -278,11 +278,11 @@ void main() {
    //Pass it through when we need delta rended.
       if ( DELTA_RENDER == 1.0) {
          float original_unchanged = texture(Source,vTexCoord).a;
-         FragColor = vec4(pixel_glowed * vGlow_Gain, original_unchanged);
+         FragColor = vec4(pixel_glowed * vGlow_Gain, original_unchanged + scanline_inflation);
          return;
       }
       
-   FragColor = vec4(pixel_glowed * vGlow_Gain, warp_y);
+   FragColor = vec4(pixel_glowed * vGlow_Gain, scanline_inflation);
    
 }
 
