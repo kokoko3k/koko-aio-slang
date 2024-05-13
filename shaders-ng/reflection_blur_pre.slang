@@ -73,7 +73,7 @@ void main() {
       coords = zoom(coords, get_autocrop_zoom(avglum_pass));
    
    //eventually return black pixel
-   #define tol 0.05
+   #define tol 0.001
    #define RECT01 vec4( vec2(0.0-tol), vec2(1.0+tol) )
    if (is_first_outside_rect(coords, RECT01)) {
    //if (coords.y < 0.0-tol || coords.y > 1.0+tol || coords.x < 0.0-tol || coords.x > 1.0+tol) {
