@@ -13,7 +13,9 @@ layout(location = 1) out float glow_h_inside_interval;
 layout(location = 2) out float vDoInGlowBias;
 layout(location = 3) out float vGlow_Gain;
 layout(location = 4) out float vSharp_sub;
+layout(location = 5) out float vMax_inLum;
 layout(location = 11) out float vDeltaRenderOk;
+
 
 void main() {
    gl_Position = global.MVP * Position;
@@ -45,6 +47,9 @@ void main() {
       
    bool bIs_Interlaced = is_interlaced();
    vDeltaRenderOk = is_deltarender_allowed(bIs_Interlaced); //carries DR mandatory conditions, including forced refreshed frames
+   
+   vMax_inLum = max( 1.0, DO_CCORRECTION * apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS));
+   
 }
 
 
@@ -55,7 +60,9 @@ layout(location = 1) in float glow_h_inside_interval;
 layout(location = 2) in float vDoInGlowBias;
 layout(location = 3) in float vGlow_Gain;
 layout(location = 4) in float vSharp_sub;
+layout(location = 5) in float vMax_inLum;
 layout(location = 11) in float vDeltaRenderOk;
+
 
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 5) uniform sampler2D shift_and_bleed_pass;
@@ -234,14 +241,12 @@ void main() {
 
    //Scanlines (over)inflation.
    //The result will be stored in the alpha channel to be consumed by final pass.
-      float max_inLum = max( 1.0, DO_CCORRECTION * apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS));
-
       float dy = global.flick_and_noise_passSize.w;
       float inflation = PIXELGRID_INFLATION * 0.25 * dy * PIXELGRID_MAX_H;
 
       vec3 gy = texture(Source, vec2(vTexCoord.x, vTexCoord.y + dy)).rgb
                - texture(Source, vec2(vTexCoord.x, vTexCoord.y - dy)).rgb; 
-      float scanline_inflation = (gy.x+gy.y+gy.z)/max_inLum * (inflation*global.FinalViewportSize.y);
+      float scanline_inflation = (gy.x+gy.y+gy.z)/vMax_inLum * (inflation*global.FinalViewportSize.y);
 
 
    

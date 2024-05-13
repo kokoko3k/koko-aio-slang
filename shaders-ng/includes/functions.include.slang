@@ -1589,3 +1589,7 @@ float delta_render_unchanged(sampler2D mip_past, sampler2D mip_now, vec2 co, flo
    // multiplying by 1000 will allow the final pass to understand if is a deltarender value or an inflation one.
    // The number has to be high, to avoid lerp issues.
 }
+
+float max3(vec3 v){
+	return max((v.x,v.y),v.z);
+}
