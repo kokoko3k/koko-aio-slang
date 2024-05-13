@@ -1202,11 +1202,17 @@ vec2 rgb2hv(vec3 c) {
 }
 	
 float get_dyn_zoom(sampler2D tex) {
-	return texture(tex, vec2(0.75,0.75)).a * DO_DYNZOOM + 1.0 ;
+	if (DELTA_RENDER == 0.0)
+		return texture(tex, vec2(0.75,0.75)).a * DO_DYNZOOM + 1.0 ;
+	else
+		return 1.0;
 }
 
 float get_autocrop_zoom(sampler2D tex) {
-	return texture(tex, AUTOCROP_SAMPLING_POINT).a;
+	if (DELTA_RENDER == 0.0)
+		return texture(tex, AUTOCROP_SAMPLING_POINT).a;
+	else
+		return 1.0;
 }
 
 
