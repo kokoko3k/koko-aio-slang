@@ -245,8 +245,11 @@ void main() {
       float inflation = PIXELGRID_INFLATION * 0.25 * dy * PIXELGRID_MAX_H;
 
       vec3 gy = texture(Source, vec2(vTexCoord.x, vTexCoord.y + dy)).rgb
-               - texture(Source, vec2(vTexCoord.x, vTexCoord.y - dy)).rgb; 
-      float scanline_inflation = (gy.x+gy.y+gy.z)/vMax_inLum * (inflation*global.FinalViewportSize.y);
+              - texture(Source, vec2(vTexCoord.x, vTexCoord.y - dy)).rgb; 
+              
+      gy /=vMax_inLum;
+              
+      float scanline_inflation = (gy.x+gy.y+gy.z) * (inflation*global.FinalViewportSize.y);
 
 
    
