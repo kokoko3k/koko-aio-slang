@@ -32,7 +32,7 @@ layout(location = 3) out float vIsRotated;
 layout(location = 4) out float vScanlinePeriod;
 layout(location = 5) out float vOffset;
 layout(location = 6) out float vIn_aspect;
-layout(location = 7) out float vDynamicSeed;
+
 layout(location = 8) out float vBEZEL_INNER_ZOOM_adapted;
 layout(location = 9) out float vDo_Tate;
 layout(location = 10) out vec3 vDotMat_Grid_Color;
@@ -215,9 +215,6 @@ void main() {
             }
 
 
-    //Generate a seed that changes over time for temporal random noise
-        vDynamicSeed = mod(params.FrameCount, 30.0001);
-
     //Calc dotmat grid color
         vDotMat_Grid_Color = vec3(DOT_M_G_BRT);
         if (DO_DOT_MATRIX + DO_CCORRECTION > 1.1) {
@@ -398,7 +395,7 @@ layout(location = 3) in float vIsRotated;
 layout(location = 4) in float vScanlinePeriod;
 layout(location = 5) in float vOffset;
 layout(location = 6) in float vIn_aspect;
-layout(location = 7) in float vDynamicSeed;
+
 layout(location = 8) in float vBEZEL_INNER_ZOOM_adapted;
 layout(location = 9) in float vDo_Tate;
 layout(location = 10) in vec3 vDotMat_Grid_Color;
@@ -1364,7 +1361,8 @@ void main() {
                 
                 if (DO_BG_IMAGE != 1.0) {
                     const float noise_power = NOISEPOWER * NOISEPOWER_AMBI_MUL;
-                    float anoise1 = random_fast(vTexCoord * vDynamicSeed);
+                    float vDynamicSeed = mod(params.FrameCount, 30.0001);
+                    float anoise1 = random_fast(vTexCoord*vDynamicSeed);
                     anoise1 = scale_to_range(anoise1, -noise_power, noise_power);
                     // anoise1 *=  (1 - pixel_ambi.g);
                     //anoise1 =  (anoise1 - anoise1 * pixel_ambi.g); //ASM PROOF FASTER
