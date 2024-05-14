@@ -77,9 +77,10 @@ void main() {
    gl_Position = global.MVP * Position;
    vTexCoord = TexCoord * 1.0001;
 
-    if (DO_GAME_GEOM_OVERRIDE > 0.5)
-        vTexCoord = content_geom_override_shift(vTexCoord, GAME_GEOM_ASPECT, get_in_aspect(), GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
-
+   if (DO_GAME_GEOM_OVERRIDE > 0.5) {
+      vec2 shift = vec2(GAME_GEOM_HSHIFT,GAME_GEOM_VSHIFT);
+      vTexCoord = content_geom_override_shift(vTexCoord, GAME_GEOM_ASPECT, get_in_aspect(), shift.y, shift.x, GAME_GEOM_ZOOM);
+   }
    
    
    if (DO_NTSC_ARTIFACTS > 0.0) {

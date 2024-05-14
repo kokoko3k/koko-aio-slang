@@ -554,8 +554,12 @@ float apply_contrast_brightness(float c, float contrast, float brightness) {
    return scale_to_range(c, -contrast, 1+contrast) + brightness;
 }
 
-float round_step(float f, float p) {
-	return floor(f*p)/p;
+float round_step(float x, float p) {
+	return round(x*p)/p;
+}
+
+vec2 round_step(vec2 x, vec2 p) {
+	return round(x*p)/p;
 }
 
 #define VEC2_RND_A_B vec2(12.9898, 78.233)
@@ -875,8 +879,8 @@ float random_fast(vec2 seed) {
 	vec2 content_geom_override_shift(vec2 co, float aspect, float in_aspect, float vshift, float hshift, float out_zoom){
 		//Aspect (ASM PROOF: IFTHEN is better)
 		//shift
-		co.y -= vshift/10.0;
-		co.x -= hshift/10.0;
+		vec2 shift = round_step(vec2(hshift, vshift)*0.1, params.OriginalSize.xy);
+		co -= shift;
 		return co;
 	}
 	
