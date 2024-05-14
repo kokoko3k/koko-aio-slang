@@ -31,7 +31,7 @@ layout(location = 3) out float vIsRotated;
 
 layout(location = 4) out float vScanlinePeriod;
 layout(location = 5) out float vOffset;
-layout(location = 6) out float vMax_inLum;
+//layout(location = 6) out float vMax_inLum;
 //Vignette, spot:
 layout(location = 7) out float vIn_aspect;
 //
@@ -220,8 +220,8 @@ void main() {
         //Calculate the maximum possible brightness of the input color by taking glow,
         //contrast and brightness into account. This is needed so that scanline generation
         //can map the proper input range and strictly obey scanline thickness constraints.
-        vMax_inLum = max( 1.0, DO_CCORRECTION * apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS)) *
-                     max( 1.0, mix(1.0, IN_GLOW_POWER, DO_CCORRECTION));
+//        vMax_inLum = max( 1.0, DO_CCORRECTION * apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS)) *
+//                     max( 1.0, mix(1.0, IN_GLOW_POWER, DO_CCORRECTION));
 
 
     //Generate a seed that changes over time for temporal random noise
@@ -408,7 +408,7 @@ layout(location = 3) in float vIsRotated;
 
 layout(location = 4) in float vScanlinePeriod;
 layout(location = 5) in float vOffset;
-layout(location = 6) in float vMax_inLum;
+//layout(location = 6) in float vMax_inLum;
 layout(location = 7) in float vIn_aspect;
 layout(location = 8) in float vDynamicSeed;
 layout(location = 9) in float vBEZEL_INNER_ZOOM_adapted;
@@ -1097,10 +1097,11 @@ vec3 fn_pixel_content(vec2 coords) {
     #else
         pixel_glowed = texture(in_glow_pass, coords);
         pixel_out = pixel_glowed.rgb;
-    #endif
-
+    #endif        
     //Pixel grid
         if (DO_PIXELGRID == 1.0) {
+            float vMax_inLum = max( 1.0, DO_CCORRECTION * apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS)) *
+                               max( 1.0, mix(1.0, IN_GLOW_POWER, DO_CCORRECTION));
             vec4 pixel_grid = fn_pixel_grid(coords, pixel_glowed, 0.0, vMax_inLum);
             //grid mask only is needed by halo to selectively light the grid.
                 dot_mat_or_pixelgrid = pixel_grid.a;
