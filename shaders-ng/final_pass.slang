@@ -31,28 +31,25 @@ layout(location = 3) out float vIsRotated;
 
 layout(location = 4) out float vScanlinePeriod;
 layout(location = 5) out float vOffset;
-//layout(location = 6) out float vMax_inLum;
-//Vignette, spot:
-layout(location = 7) out float vIn_aspect;
-//
-layout(location = 8) out float vDynamicSeed;
-layout(location = 9) out float vBEZEL_INNER_ZOOM_adapted;
-layout(location = 10) out float vDo_Tate;
-layout(location = 11) out vec3 vDotMat_Grid_Color;
-layout(location = 12) out vec4 vPG_offsets_and_size;
-layout(location = 13) out vec2 vPG_freq_base_screen;
-layout(location = 14) out vec2 vPG_freq_base_screen_unfloored;
-layout(location = 15) out float vPG_period_multiplier_x;
-layout(location = 16) out vec2 vPG_OriginalSize_tated_mul_pi;
-layout(location = 17) out vec2 vPG_OutputSize_tated;
-layout(location = 18) out vec2 vPG_OutputCoord_tated;
-layout(location = 19) out float vDotMat_Grid_Sharpness;
-layout(location = 20) out float vPG_mask_height;
-layout(location = 21) out float vDeltaRenderOk;
-layout(location = 22) out float vDo_pixelgrid_h;
-layout(location = 23) out float vDo_Curvature;
-layout(location = 24) out float vFake_scanline_period;
-layout(location = 25) out float vPG_y_shift;
+layout(location = 6) out float vIn_aspect;
+layout(location = 7) out float vDynamicSeed;
+layout(location = 8) out float vBEZEL_INNER_ZOOM_adapted;
+layout(location = 9) out float vDo_Tate;
+layout(location = 10) out vec3 vDotMat_Grid_Color;
+layout(location = 11) out vec4 vPG_offsets_and_size;
+layout(location = 12) out vec2 vPG_freq_base_screen;
+layout(location = 13) out vec2 vPG_freq_base_screen_unfloored;
+layout(location = 14) out float vPG_period_multiplier_x;
+layout(location = 15) out vec2 vPG_OriginalSize_tated_mul_pi;
+layout(location = 16) out vec2 vPG_OutputSize_tated;
+layout(location = 17) out vec2 vPG_OutputCoord_tated;
+layout(location = 18) out float vDotMat_Grid_Sharpness;
+layout(location = 19) out float vPG_mask_height;
+layout(location = 20) out float vDeltaRenderOk;
+layout(location = 21) out float vDo_pixelgrid_h;
+layout(location = 22) out float vDo_Curvature;
+layout(location = 23) out float vFake_scanline_period;
+layout(location = 24) out float vPG_y_shift;
 
 #ifdef DEBUG_PRINT_VALUE
     layout(location = 31) out float vfprintvalue; 
@@ -217,16 +214,9 @@ void main() {
                     vOffset = PI_15;
             }
 
-        //Calculate the maximum possible brightness of the input color by taking glow,
-        //contrast and brightness into account. This is needed so that scanline generation
-        //can map the proper input range and strictly obey scanline thickness constraints.
-//        vMax_inLum = max( 1.0, DO_CCORRECTION * apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS)) *
-//                     max( 1.0, mix(1.0, IN_GLOW_POWER, DO_CCORRECTION));
-
 
     //Generate a seed that changes over time for temporal random noise
         vDynamicSeed = mod(params.FrameCount, 30.0001);
-
 
     //Calc dotmat grid color
         vDotMat_Grid_Color = vec3(DOT_M_G_BRT);
@@ -405,29 +395,27 @@ layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in vec2 vOutputCoord;
 layout(location = 2) in vec2 vBg_img_coords;
 layout(location = 3) in float vIsRotated;
-
 layout(location = 4) in float vScanlinePeriod;
 layout(location = 5) in float vOffset;
-//layout(location = 6) in float vMax_inLum;
-layout(location = 7) in float vIn_aspect;
-layout(location = 8) in float vDynamicSeed;
-layout(location = 9) in float vBEZEL_INNER_ZOOM_adapted;
-layout(location = 10) in float vDo_Tate;
-layout(location = 11) in vec3 vDotMat_Grid_Color;
-layout(location = 12) in vec4 vPG_offsets_and_size;
-layout(location = 13) in vec2 vPG_freq_base_screen;
-layout(location = 14) in vec2 vPG_freq_base_screen_unfloored;
-layout(location = 15) in float vPG_period_multiplier_x;
-layout(location = 16) in vec2 vPG_OriginalSize_tated_mul_pi;
-layout(location = 17) in vec2 vPG_OutputSize_tated;
-layout(location = 18) in vec2 vPG_OutputCoord_tated;
-layout(location = 19) in float vDotMat_Grid_Sharpness;
-layout(location = 20) in float vPG_mask_height;
-layout(location = 21) in float vDeltaRenderOk;
-layout(location = 22) in float vDo_pixelgrid_h;
-layout(location = 23) in float vDo_Curvature;
-layout(location = 24) in float vFake_scanline_period;
-layout(location = 25) in float vPG_y_shift;
+layout(location = 6) in float vIn_aspect;
+layout(location = 7) in float vDynamicSeed;
+layout(location = 8) in float vBEZEL_INNER_ZOOM_adapted;
+layout(location = 9) in float vDo_Tate;
+layout(location = 10) in vec3 vDotMat_Grid_Color;
+layout(location = 11) in vec4 vPG_offsets_and_size;
+layout(location = 12) in vec2 vPG_freq_base_screen;
+layout(location = 13) in vec2 vPG_freq_base_screen_unfloored;
+layout(location = 14) in float vPG_period_multiplier_x;
+layout(location = 15) in vec2 vPG_OriginalSize_tated_mul_pi;
+layout(location = 16) in vec2 vPG_OutputSize_tated;
+layout(location = 17) in vec2 vPG_OutputCoord_tated;
+layout(location = 18) in float vDotMat_Grid_Sharpness;
+layout(location = 19) in float vPG_mask_height;
+layout(location = 20) in float vDeltaRenderOk;
+layout(location = 21) in float vDo_pixelgrid_h;
+layout(location = 22) in float vDo_Curvature;
+layout(location = 23) in float vFake_scanline_period;
+layout(location = 24) in float vPG_y_shift;
 
 #ifdef DEBUG_PRINT_VALUE
     layout(location = 31) in float vfprintvalue;
