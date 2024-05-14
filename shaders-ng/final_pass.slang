@@ -622,7 +622,8 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
         //if (DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0)) { //103.1
         if (vDo_pixelgrid_h > 0.5) {
             //Scanline Inflation:
-                freq_base_core.y += pixel_in.a;
+                #define inflation pixel_in.a
+                freq_base_core.y += inflation;
             
             //Since we emulate scanlines, take into account current scanline phase:
                 float interlacing_adapt_period = vScanlinePeriod;
@@ -638,9 +639,9 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
             if (PIXELGRID_H_ANTIMOIRE > 0.0) {
                 float anti_moire_freq = sin(vPG_freq_base_screen_unfloored.x * vPG_offsets_and_size.a );
                 float anti_moire_amp = PIXELGRID_H_ANTIMOIRE;
-                rgb_h_sin = sin( (freq_base_core.yyy * interlacing_adapt_period) + ( anti_moire_freq * anti_moire_amp ) + vOffset);
+                rgb_h_sin = sin( (freq_base_core.yyy * interlacing_adapt_period) + ( anti_moire_freq * anti_moire_amp ) + vOffset-abs(inflation));
             } else {
-                   rgb_h_sin = sin( (freq_base_core.y * interlacing_adapt_period) + triad_stagger_offset - decon_stagger + vOffset);
+                   rgb_h_sin = sin( (freq_base_core.y * interlacing_adapt_period) + triad_stagger_offset - decon_stagger + vOffset-abs(inflation));
             }
 
             //make it positve with doubled frequency:
