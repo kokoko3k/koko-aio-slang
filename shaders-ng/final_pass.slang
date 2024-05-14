@@ -47,9 +47,8 @@ layout(location = 18) out float vDotMat_Grid_Sharpness;
 layout(location = 19) out float vPG_mask_height;
 layout(location = 20) out float vDeltaRenderOk;
 layout(location = 21) out float vDo_pixelgrid_h;
-layout(location = 22) out float vDo_Curvature;
-layout(location = 23) out float vFake_scanline_period;
-layout(location = 24) out float vPG_y_shift;
+layout(location = 22) out float vFake_scanline_period;
+layout(location = 23) out float vPG_y_shift;
 
 #ifdef DEBUG_PRINT_VALUE
     layout(location = 31) out float vfprintvalue; 
@@ -285,8 +284,6 @@ void main() {
         vDo_pixelgrid_h = float( pixelgrid_h_needed() );
 
 
-    vDo_Curvature = curvature_needed();
-
     //Dot matrix: measure the final picture size to choose a right sharpness level
     //For simplicity and (my) mental health, take only y into account.
         vDotMat_Grid_Sharpness = DOT_M_G_SHARP;
@@ -410,7 +407,6 @@ layout(location = 18) in float vDotMat_Grid_Sharpness;
 layout(location = 19) in float vPG_mask_height;
 layout(location = 20) in float vDeltaRenderOk;
 layout(location = 21) in float vDo_pixelgrid_h;
-layout(location = 22) in float vDo_Curvature;
 layout(location = 23) in float vFake_scanline_period;
 layout(location = 24) in float vPG_y_shift;
 
@@ -1268,7 +1264,7 @@ void main() {
     //Curvature
         //Curvature has to come after inner zoom or bezel curved border will not match content
         //curved border when inner zoom changes.
-        if (vDo_Curvature > 0.0) {
+        if ( curvature_needed() > 0.0 ) {
             co_content = Warp_koko(co_content, vec2(GEOM_WARP_X, GEOM_WARP_Y), 0.5);
         }
 
@@ -1361,8 +1357,8 @@ void main() {
                 
                 if (DO_BG_IMAGE != 1.0) {
                     const float noise_power = NOISEPOWER * NOISEPOWER_AMBI_MUL;
-                    float vDynamicSeed = mod(params.FrameCount, 30.0001);
-                    float anoise1 = random_fast(vTexCoord*vDynamicSeed);
+                    float dynamicseed = mod(params.FrameCount, 30.0001);
+                    float anoise1 = random_fast(vTexCoord*dynamicseed);
                     anoise1 = scale_to_range(anoise1, -noise_power, noise_power);
                     // anoise1 *=  (1 - pixel_ambi.g);
                     //anoise1 =  (anoise1 - anoise1 * pixel_ambi.g); //ASM PROOF FASTER
