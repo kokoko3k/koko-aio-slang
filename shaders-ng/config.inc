@@ -409,7 +409,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter PIXELGRID_COREY_FAKE_SCAN "         . Fake integer scanlines (-1=auto)"  -1.0 -1.0 1.0 1.0
 #pragma parameter PIXELGRID_MIN_H	        "         . Phosphors height Min"           0.2 0.00 1.0 0.05
 #pragma parameter PIXELGRID_MAX_H           "         . Phosphors height Max"           0.6 0.05 1.0 0.05
-#pragma parameter PIXELGRID_INFLATION       "         . Inflation Strength"              0.5  0.0 2.0 0.01
+#pragma parameter PIXELGRID_INFLATION       "         . Inflation Strength"              0.75  0.0 2.0 0.01
 
 #pragma parameter PIXELGRID_GAMMA_H         "         . Phosphors height min->max gamma:"	4.2 1.0 8.00 0.1
 #pragma parameter PIXELGRID_NO_INTERBLEED_H	"         . Inter line extra steepness (1.0 to disable)"	1.0 1.0 11.0 0.1
