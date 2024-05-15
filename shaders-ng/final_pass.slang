@@ -28,7 +28,7 @@ layout(location = 1) out vec2 vOutputCoord;
 layout(location = 2) out vec2 vBg_img_coords;
 layout(location = 3) out float vIsRotated;
 layout(location = 4) out float vScanlinePeriod;
-layout(location = 5) out float vOffset;
+layout(location = 5) out float vInterlace_offset;
 layout(location = 6) out float vIn_aspect;
 layout(location = 7) out float vBEZEL_INNER_ZOOM_adapted;
 layout(location = 8) out float vDo_Tate;
@@ -200,14 +200,14 @@ void main() {
 
         //Scanline period:
             vScanlinePeriod = 1.0; //Base 1x period
-            vOffset = 0.0; //No interlace
+            vInterlace_offset = 0.0; //No interlace
 
             if (bIs_Interlaced && PIXELGRID_INTR_DISABLE_Y != 2.0) {
                 //Halve the scanline period, since they will interlace:
                 vScanlinePeriod = 0.5;
                 //Alternate scanlines on even/odd frames
                 if (params.FrameCount % 2 == 0.0)
-                    vOffset = PI_15;
+                    vInterlace_offset = PI_15;
             }
 
 
@@ -373,7 +373,7 @@ void main() {
             vFake_scanline_period = pi * fake_scanlines_numlines * out_coord.y;
                 
         //This somehow aligns better the scanline to the screen line:
-            vOffset+=1.0;
+            vInterlace_offset+=1.0;
     }
     
 
@@ -387,7 +387,7 @@ layout(location = 1) in vec2 vOutputCoord;
 layout(location = 2) in vec2 vBg_img_coords;
 layout(location = 3) in float vIsRotated;
 layout(location = 4) in float vScanlinePeriod;
-layout(location = 5) in float vOffset;
+layout(location = 5) in float vInterlace_offset;
 layout(location = 6) in float vIn_aspect;
 
 layout(location = 7) in float vBEZEL_INNER_ZOOM_adapted;
@@ -629,7 +629,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
                 float interlacing_adapt_period = vScanlinePeriod;
 
             //We can offset trias to emulate fake core level slotmask by applying the optional offset to emulate the slotmask on even cells
-                float triad_stagger_offset =  is_even * PIXELGRID_OFFSET_CORE * pi;
+                float fakeslot_stagger_offset =  is_even * PIXELGRID_OFFSET_CORE * pi;
             //get 3 sines with applied the optional staggered offset for slotmask, and single phosphors staggering for y deconvergence.
                 vec3 decon_stagger = vec3( PIXELGRID_DECON_R_H, PIXELGRID_DECON_G_H, PIXELGRID_DECON_B_H);
 
@@ -640,9 +640,9 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
             if (PIXELGRID_H_ANTIMOIRE > 0.0) {
                 float anti_moire_freq = sin(vPG_freq_base_screen_unfloored.x * vPG_offsets_and_size.a );
                 float anti_moire_amp = PIXELGRID_H_ANTIMOIRE;
-                rgb_h_sin = sin( (freq_base_core.yyy * interlacing_adapt_period) + ( anti_moire_freq * anti_moire_amp ) + (vOffset*anti_inflation) );
+                rgb_h_sin = sin( (freq_base_core.yyy * interlacing_adapt_period) + ( anti_moire_freq * anti_moire_amp ) + vInterlace_offset);
             } else {
-                   rgb_h_sin = sin( (freq_base_core.y * interlacing_adapt_period) + triad_stagger_offset - decon_stagger + (vOffset*anti_inflation) );
+                   rgb_h_sin = sin( (freq_base_core.y * interlacing_adapt_period) + fakeslot_stagger_offset - decon_stagger*anti_inflation + vInterlace_offset );
             }
 
             //make it positve with doubled frequency:
