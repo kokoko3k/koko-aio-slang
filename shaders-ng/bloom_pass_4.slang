@@ -140,7 +140,7 @@ void main() {
         //Use mipmap available in avglum_pass to identify bright areas.
         //vec3 avglum = texture(avglum_pass,vCo_avglum).rgb;
         
-        #define ZONE_LUMINANCE_LOD 4.0
+        #define ZONE_LUMINANCE_LOD 2.0 //Higher values lead to ugly glitch when panning or banding in static content.
         
         vec3 avglum = textureLod(colortools_and_ntsc_pass, vTexCoord, ZONE_LUMINANCE_LOD).rgb;
         float b_brightness = max(avglum.b,max(avglum.r,avglum.g));
