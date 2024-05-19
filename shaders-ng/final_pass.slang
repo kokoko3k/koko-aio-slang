@@ -1299,7 +1299,7 @@ void main() {
             // ^^ We have to check if alpha is > 3.0 because till 3.0 it means it is carrying the scanline
             // ^^ inflation information from glow_y pass.
             if (reuse_old) {
-                FragColor = texture(final_passFeedback, vOutputCoord);// * vec4(1,0,0,0);
+                FragColor = texture(final_passFeedback, vOutputCoord); // * vec4(1,0,0,0);
                 return;
             }
         }
