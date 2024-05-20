@@ -31,7 +31,7 @@ layout(push_constant) uniform Push {
 
 layout(std140, set = 0, binding = 0) uniform UBO {
 	mat4 MVP;
-	
+
 	vec4 FinalViewportSize;
 	vec4 in_glow_passSize;
 	vec4 FXAA_passSize;
@@ -39,6 +39,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	vec4 avglum_passSize;
 	vec4 flick_and_noise_passSize;
 	vec4 colortools_and_ntsc_passSize;
+	vec4 colortools_and_ntsc_passFeedbackSize;
 
 	float COLOR_MONO_COLORIZE;
 	float COLOR_MONO_HUE1;
