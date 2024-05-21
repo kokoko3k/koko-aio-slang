@@ -1584,8 +1584,8 @@ float is_deltarender_allowed(bool is_interlaced) {
 }
 
 float delta_render_unchanged(sampler2D smp_past, sampler2D smp_now, vec2 co, float lod) {
-   vec3 s1 = texture(smp_now,  co).rgb;
-   vec3 s2 = texture(smp_past, co).rgb;
+   vec3 s1 = textureLod(smp_now,  co, 1.0).rgb; // It is important that this is with lod = 1.0
+   vec3 s2 = textureLod(smp_past, co, 1.0).rgb; // It is important that this is with lod = 1.0
    vec3 m1 = textureLod(smp_now,  co, lod).rgb;
    vec3 m2 = textureLod(smp_past, co, lod).rgb;
    
