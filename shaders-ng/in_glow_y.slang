@@ -64,6 +64,8 @@ layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 5) uniform sampler2D shift_and_bleed_pass;
 layout(set = 0, binding = 6) uniform sampler2D Source;
 layout(set = 0, binding = 7) uniform sampler2D in_glow_passFeedback;
+layout(set = 0, binding = 8) uniform sampler2D colortools_and_ntsc_passFeedback;
+layout(set = 0, binding = 9) uniform sampler2D colortools_and_ntsc_pass;
 
 vec3 glow_blur_bias(sampler2D source_tex, vec2 co, vec3 pixel_glowed, float bias){
    vec3 pixel_source = texture(source_tex, co).rgb;
@@ -224,15 +226,14 @@ void main() {
 */   
 
    //Delta render?
+   float DR_changed = 1.0;
    if (DELTA_RENDER == 1.0) {
-     // if (vDeltaRenderOk == 1.0) {
-         float DR_unchanged = texture(Source,vTexCoord).a;
-         if (DR_unchanged > 0.0) {
-            FragColor = vec4(0.0);
-         }
-     // }
-   }
+     if (vDeltaRenderOk == 1.0) {
+         DR_changed = delta_render_changed(colortools_and_ntsc_passFeedback, colortools_and_ntsc_pass,
+                                                      vTexCoord, DELTA_RENDER_CHECK_AREA);
 
+     }
+   }
    float max_inLum = max( 1.0, DO_CCORRECTION * apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS));
    //Scanlines (over)inflation.
    //The result will be stored in the alpha channel to be consumed by final pass.
@@ -244,12 +245,17 @@ void main() {
               
       gy /=max_inLum;
               
-      float scanline_inflation = (gy.x+gy.y+gy.z) * (inflation*global.FinalViewportSize.y);
+      float scanline_inflation = (gy.x+gy.y+gy.z) * (inflation*global.FinalViewportSize.y) 
+      + eps;
 
 
-
+   float inflation_or_DR = scanline_inflation;
+   if (DR_changed == 0.0) {
+      inflation_or_DR = DR_changed;
+   }
+   
    if (DO_IN_GLOW == 0.0) {
-      FragColor = vec4(texture(shift_and_bleed_pass, vTexCoord).rgb * vGlow_Gain, scanline_inflation);
+      FragColor = vec4(texture(shift_and_bleed_pass, vTexCoord).rgb * vGlow_Gain, inflation_or_DR);
       return;
    }
 
@@ -287,7 +293,7 @@ void main() {
       }
    
 
-   FragColor = vec4(pixel_glowed * vGlow_Gain, scanline_inflation);
+   FragColor = vec4(pixel_glowed * vGlow_Gain, inflation_or_DR);
    
 }
 

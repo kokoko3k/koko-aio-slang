@@ -1583,16 +1583,16 @@ float is_deltarender_allowed(bool is_interlaced) {
     ( (! is_interlaced) || PIXELGRID_INTR_DISABLE_Y >= 1.0 || DO_PIXELGRID_H == 0.0)); // - screen is not interlaced or we disabled scanlines on interlaced content
 }
 
-float delta_render_unchanged(sampler2D smp_past, sampler2D smp_now, vec2 co, float lod) {
+float delta_render_changed(sampler2D smp_past, sampler2D smp_now, vec2 co, float lod) {
    vec3 s1 = textureLod(smp_now,  co, 1.0).rgb; // It is important that this is with lod = 1.0
    vec3 s2 = textureLod(smp_past, co, 1.0).rgb; // It is important that this is with lod = 1.0
    vec3 m1 = textureLod(smp_now,  co, lod).rgb;
    vec3 m2 = textureLod(smp_past, co, lod).rgb;
    
    if (m1 == m2 && s1==s2 )
-      return 1.0;
-   else
       return 0.0;
+   else
+      return 1.0;
 
 }
 

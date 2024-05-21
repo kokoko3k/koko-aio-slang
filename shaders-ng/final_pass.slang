@@ -1295,9 +1295,9 @@ void main() {
  
     #ifndef D3D_WORKAROUND
         if (DELTA_RENDER == 1.0) {
-            bool reuse_old =  bool( float( texture(halo_pass, co_content).a > 0.0) * canvas_busy * vDeltaRenderOk ) ;
+            bool reuse_old =  bool( float( texture(in_glow_pass, co_content).a == 0.0) * canvas_busy * vDeltaRenderOk ) ;
             if (reuse_old) {
-                FragColor = texture(final_passFeedback, vOutputCoord); // * vec4(1,0,0,0);
+                FragColor = texture(final_passFeedback, vOutputCoord);// * vec4(1,0,0,0);
                 return;
             }
         }
