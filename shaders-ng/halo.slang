@@ -8,6 +8,7 @@ layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
 layout(location = 1) out vec2 vHALO_SHARPNESS;
 layout(location = 2) out float vHALO_POWER;
+layout(location = 3) out float vDeltaRenderOk;
 
 vec2 radius_blur_adapt(vec2 bsize, vec4 sourcesize){
     vec2 r;
@@ -29,6 +30,8 @@ void main() {
         vHALO_SHARPNESS = vec2(GLOW_SHARP_MAX - HALO_SHARPNESS);
         vHALO_SHARPNESS = vHALO_SHARPNESS/6.0;
 
+
+//20..1 10...2 prova 5..3
     //Correct aspect
         vHALO_SHARPNESS = radius_blur_adapt(vHALO_SHARPNESS, params.SourceSize);
 
@@ -36,26 +39,36 @@ void main() {
    if (HALO_POWER >= 0.0)
       vHALO_POWER = HALO_POWER;
          else
-      vHALO_POWER = -HALO_POWER/10.0;    
+      vHALO_POWER = -HALO_POWER/10.0;
+    
+    bool bIs_Interlaced = is_interlaced();
+    vDeltaRenderOk = is_deltarender_allowed(bIs_Interlaced); 
+    
 }
 
 #pragma stage fragment
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in vec2 vHALO_SHARPNESS;
 layout(location = 2) in float vHALO_POWER;
+layout(location = 3) in float vDeltaRenderOk;
 
 layout(location = 0) out vec4 FragColor;
 
 layout(set = 0, binding = 4) uniform sampler2D Source;
+layout(set = 0, binding = 5) uniform sampler2D in_glow_pass;
 
 void main() {
     
-    // Deltarender:
-    // Friendly reminder:
-    // Do not try to skip deltarender here, it appears to work,
-    // But when flick_and_noise scales to 1x, there will be glitches
-    
     if (DO_HALO == 0.0 ) return;
+    
+    
+    if (DELTA_RENDER == 1.0) {
+         if (vDeltaRenderOk == 1.0) {
+             //No need to process halo if we're using deltarender and content did not change.
+             if (texture(in_glow_pass, vTexCoord).a > 3.0)
+                 return;
+         }
+    }
     
     //Pass the right texture unchanged for tighter blurs:
     if (HALO_SHARPNESS >= GLOW_SHARP_MAX) {
