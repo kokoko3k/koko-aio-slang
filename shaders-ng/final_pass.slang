@@ -1296,10 +1296,8 @@ void main() {
     #ifndef D3D_WORKAROUND
         if (DELTA_RENDER == 1.0) {
             bool reuse_old =  bool( float( texture(halo_pass, co_content).a > 0.0) * canvas_busy * vDeltaRenderOk ) ;
-            // ^^ We have to check if alpha is > 3.0 because till 3.0 it means it is carrying the scanline
-            // ^^ inflation information from glow_y pass.
             if (reuse_old) {
-                FragColor = texture(final_passFeedback, vOutputCoord);// * vec4(1,0,0,0);
+                FragColor = texture(final_passFeedback, vOutputCoord); // * vec4(1,0,0,0);
                 return;
             }
         }

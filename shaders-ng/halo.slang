@@ -63,14 +63,14 @@ void main() {
     
     
     if (DELTA_RENDER == 1.0) {
-        if (vDeltaRenderOk == 1.0) {
+      //  if (vDeltaRenderOk == 1.0) {
             //No need to process halo if we're using deltarender and content did not change.
             float DR_unchanged = texture(in_glow_pass_x, vTexCoord).a;
             if ( DR_unchanged > 0.0) {
                 FragColor = vec4(0.0,0.0,0.0, DR_unchanged);
                 return;
             }
-        }
+      //  }
     }
     
     //Pass the right texture unchanged for tighter blurs:

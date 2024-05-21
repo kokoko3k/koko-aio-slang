@@ -225,12 +225,12 @@ void main() {
 
    //Delta render?
    if (DELTA_RENDER == 1.0) {
-      if (vDeltaRenderOk == 1.0) {
+     // if (vDeltaRenderOk == 1.0) {
          float DR_unchanged = texture(Source,vTexCoord).a;
          if (DR_unchanged > 0.0) {
             FragColor = vec4(0.0);
          }
-      }
+     // }
    }
 
    float max_inLum = max( 1.0, DO_CCORRECTION * apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS));
