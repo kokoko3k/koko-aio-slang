@@ -1589,16 +1589,11 @@ float delta_render_unchanged(sampler2D smp_past, sampler2D smp_now, vec2 co, flo
    vec3 m1 = textureLod(smp_now,  co, lod).rgb;
    vec3 m2 = textureLod(smp_past, co, lod).rgb;
    
-   
    if (m1 == m2 && s1==s2 )
-      return 1000.0;
+      return 1.0;
    else
       return 0.0;
-    
-   // ^^ we return 1000 because glow_y will sample this alpha and will multiplex it with the
-   // inflation/warp_y value.
-   // returning 1000 will allow the final pass to understand if is a deltarender value or an inflation one.
-   // Also the number has to be high, to avoid lerp issues. (not sure about that, but just in case).
+
 }
 
 float max3(vec3 v){

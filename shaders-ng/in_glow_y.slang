@@ -222,14 +222,13 @@ void main() {
     
     return;
 */   
-   
+
    //Delta render?
    if (DELTA_RENDER == 1.0) {
       if (vDeltaRenderOk == 1.0) {
          float DR_unchanged = texture(Source,vTexCoord).a;
          if (DR_unchanged > 0.0) {
-            FragColor = vec4( texture(in_glow_passFeedback, vTexCoord).rgb,DR_unchanged); 
-            return;
+            FragColor = vec4(0.0);
          }
       }
    }
@@ -248,7 +247,7 @@ void main() {
       float scanline_inflation = (gy.x+gy.y+gy.z) * (inflation*global.FinalViewportSize.y);
 
 
-   
+
    if (DO_IN_GLOW == 0.0) {
       FragColor = vec4(texture(shift_and_bleed_pass, vTexCoord).rgb * vGlow_Gain, scanline_inflation);
       return;

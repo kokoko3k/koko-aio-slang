@@ -55,7 +55,7 @@ layout(location = 3) in float vDeltaRenderOk;
 layout(location = 0) out vec4 FragColor;
 
 layout(set = 0, binding = 4) uniform sampler2D Source;
-layout(set = 0, binding = 5) uniform sampler2D in_glow_pass;
+layout(set = 0, binding = 5) uniform sampler2D in_glow_pass_x;
 
 void main() {
     
@@ -63,16 +63,19 @@ void main() {
     
     
     if (DELTA_RENDER == 1.0) {
-         if (vDeltaRenderOk == 1.0) {
-             //No need to process halo if we're using deltarender and content did not change.
-             if (texture(in_glow_pass, vTexCoord).a > 3.0)
-                 return;
-         }
+        if (vDeltaRenderOk == 1.0) {
+            //No need to process halo if we're using deltarender and content did not change.
+            float DR_unchanged = texture(in_glow_pass_x, vTexCoord).a;
+            if ( DR_unchanged > 0.0) {
+                FragColor = vec4(0.0,0.0,0.0, DR_unchanged);
+                return;
+            }
+        }
     }
     
     //Pass the right texture unchanged for tighter blurs:
     if (HALO_SHARPNESS >= GLOW_SHARP_MAX) {
-        FragColor = vec4( pow(texture(Source, vTexCoord).rgb * vHALO_POWER,  vec3(HALO_GAMMA_OUT)), 1.0) ;
+        FragColor = vec4( pow(texture(Source, vTexCoord).rgb * vHALO_POWER,  vec3(HALO_GAMMA_OUT)), 0.0) ;
         return;
     }
     
@@ -81,6 +84,6 @@ void main() {
 
     pixel_haloed =  pow(pixel_haloed, vec3(HALO_GAMMA_OUT));
     
-    FragColor = vec4(pixel_haloed.rgb, 1.0);
+    FragColor = vec4(pixel_haloed.rgb, 0.0);
     
 }
