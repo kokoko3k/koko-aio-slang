@@ -94,15 +94,19 @@ vec4 pixel_flickering() {
 
 void main() {
    
+   vec2 co = vTexCoord;
+   
    vec4 pixel_out;
+
+   
    
    if (vDo_flickering==1.0) 
       pixel_out = pixel_flickering(); //<-alpha carries ntsc artifacts mask
    else 
-      pixel_out = texture_NEAREST(Source, vTexCoord, params.OriginalSize); //<-alpha carries ntsc artifacts mask
+      pixel_out = texture_NEAREST(Source, co, params.OriginalSize); //<-alpha carries ntsc artifacts mask
    
    if (DO_RF_NOISE > 0.0) {
-      float anoise = random_fast(vTexCoord * vDynamicSeed);
+      float anoise = random_fast(co * vDynamicSeed);
        pixel_out.rgb += scale_to_range(anoise, -RF_NOISE_STRENGTH, RF_NOISE_STRENGTH);
    }
    FragColor = pixel_out;

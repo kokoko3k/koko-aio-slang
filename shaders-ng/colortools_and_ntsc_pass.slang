@@ -162,13 +162,25 @@ vec4 ntscdec(vec2 uv, vec3 RGB_ori) {
          //In turn, because we need linear feedback from this pass (linear feedback mipmaps needed by deltarender)
          //and linear feedback is controlled by this pass filtering, contrary to the present linear filtering
          //which is controlled by next pass filtering (What a mess RetroArch!)
-         vec3 smp_mul_weight = vec3((texture_NEAREST(Source, pos, params.SourceSize).rgb * RGB2YIQ).x) * vNTSC_weights[n] ;
+         
+      
+         vec3 smp_mul_weight = vec3(( (texture_NEAREST(Source, pos, params.SourceSize).rgb ) *  RGB2YIQ).x) * vNTSC_weights[n] ;
          
          float phase =  vSubcarrierFrequency_mul_size_mul_TAU * pos.x;
 
+        
 
          float carrier = (pos.x*params.SourceSize.x * NTSC_FILTER_SCF ) - (pos.y*params.SourceSize.y * NTSC_PHASE_SHIFT);
+         
+         
          phase = carrier * (pi * (2/3.0));
+         
+   if (mod(params.FrameCount, 4.0) >= 2.0)
+      phase += 0.1;
+   else
+      phase -= 0.1;
+   
+         
          float phase_shift_for_blur = phase  + PHASE_SHIFT_FOR_BLUR_K;
          
          phase += ( pos.y * -pi10 ) * (NTSC_PHASE_SHIFT);
@@ -393,9 +405,43 @@ vec3 persistence(vec3 feedback, vec3 pixel_now, float start_decay, float late_pe
 void main() {
    vec2 co = vTexCoord;
    
+   
+/*   float ampiezza = SERVICE1;
+   float frequenza = 1.0;
+   float speed = 1.0;
+   
+   co.x = co.x + sin( co.y * pi * params.OriginalSize.y * frequenza     + (params.FrameCount*0.5*pi*speed) ) * params.OriginalSize.z * ampiezza;
+   co.x -= ampiezza * 0.5 * params.OriginalSize.z;
+  */
+
+  /* float ampiezza = 0.75;
+   float frequenza = 1.0;
+   float speed = SERVICE1;
+   
+   co.x = co.x + sin( co.y * pi * params.OriginalSize.y * frequenza     + (params.FrameCount*speed) ) * params.OriginalSize.z * ampiezza;
+   co.x -= ampiezza * 0.5 * params.OriginalSize.z;
+
    if (AUTOCROP_MAX > 0.0)
       co = clamp(co,  params.OriginalSize.zw * AUTOCROP_MIN, 
                     1-params.OriginalSize.zw * AUTOCROP_MIN );
+   
+   */
+  
+   float amp = 0.25;
+   float speed = 1.0;
+   float freq_y = 1.0;
+   
+   /*co.x = co.x + 
+   sin( pi * (co.y +     (params.FrameCount/60.0)*speed       ) * params.OriginalSize.y * freq_y )
+   * params.OriginalSize.z * amp
+   ;*/
+  /* if (mod(params.FrameCount, 3.0) >= 1.0)
+      co.x += sin(co.y*pi*params.OriginalSize.y)*params.OriginalSize.z*0.25;
+   else
+      co.x -= sin(co.y*pi*params.OriginalSize.y)*params.OriginalSize.z*0.25;
+   */
+   
+   
    
    #ifndef D3D_WORKAROUND
       float shake = texture(avglum_passFeedback, RESSWITCH_SAMPLING_POINT).a;
