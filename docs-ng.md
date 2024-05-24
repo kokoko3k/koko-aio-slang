@@ -1,7 +1,7 @@
 **koko-aio-slang documentation**
 
 **RETROARCH OUTPUT DRIVERS**
-    koko-aio does not work by on d3d12 and glitches on d3d11.<br>
+    koko-aio does not work by default on d3d12 and d3d11.<br>
     If you absolutely need it (Xbox?), you can edit the file 
     config\config-static.inc<br>
     and turn the line:
@@ -14,7 +14,16 @@
     <br>
     d3d10 is completely unsupported.
     <br>
-
+    Be warned that some functions does not work if you enable the workaround: <br>
+        * CRT glitch on resolution changes <br>
+        * Adaptive Black <br>
+        * CVBS Bleed size is limited to 5.0
+        * Scanlines inflation when using tate mode
+        * Ambientlight scene change detection
+        * Halving border updates refresh
+        * Lcd antighosting
+        * Delta render
+    
 **USEFUL LOCATIONS/FILES:**
 
     config/config-static.inc:
