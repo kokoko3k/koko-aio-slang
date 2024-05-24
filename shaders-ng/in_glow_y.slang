@@ -48,18 +48,22 @@ void main() {
    bool bIs_Interlaced = is_interlaced();
    vDeltaRenderOk = is_deltarender_allowed(bIs_Interlaced); //carries DR mandatory conditions, including forced refreshed frames
 
-   //FIXME check for d3d compatibility.
-   bool rotated = (abs((global.final_passFeedbackSize.x/global.final_passFeedbackSize.y) - (global.FinalViewportSize.x/global.FinalViewportSize.y)) > ar_tolerance);
+   float Inflation_delta = params.OriginalSize.w * 0.5;
+   vInflation = (PIXELGRID_INFLATION * PIXELGRID_MAX_H * 0.25) * Inflation_delta * global.FinalViewportSize.y ;
+   vInflation_offsets = vec2(0.0, +Inflation_delta); 
    
-   float Inflation_delta;
-   if ( need_tate(rotated) == 1.0 ) {
-      Inflation_delta = params.OriginalSize.z * 0.5;
-      vInflation_offsets = vec2(+Inflation_delta, 0.0);
-   } else {
-      Inflation_delta = params.OriginalSize.w * 0.5;
-      vInflation_offsets = vec2(0.0, +Inflation_delta); 
-   }
-   vInflation = (PIXELGRID_INFLATION * PIXELGRID_MAX_H * 0.25) * Inflation_delta;
+   #ifndef D3D_WORKAROUND
+      bool rotated = (abs((global.final_passFeedbackSize.x/global.final_passFeedbackSize.y) - 
+                        (global.FinalViewportSize.x/global.FinalViewportSize.y)) > ar_tolerance);
+      if ( need_tate(rotated) == 1.0 ) {
+         Inflation_delta = params.OriginalSize.z * 0.5;
+         vInflation_offsets = vec2(+Inflation_delta, 0.0);
+         vInflation = (PIXELGRID_INFLATION * PIXELGRID_MAX_H * 0.25) * Inflation_delta * global.FinalViewportSize.x ;
+      }
+   #endif
+   
+   
+   
    
 }
 
@@ -154,7 +158,7 @@ void main() {
               
       gy /=max_inLum;
               
-      float scanline_inflation = (gy.x+gy.y+gy.z) * (vInflation * global.FinalViewportSize.y) 
+      float scanline_inflation = (gy.x+gy.y+gy.z) * vInflation; 
       + (eps * DELTA_RENDER); 
       //This eps is needed because we multiplex deltarender and inflection and we NEED to have dr = 0.0 (and not a positive number)
       //To reuse old pixels, only that way (using 0.0 to reuse pixels) multiplexing is possible.

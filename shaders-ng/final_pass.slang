@@ -623,7 +623,11 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
         if (vDo_pixelgrid_h > 0.5) {
             //Scanline Inflation:
                 #define inflation pixel_in.a
-                freq_base_core.y += inflation;
+                #ifdef D3D_WORKAROUND
+                    freq_base_core.y += inflation * (1-vDo_Tate);
+                #else
+                    freq_base_core.y += inflation;
+                #endif
             
             //Since we emulate scanlines, take into account current scanline phase:
                 float interlacing_adapt_period = vScanlinePeriod;
