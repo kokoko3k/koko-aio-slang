@@ -50,7 +50,6 @@ layout(location = 1) in float glow_h_and_w_outside_interval;
 layout(location = 2) in float glow_w_inside_interval;
 layout(location = 3) in float vSharp_sub;
 layout(location = 4) in float vShowArtifactsMask;
-layout(location = 5) in float vDeltaRenderOk;
 
 layout(location = 0) out vec4 FragColor;
 
