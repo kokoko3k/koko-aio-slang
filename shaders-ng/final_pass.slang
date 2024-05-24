@@ -621,13 +621,6 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
         //Pixelgrid: do horizontal if enabled, but skip it if user doesn't want it on interlaced content.
         //if (DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0)) { //103.1
         if (vDo_pixelgrid_h > 0.5) {
-            //Scanline Inflation:
-                #define inflation pixel_in.a
-                #ifdef D3D_WORKAROUND
-                    freq_base_core.y += inflation * (1-vDo_Tate);
-                #else
-                    freq_base_core.y += inflation;
-                #endif
             
             //Since we emulate scanlines, take into account current scanline phase:
                 float interlacing_adapt_period = vScanlinePeriod;
@@ -638,15 +631,23 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
                 vec3 decon_stagger = vec3( PIXELGRID_DECON_R_H, PIXELGRID_DECON_G_H, PIXELGRID_DECON_B_H);
 
 
-        //Antimoire experiments:
+            //Scanline Inflation:
+                #define inflation pixel_in.a
+                #ifdef D3D_WORKAROUND
+                    float freq_base_core_inflated = freq_base_core.y += inflation * (1-vDo_Tate);
+                #else
+                    float freq_base_core_inflated = freq_base_core.y += inflation;
+                #endif
+                
             vec3 rgb_h_sin = vec3(1.0);
             float anti_inflation = 1-clamp(abs(pixel_in.a), 0.0,1.0); //<- counteract: deconvergence does not depend on inflaction 
             if (PIXELGRID_H_ANTIMOIRE > 0.0) {
+                //Antimoire experiment:
                 float anti_moire_freq = sin(vPG_freq_base_screen_unfloored.x * vPG_offsets_and_size.a );
                 float anti_moire_amp = PIXELGRID_H_ANTIMOIRE;
-                rgb_h_sin = sin( (freq_base_core.yyy * interlacing_adapt_period) + ( anti_moire_freq * anti_moire_amp ) + vInterlace_offset);
+                rgb_h_sin = sin( ( vec3(freq_base_core_inflated) * interlacing_adapt_period) + ( anti_moire_freq * anti_moire_amp ) + vInterlace_offset);
             } else {
-                   rgb_h_sin = sin( (freq_base_core.y * interlacing_adapt_period) + fakeslot_stagger_offset - decon_stagger*anti_inflation + vInterlace_offset );
+                   rgb_h_sin = sin( (freq_base_core_inflated * interlacing_adapt_period) + fakeslot_stagger_offset - decon_stagger*anti_inflation + vInterlace_offset );
             }
 
             //make it positve with doubled frequency:
