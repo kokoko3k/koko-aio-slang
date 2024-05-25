@@ -158,8 +158,8 @@ void main() {
               
       gy /=max_inLum;
               
-      float scanline_inflation = (gy.x+gy.y+gy.z) * vInflation; 
-      + (eps * DELTA_RENDER); 
+      float scanline_inflation = (gy.x+gy.y+gy.z) * vInflation 
+                               + (eps * DELTA_RENDER); 
       //This eps is needed because we multiplex deltarender and inflection and we NEED to have dr = 0.0 (and not a positive number)
       //To reuse old pixels, only that way (using 0.0 to reuse pixels) multiplexing is possible.
       

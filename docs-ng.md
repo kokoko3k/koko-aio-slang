@@ -706,7 +706,8 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
         
 **Delta Render:**
     Koko-aio can render only the part of the screen that has been changed,<br>
-    leading to a measurable power consumption reduction.<br>
+    leading to a measurable power consumption reduction and mitigate throttling
+    on mobile devices and laptops.<br>
     This feature can, however, produce artifacts in some cases, so the feature<br>
     is statically disabled by default by now.<br>
     To use it, you have to manually set to 1.0, in file config-user.txt: <br>
