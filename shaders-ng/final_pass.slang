@@ -1085,8 +1085,20 @@ vec3 fn_pixel_content(vec2 coords) {
     #endif        
     //Pixel grid
         if (DO_PIXELGRID == 1.0) {
-            float vMax_inLum = max( 1.0, DO_CCORRECTION * apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS)) *
-                               max( 1.0, mix(1.0, IN_GLOW_POWER, DO_CCORRECTION));
+            //1264,20488,22262, 108.5
+            float vMax_inLum = mix(1.0, 
+                                   apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS) * max(IN_GLOW_POWER, 1.0), 
+                                   DO_CCORRECTION
+                                   );
+            //1266,20491,22282 108.4
+            //float vMax_inLum = max( 1.0, DO_CCORRECTION * apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS)) *
+            //                   max( 1.0, mix(1.0, IN_GLOW_POWER, DO_CCORRECTION));
+            
+            //1268,20501,22268 108.3
+            /*float vMax_inLum = 1.0;
+            if (DO_CCORRECTION == 1.0)
+                 vMax_inLum = apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS) * max(IN_GLOW_POWER, 1.0);
+            */
             vec4 pixel_grid = fn_pixel_grid(coords, pixel_glowed, 0.0, vMax_inLum);
             //grid mask only is needed by halo to selectively light the grid.
                 dot_mat_or_pixelgrid = pixel_grid.a;
@@ -1099,7 +1111,6 @@ vec3 fn_pixel_content(vec2 coords) {
                 dot_mat_or_pixelgrid = pixel_dotmat.a;
             //rgb channel goes to pixel_out
             pixel_out = pixel_dotmat.rgb;
-
         }
 
     //Halo
