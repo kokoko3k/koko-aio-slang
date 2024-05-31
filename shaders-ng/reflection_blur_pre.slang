@@ -19,7 +19,7 @@ void main() {
    if (DO_GAME_GEOM_OVERRIDE > 0.5)
       vCoordsAdapted = content_geom_override_zoom(vCoordsAdapted, GAME_GEOM_ASPECT, get_in_aspect(), GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
 
-   vCoordsAdapted = zoomout_coords( vCoordsAdapted, BEZEL_RFL_ZOOM);
+   vCoordsAdapted = zoomout_coords( vCoordsAdapted, BEZEL_RFL_ZOOM*0.1);
    
    vCoords_shade = zoom(vTexCoord,1.05);
    
@@ -68,9 +68,15 @@ void main() {
 
    if (DO_DYNZOOM > 0.0)
       coords = zoom(coords, get_dyn_zoom(avglum_pass));
- 
+
+   if (AUTOCROP_MAX > 0.0)
+      coords = zoom(coords, get_autocrop_zoom(avglum_pass));
+   
    //eventually return black pixel
-   if (coords.y < 0.0 || coords.y > 1.0 || coords.x < 0.0 || coords.x > 1.0) {
+   #define tol 0.001
+   #define RECT01 vec4( vec2(0.0-tol), vec2(1.0+tol) )
+   if (is_first_outside_rect(coords, RECT01)) {
+   //if (coords.y < 0.0-tol || coords.y > 1.0+tol || coords.x < 0.0-tol || coords.x > 1.0+tol) {
       FragColor = vec4(0.0);
       return;
    }

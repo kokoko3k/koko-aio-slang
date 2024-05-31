@@ -27,32 +27,25 @@ layout(location = 0) out vec2 vTexCoord;
 layout(location = 1) out vec2 vOutputCoord;
 layout(location = 2) out vec2 vBg_img_coords;
 layout(location = 3) out float vIsRotated;
-//Scanlines:
-
 layout(location = 4) out float vScanlinePeriod;
-layout(location = 5) out float vOffset;
-layout(location = 6) out float vMax_inLum;
-//Vignette, spot:
-layout(location = 7) out float vIn_aspect;
-//
-layout(location = 8) out float vDynamicSeed;
-layout(location = 9) out float vBEZEL_INNER_ZOOM_adapted;
-layout(location = 10) out float vDo_Tate;
-layout(location = 11) out vec3 vDotMat_Grid_Color;
-layout(location = 12) out vec4 vPG_offsets_and_size;
-layout(location = 13) out vec2 vPG_freq_base_screen;
-layout(location = 14) out vec2 vPG_freq_base_screen_unfloored;
-layout(location = 15) out float vPG_period_multiplier_x;
-layout(location = 16) out vec2 vPG_OriginalSize_tated_mul_pi;
-layout(location = 17) out vec2 vPG_OutputSize_tated;
-layout(location = 18) out vec2 vPG_OutputCoord_tated;
-layout(location = 19) out float vDotMat_Grid_Sharpness;
-layout(location = 20) out float vPG_mask_height;
-layout(location = 21) out float vDeltaRenderOk;
-layout(location = 22) out float vDo_pixelgrid_h;
-layout(location = 23) out float vDo_Curvature;
-layout(location = 24) out float vFake_scanline_period;
-layout(location = 25) out float vPG_y_shift;
+layout(location = 5) out float vInterlace_offset;
+layout(location = 6) out float vIn_aspect;
+layout(location = 7) out float vBEZEL_INNER_ZOOM_adapted;
+layout(location = 8) out float vDo_Tate;
+layout(location = 9) out vec3 vDotMat_Grid_Color;
+layout(location = 10) out vec4 vPG_offsets_and_size;
+layout(location = 11) out vec2 vPG_freq_base_screen;
+layout(location = 12) out vec2 vPG_freq_base_screen_unfloored;
+layout(location = 13) out float vPG_period_multiplier_x;
+layout(location = 14) out vec2 vPG_OriginalSize_tated_mul_pi;
+layout(location = 15) out vec2 vPG_OutputSize_tated;
+layout(location = 16) out vec2 vPG_OutputCoord_tated;
+layout(location = 17) out float vDotMat_Grid_Sharpness;
+layout(location = 18) out float vPG_mask_height;
+layout(location = 19) out float vDeltaRenderOk;
+layout(location = 20) out float vDo_pixelgrid_h;
+layout(location = 21) out float vFake_scanline_period;
+layout(location = 22) out float vPG_y_shift;
 
 #ifdef DEBUG_PRINT_VALUE
     layout(location = 31) out float vfprintvalue; 
@@ -207,25 +200,15 @@ void main() {
 
         //Scanline period:
             vScanlinePeriod = 1.0; //Base 1x period
-            vOffset = 0.0; //No interlace
+            vInterlace_offset = 0.0; //No interlace
 
             if (bIs_Interlaced && PIXELGRID_INTR_DISABLE_Y != 2.0) {
                 //Halve the scanline period, since they will interlace:
                 vScanlinePeriod = 0.5;
                 //Alternate scanlines on even/odd frames
                 if (params.FrameCount % 2 == 0.0)
-                    vOffset = PI_15;
+                    vInterlace_offset = PI_15;
             }
-
-        //Calculate the maximum possible brightness of the input color by taking glow,
-        //contrast and brightness into account. This is needed so that scanline generation
-        //can map the proper input range and strictly obey scanline thickness constraints.
-        vMax_inLum = max( 1.0, DO_CCORRECTION * apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS)) *
-                     max( 1.0, mix(1.0, IN_GLOW_POWER, DO_CCORRECTION));
-
-
-    //Generate a seed that changes over time for temporal random noise
-        vDynamicSeed = mod(params.FrameCount, 30.0001);
 
 
     //Calc dotmat grid color
@@ -298,8 +281,6 @@ void main() {
         vDo_pixelgrid_h = float( pixelgrid_h_needed() );
 
 
-    vDo_Curvature = DO_CURVATURE * (GEOM_WARP_X + GEOM_WARP_Y);
-
     //Dot matrix: measure the final picture size to choose a right sharpness level
     //For simplicity and (my) mental health, take only y into account.
         vDotMat_Grid_Sharpness = DOT_M_G_SHARP;
@@ -315,11 +296,9 @@ void main() {
             vDotMat_Grid_Sharpness = clamp(vDotMat_Grid_Sharpness, 0.1, 20.0);
             //vfprintvalue = vDotMat_Grid_Sharpness;
         }
-                                                                                               // Delta render, mandatory conditions:
-    vDeltaRenderOk = float(  ( params.FrameCount % int(DELTA_RENDER_FORCE_REFRESH) != 0.0 ) && // - We are in a frame that is not forced for full refresh
-                             ( (! bIs_Interlaced) || PIXELGRID_INTR_DISABLE_Y >= 1.0 || DO_PIXELGRID_H == 0.0)   // - screen is not interlaced or we disabled scanlines on interlaced content
-                           );
-
+        
+    vDeltaRenderOk = is_deltarender_allowed(bIs_Interlaced); //carries DR mandatory conditions, including forced refreshed frames
+        
     // Fake or Faker integer scanlines:
     // We are going to compute an amount of lines that is integer multiple of the screen lines and that
     // is near to the real input/core lines
@@ -330,7 +309,7 @@ void main() {
     // fake integer scanlines will be used.
     // (Logic is skipped if integer scaling is requested.)
         bool very_lowres_y = false;
-        #define MIN_SCREEN_CORE_RATIO 4.0 //We want at least that screen lines per single scanline.
+        #define MIN_SCREEN_CORE_RATIO 3.5 //We want at least that screen lines per single scanline.
         if ( bNeed_NO_integer_scale ) {
             vec4 out_size = params.OutputSize;
             vec4 ori_size = params.OriginalSize;
@@ -394,7 +373,7 @@ void main() {
             vFake_scanline_period = pi * fake_scanlines_numlines * out_coord.y;
                 
         //This somehow aligns better the scanline to the screen line:
-            vOffset+=1.0;
+            vInterlace_offset+=1.0;
     }
     
 
@@ -407,29 +386,26 @@ layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in vec2 vOutputCoord;
 layout(location = 2) in vec2 vBg_img_coords;
 layout(location = 3) in float vIsRotated;
-
 layout(location = 4) in float vScanlinePeriod;
-layout(location = 5) in float vOffset;
-layout(location = 6) in float vMax_inLum;
-layout(location = 7) in float vIn_aspect;
-layout(location = 8) in float vDynamicSeed;
-layout(location = 9) in float vBEZEL_INNER_ZOOM_adapted;
-layout(location = 10) in float vDo_Tate;
-layout(location = 11) in vec3 vDotMat_Grid_Color;
-layout(location = 12) in vec4 vPG_offsets_and_size;
-layout(location = 13) in vec2 vPG_freq_base_screen;
-layout(location = 14) in vec2 vPG_freq_base_screen_unfloored;
-layout(location = 15) in float vPG_period_multiplier_x;
-layout(location = 16) in vec2 vPG_OriginalSize_tated_mul_pi;
-layout(location = 17) in vec2 vPG_OutputSize_tated;
-layout(location = 18) in vec2 vPG_OutputCoord_tated;
-layout(location = 19) in float vDotMat_Grid_Sharpness;
-layout(location = 20) in float vPG_mask_height;
-layout(location = 21) in float vDeltaRenderOk;
-layout(location = 22) in float vDo_pixelgrid_h;
-layout(location = 23) in float vDo_Curvature;
-layout(location = 24) in float vFake_scanline_period;
-layout(location = 25) in float vPG_y_shift;
+layout(location = 5) in float vInterlace_offset;
+layout(location = 6) in float vIn_aspect;
+
+layout(location = 7) in float vBEZEL_INNER_ZOOM_adapted;
+layout(location = 8) in float vDo_Tate;
+layout(location = 9) in vec3 vDotMat_Grid_Color;
+layout(location = 10) in vec4 vPG_offsets_and_size;
+layout(location = 11) in vec2 vPG_freq_base_screen;
+layout(location = 12) in vec2 vPG_freq_base_screen_unfloored;
+layout(location = 13) in float vPG_period_multiplier_x;
+layout(location = 14) in vec2 vPG_OriginalSize_tated_mul_pi;
+layout(location = 15) in vec2 vPG_OutputSize_tated;
+layout(location = 16) in vec2 vPG_OutputCoord_tated;
+layout(location = 17) in float vDotMat_Grid_Sharpness;
+layout(location = 18) in float vPG_mask_height;
+layout(location = 19) in float vDeltaRenderOk;
+layout(location = 20) in float vDo_pixelgrid_h;
+layout(location = 21) in float vFake_scanline_period;
+layout(location = 22) in float vPG_y_shift;
 
 #ifdef DEBUG_PRINT_VALUE
     layout(location = 31) in float vfprintvalue;
@@ -447,7 +423,7 @@ layout(set = 0, binding = 6)  uniform sampler2D monitor_body_straight;
 layout(set = 0, binding = 7)  uniform sampler2D monitor_body_curved;
 layout(set = 0, binding = 8)  uniform sampler2D bg_under;
 layout(set = 0, binding = 9)  uniform sampler2D bg_over;
-//layout(set = 0, binding = 10) uniform sampler2D halo_pre_gamma_pass;
+//layout(set = 0, binding = 10) uniform sampler2D in_glow_pass_x;
 layout(set = 0, binding = 11) uniform sampler2D in_glow_pass;
 layout(set = 0, binding = 12) uniform sampler2D halo_pass;
 #ifndef D3D_WORKAROUND
@@ -573,24 +549,10 @@ vec3 downsample_x( sampler2D tex, vec2 uv, vec4 sourcesize, float sharpness_add 
 }
 
 
-vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inLum  ) {
-    /*
-     This would provide an additional method to alter scanlines "inertia", but has a cost of 4fps
-     when using smoothstep_fast and 13fps(!) when using standard smoothstep.
-     It could replace glow_x for tight blurs.
-    */
-
-    //vec3 lum_h =  downsample(in_glow_pass, in_coords, global.flick_and_noise_passSize, 0.0).rgb;
-    //vec3 lum_h =  downsample_x(in_glow_pass, in_coords, global.flick_and_noise_passSize, 0.0).rgb;
-    //lum_h *= smoothstep_fast( vec3(SERVICE1-0.1) ,vec3(SERVICE1), lum_h);
-    //pixel_in = max(pixel_in, lum_h);
-
-    //pixel_in = blur9_x_box1tap(in_glow_pass, in_coords, params.OriginalSize.xy, abs(IN_GLOW_W)*2.0) ; //102.4
+vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inLum  ) {
 
     //Scanlines: compute each phosphor height according to input luminance, puttin it here helps parallelism a bit.
-
-        float extragain_h = max(PIXELGRID_MAX_H, 1.0);
-        vec3 phosphor_height = map_range(pixel_in*extragain_h, min_inLum, max_inLum, PIXELGRID_MIN_H, clamp(PIXELGRID_MAX_H, PIXELGRID_MIN_H, 1.0));
+        vec3 phosphor_height = map_range(pixel_in.rgb, min_inLum, max_inLum, PIXELGRID_MIN_H, clamp(PIXELGRID_MAX_H, PIXELGRID_MIN_H, 1.0));
 
     //Tate ? (other outputsize,originalsize and outputcoords "tated" in vertex shader.)
         if (vDo_Tate == 1.0) in_coords.xy = in_coords.yx;
@@ -647,6 +609,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
 
     //Moving it up there provides a small speed up due to
     //increased parallalism, I guess.
+    
         float sin_check_offset = sin(freq_base_unfloored.x);
         float is_even = step(sin_check_offset, 0.0);
 
@@ -658,24 +621,33 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
         //Pixelgrid: do horizontal if enabled, but skip it if user doesn't want it on interlaced content.
         //if (DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0)) { //103.1
         if (vDo_pixelgrid_h > 0.5) {
-
+            
             //Since we emulate scanlines, take into account current scanline phase:
                 float interlacing_adapt_period = vScanlinePeriod;
 
             //We can offset trias to emulate fake core level slotmask by applying the optional offset to emulate the slotmask on even cells
-                float triad_stagger_offset =  is_even * PIXELGRID_OFFSET_CORE * pi;
+                float fakeslot_stagger_offset =  is_even * PIXELGRID_OFFSET_CORE * pi;
             //get 3 sines with applied the optional staggered offset for slotmask, and single phosphors staggering for y deconvergence.
                 vec3 decon_stagger = vec3( PIXELGRID_DECON_R_H, PIXELGRID_DECON_G_H, PIXELGRID_DECON_B_H);
 
 
-        //Antimoire experiments:
+            //Scanline Inflation:
+                #define inflation pixel_in.a
+                #ifdef D3D_WORKAROUND
+                    float freq_base_core_inflated = freq_base_core.y += inflation * (1-vDo_Tate);
+                #else
+                    float freq_base_core_inflated = freq_base_core.y += inflation;
+                #endif
+                
             vec3 rgb_h_sin = vec3(1.0);
+            float anti_inflation = 1-clamp(abs(pixel_in.a), 0.0,1.0); //<- counteract: deconvergence does not depend on inflaction 
             if (PIXELGRID_H_ANTIMOIRE > 0.0) {
+                //Antimoire experiment:
                 float anti_moire_freq = sin(vPG_freq_base_screen_unfloored.x * vPG_offsets_and_size.a );
                 float anti_moire_amp = PIXELGRID_H_ANTIMOIRE;
-                rgb_h_sin = sin( (freq_base_core.yyy * interlacing_adapt_period) + ( anti_moire_freq * anti_moire_amp ) + vOffset);
+                rgb_h_sin = sin( ( vec3(freq_base_core_inflated) * interlacing_adapt_period) + ( anti_moire_freq * anti_moire_amp ) + vInterlace_offset);
             } else {
-                   rgb_h_sin = sin( (freq_base_core.y * interlacing_adapt_period) + triad_stagger_offset - decon_stagger + vOffset);
+                   rgb_h_sin = sin( (freq_base_core_inflated * interlacing_adapt_period) + fakeslot_stagger_offset - decon_stagger*anti_inflation + vInterlace_offset );
             }
 
             //make it positve with doubled frequency:
@@ -684,12 +656,12 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //Compute dedot mix here for use in h mask and vmask2 later
                 //dedot_mix = vec3(  PIXELGRID_H_DEDOT - PIXELGRID_H_DEDOT * rgb_h_sin.x);
                 dedot_mix = vec3( fma( -PIXELGRID_H_DEDOT, rgb_h_sin.x, PIXELGRID_H_DEDOT)); //ASM PROOF: SAME
-                dedot_mix = dedot_mix *(pixel_in/max_inLum);
+                dedot_mix = dedot_mix *(pixel_in.rgb/max_inLum);
                 
             // Compute each phosphor height according to input luminance,
             // Moved outside the branch to help parallelism a bit
                 //float extragain_h = max(PIXELGRID_MAX_H, 1.0); //Handle
-                //vec3 phosphor_height = map_range(pixel_in*extragain_h, min_inLum, max_inLum, PIXELGRID_MIN_H, clamp(PIXELGRID_MAX_H, PIXELGRID_MIN_H, 1.0));
+                //vec3 phosphor_height = map_range(pixel_in.rgb*extragain_h, min_inLum, max_inLum, PIXELGRID_MIN_H, clamp(PIXELGRID_MAX_H, PIXELGRID_MIN_H, 1.0));
 
 
             //Finally get 3 sines out of the previous one by applying height modifiers
@@ -712,7 +684,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             //make them always positive and double frequency:
                 rgb_w = (rgb_w * rgb_w);
             //Scale Max width according to pre-gains:
-                vec3 phosphor_width = map_range(pixel_in, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
+                vec3 phosphor_width = map_range(pixel_in.rgb, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
             //Get final phosphor width:
                 //rgb_w = morph_shape(rgb_w, phosphor_width, PIXELGRID_NO_INTERBLEED_W, PIXELGRID_GAMMA_W); //2%
                 rgb_w = morph_shape_full_no_steepness_vec3(rgb_w, phosphor_width, PIXELGRID_GAMMA_W); //2%
@@ -736,7 +708,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
     // can be used for slotmask,aperturegrille ... or scanlines, but they would have a boxed shape.
         vec3 darklines_mask=vec3(1.0);
 
-        vec3 pixel_in_unsparkled = pixel_in;
+        vec3 pixel_in_unsparkled = pixel_in.rgb;
         if (PIXELGRID_Y_MASK > 0.0) {
             //Compute phosphors height mask with the right reference coords.
                 float ph_mask_height;
@@ -767,7 +739,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 // return vec4(mask_shape);
 
             //Get per channel input luminance by clamping pixel_in and applying hmask
-                vec3 lum = clamp(pixel_in * rgb_w, 0.0, 1.0);
+                vec3 lum = clamp(pixel_in.rgb * rgb_w, 0.0, 1.0);
             //Adapt the luminance effect via input parameter
                 vec3 lum_adapted = (1-lum*PIXELGRID_Y_MASK_ON_WHITE);
             //Calc final mask visibility as the minimum between tha configured visibility and luminosity effect
@@ -789,11 +761,11 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
     //Apply Overmask:
         if (TEST_OVERMASK_NEW == 1.0) {
             vec3 mask_overmask = PIXELGRID_OVERMASK * (mask - 0.5) + 0.5;
-            vec3 pixel_in_overmask = mix(pixel_in, pixel_in * PIXELGRID_OVERMASK, PIXELGRID_OVERMASK);
+            vec3 pixel_in_overmask = mix(pixel_in.rgb, pixel_in.rgb * PIXELGRID_OVERMASK, PIXELGRID_OVERMASK);
         //Adaptive overmask experiment
             //different mix levels:
                 mask = mix(mask, mask_overmask, abs(mask - vec3(0.5)) );
-                pixel_in = mix(pixel_in, pixel_in_overmask, abs( pixel_in - vec3(0.5)  )      );
+                pixel_in.rgb = mix(pixel_in.rgb, pixel_in_overmask, abs( pixel_in.rgb - vec3(0.5)  )      );
             //Same mix levels:
                 //mask = mix(mask_overmask, mask,              pow( abs( pixel_in - vec3(0.5))*2.0, vec3(1.0))        );
                 //pixel_in = mix(pixel_in_overmask, pixel_in,  pow(abs( pixel_in - vec3(0.5))*2.0, vec3(1.0))        );
@@ -803,10 +775,10 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
                 //pixel_in = mix(pixel_in, pixel_in * overmask_adapted, overmask_adapted);
         } else {
             mask = PIXELGRID_OVERMASK * (mask - 0.5) + 0.5;
-            pixel_in = mix(pixel_in, pixel_in * PIXELGRID_OVERMASK, PIXELGRID_OVERMASK);
+            pixel_in.rgb = mix(pixel_in.rgb, pixel_in.rgb * PIXELGRID_OVERMASK, PIXELGRID_OVERMASK);
         }
     //Apply the mask to pixel_in and clamp the minimum to the unexcited grille.
-        vec3 mask_and_grille = max(mask * pixel_in, rgb_grille_basal);
+        vec3 mask_and_grille = max(mask * pixel_in.rgb, rgb_grille_basal);
 
     //return it with alpha channel containing the mask itself, so that halo can selectively light it.
         return vec4( mask_and_grille , dot(rgb_h, vec3(0.3333)));
@@ -1098,23 +1070,36 @@ float gaussian_coefficient(float x, float sigma) {
 vec3 fn_pixel_content(vec2 coords) {
 
     vec3 pixel_out;
-    vec3 pixel_glowed;
+    vec4 pixel_glowed;
     float dot_mat_or_pixelgrid = 1.0; //init dot grid or scanline mask to 1.0
 
 
     //#define USE_QUILEZ
 
     #ifdef USE_QUILEZ
-        pixel_glowed = texture(in_glow_pass, coords_QULEZ(coords, global.flick_and_noise_passSize)).rgb;
-        pixel_out = pixel_glowed;
+        pixel_glowed = texture(in_glow_pass, coords_QULEZ(coords, global.flick_and_noise_passSize));
+        pixel_out = pixel_glowed.rgb;
     #else
-        pixel_glowed = texture(in_glow_pass, coords).rgb;
-        pixel_out = pixel_glowed;
-    #endif
-
+        pixel_glowed = texture(in_glow_pass, coords);
+        pixel_out = pixel_glowed.rgb;
+    #endif        
     //Pixel grid
         if (DO_PIXELGRID == 1.0) {
-            vec4 pixel_grid = fn_pixel_grid(coords, pixel_out, 0.0, vMax_inLum);
+            //1264,20488,22262, 108.5
+            float vMax_inLum = mix(1.0, 
+                                   apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS) * max(IN_GLOW_POWER, 1.0), 
+                                   DO_CCORRECTION
+                                   );
+            //1266,20491,22282 108.4
+            //float vMax_inLum = max( 1.0, DO_CCORRECTION * apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS)) *
+            //                   max( 1.0, mix(1.0, IN_GLOW_POWER, DO_CCORRECTION));
+            
+            //1268,20501,22268 108.3
+            /*float vMax_inLum = 1.0;
+            if (DO_CCORRECTION == 1.0)
+                 vMax_inLum = apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS) * max(IN_GLOW_POWER, 1.0);
+            */
+            vec4 pixel_grid = fn_pixel_grid(coords, pixel_glowed, 0.0, vMax_inLum);
             //grid mask only is needed by halo to selectively light the grid.
                 dot_mat_or_pixelgrid = pixel_grid.a;
                 pixel_out = pixel_grid.rgb;
@@ -1126,7 +1111,6 @@ vec3 fn_pixel_content(vec2 coords) {
                 dot_mat_or_pixelgrid = pixel_dotmat.a;
             //rgb channel goes to pixel_out
             pixel_out = pixel_dotmat.rgb;
-
         }
 
     //Halo
@@ -1276,10 +1260,6 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
 
 
 void main() {
-    vec3 pixel_out = vec3(0.0);
-
-    float canvas_busy = 0.0; //<-- this allow for paint over not painted areas (spares gpu cycles)
-
     //Initial content coords
         vec2 co_content = vTexCoord;
 
@@ -1299,19 +1279,16 @@ void main() {
     //Curvature
         //Curvature has to come after inner zoom or bezel curved border will not match content
         //curved border when inner zoom changes.
-        if (vDo_Curvature > 0.0) {
+        if ( curvature_needed() > 0.0 ) {
             co_content = Warp_koko(co_content, vec2(GEOM_WARP_X, GEOM_WARP_Y), 0.5);
         }
 
     //Mirror coords needs to be calculated here, before geom override, but after curvature.
     //It is still not perfect but a reasonable tradeoff by now.
         vec2 co_mirror = zoom(co_content, 1/BEZEL_REFL_ZOOMOUT_ROOM);
+        
 
-    //Apply other content coords modifiers
-        if (DO_GAME_GEOM_OVERRIDE == 1.0)
-            co_content = content_geom_override_zoom(co_content, GAME_GEOM_ASPECT, vIn_aspect, GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
 
-    
   /*  float anaborderstart = 0.5;
     float anabordersize = anaborderstart + SERVICE1;
     float side_zoom = 1-smoothstep_fast(anaborderstart-0.5, anabordersize-0.5,abs(co_content.x-0.5)) ;
@@ -1319,37 +1296,46 @@ void main() {
     //FragColor = vec4(side_zoom) ; return;
     */
     
-    //Dynamic lum dependant full screen zoom?
-    #ifndef D3D_WORKAROUND
-        if (DO_DYNZOOM > 0.0)
-            co_content = zoom(co_content, get_dyn_zoom(avglum_pass) );
-    #endif
-
+    float canvas_busy = 0.0; //<-- this allow for paint over not painted areas (spares gpu cycles)
     //Create an alpha mask to write content into, it holds opacity info that will be used to compose:
         if (DO_CURVATURE == 1.0)  {
             canvas_busy = fn_border(co_content);
         } else {
             canvas_busy = float(is_first_inside_rect(co_content, RECT01)); //FIXME: is step() faster?
         }
+        
+
+    //Apply other content coords modifiers
+        if (DO_GAME_GEOM_OVERRIDE == 1.0)
+            co_content = content_geom_override_zoom(co_content, GAME_GEOM_ASPECT, vIn_aspect, GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
+ 
     #ifndef D3D_WORKAROUND
         if (DELTA_RENDER == 1.0) {
-            bool reuse_old =  bool( texture(in_glow_pass, co_content).a * canvas_busy * vDeltaRenderOk ) ;
+            bool reuse_old =  bool( float( texture(in_glow_pass, co_content).a == 0.0) * canvas_busy * vDeltaRenderOk ) ;
             if (reuse_old) {
-                FragColor = texture(final_passFeedback, vOutputCoord) ;
+                FragColor = texture(final_passFeedback, vOutputCoord);// * vec4(1,0,0,0);
                 return;
             }
         }
     #endif
+    
+    
+        //Dynamic lum dependant full screen zoom?
+    #ifndef D3D_WORKAROUND
+        if (DO_DYNZOOM > 0.0)
+            co_content = zoom(co_content, get_dyn_zoom(avglum_pass) );
+    
+        if (AUTOCROP_MAX > 0.0)
+            co_content = zoom(co_content, get_autocrop_zoom(avglum_pass) );
+    #endif
+
+
+
 
 
     vec3 pixel_ambi = vec3(0.0);
     vec3 pixel_under_content = vec3(0.0);
-    
-    
-    
-                                                                                            //  pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb ;
-                                                                                            //  FragColor = pixel_ambi.rgbr; return;
-    
+    vec3 pixel_out = vec3(0.0);
     
     //Draw content only over the alpha mask, and sample ambientlight outside it to spare gpu cycles.
         if (canvas_busy > 0.5) {
@@ -1384,7 +1370,8 @@ void main() {
                 
                 if (DO_BG_IMAGE != 1.0) {
                     const float noise_power = NOISEPOWER * NOISEPOWER_AMBI_MUL;
-                    float anoise1 = random_fast(vTexCoord * vDynamicSeed);
+                    float dynamicseed = mod(params.FrameCount, 30.0001);
+                    float anoise1 = random_fast(vTexCoord*dynamicseed);
                     anoise1 = scale_to_range(anoise1, -noise_power, noise_power);
                     // anoise1 *=  (1 - pixel_ambi.g);
                     //anoise1 =  (anoise1 - anoise1 * pixel_ambi.g); //ASM PROOF FASTER
@@ -1550,12 +1537,6 @@ void main() {
             pixel_out = 1-pixel_out;//;-clip;
     #endif
 
-
-
-
-    //pixel_out = pixel_out -diff;
-
     FragColor = vec4(pixel_out, 1.0);
-
-    //FragColor = texture(reflected_blurred_pass, co_mirror);
+    
 }

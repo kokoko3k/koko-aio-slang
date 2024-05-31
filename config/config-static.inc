@@ -132,7 +132,11 @@
 #define NEW_SCALEMOD_X (global.flick_and_noise_passSize.x/(360.0*2.0) / 2.2)
 #define NEW_SCALEMOD_Y (global.flick_and_noise_passSize.y/(270.0*2.0) / 2.2)
 
-
+	// AUTOCROP
+//which coords holds the autocrop zoom value
+#define AUTOCROP_SAMPLING_POINT vec2(0.125)
+	
+	
 // RESOLUTION SWITCH GLITCH EMULATION ##########################################################################################
 	//Where to sample alpha from avglum pass to understand if resolution has changed (very internal setting) 
 #define RESSWITCH_SAMPLING_POINT vec2(0.95) 

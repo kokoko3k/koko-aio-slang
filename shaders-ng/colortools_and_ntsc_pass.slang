@@ -20,13 +20,13 @@
 //#define DEBUG
    //#define DEBUG_COLOR_CALIB
    //#define DEBUG_TIME_FADE
-   //#define DEBUG_SOLID_COLOR
+   #define DEBUG_SOLID_COLOR
    //#define DEBUG_STEP_GRADIENT
    //#define DEBUG_STEP_GRADIENT_V
    //#define DEBUG_BLINK
    //#define DEBUG_BLINK_CIRCLE
    //#define DEBUG_WALKING_CIRCLE
-   #define DEBUG_COLORWHEEL
+   //#define DEBUG_COLORWHEEL
    
    
 #include "config.inc"
@@ -77,9 +77,10 @@ void main() {
    gl_Position = global.MVP * Position;
    vTexCoord = TexCoord * 1.0001;
 
-    if (DO_GAME_GEOM_OVERRIDE > 0.5)
-        vTexCoord = content_geom_override_shift(vTexCoord, GAME_GEOM_ASPECT, get_in_aspect(), GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
-
+   if (DO_GAME_GEOM_OVERRIDE > 0.5) {
+      vec2 shift = vec2(GAME_GEOM_HSHIFT,GAME_GEOM_VSHIFT);
+      vTexCoord = content_geom_override_shift(vTexCoord, GAME_GEOM_ASPECT, get_in_aspect(), shift.y, shift.x, GAME_GEOM_ZOOM);
+   }
    
    
    if (DO_NTSC_ARTIFACTS > 0.0) {
@@ -156,7 +157,12 @@ vec4 ntscdec(vec2 uv, vec3 RGB_ori) {
       #endif
       for (int n=0; n < N; n++) {
          vec2 pos = uv + vec2( (n-NTSC_FILTER_MIDDLE)  * params.SourceSize.z  , 0.0);
-         vec3 smp_mul_weight = vec3((texture(Source, pos).rgb * RGB2YIQ).x) * vNTSC_weights[n] ;
+         //vec3 smp_mul_weight = vec3((texture(Source, pos).rgb * RGB2YIQ).x) * vNTSC_weights[n] ;
+         //need texture nearest here, because we have to sample linearly from previous pass,
+         //In turn, because we need linear feedback from this pass (linear feedback mipmaps needed by deltarender)
+         //and linear feedback is controlled by this pass filtering, contrary to the present linear filtering
+         //which is controlled by next pass filtering (What a mess RetroArch!)
+         vec3 smp_mul_weight = vec3((texture_NEAREST(Source, pos, params.SourceSize).rgb * RGB2YIQ).x) * vNTSC_weights[n] ;
          
          float phase =  vSubcarrierFrequency_mul_size_mul_TAU * pos.x;
 
@@ -271,10 +277,6 @@ bool first_in_range_strict(float a, float lo, float hi) {
    return a == bounded;
 }
 
-/*bool first_in_range_strict(float a, float lo, float hi) {
-   return (a >= lo) && (a <= hi);
-}*/
-
 vec3 pixel_dedither(sampler2D tex, vec2 coords, vec4 sourcesize, float tmin, float tmax, float strength1, float strength2) {
    #define DX sourcesize.z
    #define DY sourcesize.w
@@ -344,14 +346,8 @@ vec3 pixel_dedither(sampler2D tex, vec2 coords, vec4 sourcesize, float tmin, flo
       }
    }
 
-   //if (accum_div1 > 0.0) {
-      //pixel_out = (pxb + pxa + pxc + pya + pyc + pxya + pxyc + pxya2 + pxyc2) / 9.0;
-      //pixel_out = (pxb + pxa + pxc + pya + pyc ) / 5.0;
-      //pixel_out = mix(p0, (avg_x + avg_y + avg_xy + avg_yx) / accum_div, strength1);
-   //}
    vec3 pixel_out = p0;
    if (accum_div1 > 0.0) {
-      //pixel_out = mix(pixel_out, (avg_x + avg_y)   / accum_div1, strength1);
       pixel_out = mix(pixel_out, fma(avg_x, vec3(1.0)/accum_div1, avg_y / accum_div1) , strength1); //ASM PROOF FASTER
    }
    if (accum_div2 > 0.0) {
@@ -361,38 +357,6 @@ vec3 pixel_dedither(sampler2D tex, vec2 coords, vec4 sourcesize, float tmin, flo
 
    return pixel_out;
 }
-
-
-
-vec3 persistence_v1(vec3 feedback, vec3 pixel_now, float start_decay, float end_decay, float motion_blur_cancel) {
-   //start_decay: is the initial decay, the fast one: 1.0 means instantaneous, try around 0.8
-   //end decay the higher, the more the persistance in the long run, try around 1.0;
-   //motion_blur_cancel: 0.0 means full blur on bright areas; try around 2.5
-
-   vec3 x=(feedback - pixel_now);
-   
-   vec3 a = vec3( 1 + start_decay );
-   vec3 b = vec3( end_decay );
-
-   //compute fade speed as an high gamma curve:
-   vec3 fade_speed=pow(a, pow(x,b) )-1;
-   
-   //higher speed is needed when composing over brighter colors to avoid motion blur
-   fade_speed = fade_speed + (pixel_now*motion_blur_cancel);
-   
-   //Ensure a minimum speed to reach 0.0 and clamp to 1.0 to avoid funky effects
-   float min_speed = 0.05  ;
-   fade_speed=clamp(fade_speed, min_speed, 1.0);
-   
-
-   //Compute the persistent light by mixing pixel current and previous one
-   vec3 pixel_persistent = mix(feedback, pixel_now, fade_speed );  
-   
-   //blend only if we are fading out
-      vec3 light_fading_out = vec3(greaterThan(feedback, pixel_now));
-      return mix(pixel_now, pixel_persistent, light_fading_out);
-   }
-   
 
 
 vec3 persistence(vec3 feedback, vec3 pixel_now, float start_decay, float late_persistence, float motion_blur_cancel) {
@@ -428,6 +392,11 @@ vec3 persistence(vec3 feedback, vec3 pixel_now, float start_decay, float late_pe
 
 void main() {
    vec2 co = vTexCoord;
+   
+   if (AUTOCROP_MAX > 0.0)
+      co = clamp(co,  params.OriginalSize.zw * AUTOCROP_MIN, 
+                    1-params.OriginalSize.zw * AUTOCROP_MIN );
+   
    #ifndef D3D_WORKAROUND
       float shake = texture(avglum_passFeedback, RESSWITCH_SAMPLING_POINT).a;
       //co.y += sin(shake * 2 * pi) * RESSWITCH_GLITCH_SIZE;
@@ -510,10 +479,11 @@ void main() {
    */
 
    if (DO_PPERSISTENCE == 1.0) {
-      //persistence(vec3 feedback, vec3 pixel_now, float start_decay, float end_decay, float motion_blur_cancel) {
-      vec3 feedback = texture(colortools_and_ntsc_passFeedback, co).rgb;
-      float motion_blur_cancel = 2.5;
-      pixel_out = persistence(feedback, pixel_out, PPERSISTENCE_START, PPERSISTENCE_END, motion_blur_cancel);
+      if (params.OutputSize.xy == global.colortools_and_ntsc_passFeedbackSize.xy) {
+         vec3 feedback = texture(colortools_and_ntsc_passFeedback, co).rgb;
+         float motion_blur_cancel = 2.5;
+         pixel_out = persistence(feedback, pixel_out, PPERSISTENCE_START, PPERSISTENCE_END, motion_blur_cancel);
+      }
    }
  
   

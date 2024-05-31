@@ -362,6 +362,53 @@ vec2 apply_fuzzy_main_pass_stage_1() {
 	return vec2(color_out/color_in, gamma_out );
 }
 
+
+vec2 apply_fuzzy_main_pass_stage_1_no_gamma_in() {
+	//This simulates the final pass pixel processing so that previous passes like 
+	//reflections, full screen luminance zoom and ambient light 
+	//can react accordingly without doing the same thing twice.
+	//For speed reasons, this lives in vertex shader and will output
+	//a vec2(mul factor, pow factor)
+	//in fragment shader one will pow(pow factor)*multiply factor;
+	
+	float color_in = 1.0;
+	float color_out = 1.0;
+	float gamma_out = 1.0;
+	
+	float halo_power_adapted;
+	halo_power_adapted = HALO_POWER;
+	if (HALO_NO_PREGAIN == 1.0) {
+		halo_power_adapted /= get_halo_ungain_factor();
+	}
+	if (HALO_POWER < 0.0) 
+		halo_power_adapted = -halo_power_adapted/10.0;
+	
+	if (DO_CCORRECTION == 1.0) {
+		color_out = pow(color_in, GAMMA_OUT); //<- nonsense
+		gamma_out = gamma_out * GAMMA_OUT;
+		color_out = color_out * IN_GLOW_POWER;
+	}
+	
+	if (DO_PIXELGRID == 1.0) {
+		color_out *= 1- DO_PIXELGRID_H * 0.5   ; //Half color if scanline.
+		color_out *= 1- DO_PIXELGRID_W * 0.5   ; //Half color if Hmask.
+		color_out *= 1- PIXELGRID_Y_MASK * 0.2 ; //Strip at most 20% if level 2 ymask.
+	}
+
+
+	if (DO_HALO == 1.0) {
+		color_out += color_in*halo_power_adapted / HALO_GAMMA;
+		gamma_out = gamma_out * mix(1.0, HALO_GAMMA_OUT, halo_power_adapted*0.25) ;
+	}
+	
+	if (DO_VIGNETTE == 1.0)
+		color_out *= 0.8 * (V_POWER);
+	
+
+	
+	return vec2(color_out/color_in, gamma_out );
+}
+
 vec3 apply_fuzzy_main_pass_stage_2(vec3 pixel_in, vec2 stage1 ) {
 	//This gets the output of stage_1 to apply its pow and mul.
 	return pow(pixel_in, vec3(stage1.y)) * stage1.x;
@@ -507,8 +554,12 @@ float apply_contrast_brightness(float c, float contrast, float brightness) {
    return scale_to_range(c, -contrast, 1+contrast) + brightness;
 }
 
-float round_step(float f, float p) {
-	return floor(f*p)/p;
+float round_step(float x, float p) {
+	return round(x*p)/p;
+}
+
+vec2 round_step(vec2 x, vec2 p) {
+	return round(x*p)/p;
 }
 
 #define VEC2_RND_A_B vec2(12.9898, 78.233)
@@ -558,20 +609,18 @@ float random_fast(vec2 seed) {
 
 
 //CURVATURE
+	float curvature_needed() {
+		return DO_CURVATURE * (GEOM_WARP_X + GEOM_WARP_Y);
+	}
 
 
+	
 	#define corner_aspect vec2(1.0,  0.75)
-	float fn_border(vec2 coord) {
-		//coord*=corner_aspect;
-		//float l = length(max(abs(coord - 0.5) - 0.5 + GEOM_CORNER_SIZE, 0.0));
-		//return clamp( (GEOM_CORNER_SIZE - l)*GEOM_CORNER_SMOOTH, 0.0, 1.0);
-		//return 1- smoothstep_fast(GEOM_CORNER_SIZE-GEOM_CORNER_SMOOTH,GEOM_CORNER_SIZE, l);
-
-		coord = min(coord, vec2(1.0) - coord); // * corner_aspect;
+	float fn_border(vec2 coord) {	
+		coord = min(coord, vec2(1.0) - coord) ; //* corner_aspect;
 		coord = GEOM_CORNER_SIZE - min(coord, GEOM_CORNER_SIZE);
 		float dist = length(coord);
-		return clamp((GEOM_CORNER_SIZE - dist)*GEOM_CORNER_SMOOTH, 0.0, 1.0);
-		
+		return clamp(   ((GEOM_CORNER_SIZE - dist) + 0.75/GEOM_CORNER_SMOOTH )  *   GEOM_CORNER_SMOOTH, 0.0, 1.0);
 	}
 	
 	float border(vec2 coord) {
@@ -830,12 +879,13 @@ float random_fast(vec2 seed) {
 	vec2 content_geom_override_shift(vec2 co, float aspect, float in_aspect, float vshift, float hshift, float out_zoom){
 		//Aspect (ASM PROOF: IFTHEN is better)
 		//shift
-		co.y -= vshift/10.0;
-		co.x -= hshift/10.0;
+		vec2 shift = round_step(vec2(hshift, vshift)*0.1, params.OriginalSize.xy);
+		co -= shift;
 		return co;
 	}
 	
 	vec2 content_geom_override_zoom(vec2 co, float aspect, float in_aspect, float vshift, float hshift, float out_zoom){
+		// see next (**)
 		float scale_y;
 		if (aspect > 0.01) 
 			scale_y = aspect/in_aspect;
@@ -847,6 +897,21 @@ float random_fast(vec2 seed) {
 		//zoom
 		return zoom(co, out_zoom);
 	}	
+	
+	vec2 content_geom_override_zoom_inv(vec2 co, float aspect, float in_aspect, float vshift, float hshift, float out_zoom){
+		// (**) This has to be exactly has the not _inv version, it returns the same but with zoom counteracted, inverted. 
+		float scale_y;
+		if (aspect > 0.01) 
+			scale_y = aspect/in_aspect;
+				else
+			scale_y = 1.0;
+		
+		float offset_y = (0.5 * scale_y ) - 0.5 ;
+		co.y = co.y*scale_y - offset_y;
+		//zoom
+		return zoom(co, 1/out_zoom);
+	}	
+	
 	
 	vec2 content_geom_override(vec2 co, float aspect, float in_aspect, float vshift, float hshift, float out_zoom){
 		//cheap cardboard emulation:
@@ -1131,8 +1196,27 @@ vec3 rgb2hsv(vec3 c){
 	return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + eps10)), d / (q.x + eps10), q.x);
 }
 	
+vec2 rgb2hv(vec3 c) {
+    vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+    vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));
+    vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
+    
+    float d = q.x - min(q.w, q.y);
+    return vec2(abs(q.z + (q.w - q.y) / (6.0 * d + 0.0001)), q.x);
+}
+	
 float get_dyn_zoom(sampler2D tex) {
-	return texture(tex, vec2(0.75,0.75)).a * DO_DYNZOOM + 1.0 ;
+	if (DELTA_RENDER == 0.0)
+		return texture(tex, vec2(0.75,0.75)).a * DO_DYNZOOM + 1.0 ;
+	else
+		return 1.0;
+}
+
+float get_autocrop_zoom(sampler2D tex) {
+	if (DELTA_RENDER == 0.0)
+		return texture(tex, AUTOCROP_SAMPLING_POINT).a;
+	else
+		return 1.0;
 }
 
 
@@ -1483,4 +1567,35 @@ vec3 adaptive_strobe_checkerboard(vec3 pixel_out, vec2 co, vec2 outputsize) {
     
 }
 
+vec2 r2(vec2 p0, int n) {
+    
+    //return fract(p0 + float(n)*vec2(0.754877669, 0.569840296));
+    return fract(p0 + vec2(n*12664745, n*9560333)/exp2(24.));	// integer mul to avoid round-off
+}
 
+float lodmax(vec2 texsize) {
+	//lod needed to average all texture points.
+    return log2(max(texsize.x, texsize.y));
+}
+float is_deltarender_allowed(bool is_interlaced) {
+	// Delta render, mandatory conditions:
+    return float( ( params.FrameCount % int(DELTA_RENDER_FORCE_REFRESH) != 0.0 ) &&              // - We are in a frame that is not forced for full refresh
+    ( (! is_interlaced) || PIXELGRID_INTR_DISABLE_Y >= 1.0 || DO_PIXELGRID_H == 0.0)); // - screen is not interlaced or we disabled scanlines on interlaced content
+}
+
+float delta_render_changed(sampler2D smp_past, sampler2D smp_now, vec2 co, float lod) {
+   vec3 s1 = textureLod(smp_now,  co, 1.0).rgb; // It is important that this is with lod = 1.0
+   vec3 s2 = textureLod(smp_past, co, 1.0).rgb; // It is important that this is with lod = 1.0
+   vec3 m1 = textureLod(smp_now,  co, lod).rgb;
+   vec3 m2 = textureLod(smp_past, co, lod).rgb;
+   
+   if (m1 == m2 && s1==s2 )
+      return 0.0;
+   else
+      return 1.0;
+
+}
+
+float max3(vec3 v){
+	return max((v.x,v.y),v.z);
+}

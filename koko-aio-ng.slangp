@@ -71,11 +71,21 @@ shaders = 17
            shader0 = shaders-ng/colortools_and_ntsc_pass.slang
             alias0 = "colortools_and_ntsc_pass"
 #float_framebuffer needed by phosphor persistance
-float_framebuffer0 = true
-    filter_linear0 = false
        scale_type0 = source
             scale0 = 1.0
-        wrap_mode0 = "clamp_to_border"
+            
+// (**Note 0)
+// Watch out for filter_linear0 and wrap_mode0
+// In retroarch, metadatas such as the followings, usually applies to the
+// previous pass (Original, in this case).
+// However it seems that those metadatas are applied to the feedback of the pass itself.
+// Now, since we need to compare colortools_and_ntsc_pass and colortools_and_ntsc_passFeedback
+// for Deltarender purposes, it is important that they share the same filtering and wrap mode.
+// Hence, we have to set the following as the same of float_framebuffer0,filter_linear0 and wrap_mode0
+float_framebuffer0 = "true"
+    filter_linear0 = "true"
+        wrap_mode0 = "mirrored_repeat"
+
 
 
         
@@ -101,13 +111,16 @@ float_framebuffer0 = true
 # ASMDEBUG: GLSL30
            shader1 = shaders-ng/flick_and_noise.slang
             alias1 = "flick_and_noise_pass"
-    filter_linear1 = true
        scale_type1 = source
           scale_x1 = 2.0
           scale_y1 = 2.0  
-        wrap_mode1 = "mirrored_repeat"
-     float_framebuffer1 = true
      mipmap_input1 = "true"
+     
+//(See **Note 0)
+        wrap_mode1 = "mirrored_repeat"
+float_framebuffer1 = "true"
+    filter_linear1 = "true"
+     
 
 
 
@@ -156,7 +169,7 @@ float_framebuffer3 = true
             scale4 = 1.0
        scale_type4 = source    
 float_framebuffer4 = true
-        wrap_mode4 = "mirrored_repeat"
+        wrap_mode4 = "clamp_to_edge"
      
 # ASMDEBUG: GLSL42
            shader5 = shaders-ng/in_glow_y.slang
@@ -165,7 +178,7 @@ float_framebuffer4 = true
             scale5 = 1.0
        scale_type5 = source    
 float_framebuffer5 = true
-        wrap_mode5 = "mirrored_repeat"
+        wrap_mode5 = "clamp_to_border"
             
           
         
@@ -180,7 +193,10 @@ float_framebuffer5 = true
             scale6 = 1.0
        scale_type6 = source
 float_framebuffer6 = true
-        wrap_mode6 = "clamp_to_edge"
+        # This has to be clamp_to_border in order for the glow pass to return a black frame
+        # around it, which is needed so that when using geometry override and zooming out the content,
+        # it will have black surrounding.
+        wrap_mode6 = "clamp_to_border"
         
 # ASMDEBUG: GLSL48
            shader7 = shaders-ng/halo.slang
@@ -189,7 +205,7 @@ float_framebuffer6 = true
             scale7 = 1.0
        scale_type7 = source
 float_framebuffer7 = true
-        wrap_mode7 = "clamp_to_edge"
+        wrap_mode7 = "clamp_to_border"
 
 
 
@@ -213,7 +229,7 @@ float_framebuffer7 = true
         filter_linear8 = true
            scale_type8 = source
                 scale8 = 0.5
-            wrap_mode8 = "mirrored_repeat"
+            wrap_mode8 = "clamp_to_border"
     float_framebuffer8 = "true"
          
          

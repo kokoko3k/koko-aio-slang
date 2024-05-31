@@ -582,6 +582,32 @@
     #define TILT_BEZEL_K	global.TILT_BEZEL_K
 #endif
 
+#ifndef AUTOCROP_MAX
+    #define AUTOCROP_MAX global.AUTOCROP_MAX
+#endif
+
+#ifndef AUTOCROP_MIN
+    #define AUTOCROP_MIN global.AUTOCROP_MIN
+#endif
+
+#ifndef AUTOCROP_SAMPLES
+    #define AUTOCROP_SAMPLES global.AUTOCROP_SAMPLES
+#endif
+
+#ifndef AUTOCROP_SAMPLE_SIZE
+    #define AUTOCROP_SAMPLE_SIZE global.AUTOCROP_SAMPLE_SIZE
+#endif
+
+
+#ifndef AUTOCROP_TRANSITION_SPEED
+	#define AUTOCROP_TRANSITION_SPEED global.AUTOCROP_TRANSITION_SPEED
+#endif
+
+#ifndef AUTOCROP_STEADINESS
+	#define AUTOCROP_STEADINESS global.AUTOCROP_STEADINESS
+#endif
+
+
 #ifndef TATE
     #define TATE	global.TATE
 #endif
@@ -674,7 +700,9 @@
     #define PIXELGRID_DOUBLESCAN 	global.PIXELGRID_DOUBLESCAN
 #endif
 
-
+#ifndef	PIXELGRID_INFLATION
+	#define PIXELGRID_INFLATION global.PIXELGRID_INFLATION
+#endif
 
 #ifndef PIXELGRID_MIN_H
     #define PIXELGRID_MIN_H 			global.PIXELGRID_MIN_H

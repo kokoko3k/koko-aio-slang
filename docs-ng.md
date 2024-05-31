@@ -1,7 +1,7 @@
 **koko-aio-slang documentation**
 
 **RETROARCH OUTPUT DRIVERS**
-    koko-aio does not work by on d3d12 and glitches on d3d11.<br>
+    koko-aio does not work by default on d3d12 and d3d11.<br>
     If you absolutely need it (Xbox?), you can edit the file 
     config\config-static.inc<br>
     and turn the line:
@@ -14,7 +14,16 @@
     <br>
     d3d10 is completely unsupported.
     <br>
-
+    Be warned that some functions does not work if you enable the workaround: <br>
+        * CRT glitch on resolution changes <br>
+        * Adaptive Black <br>
+        * CVBS Bleed size is limited to 5.0
+        * Scanlines inflation when using tate mode
+        * Ambientlight scene change detection
+        * Halving border updates refresh
+        * Lcd antighosting
+        * Delta render
+    
 **USEFUL LOCATIONS/FILES:**
 
     config/config-static.inc:
@@ -213,6 +222,8 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
               The decision will be based on the ratio of output dimensions and the core.
         Phosphors height Min, Max:
             Try to keep scanline height between those values, depending on content brightness.
+        Inflation Strength:
+            Scanlines appear as inflated depending on the pixel brightness.
         Phosphors width min->max gamma:
             Since emulating phosphors with high Min-Max range changes the apparent gamma of the final image,
             it is advised, if needed, to use this option to compensate, instead of the main gamma correction.
@@ -442,10 +453,12 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
     
     WARP X, WARP Y:
         control how much the display is curved along its axes.
+        
+**Corners/Edges:**<br>
+
     Corner radius, Edge sharpness:
         Control the "smoothness" of the display edges.
-    Cut curvature ears;
-        If you see weird image repetition try this.
+
         
 **Bezel:**<br>
     Draws a monitor frame with simulated reflections from the game content.<br>
@@ -622,6 +635,37 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
     Please TURN THIS OFF if you want to use integer scaling, since this obstructs it.
     The higher, the more prominent the effect.
 
+**Autocrop**: 
+    Clears solid bars around the frame.
+    
+    Autocrop maximum amount:
+        The higher, the more solid borders wil be cropped around the image.
+        0.3 means 30%
+    
+    Number of mandatory lines to crop:
+        The minimum lines to always crop; this is useful because sometimes
+        games have one or two "spurious" lines at the very edge of the screen that
+        won't allow autocrop to work at all.
+        This can be used to ignore them.
+    
+    Samples per frame:
+        Higher values makes the shader search more in a single frame for solid areas.
+        This leads to more accurate result in less time, however it will also stress the gpu more.
+        Fortunately even low/lighter values like 10 will work good if you're ok
+        in waiting 2..3 seconds for the final crop value to be found.
+        
+    Sample size:
+        Search multiple pixels at once, this provide a big performance boost, but less accuracy.
+        It means that some solid bar could remain around the image.
+    
+    Scene change treshold
+        When autocrop finds a maximum crop value, it only tries to crop more when the scene changes.
+        By lowering this value, you tell the shader to try higher the crop more often.
+        Use 0.0 is probably useful only to trigger a new search.
+        
+    Transition speed
+        This modulates the smoothness of the animation between various crop values.
+
 **Override content geometry:**<br>
     Contrary to the global aspect ratio control, this changes only the game geometry.<br>
     Bezel stays the same.<br>
@@ -662,7 +706,8 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
         
 **Delta Render:**
     Koko-aio can render only the part of the screen that has been changed,<br>
-    leading to a measurable power consumption reduction.<br>
+    leading to a measurable power consumption reduction and mitigate throttling
+    on mobile devices and laptops.<br>
     This feature can, however, produce artifacts in some cases, so the feature<br>
     is statically disabled by default by now.<br>
     To use it, you have to manually set to 1.0, in file config-user.txt: <br>
