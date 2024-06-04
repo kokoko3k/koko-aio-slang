@@ -755,7 +755,7 @@ float random_fast(vec2 seed) {
 		return  abs(pixel.a - alpha_mark) < 0.05; //<-- 0.05 allow about 20 alpha levels (1*0.05)
 	}
 
-	#define ar_tolerance 0.1 //To compensate when comparing different A/R 
+	#define ar_tolerance 0.005 //To compensate when comparing different A/R 
 	bool is_rotated() {
 		/*
 			For some reason, probably retroarch rotates the view only on final viewport stage, transparent to the shader passes,
