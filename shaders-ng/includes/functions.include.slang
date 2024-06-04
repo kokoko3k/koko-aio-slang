@@ -779,46 +779,41 @@ float random_fast(vec2 seed) {
 	}
 
 	vec2 get_scaled_coords_aspect(vec2 pTexCoord, vec4 destsize, float in_aspect , bool is_rotated){
+		
 		if (!border_needed()) return pTexCoord;
-			//else
-		float scale_x = 1.0;
-		float scale_y = 1.0;
-		float offset_x = 0.0 ;
-		float offset_y = 0.0 ;
-		if (is_rotated) {
-			scale_y = destsize.x/(destsize.y / in_aspect );
-			offset_y = (0.5 * scale_y ) - 0.5 ;
+
+		vec2 scale = vec2(1.0);
+		vec2 offst = vec2(0.0);
+
+	/*	if (is_rotated) {
+			scale.y = destsize.x/(destsize.y / in_aspect );
+			offst.y = (0.5 * scale.y ) - 0.5 ;
 		} else {
 			//to fit width, use this:
-				scale_x = destsize.x/(destsize.y * in_aspect);
-				offset_x = (0.5 * scale_x ) - 0.5 ;
+				scale.x = destsize.x/(destsize.y * in_aspect);
+				offst.x = (0.5 * scale.x ) - 0.5 ;
 				
 			//to fit height, use this:
-				//scale_y = destsize.y/(destsize.x / in_aspect);
-				//offset_y = (0.5 * scale_y ) - 0.5 ;
+			//	scale.y = destsize.y/(destsize.x / in_aspect);
+			//	offst.y = (0.5 * scale.y ) - 0.5 ;
 		}
-
-		vec2 scale_coord=vec2(pTexCoord.x*scale_x - offset_x , pTexCoord.y*scale_y - offset_y);
-		return scale_coord;
-	}
+	*/	
 	
-	vec2 get_scaled_coords(vec2 pTexCoord, vec4 destsize, bool is_rotated){
-		if (!border_needed()) return pTexCoord;
-			//else
-		float scale_x = 1.0;
-		float scale_y = 1.0;
-		float offset_x = 0.0 ;
-		float offset_y = 0.0 ;
-		float in_aspect = get_in_aspect();
-		if (is_rotated) {
-			scale_y = destsize.x/(destsize.y / in_aspect );			
-			offset_y = (0.5 * scale_y ) - 0.5 ;
-		} else {
-			scale_x = destsize.x/(destsize.y * in_aspect);
-			offset_x = (0.5 * scale_x ) - 0.5 ;
-		}
+	
+		if (is_rotated)
+			destsize.xy=destsize.yx;
 
-		vec2 scale_coord=vec2(pTexCoord.x*scale_x - offset_x , pTexCoord.y*scale_y - offset_y);
+		if (destsize.x > (destsize.y*in_aspect)) {
+			// fit width
+			scale.x = destsize.x/(destsize.y * in_aspect);
+			offst.x = (0.5 * scale.x ) - 0.5 ;			
+		} else {
+			// fit height
+			scale.y = destsize.y/(destsize.x / in_aspect);
+			offst.y = (0.5 * scale.y ) - 0.5 ;
+		}	
+
+		vec2 scale_coord = pTexCoord * scale - offst;
 		return scale_coord;
 	}
 	
