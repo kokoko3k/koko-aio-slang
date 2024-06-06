@@ -115,7 +115,7 @@ float random_fast(float power, vec2 seed) {
 		}
 
 		vec2 scale_coord=vec2(pTexCoord.x*scale_x - offset_x , pTexCoord.y*scale_y - offset_y);
-		return scale_coord;
+		return scale_coord*2.0;
 	}
 
 	vec2 get_scaled_coords(vec2 pTexCoord, vec4 destsize, bool is_rotated){

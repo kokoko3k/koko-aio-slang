@@ -1086,10 +1086,9 @@ vec3 fn_pixel_content(vec2 coords) {
     //Pixel grid
         if (DO_PIXELGRID == 1.0) {
             //1264,20488,22262, 108.5
-            float vMax_inLum = mix(1.0, 
-                                   apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS) * max(IN_GLOW_POWER, 1.0), 
-                                   DO_CCORRECTION
-                                   );
+            float vMax_inLum = mix( 1.0, 
+                                    apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS) * max(IN_GLOW_POWER, 1.0), 
+                                    DO_CCORRECTION );
             //1266,20491,22282 108.4
             //float vMax_inLum = max( 1.0, DO_CCORRECTION * apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS)) *
             //                   max( 1.0, mix(1.0, IN_GLOW_POWER, DO_CCORRECTION));
