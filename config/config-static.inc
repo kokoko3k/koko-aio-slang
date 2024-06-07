@@ -152,6 +152,8 @@
 	//Temporal noise strength applied on green channel when green is dark over ambient lights (multiplied by NOISEPOWER)
 #define NOISEPOWER_AMBI_MUL 3.0
 
+// This is an attempt to improve preceived motion clarity by flickering the moving part of the game
+#define FLICKER_IN_MOTION 0.0
 
 
 // STATIC CONFIG ENDS HERE ##########################################################################################
