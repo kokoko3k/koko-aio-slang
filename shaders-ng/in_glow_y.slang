@@ -52,15 +52,13 @@ void main() {
    vInflation = (PIXELGRID_INFLATION * PIXELGRID_MAX_H * 0.25) * Inflation_delta * global.FinalViewportSize.y ;
    vInflation_offsets = vec2(0.0, +Inflation_delta); 
    
-   #ifndef D3D_WORKAROUND
-      bool rotated = (abs((global.final_passFeedbackSize.x/global.final_passFeedbackSize.y) - 
-                        (global.FinalViewportSize.x/global.FinalViewportSize.y)) > ar_tolerance);
-      if ( need_tate(rotated) == 1.0 ) {
-         Inflation_delta = params.OriginalSize.z * 0.5;
-         vInflation_offsets = vec2(+Inflation_delta, 0.0);
-         vInflation = (PIXELGRID_INFLATION * PIXELGRID_MAX_H * 0.25) * Inflation_delta * global.FinalViewportSize.x ;
-      }
-   #endif
+   bool rotated = is_rotated();
+   if ( need_tate(rotated) == 1.0 ) {
+      Inflation_delta = params.OriginalSize.z * 0.5;
+      vInflation_offsets = vec2(+Inflation_delta, 0.0);
+      vInflation = (PIXELGRID_INFLATION * PIXELGRID_MAX_H * 0.25) * Inflation_delta * global.FinalViewportSize.x ;
+   }
+
    
    
    
