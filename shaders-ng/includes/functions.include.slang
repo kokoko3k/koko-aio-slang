@@ -757,6 +757,7 @@ float random_fast(vec2 seed) {
 
 	#define ar_tolerance 0.005 //To compensate when comparing different A/R 
 	bool is_rotated() {
+		return params.Rotation != 0.0;
 		/*
 			For some reason, probably retroarch rotates the view only on final viewport stage, transparent to the shader passes,
 			The OutputSize of a pass that scales to viewport will have different aspect from the real final viewport.
@@ -764,7 +765,7 @@ float random_fast(vec2 seed) {
 			-->> This function only works if the calling pass scales to viewport.
 			This will fail for very particular cases, eg: when output window is extremely tall 
 		*/
-		return (abs((params.OutputSize.x/params.OutputSize.y) - (global.FinalViewportSize.x/global.FinalViewportSize.y)) > ar_tolerance);
+		//return (abs((params.OutputSize.x/params.OutputSize.y) - (global.FinalViewportSize.x/global.FinalViewportSize.y)) > ar_tolerance);
 	}
 
 	float get_in_aspect() {
