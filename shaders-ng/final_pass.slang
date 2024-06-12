@@ -1383,16 +1383,6 @@ void main() {
                 //pixel_under_content = pixel_ambi * (1-canvas_busy);
                 //pixel_under_content = pixel_ambi - canvas_busy * pixel_ambi; //ASM PROOF: FASTER
                 pixel_under_content = fma(vec3(-canvas_busy), pixel_ambi, pixel_ambi); //ASM PROOF: FASTER
-                
-                vec2 coords = co_content;
-
-    /*float shade_size = SERVICE1*0.1;
-    float gradient_start = 1-shade_size*0.75;
-    float gradient_end   = 1+shade_size;
-    vec2 gradients = 1-smoothstep(gradient_start-0.5, gradient_end-0.5,abs(coords-0.5));
-    float border = gradients.x * gradients.y;
-    //pixel_under_content *= vec3(1-border);
-      */          
             }
         }
 
