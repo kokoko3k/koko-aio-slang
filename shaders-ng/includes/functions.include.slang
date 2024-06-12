@@ -617,11 +617,16 @@ float random_fast(vec2 seed) {
 	
 	#define corner_aspect vec2(1.0,  0.75)
 	float fn_border(vec2 coord) {	
-		coord = min(coord, vec2(1.0) - coord) ; //* corner_aspect;
-		coord = GEOM_CORNER_SIZE - min(coord, GEOM_CORNER_SIZE);
-		float dist = length(coord);
-		return clamp(   ((GEOM_CORNER_SIZE - dist) + 0.75/GEOM_CORNER_SMOOTH )  *   GEOM_CORNER_SMOOTH, 0.0, 1.0);
+		//SIMD8 shader: 1271 instructions. 0 loops. 20568 cycles. 0:0 spills:fills, 23 sends, scheduled with mode top-down. Promoted 19 constants. Compacted 20336 to 15040 bytes (26%)
+		//SIMD16 shader: 1271 instructions. 0 loops. 22328 cycles. 0:0 spills:fills, 23 sends, scheduled with mode top-down. Promoted 19 constants. Compacted 20336 to 15040 bytes (26%)
+		coord = min(coord, vec2(1.0) - coord) * corner_aspect;
+		vec2 delta = GEOM_CORNER_SIZE - coord;
+		float dist = length(max(delta, vec2(0.0)));
+		float o = clamp( (GEOM_CORNER_SIZE - dist) * GEOM_CORNER_SMOOTH + 0.75, 0.0, 1.0);
+		return o;
 	}
+
+
 	
 	float border(vec2 coord) {
 		coord = (coord - vec2(0.5)) + vec2(0.5, 0.5);
