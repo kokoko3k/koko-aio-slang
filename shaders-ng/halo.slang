@@ -12,7 +12,7 @@ layout(location = 3) out float vDeltaRenderOk;
 
 vec2 radius_blur_adapt(vec2 bsize, vec4 sourcesize){
     vec2 r;
-    r.x = bsize.x / SCALEMOD_X;
+    r.x = bsize.x / BLOOM_AND_HALO_SCALE_FACTOR;
     r.y = r.x *  get_in_aspect();
     
 	float aspect = (sourcesize.x/sourcesize.y);
