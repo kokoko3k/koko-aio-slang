@@ -415,10 +415,14 @@ vec3 apply_fuzzy_main_pass_stage_2(vec3 pixel_in, vec2 stage1 ) {
 }
 
 vec2 offsets_from_float(float in_param, int range){
-    return vec2(  
-                  (int(in_param) % range) - range*0.5,
-                  floor(in_param / range) - range*0.5 
+	vec2 mul_factor = vec2(0.5);
+	//mul_factor.x = NEW_SCALEMOD_X * 2;
+    vec2 offsets = vec2(  
+                  (int(in_param) % range) - range* 0.5,
+                  floor(in_param / range) - range* 0.5
 	        );
+	offsets *= params.OutputSize.xy/vec2(NEW_SCALEMOD_REF_X, NEW_SCALEMOD_REF_Y)*0.5;
+	return offsets;
 }
 
 /*vec2 circles(float param, float c_radius, float aspect, float directions) {
