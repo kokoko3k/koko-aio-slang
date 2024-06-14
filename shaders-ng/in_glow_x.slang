@@ -113,6 +113,10 @@ void main() {
       in_glow_w_adapted = in_glow_w_adapted / NEW_SCALEMOD_X;
       
 
+   //Also, a little hacky adaption for when flick_and_noise_pass does not scale to 2X
+      if (params.OutputSize.xy == params.OriginalSize.xy)
+         in_glow_w_adapted*=1.5;
+      
    //Finally blur horizontally 
    if (glow_w_inside_interval == 1.0)  {
          FragColor = vec4(blur_select_wrap(shift_and_bleed_pass, vTexCoord, global.flick_and_noise_passSize, in_glow_w_adapted, (IN_GLOW_W >= 0.0) ), 
