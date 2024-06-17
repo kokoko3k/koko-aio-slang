@@ -304,10 +304,7 @@
 
 
 // #define DO_TILT  0.0
-// #define TILT_X  0.0
-// #define TILT_FOV  0.7
-// #define TILT_BEZEL_K  1.0
-
+// #define TILT_X  0.25
 
 // #define DELTA_RENDER_FORCE_REFRESH  4.0
 // #define DELTA_RENDER_CHECK_AREA  1.0

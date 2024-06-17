@@ -88,6 +88,11 @@
 	//Set it roughly to  (tube size / bezel total size)
 #define BEZEL_REFL_FADEOUT_START 0.90
 
+	//Values to adapt bezel tilting to content tilting.
+	//I'm not sure what they depends on; works fine on standard bezel tho.
+#define BEZEL_TILT_MULTIPLIER 1.23
+#define BEZEL_TILT_Y_SHIFT 0.32
+
 
 // AMBIENT LIGHT STATIC CONFIG ##########################################################################################
 

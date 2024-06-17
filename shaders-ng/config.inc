@@ -172,9 +172,9 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	
 	float DO_TILT;
 	float TILT_X;
-	float TILT_BEZEL_K;
-	float TILT_FOV;
-	
+											float placeholder1; //As usual this improves perfs here (?)
+											float placeholder2; //As usual this improves perfs here (?)
+
 	float AUTOCROP_MAX;
 	float AUTOCROP_MIN;
 	float AUTOCROP_SAMPLES;
@@ -593,10 +593,13 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter DO_GLOBAL_SHZO	 "★ Global shift/zoom enable? (zo) ==>"	0.0   0.0  1.0 	  1.0
 #pragma parameter GLOBAL_OFFX	 "        X axis shift "			0.0  -1.0  1.0    0.0005
 #pragma parameter GLOBAL_OFFY	 "        Y axis shift "			0.0  -1.0  1.0    0.0005
-#pragma parameter GLOBAL_ZOOM	 "        Zoom"					2.0   0.0  3.0    0.0005
+#pragma parameter GLOBAL_ZOOM	 "        Zoom"					1.2   0.0  3.0    0.0005
 #pragma parameter LABEL0029 " " 0.0 0.0 1.0 1.0
 
-
+//Tilt
+#pragma parameter DO_TILT	  	"★ Tilt enable? (ti) ==>"				0.0   0.0  1.0 	  1.0
+#pragma parameter TILT_X	  	"        Tilt along X axis"				0.25    -0.5  0.5  0.01
+#pragma parameter LABEL0035 " " 0.0 0.0 0.0 0.0
 
 //Aspect Ratio
 #pragma parameter label_ar	 "★ Aspect Ratio (as) "							1.0  1.0  1.0     0.0
@@ -639,13 +642,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter GAME_GEOM_OFF_FIX	  "        Sharp hack through offset (0.0=disable)"	0.0    0.0  100.0  1
 #pragma parameter LABEL0034 " " 0.0 0.0 0.0 0.0
 
-
-//Tilt
-#pragma parameter DO_TILT	  	"★ Tilt enable? (ti) ==>"				0.0   0.0  1.0 	  1.0
-#pragma parameter TILT_X	  	"        Tilt along X axis"		0.0    -0.5  0.5  0.01
-#pragma parameter TILT_FOV	  	"        Fov"					0.7    0.1	1.5   0.05
-#pragma parameter TILT_BEZEL_K	"        Bezel multiplier"		1.0    0.0  1.5  0.01
-#pragma parameter LABEL0035 " " 0.0 0.0 0.0 0.0
 
 //Delta render
 #pragma parameter LABEL0053    "  !THE FOLLOWING FEATURES ARE STATIC, SEE docs-ng.md TO ENABLE"    1.0 1.0 1.0 1.0

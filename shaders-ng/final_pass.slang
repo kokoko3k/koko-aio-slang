@@ -990,10 +990,12 @@ vec2 get_scaled_coords_for_bezel(vec2 co, float isrotated) {
     co = zoomout_coords(co, -BEZEL_FRAME_ZOOM); //FIXME COULD BE FASTER.
     co.y = zoom1D(co.y, BEZEL_ASPECT_CORRECTION );
 
-    if (DO_TILT == 1.0)
-        return tilt(co, isrotated, TILT_X * TILT_BEZEL_K);
-            else
+    if (DO_TILT == 1.0) {
+               
+        return tilt_bezel( co, isrotated, TILT_X);
+    } else {
         return co;
+    }
 }
 
 
@@ -1266,7 +1268,6 @@ void main() {
         if (DO_TILT == 1.0)
             co_content = tilt(co_content, vIsRotated, TILT_X);
 
-
     //Precalc Bezel coords, since it modifies content coords.
         vec2 co_bezel = vec2(0.0);
         if (DO_BEZEL == 1.0) {
@@ -1275,6 +1276,9 @@ void main() {
         }
 
 
+
+
+        
     //Curvature
         //Curvature has to come after inner zoom or bezel curved border will not match content
         //curved border when inner zoom changes.
