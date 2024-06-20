@@ -794,38 +794,67 @@ float random_fast(vec2 seed) {
 
 		vec2 scale = vec2(1.0);
 		vec2 offst = vec2(0.0);
-
-	/*	if (is_rotated) {
-			scale.y = destsize.x/(destsize.y / in_aspect );
-			offst.y = (0.5 * scale.y ) - 0.5 ;
-		} else {
-			//to fit width, use this:
-				scale.x = destsize.x/(destsize.y * in_aspect);
-				offst.x = (0.5 * scale.x ) - 0.5 ;
-				
-			//to fit height, use this:
-			//	scale.y = destsize.y/(destsize.x / in_aspect);
-			//	offst.y = (0.5 * scale.y ) - 0.5 ;
-		}
-	*/	
 	
 	
 		if (is_rotated)
 			destsize.xy=destsize.yx;
 
-		if (destsize.x > (destsize.y*in_aspect)) {
+		if (destsize.x > destsize.y*in_aspect) {
 			// fit width
 			scale.x = destsize.x/(destsize.y * in_aspect);
-			offst.x = (0.5 * scale.x ) - 0.5 ;			
 		} else {
 			// fit height
 			scale.y = destsize.y/(destsize.x / in_aspect);
-			offst.y = (0.5 * scale.y ) - 0.5 ;
 		}	
+
+	
+		offst = 0.5 * scale - 0.5;
+		vec2 scale_coord = pTexCoord * scale - offst;
+		return scale_coord;
+	}
+
+	
+	vec2 get_scaled_coords_aspect_fgbg(vec2 pTexCoord, vec4 destsize, float aspect_image , bool is_rotated, float aspect_content){
+		
+		if (!border_needed()) return pTexCoord;
+
+		vec2 scale = vec2(1.0);
+		vec2 offst = vec2(0.0);
+	
+		if (is_rotated)
+			destsize.xy=destsize.yx;
+
+		vec2 off_adj = vec2(0.0);
+		
+		if (destsize.x > destsize.y*aspect_content) {
+			// fit width
+			scale.x = destsize.x/(destsize.y * aspect_image);
+						
+			off_adj.x = -BG_IMAGE_OFFX *
+						 (1 - destsize.x/destsize.y) /
+						 aspect_image /
+						 BG_IMAGE_ZOOM;
+		} else {
+			// fit height
+			scale.x = aspect_content * (1.0/aspect_image);
+			scale.y = (destsize.y/destsize.x) * aspect_content ;			  
+			
+			off_adj.x = -BG_IMAGE_OFFX *
+						(1-aspect_content) /
+						aspect_image /
+						BG_IMAGE_ZOOM;
+			
+			off_adj.y = -BG_IMAGE_OFFY *
+			             (1 - (destsize.y*aspect_content)/destsize.x) /
+			             BG_IMAGE_ZOOM;
+		}	
+		
+		offst = 0.5 * scale + off_adj - 0.5;
 
 		vec2 scale_coord = pTexCoord * scale - offst;
 		return scale_coord;
 	}
+
 	
 	vec2 integer_scale(vec2 in_coords, float target_aspect, bool is_rotated, float do_tate, float uncorrected_aspect) {
 

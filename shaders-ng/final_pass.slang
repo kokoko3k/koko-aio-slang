@@ -1013,7 +1013,7 @@ vec4 fn_pixel_fgbg_image(sampler2D smp) {
     //bool rotated = bool(vIsRotated) || BG_IMAGE_ROTATION > 4.5;
     bool rotated = BG_IMAGE_ROTATION > 3.5;
 
-    vec2 back_coords = get_scaled_coords_aspect(vBg_img_coords, global.FinalViewportSize, tex_size.x/tex_size.y, rotated);
+    vec2 back_coords = get_scaled_coords_aspect_fgbg(vBg_img_coords, global.FinalViewportSize, tex_size.x/tex_size.y, rotated, vIn_aspect);
 
 
     float bg_over_lod = log2(tex_size.y * global.FinalViewportSize.w);
