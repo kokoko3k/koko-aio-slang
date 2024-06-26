@@ -656,10 +656,6 @@
     #define DOT_M_MBLUR_MODE	global.DOT_M_MBLUR_MODE
 #endif
 
-#ifndef DOT_M_MULTIPLY
-    #define DOT_M_MULTIPLY  	global.DOT_M_MULTIPLY
-#endif
-
 #ifndef DOT_M_SHADOW_STR
     #define DOT_M_SHADOW_STR	global.DOT_M_SHADOW_STR
 #endif

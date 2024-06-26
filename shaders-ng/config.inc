@@ -385,7 +385,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter TATE                     "★ Tate mode (0:disabled 1:auto 2:forced)"		1.0 	0.0 2.0 1.0
 #pragma parameter LABEL0012 " " 0.0 0.0 0.0 0.0
 
-#pragma parameter RESSWITCH_GLITCH_SIZE		"★ Glitch if vertical resolution changes"		0.1		0.0 0.5 0.05
+#pragma parameter RESSWITCH_GLITCH_SIZE		"★ Glitch amount if vertical resolution changes"		0.1		0.0 0.5 0.05
 #pragma parameter LABEL0013 " " 0.0 0.0 0.0 0.0
 
 #pragma parameter LABEL_INTERLACE           "★ Hi-resolution scanlines handling" 1.0 1.0 1.0 0.0
@@ -469,7 +469,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter DOT_M_MBLUR_MODE  "           . Inertia on: both,white,black"	0.0  0.0 2.0 1.0
 #pragma parameter DOT_M_SHADOW_STR  "        Shadow strength (disables deconvergence)"	0.0  0.0 1.0 0.01
 #pragma parameter DOT_M_SHADOW_OFF  "           . Shadow offset"								0.0  -1.0 1.0 0.01
-#pragma parameter DOT_M_MULTIPLY	"        Multiply factor (debug)"		1.0  1.0 50.0 1.0
 #pragma parameter LABEL0020 " " 0.0 0.0 0.0 0.0
 
 
@@ -515,7 +514,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 //Bezel related
 #pragma parameter DO_BEZEL	      "★ Bezel enable? (be) ==>"				0.0   0.0 1.0 1.0
 #pragma parameter BEZEL_USE_STRAIGHT  "        Straight"				0.0	0.0 1.0  1.0 
-#pragma parameter BEZEL_INNER_ZOOM    "        Inner zoom (ignored if integer scaled)"	-0.18   -1.5 0.5 0.001
+#pragma parameter BEZEL_INNER_ZOOM    "        Inner zoom (ignored with integer scaling)"	-0.18   -1.5 0.5 0.001
 #pragma parameter BEZEL_FRAME_ZOOM    "        Frame zoom"				0.0   -1.5 0.5 0.001
 #pragma parameter BEZEL_R             "        Color: Red"				-0.35   -1.0 1.0  0.005
 #pragma parameter BEZEL_G             "        Color: Green"				-0.35  -1.0 1.0  0.005
@@ -550,7 +549,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 //Backdrop image
 #pragma parameter DO_BACKDROP		"★ Backdrop mirrored image enable? ==>"		 0.0  0.0  1.0     1.0
 #pragma parameter BACKDROP_OFFX		"        Shift backdrop over X axis"				 0.0  -1.0  1.0    0.0005
-#pragma parameter BACKDROP_OFFY 	"        Shift backdrop over X axis"				 0.0  -1.0  1.0    0.0005
+#pragma parameter BACKDROP_OFFY 	"        Shift backdrop over Y axis"				 0.0  -1.0  1.0    0.0005
 #pragma parameter BACKDROP_ZOOM 	"        Zoom backdrop"					 1.0  -1.0  3.0    0.0005
 #pragma parameter LABEL0026 " " 0.0 0.0 0.0 0.0
 

@@ -790,8 +790,6 @@ vec4 fn_pixel_dotmat(vec2 coords, vec3 pixel_in) {
     //Base angle, depends on original size:
         vec2 angle_base = coords * pi * params.OriginalSize.xy; //FIXME here we want .yy to make integer scaling
 
-    //Zoom to debug:
-        angle_base/=DOT_M_MULTIPLY;
 
     //Set the grid sharpness from vertex shader:
         float s_grid = vDotMat_Grid_Sharpness;
