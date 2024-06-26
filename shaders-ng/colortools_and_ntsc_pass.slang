@@ -500,7 +500,7 @@ void main() {
    pixel_out = max(pixel_out, vec3(0.0));
    
 
-      pixel_out.rgb = pow(pixel_out.rgb, vec3(PIXELGRID_INTR_GAMMA_ADJ));
+   pixel_out.rgb = pow(pixel_out.rgb, vec3(vPixelgrid_intr_gamma_adj));
         
    artifact_mask = clamp(artifact_mask, 0.0, 1.0);
    FragColor = vec4(pixel_out, artifact_mask);
