@@ -505,6 +505,10 @@ bool scanline_have_to_flicker(bool is_interlaced) {
     return ((scanline_flickering == 1.0) || ((scanline_flickering==2.0) && is_interlaced ));
 }
 
+bool scanlines_will_alternate(bool is_interlaced) {
+	return is_interlaced && PIXELGRID_INTR_DISABLE_Y != 2.0;
+}
+
 bool pixelgrid_h_needed() {
 	return DO_PIXELGRID > 0.0 && DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && is_interlaced() );
 }

@@ -148,6 +148,7 @@
 // #define LABEL_INTERLACE  0.0
 // #define MIN_LINES_INTERLACED  380.0
 // #define PIXELGRID_INTR_DISABLE_Y  -1.0
+// #define PIXELGRID_INTR_GAMMA_ADJ 0.9
 // #define LabelDescIntlScan1  0.0
 // #define LabelDescIntlScan2  0.0
 // #define PIXELGRID_INTR_FLICK_MODE  2.0

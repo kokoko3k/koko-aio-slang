@@ -202,7 +202,7 @@ void main() {
             vScanlinePeriod = 1.0; //Base 1x period
             vInterlace_offset = 0.0; //No interlace
 
-            if (bIs_Interlaced && PIXELGRID_INTR_DISABLE_Y != 2.0) {
+            if (scanlines_will_alternate(bIs_Interlaced))  {
                 //Halve the scanline period, since they will interlace:
                 vScanlinePeriod = 0.5;
                 //Alternate scanlines on even/odd frames

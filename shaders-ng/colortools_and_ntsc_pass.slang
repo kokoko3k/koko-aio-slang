@@ -46,8 +46,9 @@ layout(location = 1) out vec3 vTemperature_rgb;
 layout(location = 0) out vec2 vTexCoord;
 layout(location = 2) out float vNTSC_FILTER_FC;
 layout(location = 3) out float vSubcarrierFrequency_mul_size_mul_TAU;
-layout(location = 4) out float vNTSC_weights[NTSC_FILTER_WIDTH_MAX];
-  
+layout(location = 4) out float vPixelgrid_intr_gamma_adj;
+layout(location = 5) out float vNTSC_weights[NTSC_FILTER_WIDTH_MAX];
+
 
 #include "includes/functions.include.slang"
 
@@ -105,6 +106,12 @@ void main() {
    }
    if (TEMPERATURE != 6500)
       vTemperature_rgb = kelvin2rgb(TEMPERATURE);
+   
+   //interlaced scanline brightness compensation
+      vPixelgrid_intr_gamma_adj = 1.0;
+      if (pixelgrid_h_needed() && scanlines_will_alternate(is_interlaced()))
+          vPixelgrid_intr_gamma_adj = PIXELGRID_INTR_GAMMA_ADJ;
+   
 }
 
 
@@ -116,7 +123,8 @@ layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in vec3 vTemperature_rgb;
 layout(location = 2) in float vNTSC_FILTER_FC;
 layout(location = 3) in float vSubcarrierFrequency_mul_size_mul_TAU;
-layout(location = 4) in float vNTSC_weights[NTSC_FILTER_WIDTH_MAX];
+layout(location = 4) in float vPixelgrid_intr_gamma_adj;
+layout(location = 5) in float vNTSC_weights[NTSC_FILTER_WIDTH_MAX];
 
 
 layout(location = 0) out vec4 FragColor;
@@ -490,6 +498,10 @@ void main() {
    //Clamp artifacts to 0..1
    //Clamp RGB to 0..1000.0
    pixel_out = max(pixel_out, vec3(0.0));
+   
+
+      pixel_out.rgb = pow(pixel_out.rgb, vec3(PIXELGRID_INTR_GAMMA_ADJ));
+        
    artifact_mask = clamp(artifact_mask, 0.0, 1.0);
    FragColor = vec4(pixel_out, artifact_mask);
 

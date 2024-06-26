@@ -180,12 +180,18 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
         With values > 1.0, it will consider a frame as Hi-resolution if the lines number is above the configured value.
 
     Hi-Res scanlines type
-      -1: Use a number of scanlines that perfectly fits the screen, a good glitches/moire free tradeoff.
-      -2: As above, but tighter (~1.5x), another good glitches/moire free tradeoff.
-       0: Use interlaced scanlines, may need >1080p screen to avoid moire or weavy glitches
-       1: Avoid drawing scanlines gaps at all.
-       2: Use scanlines, but don't interlace them (bad for 1080p and lower resolutions)
-
+       -1: Use a number of scanlines that perfectly fits the screen, a good glitches/moire free tradeoff.
+       -2: As above, but tighter (~1.5x), another good glitches/moire free tradeoff.
+        0: Use interlaced scanlines, may need >1080p screen to avoid moire or weavy glitches
+        1: Avoid drawing scanlines gaps at all.
+        2: Use scanlines, but don't interlace them (bad for 1080p and low resolutions)
+        
+    Interlaced scanlines brighness push
+        When emulating interlaced scanlines (see above modes: -1, -2, 0),
+        the resulting brightness is usually diminished.
+        *Lowering* this parameter will compensate that.
+        Values around 0.8 to 0.95 usually work good.
+       
     Scanlines flicker (0=off,1=on,2=if Hi-res):
         This setting emulates the flickering issues present on crt interlaced screens
         where the brighter lines flickers when they are near dark ones.
