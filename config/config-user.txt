@@ -124,7 +124,7 @@
 
 // #define MIN_LINES_INTERLACED  380.0     //     . Consider Hi-Resolution above # lines (0=never):
 // #define PIXELGRID_INTR_DISABLE_Y  -1.0  //     . Hi-Res scanlines type (read docs):
-// #define PIXELGRID_INTR_GAMMA_ADJ 0.9    //     . Interlaced scanlines brighness push (less is more)
+// #define PIXELGRID_INTR_GAMMA_ADJ 0.9    //     . Interlaced brighness push (less is more, not for OLEDs)
 // #define PIXELGRID_INTR_FLICK_MODE  2.0  //     . Scanlines flicker (0=off,1=on,2=if Hi-Res)
 // #define PIXELGRID_INTR_FLICK_POWR  0.25 //         . Flicker power
 

@@ -186,12 +186,15 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
         1: Avoid drawing scanlines gaps at all.
         2: Use scanlines, but don't interlace them (bad for 1080p and low resolutions)
         
-    Interlaced scanlines brighness push
+    Interlaced brighness push
         When emulating interlaced scanlines (see above modes: -1, -2, 0),
         the resulting brightness is usually diminished.
-        *Lowering* this parameter will compensate that.
-        Values around 0.8 to 0.95 usually work good.
-       
+        This is due to the latency some panels have when changing open/close state.
+        *Lowering* this parameter compensates that and usually
+        Values around 0.8 to 0.95 usually work good, for affected monitors.
+        On low latency panels such as OLEDs, microleds, this is not an issue,
+        so you should keep it to 1.0, possibly locking its value too in config-user.txt
+         
     Scanlines flicker (0=off,1=on,2=if Hi-res):
         This setting emulates the flickering issues present on crt interlaced screens
         where the brighter lines flickers when they are near dark ones.

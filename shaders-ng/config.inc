@@ -362,6 +362,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter PPERSISTENCE_END      "        Late Persistence"		0.5 	 0.0 2.0 0.05
 #pragma parameter LABEL0009 " " 0.0 0.0 0.0 0.0
 
+
 //Deconvergence
 #pragma parameter DO_SHIFT_RGB       "★ Deconvergence enable? (de) ==>"	0.0	 0.0 1.0 1.0
 #pragma parameter OFFSET_STRENGTH "        Strength"			0.6 	 0.0 1.0 0.05
@@ -393,7 +394,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter PIXELGRID_INTR_DISABLE_Y  "    . Hi-Res scanlines type (read docs):"   -1.0 -2.0 2.0 1.0
 #pragma parameter LABEL0036                 "      (-2: Faker-Interlaced, -1: Fake-Interlaced)"          0.0 0.0 0.0 0.0
 #pragma parameter LABEL0037                 "      ( 0: Interlaced, 1: No scanlines, 2: Don't interlace)" 0.0 0.0 0.0 0.0
-#pragma parameter PIXELGRID_INTR_GAMMA_ADJ  "    . Interlaced scanlines brighness push (less is more)" 0.9 0.5 1.0 0.01
+#pragma parameter PIXELGRID_INTR_GAMMA_ADJ  "    . Interlaced brighness push (less is more, not for OLEDs)" 0.9 0.5 1.0 0.01
 #pragma parameter PIXELGRID_INTR_FLICK_MODE "    . Scanlines flicker (0=off,1=on,2=if Hi-Res)"			2.0 	0.0 2.0 1.0
 #pragma parameter PIXELGRID_INTR_FLICK_POWR "        . Flicker power"		  		0.12 	0.0 8.0 0.01
 
