@@ -23,7 +23,6 @@
 	#define LCD_ANTIGHOSTING 0.0
 
 
-
 // APPEARANCE SETTINGS ////////////////////////////////////////////////////////
 
 // Haloing happens on a scanlined/gapped image or not

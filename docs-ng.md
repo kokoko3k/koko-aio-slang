@@ -1,5 +1,8 @@
 **koko-aio-slang documentation**
 
+**REQUIREMENT***
+    koko-aio needs at least retroarch 1.16
+
 **RETROARCH OUTPUT DRIVERS**
     koko-aio does not work by default on d3d12 and d3d11.<br>
     If you absolutely need it (Xbox?), you can edit the file 

@@ -1341,9 +1341,7 @@ void main() {
     //Draw content only over the alpha mask, and sample ambientlight outside it to spare gpu cycles.
         if (canvas_busy > 0.5) {
             pixel_out = fn_pixel_content(co_content) * canvas_busy;
-            
-            //pixel_out = adaptive_strobe_checkerboard(pixel_out, vOutputCoord, global.FinalViewportSize.xy);
-            
+                      
             #ifndef D3D_WORKAROUND
                 if (LCD_ANTIGHOSTING > 0.0) {
                     vec3 feedback = texture(final_passFeedback, vOutputCoord).rgb;
@@ -1437,6 +1435,10 @@ void main() {
                     pixel_out += smoothstep_fast(S_SIZE * 0.90 ,0.0,dist) * (S_POWER * 1.125 * canvas_bezel_screen);
                     //pixel_out = mix(pixel_out, vec3(1.0), smoothstep(S_SIZE,0.0,dist) * S_POWER * canvas_bezel_screen); //<-- this is a bit slower, but more realistic.
             }
+            //CONTENT STROBING
+            //pixel_out = adaptive_strobe_checkerboard(pixel_out, vOutputCoord, global.FinalViewportSize.xy);
+            //pixel_out = adaptive_strobe(pixel_out);
+            //pixel_out = strobe(pixel_out);  
     }
         //Background image have, no need to paint if not in the outer border:
             if (DO_BG_IMAGE == 1.0 && BG_IMAGE_OVER == 0.0 && canvas_busy < 1.0) {

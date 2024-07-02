@@ -1565,8 +1565,19 @@ vec4 PG_get_hmask_preset_unfloored() {
 
 }
 
+vec3 strobe( vec3 c) {
+    #define STRENGTH_1 0.075 //effect strength
+
+    if (mod(params.FrameCount, 2.0 ) == 0.0) {
+       return c * (1+STRENGTH_1);
+    }else {
+       return c * (1-STRENGTH_1);
+    }
+}
+
+
 vec3 adaptive_strobe( vec3 c) {
-    #define STRENGTH 1.0; //effect strength
+    #define STRENGTH 0.1375; //effect strength
     #define BRIGHT_BIAS 1.0 //brightness compensation
     #define CONTRAST_COMPENSATION 0.5 //maximum contrast compensation
     #define GAIN_COMPENSATION 0.5 //maximum gain compensation
