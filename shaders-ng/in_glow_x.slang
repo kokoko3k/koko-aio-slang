@@ -74,16 +74,15 @@ void main() {
       
       //To debug ntsc artifacts mask:
       if (vShowArtifactsMask == 1.0) {
-         FragColor = vec4(ntsc_artifacts);
+         FragColor.rgb = vec3(ntsc_artifacts);
          return;
       }
    
    //Don't do anything if IN_GLOW_H is are over the upper limit
    //and IN_GLOW_W is outside the allowed interval;
       if ( glow_h_and_w_outside_interval == 1.0) {
-         vec4 passthrough = texture(shift_and_bleed_pass, vTexCoord);
-         //Delta render?
-         FragColor = passthrough;
+         //passthrough
+         FragColor.rgb = texture(shift_and_bleed_pass, vTexCoord).rgb;
          return;
       }
       
@@ -119,10 +118,9 @@ void main() {
       
    //Finally blur horizontally 
    if (glow_w_inside_interval == 1.0)  {
-         FragColor = vec4(blur_select_wrap(shift_and_bleed_pass, vTexCoord, global.flick_and_noise_passSize, in_glow_w_adapted, (IN_GLOW_W >= 0.0) ), 
-                          0.0);
+      FragColor.rgb = blur_select_wrap(shift_and_bleed_pass, vTexCoord, global.flick_and_noise_passSize, in_glow_w_adapted, (IN_GLOW_W >= 0.0));
    } else {
-      FragColor = vec4(texture(shift_and_bleed_pass, vTexCoord).rgb, 0.0);
+      FragColor.rgb = texture(shift_and_bleed_pass, vTexCoord).rgb;
    }
 
    
