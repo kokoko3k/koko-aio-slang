@@ -1545,6 +1545,6 @@ void main() {
             pixel_out = 1-pixel_out;//;-clip;
     #endif
 
-    FragColor = vec4(pixel_out, 1.0);
+    FragColor.rgb = pixel_out;
     
 }
