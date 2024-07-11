@@ -1361,8 +1361,7 @@ void main() {
             #ifndef D3D_WORKAROUND
                 if ( HALVE_BORDER_UPDATE == 1.0 ) {
                     if ((params.FrameCount % 2) != 1.0) {
-                        pixel_out = texture(final_passFeedback, vOutputCoord).rgb;
-                        FragColor = vec4(pixel_out, 1.0);
+                        FragColor.rgb = texture(final_passFeedback, vOutputCoord).rgb;
                         return;
                     }
                 }
