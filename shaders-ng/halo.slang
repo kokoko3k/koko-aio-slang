@@ -63,7 +63,7 @@ void main() {
     
     //Pass the right texture unchanged for tighter blurs:
     if (HALO_SHARPNESS >= GLOW_SHARP_MAX) {
-        FragColor = vec4( pow(texture(Source, vTexCoord).rgb * vHALO_POWER,  vec3(HALO_GAMMA_OUT)), 0.0) ;
+        FragColor.rgb = pow(texture(Source, vTexCoord).rgb * vHALO_POWER,  vec3(HALO_GAMMA_OUT));
         return;
     }
     
@@ -72,6 +72,6 @@ void main() {
 
     pixel_haloed =  pow(pixel_haloed, vec3(HALO_GAMMA_OUT));
     
-    FragColor = vec4(pixel_haloed.rgb, 0.0);
+    FragColor.rgb = pixel_haloed;
     
 }
