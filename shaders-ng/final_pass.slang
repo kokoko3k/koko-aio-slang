@@ -1255,8 +1255,8 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
 
     //Diffuse the light over specular areas, we use a mipmap with low precision.
         if (lut_specular > 0.0) {
-            vec4 pixel_avglum = texture(avglum_pass, coords_for_mirror);
-            bezel_out = bezel_out + (pixel_avglum.rgb * lut_specular) ;
+            vec3 pixel_avglum = texture(avglum_pass, coords_for_mirror).rgb;
+            bezel_out = bezel_out + (pixel_avglum * lut_specular) ;
         }
 
     return vec4(bezel_out, bezel_in.a);
