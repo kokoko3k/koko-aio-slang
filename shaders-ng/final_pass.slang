@@ -1130,11 +1130,16 @@ vec3 fn_pixel_content(vec2 coords) {
 
                 pixel_out += pixel_haloed;
             } else {
-                vec3 pixel_haloed = texture(halo_pass, halo_coords).rgb;
+                vec3 pixel_haloed = texture(halo_pass, halo_coords).rgb;                
                 //Halo only on scanlines:
-                pixel_out += pixel_haloed * dot_mat_or_pixelgrid ;
+                //pixel_out += pixel_haloed * dot_mat_or_pixelgrid ;
                 //Halo over scanlines gap too:
-                pixel_out += (pixel_haloed * HALO_VS_SCAN) * (1 - dot_mat_or_pixelgrid) ;
+                //pixel_out += (pixel_haloed * HALO_VS_SCAN) * (1 - dot_mat_or_pixelgrid) ;
+                
+                //ASM proof faster: less operations/cycles:
+                //p=p+h⋅(m+b⋅(1−m))
+                pixel_out = pixel_out + pixel_haloed * (dot_mat_or_pixelgrid + HALO_VS_SCAN * (1-dot_mat_or_pixelgrid));
+                
             }
 
         }
