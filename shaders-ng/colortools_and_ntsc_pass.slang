@@ -76,7 +76,12 @@ float sinc(float x) {
 
 void main() {
    gl_Position = global.MVP * Position;
-   vTexCoord = TexCoord * 1.0001;
+   //vTexCoord = TexCoord * 1.0001;
+   //Since we are using linear filtering versus the previous (Original) pass, we whould not use *1.0001,
+   //and we *need* linear filtering for deltarender purposes (see koko-aio-ng.slangp comments)
+   //Or else the picture will be slightly blurred (visible only when output gamma is low).
+   //Let's hope this will not break anything (classic diagonally broken screen).
+   vTexCoord = TexCoord;
 
    if (DO_GAME_GEOM_OVERRIDE > 0.5) {
       vec2 shift = vec2(GAME_GEOM_HSHIFT,GAME_GEOM_VSHIFT);

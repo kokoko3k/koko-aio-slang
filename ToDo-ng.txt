@@ -136,4 +136,5 @@ TODO:
 	[ ] Why bezel does not scale correctly when using integer scale?
 	[ ] why blink debug option does not trig scene change when going from 0.2 to 1.0?
 	[ ] joind dynamic zoom and override zoom into one zoom?
-	
+	[ ] Unexcited phosphor grid is not dependant on hmask strength.
+	    easy but not mandatory to fix, it would costs performance and need presets update, unsure what to do.
