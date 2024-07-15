@@ -18,9 +18,9 @@
 
 
 //#define DEBUG
-   #define DEBUG_COLOR_CALIB
+   //#define DEBUG_COLOR_CALIB
    //#define DEBUG_TIME_FADE
-   //#define DEBUG_SOLID_COLOR
+   #define DEBUG_SOLID_COLOR
    //#define DEBUG_STEP_GRADIENT
    //#define DEBUG_STEP_GRADIENT_V
    //#define DEBUG_BLINK
@@ -508,12 +508,6 @@ void main() {
    pixel_out.rgb = pow(pixel_out.rgb, vec3(vPixelgrid_intr_gamma_adj));
         
    artifact_mask = clamp(artifact_mask, 0.0, 1.0);
-   
-   if (DO_VIGNETTE == 1.0) {
-      vec2 sinco = cos((vTexCoord-0.5) / V_SIZE) ;
-      pixel_out = (pixel_out * V_POWER) * (sinco.y * sinco.x);
-   }
-   
    FragColor = vec4(pixel_out, artifact_mask);
 
 }
