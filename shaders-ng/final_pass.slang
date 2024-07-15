@@ -1372,10 +1372,10 @@ void main() {
                 pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb ;
                 
                 if (DO_BG_IMAGE != 1.0) {
-                    const float noise_power = NOISEPOWER * NOISEPOWER_AMBI_MUL;
+                    const float noise_power = -NOISEPOWER * NOISEPOWER_AMBI_MUL;
                     float dynamicseed = mod(params.FrameCount, 30.0001);
-                    float anoise1 = random_fast(vTexCoord*dynamicseed);
-                    anoise1 = scale_to_range(anoise1, -noise_power, noise_power);
+                    float anoise1 = random_fast(vTexCoord*dynamicseed) * noise_power;
+
                     // anoise1 *=  (1 - pixel_ambi.g);
                     //anoise1 =  (anoise1 - anoise1 * pixel_ambi.g); //ASM PROOF FASTER
                     anoise1 =  fma(-anoise1, pixel_ambi.g, anoise1); //ASM PROOF FASTER
@@ -1423,8 +1423,7 @@ void main() {
 
         //Vignette
             if (DO_VIGNETTE == 1.0) {
-                float spot_vignette_noise = random_fast(vTexCoord);
-                spot_vignette_noise = scale_to_range(spot_vignette_noise, -NOISEPOWER, NOISEPOWER);
+                float spot_vignette_noise = random_fast(vTexCoord) * (NOISEPOWER*2);
                 vec2 sinco = cos((co_content-0.5) / V_SIZE) ;
                 pixel_out = (pixel_out * V_POWER) * (sinco.y * sinco.x) + spot_vignette_noise;
             }
