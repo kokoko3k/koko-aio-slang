@@ -49,14 +49,14 @@ void main() {
    vDeltaRenderOk = is_deltarender_allowed(bIs_Interlaced); //carries DR mandatory conditions, including forced refreshed frames
 
    float Inflation_delta = params.OriginalSize.w * 0.5;
-   vInflation = (PIXELGRID_INFLATION * PIXELGRID_MAX_H * 0.25) * Inflation_delta * global.FinalViewportSize.y ;
+   vInflation = (PIXELGRID_INFLATION * PIXELGRID_MAX_H) * 0.6;
    vInflation_offsets = vec2(0.0, +Inflation_delta); 
    
    bool rotated = is_rotated();
    if ( need_tate(rotated) == 1.0 ) {
       Inflation_delta = params.OriginalSize.z * 0.5;
       vInflation_offsets = vec2(+Inflation_delta, 0.0);
-      vInflation = (PIXELGRID_INFLATION * PIXELGRID_MAX_H * 0.25) * Inflation_delta * global.FinalViewportSize.x ;
+      vInflation = (PIXELGRID_INFLATION * PIXELGRID_MAX_H) * 0.6;
    }
 
    
