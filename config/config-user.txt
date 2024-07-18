@@ -114,6 +114,9 @@
 // #define IN_GLOW_SPREAD_SHARPNESS    //         Glow light sharpness
 // #define IN_GLOW_W  -0.80000         //         Sharp X (neg=use BOX unsharp)
 // #define IN_GLOW_H  7.0              //         Sharp Y (neg=use BOX unsharp)
+// #define IN_GLOW_WARPSHARP_X 0.4     //         Warpsharp glow (X)
+// #define IN_GLOW_WARPSHARP_Y 0.4     //         Warpsharp glow (Y)
+// #define IN_GLOW_WARPSHARP_GAMMA 1.0 //         Warpsharp Dynamics
 
 
 // #define TATE  1.0                   // ★ Tate mode (0:disabled 1:auto 2:forced)
@@ -137,7 +140,6 @@
 // #define PIXELGRID_COREY_FAKE_SCAN  0.0  // 
 // #define PIXELGRID_MIN_H  0.3            //          . Fake integer scanlines (-1=auto)
 // #define PIXELGRID_MAX_H  0.7            //          . Phosphors height Max
-// #define PIXELGRID_INFLATION 0.5         //          . Inflation Strength
 // #define PIXELGRID_GAMMA_H  5.2          //          . Phosphors height min->max gamma:
 // #define PIXELGRID_NO_INTERBLEED_H  1.0  //          . Inter line extra steepness (1.0 to disable)
 // #define PIXELGRID_H_ANTIMOIRE  0.0      //          . Anti-moire sweet spot (disables Y deconvergence)

@@ -21,7 +21,6 @@
         * CRT glitch on resolution changes <br>
         * Adaptive Black <br>
         * CVBS Bleed size is limited to 5.0
-        * Scanlines inflation when using tate mode
         * Ambientlight scene change detection
         * Halving border updates refresh
         * Lcd antighosting
@@ -137,18 +136,18 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
 
     Early decay: is the immediate light cut after the phosphor is no more/less excited.
     Late persistence: modulates the time the residual light will stay on screen
-    
-    
+
+
 **Deconvergence:**<br>
     Shift R,G,B components separately to mimic channel deconvergence.<br>
     By varying Red, Green and Blue offsets, the relative component will be<br>
     shifted column by column, row by row.<br>
-    
+
 **Glow/Blur:**<br>
     Emulate the CRT glowing "feature", so that the brighter areas of<br>
     the image will light their surroundings,<br>
     with options to switch to classic blur.<br>
-    
+
     Glow to blur bias:
         Higher negative values -> more glow : brighter colors expands over darker ones.
         Higher positive values -> means blur: all the colors are blurred.
@@ -157,13 +156,24 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
         The higher, the more the bright colors will smoothly expand.
         It emulates the natural antialiasing you see on CRTs on bright areas.
         More pronunced as "Glow to blur bias" approaches 0.
-        
+
     Sharpness (horizontal, vertical):
         Modulates the sharpness of the image.
         - Max (actually 7.0) will not alter the image sharpness.
         - More than 0: will use gauss blur
         - Less than 0: will use box blur and will progressively
           add visual sharpness to image when approaching lower values.
+
+    Warpsharp glow (X,Y):
+        Embolden bright pixels near dark ones using a warpsharp like algorithm.
+        This is a cheap way to emulate phosphor glowing.
+        The Y parameter will also allow scanlines to be higher.
+        It will also help (if coupled with) FXAA to stay sharp.
+
+    Warpsharp Dynamics:
+        Change the amount of warpsharp applied based on the contrast between 
+        nearby pixels, thereby altering their "Warpsharped" shape.
+
 
 **Tate mode:**<br>
     Rotates mask and scanlines by 90°<br>
@@ -234,8 +244,6 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
               The decision will be based on the ratio of output dimensions and the core.
         Phosphors height Min, Max:
             Try to keep scanline height between those values, depending on content brightness.
-        Inflation Strength:
-            Scanlines appear as inflated depending on the pixel brightness.
         Phosphors width min->max gamma:
             Since emulating phosphors with high Min-Max range changes the apparent gamma of the final image,
             it is advised, if needed, to use this option to compensate, instead of the main gamma correction.

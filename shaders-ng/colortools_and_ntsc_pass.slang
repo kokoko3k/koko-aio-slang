@@ -425,6 +425,7 @@ void main() {
    if (DO_NTSC_ARTIFACTS > 0.5) {
       //Get ntsc picture
          vec4 ntsc_decoded = ntscdec(co, pixel_in);
+         //vec4 ntsc_decoded = ntscdec(co * 1.0001, pixel_in); //<-- for the next commit
       //apply the minimum treshold to artifact mask
          artifact_mask = smoothstep_fast(NTSC_ARTF_TRSH , 1.0, ntsc_decoded.a);
 

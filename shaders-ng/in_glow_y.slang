@@ -48,15 +48,20 @@ void main() {
    bool bIs_Interlaced = is_interlaced();
    vDeltaRenderOk = is_deltarender_allowed(bIs_Interlaced); //carries DR mandatory conditions, including forced refreshed frames
 
+   float inflation_scale = 1.0;
+   if (DO_PIXELGRID > 0.0 && DO_PIXELGRID_H > 0.0)
+      inflation_scale = PIXELGRID_MAX_H;
+   
+
+   vInflation = (IN_GLOW_WARPSHARP_Y * inflation_scale) * 0.6 / 1400.0 * 3.0;   //*3.0 needed because we scale to 0->1 to use pow in the fragment.
+
    float Inflation_delta = params.OriginalSize.w * 0.5;
-   vInflation = (PIXELGRID_INFLATION * PIXELGRID_MAX_H) * 0.6;
    vInflation_offsets = vec2(0.0, +Inflation_delta); 
    
    bool rotated = is_rotated();
    if ( need_tate(rotated) == 1.0 ) {
       Inflation_delta = params.OriginalSize.z * 0.5;
       vInflation_offsets = vec2(+Inflation_delta, 0.0);
-      vInflation = (PIXELGRID_INFLATION * PIXELGRID_MAX_H) * 0.6;
    }
 
    
@@ -147,23 +152,29 @@ void main() {
 
      }
    }
-   float max_inLum = max( 1.0, DO_CCORRECTION * apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS));
-   //Scanlines (over)inflation.
+   
+   //y Warpsharp 
    //The result will be stored in the alpha channel to be consumed by final pass.
-  
+   float inflation_y = 0.0;
+   if (DO_IN_GLOW == 1.0) {
+      float max_inLum = max( 1.0, DO_CCORRECTION * apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS));
       vec3 gy = texture(Source, vTexCoord + vInflation_offsets).rgb
               - texture(Source, vTexCoord - vInflation_offsets).rgb;
               
       gy /=max_inLum;
               
-      float scanline_inflation = (gy.x+gy.y+gy.z) * vInflation 
-                               + (eps * DELTA_RENDER); 
+      inflation_y = (gy.x+gy.y+gy.z) / 3.0;
+                               
+      inflation_y = pow(inflation_y, IN_GLOW_WARPSHARP_GAMMA) * sign(inflation_y);
+      
+      inflation_y = inflation_y *  vInflation + (eps * DELTA_RENDER); 
+                               
       //This eps is needed because we multiplex deltarender and inflection and we NEED to have dr = 0.0 (and not a positive number)
       //To reuse old pixels, only that way (using 0.0 to reuse pixels) multiplexing is possible.
-      
+   }
 
 
-   float inflation_or_DR = scanline_inflation;
+   float inflation_or_DR = inflation_y;
    if (DR_changed == 0.0) {
       inflation_or_DR = DR_changed;
    }

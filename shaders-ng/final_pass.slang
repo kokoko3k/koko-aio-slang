@@ -423,7 +423,7 @@ layout(set = 0, binding = 6)  uniform sampler2D monitor_body_straight;
 layout(set = 0, binding = 7)  uniform sampler2D monitor_body_curved;
 layout(set = 0, binding = 8)  uniform sampler2D bg_under;
 layout(set = 0, binding = 9)  uniform sampler2D bg_over;
-//layout(set = 0, binding = 10) uniform sampler2D in_glow_pass_x;
+layout(set = 0, binding = 10) uniform sampler2D in_glow_pass_x;
 layout(set = 0, binding = 11) uniform sampler2D in_glow_pass;
 layout(set = 0, binding = 12) uniform sampler2D halo_pass;
 #ifndef D3D_WORKAROUND
@@ -549,7 +549,7 @@ vec3 downsample_x( sampler2D tex, vec2 uv, vec4 sourcesize, float sharpness_add 
 }
 
 
-vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inLum  ) {
+vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inLum, float warpsharp_x  ) {
 
     //Scanlines: compute each phosphor height according to input luminance, puttin it here helps parallelism a bit.
         vec3 phosphor_height = map_range(pixel_in.rgb, min_inLum, max_inLum, PIXELGRID_MIN_H, clamp(PIXELGRID_MAX_H, PIXELGRID_MIN_H, 1.0));
@@ -631,23 +631,16 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
                 vec3 decon_stagger = vec3( PIXELGRID_DECON_R_H, PIXELGRID_DECON_G_H, PIXELGRID_DECON_B_H);
 
 
-            //Scanline Inflation:
-                #define inflation pixel_in.a
-                #ifdef D3D_WORKAROUND
-                    float freq_base_core_inflated = freq_base_core.y += inflation * (1-vDo_Tate);
-                #else
-                    float freq_base_core_inflated = freq_base_core.y += inflation;
-                #endif
-                
             vec3 rgb_h_sin = vec3(1.0);
             float anti_inflation = 1-clamp(abs(pixel_in.a), 0.0,1.0); //<- counteract: deconvergence does not depend on inflaction 
+            
             if (PIXELGRID_H_ANTIMOIRE > 0.0) {
                 //Antimoire experiment:
                 float anti_moire_freq = sin(vPG_freq_base_screen_unfloored.x * vPG_offsets_and_size.a );
                 float anti_moire_amp = PIXELGRID_H_ANTIMOIRE;
-                rgb_h_sin = sin( ( vec3(freq_base_core_inflated) * interlacing_adapt_period) + ( anti_moire_freq * anti_moire_amp ) + vInterlace_offset);
+                rgb_h_sin = sin( ( freq_base_core.yyy * interlacing_adapt_period) + ( anti_moire_freq * anti_moire_amp ) + vInterlace_offset);
             } else {
-                   rgb_h_sin = sin( (freq_base_core_inflated * interlacing_adapt_period) + fakeslot_stagger_offset - decon_stagger*anti_inflation + vInterlace_offset );
+                   rgb_h_sin = sin( (freq_base_core.y * interlacing_adapt_period) + fakeslot_stagger_offset - decon_stagger + vInterlace_offset );
             }
 
             //make it positve with doubled frequency:
@@ -685,6 +678,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
                 rgb_w = (rgb_w * rgb_w);
             //Scale Max width according to pre-gains:
                 vec3 phosphor_width = map_range(pixel_in.rgb, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
+                //phosphor_width += warpsharp_x*100.0;
             //Get final phosphor width:
                 //rgb_w = morph_shape(rgb_w, phosphor_width, PIXELGRID_NO_INTERBLEED_W, PIXELGRID_GAMMA_W); //2%
                 rgb_w = morph_shape_full_no_steepness_vec3(rgb_w, phosphor_width, PIXELGRID_GAMMA_W); //2%
@@ -1076,6 +1070,16 @@ vec3 fn_pixel_content(vec2 coords) {
 
     //#define USE_QUILEZ
 
+    
+    vec2 warpsharp = vec2(  texture(in_glow_pass_x, coords).a,
+                            texture(in_glow_pass,   coords).a
+                         );
+        
+    if (vDo_Tate == 0.0) 
+        coords += warpsharp.xy;
+    else
+        coords += warpsharp.yx;
+    
     #ifdef USE_QUILEZ
         pixel_glowed = texture(in_glow_pass, coords_QULEZ(coords, global.flick_and_noise_passSize));
         pixel_out = pixel_glowed.rgb;
@@ -1098,7 +1102,7 @@ vec3 fn_pixel_content(vec2 coords) {
             if (DO_CCORRECTION == 1.0)
                  vMax_inLum = apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS) * max(IN_GLOW_POWER, 1.0);
             */
-            vec4 pixel_grid = fn_pixel_grid(coords, pixel_glowed, 0.0, vMax_inLum);
+            vec4 pixel_grid = fn_pixel_grid(coords, pixel_glowed, 0.0, vMax_inLum, warpsharp.x );
             //grid mask only is needed by halo to selectively light the grid.
                 dot_mat_or_pixelgrid = pixel_grid.a;
                 pixel_out = pixel_grid.rgb;

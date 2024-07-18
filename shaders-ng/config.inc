@@ -172,7 +172,11 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	
 	float DO_TILT;
 	float TILT_X;
-											float placeholder1; //As usual this improves perfs here (?)
+	
+	float IN_GLOW_WARPSHARP_X;
+	float IN_GLOW_WARPSHARP_Y;
+	float IN_GLOW_WARPSHARP_GAMMA;
+	
 	float PIXELGRID_INTR_GAMMA_ADJ;
 
 	float AUTOCROP_MAX;
@@ -217,7 +221,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float PIXELGRID_MAX_H;
 	float PIXELGRID_MAX_W;
 	float PIXELGRID_SIZE_W;
-	float PIXELGRID_INFLATION;
 	
 	float BEZEL_LIGHT_NO_FADEOUT;
 	float IN_GLOW_SPREAD_SHARPNESS;
@@ -380,6 +383,9 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter IN_GLOW_SPREAD_SHARPNESS "        Glow light sharpness"	2.0 	0.01 2.0 0.01
 #pragma parameter IN_GLOW_W                "        Sharp X (neg=use BOX unsharp)"		2.5	-2.0 7.0 0.05
 #pragma parameter IN_GLOW_H                "        Sharp Y (neg=use BOX unsharp)"		2.5	-2.0 7.0 0.05
+#pragma parameter IN_GLOW_WARPSHARP_X      "        Warpsharp glow (X)"               0.4  0.0 2.0 0.01
+#pragma parameter IN_GLOW_WARPSHARP_Y      "        Warpsharp glow (Y)"               0.4  0.0  2.0 0.01
+#pragma parameter IN_GLOW_WARPSHARP_GAMMA  "        Warpsharp Dynamics (1.0=linear)"  1.0  0.01 1.0 0.01
 #pragma parameter LABEL0011 " " 0.0 0.0 0.0 0.0
 
 
@@ -411,7 +417,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter PIXELGRID_COREY_FAKE_SCAN "         . Fake integer scanlines (-1=auto)"  -1.0 -1.0 1.0 1.0
 #pragma parameter PIXELGRID_MIN_H	        "         . Phosphors height Min"           0.2 0.00 1.0 0.05
 #pragma parameter PIXELGRID_MAX_H           "         . Phosphors height Max"           0.6 0.05 1.0 0.05
-#pragma parameter PIXELGRID_INFLATION       "         . Inflation Strength"              0.4  0.0 2.0 0.01
 
 #pragma parameter PIXELGRID_GAMMA_H         "         . Phosphors height min->max gamma:"	4.2 1.0 8.00 0.1
 #pragma parameter PIXELGRID_NO_INTERBLEED_H	"         . Inter line extra steepness (1.0 to disable)"	1.0 1.0 11.0 0.1
