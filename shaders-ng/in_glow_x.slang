@@ -14,7 +14,7 @@ layout(location = 1) out float glow_h_and_w_outside_interval;
 layout(location = 2) out float glow_w_inside_interval;
 layout(location = 3) out float vSharp_sub;
 layout(location = 4) out float vShowArtifactsMask;
-layout(location = 13) out vec2 vInflation_offsets;
+layout(location = 13) out vec2 vWarpedglow_offsets;
 
 void main() {
    gl_Position = global.MVP * Position;
@@ -41,13 +41,13 @@ void main() {
       
    vShowArtifactsMask = float(DO_NTSC_ARTIFACTS + NTSC_SHOW_ARTF_MASK > 1.5);
    
-   float Inflation_delta = params.OriginalSize.z * 0.5;
-   vInflation_offsets = vec2(+Inflation_delta, 0.0); 
+   float warpedglow_delta = params.OriginalSize.z * 0.5;
+   vWarpedglow_offsets = vec2(+warpedglow_delta, 0.0); 
    
    bool rotated = is_rotated();
    if ( need_tate(rotated) == 1.0 ) {
-      Inflation_delta = params.OriginalSize.w * 0.5;
-      vInflation_offsets = vec2(0.0, +Inflation_delta);
+      warpedglow_delta = params.OriginalSize.w * 0.5;
+      vWarpedglow_offsets = vec2(0.0, +warpedglow_delta);
    }
    
    
@@ -61,7 +61,7 @@ layout(location = 1) in float glow_h_and_w_outside_interval;
 layout(location = 2) in float glow_w_inside_interval;
 layout(location = 3) in float vSharp_sub;
 layout(location = 4) in float vShowArtifactsMask;
-layout(location = 13) in vec2 vInflation_offsets;
+layout(location = 13) in vec2 vWarpedglow_offsets;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -84,26 +84,26 @@ void main() {
    
    //x Warpsharp.
    //The result will be stored in the alpha channel to be consumed by final pass.
-   float inflation_x = 0.0;
+   float warpedglow_x = 0.0;
    if (DO_IN_GLOW == 1.0) {
       float max_inLum = max( 1.0, DO_CCORRECTION * apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS));
-      vec3 gx = texture(shift_and_bleed_pass, vTexCoord + vInflation_offsets).rgb
-              - texture(shift_and_bleed_pass, vTexCoord - vInflation_offsets).rgb;
+      vec3 gx = texture(shift_and_bleed_pass, vTexCoord + vWarpedglow_offsets).rgb
+              - texture(shift_and_bleed_pass, vTexCoord - vWarpedglow_offsets).rgb;
               
       gx /=max_inLum;
 
       
-      inflation_x = (gx.x+gx.y+gx.z) / 3.0 ;
-      inflation_x = pow(inflation_x, IN_GLOW_WARPSHARP_GAMMA) * sign(inflation_x);
+      warpedglow_x = (gx.x+gx.y+gx.z) / 3.0 ;
+      warpedglow_x = pow(warpedglow_x, IN_GLOW_WARPSHARP_GAMMA) * sign(warpedglow_x);
    
-      inflation_x =  inflation_x * IN_GLOW_WARPSHARP_X * 0.6 / 1400.0 * 3.0;
+      warpedglow_x =  warpedglow_x * IN_GLOW_WARPSHARP_X * 0.6 / 1400.0 * 3.0;
    } 
    //Modulate glow power via ntsc artifact mask:
       float ntsc_artifacts = texture(shift_and_bleed_pass, vTexCoord).a; //compiler is smart enough to reuse this lookup, no need to branch.
       
       //To debug ntsc artifacts mask:
       if (vShowArtifactsMask == 1.0) {
-         FragColor = vec4(vec3(ntsc_artifacts), inflation_x);
+         FragColor = vec4(vec3(ntsc_artifacts), warpedglow_x);
          return;
       }
    
@@ -111,7 +111,7 @@ void main() {
    //and IN_GLOW_W is outside the allowed interval;
       if ( glow_h_and_w_outside_interval == 1.0) {
          //passthrough
-         FragColor =vec4(texture(shift_and_bleed_pass, vTexCoord).rgb, inflation_x);
+         FragColor =vec4(texture(shift_and_bleed_pass, vTexCoord).rgb, warpedglow_x);
          return;
       }
       
@@ -147,9 +147,9 @@ void main() {
       
    //Finally blur horizontally 
    if (glow_w_inside_interval == 1.0)  {
-      FragColor = vec4(blur_select_wrap(shift_and_bleed_pass, vTexCoord, global.flick_and_noise_passSize, in_glow_w_adapted, (IN_GLOW_W >= 0.0)), inflation_x);
+      FragColor = vec4(blur_select_wrap(shift_and_bleed_pass, vTexCoord, global.flick_and_noise_passSize, in_glow_w_adapted, (IN_GLOW_W >= 0.0)), warpedglow_x);
    } else {
-      FragColor = vec4(texture(shift_and_bleed_pass, vTexCoord).rgb, inflation_x);
+      FragColor = vec4(texture(shift_and_bleed_pass, vTexCoord).rgb, warpedglow_x);
    }
 
    

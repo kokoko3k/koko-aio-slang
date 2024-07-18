@@ -113,9 +113,10 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
 
     Consider artifacts above this treshold:
         Tune this to select more or less artifacts, depending on their strength.
-    Show the mask of selected artifacts (debug)
+    Show selected artifacts mask (need glow/blur enabled)
         This will show only the part of the image that contains artifacts.
-        Use it to for a better visual feedback of the following parameters
+        Use it to for a better visual feedback of the following parameters.
+        Please, enable "glow" to s
 
     1* Under treshold: Cancel blur (Glow)
         How much the glow/blur function will skip blurring "unartifacted" areas.
@@ -164,15 +165,15 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
         - Less than 0: will use box blur and will progressively
           add visual sharpness to image when approaching lower values.
 
-    Warpsharp glow (X,Y):
+    Warped glow (X,Y):
         Embolden bright pixels near dark ones using a warpsharp like algorithm.
         This is a cheap way to emulate phosphor glowing.
         The Y parameter will also allow scanlines to be higher.
         It will also help (if coupled with) FXAA to stay sharp.
 
-    Warpsharp Dynamics:
+    Warped Dynamics:
         Change the amount of warpsharp applied based on the contrast between 
-        nearby pixels, thereby altering their "Warpsharped" shape.
+        nearby pixels, thereby altering their "Warped" shape.
 
 
 **Tate mode:**<br>

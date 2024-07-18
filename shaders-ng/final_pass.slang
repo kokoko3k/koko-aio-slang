@@ -549,7 +549,7 @@ vec3 downsample_x( sampler2D tex, vec2 uv, vec4 sourcesize, float sharpness_add 
 }
 
 
-vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inLum, float warpsharp_x  ) {
+vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inLum) {
 
     //Scanlines: compute each phosphor height according to input luminance, puttin it here helps parallelism a bit.
         vec3 phosphor_height = map_range(pixel_in.rgb, min_inLum, max_inLum, PIXELGRID_MIN_H, clamp(PIXELGRID_MAX_H, PIXELGRID_MIN_H, 1.0));
@@ -632,7 +632,6 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
 
 
             vec3 rgb_h_sin = vec3(1.0);
-            float anti_inflation = 1-clamp(abs(pixel_in.a), 0.0,1.0); //<- counteract: deconvergence does not depend on inflaction 
             
             if (PIXELGRID_H_ANTIMOIRE > 0.0) {
                 //Antimoire experiment:
@@ -678,7 +677,6 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
                 rgb_w = (rgb_w * rgb_w);
             //Scale Max width according to pre-gains:
                 vec3 phosphor_width = map_range(pixel_in.rgb, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
-                //phosphor_width += warpsharp_x*100.0;
             //Get final phosphor width:
                 //rgb_w = morph_shape(rgb_w, phosphor_width, PIXELGRID_NO_INTERBLEED_W, PIXELGRID_GAMMA_W); //2%
                 rgb_w = morph_shape_full_no_steepness_vec3(rgb_w, phosphor_width, PIXELGRID_GAMMA_W); //2%
@@ -1067,18 +1065,15 @@ vec3 fn_pixel_content(vec2 coords) {
     vec4 pixel_glowed;
     float dot_mat_or_pixelgrid = 1.0; //init dot grid or scanline mask to 1.0
 
-
     //#define USE_QUILEZ
 
-    
-    vec2 warpsharp = vec2(  texture(in_glow_pass_x, coords).a,
-                            texture(in_glow_pass,   coords).a
-                         );
+    vec2 warpedglow = vec2( texture(in_glow_pass_x, coords).a,
+                            texture(in_glow_pass,   coords).a );
         
     if (vDo_Tate == 0.0) 
-        coords += warpsharp.xy;
+        coords += warpedglow.xy;
     else
-        coords += warpsharp.yx;
+        coords += warpedglow.yx;
     
     #ifdef USE_QUILEZ
         pixel_glowed = texture(in_glow_pass, coords_QULEZ(coords, global.flick_and_noise_passSize));
@@ -1102,7 +1097,7 @@ vec3 fn_pixel_content(vec2 coords) {
             if (DO_CCORRECTION == 1.0)
                  vMax_inLum = apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS) * max(IN_GLOW_POWER, 1.0);
             */
-            vec4 pixel_grid = fn_pixel_grid(coords, pixel_glowed, 0.0, vMax_inLum, warpsharp.x );
+            vec4 pixel_grid = fn_pixel_grid(coords, pixel_glowed, 0.0, vMax_inLum);
             //grid mask only is needed by halo to selectively light the grid.
                 dot_mat_or_pixelgrid = pixel_grid.a;
                 pixel_out = pixel_grid.rgb;

@@ -342,10 +342,10 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter NTSC_PHASE_SHIFT  "        Phase shift"			0.0	0.0 1.0  1.0
 #pragma parameter label_blut_ntsc   "        1 and 2 need Glow or Bandwidth Limited chroma" 0.0 0.0 0.0 0.0
 #pragma parameter NTSC_ARTF_TRSH      "      . Consider artifacts above this treshold"			0.1	0.0 1.0 0.01
-#pragma parameter NTSC_SHOW_ARTF_MASK "         . Show the mask of selected artifacts (debug)"				0.0	0.0 1.0 1.0
-#pragma parameter NTSC_ARTF_NOBLUR    "         . 1* Under treshold: Cancel blur (Glow)"				0.0	0.0 8.0 0.01
-#pragma parameter NTSC_ARTF_NOBLEED   "         . 2* Under treshold: Cancel Bandwidth limited chroma"	0.0	0.0 1.0 0.01
-#pragma parameter NTSC_ARTF_ZAP       "         . 3* Under treshold: Cancel artifacts"					0.0	0.0 1.0 0.01
+#pragma parameter NTSC_SHOW_ARTF_MASK "        . Show selected artifacts mask (need glow/blur enabled)"				0.0	0.0 1.0 1.0
+#pragma parameter NTSC_ARTF_NOBLUR    "        . 1* Under treshold: Cancel blur (Glow)"				0.0	0.0 8.0 0.01
+#pragma parameter NTSC_ARTF_NOBLEED   "        . 2* Under treshold: Cancel Bandwidth limited chroma"	0.0	0.0 1.0 0.01
+#pragma parameter NTSC_ARTF_ZAP       "        . 3* Under treshold: Cancel artifacts"					0.0	0.0 1.0 0.01
 
 #pragma parameter LABEL0007 " " 0.0 0.0 0.0 0.0
 
@@ -383,9 +383,9 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter IN_GLOW_SPREAD_SHARPNESS "        Glow light sharpness"	2.0 	0.01 2.0 0.01
 #pragma parameter IN_GLOW_W                "        Sharp X (neg=use BOX unsharp)"		2.5	-2.0 7.0 0.05
 #pragma parameter IN_GLOW_H                "        Sharp Y (neg=use BOX unsharp)"		2.5	-2.0 7.0 0.05
-#pragma parameter IN_GLOW_WARPSHARP_X      "        Warpsharp glow (X)"               0.4  0.0 2.0 0.01
-#pragma parameter IN_GLOW_WARPSHARP_Y      "        Warpsharp glow (Y)"               0.4  0.0  2.0 0.01
-#pragma parameter IN_GLOW_WARPSHARP_GAMMA  "        Warpsharp Dynamics (1.0=linear)"  1.0  0.01 1.0 0.01
+#pragma parameter IN_GLOW_WARPSHARP_X      "        Warped glow (X)"               0.4  0.0 2.0 0.01
+#pragma parameter IN_GLOW_WARPSHARP_Y      "        Warped glow (Y)"               0.4  0.0  2.0 0.01
+#pragma parameter IN_GLOW_WARPSHARP_GAMMA  "        Warped glow dynamics (1.0=linear)"  1.0  0.01 1.0 0.01
 #pragma parameter LABEL0011 " " 0.0 0.0 0.0 0.0
 
 
