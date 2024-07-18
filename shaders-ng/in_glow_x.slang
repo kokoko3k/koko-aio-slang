@@ -94,7 +94,7 @@ void main() {
 
       
       warpedglow_x = (gx.x+gx.y+gx.z) / 3.0 ;
-      warpedglow_x = pow(warpedglow_x, IN_GLOW_WARPSHARP_GAMMA) * sign(warpedglow_x);
+      warpedglow_x = pow( abs(warpedglow_x), IN_GLOW_WARPSHARP_GAMMA) * sign(warpedglow_x);
    
       warpedglow_x =  warpedglow_x * IN_GLOW_WARPSHARP_X * 0.6 / 1400.0 * 3.0;
    } 

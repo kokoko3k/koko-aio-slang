@@ -165,7 +165,7 @@ void main() {
               
       warpedglow_y = (gy.x+gy.y+gy.z) / 3.0;
                                
-      warpedglow_y = pow(warpedglow_y, IN_GLOW_WARPSHARP_GAMMA) * sign(warpedglow_y);
+      warpedglow_y = pow( abs(warpedglow_y), IN_GLOW_WARPSHARP_GAMMA) * sign(warpedglow_y);
       
       warpedglow_y = warpedglow_y *  vWarpedglow + (eps * DELTA_RENDER); 
                                
