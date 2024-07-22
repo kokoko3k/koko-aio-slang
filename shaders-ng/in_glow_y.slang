@@ -155,7 +155,7 @@ void main() {
    
    //y Warpsharp 
    //The result will be stored in the alpha channel to be consumed by final pass.
-   float warpedglow_y = 0.0;
+   float warpedglow_y = eps; //see down note: (**)
    if (DO_IN_GLOW == 1.0) {
       float max_inLum = max( 1.0, DO_CCORRECTION * apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS));
       vec3 gy = texture(Source, vTexCoord + vWarpedglow_offsets).rgb
@@ -169,7 +169,7 @@ void main() {
       
       warpedglow_y = warpedglow_y *  vWarpedglow + (eps * DELTA_RENDER); 
                                
-      //This eps is needed because we multiplex deltarender and warpedglow and we NEED to have dr = 0.0 (and not a positive number)
+      // (**) This eps is needed because we multiplex deltarender and warpedglow and we NEED to have dr = 0.0 (and not a positive number)
       //To reuse old pixels, only that way (using 0.0 to reuse pixels) multiplexing is possible.
    }
 
