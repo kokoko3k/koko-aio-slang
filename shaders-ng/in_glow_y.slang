@@ -55,13 +55,15 @@ void main() {
 
    vWarpedglow = (IN_GLOW_WARPSHARP_Y * warpedglow_scale) * 0.6 / 1400.0 * 3.0;   //*3.0 needed because we scale to 0->1 to use pow in the fragment.
 
-   float warpedglow_delta = params.OriginalSize.w * 0.5;
-   vWarpedglow_offsets = vec2(0.0, +warpedglow_delta); 
-   
-   bool rotated = is_rotated();
-   if ( need_tate(rotated) == 1.0 ) {
-      warpedglow_delta = params.OriginalSize.z * 0.5;
-      vWarpedglow_offsets = vec2(+warpedglow_delta, 0.0);
+   if (SKIP_WARPEDGLOW_Y == 0.0) {
+      float warpedglow_delta = params.OriginalSize.w * 0.5;
+      vWarpedglow_offsets = vec2(0.0, +warpedglow_delta); 
+      
+      bool rotated = is_rotated();
+      if ( need_tate(rotated) == 1.0 ) {
+         warpedglow_delta = params.OriginalSize.z * 0.5;
+         vWarpedglow_offsets = vec2(+warpedglow_delta, 0.0);
+      }
    }
 
    
@@ -110,38 +112,6 @@ vec3 blur_select_wrap(sampler2D texture_in, vec2 co, vec4 sourcesize, float shar
 
 void main() { 
 
-/*   warpsharp experiment
-   vec2 d = params.OriginalSize.zw*2.0;
-
-   vec2 sharpness = d*SERVICE1;
-   
-   vec3 gx = texture(Original, vec2(vTexCoord.x + d.x, vTexCoord.y)).rgb - 
-             texture(Original, vec2(vTexCoord.x - d.x, vTexCoord.y)).rgb;
-
-   vec3 gy = texture(Original, vec2(vTexCoord.x, vTexCoord.y + d.y)).rgb - 
-             texture(Original, vec2(vTexCoord.x, vTexCoord.y - d.y)).rgb;
-      
-  
-   vec3 color = texture(Original, vTexCoord).rgb;
-   
-   float fgx = +(gx.x+gx.y+gx.z)/3.0;
-   float fgy = +(gy.x+gy.y+gy.z)/3.0;
-   
-
-   fgx = clamp(fgx, -SERVICE1, SERVICE1);
-   fgy = clamp(fgy, -SERVICE1, SERVICE1);
-   
-    vec2 warp = vec2(fgx, fgy) * sharpness;
-    vec2 warpedTexCoord = vTexCoord + warp;
-    
-    vec4 warpedColor = texture(Original, warpedTexCoord);
-    
-    FragColor = vec4(fgx*fgy);
-    
-    //FragColor = warpedColor;
-    
-    return;
-*/   
 
    //Delta render?
    float DR_changed = 1.0;
@@ -153,24 +123,26 @@ void main() {
      }
    }
    
-   //y Warpsharp 
+   //Warped Glow Y
    //The result will be stored in the alpha channel to be consumed by final pass.
    float warpedglow_y = eps; //see down note: (**)
-   if (DO_IN_GLOW == 1.0) {
-      float max_inLum = max( 1.0, DO_CCORRECTION * apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS));
-      vec3 gy = texture(Source, vTexCoord + vWarpedglow_offsets).rgb
-              - texture(Source, vTexCoord - vWarpedglow_offsets).rgb;
-              
-      gy /=max_inLum;
-              
-      warpedglow_y = (gy.x+gy.y+gy.z) / 3.0;
-                               
-      warpedglow_y = pow( abs(warpedglow_y), IN_GLOW_WARPSHARP_GAMMA) * sign(warpedglow_y);
-      
-      warpedglow_y = warpedglow_y *  vWarpedglow + (eps * DELTA_RENDER); 
-                               
-      // (**) This eps is needed because we multiplex deltarender and warpedglow and we NEED to have dr = 0.0 (and not a positive number)
-      //To reuse old pixels, only that way (using 0.0 to reuse pixels) multiplexing is possible.
+   if (SKIP_WARPEDGLOW_Y == 0.0) {
+      if (DO_IN_GLOW == 1.0) {
+         float max_inLum = max( 1.0, DO_CCORRECTION * apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS));
+         vec3 gy = texture(Source, vTexCoord + vWarpedglow_offsets).rgb
+               - texture(Source, vTexCoord - vWarpedglow_offsets).rgb;
+               
+         gy /=max_inLum;
+               
+         warpedglow_y = (gy.x+gy.y+gy.z) / 3.0;
+                                 
+         warpedglow_y = pow( abs(warpedglow_y), IN_GLOW_WARPSHARP_GAMMA) * sign(warpedglow_y);
+         
+         warpedglow_y = warpedglow_y *  vWarpedglow + (eps * DELTA_RENDER); 
+                                 
+         // (**) This eps is needed because we multiplex deltarender and warpedglow and we NEED to have dr = 0.0 (and not a positive number)
+         //To reuse old pixels, only that way (using 0.0 to reuse pixels) multiplexing is possible.
+      }
    }
 
 

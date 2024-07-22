@@ -41,13 +41,15 @@ void main() {
       
    vShowArtifactsMask = float(DO_NTSC_ARTIFACTS + NTSC_SHOW_ARTF_MASK > 1.5);
    
-   float warpedglow_delta = params.OriginalSize.z * 0.5;
-   vWarpedglow_offsets = vec2(+warpedglow_delta, 0.0); 
-   
-   bool rotated = is_rotated();
-   if ( need_tate(rotated) == 1.0 ) {
-      warpedglow_delta = params.OriginalSize.w * 0.5;
-      vWarpedglow_offsets = vec2(0.0, +warpedglow_delta);
+   if (SKIP_WARPEDGLOW_X == 0.0) {
+      float warpedglow_delta = params.OriginalSize.z * 0.5;
+      vWarpedglow_offsets = vec2(+warpedglow_delta, 0.0); 
+      
+      bool rotated = is_rotated();
+      if ( need_tate(rotated) == 1.0 ) {
+         warpedglow_delta = params.OriginalSize.w * 0.5;
+         vWarpedglow_offsets = vec2(0.0, +warpedglow_delta);
+      }
    }
    
    
@@ -82,22 +84,24 @@ vec3 blur_select_wrap(sampler2D texture_in, vec2 co, vec4 sourcesize, float shar
 void main() { 
 
    
-   //x Warpsharp.
+   //Warped Glow X
    //The result will be stored in the alpha channel to be consumed by final pass.
    float warpedglow_x = 0.0;
-   if (DO_IN_GLOW == 1.0) {
-      float max_inLum = max( 1.0, DO_CCORRECTION * apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS));
-      vec3 gx = texture(shift_and_bleed_pass, vTexCoord + vWarpedglow_offsets).rgb
-              - texture(shift_and_bleed_pass, vTexCoord - vWarpedglow_offsets).rgb;
-              
-      gx /=max_inLum;
+   if (SKIP_WARPEDGLOW_X == 0.0) {
+      if (DO_IN_GLOW == 1.0) {
+         float max_inLum = max( 1.0, DO_CCORRECTION * apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS));
+         vec3 gx = texture(shift_and_bleed_pass, vTexCoord + vWarpedglow_offsets).rgb
+               - texture(shift_and_bleed_pass, vTexCoord - vWarpedglow_offsets).rgb;
+               
+         gx /=max_inLum;
 
+         
+         warpedglow_x = (gx.x+gx.y+gx.z) / 3.0 ;
+         warpedglow_x = pow( abs(warpedglow_x), IN_GLOW_WARPSHARP_GAMMA) * sign(warpedglow_x);
       
-      warpedglow_x = (gx.x+gx.y+gx.z) / 3.0 ;
-      warpedglow_x = pow( abs(warpedglow_x), IN_GLOW_WARPSHARP_GAMMA) * sign(warpedglow_x);
-   
-      warpedglow_x =  warpedglow_x * IN_GLOW_WARPSHARP_X * 0.6 / 1400.0 * 3.0;
-   } 
+         warpedglow_x =  warpedglow_x * IN_GLOW_WARPSHARP_X * 0.6 / 1400.0 * 3.0;
+      }
+   }
    //Modulate glow power via ntsc artifact mask:
       float ntsc_artifacts = texture(shift_and_bleed_pass, vTexCoord).a; //compiler is smart enough to reuse this lookup, no need to branch.
       

@@ -1066,9 +1066,12 @@ vec3 fn_pixel_content(vec2 coords) {
     float dot_mat_or_pixelgrid = 1.0; //init dot grid or scanline mask to 1.0
 
     //#define USE_QUILEZ
-
-    vec2 warpedglow = vec2( texture(in_glow_pass_x, coords).a,
-                            texture(in_glow_pass,   coords).a );
+    
+    vec2 warpedglow = vec2(0.0);
+    if (SKIP_WARPEDGLOW_Y == 0.0)
+        warpedglow.y = texture(in_glow_pass, coords).a;
+    if (SKIP_WARPEDGLOW_X == 0.0)
+        warpedglow.x = texture(in_glow_pass_x, coords).a;
         
     if (vDo_Tate == 0.0) 
         coords += warpedglow.xy;

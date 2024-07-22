@@ -335,8 +335,16 @@
 
 //Skip random() function used for noise/debanding/bezel roughness, 
 //set to 1.0 to spare gpu cycles:
-// #define SKIP_RANDOM 1.0
+#define SKIP_RANDOM 0.0
 
+
+//Set this to 1.0 is the only way to statically disable Warped Glow (X) and
+//spare a lookup in the final pass. 
+#define SKIP_WARPEDGLOW_X 0.0
+
+//Set this to 1.0 is the only way to statically disable Warped Glow (Y)
+//(less gain than) SKIP_WARPEDGLOW_X
+#define SKIP_WARPEDGLOW_Y 0.0
 
 // Developer reminder: bash script to partially convert a shader preset 
 // edit: obsolete and incomplete since it does not recur references.
