@@ -52,24 +52,15 @@ void main() {
    if (DO_PIXELGRID > 0.0 && DO_PIXELGRID_H > 0.0)
       warpedglow_scale = PIXELGRID_MAX_H;
    
+   float IN_GLOW_WARPSHARP_TATED = IN_GLOW_WARPSHARP_Y;
+   if (need_tate(is_rotated()) == 1.0)
+      IN_GLOW_WARPSHARP_TATED = IN_GLOW_WARPSHARP_X;
 
-   vWarpedglow = (IN_GLOW_WARPSHARP_Y * warpedglow_scale) * 0.6 / 1400.0 * 3.0;   //*3.0 needed because we scale to 0->1 to use pow in the fragment.
+   vWarpedglow = (IN_GLOW_WARPSHARP_TATED * warpedglow_scale) * 0.6 / 1400.0 * 3.0;   //*3.0 needed because we scale to 0->1 to use pow in the fragment.
 
-   if (SKIP_WARPEDGLOW_Y == 0.0) {
-      float warpedglow_delta = params.OriginalSize.w * 0.5;
-      vWarpedglow_offsets = vec2(0.0, +warpedglow_delta); 
+   float warpedglow_delta = params.OriginalSize.w * 0.5;
+   vWarpedglow_offsets = vec2(0.0, +warpedglow_delta); 
       
-      bool rotated = is_rotated();
-      if ( need_tate(rotated) == 1.0 ) {
-         warpedglow_delta = params.OriginalSize.z * 0.5;
-         vWarpedglow_offsets = vec2(+warpedglow_delta, 0.0);
-      }
-   }
-
-   
-   
-   
-   
 }
 
 

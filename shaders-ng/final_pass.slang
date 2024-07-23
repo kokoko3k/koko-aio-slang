@@ -1069,14 +1069,15 @@ vec3 fn_pixel_content(vec2 coords) {
     
     vec2 warpedglow = vec2(0.0);
     if (SKIP_WARPEDGLOW_Y == 0.0)
-        warpedglow.y = texture(in_glow_pass, coords).a;
+        warpedglow.y = texture(in_glow_pass, coords + DELTA_RENDER * eps).a;
+        // ^^ Delta render performance suffer alot if not adding eps here on my haswell for unknown reasons.
+        // ...probably some failed compiler optimization issue.
     if (SKIP_WARPEDGLOW_X == 0.0)
         warpedglow.x = texture(in_glow_pass_x, coords).a;
-        
-    if (vDo_Tate == 0.0) 
-        coords += warpedglow.xy;
-    else
-        coords += warpedglow.yx;
+
+    coords += warpedglow.xy;
+
+
     
     #ifdef USE_QUILEZ
         pixel_glowed = texture(in_glow_pass, coords_QULEZ(coords, global.flick_and_noise_passSize));

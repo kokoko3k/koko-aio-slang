@@ -14,6 +14,7 @@ layout(location = 1) out float glow_h_and_w_outside_interval;
 layout(location = 2) out float glow_w_inside_interval;
 layout(location = 3) out float vSharp_sub;
 layout(location = 4) out float vShowArtifactsMask;
+layout(location = 12) out float vWarpedglow_scale_tated;
 layout(location = 13) out vec2 vWarpedglow_offsets;
 
 void main() {
@@ -41,18 +42,15 @@ void main() {
       
    vShowArtifactsMask = float(DO_NTSC_ARTIFACTS + NTSC_SHOW_ARTF_MASK > 1.5);
    
-   if (SKIP_WARPEDGLOW_X == 0.0) {
-      float warpedglow_delta = params.OriginalSize.z * 0.5;
-      vWarpedglow_offsets = vec2(+warpedglow_delta, 0.0); 
+   float warpedglow_delta = params.OriginalSize.z * 0.5;
+   vWarpedglow_offsets = vec2(+warpedglow_delta, 0.0); 
       
-      bool rotated = is_rotated();
-      if ( need_tate(rotated) == 1.0 ) {
-         warpedglow_delta = params.OriginalSize.w * 0.5;
-         vWarpedglow_offsets = vec2(0.0, +warpedglow_delta);
-      }
-   }
+   vWarpedglow_scale_tated = IN_GLOW_WARPSHARP_X;
+   if (need_tate(is_rotated()) == 1.0)
+      vWarpedglow_scale_tated = IN_GLOW_WARPSHARP_Y;
    
-   
+   vWarpedglow_scale_tated = vWarpedglow_scale_tated * 0.6 / 1400.0 * 3.0;
+
 }
 
 
@@ -63,6 +61,7 @@ layout(location = 1) in float glow_h_and_w_outside_interval;
 layout(location = 2) in float glow_w_inside_interval;
 layout(location = 3) in float vSharp_sub;
 layout(location = 4) in float vShowArtifactsMask;
+layout(location = 12) in float vWarpedglow_scale_tated;
 layout(location = 13) in vec2 vWarpedglow_offsets;
 
 layout(location = 0) out vec4 FragColor;
@@ -99,7 +98,7 @@ void main() {
          warpedglow_x = (gx.x+gx.y+gx.z) / 3.0 ;
          warpedglow_x = pow( abs(warpedglow_x), IN_GLOW_WARPSHARP_GAMMA) * sign(warpedglow_x);
       
-         warpedglow_x =  warpedglow_x * IN_GLOW_WARPSHARP_X * 0.6 / 1400.0 * 3.0;
+         warpedglow_x =  warpedglow_x * vWarpedglow_scale_tated;
       }
    }
    //Modulate glow power via ntsc artifact mask:

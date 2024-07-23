@@ -328,7 +328,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 //Renders only changed parts of screen, set to 1.0 to lower power consumption / mitigate throttling:
-#define DELTA_RENDER 1.0 
+#define DELTA_RENDER 0.0 
 
 //Halve rendering refresh on bezel and ambilight set to 1.0 to spare gpu cycles:
 #define HALVE_BORDER_UPDATE 0.0
@@ -339,11 +339,13 @@
 
 
 //Set this to 1.0 is the only way to statically disable Warped Glow (X) and
-//spare a lookup in the final pass. 
+//spare a lookup in the final pass;
+//When the screen is rotated, skipping SKIP_WARPEDGLOW_X means skipping SKIP_WARPEDGLOW_Y
 #define SKIP_WARPEDGLOW_X 0.0
 
-//Set this to 1.0 is the only way to statically disable Warped Glow (Y)
-//(less gain than) SKIP_WARPEDGLOW_X
+//Set this to 1.0 is the only way to statically disable Warped Glow (X) and
+//spare a lookup in the final pass.
+//When the screen is rotated, skipping SKIP_WARPEDGLOW_Y means skipping SKIP_WARPEDGLOW_X
 #define SKIP_WARPEDGLOW_Y 0.0
 
 // Developer reminder: bash script to partially convert a shader preset 
