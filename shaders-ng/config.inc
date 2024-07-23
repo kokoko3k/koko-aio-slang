@@ -172,11 +172,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	
 	float DO_TILT;
 	float TILT_X;
-	
-	float IN_GLOW_WARPSHARP_X;
-	float IN_GLOW_WARPSHARP_Y;
-	float IN_GLOW_WARPSHARP_GAMMA;
-	
+		
 	float PIXELGRID_INTR_GAMMA_ADJ;
 
 	float AUTOCROP_MAX;
@@ -286,7 +282,9 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	
 	float SERVICE1;
 	
-
+	float IN_GLOW_WARPSHARP_X;
+	float IN_GLOW_WARPSHARP_Y;
+	float IN_GLOW_WARPSHARP_GAMMA;
 	
 } global;
 
