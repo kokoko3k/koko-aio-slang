@@ -588,7 +588,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter S_POSITION_X 	"        X Position"	   -0.5   -2.0 2.0 0.05
 #pragma parameter S_POSITION_Y 	"        Y Position"		0.5   -2.0 2.0 0.05
 #pragma parameter S_SIZE	"        Size"			0.36    0.0   3.0 0.01
-#pragma parameter S_POWER	"        Power" 		0.11   0.01  1.0 0.01
+#pragma parameter S_POWER	"        Power" 		0.12   0.01  1.0 0.01
 #pragma parameter LABEL0028 " " 0.0 0.0 1.0 1.0
 
 

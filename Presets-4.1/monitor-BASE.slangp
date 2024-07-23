@@ -71,7 +71,7 @@ DO_SPOT = "0.0"
     S_POSITION_X = "-0.5"
     S_POSITION_Y = "0.5"
 	S_SIZE = "0.36"
-	S_POWER = "0.06"
+	S_POWER = "0.067"
 	
 
 DO_DYNZOOM = "0.015"
