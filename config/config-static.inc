@@ -142,11 +142,13 @@
 	// AUTOCROP
 //which coords holds the autocrop zoom value
 #define AUTOCROP_SAMPLING_POINT vec2(0.125)
-	
+
+	// Luminosity tied zoom sampling point
+#define DYN_ZOOM_SAMPLING_POINT vec2(0.75)
 	
 // RESOLUTION SWITCH GLITCH EMULATION ##########################################################################################
 	//Where to sample alpha from avglum pass to understand if resolution has changed (very internal setting) 
-#define RESSWITCH_SAMPLING_POINT vec2(0.95) 
+#define RESSWITCH_SAMPLING_POINT vec2(0.9) 
 	//How much the resolution have to change for shake to be activated (in relation to the old size).
 #define RESSWITCH_GLITCH_TRESHOLD 0.1
 	//How fast is the shake [0.01 -> 1]

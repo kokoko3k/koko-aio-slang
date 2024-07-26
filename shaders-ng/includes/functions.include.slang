@@ -1245,7 +1245,7 @@ vec2 rgb2hv(vec3 c) {
 	
 float get_dyn_zoom(sampler2D tex) {
 	if (DELTA_RENDER == 0.0)
-		return texture(tex, vec2(0.75,0.75)).a * DO_DYNZOOM + 1.0 ;
+		return texture(tex, DYN_ZOOM_SAMPLING_POINT ).a * DO_DYNZOOM + 1.0 ;
 	else
 		return 1.0;
 }
