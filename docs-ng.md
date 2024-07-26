@@ -77,7 +77,12 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
         Monochrome screen colorization:
             The amount of (de) colorization applied.
         Hue bright, Hue dark:
-            Set the hue for bright and dark colors.
+            Set the hue for bright and dark colors. in [0..1] range.
+            To emulate different monochrome models, the process is quite easy:
+            . Provided you have screenshots, use a color picker tool with hue expressed in 1…360
+              range and identify the hue of the original naked background hue1
+            . Do the same for the darkest pixel on the screen, hue2
+            . Then report them in the shader with the formula hue1/360 and hue2/360.
         Hue bright-dark bias:
             Controls the distribution of dark and bright hues.
     
