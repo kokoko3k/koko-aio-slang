@@ -590,10 +590,9 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
     //shadowmask
     //works by staggering odd rows by 1.5X triad
     PG_offsets = vPG_offsets_and_size.rgb + //base offsets staggered (+)
-                float( 
-                       PIXELGRID_DO_SHADOWMASK *                                        // user wants shadowmask
-                       sin(freq_base_screen.y * 2.0 / PIXELGRID_SHADOWMASK_H ) > 0.0   // sin > 0.0 means the row is even
-                ) * PIXELGRID_SHADOWMASK_SHIFT ;                                                // stagger by 1.5
+                float( PIXELGRID_DO_SHADOWMASK *                                      // user wants shadowmask
+                       sin(freq_base_screen.y * 2.0 / PIXELGRID_SHADOWMASK_H ) > 0.0  // sin > 0.0 means the row is even
+                      ) * PIXELGRID_SHADOWMASK_SHIFT ;                                // stagger by 1.5
 
         
     vec3 freq_rgb = freq_base.xxx - PG_offsets;
@@ -672,15 +671,12 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
         vec3 rgb_grille_basal = vec3(0.0);
 
         if (DO_PIXELGRID_W > 0.0) { //4%
-            //get 3 sines in black/white
-                //rgb_w = sin(freq_rgb);
-            //make them always positive and double frequency:
-                //rgb_w = (rgb_w * rgb_w);
-            //Scale Max width according to pre-gains:
+            // get 3 sines in black/white,   | sin(freq_rgb)
+            // make them always positive and double frequency  | sin(freq_rgb) * sin(freq_rgb)
+            // and scale Max width according to pre-gains:
                 vec3 phosphor_width = map_range(pixel_in.rgb, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
             //Get final phosphor width:
-                //rgb_w = morph_shape(rgb_w, phosphor_width, PIXELGRID_NO_INTERBLEED_W, PIXELGRID_GAMMA_W); //2%
-                rgb_w = morph_shape_full_no_steepness_vec3(     sin(freq_rgb) * sin(freq_rgb)    , phosphor_width, PIXELGRID_GAMMA_W); //2%
+                rgb_w = morph_shape_full_no_steepness_vec3( sin(freq_rgb) * sin(freq_rgb), phosphor_width, PIXELGRID_GAMMA_W); //2%
 
             //Dedot rgb mask between h mask.
             //This work only when there are dots and have the countereffect when there are not.
