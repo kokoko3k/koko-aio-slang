@@ -742,26 +742,10 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
         vec3 mask = rgb_w * rgb_h * darklines_mask;
 
 
-    float TEST_OVERMASK_NEW = 0.0;
     //Apply Overmask:
-        if (TEST_OVERMASK_NEW == 1.0) {
-            vec3 mask_overmask = PIXELGRID_OVERMASK * (mask - 0.5) + 0.5;
-            vec3 pixel_in_overmask = mix(pixel_in.rgb, pixel_in.rgb * PIXELGRID_OVERMASK, PIXELGRID_OVERMASK);
-        //Adaptive overmask experiment
-            //different mix levels:
-                mask = mix(mask, mask_overmask, abs(mask - vec3(0.5)) );
-                pixel_in.rgb = mix(pixel_in.rgb, pixel_in_overmask, abs( pixel_in.rgb - vec3(0.5)  )      );
-            //Same mix levels:
-                //mask = mix(mask_overmask, mask,              pow( abs( pixel_in - vec3(0.5))*2.0, vec3(1.0))        );
-                //pixel_in = mix(pixel_in_overmask, pixel_in,  pow(abs( pixel_in - vec3(0.5))*2.0, vec3(1.0))        );
-            //Mix level applied to overmask:
-                //vec3 overmask_adapted = mix(vec3(PIXELGRID_OVERMASK), vec3(1.0), abs(pixel_in - 0.5)*2.0 );
-                //mask = overmask_adapted * (mask - 0.5) + 0.5;
-                //pixel_in = mix(pixel_in, pixel_in * overmask_adapted, overmask_adapted);
-        } else {
             mask = PIXELGRID_OVERMASK * (mask - 0.5) + 0.5;
             pixel_in.rgb = mix(pixel_in.rgb, pixel_in.rgb * PIXELGRID_OVERMASK, PIXELGRID_OVERMASK);
-        }
+            
     //Apply the mask to pixel_in and clamp the minimum to the unexcited grille.
         vec3 mask_and_grille = max(mask * pixel_in.rgb, rgb_grille_basal);
 
