@@ -650,18 +650,14 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
                 dedot_mix = vec3( fma( -PIXELGRID_H_DEDOT, rgb_h_sin.x, PIXELGRID_H_DEDOT)); //ASM PROOF: SAME
                 dedot_mix = dedot_mix *(pixel_in.rgb/max_inLum);
                 
-            // Compute each phosphor height according to input luminance,
-            // Moved outside the branch to help parallelism a bit
-                //float extragain_h = max(PIXELGRID_MAX_H, 1.0); //Handle
-                //vec3 phosphor_height = map_range(pixel_in.rgb*extragain_h, min_inLum, max_inLum, PIXELGRID_MIN_H, clamp(PIXELGRID_MAX_H, PIXELGRID_MIN_H, 1.0));
-
+            // Phosphor height computation has been moved
+            // outside the branch to help parallelism a bit
 
             //Finally get 3 sines out of the previous one by applying height modifiers
                 rgb_h = morph_shape(rgb_h_sin, phosphor_height, PIXELGRID_NO_INTERBLEED_H, PIXELGRID_GAMMA_H);
 
                 rgb_h = mix(vec3(1.0), rgb_h, DO_PIXELGRID_H);
                 rgb_h = clamp(rgb_h, 0.0,1.0);
-
         }
 
 
