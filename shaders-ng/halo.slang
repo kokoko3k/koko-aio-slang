@@ -10,18 +10,6 @@ layout(location = 1) out vec2 vHALO_SHARPNESS;
 layout(location = 2) out float vHALO_POWER;
 layout(location = 3) out float vDeltaRenderOk;
 
-vec2 radius_blur_adapt(vec2 bsize, vec4 sourcesize){
-    vec2 r;
-    r.x = bsize.x / BLOOM_AND_HALO_SCALE_FACTOR;
-    r.y = r.x *  get_in_aspect();
-    
-	float aspect = (sourcesize.x/sourcesize.y);
-    
-	r = r / vec2(1.0, aspect);
-
-    return r;
-}
-
 void main() {
     gl_Position = global.MVP * Position;
     vTexCoord = TexCoord;
@@ -33,7 +21,7 @@ void main() {
 
 //20..1 10...2 prova 5..3
     //Correct aspect
-        vHALO_SHARPNESS = radius_blur_adapt(vHALO_SHARPNESS, params.SourceSize);
+        vHALO_SHARPNESS = radius_blur_adapt(vHALO_SHARPNESS);
 
 
    if (HALO_POWER >= 0.0)

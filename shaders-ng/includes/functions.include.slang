@@ -962,6 +962,14 @@ float random_fast(vec2 seed) {
 	
 //Blur/Glow
 #define PI 3.14159265359
+
+vec2 radius_blur_adapt(vec2 bsize){
+    vec2 r;
+    r.x = bsize.x / BLOOM_AND_HALO_SCALE_FACTOR;
+    r.y = r.x *  get_in_aspect();
+    return r;
+}
+
 float sinc_lanczos(float x) {
     if (abs(x) < 0.001)
         return 1.0;
