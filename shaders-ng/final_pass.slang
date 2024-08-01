@@ -1100,27 +1100,16 @@ vec3 fn_pixel_content(vec2 coords) {
 
             vec2 halo_coords = coords;
 
-            if (HALO_PRE_SCANLINE_GAP == 1.0 &&  vDo_pixelgrid_h == 1.0) {
-                //FIXME dot_mat lasciato indietro
-                halo_coords.y += (DO_PIXELGRID_H  * global.in_glow_passSize.w) * ( 0.5 * (0.75-HALO_VS_SCAN) );
-                //halo_coords.y +=  (DO_PIXELGRID_H  * global.in_glow_passSize.w) * ( 0.375-0.5*HALO_VS_SCAN ); //ASM PROOF SLOWER
-                vec3 pixel_haloed = texture(halo_pass, halo_coords).rgb;
 
-                //pixel_haloed = blur_px(halo_pre_gamma_pass, halo_coords, vec2(SERVICE1*0.1)) ;
-
-                pixel_out += pixel_haloed;
-            } else {
-                vec3 pixel_haloed = texture(halo_pass, halo_coords).rgb;                
-                //Halo only on scanlines:
-                //pixel_out += pixel_haloed * dot_mat_or_pixelgrid ;
-                //Halo over scanlines gap too:
-                //pixel_out += (pixel_haloed * HALO_VS_SCAN) * (1 - dot_mat_or_pixelgrid) ;
-                
-                //ASM proof faster: less operations/cycles:
-                //p=p+h⋅(m+b⋅(1−m))
-                pixel_out = pixel_out + pixel_haloed * (dot_mat_or_pixelgrid + HALO_VS_SCAN * (1-dot_mat_or_pixelgrid));
-                
-            }
+            vec3 pixel_haloed = texture(halo_pass, halo_coords).rgb;                
+            //Halo only on scanlines:
+            //pixel_out += pixel_haloed * dot_mat_or_pixelgrid ;
+            //Halo over scanlines gap too:
+            //pixel_out += (pixel_haloed * HALO_VS_SCAN) * (1 - dot_mat_or_pixelgrid) ;
+            
+            //ASM proof faster: less operations/cycles:
+            //p=p+h⋅(m+b⋅(1−m))
+            pixel_out = pixel_out + pixel_haloed * (dot_mat_or_pixelgrid + HALO_VS_SCAN * (1-dot_mat_or_pixelgrid));
 
         }
 
@@ -1128,16 +1117,6 @@ vec3 fn_pixel_content(vec2 coords) {
         if (DO_CCORRECTION == 1.0)
             pixel_out = pow(max(pixel_out, vec3(0.0)),vec3(GAMMA_OUT));
 
-    //Bloom
-    /*    if (DO_BLOOM == 1.0 ) {
-            vec3 bloomed=texture(bloom_pass_final, coords).rgb ;
-            if (BLOOM_BYPASS != 1.0 ) {
-                vec3 lum = clamp(pixel_glowed, 0.0,1.0);
-                vec3 darkness=(1-lum) * (1-lum);
-                bloomed = mix( bloomed * darkness , bloomed, BLOOM_OVER_WHITE);
-            }
-            pixel_out = bloomed + float(BLOOM_BYPASS < 0.5) * pixel_out;
-        }*/
     //Bloom
         if (DO_BLOOM == 1.0 ) {
             vec3 bloomed=texture(bloom_pass_final, coords).rgb ;

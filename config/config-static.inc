@@ -23,12 +23,6 @@
 	#define LCD_ANTIGHOSTING 0.0
 
 
-// APPEARANCE SETTINGS ////////////////////////////////////////////////////////
-
-// Haloing happens on a scanlined/gapped image or not
-	#define HALO_PRE_SCANLINE_GAP 0.0
-	
-	
 // BEZEL STATIC CONFIG ////////////////////////////////////////////////////////
 
 	//The following defines the monitor frame resolution in textures/monitor_body_[curved/straight].png

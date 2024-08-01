@@ -13,16 +13,19 @@ layout(location = 3) out float vDeltaRenderOk;
 void main() {
     gl_Position = global.MVP * Position;
     vTexCoord = TexCoord;
-
+    //Shift texel coord to optimize blurring.
+    //inverted the previous pass shift.
+        float m = map_range(HALO_SHARPNESS, 0.0, GLOW_SHARP_MAX, 0.0, 1.0);
+        vTexCoord += mix( params.SourceSize.zw*0.5, vec2(0.0), m);
+        
     //Adapt to the old params range
         vHALO_SHARPNESS = vec2(GLOW_SHARP_MAX - HALO_SHARPNESS);
-        vHALO_SHARPNESS = vHALO_SHARPNESS/6.0;
+        vHALO_SHARPNESS = vHALO_SHARPNESS/7.5;
 
-
-//20..1 10...2 prova 5..3
+            
+            
     //Correct aspect
         vHALO_SHARPNESS = radius_blur_adapt(vHALO_SHARPNESS);
-
 
    if (HALO_POWER >= 0.0)
       vHALO_POWER = HALO_POWER;
@@ -62,4 +65,6 @@ void main() {
     
     FragColor.rgb = pixel_haloed;
     
+    
+      //  FragColor.rgb = pow(texture(Source, vTexCoord).rgb * vHALO_POWER,  vec3(HALO_GAMMA_OUT));
 }
