@@ -138,3 +138,6 @@ TODO:
 	[ ] joind dynamic zoom and override zoom into one zoom?
 	[ ] Unexcited phosphor grid is not dependant on hmask strength.
 	    easy but not mandatory to fix, it would costs performance and need presets update, unsure what to do.
+	[ ] Make bloom power not dependant on input signal gain
+	[ ] Add another 4 sized mask that reduces weird Hardware related artifacts: rgxb (r1,g2,b4)
+	[ ] Set rgb-h mask power parameter min step = 0.01

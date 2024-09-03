@@ -418,31 +418,45 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
     So you can use this to restore the brightness and color saturation<br>
     loss when using features like scanlines, darklines or RGB masks.<br>
     
-    Pre-attenuate input signal gain to 1x:
+    (Halo): Pre-attenuate input signal gain to 1x:
         Nullifies the input gain applied in the color correction section.
         This way the halo effect will be consistent and will not depend on 
         it, avoiding hard to manage cascading effects.
-    Strength (negative = 10x precision)
+    (Halo): Strength (negative = 10x precision)
         The effect strength.
         Negative values are interpreted as positive ones, divided by 10,
         when fine tuning is needed.
-    Sharpness
+    (Halo): Sharpness
         The lower, the wider the halo.
-    Gamma in
+    (Halo): Gamma in
         Act like a soft treshold; the higher, the less the darker colors
         will be "haloed"
-    Gamma out
+    (Halo): Gamma out
         Post-gamma correction applied to the halo.
-    Light up scanline gaps and dot grid gaps too:
-		Theoretically Halo have to be applied 
-		"over" everything, because that is the way it works in nature.
-		But you can choose to cheat and instead apply scanlines over the halo
-		instead.
-		Do this if you like much more pronunced scanlines, even at the
-		price of some graphical artifacts visible on high contrasted areas.
-		The same apply for the grid emulated via dot matrix emulation feature.
+    Mask Helper: Additional brighness if horizontal mask clips
+        To maximize horizontal mask coverage while maintaining full brightness, use the Mask Helper. 
+        This feature selectively adds color to pixels where the mask alone falls short.
+        
+        How to Use Mask Helper:
+        -----------------------
+            Activate the "Horizontal mask" parameter.
+            Set "Phosphors width Min, Max" to the minimum.
+            Set "Phosphors width min->max gamma" to the maximum.
+            Adjust "Input signal gain" based on mask size:
+                ~2.0..3.0 for 2-sized (gm, wx)
+                ~3.0..4.0 for 3-sized (gmx, rgb,rbg)
+                ~4.0..5.0 for 4-sized (rgbx, rbgx)
+                
+        Note: Halo-tagged parameters do not affect Mask Helper.
+
+    (Halo and Mask helper): Light up scanline gaps and dot grid gaps too:
+        Theoretically Halo and Mask helper have to be applied
+        "over" everything, because that is the way it works in nature.
+        But you can choose to cheat and prefer to see more scanlines gaps, instead.
+        Do this if you like much more pronunced scanlines, even at the
+        cost of some graphical artifacts visible on high contrasted areas.
+        The same apply for the grid emulated via dot matrix emulation feature.
  
-    
 **Bloom:**<br>
     Acts like Halo, but affects a much wider area and is more configurable.<br>
     By using this effect and playing with its parameters, you can achieve funny<br>

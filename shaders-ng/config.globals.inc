@@ -226,6 +226,10 @@
     #define DO_HALO		global.DO_HALO
 #endif
 
+#ifndef HALO_DO_MASK_HELPER
+    #define HALO_DO_MASK_HELPER		params.HALO_DO_MASK_HELPER
+#endif
+
 #ifndef HALO_SHARPNESS
     #define HALO_SHARPNESS	params.HALO_SHARPNESS
 #endif

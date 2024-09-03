@@ -187,13 +187,14 @@
 // #define DOT_M_SHADOW_OFF  0.0  //            . Shadow offset
 
 
-// #define DO_HALO  1.0           // ★ Halo enable?
-// #define HALO_NO_PREGAIN  1.0   //         Pre-attenuate input signal gain to 1x
-// #define HALO_POWER  0.5        //         Strength (negative = 10x precision)
-// #define HALO_SHARPNESS  6.5    //         Sharpness
-// #define HALO_GAMMA  2.0        //         Gamma in, the higher, the less the halo on dark colors
-// #define HALO_GAMMA_OUT  1.0    //         Gamma out
-// #define HALO_VS_SCAN  0.7      //         Light up scanline gaps and dot grid gaps too
+// #define DO_HALO  1.0            // ★ Halo and/or Hmask Compensation enable?
+// #define HALO_NO_PREGAIN  1.0    //         Halo: Pre-attenuate input signal gain to 1x
+// #define HALO_POWER  0.5         //         Halo: Strength (negative = 10x precision)
+// #define HALO_SHARPNESS  6.5     //         Halo: Sharpness
+// #define HALO_GAMMA  2.0         //         Halo: Gamma in: Higher -> less halo on dark colors
+// #define HALO_GAMMA_OUT  1.0     //         Halo: Gamma out
+// #define HALO_DO_MASK_HELPER 0.0 //         Additional brighness if horizontal mask clips
+// #define HALO_VS_SCAN  0.7       //         Light up scanline gaps and dot grid gaps too
 
 
 // #define DO_BLOOM  1.0             // ★ Bloom enable?
