@@ -140,5 +140,5 @@ TODO:
 	[ ] joind dynamic zoom and override zoom into one zoom?
 	[ ] Unexcited phosphor grid is not dependant on hmask strength.
 	    easy but not mandatory to fix, it would costs performance and need presets update, unsure what to do.
-	[ ] Make bloom power not dependant on input signal gain
+	[ ] Make bloom power not dependant on input signal gain ? Not sure.
 
