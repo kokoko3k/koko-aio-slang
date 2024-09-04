@@ -1,4 +1,4 @@
-#reference "Base.slangp"
+#reference "../koko-aio-ng.slangp"
 
 DO_CCORRECTION = "1.000000"
 	IN_GLOW_POWER = "4.499998"
