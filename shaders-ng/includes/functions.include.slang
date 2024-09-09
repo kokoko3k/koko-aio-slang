@@ -770,7 +770,7 @@ float random_fast(vec2 seed) {
 
 	//#define ar_tolerance 0.005 //To compensate when comparing different A/R 
 	bool is_rotated() {
-		return params.Rotation != 0.0;
+		return (params.Rotation == 1.0 || params.Rotation == 3.0);
 		/*
 			For some reason, probably retroarch rotates the view only on final viewport stage, transparent to the shader passes,
 			The OutputSize of a pass that scales to viewport will have different aspect from the real final viewport.
