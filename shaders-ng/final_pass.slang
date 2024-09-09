@@ -486,7 +486,7 @@ vec3 morph_shape_full_vec3(vec3 shape, vec3 l, float steep, float gamma ) {
     return (s2/(steep)) + s1;
 }
 
-vec3 morph_shape_full_no_steepness_vec3(vec3 shape, vec3 l, float gamma, float dewhite ) {
+vec3 morph_shape_full_no_steepness_vec3(vec3 shape, vec3 l, float gamma) {
     vec3 l_pow = pow(l,vec3(gamma));
     vec3 l2 = min(l_pow * 16, 1);
     vec3 s1 = pow(shape, inversesqrt(l2));
@@ -494,7 +494,7 @@ vec3 morph_shape_full_no_steepness_vec3(vec3 shape, vec3 l, float gamma, float d
         // == 1*l_pow  - s1*l_pow
         // == -l_pow*s1 + l_pow
     //vec3 s2 = fma(s1, -l_pow, l_pow); //ASM PROOF, slower.
-    return s2/dewhite + s1;
+    return s2 + s1;
 }
 
 
@@ -670,64 +670,10 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
             // get 3 sines in black/white,   | sin(freq_rgb)
             // make them always positive and double frequency  | sin(freq_rgb) * sin(freq_rgb)
             // and scale Max width according to pre-gains:
-        
-            
-float G = max_inLum; // mix(1.0, vPG_offsets_and_size.a,  SERVICE1);
-float dewhite = G ;            
-     dewhite= 1.0;  
-//dewhite = max_inLum * 2.0;
                 vec3 phosphor_width = map_range(pixel_in.rgb, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
-                
-                //phosphor_width *= mix( vec3(1.0), pixel_in.rgb/max_inLum + 0.001 , SERVICE1);
-                
-                //phosphor_width = pow(phosphor_width, vec3(SERVICE1*4.0));
-                
-                //return phosphor_width.rgbr;
-
-                
+        
             //Get final phosphor width:
-                rgb_w = morph_shape_full_no_steepness_vec3( sin(freq_rgb) * sin(freq_rgb), phosphor_width, PIXELGRID_GAMMA_W, dewhite); //2%
-
-                
-// rgb_w /= mix( vec3(1.0), vec3(max_inLum) + 0.001 , SERVICE1);                     
-      
-
-
-vec3 rgb_w_steep = pow(sin(freq_rgb), vec3(50.0));
-
-float mask_transient_before = 0.0;
-float mask_transient_after = 0.01;
-vec3 s0 = vec3(1/G) - mask_transient_before;
-vec3 s1 = vec3(1/G) + mask_transient_after;
-
-s0 = vec3(0.0);
-s1 = vec3(1.0);
-
-vec3 sstep = smoothstep_fast(s0, s1, pixel_in.rgb/max_inLum);
-
-sstep = pow(sstep, vec3(1.0));
-
-//return rgb_w_steep.rgbr * pixel_in.rgbr;
-
-//return rgb_w.rgbr * pixel_in.rgbr;
-
-//rgb_w = pow(rgb_w, vec3(SERVICE1));
-
-//rgb_w = (rgb_w_steep * G)  + (rgb_w * sstep);
-//rgb_w = mix( rgb_w_steep * G , rgb_w, sstep);
-
-                                                                            // Questo funziona abbastanza bene.
-                                                                            // Basta pushare il pixel_in.
-                                                                            // cfr try1.slangp
-                                                                            /*sstep = pixel_in.rgb/max_inLum;
-                                                                            sstep = pow(sstep,vec3(1.0));
-                                                                            rgb_w = mix(rgb_w_steep, rgb_w, sstep);
-                                                                            */
-//return sstep.rgbr;
-
-//return rgb_w.rgbr * pixel_in.rgbr;
-
-
+                rgb_w = morph_shape_full_no_steepness_vec3( sin(freq_rgb) * sin(freq_rgb), phosphor_width, PIXELGRID_GAMMA_W); //2%
                 
             //Dedot rgb mask between h mask.
             //This work only when there are dots and have the countereffect when there are not.
@@ -740,7 +686,6 @@ sstep = pow(sstep, vec3(1.0));
                 
             //"export" naked vertical grille
                 rgb_grille_basal = (rgb_w * rgb_w) * (rgb_w * rgb_w) * (PIXELGRID_BASAL_GRID*0.0025);
-
                 
         }
 
