@@ -11,9 +11,9 @@
 #define CYELLOW  vec3(1.0,1.0,0.0)
 #define CCUSTOM vec3(0.3,0.5,0.1)
 
-#define DEBUG_COLOR vec3(1.0)
+#define DEBUG_COLOR vec3(1,1,1)
 #define DEBUG_BLINK_TIME 100
-#define DEBUG_GRADIENT_STEPS 64
+#define DEBUG_GRADIENT_STEPS 255
 
 
 
@@ -455,6 +455,7 @@ void main() {
 
    if (DO_CCORRECTION == 1.0) {
       pixel_out = color_tools(pixel_out, vTemperature_rgb);
+      //pixel_out = color_tools(pixel_out, vec3(1.0));
       #ifndef D3D_WORKAROUND
          if (ADAPTIVE_BLACK > 0.0) {
             float avglum = texture(avglum_passFeedback, vec2(0.5,0.5)).a ;

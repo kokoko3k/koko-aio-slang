@@ -193,7 +193,6 @@
 // #define HALO_SHARPNESS  6.5     //         Halo: Sharpness
 // #define HALO_GAMMA  2.0         //         Halo: Gamma in: Higher -> less halo on dark colors
 // #define HALO_GAMMA_OUT  1.0     //         Halo: Gamma out
-// #define HALO_DO_MASK_HELPER 0.0 //         Additional brighness if horizontal mask clips
 // #define HALO_VS_SCAN  0.7       //         Light up scanline gaps and dot grid gaps too
 
 

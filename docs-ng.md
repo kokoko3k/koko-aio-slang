@@ -433,24 +433,9 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
         will be "haloed"
     (Halo): Gamma out
         Post-gamma correction applied to the halo.
-    Mask Helper: Additional brighness if horizontal mask clips
-        To maximize horizontal mask coverage while maintaining full brightness, use the Mask Helper. 
-        This feature selectively adds color to pixels where the mask alone falls short.
-        
-        How to Use Mask Helper:
-        -----------------------
-            Activate the "Horizontal mask" parameter.
-            Set "Phosphors width Min, Max" to the minimum.
-            Set "Phosphors width min->max gamma" to the maximum.
-            Adjust "Input signal gain" based on mask size:
-                ~2.0..3.0 for 2-sized (gm, wx)
-                ~3.0..4.0 for 3-sized (gmx, rgb,rbg)
-                ~4.0..5.0 for 4-sized (rgbx, rbgx)
-                
-        Note: Halo-tagged parameters do not affect Mask Helper.
 
-    (Halo and Mask helper): Light up scanline gaps and dot grid gaps too:
-        Theoretically Halo and Mask helper have to be applied
+    Light up scanline gaps and dot grid gaps too:
+        Theoretically Halo has to be applied
         "over" everything, because that is the way it works in nature.
         But you can choose to cheat and prefer to see more scanlines gaps, instead.
         Do this if you like much more pronunced scanlines, even at the
