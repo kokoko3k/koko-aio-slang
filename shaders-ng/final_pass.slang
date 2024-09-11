@@ -34,7 +34,7 @@ layout(location = 7) out float vBEZEL_INNER_ZOOM_adapted;
 layout(location = 8) out float vDo_Tate;
 layout(location = 9) out vec3 vDotMat_Grid_Color;
 layout(location = 10) out vec4 vPG_offsets_and_size;
-layout(location = 11) out vec2 vPG_freq_base_screen;
+
 layout(location = 12) out vec2 vPG_freq_base_screen_unfloored;
 layout(location = 13) out float vPG_period_multiplier_x;
 layout(location = 14) out vec2 vPG_OriginalSize_tated_mul_pi;
@@ -247,7 +247,6 @@ void main() {
 
         // screen coords needs flooring, but unfortunately floor() does not work well in vertex shader, so calc as much as possible without floor()
             vPG_period_multiplier_x = 1/PIXELGRID_MUL_X;
-            vPG_freq_base_screen = pi * vec2(1/PG_H_COUNT, 0.5);
 
         //the following unfloored coords are needed by sin/cos later to understand if we are on an even or odd mask
             vPG_freq_base_screen_unfloored = pi * vec2(1/PG_H_COUNT, 0.5) * (vPG_OutputCoord_tated * vPG_OutputSize_tated);
@@ -395,7 +394,7 @@ layout(location = 7) in float vBEZEL_INNER_ZOOM_adapted;
 layout(location = 8) in float vDo_Tate;
 layout(location = 9) in vec3 vDotMat_Grid_Color;
 layout(location = 10) in vec4 vPG_offsets_and_size;
-layout(location = 11) in vec2 vPG_freq_base_screen;
+
 layout(location = 12) in vec2 vPG_freq_base_screen_unfloored;
 layout(location = 13) in float vPG_period_multiplier_x;
 layout(location = 14) in vec2 vPG_OriginalSize_tated_mul_pi;
@@ -573,8 +572,9 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
     //Floor x screen coords when using non 1.0x sizes.
     //y screen coords appear to work just fine even if we don't floor them,
         vec2 freq_base_screen;
+        #define PG_freq_base_screen_x (pi/vPG_offsets_and_size.a)
         if (PIXELGRID_MUL_X == 1.0) {
-            freq_base_screen = vec2(vPG_freq_base_screen.x * floor(vPG_OutputCoord_tated.x * vPG_OutputSize_tated.x ), vPG_freq_base_screen_unfloored.y);
+            freq_base_screen = vec2( (PG_freq_base_screen_x) * floor(vPG_OutputCoord_tated.x * vPG_OutputSize_tated.x ), vPG_freq_base_screen_unfloored.y);
         } else {
             freq_base_screen = vPG_freq_base_screen_unfloored;
         }
