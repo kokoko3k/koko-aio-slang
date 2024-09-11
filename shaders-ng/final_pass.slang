@@ -551,8 +551,7 @@ vec3 downsample_x( sampler2D tex, vec2 uv, vec4 sourcesize, float sharpness_add 
 
 vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inLum) {
 
-    //Scanlines: compute each phosphor height according to input luminance, puttin it here helps parallelism a bit.
-        vec3 phosphor_height = map_range(pixel_in.rgb, min_inLum, max_inLum, PIXELGRID_MIN_H, clamp(PIXELGRID_MAX_H, PIXELGRID_MIN_H, 1.0));
+
 
     //Tate ? (other outputsize,originalsize and outputcoords "tated" in vertex shader.)
         if (vDo_Tate == 1.0) in_coords.xy = in_coords.yx;
@@ -621,7 +620,9 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
         //Pixelgrid: do horizontal if enabled, but skip it if user doesn't want it on interlaced content.
         //if (DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0)) { //103.1
         if (vDo_pixelgrid_h > 0.5) {
-            
+            //Scanlines: compute each phosphor height according to input luminance
+                vec3 phosphor_height = map_range(pixel_in.rgb, min_inLum, max_inLum, PIXELGRID_MIN_H, clamp(PIXELGRID_MAX_H, PIXELGRID_MIN_H, 1.0));
+                
             //Since we emulate scanlines, take into account current scanline phase:
                 float interlacing_adapt_period = vScanlinePeriod;
 
