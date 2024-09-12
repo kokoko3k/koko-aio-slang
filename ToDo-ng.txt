@@ -116,6 +116,8 @@ TODO:
 	[v] Allow to configure new bezel parameters
 	[v] Adaptive black/dynamic contrast, the more the brigher the content, the less the bezel and back/foreground image?
 	[v] Add debanding again
+	[v] Set rgb-h mask power parameter min step = 0.01
+	[v] Add another 4 sized mask that reduces weird Hardware related artifacts: rgxb (r1,g2,b4)
 	
 	[ ] Glow spread in final pass?
 	[ ] Find a way to smooth borders without cropping the image
@@ -136,4 +138,7 @@ TODO:
 	[ ] Why bezel does not scale correctly when using integer scale?
 	[ ] why blink debug option does not trig scene change when going from 0.2 to 1.0?
 	[ ] joind dynamic zoom and override zoom into one zoom?
-	
+	[ ] Unexcited phosphor grid is not dependant on hmask strength.
+	    easy but not mandatory to fix, it would costs performance and need presets update, unsure what to do.
+	[ ] Make bloom power not dependant on input signal gain ? Not sure.
+
