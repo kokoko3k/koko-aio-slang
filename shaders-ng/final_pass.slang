@@ -752,6 +752,9 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
             mask = PIXELGRID_OVERMASK * (mask - 0.5) + 0.5;
             pixel_in.rgb = mix(pixel_in.rgb, pixel_in.rgb * PIXELGRID_OVERMASK, PIXELGRID_OVERMASK);
             
+            //mask = mix(vec3(1.0), mask * PIXELGRID_OVERMASK * 1.2, PIXELGRID_OVERMASK);
+            
+            
     //Apply the mask to pixel_in and clamp the minimum to the unexcited grille.
         vec3 mask_and_grille = max(mask * pixel_in.rgb, rgb_grille_basal);
 
@@ -1115,7 +1118,9 @@ vec3 fn_pixel_content(vec2 coords) {
             
             //ASM proof faster: less operations/cycles:
             //p=p+h⋅(m+b⋅(1−m))
-            pixel_out = pixel_out + pixel_haloed * (dot_mat_or_pixelgrid + HALO_VS_SCAN * (1-dot_mat_or_pixelgrid));
+            //pixel_out = pixel_out + pixel_haloed * (dot_mat_or_pixelgrid + HALO_VS_SCAN * (1-dot_mat_or_pixelgrid));
+            //same, clearer.
+            pixel_out = pixel_out + pixel_haloed * mix( dot_mat_or_pixelgrid  , 1.0,  HALO_VS_SCAN);
 
         }
 
