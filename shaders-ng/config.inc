@@ -309,7 +309,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter COLOR_MONO_HUE2       "          . Hue dark"						0.3  0.0 1.0 0.01
 #pragma parameter COLOR_MONO_HUE_BIAS   "          . Hue bright-dark bias"		0.0	-2.0 2.0 0.01
 #pragma parameter SATURATION            "       Saturation in   (1.0=off)"		1.0	0.0  2.0 0.01
-#pragma parameter VIBRANCE              "       Vibrance in   (0.0=off)"		0.0	0.0  5.0 0.1
+#pragma parameter VIBRANCE              "       Vibrance in   (0.0=off)"		0.0	0.0  5.0 0.01
 #pragma parameter LABEL0003 " " 0.0 0.0 0.0 1.0
 
 
