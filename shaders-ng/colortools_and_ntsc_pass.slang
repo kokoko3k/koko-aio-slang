@@ -42,12 +42,14 @@
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
-layout(location = 1) out vec3 vTemperature_rgb;
+
 layout(location = 0) out vec2 vTexCoord;
+layout(location = 1) out vec3 vTemperature_rgb;
 layout(location = 2) out float vNTSC_FILTER_FC;
 layout(location = 3) out float vSubcarrierFrequency_mul_size_mul_TAU;
 layout(location = 4) out float vPixelgrid_intr_gamma_adj;
-layout(location = 5) out float vNTSC_weights[NTSC_FILTER_WIDTH_MAX];
+layout(location = 5) out vec3 vDebug;
+layout(location = 6) out float vNTSC_weights[NTSC_FILTER_WIDTH_MAX];
 
 
 #include "includes/functions.include.slang"
@@ -116,6 +118,50 @@ void main() {
       vPixelgrid_intr_gamma_adj = 1.0;
       if (pixelgrid_h_needed() && scanlines_will_alternate(is_interlaced()))
           vPixelgrid_intr_gamma_adj = PIXELGRID_INTR_GAMMA_ADJ;
+     
+   if (DO_TEST == 1.0) {
+      vDebug = vec3(0.0);
+   }
+   else if (DO_TEST == 2.0) {
+      vDebug = vec3(0.5);
+   }
+   else if (DO_TEST == 3.0) {
+      vDebug = vec3(1.0);
+   }   
+   else if (DO_TEST == 4.0) {
+      float cycle = mod(params.FrameCount / DEBUG_BLINK_TIME, 4);
+           if (cycle <= 0) vDebug = vec3(vTexCoord.x);
+      else if (cycle <= 1) vDebug = vec3(vTexCoord.x, 0.0, 0.0);
+      else if (cycle <= 2) vDebug = vec3(0.0,vTexCoord.x,0.0);
+      else if (cycle <= 3) vDebug = vec3(0.0,0.0,vTexCoord.x);
+   }   
+   else if (DO_TEST == 5.0) {
+      float cycle = mod(params.FrameCount / DEBUG_BLINK_TIME, 4);
+           if (cycle <= 0) vDebug = vec3(vTexCoord.y);
+      else if (cycle <= 1) vDebug = vec3(vTexCoord.y, 0.0, 0.0);
+      else if (cycle <= 2) vDebug = vec3(0.0,vTexCoord.y,0.0);
+      else if (cycle <= 3) vDebug = vec3(0.0,0.0,vTexCoord.y);
+   }   
+   else if (DO_TEST == 6.0) {
+      float cycle = mod(params.FrameCount / DEBUG_BLINK_TIME, 6);
+           if (cycle <= 0) vDebug = vec3(vTexCoord.x, vTexCoord.y, 0.0);
+      else if (cycle <= 1) vDebug = vec3(vTexCoord.x, 0.0,         vTexCoord.y);
+      else if (cycle <= 2) vDebug = vec3(vTexCoord.y, vTexCoord.x, 0.0);
+      else if (cycle <= 3) vDebug = vec3(vTexCoord.y, 0.0,         vTexCoord.x);
+      else if (cycle <= 4) vDebug = vec3(0.0,         vTexCoord.x, vTexCoord.y);
+      else if (cycle <= 5) vDebug = vec3(0.0,         vTexCoord.y, vTexCoord.x);
+   }   
+   else if (DO_TEST == 7.0) {
+      if (mod(params.FrameCount, DEBUG_BLINK_TIME*2) < DEBUG_BLINK_TIME) 
+         vDebug = vec3(0.0) ;
+      else 
+         vDebug = vec3(1.0) ;
+   }
+   else if (DO_TEST == 8.0) {
+      float time_fade = abs(sin(params.FrameCount/3.14/20));
+      vec3 color_fade = vec3(1.0) * time_fade;
+      vDebug = color_fade;
+   }      
    
 }
 
@@ -129,8 +175,8 @@ layout(location = 1) in vec3 vTemperature_rgb;
 layout(location = 2) in float vNTSC_FILTER_FC;
 layout(location = 3) in float vSubcarrierFrequency_mul_size_mul_TAU;
 layout(location = 4) in float vPixelgrid_intr_gamma_adj;
-layout(location = 5) in float vNTSC_weights[NTSC_FILTER_WIDTH_MAX];
-
+layout(location = 5) in vec3 vDebug;
+layout(location = 6) in float vNTSC_weights[NTSC_FILTER_WIDTH_MAX];
 
 layout(location = 0) out vec4 FragColor;
 
@@ -417,6 +463,9 @@ void main() {
    #endif
 
    vec3 pixel_in = texture(Source, co).rgb;
+   
+   pixel_in.rgb = mix(pixel_in, vDebug, min(DO_TEST, 1.0)  );
+   
    vec3 pixel_out = pixel_in;
    //This will go into alpha channel to make glow aware of it and blur more.
    //It could be configurable.
@@ -509,6 +558,7 @@ void main() {
    pixel_out.rgb = pow(pixel_out.rgb, vec3(vPixelgrid_intr_gamma_adj));
         
    artifact_mask = clamp(artifact_mask, 0.0, 1.0);
+   
    FragColor = vec4(pixel_out, artifact_mask);
 
 }

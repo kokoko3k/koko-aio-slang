@@ -1,5 +1,8 @@
 //Wrap any translation into an ifndef so that we can override them with a static include.
 
+#ifndef DO_TEST
+    #define DO_TEST	global.DO_TEST
+#endif
 
 #ifndef DO_CCORRECTION
     #define DO_CCORRECTION	global.DO_CCORRECTION

@@ -288,12 +288,17 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float IN_GLOW_WARPSHARP_Y;
 	float IN_GLOW_WARPSHARP_GAMMA;
 	
+	float DO_TEST ;
+	
 } global;
 
 
 #pragma parameter LABEL0000 "Read the documentation in docs-ng.md text file" 		0.0 0.0 0.0 1.0
 #pragma parameter LABEL0001 "==================================================" 		0.0 0.0 0.0 1.0
 #pragma parameter LABEL0002 " " 		0.0 0.0 0.0 1.0
+
+#pragma parameter DO_TEST "★ Show test pattern ==>" 		0.0 	0.0 9.0 1.0
+#pragma parameter LABELTEST " " 		0.0 0.0 0.0 1.0
 
 // Color correction 
 #pragma parameter DO_CCORRECTION "★ Color corrections enable? (co) ==>" 		0.0 	0.0 1.0 1.0
