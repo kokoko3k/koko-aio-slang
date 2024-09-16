@@ -18,6 +18,7 @@ layout(push_constant) uniform Push {
 	float HALO_GAMMA ;
 	float HALO_GAMMA_OUT;
 	float HALO_VS_SCAN ;
+	float HALO_DO_MASK_HELPER;
 	
 	float DO_BLOOM ; //4
  	float BLOOM_QUALITY ; //1
@@ -480,13 +481,15 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 
 // Halo
-#pragma parameter DO_HALO             "★ Halo enable? (ha) ==>" 						0.0	0.0 1.0 1.0
-#pragma parameter HALO_NO_PREGAIN     "  Pre-attenuate input signal gain to 1x"	0.0		0.0	1.0	1.0
-#pragma parameter HALO_POWER          "  Strength (negative = 10x precision)"	0.9 	-50.0  5.0 0.01
-#pragma parameter HALO_SHARPNESS      "  Sharpness"					3.00	0.05   7.0 0.05
-#pragma parameter HALO_GAMMA          "  Gamma in: Higher -> less halo on dark colors"	2.0 	1.0  10.0 0.05
-#pragma parameter HALO_GAMMA_OUT      "  Gamma out"	 1.0	0.25  4.0 0.05
-#pragma parameter HALO_VS_SCAN        "  Light scanlines and dot grid gaps"				0.0	0.0  1.0  0.01
+#pragma parameter DO_HALO             "★ Halo or Mask helper enable? (ha) ==>" 						0.0	0.0 1.0 1.0
+#pragma parameter HALO_NO_PREGAIN     "  Halo: Pre-attenuate input signal gain to 1x"	0.0		0.0	1.0	1.0
+#pragma parameter HALO_POWER          "  Halo: Strength (negative = 10x precision)"	0.9 	-50.0  5.0 0.01
+#pragma parameter HALO_SHARPNESS      "  Halo: Sharpness"					3.00	0.05   7.0 0.05
+#pragma parameter HALO_GAMMA          "  Halo: Gamma in: Higher -> less halo on dark colors"	2.0 	1.0  10.0 0.05
+#pragma parameter HALO_GAMMA_OUT      "  Halo: Gamma out"	 1.0	0.25  4.0 0.05
+#pragma parameter HALO_DO_MASK_HELPER "  Mask helper: Additional brighness if horizontal mask clips" 	0.0	0.0 1.0 0.05 
+#pragma parameter LABEL_HALO_HELP     "       (Mask helper: read docs-ng.md for help)" 	0.0 0.0 0.0 1.0
+#pragma parameter HALO_VS_SCAN        "  Both: Light scanlines and dot grid gaps"				0.0	0.0  1.0  0.01
 #pragma parameter LABEL0021 " " 0.0 0.0 0.0 1.0
 
 

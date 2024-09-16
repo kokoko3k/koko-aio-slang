@@ -433,7 +433,24 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
         will be "haloed"
     (Halo): Gamma out
         Post-gamma correction applied to the halo.
-
+    Mask Helper: Additional brighness if horizontal mask clips
+        This function will add more color to the subpixel mask (eg: RGB, RBGX...)
+        when it is unable to reach the enough brightness.
+        This will allow to fully exploit subpixel mask capacity while retaining
+        the desidered brightness.
+        Please note that a well calibrated monitor is needed.
+        
+        How to Use Mask Helper:
+        -----------------------
+            Adjust "Input signal gain" based on mask size:
+               ~2.0..3.0 for 2-sized (gm, wx)
+               ~3.0..4.0 for 3-sized (gmx, rgb,rbg)
+               ~4.0..5.0 for 4-sized (rgbx, rbgx)
+                
+            Activate the "Horizontal mask" parameter.
+               Set "Phosphors width Min, Max" to the minimum.
+               Set "Phosphors width min->max gamma" to the maximum.
+               
     Light up scanline gaps and dot grid gaps too:
         Theoretically Halo has to be applied
         "over" everything, because that is the way it works in nature.

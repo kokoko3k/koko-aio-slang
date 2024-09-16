@@ -1122,6 +1122,8 @@ vec3 fn_pixel_content(vec2 coords) {
             //same, clearer.
             pixel_out = pixel_out + pixel_haloed * mix( dot_mat_or_pixelgrid  , 1.0,  HALO_VS_SCAN);
 
+            //pixel_out = pixel_haloed;
+            
         }
 
     // Apply gamma out:
