@@ -162,6 +162,21 @@ void main() {
       vec3 color_fade = vec3(1.0) * time_fade;
       vDebug = color_fade;
    }      
+   else if (DO_TEST == 9.0) {
+      float time_fade = abs(sin(params.FrameCount/3.14/20));
+      vec3 color_fade = vec3(1.0,0.0,0.0) * time_fade;
+      vDebug = color_fade;
+   }      
+   else if (DO_TEST == 10.0) {
+      float time_fade = abs(sin(params.FrameCount/3.14/20));
+      vec3 color_fade = vec3(0.0, 1.0, 0.0) * time_fade;
+      vDebug = color_fade;
+   }      
+   else if (DO_TEST == 11.0) {
+      float time_fade = abs(sin(params.FrameCount/3.14/20));
+      vec3 color_fade = vec3(0.0, 0.0, 1.0) * time_fade;
+      vDebug = color_fade;
+   }      
    
 }
 
