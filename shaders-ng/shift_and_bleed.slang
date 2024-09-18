@@ -28,17 +28,19 @@ void main()
       vR_offset = vec2(DOT_M_SHADOW_OFF, abs(DOT_M_SHADOW_OFF));
       vG_offset = vR_offset;
       vB_offset = vR_offset;
+      vec2 d = -params.OutputSize.zw * 0.5;
+      vR_offset *= d;
+      vG_offset *= d;
+      vB_offset *= d;
    } else if (DO_SHIFT_RGB == 1.0) {
-      vR_offset=offsets_from_float(SHIFT_R+210.0,RGB_SHIFT_RANGE);
-      vG_offset=offsets_from_float(SHIFT_G+210.0,RGB_SHIFT_RANGE);
-      vB_offset=offsets_from_float(SHIFT_B+210.0,RGB_SHIFT_RANGE);
+      vR_offset=-vec2(DECON_RX, DECON_RY)*global.FinalViewportSize.zw;
+      vG_offset=-vec2(DECON_GX, DECON_GY)*global.FinalViewportSize.zw;
+      vB_offset=-vec2(DECON_BX, DECON_BY)*global.FinalViewportSize.zw;
+      
    }
    
    
-   vec2 d = -params.OutputSize.zw * 0.5;
-   vR_offset *= d;
-   vG_offset *= d;
-   vB_offset *= d;
+
    
    
    //Precalc some conditions:
@@ -115,7 +117,7 @@ vec4 deconvergence_shadow(vec2 coords, sampler2D in_texture, vec4 source_pixel) 
          vec2 sinco = sin(coords*pi);
          float dist_from_edge = (sinco.x*sinco.y);
          dist_from_edge = pow(dist_from_edge, EDGE_DEFOCUS_DECON_AREA);
-         float offset_multiplier = EDGE_DEFOCUS_DECON*(1-dist_from_edge);
+         float offset_multiplier = mix(EDGE_DEFOCUS_DECON, 1.0, dist_from_edge);
          R_offset *= offset_multiplier;
          G_offset *= offset_multiplier;
          B_offset *= offset_multiplier;

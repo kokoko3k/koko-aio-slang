@@ -152,16 +152,28 @@
     #define DO_SHIFT_RGB		global.DO_SHIFT_RGB
 #endif
 
-#ifndef SHIFT_R
-    #define SHIFT_R			global.SHIFT_R
+#ifndef DECON_RX
+    #define DECON_RX			global.DECON_RX
 #endif
 
-#ifndef SHIFT_G
-    #define SHIFT_G			global.SHIFT_G
+#ifndef DECON_RY
+    #define DECON_RY			global.DECON_RY
 #endif
 
-#ifndef SHIFT_B
-    #define SHIFT_B			global.SHIFT_B
+#ifndef DECON_GX
+    #define DECON_GX			global.DECON_GX
+#endif
+
+#ifndef DECON_GY
+    #define DECON_GY			global.DECON_GY
+#endif
+
+#ifndef DECON_BX
+    #define DECON_BX			global.DECON_BX
+#endif
+
+#ifndef DECON_BY
+    #define DECON_BY			global.DECON_BY
 #endif
 
 #ifndef EDGE_DEFOCUS_DECON
