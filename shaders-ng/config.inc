@@ -290,6 +290,9 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	
 	float DO_TEST ;
 	
+	float EDGE_DEFOCUS_DECON;
+	float EDGE_DEFOCUS_DECON_AREA;
+	
 } global;
 
 
@@ -376,7 +379,9 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter OFFSET_STRENGTH "        Strength"			0.6 	 0.0 1.0 0.05
 #pragma parameter SHIFT_R         "        Red offset"			-40.0 	-210.0 189.0 1
 #pragma parameter SHIFT_G         "        Green offset"		2.0 	-210.0 189.0 1
-#pragma parameter SHIFT_B         "        Blue offset"			40.0 	-210.0 189.0 1
+#pragma parameter SHIFT_B               "        Blue offset"			40.0 	-210.0 189.0 1
+#pragma parameter EDGE_DEFOCUS_DECON         "        Defocus at corners/edges (1=no defocus)" 1.0 1.0 10.0 0.1
+#pragma parameter EDGE_DEFOCUS_DECON_AREA    "        Defocus Area" 0.1 0.1 10.0 0.1
 #pragma parameter LABEL0010 " " 0.0 0.0 0.0 1.0
 
 

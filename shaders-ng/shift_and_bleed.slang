@@ -106,9 +106,24 @@ vec4 deconvergence_shadow(vec2 coords, sampler2D in_texture, vec4 source_pixel) 
       //Since we are sampling from a "clamp-to-border" texture, ensure we've no black bleeding
       //by clamping the texture coords
       coords = clamp(coords,params.SourceSize.zw*1 ,1.0-params.SourceSize.zw);
-      pixel_offset.r=texture(in_texture,coords + vR_offset).r;
-      pixel_offset.g=texture(in_texture,coords + vG_offset).g;
-      pixel_offset.b=texture(in_texture,coords + vB_offset).b;
+      
+      vec2 R_offset=vR_offset;
+      vec2 G_offset=vG_offset;
+      vec2 B_offset=vB_offset;
+      if (DOT_M_SHADOW_STR == 0.0) {
+         // Edge defocus:
+         vec2 sinco = sin(coords*pi);
+         float dist_from_edge = (sinco.x*sinco.y);
+         dist_from_edge = pow(dist_from_edge, EDGE_DEFOCUS_DECON_AREA);
+         float offset_multiplier = EDGE_DEFOCUS_DECON*(1-dist_from_edge);
+         R_offset *= offset_multiplier;
+         G_offset *= offset_multiplier;
+         B_offset *= offset_multiplier;
+      }
+      
+      pixel_offset.r=texture(in_texture,coords + R_offset).r;
+      pixel_offset.g=texture(in_texture,coords + G_offset).g;
+      pixel_offset.b=texture(in_texture,coords + B_offset).b;
       
       vec3 deconvergence_mode = mix(source_pixel.rgb, pixel_offset, OFFSET_STRENGTH);
       vec3 shadow_mode = source_pixel.rgb - max( (source_pixel.rgb - pixel_offset), vec3(0.0) ) * DOT_M_SHADOW_STR;

@@ -164,6 +164,14 @@
     #define SHIFT_B			global.SHIFT_B
 #endif
 
+#ifndef EDGE_DEFOCUS_DECON
+    #define EDGE_DEFOCUS_DECON		global.EDGE_DEFOCUS_DECON
+#endif
+
+#ifndef EDGE_DEFOCUS_DECON_AREA
+    #define EDGE_DEFOCUS_DECON_AREA		global.EDGE_DEFOCUS_DECON_AREA
+#endif
+
 #ifndef OFFSET_STRENGTH
     #define OFFSET_STRENGTH	global.OFFSET_STRENGTH
 #endif
