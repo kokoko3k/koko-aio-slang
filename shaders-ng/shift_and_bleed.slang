@@ -33,14 +33,10 @@ void main()
       vG_offset *= d;
       vB_offset *= d;
    } else if (DO_SHIFT_RGB == 1.0) {
-      vR_offset=-vec2(DECON_RX, DECON_RY)*global.FinalViewportSize.zw;
-      vG_offset=-vec2(DECON_GX, DECON_GY)*global.FinalViewportSize.zw;
-      vB_offset=-vec2(DECON_BX, DECON_BY)*global.FinalViewportSize.zw;
-      
+      vR_offset=-vec2(DECON_RX, DECON_RY)*global.flick_and_noise_passSize.zw * NEW_SCALEMOD_X;
+      vG_offset=-vec2(DECON_GX, DECON_GY)*global.flick_and_noise_passSize.zw * NEW_SCALEMOD_X;
+      vB_offset=-vec2(DECON_BX, DECON_BY)*global.flick_and_noise_passSize.zw * NEW_SCALEMOD_X;
    }
-   
-   
-
    
    
    //Precalc some conditions:
@@ -104,7 +100,7 @@ vec4 deconvergence_shadow(vec2 coords, sampler2D in_texture, vec4 source_pixel) 
       //will be the same for shadow mode. Hopefully shader texture cache will take care of
       //multiple sampling for the same tex coords.
    
-      vec3 pixel_offset;
+      vec3 pixel_offsetted;
       //Since we are sampling from a "clamp-to-border" texture, ensure we've no black bleeding
       //by clamping the texture coords
       coords = clamp(coords,params.SourceSize.zw*1 ,1.0-params.SourceSize.zw);
@@ -112,23 +108,22 @@ vec4 deconvergence_shadow(vec2 coords, sampler2D in_texture, vec4 source_pixel) 
       vec2 R_offset=vR_offset;
       vec2 G_offset=vG_offset;
       vec2 B_offset=vB_offset;
+      
       if (DOT_M_SHADOW_STR == 0.0) {
          // Edge defocus:
-         vec2 sinco = sin(coords*pi);
-         float dist_from_edge = (sinco.x*sinco.y);
-         dist_from_edge = pow(dist_from_edge, EDGE_DEFOCUS_DECON_AREA);
-         float offset_multiplier = mix(EDGE_DEFOCUS_DECON, 1.0, dist_from_edge);
+         float dist_from_edge = distance_from_edge(coords, EDGE_DEFOCUS_AREA);
+         float offset_multiplier = mix(EDGE_DEFOCUS, 1.0, dist_from_edge);
          R_offset *= offset_multiplier;
          G_offset *= offset_multiplier;
          B_offset *= offset_multiplier;
       }
       
-      pixel_offset.r=texture(in_texture,coords + R_offset).r;
-      pixel_offset.g=texture(in_texture,coords + G_offset).g;
-      pixel_offset.b=texture(in_texture,coords + B_offset).b;
+      pixel_offsetted.r=texture(in_texture,coords + R_offset).r;
+      pixel_offsetted.g=texture(in_texture,coords + G_offset).g;
+      pixel_offsetted.b=texture(in_texture,coords + B_offset).b;
       
-      vec3 deconvergence_mode = mix(source_pixel.rgb, pixel_offset, OFFSET_STRENGTH);
-      vec3 shadow_mode = source_pixel.rgb - max( (source_pixel.rgb - pixel_offset), vec3(0.0) ) * DOT_M_SHADOW_STR;
+      vec3 deconvergence_mode = mix(source_pixel.rgb, pixel_offsetted, OFFSET_STRENGTH);
+      vec3 shadow_mode = source_pixel.rgb - max( (source_pixel.rgb - pixel_offsetted), vec3(0.0) ) * DOT_M_SHADOW_STR;
       
       return vec4( mix_step(deconvergence_mode, shadow_mode, vDo_shadow_mode),
                    source_pixel.a );
@@ -221,25 +216,25 @@ vec4 pixel_bleed(vec4 pixel_in, vec2 co, sampler2D in_texture, float sourcesize_
 void main() {
    vec4 pixel_out;
 
-      if ( DO_FXAA == 1.0)  {
-         pixel_out = texture(FXAA_pass, vTexCoord );
-      } else {
-         pixel_out = texture(flick_and_noise_pass, vTexCoord);
-      }
+   if ( DO_FXAA == 1.0)  {
+      pixel_out = texture(FXAA_pass, vTexCoord );
+   } else {
+      pixel_out = texture(flick_and_noise_pass, vTexCoord);
+   }
 
-      
+   
    //shift
    if (vDecon_or_JustShadow > 0.0 )
       pixel_out = deconvergence_shadow_wrap(vTexCoord, pixel_out);
-   
+
    //..and bleed
    if (DO_SAT_BLEED > 0.0)
       pixel_out = pixel_bleed(pixel_out, vTexCoord, flick_and_noise_pass, params.OriginalSize.z*0.5);
 
-   
+
    //pre-gamma if needed by glow.
    if (DO_CCORRECTION > 0.5) 
       pixel_out.rgb = pow(pixel_out.rgb, vec3(IN_GLOW_GAMMA));
- 
+
    FragColor = pixel_out;
 }

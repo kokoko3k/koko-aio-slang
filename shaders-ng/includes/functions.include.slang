@@ -1181,8 +1181,8 @@ vec3 blur_px(sampler2D smp, vec2 co, vec2 r) {
 	}
 	*/
 	
-	vec3 blur5_x(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_x, float lod) {
-		float resolution = sourcesize.x * sharpness_x;
+	vec3 blur5_x(sampler2D image, vec2 uv, float sourcesize_x, float sharpness_x, float lod) {
+		float resolution = sourcesize_x * sharpness_x;
 		vec3 color = vec3(0.0);
 		vec2 off1 = vec2(1.333333333333 / resolution, 0.0);
 		color += textureLod(image, uv, lod).rgb   * 0.29411764705882354;
@@ -1191,8 +1191,8 @@ vec3 blur_px(sampler2D smp, vec2 co, vec2 r) {
 		return color;
 	}
 	
-	vec3 blur5_y(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_y, float lod) {
-		float resolution = sourcesize.y * sharpness_y;
+	vec3 blur5_y(sampler2D image, vec2 uv, float sourcesize_y, float sharpness_y, float lod) {
+		float resolution = sourcesize_y * sharpness_y;
 		vec3 color = vec3(0.0);
 		vec2 off1 = vec2(0.0, 1.333333333333 / resolution) ;
 		color += textureLod(image, uv, lod).rgb   * 0.29411764705882354;
@@ -1693,4 +1693,10 @@ float delta_render_changed(sampler2D smp_past, sampler2D smp_now, vec2 co, float
 
 float max3(vec3 v){
 	return max((v.x,v.y),v.z);
+}
+
+float distance_from_edge(vec2 co, float gamma) {
+	vec2 sinpi = sin(co*pi);
+	float dist_from_edge = (sinpi.x*sinpi.y);
+	return pow(dist_from_edge, gamma);
 }

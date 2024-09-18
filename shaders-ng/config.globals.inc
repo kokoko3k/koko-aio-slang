@@ -176,12 +176,16 @@
     #define DECON_BY			global.DECON_BY
 #endif
 
-#ifndef EDGE_DEFOCUS_DECON
-    #define EDGE_DEFOCUS_DECON		global.EDGE_DEFOCUS_DECON
+#ifndef EDGE_DEFOCUS
+    #define EDGE_DEFOCUS		global.EDGE_DEFOCUS
 #endif
 
-#ifndef EDGE_DEFOCUS_DECON_AREA
-    #define EDGE_DEFOCUS_DECON_AREA		global.EDGE_DEFOCUS_DECON_AREA
+#ifndef EDGE_DEFOCUS_AREA
+    #define EDGE_DEFOCUS_AREA		global.EDGE_DEFOCUS_AREA
+#endif
+
+#ifndef EDGE_DEFOCUS_DO_BLUR
+    #define EDGE_DEFOCUS_DO_BLUR		global.EDGE_DEFOCUS_DO_BLUR
 #endif
 
 #ifndef OFFSET_STRENGTH

@@ -287,15 +287,16 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	
 	float DO_TEST ;
 	
-	float EDGE_DEFOCUS_DECON;
-	float EDGE_DEFOCUS_DECON_AREA;
 	float DECON_RX;
 	float DECON_RY;
 	float DECON_GX;
 	float DECON_GY;
 	float DECON_BX;
 	float DECON_BY;
-
+	float EDGE_DEFOCUS;
+	float EDGE_DEFOCUS_AREA;
+	float EDGE_DEFOCUS_DO_BLUR;
+	
 } global;
 
 
@@ -378,7 +379,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 
 //Deconvergence
-#pragma parameter DO_SHIFT_RGB       "★ Deconvergence enable? (de) ==>"	0.0	 0.0 1.0 1.0
+#pragma parameter DO_SHIFT_RGB       "★ Deconvergence/Defocus enable? (de) ==>"	0.0	 0.0 1.0 1.0
 #pragma parameter OFFSET_STRENGTH "        Strength"			0.6 	 0.0 1.0 0.05
 #pragma parameter DECON_RX         "        Red x offset"		0.0 -50.0 50.0 0.25
 #pragma parameter DECON_RY         "        Red y offset"		0.0 -50.0 50.0 0.25
@@ -386,8 +387,10 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter DECON_GY         "        Green y offset"		0.0 -50.0 50.0 0.25
 #pragma parameter DECON_BX         "        Blue x offset"		0.0 -50.0 50.0 0.25
 #pragma parameter DECON_BY         "        Blue y offset"		0.0 -50.0 50.0 0.25
-#pragma parameter EDGE_DEFOCUS_DECON         "        Defocus at corners/edges (1=no defocus)" 1.0 1.0 10.0 0.1
-#pragma parameter EDGE_DEFOCUS_DECON_AREA    "        Defocus Area" 0.1 0.1 10.0 0.1
+#pragma parameter EDGE_DEFOCUS              "         . Increase rgb defocus at edges (1=no increase)" 1.0 1.0 10.0 0.1
+#pragma parameter EDGE_DEFOCUS_DO_BLUR      "         . Blur edges if glow/blur is active" 0.0 0.0 1.0 0.1
+#pragma parameter EDGE_DEFOCUS_AREA         "         . Blur/RGB Defocus Area" 0.1 0.1 10.0 0.1
+
 #pragma parameter LABEL0010 " " 0.0 0.0 0.0 1.0
 
 
