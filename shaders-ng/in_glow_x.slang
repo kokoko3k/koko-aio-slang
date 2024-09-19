@@ -58,7 +58,8 @@ void main() {
    } else {
       vIn_glow_edge_defocus_normalized = 0.0;
    }
-   vIn_glow_edge_sharpness = mix(abs(in_glow_w), 0.3, vIn_glow_edge_defocus_normalized);
+   vIn_glow_edge_sharpness = mix(abs(in_glow_w), 0.0, vIn_glow_edge_defocus_normalized);
+   //vIn_glow_edge_sharpness = max(vIn_glow_edge_sharpness, MIN_IN_GLOW_SHARP);
 }
 
 
