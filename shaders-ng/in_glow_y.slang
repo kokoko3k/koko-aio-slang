@@ -16,6 +16,7 @@ layout(location = 4) out float vSharp_sub;
 layout(location = 11) out float vDeltaRenderOk;
 layout(location = 12) out float vWarpedglow;
 layout(location = 13) out vec2 vWarpedglow_offsets;
+layout(location = 14) out float vDo_edge_defocus_inverted;
 
 void main() {
    gl_Position = global.MVP * Position;
@@ -60,7 +61,8 @@ void main() {
 
    float warpedglow_delta = params.OriginalSize.w * 0.5;
    vWarpedglow_offsets = vec2(0.0, +warpedglow_delta); 
-      
+   
+   vDo_edge_defocus_inverted = 1-(DO_SHIFT_RGB*EDGE_DEFOCUS_DO_BLUR);
 }
 
 
@@ -74,6 +76,7 @@ layout(location = 4) in float vSharp_sub;
 layout(location = 11) in float vDeltaRenderOk;
 layout(location = 12) in float vWarpedglow;
 layout(location = 13) in vec2 vWarpedglow_offsets;
+layout(location = 14) in float vDo_edge_defocus_inverted;
 
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 5) uniform sampler2D shift_and_bleed_pass;
@@ -182,7 +185,7 @@ void main() {
       if (vDoInGlowBias == 1.0) {
          //edge defocus: the more near edge, the more the blur
          float dist_from_edge = distance_from_edge_linear(vTexCoord, EDGE_DEFOCUS_AREA_INV);
-         float in_glow_bias_faded = mix(1.0, IN_GLOW_BIAS, dist_from_edge*(1-EDGE_DEFOCUS));
+         float in_glow_bias_faded = mix(1.0, IN_GLOW_BIAS, dist_from_edge* vDo_edge_defocus_inverted );
          pixel_glowed = glow_blur_bias(shift_and_bleed_pass, vTexCoord, pixel_glowed, in_glow_bias_faded);
       }
    
