@@ -58,7 +58,7 @@ void main() {
    } else {
       vIn_glow_edge_defocus_normalized = 0.0;
    }
-   vIn_glow_edge_sharpness = mix(abs(in_glow_w), 0.0, vIn_glow_edge_defocus_normalized);
+   vIn_glow_edge_sharpness = mix(abs(in_glow_w), 0.3, vIn_glow_edge_defocus_normalized);
    //vIn_glow_edge_sharpness = max(vIn_glow_edge_sharpness, MIN_IN_GLOW_SHARP);
 }
 
@@ -149,8 +149,10 @@ void main() {
       // Edge defocus:
          float dist_from_edge = 1.0;
          if (vIn_glow_edge_defocus_normalized > 0.0) {
-            dist_from_edge = distance_from_edge(vTexCoord, EDGE_DEFOCUS_AREA);
+            dist_from_edge = distance_from_edge_linear(vTexCoord, EDGE_DEFOCUS_AREA_INV);
             in_glow_w_adapted = mix(vIn_glow_edge_sharpness, in_glow_w_adapted,  dist_from_edge );
+            //FragColor = vec4(vec3(dist_from_edge), 0.0); return;
+            
          }
       //Make it resolution independent.
          in_glow_w_adapted = in_glow_w_adapted / NEW_SCALEMOD_X;

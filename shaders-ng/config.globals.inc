@@ -180,8 +180,8 @@
     #define EDGE_DEFOCUS		global.EDGE_DEFOCUS
 #endif
 
-#ifndef EDGE_DEFOCUS_AREA
-    #define EDGE_DEFOCUS_AREA		global.EDGE_DEFOCUS_AREA
+#ifndef EDGE_DEFOCUS_AREA_INV
+    #define EDGE_DEFOCUS_AREA_INV		global.EDGE_DEFOCUS_AREA_INV
 #endif
 
 #ifndef EDGE_DEFOCUS_DO_BLUR

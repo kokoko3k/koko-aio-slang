@@ -294,7 +294,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float DECON_BX;
 	float DECON_BY;
 	float EDGE_DEFOCUS;
-	float EDGE_DEFOCUS_AREA;
+	float EDGE_DEFOCUS_AREA_INV;
 	float EDGE_DEFOCUS_DO_BLUR;
 	
 } global;
@@ -389,7 +389,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter DECON_BY         "        Blue y offset"		0.0 -50.0 50.0 0.25
 #pragma parameter EDGE_DEFOCUS              "         . Increase rgb defocus at edges (1=no increase)" 1.0 1.0 10.0 0.1
 #pragma parameter EDGE_DEFOCUS_DO_BLUR      "         . Blur edges if glow/blur is active" 0.0 0.0 2.0 0.05
-#pragma parameter EDGE_DEFOCUS_AREA         "         . Blur/RGB Defocus Area" 0.15 0.1 10.0 0.05
+#pragma parameter EDGE_DEFOCUS_AREA_INV         "         . Blur/RGB focus Area" 0.25 0.0 0.5 0.01
 
 #pragma parameter LABEL0010 " " 0.0 0.0 0.0 1.0
 

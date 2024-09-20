@@ -111,7 +111,7 @@ vec4 deconvergence_shadow(vec2 coords, sampler2D in_texture, vec4 source_pixel) 
       
       if (DOT_M_SHADOW_STR == 0.0) {
          // Edge defocus:
-         float dist_from_edge = distance_from_edge(coords, EDGE_DEFOCUS_AREA);
+         float dist_from_edge = distance_from_edge_linear(coords, EDGE_DEFOCUS_AREA_INV);
          float offset_multiplier = mix(EDGE_DEFOCUS, 1.0, dist_from_edge);
          R_offset *= offset_multiplier;
          G_offset *= offset_multiplier;

@@ -1696,7 +1696,20 @@ float max3(vec3 v){
 }
 
 float distance_from_edge(vec2 co, float gamma) {
+	float aoe=0.2;
+	vec2 s = smoothstep_fast( vec2(0.5), vec2(aoe), abs(co-0.5));
+	float dfe=(s.x*s.y);
+	return dfe;
+	
 	vec2 sinpi = sin(co*pi);
 	float dist_from_edge = (sinpi.x*sinpi.y);
 	return pow(dist_from_edge, gamma);
+}
+
+
+
+float distance_from_edge_linear(vec2 co, float aoe_inv) {
+	vec2 s = smoothstep_fast( vec2(0.5+eps), vec2(aoe_inv), abs(co-0.5));
+	float dfe=(s.x*s.y);
+	return dfe;
 }
