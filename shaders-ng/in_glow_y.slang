@@ -180,13 +180,10 @@ void main() {
    
    //Series of conditions to do in glow bias done in vertex shader:
       if (vDoInGlowBias == 1.0) {
+         //edge defocus: the more near edge, the more the blur
          float dist_from_edge = distance_from_edge_linear(vTexCoord, EDGE_DEFOCUS_AREA_INV);
-         float in_glow_bias_faded = mix(1.0, IN_GLOW_BIAS, dist_from_edge*(1-EDGE_DEFOCUS));  //the more near edge, the more the blur.
+         float in_glow_bias_faded = mix(1.0, IN_GLOW_BIAS, dist_from_edge*(1-EDGE_DEFOCUS));
          pixel_glowed = glow_blur_bias(shift_and_bleed_pass, vTexCoord, pixel_glowed, in_glow_bias_faded);
-            
-         
-// pixel_blurred = mix(glowed_or_blurred, pixel_blurred, (1-dist_from_edge)*IN_GLOW_EDGE_DEFOCUS); //the more near edge, the more the blur.
-         //pixel_glowed = antialias_blur_bias(shift_and_bleed_pass, vTexCoord, pixel_glowed, IN_GLOW_BIAS);
       }
    
 
