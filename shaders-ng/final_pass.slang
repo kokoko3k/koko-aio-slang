@@ -658,7 +658,11 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
                 rgb_h = morph_shape(rgb_h_sin, phosphor_height, PIXELGRID_NO_INTERBLEED_H, PIXELGRID_GAMMA_H);
 
                 rgb_h = mix(vec3(1.0), rgb_h, DO_PIXELGRID_H);
+                
                 rgb_h = clamp(rgb_h, 0.0,1.0);
+                
+                //float dist_from_edge = distance_from_edge_linear(in_coords, EDGE_DEFOCUS_AREA_INV);
+                //rgb_h = mix(rgb_h, pixel_in.rgb, (1-dist_from_edge) * (DO_SHIFT_RGB * EDGE_DEFOCUS_DO_BLUR) );
         }
 
 
@@ -743,6 +747,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
                 darklines_mask = (darklines_mask-0.5) * (1+PG_spark) + 0.5 ; 
         }
 
+        
 
     //Finally put H mask, Scanlines and darklines masks together:
         vec3 mask = rgb_w * rgb_h * darklines_mask;
