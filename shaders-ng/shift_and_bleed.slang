@@ -33,9 +33,9 @@ void main()
       vG_offset *= d;
       vB_offset *= d;
    } else if (DO_SHIFT_RGB == 1.0) {
-      vR_offset=-vec2(DECON_RX, DECON_RY)*global.flick_and_noise_passSize.zw * vec2(NEW_SCALEMOD_X, NEW_SCALEMOD_Y);
-      vG_offset=-vec2(DECON_GX, DECON_GY)*global.flick_and_noise_passSize.zw * vec2(NEW_SCALEMOD_X, NEW_SCALEMOD_Y);
-      vB_offset=-vec2(DECON_BX, DECON_BY)*global.flick_and_noise_passSize.zw * vec2(NEW_SCALEMOD_X, NEW_SCALEMOD_Y);
+      vR_offset=-vec2(DECON_RX, DECON_RY) * vec2(NEW_SCALEMOD_X, NEW_SCALEMOD_Y) / global.flick_and_noise_passSize.xy ;
+      vG_offset=-vec2(DECON_GX, DECON_GY) * vec2(NEW_SCALEMOD_X, NEW_SCALEMOD_Y) / global.flick_and_noise_passSize.xy ;
+      vB_offset=-vec2(DECON_BX, DECON_BY) * vec2(NEW_SCALEMOD_X, NEW_SCALEMOD_Y) / global.flick_and_noise_passSize.xy ;
    }
    
    
