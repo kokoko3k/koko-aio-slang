@@ -104,15 +104,15 @@
 // #define DO_SHIFT_RGB  1.0           // ★ Deconvergence enable?
 // #define OFFSET_STRENGTH  0.3        //         Strength
 
-#define DECON_RX 0.0                   // Red x offset
-#define DECON_RY -1.0                  // Red y offset
-#define DECON_GX 1.0                   // Green x offset
-#define DECON_GY 0.0                   // Green y offset
-#define DECON_BX 0.0                   // Blue x offset
-#define DECON_BY 1.0                   // Blue y offset
-#define EDGE_DEFOCUS 2.0               // Deconvergence increases near edges
-#define EDGE_DEFOCUS_DO_BLUR 0.0       // Blur increases near edges when glow/blur is enabled
-#define EDGE_DEFOCUS_AREA_INV 0.4      // Focused Area
+// #define DECON_RX 0.0                   // Red x offset
+// #define DECON_RY -1.0                  // Red y offset
+// #define DECON_GX 1.0                   // Green x offset
+// #define DECON_GY 0.0                   // Green y offset
+// #define DECON_BX 0.0                   // Blue x offset
+// #define DECON_BY 1.0                   // Blue y offset
+// #define EDGE_DEFOCUS 2.0               // Deconvergence increases near edges
+// #define EDGE_DEFOCUS_DO_BLUR 0.0       // Blur increases near edges when glow/blur is enabled
+// #define EDGE_DEFOCUS_AREA_INV 0.4      // Focused Area
 
 // #define SHIFT_R  -20.0              //         Red offset
 // #define SHIFT_G  0.0                //         Green offset
