@@ -14,10 +14,6 @@
 
 
 // STATIC FEATURES ENABLE/DISABLE
-
-// Allow texture wrapping as a shader parameter, prepend // to gain some performance: 
-	#define ALLOW_BG_IMAGE_TEXTURE_WRAP_IN_SHADER
-
 	
 // Enable lcd antighosting by using values > 0.0 (try around 0.25)
 	#define LCD_ANTIGHOSTING 0.0
