@@ -146,9 +146,17 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
 
 **Deconvergence:**<br>
     Shift R,G,B components separately to mimic channel deconvergence.<br>
-    By varying Red, Green and Blue offsets, the relative component will be<br>
-    shifted column by column, row by row.<br>
+    
+    Red,Green,Blue X,Y:
+        The channels deconvergence offsets
+    Deconvergence increases near edges:
+        Increase the offsets near screen edge
+    Blur increases near edges when glow/blur is enabled:
+        When using Glow/Blur feature, the blur increases near screen edge.
+    Focused Area:
+        The area of the screen that will be in focus (affects previous 2 settings)
 
+        
 **Glow/Blur:**<br>
     Emulate the CRT glowing "feature", so that the brighter areas of<br>
     the image will light their surroundings,<br>
