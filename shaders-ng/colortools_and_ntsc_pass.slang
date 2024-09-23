@@ -479,8 +479,6 @@ void main() {
 
    vec3 pixel_in = texture(Source, co).rgb;
    
-   pixel_in.rgb = mix(pixel_in, vDebug, min(DO_TEST, 1.0)  );
-   
    vec3 pixel_out = pixel_in;
    //This will go into alpha channel to make glow aware of it and blur more.
    //It could be configurable.
@@ -510,6 +508,7 @@ void main() {
       pixel_out = pixel_dedither(Source, co, params.SourceSize, tmin, DEDITHER_TRESHMAX, DEDITHER_STRENGTH, DEDITHER_STRENGTH2);
    }
 
+   pixel_out.rgb = mix(pixel_out, vDebug, min(DO_TEST, 1.0)  );
    
    #ifdef DEBUG
       //Cant "debug" ntsc artifacts because it samples from source (original)
