@@ -220,9 +220,12 @@ vec4 ntscdec(vec2 uv, vec3 RGB_ori) {
    
    //	Sample composite signal and decode to YIQ
       vec2 YIQ_processed = vec2(0.0);
-      vec2 YIQ_processed_shifted = vec2(0.0);
-      //by doing another ntsc filtering with this shifted phase, we're able to better identify
-      //artifacts that will drive the blur modulation.
+      
+      //vec2 YIQ_processed_shifted = vec2(0.0); (*)
+         // by doing another ntsc filtering with this shifted phase, we're able to better identify
+         // artifacts that will drive the blur modulation.
+         // 
+         // Note: this logic has been abandoned in favour of smoothing them via mipmap sampling
          float phase_shift_for_blur;
          
       int N = int(NTSC_FILTER_WIDTH);
@@ -250,20 +253,23 @@ vec4 ntscdec(vec2 uv, vec3 RGB_ori) {
          //Just sample luminance via yiq:
             //vec3 smp_mul_weight = vec3((texture(Source, pos).rgb * RGB2YIQ).x) * vNTSC_weights[n] ; <--- moved up for speedup through parallelism
             YIQ_processed         += vec2(cos(phase), sin(phase)  ) * smp_mul_weight.yz;
-            YIQ_processed_shifted += vec2(cos(phase_shift_for_blur), sin(phase_shift_for_blur)) * smp_mul_weight.yz;
+            
+            //Commented because of (*2)
+            //YIQ_processed_shifted += vec2(cos(phase_shift_for_blur), sin(phase_shift_for_blur)) * smp_mul_weight.yz;
       }
 
    
    vec3 YIQ_result_to_RGB = vec3(YIQ_ori.x, YIQ_ori.yz + YIQ_processed.xy * NTSC_MIX) * YIQ2RGB ;
    
    YIQ_processed = abs(YIQ_processed);
-   YIQ_processed_shifted = abs(YIQ_processed_shifted);
+
+   //Commented because of (*2)
+   //YIQ_processed_shifted = abs(YIQ_processed_shifted);   
+   //float artifacts_mask = (YIQ_processed.x         + YIQ_processed.y) + 
+   //                       (YIQ_processed_shifted.x + YIQ_processed_shifted.y);
    
-   float artifacts_mask = (YIQ_processed.x         + YIQ_processed.y) + 
-                          (YIQ_processed_shifted.x + YIQ_processed_shifted.y);
+   float artifacts_mask = (YIQ_processed.x+YIQ_processed.y) * 2.0;
    
-                          
-   //artifacts_mask = pow(artifacts_mask, 0.25);
                           
    return vec4(YIQ_result_to_RGB, artifacts_mask);
 }

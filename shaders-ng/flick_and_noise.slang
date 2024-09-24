@@ -56,7 +56,7 @@ layout(set = 0, binding = 4) uniform sampler2D colortools_and_ntsc_passFeedback;
 
 #include "includes/functions.include.slang"
 
-vec4 pixel_flickering() {
+vec3 pixel_flickering() {
 /* Simulates the flickering effect of the interlaced screens.
  * As I remember, it was visible when a line and the next had high
  * luminosity differences.
@@ -78,7 +78,7 @@ vec4 pixel_flickering() {
  * to see the effect (the lcd panel would just mix the pixels by itself (meh).
  */
 
-   vec4 pixel_cur = texture_NEAREST(Source,vTexCoord, params.OriginalSize);   
+   vec3 pixel_cur = texture_NEAREST(Source,vTexCoord, params.OriginalSize).rgb;   
    vec3 flickline = texture_NEAREST(Source,vFlickerCoords, params.OriginalSize).rgb;
    
    //float lumdiff = abs( flickline.r + flickline.g + flickline.b - pixel_cur.r - pixel_cur.g - pixel_cur.b);
@@ -95,8 +95,9 @@ vec4 pixel_flickering() {
       lumdiff *= is_moving;
    }
    
-   return vec4( mix(pixel_cur.rgb,flickline.rgb,lumdiff),
-                pixel_cur.a); //<-- wee need to return the alpha channel because it carries ntsc artifact mask
+   return mix(pixel_cur.rgb,flickline.rgb,lumdiff);
+   //return vec4( mix(pixel_cur.rgb,flickline.rgb,lumdiff),
+   //             pixel_cur.a); //<-- wee need to return the alpha channel because it carries ntsc artifact mask
 }
 
 
@@ -105,13 +106,19 @@ void main() {
    vec4 pixel_out;
    
    if (vDo_flickering==1.0) 
-      pixel_out = pixel_flickering(); //<-alpha carries ntsc artifacts mask
+      pixel_out.rgb = pixel_flickering().rgb; //<-alpha carries ntsc artifacts mask
    else 
-      pixel_out = texture_NEAREST(Source, vTexCoord, params.OriginalSize); //<-alpha carries ntsc artifacts mask
+      pixel_out.rgb = texture_NEAREST(Source, vTexCoord, params.OriginalSize).rgb; //<-alpha carries ntsc artifacts mask
    
+   // If we sample ntsc articacts from a mipmap, we can smooth them
+   // which is good when slective blurring them.
+   if (DO_NTSC_ARTIFACTS > 0.5) {
+      pixel_out.a = textureLod(Source, vTexCoord, 1.0).a;
+   }
+      
    if (DO_RF_NOISE > 0.0) {
       float anoise = random_fast(vTexCoord * vDynamicSeed);
-       pixel_out.rgb += scale_to_range(anoise, -RF_NOISE_STRENGTH, RF_NOISE_STRENGTH);
+      pixel_out.rgb += scale_to_range(anoise, -RF_NOISE_STRENGTH, RF_NOISE_STRENGTH);
    }
      
    FragColor = pixel_out;
