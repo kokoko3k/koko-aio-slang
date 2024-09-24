@@ -112,6 +112,7 @@ void main() {
    
    // If we sample ntsc articacts from a mipmap, we can smooth them
    // which is good when slective blurring them.
+   pixel_out.a = 0.0;
    if (DO_NTSC_ARTIFACTS > 0.5) {
       pixel_out.a = textureLod(Source, vTexCoord, 1.0).a;
    }
@@ -120,7 +121,7 @@ void main() {
       float anoise = random_fast(vTexCoord * vDynamicSeed);
       pixel_out.rgb += scale_to_range(anoise, -RF_NOISE_STRENGTH, RF_NOISE_STRENGTH);
    }
-     
+
    FragColor = pixel_out;
 }
 
