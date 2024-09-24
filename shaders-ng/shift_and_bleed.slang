@@ -223,13 +223,23 @@ void main() {
    }
 
    
-   //shift
+   // CVBS bleeding before deconvergence is better when CVBS bleeding is set to pal.
+   // That way deconvergence does not completely succumb to PAL bleed.
+   // For performance reasons, is still a tradeoff, but at least you can modulate
+   // between the two.
+   
+   //bleed
+   if (DO_SAT_BLEED > 0.0)
+      pixel_out = pixel_bleed(pixel_out, vTexCoord, flick_and_noise_pass, params.OriginalSize.z*0.5);
+   
+   //... and shift
    if (vDecon_or_JustShadow > 0.0 )
       pixel_out = deconvergence_shadow_wrap(vTexCoord, pixel_out);
 
-   //..and bleed
-   if (DO_SAT_BLEED > 0.0)
-      pixel_out = pixel_bleed(pixel_out, vTexCoord, flick_and_noise_pass, params.OriginalSize.z*0.5);
+   
+
+
+  
 
 
    //pre-gamma if needed by glow.
