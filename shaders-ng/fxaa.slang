@@ -2,12 +2,14 @@
 
 #include "config.inc"
 
+//#define AA_MODE_SCALE2XPLUS      // 130
 //#define AA_MODE_GUEST_ADVANCEDAA //129.5
+//#define AA_MODE_2XSCALEHQ        // 127
+//#define AA_MODE_DDTXBRLV1 // 127
 //#define AA_MODE_2XSAI            // 125
 //#define AA_MODE_SUPER2XSAI       // 123
-//#define AA_MODE_SCALE2XPLUS      // 130
-//#define AA_MODE_2XSCALEHQ        // 127
 #define AA_MODE_MMPX        // 118
+
 
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
@@ -54,6 +56,13 @@ void main() {
       t3 = vec4(vTexCoord + dg1, vTexCoord + dy);
       t4 = vec4(vTexCoord + dg2, vTexCoord - dx);
    #endif
+      
+      
+   #ifdef AA_MODE_DDTXBRLV1
+      vec2 d = params.SourceSize.zw;
+      t1.xy = vec2( d.x,  0); // F
+      t1.zw = vec2(  0, d.y); // H
+   #endif
 }
 
 #pragma stage fragment
@@ -73,6 +82,196 @@ vec4 texture_ovr_nearest( sampler2D tex, vec2 co) {
    //return texture(tex, co);
    return texture_NEAREST(tex, co, params.SourceSize);
 }
+
+#ifdef AA_MODE_DDTXBRLV1
+
+   /*
+   Hyllian's DDT-xBR-lv1 Shader
+   
+   Copyright (C) 2011-2022 Hyllian/Jararaca - sergiogdb@gmail.com
+
+   Sharpness control - Copyright (c) 2022 Filippo Scognamiglio
+
+   Permission is hereby granted, free of charge, to any person obtaining a copy
+   of this software and associated documentation files (the "Software"), to deal
+   in the Software without restriction, including without limitation the rights
+   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+   copies of the Software, and to permit persons to whom the Software is
+   furnished to do so, subject to the following conditions:
+
+   The above copyright notice and this permission notice shall be included in
+   all copies or substantial portions of the Software.
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+   THE SOFTWARE.
+   */
+   
+   
+   //    // set to 1.0 to use dynamic sharpening
+   //    #pragma parameter USE_DYNAMIC_SHARPNESS "Dynamic Sharpness [ 0FF | ON ]" 1.0 0.0 1.0 1.0
+   // 
+   //    // Set to 1.0 to bias the interpolation towards sharpening
+   //    #pragma parameter USE_SHARPENING_BIAS "Sharpness Bias [ 0FF | ON ]" 1.0 0.0 1.0 1.0
+   // 
+   //    // Minimum amount of sharpening in range [0.0, 1.0]
+   //    #pragma parameter DYNAMIC_SHARPNESS_MIN "Dynamic Sharpness Min" 0.0 0.0 1.0 0.1
+   // 
+   //    // Maximum amount of sharpening in range [0.0, 1.0]
+   //    #pragma parameter DYNAMIC_SHARPNESS_MAX "Dynamic Sharpness Max" 0.3 0.0 1.0 0.1
+   // 
+   //    // If USE_DYNAMIC_SHARPNESS is 0 apply this static sharpness
+   //    #pragma parameter STATIC_SHARPNESS "Static Sharpness" 0.5 0.0 1.0 0.1
+   // 
+   //    #pragma parameter DDT_THRESHOLD "DDT Diagonal Threshold" 2.6 1.0 6.0 0.2
+   // 
+   //    #define USE_DYNAMIC_SHARPNESS  params.USE_DYNAMIC_SHARPNESS
+   //    #define USE_SHARPENING_BIAS    params.USE_SHARPENING_BIAS
+   //    #define DYNAMIC_SHARPNESS_MIN  (params.DYNAMIC_SHARPNESS_MIN * 0.5)
+   //    #define DYNAMIC_SHARPNESS_MAX  (params.DYNAMIC_SHARPNESS_MAX * 0.5)
+   //    #define STATIC_SHARPNESS       (params.STATIC_SHARPNESS * 0.5)
+   //    #define DDT_THRESHOLD params.DDT_THRESHOLD
+   // 
+   
+   #define WP1  4.0
+   #define WP2  1.0
+   #define WP3 -1.0
+
+   #define USE_DYNAMIC_SHARPNESS  1.0
+   #define USE_SHARPENING_BIAS    1.0
+   #define DYNAMIC_SHARPNESS_MIN  (0.0 * 0.5)
+   #define DYNAMIC_SHARPNESS_MAX  (0.3 * 0.5)
+   #define STATIC_SHARPNESS       (0.5 * 0.5)
+   #define DDT_THRESHOLD 2.6
+   
+   const vec3 Y = vec3( 0.299,  0.587,  0.114);
+
+   float luma(vec3 color) {
+   return dot(color, Y);
+   }
+
+   float linearStep(float edge0, float edge1, float t) {
+      return clamp((t - edge0) / (edge1 - edge0), 0.0, 1.0);
+   }
+
+   float sharpSmooth(float t, float sharpness) {
+      return linearStep(sharpness, 1.0 - sharpness, t);
+   }
+
+   vec3 quadBilinear(vec3 a, vec3 b, vec3 c, vec3 d, vec2 p, float sharpness){
+      float x = sharpSmooth(p.x, sharpness);
+      float y = sharpSmooth(p.y, sharpness);
+      return mix(mix(a, b, x), mix(c, d, x), y);
+   }
+
+   // Fast computation of barycentric coordinates only in the sub-triangle 1 2 4
+   vec3 fastBarycentric(vec2 p, float sharpness) {
+      float l0 = sharpSmooth(1.0 - p.x - p.y, sharpness);
+      float l1 = sharpSmooth(p.x, sharpness);
+      return vec3(l0, l1, 1.0 - l0 - l1);
+   }
+
+   vec3 triangleInterpolate(vec3 t1, vec3 t2, vec3 t3, vec3 t4, vec2 c, float sharpness) {
+      // Alter colors and coordinates to compute the other triangle.
+      bool altTriangle = 1.0 - c.x < c.y;
+      vec3 cornerColor = altTriangle ? t3 : t1;
+      //vec2 triangleCoords = altTriangle ? vec2(1.0 - c.y, 1.0 - c.x) : c;
+      vec2 triangleCoords;
+      if (altTriangle) {
+         triangleCoords = vec2(1.0 - c.y, 1.0 - c.x);
+      } else {
+         triangleCoords = c;
+      }
+      vec3 weights = fastBarycentric(triangleCoords, sharpness);
+      return weights.x * cornerColor + weights.y * t2 + weights.z * t4;
+   } 
+   
+   vec3 aa_ddtxbrlv1(sampler2D tex, vec2 co, vec4 pt1) {
+   
+      vec2 pos = fract(co*params.SourceSize.xy)-vec2(0.5); // pos = pixel position
+      vec2 dir = sign(pos); // dir = pixel direction
+      float lmax, lmin, contrast;
+      float sharpness = STATIC_SHARPNESS;
+
+      vec2 g1 = dir*t1.xy;
+      vec2 g2 = dir*t1.zw;
+
+      vec3 A = texture(tex, vTexCoord       ).xyz;
+      vec3 B = texture(tex, vTexCoord +g1   ).xyz;
+      vec3 C = texture(tex, vTexCoord    +g2).xyz;
+      vec3 D = texture(tex, vTexCoord +g1+g2).xyz;
+
+      vec3 A1 = texture(tex, vTexCoord    -g2).xyz;
+      vec3 B1 = texture(tex, vTexCoord +g1-g2).xyz;
+      vec3 A0 = texture(tex, vTexCoord -g1   ).xyz;
+      vec3 C0 = texture(tex, vTexCoord -g1+g2).xyz;
+
+      vec3 B2 = texture(tex, vTexCoord +2*g1     ).xyz;
+      vec3 D2 = texture(tex, vTexCoord +2*g1+  g2).xyz;
+      vec3 C3 = texture(tex, vTexCoord      +2*g2).xyz;
+      vec3 D3 = texture(tex, vTexCoord   +g1+2*g2).xyz;
+
+      float a = luma(A);
+      float b = luma(B);
+      float c = luma(C);
+      float d = luma(D);
+
+      if (USE_DYNAMIC_SHARPNESS == 1.0) {
+         lmax = max(max(a, b), max(c, d));
+         lmin = min(min(a, b), min(c, d));
+         contrast = (lmax - lmin) / (lmax + lmin + 0.05);
+
+         if (USE_SHARPENING_BIAS == 1.0)
+            contrast = sqrt(contrast);
+
+         sharpness = mix(DYNAMIC_SHARPNESS_MIN, DYNAMIC_SHARPNESS_MAX, contrast);
+      }	
+      
+      float a1 = luma(A1);
+      float b1 = luma(B1);
+      float a0 = luma(A0);
+      float c0 = luma(C0);
+
+      float b2 = luma(B2);
+      float d2 = luma(D2);
+      float c3 = luma(C3);
+      float d3 = luma(D3);
+
+      float p = abs(pos.x);
+      float q = abs(pos.y);
+
+      //    A1 B1
+      // A0 A  B  B2
+      // C0 C  D  D2
+      //    C3 D3
+
+      float wd1 = (WP1*abs(a-d) + WP2*(abs(b-a1) + abs(b-d2) + abs(c-a0) + abs(c-d3)) + WP3*(abs(a1-d2) + abs(a0-d3)));
+      float wd2 = (WP1*abs(b-c) + WP2*(abs(a-b1) + abs(a-c0) + abs(d-b2) + abs(d-c3)) + WP3*(abs(b1-c0) + abs(b2-c3)));
+
+      float irlv1 = (abs(a-b)+abs(a-c)+abs(d-c)+abs(d-b));
+
+      vec3 color;
+
+      if ( ((wd1+0.1*DDT_THRESHOLD)*DDT_THRESHOLD < wd2) && (irlv1 > 0.0) )
+      {
+            color = triangleInterpolate(B, D, C, A, vec2(q, 1-p), sharpness);
+      }
+      else if ( (wd1 > (wd2+0.1*DDT_THRESHOLD)*DDT_THRESHOLD) && (irlv1 > 0.0))
+      {
+            color = triangleInterpolate(A, B, D, C, vec2(p, q), sharpness);
+      }
+      else
+         color = quadBilinear(A, B, C, D, vec2(p, q), sharpness);
+
+      return color;
+   }
+   
+
+#endif
 
 
 #ifdef AA_MODE_MMPX
@@ -772,7 +971,11 @@ void main() {
    #ifdef AA_MODE_MMPX
       pixel_out.rgb = aa_mmpx(Source, vTexCoord);
    #endif
-   
+
+   #ifdef AA_MODE_DDTXBRLV1
+      pixel_out.rgb = aa_ddtxbrlv1(Source, vTexCoord, t1);
+   #endif
+      
    FragColor = pixel_out;
    
 }
