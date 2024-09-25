@@ -2,13 +2,13 @@
 
 #include "config.inc"
 
-//#define AA_MODE_SCALE2XPLUS      // 130
-//#define AA_MODE_GUEST_ADVANCEDAA //129.5
-//#define AA_MODE_2XSCALEHQ        // 127
-#define AA_MODE_DDTXBRLV1 // 127
-//#define AA_MODE_2XSAI            // 125
-//#define AA_MODE_SUPER2XSAI       // 123
-//#define AA_MODE_MMPX        // 118
+//#define AA_MODE_SCALE2XPLUS      // 130  //good general purpose
+//#define AA_MODE_GUEST_ADVANCEDAA //129.5 // good general purposes, misses some lines
+//#define AA_MODE_2XSCALEHQ        // 127 //blurs too much shades, try to tweak it.
+//#define AA_MODE_DDTXBRLV1 // 127 // a bit blurry, parameters do help?
+//#define AA_MODE_2XSAI            // 125 //need to fix pixel shift
+//#define AA_MODE_SUPER2XSAI       // 123 //need to fix pixel shift
+//#define AA_MODE_MMPX        // 118 //preserve a lot of details
 
 
 #pragma stage vertex
