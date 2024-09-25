@@ -163,13 +163,13 @@ void main() {
    //Make it resolution independent.
       IN_GLOW_H_ADAPTED = IN_GLOW_H_ADAPTED / NEW_SCALEMOD_Y;
 
-   //Also, a little hacky adaption for when flick_and_noise_pass does not scale to 2X
+   //Also, a little hacky adaption for when upscale_pass does not scale to 2X
       if (params.OutputSize.xy == params.OriginalSize.xy)
          IN_GLOW_H_ADAPTED*=1.5;
       
    //If over the max sharp, then just passthrough, else do the blur.
       if (glow_h_inside_interval == 1.0) {
-         pixel_glowed = blur_select_wrap(Source, vTexCoord, global.flick_and_noise_passSize, IN_GLOW_H_ADAPTED, (IN_GLOW_H >= 0.0) );
+         pixel_glowed = blur_select_wrap(Source, vTexCoord, global.upscale_passSize, IN_GLOW_H_ADAPTED, (IN_GLOW_H >= 0.0) );
          //pixel_glowed = blur9_y(Source, vTexCoord, params.SourceSize.xy, IN_GLOW_H_ADAPTED);
       } else {
          pixel_glowed = texture(Source, vTexCoord).rgb;

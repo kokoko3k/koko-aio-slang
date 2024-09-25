@@ -72,7 +72,7 @@ void main() {
     vSmp_step = (vSmpBorder_max - vSmpBorder_min)  / (leds_per_strip-1);
 
     //Calc a lod for a texture sized led_strip x led_strip
-        lod = log2(global.flick_and_noise_passSize.y / leds_per_strip) - 1;
+        lod = log2(global.upscale_passSize.y / leds_per_strip) - 1;
 
 
    //Scale to the original aspect

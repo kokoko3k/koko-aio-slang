@@ -118,8 +118,8 @@ float_framebuffer0 = "true"
            shader1 = shaders-ng/flick_and_noise.slang
             alias1 = "flick_and_noise_pass"
        scale_type1 = source
-          scale_x1 = 2.0
-          scale_y1 = 2.0  
+          scale_x1 = 1.0
+          scale_y1 = 1.0  
      mipmap_input1 = "true"
      
 //(See **Note 0)
@@ -140,10 +140,10 @@ float_framebuffer1 = "true"
 
 # ASMDEBUG: GLSL33
            shader2 = shaders-ng/fxaa.slang
-            alias2 = "FXAA_pass"
+            alias2 = "upscale_pass"
     filter_linear2 = true
        scale_type2 = source
-            scale2 = 1.0
+            scale2 = 2.0
 float_framebuffer2 = true
       //this *has* to be clamp_to_border because  specular reflections need to turn to black
       //if geometry content override is shifting/zooming out the image.

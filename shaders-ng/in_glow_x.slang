@@ -158,14 +158,14 @@ void main() {
          in_glow_w_adapted = in_glow_w_adapted / NEW_SCALEMOD_X;
          
 
-      //Also, a little hacky adaption for when flick_and_noise_pass does not scale to 2X
+      //Also, a little hacky adaption for when upscale_pass does not scale to 2X
          if (params.OutputSize.xy == params.OriginalSize.xy)
             in_glow_w_adapted*=1.5;
          
 
          //sharp_sub goes to 1.0 (no unsharp mask) as the picture gets unfocused near edges
             float sharp_sub = mix(vSharp_sub, 1.0, (1-dist_from_edge)*vIn_glow_edge_defocus_normalized );
-         FragColor = vec4(blur_select_wrap(shift_and_bleed_pass, vTexCoord, global.flick_and_noise_passSize, in_glow_w_adapted, sharp_sub, (IN_GLOW_W >= 0.0)), warpedglow_x);
+         FragColor = vec4(blur_select_wrap(shift_and_bleed_pass, vTexCoord, global.upscale_passSize, in_glow_w_adapted, sharp_sub, (IN_GLOW_W >= 0.0)), warpedglow_x);
 
    
 }

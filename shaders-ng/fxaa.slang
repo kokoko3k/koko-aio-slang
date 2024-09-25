@@ -80,7 +80,8 @@ layout(set = 0, binding = 2) uniform sampler2D Source;
 
 
 vec4 texture_ovr( sampler2D tex, vec2 co) {
-	return texture_NEAREST(tex, co, params.SourceSize);
+   //return texture(tex, co);
+   return texture_NEAREST(tex, co, params.SourceSize);
 }
 
 
@@ -88,7 +89,7 @@ void main()
 {
 	
 	if (DO_FXAA == 0.0) {
-		FragColor = texture(Source, vTexCoord);
+		FragColor = texture_ovr(Source, vTexCoord);
 		return;
 	}
 	

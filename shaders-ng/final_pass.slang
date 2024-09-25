@@ -285,7 +285,7 @@ void main() {
         vDotMat_Grid_Sharpness = DOT_M_G_SHARP;
         if (DOT_M_G_SHARP == 0.0) {
             float zooms_modifier  = get_zooms_modifier(vDo_Tate, bNeed_NO_integer_scale, bIsRotated).y;
-            float dotmat_insize  = global.flick_and_noise_passSize.y;
+            float dotmat_insize  = global.upscale_passSize.y;
             float dotmat_outsize = global.FinalViewportSize.y  * zooms_modifier;
             #ifdef DEBUG_PRINT_VALUE
                 vfprintvalue = dotmat_outsize / dotmat_insize;
@@ -1078,7 +1078,7 @@ vec3 fn_pixel_content(vec2 coords) {
 
     
     #ifdef USE_QUILEZ
-        pixel_glowed = texture(in_glow_pass, coords_QULEZ(coords, global.flick_and_noise_passSize));
+        pixel_glowed = texture(in_glow_pass, coords_QULEZ(coords, global.upscale_passSize));
         pixel_out = pixel_glowed.rgb;
     #else
         pixel_glowed = texture(in_glow_pass, coords);

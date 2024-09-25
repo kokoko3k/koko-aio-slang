@@ -33,9 +33,9 @@ void main()
       vG_offset *= d;
       vB_offset *= d;
    } else if (DO_SHIFT_RGB == 1.0) {
-      vR_offset=-vec2(DECON_RX, DECON_RY) * vec2(NEW_SCALEMOD_X, NEW_SCALEMOD_Y) / global.flick_and_noise_passSize.xy ;
-      vG_offset=-vec2(DECON_GX, DECON_GY) * vec2(NEW_SCALEMOD_X, NEW_SCALEMOD_Y) / global.flick_and_noise_passSize.xy ;
-      vB_offset=-vec2(DECON_BX, DECON_BY) * vec2(NEW_SCALEMOD_X, NEW_SCALEMOD_Y) / global.flick_and_noise_passSize.xy ;
+      vR_offset=-vec2(DECON_RX, DECON_RY) * vec2(NEW_SCALEMOD_X, NEW_SCALEMOD_Y) / global.upscale_passSize.xy ;
+      vG_offset=-vec2(DECON_GX, DECON_GY) * vec2(NEW_SCALEMOD_X, NEW_SCALEMOD_Y) / global.upscale_passSize.xy ;
+      vB_offset=-vec2(DECON_BX, DECON_BY) * vec2(NEW_SCALEMOD_X, NEW_SCALEMOD_Y) / global.upscale_passSize.xy ;
    }
    
    
@@ -58,8 +58,7 @@ layout(location = 6) in float vShow_artifact_mask;
 
 layout(location = 0) out vec4 FragColor;
 
-layout(set = 0, binding = 1) uniform sampler2D FXAA_pass;
-layout(set = 0, binding = 2) uniform sampler2D flick_and_noise_pass;
+layout(set = 0, binding = 1) uniform sampler2D upscale_pass;
 
 
 #define bandwidth_mhz_Y_ntsc 4.2
@@ -127,14 +126,6 @@ vec4 deconvergence_shadow(vec2 coords, sampler2D in_texture, vec4 source_pixel) 
       
       return vec4( mix_step(deconvergence_mode, shadow_mode, vDo_shadow_mode),
                    source_pixel.a );
-}
-
-
-vec4 deconvergence_shadow_wrap(vec2 coord, vec4 source_pixel) {
-   if ( DO_FXAA == 1.0)
-      return deconvergence_shadow(coord, FXAA_pass, source_pixel);
-   else
-      return deconvergence_shadow(coord, flick_and_noise_pass, source_pixel);
 }
 
 #define SIDE_RIGHT 1
@@ -216,12 +207,7 @@ vec4 pixel_bleed(vec4 pixel_in, vec2 co, sampler2D in_texture, float sourcesize_
 void main() {
    vec4 pixel_out;
 
-   if ( DO_FXAA == 1.0)  {
-      pixel_out = texture(FXAA_pass, vTexCoord );
-   } else {
-      pixel_out = texture(flick_and_noise_pass, vTexCoord);
-   }
-
+   pixel_out = texture(upscale_pass, vTexCoord );
    
    // CVBS bleeding before deconvergence is better when CVBS bleeding is set to pal.
    // That way deconvergence does not completely succumb to PAL bleed.
@@ -230,11 +216,11 @@ void main() {
    
    //bleed
    if (DO_SAT_BLEED > 0.0)
-      pixel_out = pixel_bleed(pixel_out, vTexCoord, flick_and_noise_pass, params.OriginalSize.z*0.5);
+      pixel_out = pixel_bleed(pixel_out, vTexCoord, upscale_pass, params.OriginalSize.z*0.5);
    
    //... and shift
    if (vDecon_or_JustShadow > 0.0 )
-      pixel_out = deconvergence_shadow_wrap(vTexCoord, pixel_out);
+      pixel_out = deconvergence_shadow(vTexCoord, upscale_pass, pixel_out);
 
    
 
