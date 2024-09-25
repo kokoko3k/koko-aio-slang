@@ -2,7 +2,7 @@
 
 #include "config.inc"
 
-//#define AA_MODE_SCALE2XPLUS      // 130  //good general purpose
+#define AA_MODE_SCALE2XPLUS      // 130  //good general purpose
 //#define AA_MODE_GUEST_ADVANCEDAA //129.5 // good general purposes, misses some lines
 //#define AA_MODE_2XSCALEHQ        // 127 //blurs too much shades, try to tweak it.
 //#define AA_MODE_DDTXBRLV1 // 127 // a bit blurry, parameters do help?
