@@ -946,6 +946,7 @@ void main() {
 	if (DO_FXAA == 0.0) {
 		pixel_out.rgb = texture_ovr_nearest(Source, vTexCoord).rgb;
 		FragColor = pixel_out;
+        return;
 	}
 
    #ifdef AA_MODE_GUEST_ADVANCEDAA
