@@ -3,34 +3,9 @@
 #include "config.inc"
 
 
+#define GUEST 1
 
-/*
-   Copyright (C) 2006 guest(r) - guest.r@gmail.com
-
-   This program is free software; you can redistribute it and/or
-   modify it under the terms of the GNU General Public License
-   as published by the Free Software Foundation; either version 2
-   of the License, or (at your option) any later version.
-
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
-
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-*/
-
-/*
-   The AdvancedAA shader is well used to:
-   - AA 2xscaled gfx. to its 4x absolute size,   
-   - AA hi-res "screens" (640x480) to their 2x size or,
-   - AA gfx. back to it's original size (looks nice above 640x480, set scaling to 1.0) 
-*/
-
-
-vec3  dt = vec3(1,1,1);
+#define AA_MODE GUEST
 
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
@@ -43,27 +18,21 @@ layout(location = 4) out vec4 t4;
 
 
 void main() {
-	
-	#define AA_RESOLUTION_X 0.0
-	#define AA_RESOLUTION_Y 0.0
-	
-	#define AA_RESOLUTION_X_DEF params.SourceSize.x
-	#define AA_RESOLUTION_Y_DEF params.SourceSize.y
-	
+		
 	gl_Position = global.MVP * Position;
 	vTexCoord = TexCoord;
-   	vec2 ps = vec2(1.0/AA_RESOLUTION_X_DEF,  1.0/AA_RESOLUTION_Y_DEF);
-	float dx = ps.x*0.5;
-	float dy = ps.y*0.5;
-	
-	t1.xy = vTexCoord + vec2(-dx, 0);
-	t2.xy = vTexCoord + vec2( dx, 0);
-	t3.xy = vTexCoord + vec2( 0,-dy);
-	t4.xy = vTexCoord + vec2( 0, dy);
-	t1.zw = vTexCoord + vec2(-dx,-dy);
-	t2.zw = vTexCoord + vec2(-dx, dy);
-	t3.zw = vTexCoord + vec2( dx,-dy);
-	t4.zw = vTexCoord + vec2( dx, dy);
+    
+    if (AA_MODE == GUEST) {
+      vec2 d = params.SourceSize.zw * 0.5;
+      t1.xy = vTexCoord + vec2(-d.x, 0);
+      t2.xy = vTexCoord + vec2( d.x, 0);
+      t3.xy = vTexCoord + vec2( 0,-d.y);
+      t4.xy = vTexCoord + vec2( 0, d.y);
+      t1.zw = vTexCoord + vec2(-d.x,-d.y);
+      t2.zw = vTexCoord + vec2(-d.x, d.y);
+      t3.zw = vTexCoord + vec2( d.x,-d.y);
+      t4.zw = vTexCoord + vec2( d.x, d.y);
+    }
 }
 
 #pragma stage fragment
@@ -85,37 +54,76 @@ vec4 texture_ovr( sampler2D tex, vec2 co) {
 }
 
 
-void main()
-{
-	
-	if (DO_FXAA == 0.0) {
-		FragColor = texture_ovr(Source, vTexCoord);
-		return;
-	}
-	
-   vec3 c00 = texture_ovr(Source, t1.zw).xyz; 
-   vec3 c10 = texture_ovr(Source, t3.xy).xyz;
-   vec3 c20 = texture_ovr(Source, t3.zw).xyz;
-   vec3 c01 = texture_ovr(Source, t1.xy).xyz;
-   vec3 c11 = texture_ovr(Source, vTexCoord).xyz;
-   vec3 c21 = texture_ovr(Source, t2.xy).xyz;
-   vec3 c02 = texture_ovr(Source, t2.zw).xyz;
-   vec3 c12 = texture_ovr(Source, t4.xy).xyz;
-   vec3 c22 = texture_ovr(Source, t4.zw).xyz;
+vec3 AdvancedAA(sampler2D tex, vec2 co, vec4 pt1, vec4 pt2, vec4 pt3, vec4 pt4){
+   /*
+      Copyright (C) 2006 guest(r) - guest.r@gmail.com
 
-   float d1=dot(abs(c00-c22),dt)+0.0001;
-   float d2=dot(abs(c20-c02),dt)+0.0001;
-   float hl=dot(abs(c01-c21),dt)+0.0001;
-   float vl=dot(abs(c10-c12),dt)+0.0001;
-   
+      This program is free software; you can redistribute it and/or
+      modify it under the terms of the GNU General Public License
+      as published by the Free Software Foundation; either version 2
+      of the License, or (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+      GNU General Public License for more details.
+
+      You should have received a copy of the GNU General Public License
+      along with this program; if not, write to the Free Software
+      Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+   */
+
+   /*
+      The AdvancedAA shader is well used to:
+      - AA 2xscaled gfx. to its 4x absolute size,   
+      - AA hi-res "screens" (640x480) to their 2x size or,
+      - AA gfx. back to it's original size (looks nice above 640x480, set scaling to 1.0) 
+   */
+
+   vec3 c00 = texture_ovr(tex, pt1.zw).xyz; 
+   vec3 c10 = texture_ovr(tex, pt3.xy).xyz;
+   vec3 c20 = texture_ovr(tex, pt3.zw).xyz;
+   vec3 c01 = texture_ovr(tex, pt1.xy).xyz;
+   vec3 c11 = texture_ovr(tex, co).xyz;
+   vec3 c21 = texture_ovr(tex, pt2.xy).xyz;
+   vec3 c02 = texture_ovr(tex, pt2.zw).xyz;
+   vec3 c12 = texture_ovr(tex, pt4.xy).xyz;
+   vec3 c22 = texture_ovr(tex, pt4.zw).xyz;
+
+   float d1=dot(abs(c00-c22),vec3(1))+0.0001;
+   float d2=dot(abs(c20-c02),vec3(1))+0.0001;
+   float hl=dot(abs(c01-c21),vec3(1))+0.0001;
+   float vl=dot(abs(c10-c12),vec3(1))+0.0001;
+
    float k1=0.5*(hl+vl);
    float k2=0.5*(d1+d2);
 
-   vec3 t1=(hl*(c10+c12)+vl*(c01+c21)+k1*c11)/(2.5*(hl+vl));
-   vec3 t2=(d1*(c20+c02)+d2*(c00+c22)+k2*c11)/(2.5*(d1+d2));
+   vec3 t1_vec3= ( hl*(c10+c12) + vl*(c01+c21) + k1*c11 ) /( 2.5*(hl+vl) );
+   vec3 t2_vec3= ( d1*(c20+c02) + d2*(c00+c22) + k2*c11 ) /( 2.5*(d1+d2) );
 
-   k1=dot(abs(t1-c11),dt)+0.0001;
-   k2=dot(abs(t2-c11),dt)+0.0001;
+   k1=dot(abs(t1_vec3-c11),vec3(1))+0.0001;
+   k2=dot(abs(t1_vec3-c11),vec3(1))+0.0001;
+
+   return ( (k1*t1_vec3) + (k2*t1_vec3) ) / (k1+k2);
    
-   FragColor = vec4((k1*t2+k2*t1)/(k1+k2),1);
+}
+
+
+void main()
+{
+	
+   vec4 pixel_out;
+   pixel_out.a = texture(Source, vTexCoord).a;
+   
+	if (DO_FXAA == 0.0) {
+		pixel_out.rgb = texture_ovr(Source, vTexCoord).rgb;
+		FragColor = pixel_out;
+	}
+
+   if (AA_MODE == GUEST)
+      pixel_out.rgb = AdvancedAA(Source, vTexCoord, t1, t2, t3, t4);
+   
+   FragColor = pixel_out;
+   
+
 }
