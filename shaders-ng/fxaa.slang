@@ -5,10 +5,10 @@
 //#define AA_MODE_SCALE2XPLUS      // 130
 //#define AA_MODE_GUEST_ADVANCEDAA //129.5
 //#define AA_MODE_2XSCALEHQ        // 127
-//#define AA_MODE_DDTXBRLV1 // 127
+#define AA_MODE_DDTXBRLV1 // 127
 //#define AA_MODE_2XSAI            // 125
 //#define AA_MODE_SUPER2XSAI       // 123
-#define AA_MODE_MMPX        // 118
+//#define AA_MODE_MMPX        // 118
 
 
 #pragma stage vertex
@@ -200,20 +200,20 @@ vec4 texture_ovr_nearest( sampler2D tex, vec2 co) {
       vec2 g1 = dir*t1.xy;
       vec2 g2 = dir*t1.zw;
 
-      vec3 A = texture(tex, vTexCoord       ).xyz;
-      vec3 B = texture(tex, vTexCoord +g1   ).xyz;
-      vec3 C = texture(tex, vTexCoord    +g2).xyz;
-      vec3 D = texture(tex, vTexCoord +g1+g2).xyz;
+      vec3 A = texture_ovr_nearest(tex, vTexCoord       ).xyz;
+      vec3 B = texture_ovr_nearest(tex, vTexCoord +g1   ).xyz;
+      vec3 C = texture_ovr_nearest(tex, vTexCoord    +g2).xyz;
+      vec3 D = texture_ovr_nearest(tex, vTexCoord +g1+g2).xyz;
 
-      vec3 A1 = texture(tex, vTexCoord    -g2).xyz;
-      vec3 B1 = texture(tex, vTexCoord +g1-g2).xyz;
-      vec3 A0 = texture(tex, vTexCoord -g1   ).xyz;
-      vec3 C0 = texture(tex, vTexCoord -g1+g2).xyz;
+      vec3 A1 = texture_ovr_nearest(tex, vTexCoord    -g2).xyz;
+      vec3 B1 = texture_ovr_nearest(tex, vTexCoord +g1-g2).xyz;
+      vec3 A0 = texture_ovr_nearest(tex, vTexCoord -g1   ).xyz;
+      vec3 C0 = texture_ovr_nearest(tex, vTexCoord -g1+g2).xyz;
 
-      vec3 B2 = texture(tex, vTexCoord +2*g1     ).xyz;
-      vec3 D2 = texture(tex, vTexCoord +2*g1+  g2).xyz;
-      vec3 C3 = texture(tex, vTexCoord      +2*g2).xyz;
-      vec3 D3 = texture(tex, vTexCoord   +g1+2*g2).xyz;
+      vec3 B2 = texture_ovr_nearest(tex, vTexCoord +2*g1     ).xyz;
+      vec3 D2 = texture_ovr_nearest(tex, vTexCoord +2*g1+  g2).xyz;
+      vec3 C3 = texture_ovr_nearest(tex, vTexCoord      +2*g2).xyz;
+      vec3 D3 = texture_ovr_nearest(tex, vTexCoord   +g1+2*g2).xyz;
 
       float a = luma(A);
       float b = luma(B);
