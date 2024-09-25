@@ -1,279 +1,120 @@
 #version 450
+
 #include "config.inc"
 
-/**
- * @license
- * Copyright (c) 2011 NVIDIA Corporation. All rights reserved.
- *
- * TO  THE MAXIMUM  EXTENT PERMITTED  BY APPLICABLE  LAW, THIS SOFTWARE  IS PROVIDED
- * *AS IS*  AND NVIDIA AND  ITS SUPPLIERS DISCLAIM  ALL WARRANTIES,  EITHER  EXPRESS
- * OR IMPLIED, INCLUDING, BUT NOT LIMITED  TO, NONINFRINGEMENT,IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.  IN NO EVENT SHALL  NVIDIA 
- * OR ITS SUPPLIERS BE  LIABLE  FOR  ANY  DIRECT, SPECIAL,  INCIDENTAL,  INDIRECT,  OR  
- * CONSEQUENTIAL DAMAGES WHATSOEVER (INCLUDING, WITHOUT LIMITATION,  DAMAGES FOR LOSS 
- * OF BUSINESS PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION, OR ANY 
- * OTHER PECUNIARY LOSS) ARISING OUT OF THE  USE OF OR INABILITY  TO USE THIS SOFTWARE, 
- * EVEN IF NVIDIA HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
- */
+
 
 /*
-FXAA_PRESET - Choose compile-in knob preset 0-5.
-------------------------------------------------------------------------------
-FXAA_EDGE_THRESHOLD - The minimum amount of local contrast required 
-                      to apply algorithm.
-                      1.0/3.0  - too little
-                      1.0/4.0  - good start
-                      1.0/8.0  - applies to more edges
-                      1.0/16.0 - overkill
-------------------------------------------------------------------------------
-FXAA_EDGE_THRESHOLD_MIN - Trims the algorithm from processing darks.
-                          Perf optimization.
-                          1.0/32.0 - visible limit (smaller isn't visible)
-                          1.0/16.0 - good compromise
-                          1.0/12.0 - upper limit (seeing artifacts)
-------------------------------------------------------------------------------
-FXAA_SEARCH_STEPS - Maximum number of search steps for end of span.
-------------------------------------------------------------------------------
-FXAA_SEARCH_THRESHOLD - Controls when to stop searching.
-                        1.0/4.0 - seems to be the best quality wise
-------------------------------------------------------------------------------
-FXAA_SUBPIX_TRIM - Controls sub-pixel aliasing removal.
-                   1.0/2.0 - low removal
-                   1.0/3.0 - medium removal
-                   1.0/4.0 - default removal
-                   1.0/8.0 - high removal
-                   0.0 - complete removal
-------------------------------------------------------------------------------
-FXAA_SUBPIX_CAP - Insures fine detail is not completely removed.
-                  This is important for the transition of sub-pixel detail,
-                  like fences and wires.
-                  3.0/4.0 - default (medium amount of filtering)
-                  7.0/8.0 - high amount of filtering
-                  1.0 - no capping of sub-pixel aliasing removal
+   Copyright (C) 2006 guest(r) - guest.r@gmail.com
+
+   This program is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public License
+   as published by the Free Software Foundation; either version 2
+   of the License, or (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
-#ifndef FXAA_PRESET
-    #define FXAA_PRESET 4
-#endif
+/*
+   The AdvancedAA shader is well used to:
+   - AA 2xscaled gfx. to its 4x absolute size,   
+   - AA hi-res "screens" (640x480) to their 2x size or,
+   - AA gfx. back to it's original size (looks nice above 640x480, set scaling to 1.0) 
+*/
 
-#if (FXAA_PRESET == 6)
-    #define FXAA_EDGE_THRESHOLD      (1.0/16.0)
-    #define FXAA_EDGE_THRESHOLD_MIN  (1.0/12.0)
-    #define FXAA_SEARCH_STEPS        128
-    #define FXAA_SEARCH_THRESHOLD    (1.0/16.0)
-    #define FXAA_SUBPIX_CAP          (1.0)
-    #define FXAA_SUBPIX_TRIM         (0.0)
-#endif
 
-#if (FXAA_PRESET == 3)
-    #define FXAA_EDGE_THRESHOLD      (1.0/16.0)
-    #define FXAA_EDGE_THRESHOLD_MIN  (1.0/16.0)
-    #define FXAA_SEARCH_STEPS        16
-    #define FXAA_SEARCH_THRESHOLD    (1.0/4.0)
-    #define FXAA_SUBPIX_CAP          (3.0/4.0)
-    #define FXAA_SUBPIX_TRIM         (1.0/4.0)
-#endif
-#if (FXAA_PRESET == 4)
-    #define FXAA_EDGE_THRESHOLD      (1.0/8.0)
-    #define FXAA_EDGE_THRESHOLD_MIN  (1.0/24.0)
-    #define FXAA_SEARCH_STEPS        8
-    #define FXAA_SEARCH_THRESHOLD    (1.0/4.0)
-    #define FXAA_SUBPIX_CAP          (3.0/4.0)
-    #define FXAA_SUBPIX_TRIM         (1.0/8.0)
-#endif
-#if (FXAA_PRESET == 5)
-    #define FXAA_EDGE_THRESHOLD      (1.0/16.0)
-    #define FXAA_EDGE_THRESHOLD_MIN  (1.0/12.0)
-    #define FXAA_SEARCH_STEPS        32
-    #define FXAA_SEARCH_THRESHOLD    (1.0/4.0)
-    #define FXAA_SUBPIX_CAP          (7.0/8.0)
-    #define FXAA_SUBPIX_TRIM         (1.0/8.0)
-#endif
-
-#define FXAA_SUBPIX_TRIM_SCALE (1.0/(1.0 - FXAA_SUBPIX_TRIM))
-
-// Return the luma, the estimation of luminance from rgb inputs.
-// This approximates luma using one FMA instruction,
-// skipping normalization and tossing out blue.
-// FxaaLuma() will range 0.0 to 2.963210702.
-float FxaaLuma(vec3 rgb) {
-    //return rgb.y * (0.587/0.299) + rgb.x;
-    return fma( rgb.y, (0.587/0.299), rgb.x ); //ASM_PROOF: SAME
-}
-
-vec3 FxaaLerp3(vec3 a, vec3 b, float amountOfA) {
-    return (vec3(-amountOfA) * b) + ((a * vec3(amountOfA)) + b);
-}
-
-vec4 FxaaTexOff(sampler2D tex, vec2 pos, ivec2 off, vec2 rcpFrame) {
-    //float x = pos.x + float(off.x) * rcpFrame.x;
-    //float y = pos.y + float(off.y) * rcpFrame.y;
-    float x = fma(float(off.x), rcpFrame.x, pos.x); //ASM PROOF: SAME
-    float y = fma(float(off.y), rcpFrame.y, pos.y); //ASM PROOF: SAME
-    return textureLod(tex, vec2(x, y),0);
-}
-
-// pos is the output of FxaaVertexShader interpolated across screen.
-// xy -> actual texture position {0.0 to 1.0}
-// rcpFrame should be a uniform equal to  {1.0/frameWidth, 1.0/frameHeight}
-vec3 FxaaPixelShader(vec2 pos, sampler2D tex, vec2 rcpFrame)
-{
-    vec3 rgbN = FxaaTexOff(tex, pos.xy, ivec2( 0,-1), rcpFrame).xyz;
-    vec3 rgbW = FxaaTexOff(tex, pos.xy, ivec2(-1, 0), rcpFrame).xyz;
-    vec3 rgbM = FxaaTexOff(tex, pos.xy, ivec2( 0, 0), rcpFrame).xyz;
-    vec3 rgbE = FxaaTexOff(tex, pos.xy, ivec2( 1, 0), rcpFrame).xyz;
-    vec3 rgbS = FxaaTexOff(tex, pos.xy, ivec2( 0, 1), rcpFrame).xyz;
-    
-    float lumaN = FxaaLuma(rgbN);
-    float lumaW = FxaaLuma(rgbW);
-    float lumaM = FxaaLuma(rgbM);
-    float lumaE = FxaaLuma(rgbE);
-    float lumaS = FxaaLuma(rgbS);
-    float rangeMin = min(lumaM, min(min(lumaN, lumaW), min(lumaS, lumaE)));
-    float rangeMax = max(lumaM, max(max(lumaN, lumaW), max(lumaS, lumaE)));
-    
-    float range = rangeMax - rangeMin;
-    if(range < max(FXAA_EDGE_THRESHOLD_MIN, rangeMax * FXAA_EDGE_THRESHOLD))
-    {
-        return rgbM;
-    }
-    
-    vec3 rgbL = rgbN + rgbW + rgbM + rgbE + rgbS; //ASM_PROOF: USELESS parenthesis
-    
-    float lumaL = (lumaN + lumaW + lumaE + lumaS) * 0.25;
-    float rangeL = abs(lumaL - lumaM);
-    float blendL = max(0.0, (rangeL / range) - FXAA_SUBPIX_TRIM) * FXAA_SUBPIX_TRIM_SCALE; 
-    blendL = min(FXAA_SUBPIX_CAP, blendL);
-    
-    vec3 rgbNW = FxaaTexOff(tex, pos.xy, ivec2(-1,-1), rcpFrame).xyz;
-    vec3 rgbNE = FxaaTexOff(tex, pos.xy, ivec2( 1,-1), rcpFrame).xyz;
-    vec3 rgbSW = FxaaTexOff(tex, pos.xy, ivec2(-1, 1), rcpFrame).xyz;
-    vec3 rgbSE = FxaaTexOff(tex, pos.xy, ivec2( 1, 1), rcpFrame).xyz;
-    rgbL += (rgbNW + rgbNE + rgbSW + rgbSE);
-    rgbL *= vec3(1.0/9.0);
-    
-    float lumaNW = FxaaLuma(rgbNW);
-    float lumaNE = FxaaLuma(rgbNE);
-    float lumaSW = FxaaLuma(rgbSW);
-    float lumaSE = FxaaLuma(rgbSE);
-    
-    float edgeVert = 
-        abs((0.25 * lumaNW) + (-0.5 * lumaN) + (0.25 * lumaNE)) +
-        abs((0.50 * lumaW ) + (-1.0 * lumaM) + (0.50 * lumaE )) +
-        abs((0.25 * lumaSW) + (-0.5 * lumaS) + (0.25 * lumaSE));
-    float edgeHorz = 
-        abs((0.25 * lumaNW) + (-0.5 * lumaW) + (0.25 * lumaSW)) +
-        abs((0.50 * lumaN ) + (-1.0 * lumaM) + (0.50 * lumaS )) +
-        abs((0.25 * lumaNE) + (-0.5 * lumaE) + (0.25 * lumaSE));
-        
-    bool horzSpan = edgeHorz >= edgeVert;
-    float lengthSign = horzSpan ? -rcpFrame.y : -rcpFrame.x;
-    
-    if(!horzSpan)
-    {
-        lumaN = lumaW;
-        lumaS = lumaE;
-    }
-    
-    float gradientN = abs(lumaN - lumaM);
-    float gradientS = abs(lumaS - lumaM);
-    lumaN = (lumaN + lumaM) * 0.5;
-    lumaS = (lumaS + lumaM) * 0.5;
-    
-    if (gradientN < gradientS)
-    {
-        lumaN = lumaS;
-        lumaN = lumaS;
-        gradientN = gradientS;
-        lengthSign *= -1.0;
-    }
-    
-    vec2 posN;
-    posN.x = pos.x + (horzSpan ? 0.0 : lengthSign * 0.5);
-    posN.y = pos.y + (horzSpan ? lengthSign * 0.5 : 0.0);
-    
-    gradientN *= FXAA_SEARCH_THRESHOLD;
-    
-    vec2 posP = posN;
-    vec2 offNP = horzSpan ? vec2(rcpFrame.x, 0.0) : vec2(0.0, rcpFrame.y); 
-    float lumaEndN = lumaN;
-    float lumaEndP = lumaN;
-    bool doneN = false;
-    bool doneP = false;
-    posN += offNP * vec2(-1.0, -1.0);
-    posP += offNP * vec2( 1.0,  1.0);
-    
-    for(int i = 0; i < FXAA_SEARCH_STEPS; i++) {
-        if(!doneN)
-        {
-            lumaEndN = FxaaLuma(textureLod(tex, posN.xy,0.0).xyz);
-        }
-        if(!doneP)
-        {
-            lumaEndP = FxaaLuma(textureLod(tex, posP.xy,0.0).xyz);
-        }
-        
-        doneN = doneN || (abs(lumaEndN - lumaN) >= gradientN);
-        doneP = doneP || (abs(lumaEndP - lumaN) >= gradientN);
-        
-        if(doneN && doneP)
-        {
-            break;
-        }
-        if(!doneN)
-        {
-            posN -= offNP;
-        }
-        if(!doneP)
-        {
-            posP += offNP;
-        }
-    }
-    
-    float dstN = horzSpan ? pos.x - posN.x : pos.y - posN.y;
-    float dstP = horzSpan ? posP.x - pos.x : posP.y - pos.y;
-    bool directionN = dstN < dstP;
-    lumaEndN = directionN ? lumaEndN : lumaEndP;
-    
-    if(((lumaM - lumaN) < 0.0) == ((lumaEndN - lumaN) < 0.0))
-    {
-        lengthSign = 0.0;
-    }
- 
-
-    float spanLength = (dstP + dstN);
-    dstN = directionN ? dstN : dstP;
-    float subPixelOffset = (0.5 + (dstN * (-1.0/spanLength))) * lengthSign;
-    vec3 rgbF = textureLod(tex, vec2(
-        pos.x + (horzSpan ? 0.0 : subPixelOffset),
-        pos.y + (horzSpan ? subPixelOffset : 0.0)),0.0).xyz;
-    return FxaaLerp3(rgbL, rgbF, blendL); 
-}
+vec3  dt = vec3(1,1,1);
 
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
+layout(location = 1) out vec4 t1;
+layout(location = 2) out vec4 t2;
+layout(location = 3) out vec4 t3;
+layout(location = 4) out vec4 t4;
 
 
-
-void main()
-{
-   gl_Position = global.MVP * Position;
-   vTexCoord = TexCoord;
+void main() {
+	
+	#define AA_RESOLUTION_X 0.0
+	#define AA_RESOLUTION_Y 0.0
+	
+	#define AA_RESOLUTION_X_DEF params.SourceSize.x
+	#define AA_RESOLUTION_Y_DEF params.SourceSize.y
+	
+	gl_Position = global.MVP * Position;
+	vTexCoord = TexCoord;
+   	vec2 ps = vec2(1.0/AA_RESOLUTION_X_DEF,  1.0/AA_RESOLUTION_Y_DEF);
+	float dx = ps.x*0.5;
+	float dy = ps.y*0.5;
+	
+	t1.xy = vTexCoord + vec2(-dx, 0);
+	t2.xy = vTexCoord + vec2( dx, 0);
+	t3.xy = vTexCoord + vec2( 0,-dy);
+	t4.xy = vTexCoord + vec2( 0, dy);
+	t1.zw = vTexCoord + vec2(-dx,-dy);
+	t2.zw = vTexCoord + vec2(-dx, dy);
+	t3.zw = vTexCoord + vec2( dx,-dy);
+	t4.zw = vTexCoord + vec2( dx, dy);
 }
 
 #pragma stage fragment
 layout(location = 0) in vec2 vTexCoord;
+layout(location = 1) in vec4 t1;
+layout(location = 2) in vec4 t2;
+layout(location = 3) in vec4 t3;
+layout(location = 4) in vec4 t4;
 layout(location = 0) out vec4 FragColor;
-layout(set = 0, binding = 2) uniform sampler2D flick_and_noise_pass;
+layout(set = 0, binding = 2) uniform sampler2D Source;
 
-void main() {  
-    if ( DO_FXAA == 0.0 ) return;
-    
-    //Here lies the blur modifier from ntsc pass to glow.
-    //I'm not expecting any performance hit, since the lookup should have been already cached
-        float pixel_alpha = texture(flick_and_noise_pass, vTexCoord).a;
-    
-   FragColor = vec4(FxaaPixelShader(vTexCoord, flick_and_noise_pass, global.flick_and_noise_passSize.zw),pixel_alpha);
+#include "includes/functions.include.slang"
+
+
+
+vec4 texture_ovr( sampler2D tex, vec2 co) {
+	return texture_NEAREST(tex, co, params.SourceSize);
+}
+
+
+void main()
+{
+	
+	if (DO_FXAA == 0.0) {
+		FragColor = texture(Source, vTexCoord);
+		return;
+	}
+	
+   vec3 c00 = texture_ovr(Source, t1.zw).xyz; 
+   vec3 c10 = texture_ovr(Source, t3.xy).xyz;
+   vec3 c20 = texture_ovr(Source, t3.zw).xyz;
+   vec3 c01 = texture_ovr(Source, t1.xy).xyz;
+   vec3 c11 = texture_ovr(Source, vTexCoord).xyz;
+   vec3 c21 = texture_ovr(Source, t2.xy).xyz;
+   vec3 c02 = texture_ovr(Source, t2.zw).xyz;
+   vec3 c12 = texture_ovr(Source, t4.xy).xyz;
+   vec3 c22 = texture_ovr(Source, t4.zw).xyz;
+
+   float d1=dot(abs(c00-c22),dt)+0.0001;
+   float d2=dot(abs(c20-c02),dt)+0.0001;
+   float hl=dot(abs(c01-c21),dt)+0.0001;
+   float vl=dot(abs(c10-c12),dt)+0.0001;
+   
+   float k1=0.5*(hl+vl);
+   float k2=0.5*(d1+d2);
+
+   vec3 t1=(hl*(c10+c12)+vl*(c01+c21)+k1*c11)/(2.5*(hl+vl));
+   vec3 t2=(d1*(c20+c02)+d2*(c00+c22)+k2*c11)/(2.5*(d1+d2));
+
+   k1=dot(abs(t1-c11),dt)+0.0001;
+   k2=dot(abs(t2-c11),dt)+0.0001;
+   
+   FragColor = vec4((k1*t2+k2*t1)/(k1+k2),1);
 }
