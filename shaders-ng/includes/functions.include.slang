@@ -116,6 +116,13 @@ vec4 texture_NEAREST(sampler2D tex, vec2 co_linear, vec4 tex_size) {
    return texture(tex, co_nearest);
 }
 
+vec4 texture_NEAREST_lod(sampler2D tex, vec2 co_linear, vec4 tex_size, float lod) {
+	   //return nearest sampling from a linear filtered texture
+   vec2 integerCoords = floor(co_linear.xy * tex_size.xy);
+   vec2 co_nearest = (integerCoords + 0.5) * tex_size.zw; // Aggiungi 0.5 per centrare il texel
+   return texture(tex, co_nearest);
+}
+
 float DigitBin( const int x )
 {
     return x==0?480599.0:x==1?139810.0:x==2?476951.0:x==3?476999.0:x==4?350020.0:x==5?464711.0:x==6?464727.0:x==7?476228.0:x==8?481111.0:x==9?481095.0:0.0;

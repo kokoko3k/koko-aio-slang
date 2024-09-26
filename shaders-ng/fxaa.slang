@@ -4,13 +4,13 @@
 #include "includes/functions.include.slang"
 
 
-//#define AA_MODE_SCALE2XPLUS       // 111.2
-//#define AA_MODE_GUEST_ADVANCEDAA  // 112
-//#define AA_MODE_2XSCALEHQ         // 109.5 //blurs too much shades, try to tweak it.
-#define AA_MODE_DDTXBRLV1         // 108.4 // a bit blurry, parameters do help?
-//#define AA_MODE_2XSAI             // 107 //need to fix pixel shift
-//#define AA_MODE_SUPER2XSAI        // 106.5 //need to fix pixel shift
-//#define AA_MODE_MMPX              // 98 //preserve a lot of details
+//#define AA_MODE_SCALE2XPLUS       // 111.2 //good general purpose, very light, but blurs edges too much; unsharp mask does not help.
+//#define AA_MODE_GUEST_ADVANCEDAA  // 112 // good general purposes, misses some lines, not good overall
+#define AA_MODE_2XSCALEHQ         // 109.5 //used to blur too much shades, tweaked better now. rounder look than ddtxbrlv1, but rounds almost any corner.
+//#define AA_MODE_DDTXBRLV1           // 108.4 // a bit blurry, parameters do help, yes, done.
+//#define AA_MODE_2XSAI             // 107 // Dirty.
+//#define AA_MODE_SUPER2XSAI        // 106.5 // less Dirty.
+//#define AA_MODE_MMPX              // 98 //preserves a lot of details, too heavy.
 
 
 #pragma stage vertex
@@ -111,6 +111,11 @@ vec4 texture_ovr_nearest( sampler2D tex, vec2 co) {
    return texture_NEAREST(tex, co, params.SourceSize);
 }
 
+vec4 texture_ovr_nearest_lod0( sampler2D tex, vec2 co) {
+   //return texture(tex, co);
+   return texture_NEAREST_lod(tex, co, params.SourceSize, 0.0);
+}
+
 #ifdef AA_MODE_DDTXBRLV1
 
    /*
@@ -170,9 +175,10 @@ vec4 texture_ovr_nearest( sampler2D tex, vec2 co) {
    #define WP3 -1.0
 
    #define USE_DYNAMIC_SHARPNESS  1.0
-   #define USE_SHARPENING_BIAS    1.0
-   #define DYNAMIC_SHARPNESS_MIN  (0.0 * 0.5)
-   #define DYNAMIC_SHARPNESS_MAX  (0.3 * 0.5)
+      #define USE_SHARPENING_BIAS    1.0
+      #define DYNAMIC_SHARPNESS_MIN  0.1  // default: (0.0 * 0.5)
+      #define DYNAMIC_SHARPNESS_MAX  0.25 // default: (0.3 * 0.5)
+
    #define STATIC_SHARPNESS       (0.5 * 0.5)
    #define DDT_THRESHOLD 2.6
    
@@ -228,20 +234,20 @@ vec4 texture_ovr_nearest( sampler2D tex, vec2 co) {
       vec2 g1 = dir*t1.xy;
       vec2 g2 = dir*t1.zw;
 
-      vec3 A = texture_ovr_nearest(tex, vTexCoord       ).xyz;
-      vec3 B = texture_ovr_nearest(tex, vTexCoord +g1   ).xyz;
-      vec3 C = texture_ovr_nearest(tex, vTexCoord    +g2).xyz;
-      vec3 D = texture_ovr_nearest(tex, vTexCoord +g1+g2).xyz;
+      vec3 A = texture_ovr_nearest_lod0(tex, vTexCoord       ).xyz;
+      vec3 B = texture_ovr_nearest_lod0(tex, vTexCoord +g1   ).xyz;
+      vec3 C = texture_ovr_nearest_lod0(tex, vTexCoord    +g2).xyz;
+      vec3 D = texture_ovr_nearest_lod0(tex, vTexCoord +g1+g2).xyz;
 
-      vec3 A1 = texture_ovr_nearest(tex, vTexCoord    -g2).xyz;
-      vec3 B1 = texture_ovr_nearest(tex, vTexCoord +g1-g2).xyz;
-      vec3 A0 = texture_ovr_nearest(tex, vTexCoord -g1   ).xyz;
-      vec3 C0 = texture_ovr_nearest(tex, vTexCoord -g1+g2).xyz;
+      vec3 A1 = texture_ovr_nearest_lod0(tex, vTexCoord    -g2).xyz;
+      vec3 B1 = texture_ovr_nearest_lod0(tex, vTexCoord +g1-g2).xyz;
+      vec3 A0 = texture_ovr_nearest_lod0(tex, vTexCoord -g1   ).xyz;
+      vec3 C0 = texture_ovr_nearest_lod0(tex, vTexCoord -g1+g2).xyz;
 
-      vec3 B2 = texture_ovr_nearest(tex, vTexCoord +2*g1     ).xyz;
-      vec3 D2 = texture_ovr_nearest(tex, vTexCoord +2*g1+  g2).xyz;
-      vec3 C3 = texture_ovr_nearest(tex, vTexCoord      +2*g2).xyz;
-      vec3 D3 = texture_ovr_nearest(tex, vTexCoord   +g1+2*g2).xyz;
+      vec3 B2 = texture_ovr_nearest_lod0(tex, vTexCoord +2*g1     ).xyz;
+      vec3 D2 = texture_ovr_nearest_lod0(tex, vTexCoord +2*g1+  g2).xyz;
+      vec3 C3 = texture_ovr_nearest_lod0(tex, vTexCoord      +2*g2).xyz;
+      vec3 D3 = texture_ovr_nearest_lod0(tex, vTexCoord   +g1+2*g2).xyz;
 
       float a = luma(A);
       float b = luma(B);
@@ -346,7 +352,7 @@ vec4 texture_ovr_nearest( sampler2D tex, vec2 co) {
    }
  
    vec3 tex_src(vec2 co, float ox, float oy) {
-      return texture_ovr_nearest(Source, co + vec2(ox, oy) * params.SourceSize.zw).rgb;
+      return texture_ovr_nearest_lod0(Source, co + vec2(ox, oy) * params.SourceSize.zw).rgb;
    }
    
    vec3 aa_mmpx(sampler2D tex, vec2 co) {
@@ -605,15 +611,15 @@ vec4 texture_ovr_nearest( sampler2D tex, vec2 co) {
          - AA gfx. back to it's original size (looks nice above 640x480, set scaling to 1.0) 
       */
 
-      vec3 c00 = texture_ovr_nearest(tex, pt1.zw).xyz; 
-      vec3 c10 = texture_ovr_nearest(tex, pt3.xy).xyz;
-      vec3 c20 = texture_ovr_nearest(tex, pt3.zw).xyz;
-      vec3 c01 = texture_ovr_nearest(tex, pt1.xy).xyz;
-      vec3 c11 = texture_ovr_nearest(tex, co).xyz;
-      vec3 c21 = texture_ovr_nearest(tex, pt2.xy).xyz;
-      vec3 c02 = texture_ovr_nearest(tex, pt2.zw).xyz;
-      vec3 c12 = texture_ovr_nearest(tex, pt4.xy).xyz;
-      vec3 c22 = texture_ovr_nearest(tex, pt4.zw).xyz;
+      vec3 c00 = texture_ovr_nearest_lod0(tex, pt1.zw).xyz; 
+      vec3 c10 = texture_ovr_nearest_lod0(tex, pt3.xy).xyz;
+      vec3 c20 = texture_ovr_nearest_lod0(tex, pt3.zw).xyz;
+      vec3 c01 = texture_ovr_nearest_lod0(tex, pt1.xy).xyz;
+      vec3 c11 = texture_ovr_nearest_lod0(tex, co).xyz;
+      vec3 c21 = texture_ovr_nearest_lod0(tex, pt2.xy).xyz;
+      vec3 c02 = texture_ovr_nearest_lod0(tex, pt2.zw).xyz;
+      vec3 c12 = texture_ovr_nearest_lod0(tex, pt4.xy).xyz;
+      vec3 c22 = texture_ovr_nearest_lod0(tex, pt4.zw).xyz;
 
       float d1=dot(abs(c00-c22),vec3(1))+0.0001;
       float d2=dot(abs(c20-c02),vec3(1))+0.0001;
@@ -907,11 +913,11 @@ vec4 texture_ovr_nearest( sampler2D tex, vec2 co) {
       vec2 fp = fract(co*params.SourceSize.xy);
 
       // Reading the texels
-         vec3 B = texture_ovr_nearest(tex, pt1.xy).xyz;
-         vec3 D = texture_ovr_nearest(tex, pt1.zw).xyz;
-         vec3 E = texture_ovr_nearest(tex, co).xyz;
-         vec3 F = texture_ovr_nearest(tex, pt2.xy).xyz;
-         vec3 H = texture_ovr_nearest(tex, pt2.zw).xyz;
+         vec3 B = texture_ovr_nearest_lod0(tex, pt1.xy).xyz;
+         vec3 D = texture_ovr_nearest_lod0(tex, pt1.zw).xyz;
+         vec3 E = texture_ovr_nearest_lod0(tex, co).xyz;
+         vec3 F = texture_ovr_nearest_lod0(tex, pt2.xy).xyz;
+         vec3 H = texture_ovr_nearest_lod0(tex, pt2.zw).xyz;
 
       vec3 E0 = D == B && B != H && D != F ? D : E;
       vec3 E1 = B == F && B != H && D != F ? F : E;
@@ -927,19 +933,19 @@ vec4 texture_ovr_nearest( sampler2D tex, vec2 co) {
 #ifdef AA_MODE_2XSCALEHQ
    vec3 aa_2xscalehq(sampler2D tex, vec2 co, vec4 pt1, vec4 pt2, vec4 pt3, vec4 pt4) {
       float mx = 0.325;      // start smoothing wt.
-      float k = -0.250;      // wt. decrease factor
-      float max_w = 0.25;    // max filter weigth
+      float k = -0.250;      // wt. decrease factor //does not seem to affect anything
+      float max_w = 0.25 * 0.0;    // max filter weigth // the lower, the less "debanding"
       float min_w =-0.05;    // min filter weigth
       float lum_add = 0.25;  // affects smoothing
-      vec3 c00 = texture_ovr_nearest(tex, pt1.xy).xyz; 
-      vec3 c10 = texture_ovr_nearest(tex, pt1.zw).xyz; 
-      vec3 c20 = texture_ovr_nearest(tex, pt2.xy).xyz; 
-      vec3 c01 = texture_ovr_nearest(tex, pt4.zw).xyz; 
-      vec3 c11 = texture_ovr_nearest(tex, co).xyz; 
-      vec3 c21 = texture_ovr_nearest(tex, pt2.zw).xyz; 
-      vec3 c02 = texture_ovr_nearest(tex, pt4.xy).xyz; 
-      vec3 c12 = texture_ovr_nearest(tex, pt3.zw).xyz; 
-      vec3 c22 = texture_ovr_nearest(tex, pt3.xy).xyz; 
+      vec3 c00 = texture_ovr_nearest_lod0(tex, pt1.xy).xyz; 
+      vec3 c10 = texture_ovr_nearest_lod0(tex, pt1.zw).xyz; 
+      vec3 c20 = texture_ovr_nearest_lod0(tex, pt2.xy).xyz; 
+      vec3 c01 = texture_ovr_nearest_lod0(tex, pt4.zw).xyz; 
+      vec3 c11 = texture_ovr_nearest_lod0(tex, co).xyz; 
+      vec3 c21 = texture_ovr_nearest_lod0(tex, pt2.zw).xyz; 
+      vec3 c02 = texture_ovr_nearest_lod0(tex, pt4.xy).xyz; 
+      vec3 c12 = texture_ovr_nearest_lod0(tex, pt3.zw).xyz; 
+      vec3 c22 = texture_ovr_nearest_lod0(tex, pt3.xy).xyz; 
 
       float md1 = dot(abs(c00 - c22), vec3(1.0));
       float md2 = dot(abs(c02 - c20), vec3(1.0));
@@ -1029,9 +1035,7 @@ void main() {
       #endif
 
       #ifdef AA_MODE_2XSAI
-         vec2 co = vTexCoord+0.0001;
-         co.xy -= params.OutputSize.zw*SERVICE1;
-         pixel_out.rgb = aa_2xsai(Source, co);
+         pixel_out.rgb = aa_2xsai(Source, vTexCoord);
       #endif
          
       #ifdef AA_MODE_SUPER2XSAI
