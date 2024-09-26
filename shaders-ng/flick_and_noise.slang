@@ -103,7 +103,11 @@ vec3 pixel_flickering() {
 
 void main() {
    
-   vec4 pixel_out;
+     vec4 pixel_out = texture_NEAREST(Source, vTexCoord, params.OriginalSize); //<-alpha carries ntsc artifacts mask
+      FragColor = pixel_out;
+      return;
+   
+   //vec4 pixel_out;
    
    if (vDo_flickering==1.0) 
       pixel_out.rgb = pixel_flickering().rgb; //<-alpha carries ntsc artifacts mask

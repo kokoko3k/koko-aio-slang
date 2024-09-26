@@ -1,6 +1,7 @@
 #version 450
 
 #include "config.inc"
+#include "includes/functions.include.slang"
 
 #define AA_MODE_SCALE2XPLUS      // 130  //good general purpose
 //#define AA_MODE_GUEST_ADVANCEDAA //129.5 // good general purposes, misses some lines
@@ -20,12 +21,35 @@ layout(location = 2) out vec4 t2;
 layout(location = 3) out vec4 t3;
 layout(location = 4) out vec4 t4;
 
+layout(location = 5) out float vDo_flickering;
+layout(location = 6) out vec2  vFlickerCoords;
+layout(location = 7) out float vDynamicSeed;
 
 void main() {
 
    gl_Position = global.MVP * Position;
    vTexCoord = TexCoord;
-    
+   
+   //Generate a seed that changes over time for temporal random noise
+   vDynamicSeed = mod(params.FrameCount, 120.0001);
+   
+   //flickering helper
+   vDo_flickering  = float ( scanline_have_to_flicker(is_interlaced()) || FLICKER_IN_MOTION == 1.0  ) ; 
+   if (vDo_flickering == 1.0) {
+      //Flicker one over 3 frames:
+         float ModFlicker = params.FrameCount % 3;
+      
+      //Compute y flicker offset:
+         float FlickerOffset = 0.0;
+         float line_tick = is_interlaced() ? 1 : 2 ;
+         if (ModFlicker == 1.0 )
+            FlickerOffset = params.OriginalSize.w/line_tick;
+         else if (ModFlicker == 2.0)
+            FlickerOffset = -params.OriginalSize.w/line_tick;
+      //Export flicker coords for Fragment shader here:
+         vFlickerCoords =  vec2(TexCoord.x, TexCoord.y + FlickerOffset);
+   }
+   
    #ifdef AA_MODE_GUEST_ADVANCEDAA
       vec2 d = params.SourceSize.zw * 0.5;
       t1.xy = vTexCoord + vec2(-d.x, 0);
@@ -71,11 +95,14 @@ layout(location = 1) in vec4 t1;
 layout(location = 2) in vec4 t2;
 layout(location = 3) in vec4 t3;
 layout(location = 4) in vec4 t4;
+
+layout(location = 5) in float vDo_flickering;
+layout(location = 6) in vec2  vFlickerCoords;
+layout(location = 7) in float vDynamicSeed;
+
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D Source;
-
-#include "includes/functions.include.slang"
-
+layout(set = 0, binding = 3) uniform sampler2D upscale_passFeedback;
 
 
 vec4 texture_ovr_nearest( sampler2D tex, vec2 co) {
@@ -938,45 +965,109 @@ vec4 texture_ovr_nearest( sampler2D tex, vec2 co) {
    }
 #endif
 
+
+vec3 pixel_flickering(vec3 pixel_cur) {
+/* Simulates the flickering effect of the interlaced screens.
+ * As I remember, it was visible when a line and the next had high
+ * luminosity differences.
+ * So we need to sample the current line and the previous one
+ * (eventually applying color corrections to both).
+ *
+ * Repeating the following:
+ * On frame 0, return the "clean" pixel
+ * On frame 1, mix the upper pixel with the current one
+ * On frame 2, mix the lower pixel with the current one
+ *
+ * The effect of the mix is the flickering itself, and we modulate
+ * the mix according to the luminance difference between the current
+ * pixel and the mixed one.
+ *
+ * We choose to alternate on a period of 3,
+ * (thus considering the upper pixel and the lower one)
+ * or else the high pixel persistance of lcd displays wont allow
+ * to see the effect (the lcd panel would just mix the pixels by itself (meh).
+ */
+
+   //vec3 pixel_cur = texture_NEAREST(Source,vTexCoord, params.OriginalSize).rgb;
+   //vec3 pixel_cur = texture(Source,vTexCoord).rgb;      
+   //vec3 flickline = texture_NEAREST(upscale_passFeedback,vFlickerCoords, params.OriginalSize).rgb;
+   //vec3 flickline = texture(upscale_passFeedback,vFlickerCoords).rgb;
+   vec3 flickline = texture(Source,vFlickerCoords).rgb;
+   //vec3 flickline = texture_NEAREST(Source,vFlickerCoords, params.OriginalSize).rgb;
+   
+   //float lumdiff = abs( flickline.r + flickline.g + flickline.b - pixel_cur.r - pixel_cur.g - pixel_cur.b);
+   //float lumdiff = abs( (flickline.r + flickline.g) + (flickline.b - pixel_cur.r) - (pixel_cur.g + pixel_cur.b) ); //1687 1754 2946   ASM PROOF: FASTER
+   float lumdiff = abs( dot(flickline.rgb, vec3(1.0)) - dot(pixel_cur.rgb, vec3(1.0)));// 1685 1750 2948 //ASM PROOF: Faster on SIMD8 and SIMD16, slower on SIMD32
+
+   lumdiff = min(lumdiff * PIXELGRID_INTR_FLICK_POWR, 1.0);
+   
+   /*if (FLICKER_IN_MOTION == 1.0) {
+      lumdiff = 0.4;
+      vec3 prev_frame = texture(colortools_and_ntsc_passFeedback, vTexCoord).rgb;
+      vec3 cur_frame = texture(colortools_and_ntsc_pass, vTexCoord).rgb;
+      float is_moving = float(prev_frame != cur_frame);
+      lumdiff *= is_moving;
+   }*/
+   
+   return mix(pixel_cur.rgb,flickline.rgb,lumdiff);
+   //return vec4( mix(pixel_cur.rgb,flickline.rgb,lumdiff),
+   //             pixel_cur.a); //<-- wee need to return the alpha channel because it carries ntsc artifact mask
+}
+
+
 void main() {
 	
    vec4 pixel_out;
-   pixel_out.a = texture(Source, vTexCoord).a;
+   pixel_out.rgb = texture_ovr_nearest(Source, vTexCoord).rgb;
    
-	if (DO_FXAA == 0.0) {
-		pixel_out.rgb = texture_ovr_nearest(Source, vTexCoord).rgb;
-		FragColor = pixel_out;
-        return;
-	}
+   
+   if (DO_FXAA != 0.0) {
 
-   #ifdef AA_MODE_GUEST_ADVANCEDAA
-      pixel_out.rgb = aa_AdvancedAA(Source, vTexCoord, t1, t2, t3, t4);
-   #endif
+      #ifdef AA_MODE_GUEST_ADVANCEDAA
+         pixel_out.rgb = aa_AdvancedAA(Source, vTexCoord, t1, t2, t3, t4);
+      #endif
 
-   #ifdef AA_MODE_2XSAI
-      pixel_out.rgb = aa_2xsai(Source, vTexCoord);
-   #endif
-      
-   #ifdef AA_MODE_SUPER2XSAI
-      pixel_out.rgb = aa_super2x_sai(Source, vTexCoord);
-   #endif
-      
-   #ifdef AA_MODE_SCALE2XPLUS
-      pixel_out.rgb = aa_scale2xplus(Source, vTexCoord, t1, t2);
-   #endif
-      
-   #ifdef AA_MODE_2XSCALEHQ
-      pixel_out.rgb =  aa_2xscalehq(Source, vTexCoord, t1, t2, t3, t4);
-   #endif
-      
-   #ifdef AA_MODE_MMPX
-      pixel_out.rgb = aa_mmpx(Source, vTexCoord);
-   #endif
+      #ifdef AA_MODE_2XSAI
+         pixel_out.rgb = aa_2xsai(Source, vTexCoord);
+      #endif
+         
+      #ifdef AA_MODE_SUPER2XSAI
+         pixel_out.rgb = aa_super2x_sai(Source, vTexCoord);
+      #endif
+         
+      #ifdef AA_MODE_SCALE2XPLUS
+         pixel_out.rgb = aa_scale2xplus(Source, vTexCoord, t1, t2);
+      #endif
+         
+      #ifdef AA_MODE_2XSCALEHQ
+         pixel_out.rgb =  aa_2xscalehq(Source, vTexCoord, t1, t2, t3, t4);
+      #endif
+         
+      #ifdef AA_MODE_MMPX
+         pixel_out.rgb = aa_mmpx(Source, vTexCoord);
+      #endif
 
-   #ifdef AA_MODE_DDTXBRLV1
-      pixel_out.rgb = aa_ddtxbrlv1(Source, vTexCoord, t1);
-   #endif
+      #ifdef AA_MODE_DDTXBRLV1
+         pixel_out.rgb = aa_ddtxbrlv1(Source, vTexCoord, t1);
+      #endif
+         
+   }
+   
+   if (DO_RF_NOISE > 0.0) {
+      float anoise = random_fast(vTexCoord * vDynamicSeed);
+      pixel_out.rgb += scale_to_range(anoise, -RF_NOISE_STRENGTH, RF_NOISE_STRENGTH);
+   }
       
+   if (vDo_flickering==1.0) 
+      pixel_out.rgb = pixel_flickering(pixel_out.rgb).rgb;
+      
+   // If we sample ntsc articacts from a mipmap, we can smooth them
+   // which is good when slective blurring them.
+   pixel_out.a = 0.0;
+   if (DO_NTSC_ARTIFACTS > 0.5) {
+      pixel_out.a = textureLod(Source, vTexCoord, 1.0).a;
+   }
+   
    FragColor = pixel_out;
    
 }
