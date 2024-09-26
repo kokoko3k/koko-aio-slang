@@ -11,10 +11,6 @@
 #        glowing, haloing, blooming, gamma and SATURATION correction,pixel_outi        
 #        black frame insertions, interlace emulation, antialiasing.
 
-#    External code by:
-#    * Nvidia (FXAA)
-
-
 
     
 # Bezel texture contains the following infomations:
@@ -26,30 +22,30 @@
 
                 textures = "monitor_body_curved;monitor_body_straight;bg_under;bg_over;backdrop"
                 
-            monitor_body_curved = "textures/monitor_body_curved.png"
+            monitor_body_curved = "../textures/monitor_body_curved.png"
      monitor_body_curved_linear = "true"
   # Does this work?
   monitor_body_curved_wrap_mode = "clamp_to_edge"
      monitor_body_curved_mipmap = "true"
 
-            monitor_body_straight = "textures/monitor_body_straight.png"
+            monitor_body_straight = "../textures/monitor_body_straight.png"
      monitor_body_straight_linear = "true"
   # Does this work?
   monitor_body_straight_wrap_mode = "clamp_to_edge"
      monitor_body_straight_mipmap = "true"
      
-                bg_under = "textures/background_under.png"
+                bg_under = "../textures/background_under.png"
          bg_under_linear = "true"
       bg_under_wrap_mode = "mirrored_repeat"
          bg_under_mipmap = "false"
          
-                 bg_over = "textures/background_over.png"
+                 bg_over = "../textures/background_over.png"
           bg_over_linear = "true"
        bg_over_wrap_mode = "mirrored_repeat"
           bg_over_mipmap = "false"
 
         #This is for support for arcade backdrop pictures, enable it in config.inc.
-                backdrop = "textures/boothill.jpg"
+                backdrop = "../textures/boothill.jpg"
          backdrop_linear = "true"
       backdrop_wrap_mode = "mirrored_repeat"
          backdrop_mipmap = "true"
@@ -68,7 +64,7 @@ shaders = 16
 # some #defines in the pass itself
 
 #ASMDEBUG GLSL27
-           shader0 = shaders-ng/colortools_and_ntsc_pass.slang
+           shader0 = ../shaders-ng/colortools_and_ntsc_pass.slang
             alias0 = "colortools_and_ntsc_pass"
 #float_framebuffer needed by phosphor persistance
        scale_type0 = source
@@ -111,7 +107,7 @@ float_framebuffer0 = "true"
 # But this way you loose the emulation for hires content (not much games uses it anyway).
         
 # ASMDEBUG: GLSL30
-           shader1 = shaders-ng/fxaa.slang
+           shader1 = ../shaders-ng/fxaa.slang
             alias1 = "upscale_pass"
        scale_type1 = source
             scale1 = 1.0
@@ -128,7 +124,7 @@ float_framebuffer1 = "true"
 # This pass also applies the input gamma needed for glow pass.
         
 # ASMDEBUG: GLSL33
-           shader2 = shaders-ng/shift_and_bleed.slang
+           shader2 = ../shaders-ng/shift_and_bleed.slang
             alias2 = "shift_and_bleed_pass"
     filter_linear2 = true
             scale2 = 1.0
@@ -142,7 +138,7 @@ float_framebuffer2 = true
 # This passes aims to simulate the signal input power.
         
 # ASMDEBUG: GLSL36
-           shader3 = shaders-ng/in_glow_x.slang
+           shader3 = ../shaders-ng/in_glow_x.slang
             alias3 = "in_glow_pass_x"
     filter_linear3 = true
             scale3 = 1.0
@@ -151,7 +147,7 @@ float_framebuffer3 = true
         wrap_mode3 = "clamp_to_edge"
      
 # ASMDEBUG: GLSL39
-           shader4 = shaders-ng/in_glow_y.slang
+           shader4 = ../shaders-ng/in_glow_y.slang
             alias4 = "in_glow_pass"
     filter_linear4 = true
             scale4 = 1.0
@@ -166,7 +162,7 @@ float_framebuffer4 = true
 # in the final pass.
         
 # ASMDEBUG: GLSL42
-           shader5 = shaders-ng/halo_pre_gamma.slang
+           shader5 = ../shaders-ng/halo_pre_gamma.slang
             alias5 = "halo_pre_gamma_pass"
     filter_linear5 = true
             scale5 = 1.0
@@ -178,7 +174,7 @@ float_framebuffer5 = true
         wrap_mode5 = "clamp_to_border"
         
 # ASMDEBUG: GLSL45
-           shader6 = shaders-ng/halo.slang
+           shader6 = ../shaders-ng/halo.slang
             alias6 = "halo_pass"
     filter_linear6 = true
             scale6 = 1.0
@@ -203,7 +199,7 @@ float_framebuffer6 = true
 # alpha@other coords: simple continuous sampling used to modulate bezel highlights strength.
         
 # ASMDEBUG: GLSL48
-               shader7 = shaders-ng/avglum_pass.slang
+               shader7 = ../shaders-ng/avglum_pass.slang
                 alias7 = "avglum_pass"
         filter_linear7 = true
            scale_type7 = source
@@ -215,7 +211,7 @@ float_framebuffer6 = true
 # The following passes emulates soft bezel reflections.
     
 # ASMDEBUG: GLSL51
-               shader8 = shaders-ng/reflection_blur_pre.slang
+               shader8 = ../shaders-ng/reflection_blur_pre.slang
                 alias8 = "reflected_blurred_pass_pre"
         filter_linear8 = true
            scale_type8 = source
@@ -223,7 +219,7 @@ float_framebuffer6 = true
             wrap_mode8 = "clamp_to_border"
 
 # ASMDEBUG: GLSL54          
-               shader9 = shaders-ng/reflection_blur.slang
+               shader9 = ../shaders-ng/reflection_blur.slang
                 alias9 = "reflected_blurred_pass"
         filter_linear9 = true
            scale_type9 = source
@@ -237,7 +233,7 @@ float_framebuffer6 = true
 # the starting point in every subsequent pass.
             
 # ASMDEBUG: GLSL57
-               shader10 = shaders-ng/bloom_pass_1.slang
+               shader10 = ../shaders-ng/bloom_pass_1.slang
                 alias10 = "bloom_pass_1"
         filter_linear10 = true
            scale_type10 = source
@@ -245,7 +241,7 @@ float_framebuffer6 = true
             wrap_mode10 = "mirrored_repeat"
     
 # ASMDEBUG: GLSL54
-               shader11 = shaders-ng/bloom_pass_2.slang
+               shader11 = ../shaders-ng/bloom_pass_2.slang
                 alias11 = "bloom_pass_2"
         filter_linear11 = true
            scale_type11 = source
@@ -253,7 +249,7 @@ float_framebuffer6 = true
             wrap_mode11 = "clamp_to_edge"
             
 # ASMDEBUG: GLSL63
-               shader12 = shaders-ng/bloom_pass_3.slang
+               shader12 = ../shaders-ng/bloom_pass_3.slang
                 alias12 = "bloom_pass_3"
         filter_linear12 = true
            scale_type12 = source
@@ -261,7 +257,7 @@ float_framebuffer6 = true
             wrap_mode12 = "clamp_to_edge"
 
 # ASMDEBUG: GLSL66
-               shader13 = shaders-ng/bloom_pass_4.slang
+               shader13 = ../shaders-ng/bloom_pass_4.slang
                 alias13 = "bloom_pass_final"
         filter_linear13 = true
            scale_type13 = source
@@ -276,7 +272,7 @@ float_framebuffer6 = true
 # Extra logic makes it possible to lower the led reaction time when a scene change is detected.
 # this is achieved through average luminance sampling from avglum_pass
 # ASMDEBUG: GLSL69
-               shader14 = shaders-ng/ambi_temporal_pass.slang
+               shader14 = ../shaders-ng/ambi_temporal_pass.slang
                 alias14 = "ambi_temporal_pass"
         filter_linear14 = true
            scale_type14 = viewport
@@ -294,7 +290,7 @@ float_framebuffer6 = true
 # * Bezel
 # * Background images
 # ASMDEBUG: GLSL72
-           shader15 = shaders-ng/final_pass.slang
+           shader15 = ../shaders-ng/final_pass.slang
             alias15 = "final_pass"
     filter_linear15 = true
        scale_type15 = viewport
