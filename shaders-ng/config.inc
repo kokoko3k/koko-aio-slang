@@ -326,9 +326,9 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter LABEL0003 " " 0.0 0.0 0.0 1.0
 
 
-// FXAA
+// AA
 // Apply an antialiasing filter via FXAA from Nvidia.
-#pragma parameter DO_FXAA "★ FXAA enable? (*f) ==>"	0.0 	0.0 1.0 1.0
+#pragma parameter DO_FXAA "★ Antialiasing enable? (*f) ==>"	0.0 	0.0 1.0 1.0
 #pragma parameter LABEL0004 " " 0.0 0.0 0.0 1.0
 
 
