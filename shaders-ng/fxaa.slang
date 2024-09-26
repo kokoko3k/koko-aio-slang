@@ -3,13 +3,14 @@
 #include "config.inc"
 #include "includes/functions.include.slang"
 
-#define AA_MODE_SCALE2XPLUS      // 130  //good general purpose
-//#define AA_MODE_GUEST_ADVANCEDAA //129.5 // good general purposes, misses some lines
-//#define AA_MODE_2XSCALEHQ        // 127 //blurs too much shades, try to tweak it.
-//#define AA_MODE_DDTXBRLV1 // 127 // a bit blurry, parameters do help?
-//#define AA_MODE_2XSAI            // 125 //need to fix pixel shift
-//#define AA_MODE_SUPER2XSAI       // 123 //need to fix pixel shift
-//#define AA_MODE_MMPX        // 118 //preserve a lot of details
+
+//#define AA_MODE_SCALE2XPLUS       // 111.2
+//#define AA_MODE_GUEST_ADVANCEDAA  // 112
+//#define AA_MODE_2XSCALEHQ         // 109.5 //blurs too much shades, try to tweak it.
+#define AA_MODE_DDTXBRLV1         // 108.4 // a bit blurry, parameters do help?
+//#define AA_MODE_2XSAI             // 107 //need to fix pixel shift
+//#define AA_MODE_SUPER2XSAI        // 106.5 //need to fix pixel shift
+//#define AA_MODE_MMPX              // 98 //preserve a lot of details
 
 
 #pragma stage vertex
@@ -1028,7 +1029,9 @@ void main() {
       #endif
 
       #ifdef AA_MODE_2XSAI
-         pixel_out.rgb = aa_2xsai(Source, vTexCoord);
+         vec2 co = vTexCoord+0.0001;
+         co.xy -= params.OutputSize.zw*SERVICE1;
+         pixel_out.rgb = aa_2xsai(Source, co);
       #endif
          
       #ifdef AA_MODE_SUPER2XSAI
