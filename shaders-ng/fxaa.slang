@@ -4,13 +4,13 @@
 #include "includes/functions.include.slang"
 
 
-//#define AA_MODE_SCALE2XPLUS       // 111.2 //good general purpose, very light, but blurs edges too much; unsharp mask does not help.
-//#define AA_MODE_GUEST_ADVANCEDAA  // 112 // good general purposes, misses some lines, not good overall
-#define AA_MODE_2XSCALEHQ         // 109.5 //used to blur too much shades, tweaked better now. rounder look than ddtxbrlv1, but rounds almost any corner.
-//#define AA_MODE_DDTXBRLV1           // 108.4 // a bit blurry, parameters do help, yes, done.
-//#define AA_MODE_2XSAI             // 107 // Dirty.
-//#define AA_MODE_SUPER2XSAI        // 106.5 // less Dirty.
-//#define AA_MODE_MMPX              // 98 //preserves a lot of details, too heavy.
+//#define AA_MODE_SCALE2XPLUS          // 111.2 //good general purpose, very light, but blurs edges too much; unsharp mask does not help.
+//#define AA_MODE_GUEST_ADVANCEDAA     // 112 // good general purposes, misses some lines, not good overall
+#define AA_MODE_2XSCALEHQ              // 109.5 //used to blur too much shades, tweaked better now. rounder look than ddtxbrlv1, but rounds almost any corner.
+//#define AA_MODE_DDTXBRLV1            // 108.4 // a bit blurry, parameters do help, yes, done.
+//#define AA_MODE_2XSAI                // 107 // Dirty.
+//#define AA_MODE_SUPER2XSAI           // 106.5 // less Dirty.
+//#define AA_MODE_MMPX                 // 98 //preserves a lot of details, too heavy.
 
 
 #pragma stage vertex
