@@ -3,10 +3,10 @@
 #include "config.inc"
 #include "includes/functions.include.slang"
 
-#define AA_MODE_FXAA
-//#define AA_MODE_SCALE2XPLUS          // 111.2 //good general purpose, very light, but blurs edges too much? or not?; unsharp mask does not help.
+#define AA_MODE_FXAA                   // 110 fps  // on fastest preset (good for 2x upscale)
+//#define AA_MODE_SCALE2XPLUS          // 111.2 fps //good general purpose, very light, but blurs edges too much? or not?; unsharp mask does not help.
 //#define AA_MODE_GUEST_ADVANCEDAA     // 112 // good general purposes, misses some lines, not good overall
-//#define AA_MODE_2XSCALEHQ              // 109.5 //used to blur too much shades, tweaked better now. rounder look than ddtxbrlv1, but rounds almost any corner.
+//#define AA_MODE_2XSCALEHQ            // 109.5 //used to blur too much shades, tweaked better now. rounder look than ddtxbrlv1, but rounds almost any corner.
 //#define AA_MODE_DDTXBRLV1            // 108.4 // a bit blurry, parameters do help, yes, done.
 //#define AA_MODE_2XSAI                // 107 // Dirty.
 //#define AA_MODE_SUPER2XSAI           // 106.5 // less Dirty.
@@ -1023,7 +1023,16 @@ vec3 pixel_flickering(vec3 pixel_cur) {
 
 
 #ifndef FXAA_PRESET
-    #define FXAA_PRESET 4
+    #define FXAA_PRESET 0
+#endif
+
+#if (FXAA_PRESET == 0)  //Dumb preset, looks like others, skip search.
+    #define FXAA_EDGE_THRESHOLD      (1.0/8.0)
+    #define FXAA_EDGE_THRESHOLD_MIN  (1.0/24.0)
+    #define FXAA_SEARCH_STEPS        0
+    #define FXAA_SEARCH_THRESHOLD    (1.0/4.0)
+    #define FXAA_SUBPIX_CAP          (3.0/4.0)
+    #define FXAA_SUBPIX_TRIM         (1.0/8.0)
 #endif
 
 #if (FXAA_PRESET == 6)
@@ -1046,7 +1055,7 @@ vec3 pixel_flickering(vec3 pixel_cur) {
 #if (FXAA_PRESET == 4)
     #define FXAA_EDGE_THRESHOLD      (1.0/8.0)
     #define FXAA_EDGE_THRESHOLD_MIN  (1.0/24.0)
-    #define FXAA_SEARCH_STEPS        8
+    #define FXAA_SEARCH_STEPS        1
     #define FXAA_SEARCH_THRESHOLD    (1.0/4.0)
     #define FXAA_SUBPIX_CAP          (3.0/4.0)
     #define FXAA_SUBPIX_TRIM         (1.0/8.0)
