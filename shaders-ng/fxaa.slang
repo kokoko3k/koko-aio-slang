@@ -3,13 +3,11 @@
 #include "config.inc"
 #include "includes/functions.include.slang"
 
-#define AA_MODE_FXAA                   // 110 fps  // on fastest preset (good for 2x upscale)
-#define AA_MODE_SCALE2XPLUS              // 111.2 fps //good general purpose, very light, but blurs edges too much? or not?; unsharp mask does not help.
-//#define AA_MODE_GUEST_ADVANCEDAA     // 112 // good general purposes, misses some lines, not good overall
-//#define AA_MODE_2XSCALEHQ            // 109.5 //used to blur too much shades, tweaked better now. rounder look than ddtxbrlv1, but rounds almost any corner.
+#define AA_MODE_FXAA                 // 110 fps  // on fastest preset (good for 2x upscale)
+#define AA_MODE_SCALE2XPLUS          // 111.2 fps //good general purpose, very light, but blurs edges too much? or not?; unsharp mask does not help.
+#define AA_MODE_2XSCALEHQ            // 109.5 //used to blur too much shades, tweaked better now. rounder look than ddtxbrlv1, but rounds almost any corner.
 #define AA_MODE_DDTXBRLV1            // 108.4 // a bit blurry, parameters do help, yes, done.
-//#define AA_MODE_2XSAI                // 107 // Dirty.
-//#define AA_MODE_SUPER2XSAI           // 106.5 // less Dirty.
+#define AA_MODE_SUPER2XSAI           // 106.5 // less Dirty.
 //#define AA_MODE_MMPX                 // 98 //preserves a lot of details, too heavy.
 
 
@@ -17,20 +15,16 @@
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
-layout(location = 1) out vec4 gt1;
-layout(location = 2) out vec4 gt2;
-layout(location = 3) out vec4 gt3;
-layout(location = 4) out vec4 gt4;
 
-layout(location = 5) out vec4 pt1;
-layout(location = 6) out vec4 pt2;
+layout(location = 5) out vec4 vpt1;
+layout(location = 6) out vec4 vpt2;
 
-layout(location = 7) out vec4 hqt1;
-layout(location = 8) out vec4 hqt2;
-layout(location = 9) out vec4 hqt3;
-layout(location = 10) out vec4 hqt4;
+layout(location = 7) out vec4 vhqt1;
+layout(location = 8) out vec4 vhqt2;
+layout(location = 9) out vec4 vhqt3;
+layout(location = 10) out vec4 vhqt4;
 
-layout(location = 11) out vec4 xt1;
+layout(location = 11) out vec4 vxt1;
 
 layout(location = 12) out float vDo_flickering;
 layout(location = 13) out vec2  vFlickerCoords;
@@ -60,24 +54,13 @@ void main() {
       //Export flicker coords for Fragment shader here:
          vFlickerCoords =  vec2(TexCoord.x, TexCoord.y + FlickerOffset);
    }
-   
-   #ifdef AA_MODE_GUEST_ADVANCEDAA
-      vec2 gd = params.SourceSize.zw * 0.5;
-      gt1.xy = vTexCoord + vec2(-gd.x, 0);
-      gt2.xy = vTexCoord + vec2( gd.x, 0);
-      gt3.xy = vTexCoord + vec2( 0,-gd.y);
-      gt4.xy = vTexCoord + vec2( 0, gd.y);
-      gt1.zw = vTexCoord + vec2(-gd.x,-gd.y);
-      gt2.zw = vTexCoord + vec2(-gd.x, gd.y);
-      gt3.zw = vTexCoord + vec2( gd.x,-gd.y);
-      gt4.zw = vTexCoord + vec2( gd.x, gd.y);
-   #endif
+
       
    #ifdef AA_MODE_SCALE2XPLUS
       vec2 pd = params.SourceSize.zw;
 
-      pt1 = vTexCoord.xyxy + vec4( 0,   -pd.y, -pd.x, 0);   // B, D
-      pt2 = vTexCoord.xyxy + vec4( pd.x,  0,    0,   pd.y); // F, H	
+      vpt1 = vTexCoord.xyxy + vec4( 0,   -pd.y, -pd.x, 0);   // B, D
+      vpt2 = vTexCoord.xyxy + vec4( pd.x,  0,    0,   pd.y); // F, H	
    #endif
       
    #ifdef AA_MODE_2XSCALEHQ
@@ -86,36 +69,33 @@ void main() {
       vec2 dg2 = vec2(-s.x, s.y);
       vec2 dx = vec2(s.x, 0.0);
       vec2 dy = vec2(0.0, s.y);
-      hqt1 = vec4(vTexCoord - dg1, vTexCoord - dy);
-      hqt2 = vec4(vTexCoord - dg2, vTexCoord + dx);
-      hqt3 = vec4(vTexCoord + dg1, vTexCoord + dy);
-      hqt4 = vec4(vTexCoord + dg2, vTexCoord - dx);
+      vhqt1 = vec4(vTexCoord - dg1, vTexCoord - dy);
+      vhqt2 = vec4(vTexCoord - dg2, vTexCoord + dx);
+      vhqt3 = vec4(vTexCoord + dg1, vTexCoord + dy);
+      vhqt4 = vec4(vTexCoord + dg2, vTexCoord - dx);
    #endif
       
       
    #ifdef AA_MODE_DDTXBRLV1
       vec2 xd = params.SourceSize.zw;
-      xt1.xy = vec2( xd.x,  0); // F
-      xt1.zw = vec2(  0, xd.y); // H
+      vxt1.xy = vec2( xd.x,  0); // F
+      vxt1.zw = vec2(  0, xd.y); // H
    #endif
 }
 
 #pragma stage fragment
 layout(location = 0) in vec2 vTexCoord;
-layout(location = 1) in vec4 gt1;
-layout(location = 2) in vec4 gt2;
-layout(location = 3) in vec4 gt3;
-layout(location = 4) in vec4 gt4;
 
-layout(location = 5) in vec4 pt1;
-layout(location = 6) in vec4 pt2;
 
-layout(location = 7) in vec4 hqt1;
-layout(location = 8) in vec4 hqt2;
-layout(location = 9) in vec4 hqt3;
-layout(location = 10) in vec4 hqt4;
+layout(location = 5) in vec4 vpt1;
+layout(location = 6) in vec4 vpt2;
 
-layout(location = 11) in vec4 xt1;
+layout(location = 7) in vec4 vhqt1;
+layout(location = 8) in vec4 vhqt2;
+layout(location = 9) in vec4 vhqt3;
+layout(location = 10) in vec4 vhqt4;
+
+layout(location = 11) in vec4 vxt1;
 
 layout(location = 12) in float vDo_flickering;
 layout(location = 13) in vec2  vFlickerCoords;
@@ -334,7 +314,7 @@ vec4 texture_ovr_nearest_lod0( sampler2D tex, vec2 co) {
    // https://casual-effects.com/research/McGuire2021PixelArt/
    // License: MIT
    // adapted for slang by hunterk
-   float luma(vec3 col){
+   float mmpx_luma(vec3 col){
       return dot(col, vec3(0.2126, 0.7152, 0.0722));
    }
 
@@ -417,11 +397,11 @@ vec4 texture_ovr_nearest_lod0( sampler2D tex, vec2 co) {
          vec3 S  = tex_src(co, +0.,+2.);
 
       // Precompute luminances
-         float Bl = luma(B);
-         float Dl = luma(D);
-         float El = luma(E);
-         float Fl = luma(F);
-         float Hl = luma(H);
+         float Bl = mmpx_luma(B);
+         float Dl = mmpx_luma(D);
+         float El = mmpx_luma(E);
+         float Fl = mmpx_luma(F);
+         float Hl = mmpx_luma(H);
 
       // Round some corners and fill in 1:1 slopes, but preserve
       // sharp right angles.
@@ -603,190 +583,6 @@ vec4 texture_ovr_nearest_lod0( sampler2D tex, vec2 co) {
    
    
 #endif
-
-#ifdef AA_MODE_GUEST_ADVANCEDAA
-   vec3 aa_AdvancedAA(sampler2D tex, vec2 co, vec4 pt1, vec4 pt2, vec4 pt3, vec4 pt4){
-      /*
-         Copyright (C) 2006 guest(r) - guest.r@gmail.com
-
-         This program is free software; you can redistribute it and/or
-         modify it under the terms of the GNU General Public License
-         as published by the Free Software Foundation; either version 2
-         of the License, or (at your option) any later version.
-
-         This program is distributed in the hope that it will be useful,
-         but WITHOUT ANY WARRANTY; without even the implied warranty of
-         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-         GNU General Public License for more details.
-
-         You should have received a copy of the GNU General Public License
-         along with this program; if not, write to the Free Software
-         Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-      */
-
-      /*
-         The AdvancedAA shader is well used to:
-         - AA 2xscaled gfx. to its 4x absolute size,   
-         - AA hi-res "screens" (640x480) to their 2x size or,
-         - AA gfx. back to it's original size (looks nice above 640x480, set scaling to 1.0) 
-      */
-
-      vec3 c00 = texture_ovr_nearest_lod0(tex, pt1.zw).xyz; 
-      vec3 c10 = texture_ovr_nearest_lod0(tex, pt3.xy).xyz;
-      vec3 c20 = texture_ovr_nearest_lod0(tex, pt3.zw).xyz;
-      vec3 c01 = texture_ovr_nearest_lod0(tex, pt1.xy).xyz;
-      vec3 c11 = texture_ovr_nearest_lod0(tex, co).xyz;
-      vec3 c21 = texture_ovr_nearest_lod0(tex, pt2.xy).xyz;
-      vec3 c02 = texture_ovr_nearest_lod0(tex, pt2.zw).xyz;
-      vec3 c12 = texture_ovr_nearest_lod0(tex, pt4.xy).xyz;
-      vec3 c22 = texture_ovr_nearest_lod0(tex, pt4.zw).xyz;
-
-      float d1=dot(abs(c00-c22),vec3(1))+0.0001;
-      float d2=dot(abs(c20-c02),vec3(1))+0.0001;
-      float hl=dot(abs(c01-c21),vec3(1))+0.0001;
-      float vl=dot(abs(c10-c12),vec3(1))+0.0001;
-
-      float k1=0.5*(hl+vl);
-      float k2=0.5*(d1+d2);
-
-      vec3 t1_vec3= ( hl*(c10+c12) + vl*(c01+c21) + k1*c11 ) /( 2.5*(hl+vl) );
-      vec3 t2_vec3= ( d1*(c20+c02) + d2*(c00+c22) + k2*c11 ) /( 2.5*(d1+d2) );
-
-      k1=dot(abs(t1_vec3-c11),vec3(1))+0.0001;
-      k2=dot(abs(t1_vec3-c11),vec3(1))+0.0001;
-
-      return ( (k1*t1_vec3) + (k2*t1_vec3) ) / (k1+k2);
-      
-   }
-#endif
-
-
-#ifdef AA_MODE_2XSAI
-
-    /*                2xSaI code                  */
-    /*  Copied from the Dosbox source code        */
-    /*  Copyright (C) 2002-2007  The DOSBox Team  */
-    /*  License: GNU-GPL                          */
-    /*  Adapted by guest(r) on 20.4 and 9.5. 2007 */
-
-   const vec3 dt = vec3(65536.0,256.0,1.0);
-
-   float GET_RESULT(float A, float B, float C, float D) {
-      return (sign(abs(A-C)+abs(A-D)) - sign(abs(B-C)+abs(B-D))); 
-   }
-
-   float reduce(vec3 color) { 
-      return dot(color,dt);
-   }
-
-      vec3 aa_2xsai(sampler2D tex,  vec2 co) {
-      vec2 OGL2Size    = params.SourceSize.xy;
-      vec2 OGL2InvSize = params.SourceSize.zw;
-
-      // Calculating texel coordinates
-
-      vec2 OGL2Pos = co.xy*OGL2Size.xy;
-      vec2 fp = fract(OGL2Pos);
-      vec2 g1 = vec2( OGL2InvSize.x,OGL2InvSize.y);
-      vec2 g2 = vec2(-OGL2InvSize.x,OGL2InvSize.y);
-
-
-      if ((fp.x >= 0.50) && (fp.y < 0.50)) g2*=-1.0;
-
-      vec2 pC4 = floor(OGL2Pos)/OGL2Size.xy + 0.5*OGL2InvSize;
-
-      vec2 pC8 = pC4 + g1;
-      vec2 pC0 = pC4 - g1;
-
-      vec2 p04 = pC4 - 0.5*g1;
-      vec2 pC3 = p04 + 0.5*g2;
-      vec2 pC1 = pC3 - g2;
-      vec2 pC5 = pC1 + g1;
-      vec2 pC7 = pC3 + g1;
-
-
-      // Reading the texels
-         vec3 C0 = texture(tex,pC0   ).xyz; 
-         vec3 C1 = texture(tex,pC1   ).xyz;
-         vec3 C2 = texture(tex,pC4-g2).xyz;
-         vec3 C3 = texture(tex,pC3   ).xyz;
-         vec3 C4 = texture(tex,pC4   ).xyz;
-         vec3 C5 = texture(tex,pC5   ).xyz;
-         vec3 D4 = texture(tex,pC8-g2).xyz;
-         vec3 C6 = texture(tex,pC4+g2).xyz;
-         vec3 C7 = texture(tex,pC7   ).xyz;
-         vec3 C8 = texture(tex,pC8   ).xyz;
-         vec3 D5 = texture(tex,pC5+g1).xyz;
-         vec3 D0 = texture(tex,pC7+g2).xyz;
-         vec3 D1 = texture(tex,pC8+g2).xyz;
-         vec3 D2 = texture(tex,pC7+g1).xyz;
-         vec3 p10,p11;
-
-      float c0 = reduce(C0);float c1 = reduce(C1);
-      float c2 = reduce(C2);float c3 = reduce(C3);
-      float c4 = reduce(C4);float c5 = reduce(C5);
-      float c6 = reduce(C6);float c7 = reduce(C7);
-      float c8 = reduce(C8);float d0 = reduce(D0);
-      float d1 = reduce(D1);float d2 = reduce(D2);
-      float d4 = reduce(D4);float d5 = reduce(D5);
-
-
-      if (c4 == c8) {
-         if (c5 != c7) {
-            if (((c4 == c3)&&(c7 == d2))||((c4 == c5)&&(c4 == c6)&&(c3 != c7)&&(c7 == d0))) {
-                     p10 = C4;
-            } else {
-                     p10 = 0.5*(C4+C7);
-            }
-            p11 = C4;
-         } else {
-            if (c4 == c5) {
-                     p10 = C4;
-                     p11 = C4;
-            } else {
-                  float r;
-                  r  = GET_RESULT(c4,c5,c3,c1);
-                  r -= GET_RESULT(c5,c4,d4,c2);
-                  r -= GET_RESULT(c5,c4,c6,d1);
-                  r += GET_RESULT(c4,c5,d5,d2);
-                  if (r > 0.0) p11 = C4;
-                  else if (r < 0.0) p11 = C5;
-                  else p11 = 0.25*(C4+C5+C7+C8);
-                  p10 = 0.5*(C4+C7);
-            }
-         }
-      } else
-         if (c5 == c7) {
-            if (((c7 == c6)&&(c4 == c2))||((c7 == c3)&&(c7 == c8)&&(c4 != c6)&&(c4 == c0))) {
-                     p10 = C7;
-            } else {
-                     p10 = 0.5*(C4+C7);
-            }
-            p11 = C5;
-         } else {
-            p11 = 0.25*(C4+C5+C7+C8);
-
-            if ((c4 == c5)&&(c4 == c6)&&(c3 != c7)&&(c7 == d0)) {
-                     p10 = C4;
-            } else if ((c7 == c3)&&(c7 == c8)&&(c4 != c6)&&(c4 == c0)) {
-                        p10 = C7;
-            } else {
-                  p10 = 0.5*(C4+C7);
-         } 
-      }
-
-      // Distributing the final products 
-
-      vec3 color; 
-
-      if (fp.x >= 0.5 && fp.y >= 0.5) color = p11; else
-      if (fp.x <  0.5 && fp.y <  0.5) color =  C4; else color = p10; 
-      
-      return color;
-   }
-   
-#endif
-
 
 
 #ifdef AA_MODE_SUPER2XSAI
@@ -1283,58 +1079,43 @@ vec3 FxaaPixelShader(vec2 pos, sampler2D tex, vec4 sourcesize, vec4 outputsize) 
 void main() {
    
    vec4 pixel_out;
-      pixel_out.rgb = texture_ovr_nearest(Source, vTexCoord).rgb;
-      
-/*   if (DO_FXAA != 0.0) {
- 
-      
-      
-      
-
-      #ifdef AA_MODE_FXAA
-            pixel_out.rgb = FxaaPixelShader(vTexCoord, Source, params.SourceSize, params.OutputSize);
-      #endif
-      
-      #ifdef AA_MODE_GUEST_ADVANCEDAA
-         pixel_out.rgb = aa_AdvancedAA(Source, vTexCoord, gt1, gt2, gt3, gt4);
-      #endif
-
-      #ifdef AA_MODE_2XSAI
-         pixel_out.rgb = aa_2xsai(Source, vTexCoord);
-      #endif
-         
-      #ifdef AA_MODE_SUPER2XSAI
-         pixel_out.rgb = aa_super2x_sai(Source, vTexCoord);
-      #endif
-         
-      #ifdef AA_MODE_SCALE2XPLUS
-         pixel_out.rgb = aa_scale2xplus(Source, vTexCoord, pt1, pt2);
-      #endif
-         
-      #ifdef AA_MODE_2XSCALEHQ
-         pixel_out.rgb =  aa_2xscalehq(Source, vTexCoord, hqt1, hqt2, hqt3, hqt4);
-      #endif
-         
-      #ifdef AA_MODE_MMPX
-         pixel_out.rgb = aa_mmpx(Source, vTexCoord);
-      #endif
-
-      #ifdef AA_MODE_DDTXBRLV1
-         pixel_out.rgb = aa_ddtxbrlv1(Source, vTexCoord, xt1);
-      #endif
-
+   pixel_out.rgb = texture_ovr_nearest(Source, vTexCoord).rgb;
+   
+   float anoise;
+   
+   // If we sample ntsc articacts from a mipmap, we can smooth them
+   // which is good when slective blurring them.
+   pixel_out.a = 0.0;
+   if (DO_NTSC_ARTIFACTS > 0.5) {
+      pixel_out.a = textureLod(Source, vTexCoord, 1.0).a;
    }
+
+/*
+   if (DO_FXAA == 1.0) {
+      pixel_out.rgb = FxaaPixelShader(vTexCoord, Source, params.SourceSize, params.OutputSize);
+	}
 */
+
 
    if (DO_FXAA == 1.0) {
       pixel_out.rgb = FxaaPixelShader(vTexCoord, Source, params.SourceSize, params.OutputSize);
    } else
    if (DO_FXAA == 2.0) {
-      pixel_out.rgb = aa_scale2xplus(Source, vTexCoord, pt1, pt2);
+      pixel_out.rgb = aa_ddtxbrlv1(Source, vTexCoord, vxt1);
    } else
    if (DO_FXAA == 3.0) {
-      pixel_out.rgb = aa_ddtxbrlv1(Source, vTexCoord, xt1);
-   }
+      pixel_out.rgb =  aa_2xscalehq(Source, vTexCoord , vhqt1, vhqt2, vhqt3, vhqt4);
+   } else
+   if (DO_FXAA == 4.0) {
+      pixel_out.rgb = aa_scale2xplus(Source, vTexCoord, vpt1, vpt2);
+   } else
+   if (DO_FXAA == 5.0) {
+      pixel_out.rgb = aa_super2x_sai(Source, vTexCoord);
+   }/*
+   if (DO_FXAA == 6.0) {
+      pixel_out.rgb = aa_mmpx(Source, vTexCoord);
+   }*/
+
 
 
    if (DO_RF_NOISE > 0.0) {
@@ -1345,13 +1126,7 @@ void main() {
    if (vDo_flickering==1.0) 
       pixel_out.rgb = pixel_flickering(pixel_out.rgb).rgb;
       
-   // If we sample ntsc articacts from a mipmap, we can smooth them
-   // which is good when slective blurring them.
-   pixel_out.a = 0.0;
-   if (DO_NTSC_ARTIFACTS > 0.5) {
-      pixel_out.a = textureLod(Source, vTexCoord, 1.0).a;
-   }
-   
+
    //pixel_out.rgb = pow(pixel_out.rgb, vec3(1/2.2));
    
    FragColor = pixel_out;
