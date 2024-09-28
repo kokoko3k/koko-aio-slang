@@ -3,11 +3,11 @@
 #include "config.inc"
 #include "includes/functions.include.slang"
 
-//#define AA_MODE_FXAA                   // 110 fps  // on fastest preset (good for 2x upscale)
-#define AA_MODE_SCALE2XPLUS          // 111.2 fps //good general purpose, very light, but blurs edges too much? or not?; unsharp mask does not help.
+#define AA_MODE_FXAA                   // 110 fps  // on fastest preset (good for 2x upscale)
+#define AA_MODE_SCALE2XPLUS              // 111.2 fps //good general purpose, very light, but blurs edges too much? or not?; unsharp mask does not help.
 //#define AA_MODE_GUEST_ADVANCEDAA     // 112 // good general purposes, misses some lines, not good overall
 //#define AA_MODE_2XSCALEHQ            // 109.5 //used to blur too much shades, tweaked better now. rounder look than ddtxbrlv1, but rounds almost any corner.
-//#define AA_MODE_DDTXBRLV1            // 108.4 // a bit blurry, parameters do help, yes, done.
+#define AA_MODE_DDTXBRLV1            // 108.4 // a bit blurry, parameters do help, yes, done.
 //#define AA_MODE_2XSAI                // 107 // Dirty.
 //#define AA_MODE_SUPER2XSAI           // 106.5 // less Dirty.
 //#define AA_MODE_MMPX                 // 98 //preserves a lot of details, too heavy.
@@ -17,14 +17,24 @@
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
-layout(location = 1) out vec4 t1;
-layout(location = 2) out vec4 t2;
-layout(location = 3) out vec4 t3;
-layout(location = 4) out vec4 t4;
+layout(location = 1) out vec4 gt1;
+layout(location = 2) out vec4 gt2;
+layout(location = 3) out vec4 gt3;
+layout(location = 4) out vec4 gt4;
 
-layout(location = 5) out float vDo_flickering;
-layout(location = 6) out vec2  vFlickerCoords;
-layout(location = 7) out float vDynamicSeed;
+layout(location = 5) out vec4 pt1;
+layout(location = 6) out vec4 pt2;
+
+layout(location = 7) out vec4 hqt1;
+layout(location = 8) out vec4 hqt2;
+layout(location = 9) out vec4 hqt3;
+layout(location = 10) out vec4 hqt4;
+
+layout(location = 11) out vec4 xt1;
+
+layout(location = 12) out float vDo_flickering;
+layout(location = 13) out vec2  vFlickerCoords;
+layout(location = 14) out float vDynamicSeed;
 
 void main() {
 
@@ -52,22 +62,22 @@ void main() {
    }
    
    #ifdef AA_MODE_GUEST_ADVANCEDAA
-      vec2 d = params.SourceSize.zw * 0.5;
-      t1.xy = vTexCoord + vec2(-d.x, 0);
-      t2.xy = vTexCoord + vec2( d.x, 0);
-      t3.xy = vTexCoord + vec2( 0,-d.y);
-      t4.xy = vTexCoord + vec2( 0, d.y);
-      t1.zw = vTexCoord + vec2(-d.x,-d.y);
-      t2.zw = vTexCoord + vec2(-d.x, d.y);
-      t3.zw = vTexCoord + vec2( d.x,-d.y);
-      t4.zw = vTexCoord + vec2( d.x, d.y);
+      vec2 gd = params.SourceSize.zw * 0.5;
+      gt1.xy = vTexCoord + vec2(-gd.x, 0);
+      gt2.xy = vTexCoord + vec2( gd.x, 0);
+      gt3.xy = vTexCoord + vec2( 0,-gd.y);
+      gt4.xy = vTexCoord + vec2( 0, gd.y);
+      gt1.zw = vTexCoord + vec2(-gd.x,-gd.y);
+      gt2.zw = vTexCoord + vec2(-gd.x, gd.y);
+      gt3.zw = vTexCoord + vec2( gd.x,-gd.y);
+      gt4.zw = vTexCoord + vec2( gd.x, gd.y);
    #endif
       
    #ifdef AA_MODE_SCALE2XPLUS
-      vec2 d = params.SourceSize.zw;
+      vec2 pd = params.SourceSize.zw;
 
-      t1 = vTexCoord.xyxy + vec4( 0,   -d.y, -d.x, 0);   // B, D
-      t2 = vTexCoord.xyxy + vec4( d.x,  0,    0,   d.y); // F, H	
+      pt1 = vTexCoord.xyxy + vec4( 0,   -pd.y, -pd.x, 0);   // B, D
+      pt2 = vTexCoord.xyxy + vec4( pd.x,  0,    0,   pd.y); // F, H	
    #endif
       
    #ifdef AA_MODE_2XSCALEHQ
@@ -76,30 +86,40 @@ void main() {
       vec2 dg2 = vec2(-s.x, s.y);
       vec2 dx = vec2(s.x, 0.0);
       vec2 dy = vec2(0.0, s.y);
-      t1 = vec4(vTexCoord - dg1, vTexCoord - dy);
-      t2 = vec4(vTexCoord - dg2, vTexCoord + dx);
-      t3 = vec4(vTexCoord + dg1, vTexCoord + dy);
-      t4 = vec4(vTexCoord + dg2, vTexCoord - dx);
+      hqt1 = vec4(vTexCoord - dg1, vTexCoord - dy);
+      hqt2 = vec4(vTexCoord - dg2, vTexCoord + dx);
+      hqt3 = vec4(vTexCoord + dg1, vTexCoord + dy);
+      hqt4 = vec4(vTexCoord + dg2, vTexCoord - dx);
    #endif
       
       
    #ifdef AA_MODE_DDTXBRLV1
-      vec2 d = params.SourceSize.zw;
-      t1.xy = vec2( d.x,  0); // F
-      t1.zw = vec2(  0, d.y); // H
+      vec2 xd = params.SourceSize.zw;
+      xt1.xy = vec2( xd.x,  0); // F
+      xt1.zw = vec2(  0, xd.y); // H
    #endif
 }
 
 #pragma stage fragment
 layout(location = 0) in vec2 vTexCoord;
-layout(location = 1) in vec4 t1;
-layout(location = 2) in vec4 t2;
-layout(location = 3) in vec4 t3;
-layout(location = 4) in vec4 t4;
+layout(location = 1) in vec4 gt1;
+layout(location = 2) in vec4 gt2;
+layout(location = 3) in vec4 gt3;
+layout(location = 4) in vec4 gt4;
 
-layout(location = 5) in float vDo_flickering;
-layout(location = 6) in vec2  vFlickerCoords;
-layout(location = 7) in float vDynamicSeed;
+layout(location = 5) in vec4 pt1;
+layout(location = 6) in vec4 pt2;
+
+layout(location = 7) in vec4 hqt1;
+layout(location = 8) in vec4 hqt2;
+layout(location = 9) in vec4 hqt3;
+layout(location = 10) in vec4 hqt4;
+
+layout(location = 11) in vec4 xt1;
+
+layout(location = 12) in float vDo_flickering;
+layout(location = 13) in vec2  vFlickerCoords;
+layout(location = 14) in float vDynamicSeed;
 
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D Source;
@@ -231,8 +251,8 @@ vec4 texture_ovr_nearest_lod0( sampler2D tex, vec2 co) {
       float lmax, lmin, contrast;
       float sharpness = STATIC_SHARPNESS;
 
-      vec2 g1 = dir*t1.xy;
-      vec2 g2 = dir*t1.zw;
+      vec2 g1 = dir*pt1.xy;
+      vec2 g2 = dir*pt1.zw;
 
       vec3 A = texture_ovr_nearest_lod0(tex, vTexCoord       ).xyz;
       vec3 B = texture_ovr_nearest_lod0(tex, vTexCoord +g1   ).xyz;
@@ -1265,14 +1285,18 @@ void main() {
    vec4 pixel_out;
       pixel_out.rgb = texture_ovr_nearest(Source, vTexCoord).rgb;
       
-   if (DO_FXAA != 0.0) {
+/*   if (DO_FXAA != 0.0) {
+ 
       
+      
+      
+
       #ifdef AA_MODE_FXAA
             pixel_out.rgb = FxaaPixelShader(vTexCoord, Source, params.SourceSize, params.OutputSize);
       #endif
       
       #ifdef AA_MODE_GUEST_ADVANCEDAA
-         pixel_out.rgb = aa_AdvancedAA(Source, vTexCoord, t1, t2, t3, t4);
+         pixel_out.rgb = aa_AdvancedAA(Source, vTexCoord, gt1, gt2, gt3, gt4);
       #endif
 
       #ifdef AA_MODE_2XSAI
@@ -1284,11 +1308,11 @@ void main() {
       #endif
          
       #ifdef AA_MODE_SCALE2XPLUS
-         pixel_out.rgb = aa_scale2xplus(Source, vTexCoord, t1, t2);
+         pixel_out.rgb = aa_scale2xplus(Source, vTexCoord, pt1, pt2);
       #endif
          
       #ifdef AA_MODE_2XSCALEHQ
-         pixel_out.rgb =  aa_2xscalehq(Source, vTexCoord, t1, t2, t3, t4);
+         pixel_out.rgb =  aa_2xscalehq(Source, vTexCoord, hqt1, hqt2, hqt3, hqt4);
       #endif
          
       #ifdef AA_MODE_MMPX
@@ -1296,11 +1320,23 @@ void main() {
       #endif
 
       #ifdef AA_MODE_DDTXBRLV1
-         pixel_out.rgb = aa_ddtxbrlv1(Source, vTexCoord, t1);
+         pixel_out.rgb = aa_ddtxbrlv1(Source, vTexCoord, xt1);
       #endif
-         
+
    }
-   
+*/
+
+   if (DO_FXAA == 1.0) {
+      pixel_out.rgb = FxaaPixelShader(vTexCoord, Source, params.SourceSize, params.OutputSize);
+   } else
+   if (DO_FXAA == 2.0) {
+      pixel_out.rgb = aa_scale2xplus(Source, vTexCoord, pt1, pt2);
+   } else
+   if (DO_FXAA == 3.0) {
+      pixel_out.rgb = aa_ddtxbrlv1(Source, vTexCoord, xt1);
+   }
+
+
    if (DO_RF_NOISE > 0.0) {
       float anoise = random_fast(vTexCoord * vDynamicSeed);
       pixel_out.rgb += scale_to_range(anoise, -RF_NOISE_STRENGTH, RF_NOISE_STRENGTH);
