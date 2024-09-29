@@ -328,7 +328,7 @@ float get_autocrop() {
 
 
 void main() {
-    /*Grab a mipmap from the flick_and_noise_pass.
+    /*Grab a mipmap from the colortools_and_ntsc_pass.
       Calculate the average luminance from the smallest mipmap and put into the alpha channel
       So that can be used:
       1 - continuously at coordinate 0.5,0.5

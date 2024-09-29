@@ -86,8 +86,8 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
         Hue bright-dark bias:
             Controls the distribution of dark and bright hues.
     
-**FXAA:**<br>
-    Apply the well known antialiasing effect by Nvidia.<br>
+**Antialiasing enable:**<br>
+    Apply an edge smoothing/antialiasing algotithm.<br>
     Use it if you don't want to blur the image and you still don't like<br>
     jagged or too much pixelated images.<br>
 
@@ -182,7 +182,7 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
         Embolden bright pixels near dark ones using a warpsharp like algorithm.
         This is a cheap way to emulate phosphor glowing.
         The Y parameter will also allow scanlines to be higher.
-        It will also help (if coupled with) FXAA to stay sharp.
+        It will also help (if coupled with) antialiasing to stay sharp.
 
     Warped Dynamics:
         Change the amount of warpsharp applied based on the contrast between 

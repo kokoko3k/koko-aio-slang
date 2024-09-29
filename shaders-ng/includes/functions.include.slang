@@ -109,11 +109,23 @@ vec4 texture_QUILEZ(sampler2D tex, vec2 co, vec4 texsize) {
 }
 
 
+vec2 coords_NEAREST(vec2 co, vec4 texsize) {
+   vec2 integerCoords = floor(co.xy * texsize.xy);
+   return (integerCoords + 0.5) * texsize.zw;
+}
+
 vec4 texture_NEAREST(sampler2D tex, vec2 co_linear, vec4 tex_size) {
    //return nearest sampling from a linear filtered texture
    vec2 integerCoords = floor(co_linear.xy * tex_size.xy);
    vec2 co_nearest = (integerCoords + 0.5) * tex_size.zw; // Aggiungi 0.5 per centrare il texel
    return texture(tex, co_nearest);
+}
+
+vec4 texture_NEAREST_lod(sampler2D tex, vec2 co_linear, vec4 tex_size, float lod) {
+	   //return nearest sampling from a linear filtered texture
+   vec2 integerCoords = floor(co_linear.xy * tex_size.xy);
+   vec2 co_nearest = (integerCoords + 0.5) * tex_size.zw; // Aggiungi 0.5 per centrare il texel
+   return textureLod(tex, co_nearest, 0.0);
 }
 
 float DigitBin( const int x )
@@ -1123,17 +1135,17 @@ vec3 blur_px(sampler2D smp, vec2 co, vec2 r) {
     //float c1 = 0.75;
     //float c2 = 1.25;
 
-	#define c1 1.0
-	#define c2 1.0
+	#define KAIO_c1 1.0
+	#define KAIO_c2 1.0
 
-    c += texture(smp, co + vec2(0.0, 1.0) * r).rgb * c1;
-    c += texture(smp, co + vec2(0.7071, 0.7071) * r).rgb * c2;
-    c += texture(smp, co + vec2(1.0, 0.0) * r).rgb * c1 ;
-    c += texture(smp, co + vec2(0.7071, -0.7071) * r).rgb * c2;
-    c += texture(smp, co + vec2(0.0, -1.0) * r).rgb * c1;
-    c += texture(smp, co + vec2(-0.7071, -0.7071) * r).rgb * c2;
-    c += texture(smp, co + vec2(-1.0, 0.0) * r).rgb * c1;
-    c += texture(smp, co + vec2(-0.7071, 0.7071) * r).rgb * c2;
+    c += texture(smp, co + vec2(0.0, 1.0) * r).rgb * KAIO_c1;
+    c += texture(smp, co + vec2(0.7071, 0.7071) * r).rgb * KAIO_c2;
+    c += texture(smp, co + vec2(1.0, 0.0) * r).rgb * KAIO_c1 ;
+    c += texture(smp, co + vec2(0.7071, -0.7071) * r).rgb * KAIO_c2;
+    c += texture(smp, co + vec2(0.0, -1.0) * r).rgb * KAIO_c1;
+    c += texture(smp, co + vec2(-0.7071, -0.7071) * r).rgb * KAIO_c2;
+    c += texture(smp, co + vec2(-1.0, 0.0) * r).rgb * KAIO_c1;
+    c += texture(smp, co + vec2(-0.7071, 0.7071) * r).rgb * KAIO_c2;
 
     //vec3 c0 = texture(smp, co + vec2(0.0, 0.0) * r).rgb;
     //return min(c0, c/8.0);

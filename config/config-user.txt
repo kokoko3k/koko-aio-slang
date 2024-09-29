@@ -63,7 +63,7 @@
 // #define VIBRANCE 0.0                 //        Vibrance in   (0.0=off)
 
 
-// #define DO_FXAA  0.0                 // ★ FXAA enable? 
+// #define DO_FXAA  0.0                 // ★ Antialiasing enable ? 
 
 
 // #define DO_RF_NOISE  0.0             // ★ RF Noise enable?

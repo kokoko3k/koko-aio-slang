@@ -35,10 +35,10 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	vec4 FinalViewportSize;
 	vec4 final_passFeedbackSize;
 	vec4 in_glow_passSize;
-	vec4 FXAA_passSize;
+	vec4 placeholder;
 
 	vec4 avglum_passSize;
-	vec4 flick_and_noise_passSize;
+	vec4 upscale_passSize;
 	vec4 colortools_and_ntsc_passSize;
 	vec4 colortools_and_ntsc_passFeedbackSize;
 
@@ -326,9 +326,9 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter LABEL0003 " " 0.0 0.0 0.0 1.0
 
 
-// FXAA
+// AA
 // Apply an antialiasing filter via FXAA from Nvidia.
-#pragma parameter DO_FXAA "★ FXAA enable? (*f) ==>"	0.0 	0.0 1.0 1.0
+#pragma parameter DO_FXAA "★ Antialiasing enable? (*f) ==>"	0.0 	0.0 1.0 1.0
 #pragma parameter LABEL0004 " " 0.0 0.0 0.0 1.0
 
 

@@ -123,8 +123,8 @@
 	//Try to keep blur sizes consistent across input resolutions
 #define NEW_SCALEMOD_REF_X 360.0
 #define NEW_SCALEMOD_REF_Y 270.0
-#define NEW_SCALEMOD_X (global.flick_and_noise_passSize.x/(NEW_SCALEMOD_REF_X*2.0) / 2.2)
-#define NEW_SCALEMOD_Y (global.flick_and_noise_passSize.y/(NEW_SCALEMOD_REF_Y*2.0) / 2.2)
+#define NEW_SCALEMOD_X (global.upscale_passSize.x/(NEW_SCALEMOD_REF_X*2.0) / 2.2)
+#define NEW_SCALEMOD_Y (global.upscale_passSize.y/(NEW_SCALEMOD_REF_Y*2.0) / 2.2)
 
 	//Hardcoded radius scale factor used by bloom and halo.
 #define BLOOM_AND_HALO_SCALE_FACTOR 360.0
