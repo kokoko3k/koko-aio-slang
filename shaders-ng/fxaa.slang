@@ -1090,13 +1090,13 @@ void main() {
       pixel_out.a = textureLod(Source, vTexCoord, 1.0).a;
    }
 
-/*
+
    if (DO_FXAA == 1.0) {
       pixel_out.rgb = FxaaPixelShader(vTexCoord, Source, params.SourceSize, params.OutputSize);
 	}
-*/
 
 
+/*
    if (DO_FXAA == 1.0) {
       pixel_out.rgb = FxaaPixelShader(vTexCoord, Source, params.SourceSize, params.OutputSize);
    } else
@@ -1111,11 +1111,11 @@ void main() {
    } else
    if (DO_FXAA == 5.0) {
       pixel_out.rgb = aa_super2x_sai(Source, vTexCoord);
-   }/*
+   }
    if (DO_FXAA == 6.0) {
       pixel_out.rgb = aa_mmpx(Source, vTexCoord);
-   }*/
-
+   }
+*/
 
 
    if (DO_RF_NOISE > 0.0) {
