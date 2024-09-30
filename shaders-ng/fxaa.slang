@@ -104,8 +104,8 @@ layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D Source;
 layout(set = 0, binding = 3) uniform sampler2D upscale_passFeedback;
 
-#define _KOKO_AA_PRELINEARIZE
-#define _KOKO_AA_PRELINEARIZE_IN  (1+round(SERVICE1))
+//#define _KOKO_AA_PRELINEARIZE
+#define _KOKO_AA_PRELINEARIZE_IN  (2.0)
 #define _KOKO_AA_PRELINEARIZE_OUT (1/_KOKO_AA_PRELINEARIZE_IN)
 
 vec4 texture_ovr_nearest( sampler2D tex, vec2 co) {
@@ -834,7 +834,7 @@ void main() {
 
    if (DO_FXAA == 1.0) {
       pixel_out.rgb = FxaaPixelShader(vTexCoord, Source, params.SourceSize, params.OutputSize); // yes linearization
-      //pixel_out.rgb = aa_ddtxbrlv1(Source, vTexCoord, vxt1); // no linearization
+      //pixel_out.rgb = aa_ddtxbrlv1(Source, vTexCoord, vxt1); // yes linearization
       //pixel_out.rgb = aa_2xscalehq(Source, vTexCoord , vhqt1, vhqt2, vhqt3, vhqt4); //no linearization
       //pixel_out.rgb = aa_scale2xplus(Source, vTexCoord, vpt1, vpt2); // no linearization
       //pixel_out.rgb = aa_super2x_sai(Source, vTexCoord); §// ?? linearization
