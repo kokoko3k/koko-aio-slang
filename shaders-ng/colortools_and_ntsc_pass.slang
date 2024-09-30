@@ -579,7 +579,8 @@ void main() {
         
    artifact_mask = clamp(artifact_mask, 0.0, 1.0);
    
-   //pixel_out = pow(pixel_out, vec3(2.2));
+   //gamma-in
+   pixel_out.rgb = pow(pixel_out.rgb, vec3(IN_GLOW_GAMMA));
    
    FragColor = vec4(pixel_out, artifact_mask);
 

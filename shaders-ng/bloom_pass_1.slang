@@ -34,13 +34,18 @@ layout(set = 0, binding = 1) uniform sampler2D colortools_and_ntsc_pass;
 void main() {
     if (DO_BLOOM == 0.0) return;
     
+    //when sampling from colortools, also counteract IN_GLOW_GAMMA
+    //applied in that pass.
+    //That way bloom just depends on gamma out set in the final pass.
+    //unsure if this is good.
+    
     vec3 bloomed = bloom_gamma_power(
         colortools_and_ntsc_pass,
         vTexCoord,
         params.OriginalSize,
         vec2(BLOOM_SIZE),
         BLOOM_QUALITY,
-        BLOOM_GAMMA, 1.0,
+        BLOOM_GAMMA/IN_GLOW_GAMMA, 1.0,
         0.0,
         0.0
     );

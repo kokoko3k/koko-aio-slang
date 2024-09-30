@@ -140,7 +140,10 @@ vec3 ambi_push_pass(vec2 coords, float f_lod) {
     }
     
     vec3 pixel_out = textureLod(colortools_and_ntsc_pass, smp_coords, f_lod).rgb;
-    pixel_out = pow(pixel_out, vec3(AMBI_GAMMA)); 
+    //Apply AMBI_GAMMA
+    //and counteract IN_GLOW_GAMMA, that way, ambilights does not depend on it.
+    pixel_out = pow(pixel_out, vec3(AMBI_GAMMA / IN_GLOW_GAMMA )); 
+    
 
     pixel_out = pixel_push_luminance(pixel_out, vAMBI_POWER);
     return pixel_out;

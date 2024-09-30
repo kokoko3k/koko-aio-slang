@@ -222,9 +222,5 @@ void main() {
    if (vDecon_or_JustShadow > 0.0 )
       pixel_out = deconvergence_shadow(vTexCoord, upscale_pass, pixel_out);
 
-
-   //gamma-in
-   pixel_out.rgb = pow(pixel_out.rgb, vec3(IN_GLOW_GAMMA));
-
    FragColor = pixel_out;
 }

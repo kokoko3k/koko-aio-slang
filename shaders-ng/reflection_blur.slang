@@ -78,7 +78,6 @@ void main() {
       
    //Next simulate a diffused light
       vec3 pixel_diffused = textureLod( colortools_and_ntsc_pass, vCoords_zoomout, 6.0).rgb;
-      pixel_diffused = pow(pixel_diffused.rgb, vec3(IN_GLOW_GAMMA));
 
       pixel_out = mix( pixel_out, pixel_diffused, BEZEL_DIFFUSION_STR);
 
