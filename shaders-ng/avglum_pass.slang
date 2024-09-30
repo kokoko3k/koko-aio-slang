@@ -88,7 +88,7 @@ layout(set = 0, binding = 3) uniform sampler2D avglum_passFeedback;
 #define RGB_TO_GRAYSCALE vec3(0.299, 0.587, 0.114)
 float get_avg_lum_from_mip() {
     vec3 mip = textureLod(colortools_and_ntsc_pass, vec2(0.5,0.5),20.0).rgb;
-    mip = apply_fuzzy_main_pass_stage_2(mip, vFuzzy_main_pass_stage_1);
+     mip = apply_fuzzy_main_pass_stage_2(mip, vFuzzy_main_pass_stage_1);
     //return (mip.r+mip.g+mip.b)/3.0;
     return rgb_to_gray(mip);
 }
