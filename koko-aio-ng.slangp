@@ -116,9 +116,9 @@ float_framebuffer0 = "true"
        scale_type1 = source
             scale1 = 2.0
      mipmap_input1 = "true"
-        //this *has* to be clamp_to_border because  specular reflections need to turn to black
-        //if geometry content override is shifting/zooming out the image.
-        wrap_mode1 = "clamp_to_border"
+        // This *has* to be mirrored repeat so that avglum mipmap sampling that samplese from previous
+        // pass will not pick black.
+        wrap_mode1 = "mirrored_repeat"
 float_framebuffer1 = "true"
     filter_linear1 = "true"
         
