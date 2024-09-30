@@ -307,7 +307,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 
 #pragma parameter IN_GLOW_GAMMA  "★ Gamma In  "		2.0 	0.5 	10.0 0.01
-#pragma parameter GAMMA_OUT      "★ Gamma out "		0.5		0.5 	5.0  0.01
+#pragma parameter GAMMA_OUT      "★ Gamma out "		0.5		0.1 	5.0  0.01
 #pragma parameter LABEL0054 " " 0.0 0.0 0.0 1.0
 
 
