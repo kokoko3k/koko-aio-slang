@@ -1452,7 +1452,7 @@ vec3 vibrance_set(vec3 c, float v) {
 	}
 
 	vec3 adaptive_black(vec3 c_in, float lum_in, float range) {
-		float luminance_adapt = mix( 1-range, 1+range, pow(lum_in,1/IN_GLOW_GAMMA) );
+		float luminance_adapt = mix( 1-range, 1+range, lum_in);
 		return c_in * luminance_adapt - luminance_adapt + 1;
 		return fma(c_in, vec3(luminance_adapt), vec3(-luminance_adapt + 1)); //ASM_PROOF: SAME
 	}
