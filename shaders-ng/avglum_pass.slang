@@ -71,7 +71,7 @@ layout(location = 8) in vec2 vTexCoord_unscaled;
 //layout(location = 9) in vec2 vLods;
 
 layout(location = 0) out vec4 FragColor;
-layout(set = 0, binding = 1) uniform sampler2D colortools_and_ntsc_passFeedback;
+layout(set = 0, binding = 1) uniform sampler2D  colortools_and_ntsc_passFeedback;
 layout(set = 0, binding = 2) uniform sampler2D colortools_and_ntsc_pass;
 layout(set = 0, binding = 3) uniform sampler2D avglum_passFeedback;
 
