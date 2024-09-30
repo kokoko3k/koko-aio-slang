@@ -141,8 +141,8 @@ TODO:
 	[ ] Unexcited phosphor grid is not dependant on hmask strength.
 	    easy but not mandatory to fix, it would costs performance and need presets update, unsure what to do.
 	[ ] Make bloom power not dependant on input signal gain ? Not sure.
-	[v] At least 2 scaling algorithm needs linear color space to work good
+	[ ] At least 2 scaling algorithm needs linear color space to work good
 	    This requires powing on colortools pass, which i didn't because... can't remember. 
 	[ ] bloom_pass_1 counteracts gamma in in the sampling stage, then applies it afterwards in the apply_fuzzy_*() function. 
 		...what if we don't apply it at all?
-	[v] diffusion does not work as it should. see wrap_mode1, and set it to mirrored, it should work.
+	[ ] diffusion does not work as it should. see wrap_mode1, and set it to mirrored, it should work.
