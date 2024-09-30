@@ -4,10 +4,10 @@
 #include "includes/functions.include.slang"
 
 #define AA_MODE_FXAA                 // 110 fps  // on fastest preset (good for 2x upscale)
-#define AA_MODE_SCALE2XPLUS          // 111.2 fps //good general purpose, very light, but blurs edges too much? or not?; unsharp mask does not help.
-#define AA_MODE_2XSCALEHQ            // 109.5 //used to blur too much shades, tweaked better now. rounder look than ddtxbrlv1, but rounds almost any corner.
+//#define AA_MODE_SCALE2XPLUS          // 111.2 fps //good general purpose, very light, but blurs edges too much? or not?; unsharp mask does not help.
+//#define AA_MODE_2XSCALEHQ            // 109.5 //used to blur too much shades, tweaked better now. rounder look than ddtxbrlv1, but rounds almost any corner.
 #define AA_MODE_DDTXBRLV1            // 108.4 // a bit blurry, parameters do help, yes, done.
-#define AA_MODE_SUPER2XSAI           // 106.5 // less Dirty.
+//#define AA_MODE_SUPER2XSAI           // 106.5 // less Dirty.
 
 
 #pragma stage vertex
@@ -832,9 +832,9 @@ void main() {
    }
 
 
-   if (DO_FXAA == 1.0) {
-      pixel_out.rgb = FxaaPixelShader(vTexCoord, Source, params.SourceSize, params.OutputSize); // yes linearization
-      //pixel_out.rgb = aa_ddtxbrlv1(Source, vTexCoord, vxt1); // yes linearization
+/*   if (DO_FXAA == 1.0) {
+      //pixel_out.rgb = FxaaPixelShader(vTexCoord, Source, params.SourceSize, params.OutputSize); // yes linearization
+      pixel_out.rgb = aa_ddtxbrlv1(Source, vTexCoord, vxt1); // yes linearization
       //pixel_out.rgb = aa_2xscalehq(Source, vTexCoord , vhqt1, vhqt2, vhqt3, vhqt4); //no linearization
       //pixel_out.rgb = aa_scale2xplus(Source, vTexCoord, vpt1, vpt2); // no linearization
       //pixel_out.rgb = aa_super2x_sai(Source, vTexCoord); §// ?? linearization
@@ -842,8 +842,21 @@ void main() {
          pixel_out.rgb = pow(pixel_out.rgb, vec3(_KOKO_AA_PRELINEARIZE_OUT) );
       #endif
 	}
+*/
 
-
+   if (DO_FXAA == 1.0) {
+      pixel_out.rgb = FxaaPixelShader(vTexCoord, Source, params.SourceSize, params.OutputSize);
+      #ifdef _KOKO_AA_PRELINEARIZE
+         pixel_out.rgb = pow(pixel_out.rgb, vec3(_KOKO_AA_PRELINEARIZE_OUT) );
+      #endif
+   } else
+   if (DO_FXAA == 2.0) {
+      pixel_out.rgb = aa_ddtxbrlv1(Source, vTexCoord, vxt1);
+      #ifdef _KOKO_AA_PRELINEARIZE
+         pixel_out.rgb = pow(pixel_out.rgb, vec3(_KOKO_AA_PRELINEARIZE_OUT) );
+      #endif
+   }
+	
 /*
    if (DO_FXAA == 1.0) {
       pixel_out.rgb = FxaaPixelShader(vTexCoord, Source, params.SourceSize, params.OutputSize);
