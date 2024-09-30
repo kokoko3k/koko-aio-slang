@@ -55,6 +55,10 @@ Texture "sources", including the main gimp project file for the default curved a
 are on the following repo:
 https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
 
+**Gamma in:**
+        Input Gamma: set it around 2.2 to linearize values.
+**Gamma out:**
+        Output Gamma: set it around "1/Gamma in"; small tweaks allowed.
         
 **Color corrections:**<br>
     Modify signal color at "input" stage.<br>
@@ -63,10 +67,6 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
         self explanatory.
     Input signal gain:
         Gain applied in the chain just before the crt emulation stages.
-    Gamma in:
-        Gamma correction applied at the beginning of the chain.
-    Gamma out:
-        Gamma correction applied to the final processed picture.
     Adaptive black level range:
         On old CRTs the contrast was higher on high luminosity content,
         and lower on low luminosity content.

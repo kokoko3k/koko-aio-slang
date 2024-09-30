@@ -290,9 +290,9 @@ vec3 pixel_push_luminance(vec3 c, float strength) {
 vec3 apply_fuzzy_main_pass(vec3 color_in) {
 	vec3 color_out = color_in;
 
-	if (DO_CCORRECTION == 1.0) {
-		color_out = pow(color_out, vec3(IN_GLOW_GAMMA * GAMMA_OUT));
-	}
+
+	color_out = pow(color_out, vec3(IN_GLOW_GAMMA * GAMMA_OUT));
+
 	
 	if (DO_IN_GLOW == 1.0)
 		color_out = color_out*IN_GLOW_POWER;
@@ -346,14 +346,17 @@ vec2 apply_fuzzy_main_pass_stage_1() {
 	}
 	if (HALO_POWER < 0.0) 
 		halo_power_adapted = -halo_power_adapted/10.0;
+
+	color_out = pow(color_in, GAMMA_OUT); //<- nonsense ?
+	gamma_out = gamma_out * GAMMA_OUT;
+	gamma_out = gamma_out * IN_GLOW_GAMMA;
+	color_out = pow(color_out,IN_GLOW_GAMMA);
 	
 	if (DO_CCORRECTION == 1.0) {
-		color_out = pow(color_in, GAMMA_OUT); //<- nonsense
-		gamma_out = gamma_out * GAMMA_OUT;
-		gamma_out = gamma_out * IN_GLOW_GAMMA;
-		color_out = pow(color_out,IN_GLOW_GAMMA)*IN_GLOW_POWER;
+		color_out *= IN_GLOW_POWER;
 	}
-	
+
+
 	if (DO_PIXELGRID == 1.0) {
 		color_out *= 1- DO_PIXELGRID_H * 0.5   ; //Half color if scanline.
 		color_out *= 1- DO_PIXELGRID_W * 0.5   ; //Half color if Hmask.
@@ -395,9 +398,10 @@ vec2 apply_fuzzy_main_pass_stage_1_no_gamma_in() {
 	if (HALO_POWER < 0.0) 
 		halo_power_adapted = -halo_power_adapted/10.0;
 	
+	color_out = pow(color_in, GAMMA_OUT); //<- nonsense ?
+	gamma_out = gamma_out * GAMMA_OUT;
+
 	if (DO_CCORRECTION == 1.0) {
-		color_out = pow(color_in, GAMMA_OUT); //<- nonsense
-		gamma_out = gamma_out * GAMMA_OUT;
 		color_out = color_out * IN_GLOW_POWER;
 	}
 	
@@ -416,7 +420,6 @@ vec2 apply_fuzzy_main_pass_stage_1_no_gamma_in() {
 	if (DO_VIGNETTE == 1.0)
 		color_out *= 0.8 * (V_POWER);
 	
-
 	
 	return vec2(color_out/color_in, gamma_out );
 }

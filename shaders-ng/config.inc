@@ -302,10 +302,14 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 #pragma parameter LABEL0000 "Read the documentation in docs-ng.md text file" 		0.0 0.0 0.0 1.0
 #pragma parameter LABEL0001 "==================================================" 		0.0 0.0 0.0 1.0
-#pragma parameter LABEL0002 " " 		0.0 0.0 0.0 1.0
-
 #pragma parameter DO_TEST "★ Show test pattern ==>" 		0.0 	0.0 12.0 1.0
 #pragma parameter LABELTEST " " 		0.0 0.0 0.0 1.0
+
+
+#pragma parameter IN_GLOW_GAMMA  "★ Gamma In  "		2.0 	0.5 	10.0 0.01
+#pragma parameter GAMMA_OUT      "★ Gamma out "		0.5		0.5 	5.0  0.01
+#pragma parameter LABEL0054 " " 0.0 0.0 0.0 1.0
+
 
 // Color correction 
 #pragma parameter DO_CCORRECTION "★ Color corrections enable? (co) ==>" 		0.0 	0.0 1.0 1.0
@@ -315,8 +319,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter CONTRAST       "       Contrast in     (0.0=off)"		0.0	-1.0 1.0 0.01
 #pragma parameter ADAPTIVE_BLACK "       Adaptive black level range"	0.0 0.0  1.0 0.01
 #pragma parameter TEMPERATURE    "       Temperature in (6500=off)"		6500.0	3000 14000.0 50.0
-#pragma parameter IN_GLOW_GAMMA  "       Gamma In  (applied at the beginning)"		1.0 	1.0 	10.0 0.1
-#pragma parameter GAMMA_OUT             "       Gamma out (applied at the end)"			0.69	0.1 	4.0  0.01
 #pragma parameter COLOR_MONO_COLORIZE	"       Monochrome screen colorization"	0.0  0.0 1.0 0.1
 #pragma parameter COLOR_MONO_HUE1       "          . Hue bright"					0.25 0.0 1.0 0.01
 #pragma parameter COLOR_MONO_HUE2       "          . Hue dark"						0.3  0.0 1.0 0.01

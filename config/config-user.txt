@@ -45,6 +45,8 @@
 //   
   
 
+// #define IN_GLOW_GAMMA  2.0           //        Gamma In
+// #define GAMMA_OUT 0.4                //        Gamma out
 
 // #define DO_CCORRECTION 1.0           // ★ Color corrections enable?
 // #define IN_GLOW_POWER 1.5            //        Input signal gain
@@ -53,8 +55,6 @@
 // #define CONTRAST  0.0                //        Contrast in
 // #define ADAPTIVE_BLACK 0.1           //        Adaptive Black level range
 // #define TEMPERATURE  7700.0          //        Temperature in (6500=off)
-// #define IN_GLOW_GAMMA  2.0           //        Gamma In  (applied at the beginning)
-// #define GAMMA_OUT 0.4                //        Gamma out (applied at the end)
 // #define COLOR_MONO_COLORIZE  0.0     //        Monochrome screen colorization
 // #define COLOR_MONO_HUE1  0.25        //        . Hue bright
 // #define COLOR_MONO_HUE2  0.3         //        . Hue dark
