@@ -877,16 +877,13 @@ void main() {
    #endif
 */
 
-   /*if (DO_RF_NOISE > 0.0) {
-      float anoise1 = random_fast(vTexCoord * vDynamicSeed);
-      float anoise2 = smoothstep_fast( SERVICE1, SERVICE1+0.08, anoise1);
-      pixel_out.rgb += (anoise1*RF_NOISE_STRENGTH*0.00)+(anoise2*RF_NOISE_STRENGTH);
-   }*/
-
    if (DO_RF_NOISE > 0.0) {
       float anoise = random_fast(vTexCoord * vDynamicSeed);
-      pixel_out.rgb += scale_to_range(anoise, -RF_NOISE_STRENGTH, RF_NOISE_STRENGTH);
+      pixel_out.rgb = pixel_out.rgb
+                    + scale_to_range(anoise, -RF_NOISE_STRENGTH, RF_NOISE_STRENGTH) 
+                    + smoothstep_fast(0.90, 1.0, anoise) * RF_NOISE_SPARK;      
    }
+
       
    if (vDo_flickering==1.0) 
       pixel_out.rgb = pixel_flickering(pixel_out.rgb).rgb;

@@ -124,6 +124,10 @@
     #define DO_RF_NOISE		global.DO_RF_NOISE
 #endif
 
+#ifndef RF_NOISE_SPARK
+    #define RF_NOISE_SPARK		global.RF_NOISE_SPARK
+#endif
+
 #ifndef RF_NOISE_STRENGTH
     #define RF_NOISE_STRENGTH	global.RF_NOISE_STRENGTH
 #endif
