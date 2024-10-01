@@ -821,9 +821,7 @@ void main() {
    
    vec4 pixel_out;
    pixel_out.rgb = texture_NEAREST(Source, vTexCoord, params.SourceSize).rgb;
-   
-   float anoise;
-   
+      
    // If we sample ntsc articacts from a mipmap, we can smooth them
    // which is good when slective blurring them.
    pixel_out.a = 0.0;
@@ -879,6 +877,11 @@ void main() {
    #endif
 */
 
+   /*if (DO_RF_NOISE > 0.0) {
+      float anoise1 = random_fast(vTexCoord * vDynamicSeed);
+      float anoise2 = smoothstep_fast( SERVICE1, SERVICE1+0.08, anoise1);
+      pixel_out.rgb += (anoise1*RF_NOISE_STRENGTH*0.00)+(anoise2*RF_NOISE_STRENGTH);
+   }*/
 
    if (DO_RF_NOISE > 0.0) {
       float anoise = random_fast(vTexCoord * vDynamicSeed);
