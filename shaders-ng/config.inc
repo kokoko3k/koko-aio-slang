@@ -18,6 +18,7 @@ layout(push_constant) uniform Push {
 	float HALO_GAMMA ;
 	float HALO_GAMMA_OUT;
 	float HALO_VS_SCAN ;
+	float HALO_DO_MASK_HELPER;
 	
 	float DO_BLOOM ; //4
  	float BLOOM_QUALITY ; //1
@@ -34,10 +35,10 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	vec4 FinalViewportSize;
 	vec4 final_passFeedbackSize;
 	vec4 in_glow_passSize;
-	vec4 FXAA_passSize;
+	vec4 placeholder;
 
 	vec4 avglum_passSize;
-	vec4 flick_and_noise_passSize;
+	vec4 upscale_passSize;
 	vec4 colortools_and_ntsc_passSize;
 	vec4 colortools_and_ntsc_passFeedbackSize;
 
@@ -148,9 +149,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float BG_IMAGE_WRAP_MODE;
 
 	float DO_SHIFT_RGB;
-	float SHIFT_R;
-	float SHIFT_G;
-	float SHIFT_B;
 	float OFFSET_STRENGTH;
 	
 	float DO_GLOBAL_SHZO;
@@ -287,12 +285,33 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float IN_GLOW_WARPSHARP_Y;
 	float IN_GLOW_WARPSHARP_GAMMA;
 	
+	float DO_TEST ;
+	
+	float DECON_RX;
+	float DECON_RY;
+	float DECON_GX;
+	float DECON_GY;
+	float DECON_BX;
+	float DECON_BY;
+	float EDGE_DEFOCUS;
+	float EDGE_DEFOCUS_AREA_INV;
+	float EDGE_DEFOCUS_DO_BLUR;
+	
+	float RF_NOISE_SPARK;
+	
 } global;
 
 
 #pragma parameter LABEL0000 "Read the documentation in docs-ng.md text file" 		0.0 0.0 0.0 1.0
 #pragma parameter LABEL0001 "==================================================" 		0.0 0.0 0.0 1.0
-#pragma parameter LABEL0002 " " 		0.0 0.0 0.0 1.0
+#pragma parameter DO_TEST "★ Show test pattern ==>" 		0.0 	0.0 12.0 1.0
+#pragma parameter LABELTEST " " 		0.0 0.0 0.0 1.0
+
+
+#pragma parameter IN_GLOW_GAMMA  "★ Gamma In  "		2.0 	0.5 	10.0 0.01
+#pragma parameter GAMMA_OUT      "★ Gamma out "		0.5		0.1 	5.0  0.01
+#pragma parameter LABEL0054 " " 0.0 0.0 0.0 1.0
+
 
 // Color correction 
 #pragma parameter DO_CCORRECTION "★ Color corrections enable? (co) ==>" 		0.0 	0.0 1.0 1.0
@@ -302,8 +321,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter CONTRAST       "       Contrast in     (0.0=off)"		0.0	-1.0 1.0 0.01
 #pragma parameter ADAPTIVE_BLACK "       Adaptive black level range"	0.0 0.0  1.0 0.01
 #pragma parameter TEMPERATURE    "       Temperature in (6500=off)"		6500.0	3000 14000.0 50.0
-#pragma parameter IN_GLOW_GAMMA  "       Gamma In  (applied at the beginning)"		1.0 	1.0 	10.0 0.1
-#pragma parameter GAMMA_OUT             "       Gamma out (applied at the end)"			0.69	0.1 	4.0  0.01
 #pragma parameter COLOR_MONO_COLORIZE	"       Monochrome screen colorization"	0.0  0.0 1.0 0.1
 #pragma parameter COLOR_MONO_HUE1       "          . Hue bright"					0.25 0.0 1.0 0.01
 #pragma parameter COLOR_MONO_HUE2       "          . Hue dark"						0.3  0.0 1.0 0.01
@@ -313,15 +330,16 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter LABEL0003 " " 0.0 0.0 0.0 1.0
 
 
-// FXAA
-// Apply an antialiasing filter via FXAA from Nvidia.
-#pragma parameter DO_FXAA "★ FXAA enable? (*f) ==>"	0.0 	0.0 1.0 1.0
+// AA
+// Apply an antialiasing filters.
+#pragma parameter DO_FXAA "★ Antialiasing enable? (fxaa|ddt-xbr-lv1) ==>"	0.0 	0.0 2.0 1.0
 #pragma parameter LABEL0004 " " 0.0 0.0 0.0 1.0
 
 
 // RF Noise
 #pragma parameter DO_RF_NOISE	 "★ RF Noise enable? (rf) ==>"			0.0 	0.0  1.0     1.0
-#pragma parameter RF_NOISE_STRENGTH "        Strength"				0.05	0.0 1.0 0.005
+#pragma parameter RF_NOISE_STRENGTH "        Strength"				0.05	0.0 1.0 0.01
+#pragma parameter RF_NOISE_SPARK    "        Add snow"				0.07		0.0 0.9 0.01
 #pragma parameter LABEL0005 " " 0.0 0.0 0.0 1.0
 
 // Dedithering
@@ -366,11 +384,18 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 
 //Deconvergence
-#pragma parameter DO_SHIFT_RGB       "★ Deconvergence enable? (de) ==>"	0.0	 0.0 1.0 1.0
-#pragma parameter OFFSET_STRENGTH "        Strength"			0.6 	 0.0 1.0 0.05
-#pragma parameter SHIFT_R         "        Red offset"			-40.0 	-210.0 189.0 1
-#pragma parameter SHIFT_G         "        Green offset"		2.0 	-210.0 189.0 1
-#pragma parameter SHIFT_B         "        Blue offset"			40.0 	-210.0 189.0 1
+#pragma parameter DO_SHIFT_RGB       "★ Deconvergence/Defocus enable? (de) ==>"	0.0	 0.0 1.0 1.0
+#pragma parameter OFFSET_STRENGTH  "        Strength"			0.6 	 0.0 1.0 0.05
+#pragma parameter DECON_RX         "        Red x offset"	    0.0 -50.0 50.0 0.25
+#pragma parameter DECON_RY         "        Red y offset"	   -1.0 -50.0 50.0 0.25
+#pragma parameter DECON_GX         "        Green x offset"		1.0 -50.0 50.0 0.25
+#pragma parameter DECON_GY         "        Green y offset"		0.0 -50.0 50.0 0.25
+#pragma parameter DECON_BX         "        Blue x offset"		0.0 -50.0 50.0 0.25
+#pragma parameter DECON_BY         "        Blue y offset"		1.0 -50.0 50.0 0.25
+#pragma parameter EDGE_DEFOCUS              "         . Deconvergence increases near edges (1=no increase)" 2.0 1.0 10.0 0.1
+#pragma parameter EDGE_DEFOCUS_DO_BLUR      "         . Blur increases near edges when glow/blur is enabled" 0.0 0.0 1.0 0.05
+#pragma parameter EDGE_DEFOCUS_AREA_INV     "         . Focused Area" 0.4 0.0 0.5 0.01
+
 #pragma parameter LABEL0010 " " 0.0 0.0 0.0 1.0
 
 
@@ -480,13 +505,15 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 
 // Halo
-#pragma parameter DO_HALO             "★ Halo enable? (ha) ==>" 						0.0	0.0 1.0 1.0
-#pragma parameter HALO_NO_PREGAIN     "  Pre-attenuate input signal gain to 1x"	0.0		0.0	1.0	1.0
-#pragma parameter HALO_POWER          "  Strength (negative = 10x precision)"	0.9 	-50.0  5.0 0.01
-#pragma parameter HALO_SHARPNESS      "  Sharpness"					3.00	0.05   7.0 0.05
-#pragma parameter HALO_GAMMA          "  Gamma in: Higher -> less halo on dark colors"	2.0 	1.0  10.0 0.05
-#pragma parameter HALO_GAMMA_OUT      "  Gamma out"	 1.0	0.25  4.0 0.05
-#pragma parameter HALO_VS_SCAN        "  Light scanlines and dot grid gaps"				0.0	0.0  1.0  0.01
+#pragma parameter DO_HALO             "★ Halo or Mask helper enable? (ha) ==>" 						0.0	0.0 1.0 1.0
+#pragma parameter HALO_NO_PREGAIN     "  Halo: Pre-attenuate input signal gain to 1x"	0.0		0.0	1.0	1.0
+#pragma parameter HALO_POWER          "  Halo: Strength (negative = 10x precision)"	0.9 	-50.0  5.0 0.01
+#pragma parameter HALO_SHARPNESS      "  Halo: Sharpness"					3.00	0.05   7.0 0.05
+#pragma parameter HALO_GAMMA          "  Halo: Gamma in: Higher -> less halo on dark colors"	2.0 	1.0  10.0 0.05
+#pragma parameter HALO_GAMMA_OUT      "  Halo: Gamma out"	 1.0	0.25  4.0 0.05
+#pragma parameter HALO_DO_MASK_HELPER "  Mask helper: Additional brighness if horizontal mask clips" 	0.0	0.0 1.0 0.05 
+#pragma parameter LABEL_HALO_HELP     "       (Mask helper: read docs-ng.md for help)" 	0.0 0.0 0.0 1.0
+#pragma parameter HALO_VS_SCAN        "  Both: Light scanlines and dot grid gaps"				0.0	0.0  1.0  0.01
 #pragma parameter LABEL0021 " " 0.0 0.0 0.0 1.0
 
 
@@ -622,11 +649,11 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter LABEL0051 " " 0.0 0.0 0.0 1.0
 
 //Modulate the image zooming depending on the image luminosity.
-#pragma parameter DO_DYNZOOM	     "★ Luminosity tied zoom (!!OBSTRUCTS integer scale!!) ==>"		0.015   0.0   1.0  0.005
+#pragma parameter DO_DYNZOOM	     "★ Luminosity tied zoom (ignored with integer scaling) ==>"		0.015   0.0   1.0  0.005
 #pragma parameter LABEL0032 " " 0.0 0.0 0.0 1.0
 
 //Autocrop
-#pragma parameter AUTOCROP_MAX	     "★ Autocrop: maximum amount (!!OBSTRUCTS integer scale!!) ==>"   0.0   0.0   0.5  0.01
+#pragma parameter AUTOCROP_MAX	     "★ Autocrop: maximum amount (ignored with integer scaling) ==>"   0.0   0.0   0.5  0.01
 #pragma parameter AUTOCROP_MIN	            "        Number of mandatory lines to crop"   1.0   0.0   10.0  1.0
 #pragma parameter AUTOCROP_SAMPLES          "        Samples per frame (faster response, higher gpu use)"     20.0   0.0   300.0 1.0
 #pragma parameter AUTOCROP_SAMPLE_SIZE      "        Sample size (big speedup, less accurate)" 2.0 0.0 5.0 1.0  
@@ -636,7 +663,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 //Content geomerty overrides
 #pragma parameter DO_GAME_GEOM_OVERRIDE	  "★ Override content geometry enable? (ov)==>"	0.0   0.0  1.0 	  1.0
-#pragma parameter GAME_GEOM_INT_SCALE     "        Integer scale (disables inner zoom) 2=No keep aspect"	0.0   0.0  2.0    1.0
+#pragma parameter GAME_GEOM_INT_SCALE     "        Integer scale (2=No keep aspect)"	0.0   0.0  2.0    1.0
 #pragma parameter GAME_GEOM_INT_SCALE_MAX "        .    Maximum integer scale" 			10.0  1.0  100.0  1.0
 #pragma parameter GAME_GEOM_INT_SCALE_OVR "        .    Permit integer overscale by" 			1.04   1.00  1.1  0.01
 #pragma parameter LABEL0052           "    !! The following will override integer scale" 0.0 0.0 0.0 1.0

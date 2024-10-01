@@ -16,6 +16,7 @@ layout(location = 4) out float vSharp_sub;
 layout(location = 11) out float vDeltaRenderOk;
 layout(location = 12) out float vWarpedglow;
 layout(location = 13) out vec2 vWarpedglow_offsets;
+layout(location = 14) out float vDo_edge_defocus;
 
 void main() {
    gl_Position = global.MVP * Position;
@@ -60,7 +61,6 @@ void main() {
 
    float warpedglow_delta = params.OriginalSize.w * 0.5;
    vWarpedglow_offsets = vec2(0.0, +warpedglow_delta); 
-      
 }
 
 
@@ -163,13 +163,13 @@ void main() {
    //Make it resolution independent.
       IN_GLOW_H_ADAPTED = IN_GLOW_H_ADAPTED / NEW_SCALEMOD_Y;
 
-   //Also, a little hacky adaption for when flick_and_noise_pass does not scale to 2X
+   //Also, a little hacky adaption for when upscale_pass does not scale to 2X
       if (params.OutputSize.xy == params.OriginalSize.xy)
          IN_GLOW_H_ADAPTED*=1.5;
       
    //If over the max sharp, then just passthrough, else do the blur.
       if (glow_h_inside_interval == 1.0) {
-         pixel_glowed = blur_select_wrap(Source, vTexCoord, global.flick_and_noise_passSize, IN_GLOW_H_ADAPTED, (IN_GLOW_H >= 0.0) );
+         pixel_glowed = blur_select_wrap(Source, vTexCoord, global.upscale_passSize, IN_GLOW_H_ADAPTED, (IN_GLOW_H >= 0.0) );
          //pixel_glowed = blur9_y(Source, vTexCoord, params.SourceSize.xy, IN_GLOW_H_ADAPTED);
       } else {
          pixel_glowed = texture(Source, vTexCoord).rgb;
@@ -180,8 +180,13 @@ void main() {
    
    //Series of conditions to do in glow bias done in vertex shader:
       if (vDoInGlowBias == 1.0) {
-            pixel_glowed = glow_blur_bias(shift_and_bleed_pass, vTexCoord, pixel_glowed, IN_GLOW_BIAS);
-            //pixel_glowed = antialias_blur_bias(shift_and_bleed_pass, vTexCoord, pixel_glowed, IN_GLOW_BIAS);
+         //edge defocus: the more near edge, the more the blur
+         float dist_from_edge = distance_from_edge_linear(vTexCoord, EDGE_DEFOCUS_AREA_INV);
+         float in_glow_bias_faded = mix(IN_GLOW_BIAS, 1.0,  (1-dist_from_edge) *  (DO_SHIFT_RGB * EDGE_DEFOCUS_DO_BLUR ) );
+         //float in_glow_bias_faded = mix(IN_GLOW_BIAS,  1.0, (1-dist_from_edge) * (DO_SHIFT_RGB * EDGE_DEFOCUS_DO_BLUR)  );
+         //FragColor = vec4(vec3(in_glow_bias_faded), 0.0);
+         //return;
+         pixel_glowed = glow_blur_bias(shift_and_bleed_pass, vTexCoord, pixel_glowed, in_glow_bias_faded);
       }
    
 

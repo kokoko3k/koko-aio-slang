@@ -285,7 +285,7 @@ void main() {
         vDotMat_Grid_Sharpness = DOT_M_G_SHARP;
         if (DOT_M_G_SHARP == 0.0) {
             float zooms_modifier  = get_zooms_modifier(vDo_Tate, bNeed_NO_integer_scale, bIsRotated).y;
-            float dotmat_insize  = global.flick_and_noise_passSize.y;
+            float dotmat_insize  = global.upscale_passSize.y;
             float dotmat_outsize = global.FinalViewportSize.y  * zooms_modifier;
             #ifdef DEBUG_PRINT_VALUE
                 vfprintvalue = dotmat_outsize / dotmat_insize;
@@ -630,8 +630,14 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
                 float fakeslot_stagger_offset =  is_even * PIXELGRID_OFFSET_CORE * pi;
             //get 3 sines with applied the optional staggered offset for slotmask, and single phosphors staggering for y deconvergence.
                 vec3 decon_stagger = vec3( PIXELGRID_DECON_R_H, PIXELGRID_DECON_G_H, PIXELGRID_DECON_B_H);
-
-
+                
+            #ifdef HQ_DECON
+                float dist_from_edge = distance_from_edge_linear(in_coords, EDGE_DEFOCUS_AREA_INV)*(DO_SHIFT_RGB);
+                float offset_multiplier = mix(EDGE_DEFOCUS, 1.0, dist_from_edge) * NEW_SCALEMOD_Y;
+                decon_stagger = vec3(DECON_RY,DECON_GY,DECON_BY)*pi/2.0;
+                decon_stagger *= offset_multiplier;
+            #endif
+            
             vec3 rgb_h_sin = vec3(1.0);
             
             if (PIXELGRID_H_ANTIMOIRE > 0.0) {
@@ -658,7 +664,12 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
                 rgb_h = morph_shape(rgb_h_sin, phosphor_height, PIXELGRID_NO_INTERBLEED_H, PIXELGRID_GAMMA_H);
 
                 rgb_h = mix(vec3(1.0), rgb_h, DO_PIXELGRID_H);
+                
                 rgb_h = clamp(rgb_h, 0.0,1.0);
+                
+                #ifdef HQ_DECON
+                    rgb_h = mix(rgb_h, pixel_in.rgb, (1-dist_from_edge) * (DO_SHIFT_RGB * EDGE_DEFOCUS_DO_BLUR) );
+                #endif
         }
 
 
@@ -743,6 +754,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
                 darklines_mask = (darklines_mask-0.5) * (1+PG_spark) + 0.5 ; 
         }
 
+        
 
     //Finally put H mask, Scanlines and darklines masks together:
         vec3 mask = rgb_w * rgb_h * darklines_mask;
@@ -1066,7 +1078,7 @@ vec3 fn_pixel_content(vec2 coords) {
 
     
     #ifdef USE_QUILEZ
-        pixel_glowed = texture(in_glow_pass, coords_QULEZ(coords, global.flick_and_noise_passSize));
+        pixel_glowed = texture(in_glow_pass, coords_QULEZ(coords, global.upscale_passSize));
         pixel_out = pixel_glowed.rgb;
     #else
         pixel_glowed = texture(in_glow_pass, coords);
@@ -1122,6 +1134,8 @@ vec3 fn_pixel_content(vec2 coords) {
             //same, clearer.
             pixel_out = pixel_out + pixel_haloed * mix( dot_mat_or_pixelgrid  , 1.0,  HALO_VS_SCAN);
 
+            //pixel_out = pixel_haloed;
+            
         }
 
     // Apply gamma out:
@@ -1249,14 +1263,11 @@ void main() {
         }
 
 
-
-
-        
     //Curvature
         //Curvature has to come after inner zoom or bezel curved border will not match content
         //curved border when inner zoom changes.
         if ( curvature_needed() > 0.0 ) {
-            co_content = Warp_koko(co_content, vec2(GEOM_WARP_X, GEOM_WARP_Y), 0.5);
+            co_content = Warp_koko(co_content, vec2(GEOM_WARP_X, GEOM_WARP_Y*float(need_NO_integer_scale())), 0.5);
         }
 
     //Mirror coords needs to be calculated here, before geom override, but after curvature.

@@ -14,10 +14,6 @@
 
 
 // STATIC FEATURES ENABLE/DISABLE
-
-// Allow texture wrapping as a shader parameter, prepend // to gain some performance: 
-	#define ALLOW_BG_IMAGE_TEXTURE_WRAP_IN_SHADER
-
 	
 // Enable lcd antighosting by using values > 0.0 (try around 0.25)
 	#define LCD_ANTIGHOSTING 0.0
@@ -127,8 +123,8 @@
 	//Try to keep blur sizes consistent across input resolutions
 #define NEW_SCALEMOD_REF_X 360.0
 #define NEW_SCALEMOD_REF_Y 270.0
-#define NEW_SCALEMOD_X (global.flick_and_noise_passSize.x/(NEW_SCALEMOD_REF_X*2.0) / 2.2)
-#define NEW_SCALEMOD_Y (global.flick_and_noise_passSize.y/(NEW_SCALEMOD_REF_Y*2.0) / 2.2)
+#define NEW_SCALEMOD_X (global.upscale_passSize.x/(NEW_SCALEMOD_REF_X*2.0) / 2.2)
+#define NEW_SCALEMOD_Y (global.upscale_passSize.y/(NEW_SCALEMOD_REF_Y*2.0) / 2.2)
 
 	//Hardcoded radius scale factor used by bloom and halo.
 #define BLOOM_AND_HALO_SCALE_FACTOR 360.0

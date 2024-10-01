@@ -109,11 +109,23 @@ vec4 texture_QUILEZ(sampler2D tex, vec2 co, vec4 texsize) {
 }
 
 
+vec2 coords_NEAREST(vec2 co, vec4 texsize) {
+   vec2 integerCoords = floor(co.xy * texsize.xy);
+   return (integerCoords + 0.5) * texsize.zw;
+}
+
 vec4 texture_NEAREST(sampler2D tex, vec2 co_linear, vec4 tex_size) {
    //return nearest sampling from a linear filtered texture
    vec2 integerCoords = floor(co_linear.xy * tex_size.xy);
    vec2 co_nearest = (integerCoords + 0.5) * tex_size.zw; // Aggiungi 0.5 per centrare il texel
    return texture(tex, co_nearest);
+}
+
+vec4 texture_NEAREST_lod(sampler2D tex, vec2 co_linear, vec4 tex_size, float lod) {
+	   //return nearest sampling from a linear filtered texture
+   vec2 integerCoords = floor(co_linear.xy * tex_size.xy);
+   vec2 co_nearest = (integerCoords + 0.5) * tex_size.zw; // Aggiungi 0.5 per centrare il texel
+   return textureLod(tex, co_nearest, 0.0);
 }
 
 float DigitBin( const int x )
@@ -278,9 +290,9 @@ vec3 pixel_push_luminance(vec3 c, float strength) {
 vec3 apply_fuzzy_main_pass(vec3 color_in) {
 	vec3 color_out = color_in;
 
-	if (DO_CCORRECTION == 1.0) {
-		color_out = pow(color_out, vec3(IN_GLOW_GAMMA * GAMMA_OUT));
-	}
+
+	color_out = pow(color_out, vec3(IN_GLOW_GAMMA * GAMMA_OUT));
+
 	
 	if (DO_IN_GLOW == 1.0)
 		color_out = color_out*IN_GLOW_POWER;
@@ -334,14 +346,17 @@ vec2 apply_fuzzy_main_pass_stage_1() {
 	}
 	if (HALO_POWER < 0.0) 
 		halo_power_adapted = -halo_power_adapted/10.0;
+
+	color_out = pow(color_in, GAMMA_OUT); //<- nonsense ?
+	gamma_out = gamma_out * GAMMA_OUT;
+	gamma_out = gamma_out * IN_GLOW_GAMMA;
+	color_out = pow(color_out,IN_GLOW_GAMMA);
 	
 	if (DO_CCORRECTION == 1.0) {
-		color_out = pow(color_in, GAMMA_OUT); //<- nonsense
-		gamma_out = gamma_out * GAMMA_OUT;
-		gamma_out = gamma_out * IN_GLOW_GAMMA;
-		color_out = pow(color_out,IN_GLOW_GAMMA)*IN_GLOW_POWER;
+		color_out *= IN_GLOW_POWER;
 	}
-	
+
+
 	if (DO_PIXELGRID == 1.0) {
 		color_out *= 1- DO_PIXELGRID_H * 0.5   ; //Half color if scanline.
 		color_out *= 1- DO_PIXELGRID_W * 0.5   ; //Half color if Hmask.
@@ -383,9 +398,10 @@ vec2 apply_fuzzy_main_pass_stage_1_no_gamma_in() {
 	if (HALO_POWER < 0.0) 
 		halo_power_adapted = -halo_power_adapted/10.0;
 	
+	color_out = pow(color_in, GAMMA_OUT); //<- nonsense ?
+	gamma_out = gamma_out * GAMMA_OUT;
+
 	if (DO_CCORRECTION == 1.0) {
-		color_out = pow(color_in, GAMMA_OUT); //<- nonsense
-		gamma_out = gamma_out * GAMMA_OUT;
 		color_out = color_out * IN_GLOW_POWER;
 	}
 	
@@ -404,7 +420,6 @@ vec2 apply_fuzzy_main_pass_stage_1_no_gamma_in() {
 	if (DO_VIGNETTE == 1.0)
 		color_out *= 0.8 * (V_POWER);
 	
-
 	
 	return vec2(color_out/color_in, gamma_out );
 }
@@ -692,15 +707,14 @@ float random_fast(vec2 seed) {
 	}
 	
 	
+
 	vec2 Warp_koko(vec2 co, vec2 w, float protrusion) {
-		//Keep protrusion higher than ~0.5
+		vec2 coff    = w * 0.625;
 		float czoom  = 1 - distance(co, vec2(0.5));
-		czoom        = mix(czoom, czoom * protrusion, czoom);
+		czoom        = mix(czoom, czoom * 0.5, czoom);
 		vec2 czoom2d = mix(vec2(1.0), vec2(czoom), w);
-		vec2 coff    = mix( vec2(0.0), vec2(0.625), w);
 		return zoomxy(co, coff + czoom2d );
 	}
-
 	
 	vec2 Warp_fast(vec2 uv, vec2 v_exp, vec2 arg2, float cut_ears) {
 		/*This version is exact and faster than the other implementation,
@@ -1123,17 +1137,17 @@ vec3 blur_px(sampler2D smp, vec2 co, vec2 r) {
     //float c1 = 0.75;
     //float c2 = 1.25;
 
-	#define c1 1.0
-	#define c2 1.0
+	#define KAIO_c1 1.0
+	#define KAIO_c2 1.0
 
-    c += texture(smp, co + vec2(0.0, 1.0) * r).rgb * c1;
-    c += texture(smp, co + vec2(0.7071, 0.7071) * r).rgb * c2;
-    c += texture(smp, co + vec2(1.0, 0.0) * r).rgb * c1 ;
-    c += texture(smp, co + vec2(0.7071, -0.7071) * r).rgb * c2;
-    c += texture(smp, co + vec2(0.0, -1.0) * r).rgb * c1;
-    c += texture(smp, co + vec2(-0.7071, -0.7071) * r).rgb * c2;
-    c += texture(smp, co + vec2(-1.0, 0.0) * r).rgb * c1;
-    c += texture(smp, co + vec2(-0.7071, 0.7071) * r).rgb * c2;
+    c += texture(smp, co + vec2(0.0, 1.0) * r).rgb * KAIO_c1;
+    c += texture(smp, co + vec2(0.7071, 0.7071) * r).rgb * KAIO_c2;
+    c += texture(smp, co + vec2(1.0, 0.0) * r).rgb * KAIO_c1 ;
+    c += texture(smp, co + vec2(0.7071, -0.7071) * r).rgb * KAIO_c2;
+    c += texture(smp, co + vec2(0.0, -1.0) * r).rgb * KAIO_c1;
+    c += texture(smp, co + vec2(-0.7071, -0.7071) * r).rgb * KAIO_c2;
+    c += texture(smp, co + vec2(-1.0, 0.0) * r).rgb * KAIO_c1;
+    c += texture(smp, co + vec2(-0.7071, 0.7071) * r).rgb * KAIO_c2;
 
     //vec3 c0 = texture(smp, co + vec2(0.0, 0.0) * r).rgb;
     //return min(c0, c/8.0);
@@ -1181,8 +1195,8 @@ vec3 blur_px(sampler2D smp, vec2 co, vec2 r) {
 	}
 	*/
 	
-	vec3 blur5_x(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_x, float lod) {
-		float resolution = sourcesize.x * sharpness_x;
+	vec3 blur5_x(sampler2D image, vec2 uv, float sourcesize_x, float sharpness_x, float lod) {
+		float resolution = sourcesize_x * sharpness_x;
 		vec3 color = vec3(0.0);
 		vec2 off1 = vec2(1.333333333333 / resolution, 0.0);
 		color += textureLod(image, uv, lod).rgb   * 0.29411764705882354;
@@ -1191,8 +1205,8 @@ vec3 blur_px(sampler2D smp, vec2 co, vec2 r) {
 		return color;
 	}
 	
-	vec3 blur5_y(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_y, float lod) {
-		float resolution = sourcesize.y * sharpness_y;
+	vec3 blur5_y(sampler2D image, vec2 uv, float sourcesize_y, float sharpness_y, float lod) {
+		float resolution = sourcesize_y * sharpness_y;
 		vec3 color = vec3(0.0);
 		vec2 off1 = vec2(0.0, 1.333333333333 / resolution) ;
 		color += textureLod(image, uv, lod).rgb   * 0.29411764705882354;
@@ -1693,4 +1707,23 @@ float delta_render_changed(sampler2D smp_past, sampler2D smp_now, vec2 co, float
 
 float max3(vec3 v){
 	return max((v.x,v.y),v.z);
+}
+
+float distance_from_edge(vec2 co, float gamma) {
+	float aoe=0.2;
+	vec2 s = smoothstep_fast( vec2(0.5), vec2(aoe), abs(co-0.5));
+	float dfe=(s.x*s.y);
+	return dfe;
+	
+	vec2 sinpi = sin(co*pi);
+	float dist_from_edge = (sinpi.x*sinpi.y);
+	return pow(dist_from_edge, gamma);
+}
+
+
+
+float distance_from_edge_linear(vec2 co, float aoe_inv) {
+	vec2 s = smoothstep_fast( vec2(0.5+eps), vec2(aoe_inv), abs(co-0.5));
+	float dfe=(s.x*s.y);
+	return dfe;
 }

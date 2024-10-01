@@ -1,13 +1,15 @@
-**koko-aio-slang documentation**
+**-KOKO-AIO DOCUMENTAION-**
+---------------------------
+---------------------------
 
-**REQUIREMENT***
+**REQUIREMENTS** <br>
     koko-aio needs at least retroarch 1.16
 
-**RETROARCH OUTPUT DRIVERS**
+**RETROARCH OUTPUT DRIVERS** <br>
     koko-aio does not work by default on d3d12 and d3d11.<br>
-    If you absolutely need it (Xbox?), you can edit the file 
-    config\config-static.inc<br>
-    and turn the line:
+    If you absolutely need it (Xbox?), you can edit the file <br>
+    config\config-static.inc <br>
+    and turn the line: <br>
     // #define D3D_WORKAROUND <br>
     into:<br>
     #define D3D_WORKAROUND <br>
@@ -17,14 +19,17 @@
     <br>
     d3d10 is completely unsupported.
     <br>
-    Be warned that some functions does not work if you enable the workaround: <br>
+    Be warned that the following functions do not work if you enable the workaround: <br>
         * CRT glitch on resolution changes <br>
         * Adaptive Black <br>
-        * CVBS Bleed size is limited to 5.0
-        * Ambientlight scene change detection
-        * Halving border updates refresh
-        * Lcd antighosting
-        * Delta render
+        * CVBS Bleed size is limited to 5.0 <br>
+        * Ambientlight scene change detection <br>
+        * Halving border updates refresh <br>
+        * Lcd antighosting <br>
+        * Delta render <br>
+        * Possibly others (?) <br>
+    
+---------------------------
     
 **USEFUL LOCATIONS/FILES:**
 
@@ -40,21 +45,31 @@
         CON: The parameters can no longer be modified within Retroarch. 
         
     textures/background_under.png
-        This is the image that can is shown by default under the main content and under the bezel.
+        This is the image that shown by default under the main content and under the bezel.
         Read further for details. 
         
     textures/background_over.png
-        This is the image that can is shown by default over the main content and under the bezel.
+        This is the image that shown by default over the main content and under the bezel.
         Read further for details.
         
     textures/monitor_body_curved.png, textures/monitor_body_straight.png
         This is the image used to draw the bezel.
         Read further for details.
         
-Texture "sources", including the main gimp project file for the default curved and straight monitor frame
-are on the following repo:
+Texture "sources", including the main gimp project file for the <br>
+default curved and straight monitor frame are on the following repo: <br>
 https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
 
+
+---------------------------
+
+**PARAMETERS:**
+
+**Gamma in:**
+        Input Gamma: set it around 2.2 to linearize values.
+        
+**Gamma out:**
+        Output Gamma: set it around "1/Gamma in"; small tweaks allowed.
         
 **Color corrections:**<br>
     Modify signal color at "input" stage.<br>
@@ -63,10 +78,6 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
         self explanatory.
     Input signal gain:
         Gain applied in the chain just before the crt emulation stages.
-    Gamma in:
-        Gamma correction applied at the beginning of the chain.
-    Gamma out:
-        Gamma correction applied to the final processed picture.
     Adaptive black level range:
         On old CRTs the contrast was higher on high luminosity content,
         and lower on low luminosity content.
@@ -86,8 +97,8 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
         Hue bright-dark bias:
             Controls the distribution of dark and bright hues.
     
-**FXAA:**<br>
-    Apply the well known antialiasing effect by Nvidia.<br>
+**Antialiasing enable:**<br>
+    Apply an edge smoothing/antialiasing algotithm.<br>
     Use it if you don't want to blur the image and you still don't like<br>
     jagged or too much pixelated images.<br>
 
@@ -146,9 +157,17 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
 
 **Deconvergence:**<br>
     Shift R,G,B components separately to mimic channel deconvergence.<br>
-    By varying Red, Green and Blue offsets, the relative component will be<br>
-    shifted column by column, row by row.<br>
+    
+    Red,Green,Blue X,Y:
+        The channels deconvergence offsets
+    Deconvergence increases near edges:
+        Increase the offsets near screen edge
+    Blur increases near edges when glow/blur is enabled:
+        When using Glow/Blur feature, the blur increases near screen edge.
+    Focused Area:
+        The area of the screen that will be in focus (affects previous 2 settings)
 
+        
 **Glow/Blur:**<br>
     Emulate the CRT glowing "feature", so that the brighter areas of<br>
     the image will light their surroundings,<br>
@@ -174,7 +193,7 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
         Embolden bright pixels near dark ones using a warpsharp like algorithm.
         This is a cheap way to emulate phosphor glowing.
         The Y parameter will also allow scanlines to be higher.
-        It will also help (if coupled with) FXAA to stay sharp.
+        It will also help (if coupled with) antialiasing to stay sharp.
 
     Warped Dynamics:
         Change the amount of warpsharp applied based on the contrast between 
@@ -433,7 +452,24 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
         will be "haloed"
     (Halo): Gamma out
         Post-gamma correction applied to the halo.
-
+    Mask Helper: Additional brighness if horizontal mask clips
+        This function will add more color to the subpixel mask (eg: RGB, RBGX...)
+        when it is unable to reach the enough brightness.
+        This will allow to fully exploit subpixel mask capacity while retaining
+        the desidered brightness.
+        Please note that a well calibrated monitor is needed.
+        
+        How to Use Mask Helper:
+        -----------------------
+            Adjust "Input signal gain" based on mask size:
+               ~2.0..3.0 for 2-sized (gm, wx)
+               ~3.0..4.0 for 3-sized (gmx, rgb,rbg)
+               ~4.0..5.0 for 4-sized (rgbx, rbgx)
+                
+            Activate the "Horizontal mask" parameter.
+               Set "Phosphors width Min, Max" to the minimum.
+               Set "Phosphors width min->max gamma" to the maximum.
+               
     Light up scanline gaps and dot grid gaps too:
         Theoretically Halo has to be applied
         "over" everything, because that is the way it works in nature.
@@ -729,7 +765,7 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
         Can be used to adjust the bezel rotation
         in relation to the game tilt amount
         
-**Delta Render:**
+**Delta Render:**<br>
     Koko-aio can render only the part of the screen that has been changed,<br>
     leading to a measurable power consumption reduction and mitigate throttling
     on mobile devices and laptops.<br>

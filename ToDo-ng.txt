@@ -141,4 +141,6 @@ TODO:
 	[ ] Unexcited phosphor grid is not dependant on hmask strength.
 	    easy but not mandatory to fix, it would costs performance and need presets update, unsure what to do.
 	[ ] Make bloom power not dependant on input signal gain ? Not sure.
-
+	[ ] At least 2 scaling algorithm needs linear color space to work good
+	    This requires powing on colortools pass, which i didn't because... can't remember.
+	    
