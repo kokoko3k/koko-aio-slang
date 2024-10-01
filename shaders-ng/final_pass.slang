@@ -1263,9 +1263,6 @@ void main() {
         }
 
 
-
-
-        
     //Curvature
         //Curvature has to come after inner zoom or bezel curved border will not match content
         //curved border when inner zoom changes.
