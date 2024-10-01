@@ -1270,7 +1270,7 @@ void main() {
         //Curvature has to come after inner zoom or bezel curved border will not match content
         //curved border when inner zoom changes.
         if ( curvature_needed() > 0.0 ) {
-            co_content = Warp_koko(co_content, vec2(GEOM_WARP_X, GEOM_WARP_Y), 0.5);
+            co_content = Warp_koko(co_content, vec2(GEOM_WARP_X, GEOM_WARP_Y*float(need_NO_integer_scale())), 0.5);
         }
 
     //Mirror coords needs to be calculated here, before geom override, but after curvature.
