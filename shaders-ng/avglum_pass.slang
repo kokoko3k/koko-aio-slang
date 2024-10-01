@@ -25,6 +25,7 @@ layout(location = 5) out float vBezel_or_Bloom;
 layout(location = 6) out float vResSwitch_res_changed;
 layout(location = 7) out float vResChanged;
 layout(location = 8) out vec2 vTexCoord_unscaled;
+layout(location = 9) out float vDo_autocrop;
 //layout(location = 9) out vec2 vLods;
 #include "includes/functions.include.slang"
 
@@ -56,6 +57,11 @@ void main() {
         //float lod_max = lodmax(params.OriginalSize.xy);
         //vLods.x = lod_max/2.0;
         //vLods.y = vLods.x/2.0;
+        
+    //Disable Autocrop when integer scaling is requested.
+        bool Autocrop_disabled = (AUTOCROP_MAX == 0.0) || 
+                                 (DO_GAME_GEOM_OVERRIDE > 0.0 && GAME_GEOM_INT_SCALE > 0.0) ;              
+        vDo_autocrop = float(!Autocrop_disabled);
 }
 
 #pragma stage fragment
@@ -68,7 +74,7 @@ layout(location = 5) in float vBezel_or_Bloom;
 layout(location = 6) in float vResSwitch_res_changed;
 layout(location = 7) in float vResChanged;
 layout(location = 8) in vec2 vTexCoord_unscaled;
-//layout(location = 9) in vec2 vLods;
+layout(location = 9) in float vDo_autocrop;
 
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 1) uniform sampler2D  colortools_and_ntsc_passFeedback;
@@ -339,8 +345,7 @@ void main() {
     if ( vAvglum_needed == 0.0) return;
     
     vec4 pixel_out;
-    
-    
+    pixel_out.a = 1.0;
     
     //We also reserve a sampling point in alpha channel to store if the resolution has changed.
     //The value stored will be used by the first pass as an argument to sin() to shake the image.
@@ -357,7 +362,7 @@ void main() {
         
 
     } else if (is_first_inside_rect(vTexCoord_unscaled, vec4(AUTOCROP_SAMPLING_POINT-0.01, AUTOCROP_SAMPLING_POINT+0.01) ))  {
-        if (AUTOCROP_MAX > 0.001)
+        if (vDo_autocrop == 1.0)
             pixel_out.a = get_autocrop();
         
     } else {
