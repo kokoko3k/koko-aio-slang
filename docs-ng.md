@@ -3,7 +3,12 @@
 ---------------------------
 
 **REQUIREMENTS** <br>
-    koko-aio needs at least retroarch 1.16
+    koko-aio needs at least retroarch 1.16 <br>
+    Also it expects the following options set in Retroarch:
+    
+    Settings -> Core -> Allow Rotation: ON
+    Settings -> Video -> Scaling -> Aspect Ratio: Full
+    
 
 **RETROARCH OUTPUT DRIVERS** <br>
     koko-aio does not work by default on d3d12 and d3d11.<br>
