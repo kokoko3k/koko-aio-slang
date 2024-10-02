@@ -473,7 +473,7 @@ vec3 persistence(vec3 feedback, vec3 pixel_now, float start_decay, float late_pe
 void main() {
    vec2 co = vTexCoord;
    
-   if (AUTOCROP_MAX > 0.0)
+   if (AUTOCROP_MAX > 0.0 && need_NO_integer_scale() )
       co = clamp(co,  params.OriginalSize.zw * AUTOCROP_MIN, 
                     1-params.OriginalSize.zw * AUTOCROP_MIN );
    
