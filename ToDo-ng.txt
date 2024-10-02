@@ -118,14 +118,15 @@ TODO:
 	[v] Add debanding again
 	[v] Set rgb-h mask power parameter min step = 0.01
 	[v] Add another 4 sized mask that reduces weird Hardware related artifacts: rgxb (r1,g2,b4)
-	
-	[ ] Glow spread in final pass?
-	[ ] Find a way to smooth borders without cropping the image
+	[v] Sync full screen decon with phosphor decon.
+		Done, optionally via HW_DECON option	
+	[v] Glow spread in final pass?
+		Superseeded by warpedglow, yay.
+	[v] Find a way to smooth borders without cropping the image
+		Done, via repeated lines
+	[v] bloom should bleed over when forcing geometry aspect
 
-	[ ] bloom should bleed over when forcing geometry aspect
 	[ ] reflection blurriness should not depend on input resolution
-	[ ] Sync full screen decon with phosphor decon.
-	
 	[ ] dedicated subtractive sharpness in glow section
 	[ ] erode/dilate setting in glow section
 	[ ] why altering glow power alters scanline shape?
@@ -141,6 +142,8 @@ TODO:
 	[ ] Unexcited phosphor grid is not dependant on hmask strength.
 	    easy but not mandatory to fix, it would costs performance and need presets update, unsure what to do.
 	[ ] Make bloom power not dependant on input signal gain ? Not sure.
-	[ ] At least 2 scaling algorithm needs linear color space to work good
+	[v] At least 2 scaling algorithm needs linear color space to work good
 	    This requires powing on colortools pass, which i didn't because... can't remember.
+	    ...because is a big mess for all the shader.
+	    Optional linearization can be enabled via static config now.
 	    
