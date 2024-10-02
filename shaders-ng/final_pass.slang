@@ -140,20 +140,23 @@ vec2 get_zooms_modifier(float do_tate, bool bNeed_NO_integer_scale, bool isrotat
         co_scaled_max = integer_scale(co_scaled_max, vIn_aspect, isrotated, do_tate, GAME_GEOM_INT_SCALE-1.0 );
     }
 
-
-    co_scaled_min = (zoom(co_scaled_min + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM ) * DO_GLOBAL_SHZO) +
-                (co_scaled_min * (1-DO_GLOBAL_SHZO) );
-    co_scaled_max = (zoom(co_scaled_max + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM ) * DO_GLOBAL_SHZO) +
-                (co_scaled_max * (1-DO_GLOBAL_SHZO) );
-
-    if (DO_BEZEL == 1.0) {
-        co_scaled_min = zoomout_coords(co_scaled_min, -vBEZEL_INNER_ZOOM_adapted);
-        co_scaled_max = zoomout_coords(co_scaled_max, -vBEZEL_INNER_ZOOM_adapted);
+    //Other zoom modifiers allowed only without integer scaling.
+    if ( bNeed_NO_integer_scale ) {
+        co_scaled_min = (zoom(co_scaled_min + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM ) * DO_GLOBAL_SHZO) +
+                    (co_scaled_min * (1-DO_GLOBAL_SHZO) );
+        co_scaled_max = (zoom(co_scaled_max + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM ) * DO_GLOBAL_SHZO) +
+                    (co_scaled_max * (1-DO_GLOBAL_SHZO) );
+        if (DO_BEZEL == 1.0) {
+            co_scaled_min = zoomout_coords(co_scaled_min, -vBEZEL_INNER_ZOOM_adapted);
+            co_scaled_max = zoomout_coords(co_scaled_max, -vBEZEL_INNER_ZOOM_adapted);
+        }
+        if (DO_GAME_GEOM_OVERRIDE == 1.0) {
+            co_scaled_min = content_geom_override_zoom(co_scaled_min, GAME_GEOM_ASPECT, vIn_aspect, GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
+            co_scaled_max = content_geom_override_zoom(co_scaled_max, GAME_GEOM_ASPECT, vIn_aspect, GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
+        }
     }
- 	if (DO_GAME_GEOM_OVERRIDE == 1.0) {
-		co_scaled_min = content_geom_override_zoom(co_scaled_min, GAME_GEOM_ASPECT, vIn_aspect, GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
-        co_scaled_max = content_geom_override_zoom(co_scaled_max, GAME_GEOM_ASPECT, vIn_aspect, GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
-    }
+    
+
 
     //vfprintvalue = 1/(co_scaled_max.y - co_scaled_min.y);
     return 1 / vec2(co_scaled_max.x - co_scaled_min.x,
@@ -183,11 +186,11 @@ void main() {
 
     
 
-    //if (DO_GLOBAL_SHZO >0.5)
-    //    vTexCoord = zoom(vTexCoord + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM );
-    //..unbranched previous
+    //Global zoom, but only if not integer scaling
+    if (bNeed_NO_integer_scale) {
         vTexCoord = (zoom(vTexCoord + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM ) * DO_GLOBAL_SHZO) +
-                    (vTexCoord * (1-DO_GLOBAL_SHZO) );
+                (vTexCoord * (1-DO_GLOBAL_SHZO) );
+    }
 
     vOutputCoord = TexCoord ;
 

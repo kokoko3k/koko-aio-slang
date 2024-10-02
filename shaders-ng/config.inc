@@ -546,7 +546,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 //Bezel related
 #pragma parameter DO_BEZEL	      "★ Bezel enable? (be) ==>"				0.0   0.0 1.0 1.0
 #pragma parameter BEZEL_USE_STRAIGHT  "        Straight"				0.0	0.0 1.0  1.0 
-#pragma parameter BEZEL_INNER_ZOOM    "        Inner zoom (ignored with integer scaling)"	-0.18   -1.5 0.5 0.001
+#pragma parameter BEZEL_INNER_ZOOM    "        Inner zoom (ignored if integer scaling)"	-0.18   -1.5 0.5 0.001
 #pragma parameter BEZEL_FRAME_ZOOM    "        Frame zoom"				0.0   -1.5 0.5 0.001
 #pragma parameter BEZEL_R             "        Color: Red"				-0.35   -1.0 1.0  0.005
 #pragma parameter BEZEL_G             "        Color: Green"				-0.35  -1.0 1.0  0.005
@@ -622,7 +622,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 
 //Global Zoom/Offset
-#pragma parameter DO_GLOBAL_SHZO	 "★ Global shift/zoom enable? (zo) ==>"	0.0   0.0  1.0 	  1.0
+#pragma parameter DO_GLOBAL_SHZO	 "★ Global shift/zoom enable? (ignored if integer scaling) ==>"	0.0   0.0  1.0 	  1.0
 #pragma parameter GLOBAL_OFFX	 "        X axis shift "			0.0  -1.0  1.0    0.0005
 #pragma parameter GLOBAL_OFFY	 "        Y axis shift "			0.0  -1.0  1.0    0.0005
 #pragma parameter GLOBAL_ZOOM	 "        Zoom"					1.2   0.0  3.0    0.0005
@@ -649,11 +649,11 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter LABEL0051 " " 0.0 0.0 0.0 1.0
 
 //Modulate the image zooming depending on the image luminosity.
-#pragma parameter DO_DYNZOOM	     "★ Luminosity tied zoom (ignored with integer scaling) ==>"		0.015   0.0   1.0  0.005
+#pragma parameter DO_DYNZOOM	     "★ Luminosity tied zoom (ignored if integer scaling) ==>"		0.015   0.0   1.0  0.005
 #pragma parameter LABEL0032 " " 0.0 0.0 0.0 1.0
 
 //Autocrop
-#pragma parameter AUTOCROP_MAX	     "★ Autocrop: maximum amount (ignored with integer scaling) ==>"   0.0   0.0   0.5  0.01
+#pragma parameter AUTOCROP_MAX	     "★ Autocrop: maximum amount (ignored if integer scaling) ==>"   0.0   0.0   0.5  0.01
 #pragma parameter AUTOCROP_MIN	            "        Number of mandatory lines to crop"   1.0   0.0   10.0  1.0
 #pragma parameter AUTOCROP_SAMPLES          "        Samples per frame (faster response, higher gpu use)"     20.0   0.0   300.0 1.0
 #pragma parameter AUTOCROP_SAMPLE_SIZE      "        Sample size (big speedup, less accurate)" 2.0 0.0 5.0 1.0  
