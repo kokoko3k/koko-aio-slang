@@ -1398,7 +1398,7 @@ void main() {
                 float spot_vignette_noise = random_fast(vTexCoord) * (NOISEPOWER*2);
                 //vec2 sinco = cos((co_content-0.5) / V_SIZE) ;
                 //pixel_out = (pixel_out * V_POWER) * (sinco.y * sinco.x) + spot_vignette_noise;
-                pixel_out *= vignette_spot.x;
+                pixel_out = pixel_out * vignette_spot.x + spot_vignette_noise;
             }
 
         //Spot
@@ -1412,6 +1412,7 @@ void main() {
                     //pixel_out = mix(pixel_out, vec3(1.0), smoothstep(S_SIZE,0.0,dist) * S_POWER * canvas_bezel_screen); //<-- this is a bit slower, but more realistic.
                     
                     pixel_out += vignette_spot.y * canvas_bezel_screen;
+                    //pixel_out = max(pixel_out, vignette_spot.y * canvas_bezel_screen);
                     
             }
             //CONTENT STROBING
