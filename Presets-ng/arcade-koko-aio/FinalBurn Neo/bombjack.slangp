@@ -1,6 +1,5 @@
 #reference "../../shaders/shaders_slang/bezel/koko-aio/Presets-ng/Monitor-Ambilight-immersive.slangp"
-LUMINANCE = "0.000000"
-DO_IN_GLOW = "0.000000"
+TATE = "0.000000"
 BEZEL_INNER_ZOOM = "-0.110000"
 BEZEL_FRAME_ZOOM = "0.090000"
 BEZEL_R = "-0.220000"
@@ -19,3 +18,8 @@ GLOBAL_OFFY = "0.003000"
 GLOBAL_ZOOM = "1.065495"
 bg_under = "../../shaders/shaders_slang/bezel/koko-aio/textures/arcade_textures/bombjack.png"
 bg_over = "../../shaders/shaders_slang/bezel/koko-aio/textures/arcade_textures/bombjack.png"
+
+// Credits
+// shader by kokoko3k - https://github.com/kokoko3k/koko-aio-slang
+// artwork by ?
+// preset and artwork adjustments by estefan3112 - https://github.com/estefan3112/koko-aio-slang
