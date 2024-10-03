@@ -1258,13 +1258,8 @@ void main() {
         if (DO_TILT == 1.0)
             co_content = tilt(co_content, vIsRotated, TILT_X);
 
-    //Precalc Bezel coords, since it modifies content coords.
-        vec2 co_bezel = vec2(0.0);
-        if (DO_BEZEL == 1.0) {
-            co_content = zoomout_coords(co_content, -vBEZEL_INNER_ZOOM_adapted);
-            co_bezel = get_scaled_coords_for_bezel(vTexCoord, vIsRotated);
-        }
-
+    // if DO_BEZEL removed, since vBEZEL_INNER_ZOOM_adapted already takes care of it.
+            co_content = zoomout_coords(co_content, -vBEZEL_INNER_ZOOM_adapted);            
 
     //Curvature
         //Curvature has to come after inner zoom or bezel curved border will not match content
@@ -1277,21 +1272,13 @@ void main() {
     //It is still not perfect but a reasonable tradeoff by now.
         vec2 co_mirror = zoom(co_content, 1/BEZEL_REFL_ZOOMOUT_ROOM);
         
-
-
-  /*  float anaborderstart = 0.5;
-    float anabordersize = anaborderstart + SERVICE1;
-    float side_zoom = 1-smoothstep_fast(anaborderstart-0.5, anabordersize-0.5,abs(co_content.x-0.5)) ;
-    co_content.x = zoom1D(co_content.x, 1/side_zoom);
-    //FragColor = vec4(side_zoom) ; return;
-    */
     
-    float canvas_busy = 0.0; //<-- this allow for paint over not painted areas (spares gpu cycles)
-    //Create an alpha mask to write content into, it holds opacity info that will be used to compose:
+    float canvas_busy = 0.0; //<-- Use this to save GPU cycles by skipping already processed areas.
+    //Create an alpha mask to store opacity information for composing content:
         if (DO_CURVATURE == 1.0)  {
             canvas_busy = fn_border(co_content);
         } else {
-            canvas_busy = float(is_first_inside_rect(co_content, RECT01)); //FIXME: is step() faster?
+            canvas_busy = float(is_first_inside_rect(co_content, RECT01));
         }
         
 
@@ -1310,7 +1297,7 @@ void main() {
     #endif
     
     
-        //Dynamic lum dependant full screen zoom?
+    //Dynamic lum dependant full screen zoom and autocrop
     #ifndef D3D_WORKAROUND
         if (DO_DYNZOOM > 0.0)
             co_content = zoom(co_content, get_dyn_zoom(avglum_pass) );
@@ -1321,13 +1308,11 @@ void main() {
 
 
 
-
-
     vec3 pixel_ambi = vec3(0.0);
     vec3 pixel_under_content = vec3(0.0);
     vec3 pixel_out = vec3(0.0);
     
-    //Draw content only over the alpha mask, and sample ambientlight outside it to spare gpu cycles.
+    //Draw content only over the alpha mask, and sample ambientlight outside it to save gpu cycles.
         if (canvas_busy > 0.5) {
             pixel_out = fn_pixel_content(co_content) * canvas_busy;
                       
@@ -1383,7 +1368,9 @@ void main() {
     //Draw Bezel
         vec4 pixel_bezel;
         //SKIP LOGIC is inside fn_pixel_bezel
+        vec2 co_bezel = vec2(0.0);
         if (DO_BEZEL == 1.0) {
+            co_bezel = get_scaled_coords_for_bezel(vTexCoord, vIsRotated);
             pixel_bezel = fn_pixel_bezel(co_bezel, co_mirror, BG_IMAGE_NIGHTIFY * DO_BG_IMAGE, pixel_ambi);
             //If we used a smooth_border, canvas_busy is it, but since the content is in the bezel,
             //we can safely use it to smooth/darken the game border
