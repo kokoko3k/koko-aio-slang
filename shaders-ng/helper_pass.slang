@@ -49,30 +49,16 @@ void main() {
 	}*/
 	
 	//Vignette:
-	
-	float anoise;
-	if (DO_VIGNETTE + DO_SPOT > 0.0) {
-		float dynamicseed = mod(params.FrameCount, 30.0001);
-        anoise = random_fast(vTexCoord*dynamicseed) * -NOISEPOWER*2.0;
-		anoise = 0.0;
-	}
-	
 	if (DO_VIGNETTE == 1.0) {
-		vec2 sinco = cos((vTexCoord-0.5 + anoise) / V_SIZE) ;
+		vec2 sinco = cos((vTexCoord-0.5) / V_SIZE) ;
 		FragColor.z = V_POWER * (sinco.y * sinco.x);
 	}
 	//Spot:
 	if (DO_SPOT == 1.0) {
-		float dist = length( vec2(  (vTexCoord.x-0.5+anoise) * vIn_aspect, vTexCoord.y-0.5+anoise) +
+		float dist = length( vec2(  (vTexCoord.x-0.5) * vIn_aspect, vTexCoord.y-0.5) +
 								vec2(   S_POSITION_X      * vIn_aspect, S_POSITION_Y) );
 		FragColor.w = smoothstep(S_SIZE,0.0,dist) * S_POWER;
 		
 	}
-	if (DO_VIGNETTE + DO_SPOT > 0.0) {
-		FragColor.zw *= (1+ (params.FrameCount % 2 * 0.05  )      );
-	}
-    
-	
-
 
 }
