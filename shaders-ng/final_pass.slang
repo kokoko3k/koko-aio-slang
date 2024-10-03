@@ -432,6 +432,7 @@ layout(set = 0, binding = 12) uniform sampler2D halo_pass;
 #ifndef D3D_WORKAROUND
     layout(set = 0, binding = 13) uniform sampler2D final_passFeedback;
 #endif
+    layout(set = 0, binding = 14) uniform sampler2D helper_pass;
 layout(set = 0, binding = 15) uniform sampler2D DEBUG_TEXTURE;
 
 
@@ -982,7 +983,6 @@ vec2 get_scaled_coords_for_bezel(vec2 co, float isrotated) {
     co.y = zoom1D(co.y, BEZEL_ASPECT_CORRECTION );
 
     if (DO_TILT == 1.0) {
-               
         return tilt_bezel( co, isrotated, TILT_X);
     } else {
         return co;
@@ -1260,7 +1260,7 @@ void main() {
 
     // if DO_BEZEL removed, since vBEZEL_INNER_ZOOM_adapted already takes care of it.
             co_content = zoomout_coords(co_content, -vBEZEL_INNER_ZOOM_adapted);            
-
+    
     //Curvature
         //Curvature has to come after inner zoom or bezel curved border will not match content
         //curved border when inner zoom changes.
@@ -1391,23 +1391,28 @@ void main() {
         }
 
     if (canvas_bezel_screen > 0.5) {
-
+        vec2 vignette_spot = texture(helper_pass, vTexCoord).zw;
+        
         //Vignette
             if (DO_VIGNETTE == 1.0) {
                 float spot_vignette_noise = random_fast(vTexCoord) * (NOISEPOWER*2);
-                vec2 sinco = cos((co_content-0.5) / V_SIZE) ;
-                pixel_out = (pixel_out * V_POWER) * (sinco.y * sinco.x) + spot_vignette_noise;
+                //vec2 sinco = cos((co_content-0.5) / V_SIZE) ;
+                //pixel_out = (pixel_out * V_POWER) * (sinco.y * sinco.x) + spot_vignette_noise;
+                pixel_out *= vignette_spot.x;
             }
 
         //Spot
             if (DO_SPOT == 1.0) {
-                    float dist = length( vec2(  (co_content.x-0.5) * vIn_aspect, co_content.y-0.5) +
-                                         vec2(   S_POSITION_X      * vIn_aspect, S_POSITION_Y) );
+//                    float dist = length( vec2(  (co_content.x-0.5) * vIn_aspect, co_content.y-0.5) +
+//                                         vec2(   S_POSITION_X      * vIn_aspect, S_POSITION_Y) );
                     //pixel_out += smoothstep_fast(S_SIZE,0.0,dist) * (S_POWER * canvas_bezel_screen); //ASM PROOF FASTER
                     //pixel_out += smoothstep_cos(S_SIZE,0.0,dist) * (S_POWER * canvas_bezel_screen); //ASM PROOF MORE INSTRUCTIONS, LESS CYCLES
                     //pixel_out += smoothstep(S_SIZE,0.0,dist) * (S_POWER * canvas_bezel_screen);
-                    pixel_out += smoothstep_fast(S_SIZE * 0.90 ,0.0,dist) * (S_POWER * canvas_bezel_screen);
+//                    pixel_out += smoothstep_fast(S_SIZE * 0.90 ,0.0,dist) * (S_POWER * canvas_bezel_screen);
                     //pixel_out = mix(pixel_out, vec3(1.0), smoothstep(S_SIZE,0.0,dist) * S_POWER * canvas_bezel_screen); //<-- this is a bit slower, but more realistic.
+                    
+                    pixel_out += vignette_spot.y * canvas_bezel_screen;
+                    
             }
             //CONTENT STROBING
             //pixel_out = adaptive_strobe_checkerboard(pixel_out, vOutputCoord, global.FinalViewportSize.xy);
@@ -1415,7 +1420,7 @@ void main() {
             //pixel_out = strobe(pixel_out);  
     }
         //Background image have, no need to paint if not in the outer border:
-            if (DO_BG_IMAGE == 1.0 && BG_IMAGE_OVER == 0.0 && canvas_busy < 1.0) {
+            if ( (DO_BG_IMAGE == 1.0 && BG_IMAGE_OVER == 0.0) && (canvas_busy < 1.0) ) {
                 vec4 pixel_bg_image = fn_pixel_fgbg_image(bg_under);
 
                                                         //pixel_bg_image.rgb = scale_to_range_vec3(pixel_bg_image.rgb, -pixel_ambi, 1+pixel_ambi);
@@ -1513,7 +1518,7 @@ void main() {
         if (clip  > 1.0)
             pixel_out = 1-pixel_out;//;-clip;
     #endif
-
+   
     FragColor.rgb = pixel_out;
     
 }

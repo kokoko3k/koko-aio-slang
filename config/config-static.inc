@@ -136,6 +136,10 @@
 	// Luminosity tied zoom sampling point
 #define DYN_ZOOM_SAMPLING_POINT vec2(0.75)
 	
+	//Sampling points from test pass
+#define SMP_RANGE1 vec4(0.24,0.24  ,  0.26,0.26)
+#define SMP_POINT1 vec2(         0.25          )
+	
 // RESOLUTION SWITCH GLITCH EMULATION ##########################################################################################
 	//Where to sample alpha from avglum pass to understand if resolution has changed (very internal setting) 
 #define RESSWITCH_SAMPLING_POINT vec2(0.9) 

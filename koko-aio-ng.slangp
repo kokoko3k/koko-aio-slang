@@ -54,7 +54,7 @@
       backdrop_wrap_mode = "mirrored_repeat"
          backdrop_mipmap = "true"
 
-shaders = 16
+shaders = 17
 
 
 # The very first pass emulates:
@@ -284,6 +284,15 @@ float_framebuffer6 = true
             wrap_mode14 = "clamp_to_border"
     float_framebuffer14 = true
     
+# This is a small helper pass i can use to store values and things
+# that don't need high resolution like noise and vignette.
+           shader15 = shaders-ng/helper_pass.slang
+            alias15 = "helper_pass"
+       scale_type15 = absolute
+            scale15 = 64
+    filter_linear15 = true    
+        wrap_mode15 = "mirrored_repeat"
+    
 
 # This pass pass will do everything needed to happen at screen coordinates:
 # * The composition of the previous passes with the bloomed image, 
@@ -294,11 +303,11 @@ float_framebuffer6 = true
 # * Bezel
 # * Background images
 # ASMDEBUG: GLSL72
-           shader15 = shaders-ng/final_pass.slang
-            alias15 = "final_pass"
-    filter_linear15 = true
-       scale_type15 = viewport
-            scale15 = 1.0
-        wrap_mode15 = "mirrored_repeat"
+           shader16 = shaders-ng/final_pass.slang
+            alias16 = "final_pass"
+    filter_linear16 = true
+       scale_type16 = viewport
+            scale16 = 1.0
+        wrap_mode16 = "mirrored_repeat"
         
 
