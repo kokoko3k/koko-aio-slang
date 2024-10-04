@@ -228,6 +228,7 @@ float_framebuffer6 = true
         filter_linear9 = true
            scale_type9 = source
                 scale9 = 1.0
+    float_framebuffer9 = true
             wrap_mode9 = "mirrored_repeat"
 
 # In the following passes we emulate bloom effect.
