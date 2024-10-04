@@ -1394,9 +1394,8 @@ void main() {
         if (DO_SPOT + DO_VIGNETTE > 0.0) {
             vec2 displace = screen_space_displacement(vTexCoord, params.OutputSize.xy, 0.05); //deband
             vec2 vignette_spot = texture(helper_pass, vTexCoord + displace.xy ).zw;
-            pixel_out = max(pixel_out, vignette_spot.y);
-            pixel_out = pixel_out * vignette_spot.x * canvas_bezel_screen;
-
+            pixel_out = max(pixel_out, vignette_spot.y * canvas_bezel_screen);
+            pixel_out = pixel_out * vignette_spot.x;
         }
   
     }
