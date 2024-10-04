@@ -286,6 +286,7 @@ float_framebuffer6 = true
     
 # This is a small helper pass i can use to store values and things
 # that don't need high resolution like noise and vignette.
+# ASMDEBUG: GLSL72
            shader15 = shaders-ng/helper_pass.slang
             alias15 = "helper_pass"
        scale_type15 = absolute
@@ -302,12 +303,13 @@ float_framebuffer6 = true
 # * Black frame insertions
 # * Bezel
 # * Background images
-# ASMDEBUG: GLSL72
+# ASMDEBUG: GLSL75
            shader16 = shaders-ng/final_pass.slang
             alias16 = "final_pass"
     filter_linear16 = true
        scale_type16 = viewport
             scale16 = 1.0
-        wrap_mode16 = "mirrored_repeat"
+        //This needs to be clamp_to_edge or displacing vignette would dark screen borders
+        wrap_mode16 = "clamp_to_edge" 
         
 

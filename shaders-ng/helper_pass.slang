@@ -48,17 +48,19 @@ void main() {
 			FragColor.y = bezel_frame_lod;
 	}*/
 	
-	//Vignette:
-	if (DO_VIGNETTE == 1.0) {
-		vec2 sinco = cos((vTexCoord-0.5) / V_SIZE) ;
-		FragColor.z = V_POWER * (sinco.y * sinco.x);
-	}
-	//Spot:
-	if (DO_SPOT == 1.0) {
-		float dist = length( vec2(  (vTexCoord.x-0.5) * vIn_aspect, vTexCoord.y-0.5) +
-								vec2(   S_POSITION_X      * vIn_aspect, S_POSITION_Y) );
-		FragColor.w = smoothstep(S_SIZE,0.0,dist) * S_POWER;
+	//Vignette/Spot:
+		//Vignette defaults to 1.0 (multiplied in final pass), spot to 0.0 (added in final pass)
+		FragColor.zw = vec2(1.0, 0.0); 
 		
-	}
+		if (DO_VIGNETTE == 1.0) {
+			vec2 sinco = cos((vTexCoord-0.5) / V_SIZE) ;
+			FragColor.z = V_POWER * (sinco.y * sinco.x);
+		}
+		//Spot:
+		if (DO_SPOT == 1.0) {
+			float dist = length( vec2(  (vTexCoord.x-0.5) * vIn_aspect, vTexCoord.y-0.5) +
+			                     vec2(   S_POSITION_X     * vIn_aspect, S_POSITION_Y) );
+			FragColor.w = smoothstep(S_SIZE,0.0,dist) * S_POWER;
+		}
 
 }

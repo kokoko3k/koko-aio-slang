@@ -629,6 +629,22 @@ float random_fast(vec2 seed) {
     return noise_out;
 }
 
+vec3 screen_space_dither(vec2 frag_coord) { 
+	// Iestyn's RGB dither (7 asm instructions) from Portal 2 X360, slightly modified for VR. 
+	vec3 dither = vec3(dot(vec2(171.0, 231.0), frag_coord)); 
+	dither.rgb = fract(dither.rgb / vec3(103.0, 71.0, 97.0)); 
+
+	// Subtract 0.5 to avoid slightly brightening the whole viewport. 
+	return (dither.rgb - 0.5) / 255.0; 
+} 
+
+
+vec2 screen_space_displacement(vec2 co, vec2 outputsize, float size) { 
+	// Based on // Iestyn's RGB dither (7 asm instructions) from Portal 2 X360, slightly modified for VR. 
+	vec2 d = vec2(dot(vec2(171.0, 231.0), co*outputsize.xy)); 
+	d.xy = fract(d.xy / vec2(97.0, 71.0)); 
+	return d*size;
+} 
 
 
 //CURVATURE

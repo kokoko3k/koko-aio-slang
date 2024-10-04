@@ -1391,35 +1391,14 @@ void main() {
         }
 
     if (canvas_bezel_screen > 0.5) {
-        vec2 vignette_spot = texture(helper_pass, vTexCoord).zw;
-        
-        //Vignette
-            if (DO_VIGNETTE == 1.0) {
-                float spot_vignette_noise = random_fast(vTexCoord) * (NOISEPOWER*2);
-                //vec2 sinco = cos((co_content-0.5) / V_SIZE) ;
-                //pixel_out = (pixel_out * V_POWER) * (sinco.y * sinco.x) + spot_vignette_noise;
-                pixel_out = pixel_out * vignette_spot.x + spot_vignette_noise;
-                
-            }
+        if (DO_SPOT + DO_VIGNETTE > 0.0) {
+            vec2 displace = screen_space_displacement(vTexCoord, params.OutputSize.xy, 0.05); //deband
+            vec2 vignette_spot = texture(helper_pass, vTexCoord + displace.xy ).zw;
+            pixel_out = max(pixel_out, vignette_spot.y);
+            pixel_out = pixel_out * vignette_spot.x * canvas_bezel_screen;
 
-        //Spot
-            if (DO_SPOT == 1.0) {
-//                    float dist = length( vec2(  (co_content.x-0.5) * vIn_aspect, co_content.y-0.5) +
-//                                         vec2(   S_POSITION_X      * vIn_aspect, S_POSITION_Y) );
-                    //pixel_out += smoothstep_fast(S_SIZE,0.0,dist) * (S_POWER * canvas_bezel_screen); //ASM PROOF FASTER
-                    //pixel_out += smoothstep_cos(S_SIZE,0.0,dist) * (S_POWER * canvas_bezel_screen); //ASM PROOF MORE INSTRUCTIONS, LESS CYCLES
-                    //pixel_out += smoothstep(S_SIZE,0.0,dist) * (S_POWER * canvas_bezel_screen);
-//                    pixel_out += smoothstep_fast(S_SIZE * 0.90 ,0.0,dist) * (S_POWER * canvas_bezel_screen);
-                    //pixel_out = mix(pixel_out, vec3(1.0), smoothstep(S_SIZE,0.0,dist) * S_POWER * canvas_bezel_screen); //<-- this is a bit slower, but more realistic.
-                    
-                    //pixel_out += vignette_spot.y * canvas_bezel_screen;
-                    pixel_out = max(pixel_out, vignette_spot.y * canvas_bezel_screen);
-                    
-            }
-            //CONTENT STROBING
-            //pixel_out = adaptive_strobe_checkerboard(pixel_out, vOutputCoord, global.FinalViewportSize.xy);
-            //pixel_out = adaptive_strobe(pixel_out);
-            //pixel_out = strobe(pixel_out);  
+        }
+  
     }
         //Background image have, no need to paint if not in the outer border:
             if ( (DO_BG_IMAGE == 1.0 && BG_IMAGE_OVER == 0.0) && (canvas_busy < 1.0) ) {
