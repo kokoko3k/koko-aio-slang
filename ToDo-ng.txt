@@ -146,4 +146,4 @@ TODO:
 	    This requires powing on colortools pass, which i didn't because... can't remember.
 	    ...because is a big mess for all the shader.
 	    Optional linearization can be enabled via static config now.
-	    
+	[ ] rf-noise: apply after blur-y or maybe even after halo-y?
