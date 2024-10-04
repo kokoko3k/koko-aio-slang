@@ -290,7 +290,7 @@ float_framebuffer6 = true
            shader15 = shaders-ng/helper_pass.slang
             alias15 = "helper_pass"
        scale_type15 = absolute
-            scale15 = 64
+            scale15 = 128
     filter_linear15 = true    
         wrap_mode15 = "mirrored_repeat"
     

@@ -555,8 +555,6 @@ vec3 downsample_x( sampler2D tex, vec2 uv, vec4 sourcesize, float sharpness_add 
 
 vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inLum) {
 
-
-
     //Tate ? (other outputsize,originalsize and outputcoords "tated" in vertex shader.)
         if (vDo_Tate == 1.0) in_coords.xy = in_coords.yx;
 
@@ -1249,6 +1247,21 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
     return vec4(bezel_out, bezel_in.a);
 }
 
+float quasirandom(float n) {
+    //n has to be integer for this to work.
+  // https://extremelearning.com.au/unreasonable-effectiveness-of-quasirandom-sequences/
+  return fract(n*0.754877626895905);
+    //return abs(sin(n));
+}
+
+vec2 quasirandom(vec2 n) {
+    //n has to be integer for this to work.
+  // https://extremelearning.com.au/unreasonable-effectiveness-of-quasirandom-sequences/
+  return fract(n*0.754877626895905);
+    //return abs(sin(n));
+}
+
+
 
 void main() {
     //Initial content coords
@@ -1390,12 +1403,15 @@ void main() {
                 //canvas_bezel_screen = rect_bezel - rect_bezel* pixel_bezel.a; //ASM PROOF: SLOWER
         }
 
+
     if (canvas_bezel_screen > 0.5) {
-        if (DO_SPOT + DO_VIGNETTE > 0.0) {
-            vec2 displace = screen_space_displacement(vTexCoord, params.OutputSize.xy, 0.05); //deband
-            vec2 vignette_spot = texture(helper_pass, vTexCoord + displace.xy ).zw;
-            pixel_out = max(pixel_out, vignette_spot.y * canvas_bezel_screen);
+        if ( DO_SPOT + DO_VIGNETTE > 0.0 ) {
+            vec2 perlin = random_fast(vTexCoord*mod(params.FrameCount, 10.0001))
+                                    * 0.01
+                                    * vec2(1.0, -1.0);        
+            vec2 vignette_spot = texture(helper_pass, vTexCoord + perlin ).zw;
             pixel_out = pixel_out * vignette_spot.x;
+            pixel_out = max(pixel_out, vignette_spot.y * canvas_bezel_screen);
         }
   
     }
