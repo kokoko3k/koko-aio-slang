@@ -12,7 +12,7 @@ layout(location = 1) out float vIn_aspect;
 
 void main() {
 	gl_Position = global.MVP * Position;
-	vTexCoord = TexCoord;
+	vTexCoord = TexCoord + 0.0001;
 	vIn_aspect = get_in_aspect();
 }
 

@@ -1406,12 +1406,11 @@ void main() {
 
     if (canvas_bezel_screen > 0.5) {
         if ( DO_SPOT + DO_VIGNETTE > 0.0 ) {
-            vec2 perlin = random_fast(vTexCoord*mod(params.FrameCount, 10.0001))
-                                    * 0.01
-                                    * vec2(1.0, -1.0);        
-            vec2 vignette_spot = texture(helper_pass, vTexCoord + perlin ).zw;
+            float perlin = (random_fast(vTexCoord)-0.5) * (1/255.0);
+            vec2 vignette_spot = texture(helper_pass, vTexCoord).zw;
             pixel_out = pixel_out * vignette_spot.x;
             pixel_out = max(pixel_out, vignette_spot.y * canvas_bezel_screen);
+            pixel_out += perlin;
         }
   
     }
