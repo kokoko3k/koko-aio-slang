@@ -338,8 +338,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 // RF Noise
 #pragma parameter DO_RF_NOISE	 "★ RF Noise enable? (rf) ==>"			0.0 	0.0  1.0     1.0
-#pragma parameter RF_NOISE_STRENGTH "        Strength"				0.05	0.0 1.0 0.01
-#pragma parameter RF_NOISE_SPARK    "        Add snow"				0.07		0.0 0.9 0.01
+#pragma parameter RF_NOISE_STRENGTH "        Uniform noise"				0.05	0.0 1.0 0.01
+#pragma parameter RF_NOISE_SPARK    "        Snow noise"				0.07		0.0 0.9 0.01
 #pragma parameter LABEL0005 " " 0.0 0.0 0.0 1.0
 
 // Dedithering

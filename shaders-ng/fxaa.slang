@@ -880,7 +880,7 @@ void main() {
    if (DO_RF_NOISE > 0.0) {
       float anoise = random_fast(vTexCoord * vDynamicSeed);
       pixel_out.rgb = pixel_out.rgb
-                    + scale_to_range(anoise, -RF_NOISE_STRENGTH, RF_NOISE_STRENGTH) 
+                    + (anoise - 0.5) * RF_NOISE_STRENGTH*RF_NOISE_STRENGTH
                     + smoothstep_fast(0.90, 1.0, anoise) * RF_NOISE_SPARK;      
    }
 
