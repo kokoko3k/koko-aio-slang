@@ -186,7 +186,7 @@ vec3 pixel_bleed(vec4 pixel_in, vec2 co, sampler2D in_texture, float sourcesize_
    //Compute dot crawl "carrier"
    float sin_crawl = sin(co.y*params.OriginalSize.y*0.5 *pi-params.FrameCount*0.2);
    sin_crawl*=sin_crawl;
-   sin_crawl *= SAT_BLEED_DOTC * 2.0;
+   sin_crawl *= SAT_BLEED_DOTC;
    
    float apply_dot_crawl_prev = chroma_diff_prev*sin_crawl;
    float apply_dot_crawl_next = chroma_diff_next*sin_crawl;
