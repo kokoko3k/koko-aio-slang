@@ -136,6 +136,10 @@
     #define DO_SAT_BLEED		global.DO_SAT_BLEED
 #endif
 
+#ifndef SAT_BLEED_DOTC
+    #define SAT_BLEED_DOTC		global.SAT_BLEED_DOTC
+#endif
+
 #ifndef SAT_BLEED_SIZE
     #define SAT_BLEED_SIZE	global.SAT_BLEED_SIZE
 #endif

@@ -108,10 +108,6 @@ layout(set = 0, binding = 1) uniform sampler2D upscale_pass;
 
 
 
-
-
-
-
 vec4 deconvergence_shadow(vec2 coords, sampler2D in_texture, vec4 source_pixel) {
       //Emulates deconvergence or shadowing for dot matrix screens like Gameboy.
       //Since both effects should not coexist in real life, we use a singe function for both.
@@ -161,6 +157,7 @@ vec3 pixel_bleed(vec4 pixel_in, vec2 co, sampler2D in_texture, float sourcesize_
       size = min(20.0,SAT_BLEED_SIZE) ;
    #endif
    
+
    //apply strength modifier to blur ntsc artifacts more.
    float strength_modifier = 1.0;
    float w = SAT_BLEED_STRENGTH;
@@ -173,9 +170,26 @@ vec3 pixel_bleed(vec4 pixel_in, vec2 co, sampler2D in_texture, float sourcesize_
       
    vec3 blur_YIQ_l = pixel_in.rgb * vmat3_RGB2XXX;    //Work in YIQ space ot YUV space (ntsc, pal)
    vec3 blur_YIQ_r = blur_YIQ_l;
-   
+      
    vec2 off_l = vec2(SIDE_LEFT  * sourcesize_z,0.0);
    vec2 off_r = vec2(SIDE_RIGHT * sourcesize_z,0.0);
+   
+   //Compute chroma diff to drive dot crawl:
+   float chroma_now  = dot(blur_YIQ_l.yz, vec2(1.0));
+   float chroma_next = dot(vec3(texture(in_texture, co + off_r).rgb * vmat3_RGB2XXX).yz, vec2(1.0));
+   float chroma_prev = dot(vec3(texture(in_texture, co + off_l).rgb * vmat3_RGB2XXX).yz, vec2(1.0));
+   float chroma_diff_next = abs(chroma_next-chroma_now);
+   float chroma_diff_prev = abs(chroma_prev-chroma_now);
+   chroma_diff_next *= chroma_diff_next; // soft treshold for dot crawl
+   chroma_diff_prev *= chroma_diff_prev; // soft treshold for dot crawl
+   
+   //Compute dot crawl "carrier"
+   float sin_crawl = sin(co.y*params.OriginalSize.y*0.5 *pi-params.FrameCount*0.2);
+   sin_crawl*=sin_crawl;
+   sin_crawl *= SAT_BLEED_DOTC * 2.0;
+   
+   float apply_dot_crawl_prev = chroma_diff_prev*sin_crawl;
+   float apply_dot_crawl_next = chroma_diff_next*sin_crawl;
    
    for ( float i=1 ; i <= size ; i++ ){
       w=w/SAT_BLEED_FALLOFF;  //w = w * exp(i*i*(1-SAT_BLEED_FALLOFF)*0.1);
@@ -187,6 +201,16 @@ vec3 pixel_bleed(vec4 pixel_in, vec2 co, sampler2D in_texture, float sourcesize_
       //Blur Y, I and Q
       blur_YIQ_r = mix(blur_YIQ_r.xyz, smp_YIQ.xyz, w/vBandwidths);
    }
+   
+   
+
+   blur_YIQ_r.x = mix( blur_YIQ_r.x, (blur_YIQ_r.y + blur_YIQ_r.z)*0.5, apply_dot_crawl_next );
+   blur_YIQ_l.x = mix( blur_YIQ_l.x, (blur_YIQ_l.y + blur_YIQ_l.z)*0.5, apply_dot_crawl_prev );
+   
+   
+   //return vec3(apply_dot_crawl);
+   
+   
    vec3 blur_RGB_l = blur_YIQ_l * vmat3_XXX2RGB; //return to RGB colorspace
    vec3 blur_RGB_r = blur_YIQ_r * vmat3_XXX2RGB; //return to RGB colorspace
    
