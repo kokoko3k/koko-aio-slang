@@ -175,16 +175,18 @@ vec3 pixel_bleed(vec4 pixel_in, vec2 co, sampler2D in_texture, float sourcesize_
    vec2 off_r = vec2(SIDE_RIGHT * sourcesize_z,0.0);
    
    //Compute chroma diff to drive dot crawl:
-   float chroma_now  = dot(blur_YIQ_l.yz, vec2(1.0));
-   float chroma_next = dot(vec3(texture(in_texture, co + off_r).rgb * vmat3_RGB2XXX).yz, vec2(1.0));
-   float chroma_prev = dot(vec3(texture(in_texture, co + off_l).rgb * vmat3_RGB2XXX).yz, vec2(1.0));
+   vec2 blue_bias = vec2(1.0,0.6); //Allows to apply more dot crawl to blue?
+   float chroma_now  = dot(blur_YIQ_l.yz, blue_bias);
+   float chroma_next = dot(vec3(texture(in_texture, co + off_r).rgb * vmat3_RGB2XXX).yz, blue_bias);
+   float chroma_prev = dot(vec3(texture(in_texture, co + off_l).rgb * vmat3_RGB2XXX).yz, blue_bias);
    float chroma_diff_next = abs(chroma_next-chroma_now);
    float chroma_diff_prev = abs(chroma_prev-chroma_now);
    chroma_diff_next *= chroma_diff_next; // soft treshold for dot crawl
    chroma_diff_prev *= chroma_diff_prev; // soft treshold for dot crawl
    
    //Compute dot crawl "carrier"
-   float sin_crawl = sin(co.y*params.OriginalSize.y*0.5 *pi-params.FrameCount*0.2);
+   float dot_crawl_speed = 0.2;
+   float sin_crawl = sin(co.y*params.OriginalSize.y*0.5 *pi-params.FrameCount*dot_crawl_speed);
    sin_crawl*=sin_crawl;
    sin_crawl *= SAT_BLEED_DOTC;
    
