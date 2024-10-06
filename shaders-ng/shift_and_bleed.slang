@@ -174,25 +174,23 @@ vec3 pixel_bleed(vec4 pixel_in, vec2 co, sampler2D in_texture, float sourcesize_
    vec2 off_l = vec2(SIDE_LEFT  * sourcesize_z,0.0);
    vec2 off_r = vec2(SIDE_RIGHT * sourcesize_z,0.0);
    
-   //Compute chroma diff to drive dot crawl:
-   vec2 blue_bias = vec2(1.0,0.6); //Allows to apply more dot crawl to blue?
-   float chroma_now  = dot(blur_YIQ_l.yz, blue_bias);
-   float chroma_next = dot(vec3(texture(in_texture, co + off_r).rgb * vmat3_RGB2XXX).yz, blue_bias);
-   float chroma_prev = dot(vec3(texture(in_texture, co + off_l).rgb * vmat3_RGB2XXX).yz, blue_bias);
-   float chroma_diff_next = abs(chroma_next-chroma_now);
-   float chroma_diff_prev = abs(chroma_prev-chroma_now);
-   chroma_diff_next *= chroma_diff_next; // soft treshold for dot crawl
-   chroma_diff_prev *= chroma_diff_prev; // soft treshold for dot crawl
-   
-   //Compute dot crawl "carrier"
-   float dot_crawl_speed = 0.2;
-   float sin_crawl = sin(co.y*params.OriginalSize.y*0.5 *pi-params.FrameCount*dot_crawl_speed);
-   sin_crawl*=sin_crawl;
-   sin_crawl *= SAT_BLEED_DOTC;
-   
-   float apply_dot_crawl_prev = chroma_diff_prev*sin_crawl;
-   float apply_dot_crawl_next = chroma_diff_next*sin_crawl;
-   
+   //dot crawl: Compute chroma diff to drive it:
+      vec2 chroma_now  = blur_YIQ_l.yz;
+      vec2 chroma_next = (texture(in_texture, co + off_r).rgb * vmat3_RGB2XXX).yz;
+      vec2 chroma_prev = (texture(in_texture, co + off_l).rgb * vmat3_RGB2XXX).yz;
+      float chroma_diff_next = distance(chroma_next,chroma_now);
+      float chroma_diff_prev = distance(chroma_prev,chroma_now);
+      chroma_diff_next *= chroma_diff_next; // soft treshold for dot crawl
+      chroma_diff_prev *= chroma_diff_prev; // soft treshold for dot crawl
+   //dot crawl: Compute "carrier"
+      float dot_crawl_speed = 0.2;
+      float sin_crawl = sin(co.y*params.OriginalSize.y*0.5 *pi-params.FrameCount*dot_crawl_speed);
+   //dot crawl: Modulate strength via chroma differences
+      sin_crawl *=sin_crawl; //Soft treshold, less on less differences
+      sin_crawl *= SAT_BLEED_DOTC;
+      float apply_dot_crawl_prev = chroma_diff_prev*sin_crawl;
+      float apply_dot_crawl_next = chroma_diff_next*sin_crawl;
+      
    for ( float i=1 ; i <= size ; i++ ){
       w=w/SAT_BLEED_FALLOFF;  //w = w * exp(i*i*(1-SAT_BLEED_FALLOFF)*0.1);
       vec3 smp_YIQ = texture(in_texture, co - i*off_l ).rgb * vmat3_RGB2XXX;
@@ -204,13 +202,9 @@ vec3 pixel_bleed(vec4 pixel_in, vec2 co, sampler2D in_texture, float sourcesize_
       blur_YIQ_r = mix(blur_YIQ_r.xyz, smp_YIQ.xyz, w/vBandwidths);
    }
    
-   
-
-   blur_YIQ_r.x = mix( blur_YIQ_r.x, (blur_YIQ_r.y + blur_YIQ_r.z)*0.5, apply_dot_crawl_next );
-   blur_YIQ_l.x = mix( blur_YIQ_l.x, (blur_YIQ_l.y + blur_YIQ_l.z)*0.5, apply_dot_crawl_prev );
-   
-   
-   //return vec3(apply_dot_crawl);
+   //Mix dot crawl into the final color
+      blur_YIQ_r.x = mix( blur_YIQ_r.x, (blur_YIQ_r.y + blur_YIQ_r.z)*0.5, apply_dot_crawl_next );
+      blur_YIQ_l.x = mix( blur_YIQ_l.x, (blur_YIQ_l.y + blur_YIQ_l.z)*0.5, apply_dot_crawl_prev );
    
    
    vec3 blur_RGB_l = blur_YIQ_l * vmat3_XXX2RGB; //return to RGB colorspace
