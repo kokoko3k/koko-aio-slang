@@ -191,7 +191,7 @@ float dotc_carrier(float co_y, float OriginalSize_y) {
    float dot_crawl_speed = 0.2;
    float sin_crawl = sin(co_y*OriginalSize_y*0.5 *pi-params.FrameCount*dot_crawl_speed);
    sin_crawl *= sin_crawl;      //Make sin positive, double freq.
-   sin_crawl *= SAT_BLEED_DOTC; //Modulate strength
+   sin_crawl *= DOT_C; //Modulate strength
    return sin_crawl;
 }
 
@@ -210,7 +210,7 @@ vec3 dotc(sampler2D in_texture, vec2 co, vec4 tex_size, mat3 rgb2x, mat3 x2rgb){
    return cm*x2rgb;
 }
 
-vec4 pixel_bleed(vec4 pixel_in, vec2 co, sampler2D in_texture, float sourcesize_z) {
+vec4 pixel_bleed(vec4 pixel_in, vec2 co, sampler2D in_texture, float sourcesize_z) { //FIXME pixelin.a è passante, non serve vec4
    float size = SAT_BLEED_SIZE;
    #ifdef D3D_WORKAROUND
       // d3d11 compiler complains it is unable to unroll the loop because it is
@@ -221,10 +221,8 @@ vec4 pixel_bleed(vec4 pixel_in, vec2 co, sampler2D in_texture, float sourcesize_
    #endif
    
    if (SAT_BLEED_PAL == 1.0) {
-         pixel_in.rgb = dotc(upscale_pass, vTexCoord, params.OriginalSize, mat3_RGB2YUV, mat3_YUV2RGB);
          return vec4 ( pixel_bleed_side_PAL(pixel_in.rgb, co, size, in_texture, sourcesize_z), pixel_in.a);
    } else {
-         pixel_in.rgb = dotc(upscale_pass, vTexCoord, params.OriginalSize, mat3_RGB2YIQ, mat3_YIQ2RGB);
          return vec4 ( pixel_bleed_side_NTSC(pixel_in.rgba, co, size, in_texture, sourcesize_z), pixel_in.a);
    }
 }
@@ -241,6 +239,13 @@ void main() {
    
    
    //pixel_out.rgb = dotc(upscale_pass, vTexCoord, params.OriginalSize, mat3_RGB2YIQ, mat3_YIQ2RGB);
+   if (DOT_C > 0.0) {
+      if (DOT_C_YUV > 0.0)
+         pixel_out.rgb = dotc(upscale_pass, vTexCoord, params.OriginalSize, mat3_RGB2YUV, mat3_YUV2RGB);
+      else
+         pixel_out.rgb = dotc(upscale_pass, vTexCoord, params.OriginalSize, mat3_RGB2YIQ, mat3_YIQ2RGB);
+   }
+   
    
    //bleed
    if (DO_SAT_BLEED > 0.0)

@@ -153,6 +153,10 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
     It can be used with RGB shifting and image blurring to give the picture<br>
     an ntsc look without dealing with specific encoding/decoding stuffs. <br>
 
+**CVBS: Dot crawl**<br>
+    Emulates rolling chroma->luma crosstalks observed in composite signals.<br>
+    You can switch between pal and ntsc.<br>
+    
 **Persistence of phosphors:**<br>
     This emulates the unexcited phosphors that continue to emit light.
 

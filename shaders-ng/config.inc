@@ -299,7 +299,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	
 	float RF_NOISE_SPARK;
 	
-	float SAT_BLEED_DOTC;
+	float DOT_C;
+	float DOT_C_YUV;
 	
 } global;
 
@@ -371,13 +372,15 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 // YIQ/YUV bandwidth limited chroma bleeding.
 #pragma parameter DO_SAT_BLEED "★ CVBS: Bandwidth limited chroma enable? (cv) ==>"	0.0 	0.0 1.0 1.0
-#pragma parameter SAT_BLEED_PAL           "        Use PAL colorspace, not NTSC"	0.0 	 0.0 1.0 1.0
+#pragma parameter SAT_BLEED_PAL           "        Colorspace (NTSC, PAL)"	0.0 	 0.0 1.0 1.0
 #pragma parameter SAT_BLEED_STRENGTH      "        Strength"						1.0	 0.0 5.0  0.01
 #pragma parameter SAT_BLEED_SIZE          "        Size (capped to 5.0 in d3d)"		5.0  1.0 20.0  1.0
-#pragma parameter SAT_BLEED_FALLOFF  	  "        Falloff"				1.7 	 1.0 2.0 0.01
-#pragma parameter SAT_BLEED_DOTC          "        Dot Crawl"				0.5 	 0.0 2.0 0.01
+#pragma parameter SAT_BLEED_FALLOFF  	  "        Falloff"				1.7 	 1.0 2.0 0.01        
 #pragma parameter LABEL0008 " " 0.0 0.0 0.0 1.0
 
+#pragma parameter DOT_C     "★ CVBS: Dot crawl ==>"		0.0 	 0.0 2.0 0.01
+#pragma parameter DOT_C_YUV "        Colorspace (NTSC, PAL)"		0.0 	 0.0 1.0 1.0
+#pragma parameter LABEL0055 " " 0.0 0.0 0.0 1.0
 
 //Phosphor persistence
 #pragma parameter DO_PPERSISTENCE       "★ Persistence of phosphors enable? (ppe) ==>"	0.0	 0.0 1.0 1.0

@@ -136,8 +136,12 @@
     #define DO_SAT_BLEED		global.DO_SAT_BLEED
 #endif
 
-#ifndef SAT_BLEED_DOTC
-    #define SAT_BLEED_DOTC		global.SAT_BLEED_DOTC
+#ifndef DOT_C
+    #define DOT_C		global.DOT_C
+#endif
+
+#ifndef DOT_C_YIQ
+    #define DOT_C_YUV		global.DOT_C_YUV
 #endif
 
 #ifndef SAT_BLEED_SIZE
