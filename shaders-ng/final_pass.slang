@@ -30,7 +30,7 @@ layout(location = 3) out float vIsRotated;
 layout(location = 4) out float vScanlinePeriod;
 layout(location = 5) out float vInterlace_offset;
 layout(location = 6) out float vIn_aspect;
-layout(location = 7) out float vBEZEL_INNER_ZOOM_adapted;
+                                                    //NOTE location 7 is free to use (freed, was a float)
 layout(location = 8) out float vDo_Tate;
 layout(location = 9) out vec3 vDotMat_Grid_Color;
 layout(location = 10) out vec4 vPG_offsets_and_size;
@@ -146,10 +146,6 @@ vec2 get_zooms_modifier(float do_tate, bool bNeed_NO_integer_scale, bool isrotat
                     (co_scaled_min * (1-DO_GLOBAL_SHZO) );
         co_scaled_max = (zoom(co_scaled_max + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM ) * DO_GLOBAL_SHZO) +
                     (co_scaled_max * (1-DO_GLOBAL_SHZO) );
-        if (DO_BEZEL == 1.0) {
-            co_scaled_min = zoomout_coords(co_scaled_min, -vBEZEL_INNER_ZOOM_adapted);
-            co_scaled_max = zoomout_coords(co_scaled_max, -vBEZEL_INNER_ZOOM_adapted);
-        }
         if (DO_GAME_GEOM_OVERRIDE == 1.0) {
             co_scaled_min = content_geom_override_zoom(co_scaled_min, GAME_GEOM_ASPECT, vIn_aspect, GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
             co_scaled_max = content_geom_override_zoom(co_scaled_max, GAME_GEOM_ASPECT, vIn_aspect, GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
@@ -195,8 +191,6 @@ void main() {
     vOutputCoord = TexCoord ;
 
     vBg_img_coords =  get_bg_image_coords(vOutputCoord, bIsRotated);
-
-    vBEZEL_INNER_ZOOM_adapted = get_BEZEL_INNER_ZOOM() * DO_BEZEL;
 
     //Help scanline/pixelgrid code too:
         bool bIs_Interlaced = is_interlaced();
@@ -392,8 +386,7 @@ layout(location = 3) in float vIsRotated;
 layout(location = 4) in float vScanlinePeriod;
 layout(location = 5) in float vInterlace_offset;
 layout(location = 6) in float vIn_aspect;
-
-layout(location = 7) in float vBEZEL_INNER_ZOOM_adapted;
+                                                    //NOTE location 7 is free to use (freed, was a float)
 layout(location = 8) in float vDo_Tate;
 layout(location = 9) in vec3 vDotMat_Grid_Color;
 layout(location = 10) in vec4 vPG_offsets_and_size;
@@ -1270,10 +1263,7 @@ void main() {
     //Tilt?
         if (DO_TILT == 1.0)
             co_content = tilt(co_content, vIsRotated, TILT_X);
-
-    // if DO_BEZEL removed, since vBEZEL_INNER_ZOOM_adapted already takes care of it.
-            co_content = zoomout_coords(co_content, -vBEZEL_INNER_ZOOM_adapted);            
-    
+         
     //Curvature
         //Curvature has to come after inner zoom or bezel curved border will not match content
         //curved border when inner zoom changes.

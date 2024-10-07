@@ -232,8 +232,7 @@
 
 // #define DO_BEZEL  1.0              // ★ Bezel enable? 
 // #define BEZEL_USE_STRAIGHT  0.0    //         Straight
-// #define BEZEL_INNER_ZOOM  -0.01    //         Inner zoom (ignored with integer scaling)
-// #define BEZEL_FRAME_ZOOM  0.17     //         Frame zoom
+// #define BEZEL_FRAME_ZOOM  0.17     //         Frame Alignment
 // #define BEZEL_R  -0.35             //         Color: Red
 // #define BEZEL_G  -0.35             //         Color: Green
 // #define BEZEL_B  -0.35             //         Color: Blue	
@@ -247,6 +246,10 @@
 // #define BEZEL_SPCL_STRENGTH  0.5   //         Light fadeout distance
 // #define BEZEL_CORNER_DARK  0.8     //         Darken corners
 
+// #define DO_GLOBAL_SHZO  0.0  // ★ Global shift/zoom enable?
+// #define GLOBAL_OFFX  0.0     //         X axis shift 
+// #define GLOBAL_OFFY  0.0     //         Y axis shift 
+// #define GLOBAL_ZOOM  2.0     //         Zoom
 
 // #define DO_BG_IMAGE  0.0           // ★ Back/Foreground image enable?
 // #define BG_IMAGE_OVER  0.0         //       Image over content (alpha channel driven)?
@@ -291,12 +294,6 @@
 // #define S_POWER  0.05        //         Power
 
 
-// #define DO_GLOBAL_SHZO  0.0  // ★ Global shift/zoom enable?
-// #define GLOBAL_OFFX  0.0     //         X axis shift 
-// #define GLOBAL_OFFY  0.0     //         Y axis shift 
-// #define GLOBAL_ZOOM  2.0     //         Zoom
-
-
 // #define DO_TILT  0.0  // ★ Tilt enable? 
 // #define TILT_X  0.25  //         Tilt along X axis
 
@@ -316,7 +313,7 @@
 // #define AUTOCROP_SAMPLES 0.02       //        Transition speed 
 
 // #define DO_GAME_GEOM_OVERRIDE  0.0     // ★ Override content geometry enable?
-// #define GAME_GEOM_INT_SCALE  0.0       //         Integer scale (disables inner zoom) 2=No keep aspect
+// #define GAME_GEOM_INT_SCALE  0.0       //         Integer scale 2=No keep aspect
 // #define GAME_GEOM_INT_SCALE_MAX  10.0  //         .    Maximum integer scale
 // #define GAME_GEOM_INT_SCALE_OVR 1.0    //         .    Permit integer overscale by
 

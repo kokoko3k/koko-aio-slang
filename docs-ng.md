@@ -533,26 +533,20 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
 **Bezel:**<br>
     Draws a monitor frame with simulated reflections from the game content.<br>
     The monitor frame is an image loaded by the shader and is shipped<br>
-    in the "textures" shader subdirectory, named:
-    monitor_body_curved.png and monitor_body_straight.png
-    It has been made with the following rules that may come handy<br>
-    only if you want to edit it; otherwise go on.<br>
-    - The red channel represents the luminance information<br>
-    - The green channel represents the highlights<br>
-    - The alpha channel in the inner frame represents the part of the bezel<br>
-      that will be filled by the game content<br>
-    - The blue channel represents the part of the bezel that will be filled by the game reflection.<br>
+    in the "textures" shader subdirectory, named:<br>
+    monitor_body_curved.png and monitor_body_straight.png<br>
+    It has been made with the following rules that may come handy
+    only if you want to edit it; otherwise go on:<br>
+    * The red channel represents the luminance information<br>
+    * The green channel represents the highlights<br>
+    * The alpha channel in the inner frame represents the part of the bezel that will be filled by the game content<br>
+    * The blue channel represents the part of the bezel that will be filled by the game reflection.<br>
     
     Straight
         Use a straight bezel instead of a curved one.
-    Inner zoom:
-        Allows to shrink or expand the game content to fit the monitor frame.
-        "Fitting the monitor frame" is the ONLY scope of this option.
-        To have a smaller or larger than bezel screen, please use "Override content geometry"
-        options, or the reflections on the bezel will be misaligned.p
-
-    Frame zoom:
-          Allows to shrink or expand the monitor frame to fit the game content.
+    Frame alignment:
+        Allows to shrink or expand the monitor frame to fit game content and align reflections.
+        "Aligning the reflections" is the ONLY scope of this option.
     Bezel color (red,green,blue) and contrast:
         Allows to choose the color of the monitor frame.
     Reflections strength
@@ -570,7 +564,9 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
     Darken corners
         How much the bezel corners should be darkened
     
-
+**Global shift/zoom:**<br>
+    Zoom and shift everything on screen, but background pictures.<br>
+    
 **Backgound image:**<br>
     Draws an image on screen picked from the "textures" shader subdirectory,<br>
     named by default background_over.png and background_under.png<br>
@@ -696,9 +692,6 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
     Aspect Ratio Denominator:
         As long as Aspect Ratio Numerator is positive, this will
         be used as the denominator of the fraction.
-
-**Global shift/zoom image:**<br>
-    Zoom and shift everything on screen, but background pictures.<br>
 
 **Luminosity tied zoom:**<br>
     On older CRT monitors, the picture gets bigger when the image was brighter.<br>

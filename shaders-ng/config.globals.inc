@@ -377,10 +377,6 @@
     #define BEZEL_CON		global.BEZEL_CON
 #endif
 
-#ifndef BEZEL_INNER_ZOOM
-    #define BEZEL_INNER_ZOOM	global.BEZEL_INNER_ZOOM
-#endif
-
 #ifndef BEZEL_FRAME_ZOOM
     #define BEZEL_FRAME_ZOOM	global.BEZEL_FRAME_ZOOM
 #endif

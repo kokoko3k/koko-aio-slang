@@ -93,9 +93,6 @@ void main() {
 
         if (DO_GAME_GEOM_OVERRIDE > 0.5)
             pre_pass_coords = content_geom_override_zoom(pre_pass_coords, GAME_GEOM_ASPECT, get_in_aspect(), GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
-
-        if (DO_BEZEL > 0.5)
-            pre_pass_coords = zoomout_coords(pre_pass_coords, -get_BEZEL_INNER_ZOOM());
     }
 
 

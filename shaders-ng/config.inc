@@ -101,7 +101,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float BEZEL_G;
 	float BEZEL_B;
 	float BEZEL_CON;
-	float BEZEL_INNER_ZOOM;
+
 	float BEZEL_FRAME_ZOOM;
 	float BEZEL_USE_STRAIGHT;
 	float BEZEL_RFL_BLR_SHD;
@@ -552,8 +552,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 //Bezel related
 #pragma parameter DO_BEZEL	      "★ Bezel enable? (be) ==>"				0.0   0.0 1.0 1.0
 #pragma parameter BEZEL_USE_STRAIGHT  "        Straight"				0.0	0.0 1.0  1.0 
-#pragma parameter BEZEL_INNER_ZOOM    "        Inner zoom (ignored if integer scaling)"	-0.18   -1.5 0.5 0.001
-#pragma parameter BEZEL_FRAME_ZOOM    "        Frame zoom"				0.0   -1.5 0.5 0.001
+#pragma parameter BEZEL_FRAME_ZOOM    "        Frame Alignment"			0.0   -1.5 0.5 0.001
 #pragma parameter BEZEL_R             "        Color: Red"				-0.35   -1.0 1.0  0.005
 #pragma parameter BEZEL_G             "        Color: Green"				-0.35  -1.0 1.0  0.005
 #pragma parameter BEZEL_B             "        Color: Blue"				-0.35   -1.0 1.0  0.005
@@ -566,11 +565,14 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BEZEL_SPCL_STRENGTH "        Specularity strength"			0.5    0.0 3.0 0.05
 #pragma parameter BEZEL_LIGHT_NO_FADEOUT "        Light fadeout distance"		0.5    0.0 1.0 0.01
 #pragma parameter BEZEL_CORNER_DARK   "        Darken corners"					0.8    0.0 2.0 0.05
-
-
 #pragma parameter LABEL0024 " " 0.0 0.0 0.0 1.0
 
-
+//Global Zoom/Offset
+#pragma parameter DO_GLOBAL_SHZO	 "★ Global shift/zoom enable? (ignored if integer scaling) ==>"	0.0   0.0  1.0 	  1.0
+#pragma parameter GLOBAL_OFFX	 "        X axis shift "			0.0  -1.0  1.0    0.0005
+#pragma parameter GLOBAL_OFFY	 "        Y axis shift "			0.0  -1.0  1.0    0.0005
+#pragma parameter GLOBAL_ZOOM	 "        Zoom"					1.2   0.0  3.0    0.0005
+#pragma parameter LABEL0029 " " 0.0 0.0 0.0 1.0
 
 //Background Image
 #pragma parameter DO_BG_IMAGE	     "★ Back/Foreground image enable? (ba) ==>"				 0.0  0.0  1.0     1.0
@@ -625,14 +627,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter S_POWER	"        Power" 		0.12   0.01  1.0 0.01
 #pragma parameter LABEL0028 " " 0.0 0.0 0.0 1.0
 
-
-
-//Global Zoom/Offset
-#pragma parameter DO_GLOBAL_SHZO	 "★ Global shift/zoom enable? (ignored if integer scaling) ==>"	0.0   0.0  1.0 	  1.0
-#pragma parameter GLOBAL_OFFX	 "        X axis shift "			0.0  -1.0  1.0    0.0005
-#pragma parameter GLOBAL_OFFY	 "        Y axis shift "			0.0  -1.0  1.0    0.0005
-#pragma parameter GLOBAL_ZOOM	 "        Zoom"					1.2   0.0  3.0    0.0005
-#pragma parameter LABEL0029 " " 0.0 0.0 0.0 1.0
 
 //Tilt
 #pragma parameter DO_TILT	  	"★ Tilt enable? (ti) ==>"				0.0   0.0  1.0 	  1.0

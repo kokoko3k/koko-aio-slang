@@ -939,11 +939,6 @@ vec2 screen_space_displacement(vec2 co, vec2 outputsize, float size) {
 	}
 
 
-	float get_BEZEL_INNER_ZOOM() {
-		//Disables bezel inner zoom when using integer scaling
-		return BEZEL_INNER_ZOOM * float( !need_integer_scale() );
-	}
-
 	vec2 content_geom_override_shift(vec2 co, float aspect, float in_aspect, float vshift, float hshift, float out_zoom){
 		//Aspect (ASM PROOF: IFTHEN is better)
 		//shift
