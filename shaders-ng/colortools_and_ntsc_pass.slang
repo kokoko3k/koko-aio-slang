@@ -18,10 +18,10 @@
 
 
 //#define DEBUG
-   //#define DEBUG_COLOR_CALIB
+   #define DEBUG_COLOR_CALIB
    //#define DEBUG_TIME_FADE
    //#define DEBUG_SOLID_COLOR
-   #define DEBUG_STEP_GRADIENT
+   //#define DEBUG_STEP_GRADIENT
    //#define DEBUG_STEP_GRADIENT_V
    //#define DEBUG_BLINK
    //#define DEBUG_BLINK_CIRCLE
@@ -238,7 +238,12 @@ vec4 ntscdec(vec2 uv, vec3 RGB_ori) {
          //which is controlled by next pass filtering (What a mess RetroArch!)
          vec3 smp_mul_weight = vec3((texture_NEAREST(Source, pos, params.SourceSize).rgb * RGB2YIQ).x) * vNTSC_weights[n] ;
          
-         float carrier = (pos.x*params.SourceSize.x * NTSC_FILTER_SCF ) - (pos.y*params.SourceSize.y * NTSC_PHASE_SHIFT);
+         //you could animate the artifacts, unsure if it is a real thing (?)
+            float shift = 0.0;
+            //float slowness = 1; 
+            //shift = mod(params.FrameCount, params.SourceSize.y*slowness)*params.SourceSize.w/slowness;
+            
+         float carrier = ((pos.x-shift)* params.SourceSize.x * NTSC_FILTER_SCF ) - ((pos.y)*params.SourceSize.y * NTSC_PHASE_SHIFT);
          float phase = carrier * (pi * (2/3.0));
          float phase_shift_for_blur = phase  + PHASE_SHIFT_FOR_BLUR_K;
          
