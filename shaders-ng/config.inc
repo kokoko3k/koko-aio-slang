@@ -552,7 +552,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 //Bezel related
 #pragma parameter DO_BEZEL	      "★ Bezel enable? (be) ==>"				0.0   0.0 1.0 1.0
 #pragma parameter BEZEL_USE_STRAIGHT  "        Straight"				0.0	0.0 1.0  1.0 
-#pragma parameter BEZEL_FRAME_ZOOM    "        Frame Alignment"			0.0   -1.5 0.5 0.001
+#pragma parameter BEZEL_FRAME_ZOOM    "        Frame Alignment"			0.179   -1.5 0.5 0.001
 #pragma parameter BEZEL_R             "        Color: Red"				-0.35   -1.0 1.0  0.005
 #pragma parameter BEZEL_G             "        Color: Green"				-0.35  -1.0 1.0  0.005
 #pragma parameter BEZEL_B             "        Color: Blue"				-0.35   -1.0 1.0  0.005

@@ -232,7 +232,7 @@
 
 // #define DO_BEZEL  1.0              // ★ Bezel enable? 
 // #define BEZEL_USE_STRAIGHT  0.0    //         Straight
-// #define BEZEL_FRAME_ZOOM  0.17     //         Frame Alignment
+// #define BEZEL_FRAME_ZOOM  0.179    //         Frame Alignment
 // #define BEZEL_R  -0.35             //         Color: Red
 // #define BEZEL_G  -0.35             //         Color: Green
 // #define BEZEL_B  -0.35             //         Color: Blue	
