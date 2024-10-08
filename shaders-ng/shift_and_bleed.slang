@@ -259,6 +259,7 @@ void main() {
 
    
    //gamma-in
+   //pixel_out.rgb = max(vec3(0.0), pixel_out.rgb);  //<-- before powing make sure everything is over 0.0
    pixel_out.rgb = pow(pixel_out.rgb, vec3(IN_GLOW_GAMMA));
 
    FragColor = pixel_out;

@@ -28,11 +28,13 @@ layout(location = 11) out vec4 vxt1;
 layout(location = 12) out float vDo_flickering;
 layout(location = 13) out vec2  vFlickerCoords;
 layout(location = 14) out float vDynamicSeed;
-
+layout(location = 15) out float vDo_noise;
 void main() {
 
    gl_Position = global.MVP * Position;
    vTexCoord = TexCoord;
+   
+   vDo_noise = float( DO_RF_NOISE < -0.5 || ( DO_RF_NOISE > 0.5 && DO_IN_GLOW < 0.5 ));
    
    //Generate a seed that changes over time for temporal random noise
    vDynamicSeed = mod(params.FrameCount, 120.0001);
@@ -99,6 +101,7 @@ layout(location = 11) in vec4 vxt1;
 layout(location = 12) in float vDo_flickering;
 layout(location = 13) in vec2  vFlickerCoords;
 layout(location = 14) in float vDynamicSeed;
+layout(location = 15) in float vDo_noise;
 
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D Source;
@@ -877,8 +880,8 @@ void main() {
    #endif
 */
 
-   if (DO_RF_NOISE < -0.1) {
-      pixel_out.rgb += get_rf_noise(vTexCoord * vDynamicSeed);   
+   if (vDo_noise > 0.5 ) {
+      pixel_out.rgb += get_rf_noise(vTexCoord * vDynamicSeed);
    }
 
       
