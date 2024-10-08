@@ -1133,8 +1133,7 @@ vec3 fn_pixel_content(vec2 coords) {
         }
 
     // Apply gamma out:
-        if (DO_CCORRECTION == 1.0)
-            pixel_out = pow(max(pixel_out, vec3(0.0)),vec3(GAMMA_OUT));
+        pixel_out = pow(max(pixel_out, vec3(0.0)),vec3(GAMMA_OUT));
 
     //Bloom
         if (DO_BLOOM == 1.0 ) {
