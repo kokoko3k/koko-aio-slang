@@ -92,7 +92,7 @@ const mat3 mat3_YUV2RGB = mat3(
 
 
 
-vec4 deconvergence_shadow(vec2 coords, sampler2D in_texture, vec4 source_pixel) {
+vec3 deconvergence_shadow(vec2 coords, sampler2D in_texture, vec3 source_pixel) {
       //Emulates deconvergence or shadowing for dot matrix screens like Gameboy.
       //Since both effects should not coexist in real life, we use a singe function for both.
       //The function stays more or less the same, but rgb offsets calculated in vertex shader
@@ -124,8 +124,7 @@ vec4 deconvergence_shadow(vec2 coords, sampler2D in_texture, vec4 source_pixel) 
       vec3 deconvergence_mode = mix(source_pixel.rgb, pixel_offsetted, OFFSET_STRENGTH);
       vec3 shadow_mode = source_pixel.rgb - max( (source_pixel.rgb - pixel_offsetted), vec3(0.0) ) * DOT_M_SHADOW_STR;
       
-      return vec4( mix_step(deconvergence_mode, shadow_mode, vDo_shadow_mode),
-                   source_pixel.a );
+      return mix_step(deconvergence_mode, shadow_mode, vDo_shadow_mode);
 }
 
 #define SIDE_RIGHT 1
@@ -253,7 +252,7 @@ void main() {
    
    //... and shift
    if (vDecon_or_JustShadow > 0.0 )
-      pixel_out = deconvergence_shadow(vTexCoord, upscale_pass, pixel_out);
+      pixel_out.rgb = deconvergence_shadow(vTexCoord, upscale_pass, pixel_out.rgb);
 
 
    //gamma-in
