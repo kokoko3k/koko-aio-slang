@@ -102,7 +102,8 @@ vec3 deconvergence_shadow(vec2 coords, sampler2D in_texture, vec3 source_pixel) 
       vec3 pixel_offsetted;
       //Since we are sampling from a "clamp-to-border" texture, ensure we've no black bleeding
       //by clamping the texture coords
-      coords = clamp(coords,params.SourceSize.zw*1 ,1.0-params.SourceSize.zw);
+      //Removed, since shader chain changed, and this is now useless (?) WARNING <----
+      //coords = clamp(coords,params.SourceSize.zw*1 ,1.0-params.SourceSize.zw);
 
       vec2 R_offset=vR_offset;
       vec2 G_offset=vG_offset;
