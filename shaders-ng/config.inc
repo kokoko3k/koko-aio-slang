@@ -339,12 +339,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter LABEL0004 " " 0.0 0.0 0.0 1.0
 
 
-// RF Noise
-#pragma parameter DO_RF_NOISE	 "★ RF Noise enable? (rf) ==>"			0.0 	0.0  1.0     1.0
-#pragma parameter RF_NOISE_STRENGTH "        Uniform noise"				0.05	0.0 1.0 0.01
-#pragma parameter RF_NOISE_SPARK    "        Snow noise"				0.07		0.0 0.9 0.01
-#pragma parameter LABEL0005 " " 0.0 0.0 0.0 1.0
-
 // Dedithering
 #pragma parameter DO_DEDITHER         "★ Dedither enable? (not with NTSC artifacts) ==>"	0.0 	0.0 1.0 1.0
 #pragma parameter DEDITHER_TRESHMAX   "        Sensitivity"				1.2	0.0 3.0  0.1
@@ -404,7 +398,11 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 #pragma parameter LABEL0010 " " 0.0 0.0 0.0 1.0
 
-
+// RF Noise
+#pragma parameter DO_RF_NOISE	 "★ RF Noise? (Pre glow, Off, Post glow)  ==>"			0.0 	-1.0  1.0     1.0
+#pragma parameter RF_NOISE_STRENGTH "        Uniform noise"				0.05	0.0 1.0 0.01
+#pragma parameter RF_NOISE_SPARK    "        Snow noise"				0.07		0.0 1.0 0.01
+#pragma parameter LABEL0005 " " 0.0 0.0 0.0 1.0
 
 // Input Blur / light glowing
 #pragma parameter DO_IN_GLOW               "★ Glow/Blur enable? (gl) ==>"	 					0.0	0.0 1.0 1.0

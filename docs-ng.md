@@ -107,8 +107,6 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
     Use it if you don't want to blur the image and you still don't like<br>
     jagged or too much pixelated images.<br>
 
-** RF Noise:**<br>
-    Emulates radio frequency noise with a given strength<br>
 
 ** Dedither:**<br>
     Try to smooth dithering patterns.<br>
@@ -176,6 +174,17 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
     Focused Area:
         The area of the screen that will be in focus (affects previous 2 settings)
 
+        
+** RF Noise:**<br>
+    Emulates radio frequency noise with a given strength<br>
+    1 produce noise after the Glow/Blur pass, while -1 will move it before it.
+    Suggestions:
+    If you're blurring the image, is better to use 1.<br>
+    If you're glowing the image, prefer -1.<br>
+    
+    Uniform noise: Balanced noise that ranges from -x to +x.
+    Snow noise: Sparkling/Rarefied noise 
+        
         
 **Glow/Blur:**<br>
     Emulate the CRT glowing "feature", so that the brighter areas of<br>

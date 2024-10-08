@@ -16,7 +16,7 @@ layout(location = 4) out float vSharp_sub;
 layout(location = 11) out float vDeltaRenderOk;
 layout(location = 12) out float vWarpedglow;
 layout(location = 13) out vec2 vWarpedglow_offsets;
-layout(location = 14) out float vDo_edge_defocus;
+layout(location = 14) out float vDynamicSeed;
 
 void main() {
    gl_Position = global.MVP * Position;
@@ -61,6 +61,9 @@ void main() {
 
    float warpedglow_delta = params.OriginalSize.w * 0.5;
    vWarpedglow_offsets = vec2(0.0, +warpedglow_delta); 
+   
+   //Generate a seed that changes over time for temporal random noise
+   vDynamicSeed = mod(params.FrameCount, 120.0001);
 }
 
 
@@ -74,6 +77,7 @@ layout(location = 4) in float vSharp_sub;
 layout(location = 11) in float vDeltaRenderOk;
 layout(location = 12) in float vWarpedglow;
 layout(location = 13) in vec2 vWarpedglow_offsets;
+layout(location = 14) in float vDynamicSeed;
 
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 5) uniform sampler2D shift_and_bleed_pass;
@@ -189,6 +193,8 @@ void main() {
          pixel_glowed = glow_blur_bias(shift_and_bleed_pass, vTexCoord, pixel_glowed, in_glow_bias_faded);
       }
    
+   if (DO_RF_NOISE > 0.1)
+      pixel_glowed += get_rf_noise(vTexCoord * vDynamicSeed);
 
    FragColor = vec4(pixel_glowed * vGlow_Gain, warpedglow_or_DR);
    

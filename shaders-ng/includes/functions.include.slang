@@ -1732,9 +1732,15 @@ float distance_from_edge(vec2 co, float gamma) {
 }
 
 
-
 float distance_from_edge_linear(vec2 co, float aoe_inv) {
 	vec2 s = smoothstep_fast( vec2(0.5+eps), vec2(aoe_inv), abs(co-0.5));
 	float dfe=(s.x*s.y);
 	return dfe;
+}
+
+float get_rf_noise(vec2 seed) {
+	// Eg: seed = vTexCoord * mod(params.FrameCount, 120.0001);
+	float anoise = random_fast(seed);
+	return (anoise - 0.5) * RF_NOISE_STRENGTH*RF_NOISE_STRENGTH 
+	       + smoothstep_fast(0.98, 1.0, anoise) * RF_NOISE_SPARK;
 }
