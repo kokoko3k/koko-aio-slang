@@ -685,6 +685,7 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
     the core aspect ratio to the shader manually via the following parameters.<br>
     NOTE: The following parameters are ignored when not using ambient lights
     or background/foreground images.
+    In those cases, use options under "Override content geometry" section.
     
     Use -6 for MAME cores that pre-rotates the game (TATE mode)<br>
     With Mame 2003 plus and fbneo cores, koko-aio detects if the<br>
