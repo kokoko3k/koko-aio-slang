@@ -812,6 +812,7 @@ vec2 screen_space_displacement(vec2 co, vec2 outputsize, float size) {
 	}
 
 	float get_in_aspect() {
+		if (!border_needed()) return global.FinalViewportSize.x/global.FinalViewportSize.y; //image adapts to game window.
 		if (ASPECT_X ==  0) return 1.3333333333333; //all mame games, not rotated
 		if (ASPECT_X == -1) return 1.5;   // ntsc
 		if (ASPECT_X == -2) return 1.25;  // pal
@@ -819,6 +820,7 @@ vec2 screen_space_displacement(vec2 co, vec2 outputsize, float size) {
 		if (ASPECT_X == -4) return 1.428; // 10/7 megadrive
 		if (ASPECT_X == -5) return params.OriginalSize.x/params.OriginalSize.y; //uncorrected
 		if (ASPECT_X == -6) return 0.75;  // 3/4, pre-rotated (TATE) 1.33 games.
+
 		return ASPECT_X / ASPECT_Y ;
 	}
 

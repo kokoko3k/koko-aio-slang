@@ -680,10 +680,12 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
 **Spot:**<br>
     Simulates external light reflected by the monitor glass.<br>
             
-**Aspect Ratio:**<br>
-    When using effects that need Retroarch aspect ratio option<br>
-    to be set to "full", you have to provide the source aspect<br>
-    ratio to the shader.<br>
+**Aspect (active with ambient light or background image only):**<br>
+    If you set retroarch aspect ratio option to full, you have to provide<br>
+    the core aspect ratio to the shader manually via the following parameters.<br>
+    NOTE: The following parameters are ignored when not using ambient lights
+    or background/foreground images.
+    
     Use -6 for MAME cores that pre-rotates the game (TATE mode)<br>
     With Mame 2003 plus and fbneo cores, koko-aio detects if the<br>
     game is rotated or not without any user intervention.<br>
