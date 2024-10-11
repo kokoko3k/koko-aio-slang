@@ -136,6 +136,14 @@
     #define DO_SAT_BLEED		global.DO_SAT_BLEED
 #endif
 
+#ifndef DOT_C
+    #define DOT_C		global.DOT_C
+#endif
+
+#ifndef DOT_C_YIQ
+    #define DOT_C_YUV		global.DOT_C_YUV
+#endif
+
 #ifndef SAT_BLEED_SIZE
     #define SAT_BLEED_SIZE	global.SAT_BLEED_SIZE
 #endif
@@ -367,10 +375,6 @@
 
 #ifndef BEZEL_CON
     #define BEZEL_CON		global.BEZEL_CON
-#endif
-
-#ifndef BEZEL_INNER_ZOOM
-    #define BEZEL_INNER_ZOOM	global.BEZEL_INNER_ZOOM
 #endif
 
 #ifndef BEZEL_FRAME_ZOOM

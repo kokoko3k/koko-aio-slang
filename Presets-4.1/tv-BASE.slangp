@@ -66,13 +66,12 @@ DO_CURVATURE = "1.0"
 
 	
 DO_BEZEL = "0.0"
-        BEZEL_R = "-0.19"
-        BEZEL_G = "-0.19"
-        BEZEL_B = "-0.19"
-        BEZEL_CON = "2.18"
-        BEZEL_FRAME_ZOOM = "0.0"
-        BEZEL_INNER_ZOOM = "-0.163"
-		BEZEL_RFL_BLR_SHD = "-0.200000"
+	BEZEL_R = "-0.19"
+	BEZEL_G = "-0.19"
+	BEZEL_B = "-0.19"
+	BEZEL_CON = "2.18"
+	BEZEL_FRAME_ZOOM = "0.179000"
+	BEZEL_RFL_BLR_SHD = "-0.200000"
 
 
 DO_AMBILIGHT = 1.0

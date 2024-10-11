@@ -54,7 +54,7 @@
       backdrop_wrap_mode = "clamp_to_edge"
          backdrop_mipmap = "true"
 
-shaders = 16
+shaders = 17
 
 
 # The very first pass emulates:
@@ -228,6 +228,7 @@ float_framebuffer6 = true
         filter_linear9 = true
            scale_type9 = source
                 scale9 = 1.0
+    float_framebuffer9 = true
             wrap_mode9 = "mirrored_repeat"
 
 # In the following passes we emulate bloom effect.
@@ -284,6 +285,17 @@ float_framebuffer6 = true
             wrap_mode14 = "clamp_to_border"
     float_framebuffer14 = true
     
+# This is a small helper pass i can use to store values and things
+# that don't need high resolution like noise and vignette.
+# ASMDEBUG: GLSL72
+           shader15 = shaders-ng/helper_pass.slang
+            alias15 = "helper_pass"
+       scale_type15 = absolute
+float_framebuffer15 = true
+            scale15 = 128
+    filter_linear15 = true    
+        wrap_mode15 = "mirrored_repeat"
+    
 
 # This pass pass will do everything needed to happen at screen coordinates:
 # * The composition of the previous passes with the bloomed image, 
@@ -293,12 +305,13 @@ float_framebuffer6 = true
 # * Black frame insertions
 # * Bezel
 # * Background images
-# ASMDEBUG: GLSL72
-           shader15 = shaders-ng/final_pass.slang
-            alias15 = "final_pass"
-    filter_linear15 = true
-       scale_type15 = viewport
-            scale15 = 1.0
-        wrap_mode15 = "mirrored_repeat"
+# ASMDEBUG: GLSL75
+           shader16 = shaders-ng/final_pass.slang
+            alias16 = "final_pass"
+    filter_linear16 = true
+       scale_type16 = viewport
+            scale16 = 1.0
+        //This needs to be clamp_to_edge or displacing vignette would dark screen borders
+        wrap_mode16 = "clamp_to_edge" 
         
 

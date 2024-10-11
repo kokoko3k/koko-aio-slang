@@ -92,7 +92,7 @@ const mat3 mat3_YUV2RGB = mat3(
 
 
 
-vec4 deconvergence_shadow(vec2 coords, sampler2D in_texture, vec4 source_pixel) {
+vec3 deconvergence_shadow(vec2 coords, sampler2D in_texture, vec3 source_pixel) {
       //Emulates deconvergence or shadowing for dot matrix screens like Gameboy.
       //Since both effects should not coexist in real life, we use a singe function for both.
       //The function stays more or less the same, but rgb offsets calculated in vertex shader
@@ -102,12 +102,13 @@ vec4 deconvergence_shadow(vec2 coords, sampler2D in_texture, vec4 source_pixel) 
       vec3 pixel_offsetted;
       //Since we are sampling from a "clamp-to-border" texture, ensure we've no black bleeding
       //by clamping the texture coords
-      coords = clamp(coords,params.SourceSize.zw*1 ,1.0-params.SourceSize.zw);
-      
+      //Removed, since shader chain changed, and this is now useless (?) WARNING <----
+      //coords = clamp(coords,params.SourceSize.zw*1 ,1.0-params.SourceSize.zw);
+
       vec2 R_offset=vR_offset;
       vec2 G_offset=vG_offset;
       vec2 B_offset=vB_offset;
-      
+
       if (DOT_M_SHADOW_STR == 0.0) {
          // Edge defocus:
          float dist_from_edge = distance_from_edge_linear(coords, EDGE_DEFOCUS_AREA_INV);
@@ -116,16 +117,15 @@ vec4 deconvergence_shadow(vec2 coords, sampler2D in_texture, vec4 source_pixel) 
          G_offset *= offset_multiplier;
          B_offset *= offset_multiplier;
       }
-      
+
       pixel_offsetted.r=texture(in_texture,coords + R_offset).r;
       pixel_offsetted.g=texture(in_texture,coords + G_offset).g;
       pixel_offsetted.b=texture(in_texture,coords + B_offset).b;
-      
+     
       vec3 deconvergence_mode = mix(source_pixel.rgb, pixel_offsetted, OFFSET_STRENGTH);
       vec3 shadow_mode = source_pixel.rgb - max( (source_pixel.rgb - pixel_offsetted), vec3(0.0) ) * DOT_M_SHADOW_STR;
-      
-      return vec4( mix_step(deconvergence_mode, shadow_mode, vDo_shadow_mode),
-                   source_pixel.a );
+     
+      return mix_step(deconvergence_mode, shadow_mode, vDo_shadow_mode);
 }
 
 #define SIDE_RIGHT 1
@@ -134,8 +134,8 @@ vec4 deconvergence_shadow(vec2 coords, sampler2D in_texture, vec4 source_pixel) 
 vec3 pixel_bleed_side_NTSC(vec4 pixel_in, vec2 co, float size, sampler2D in_texture, float sourcesize_z) {
    //apply strength modifier to blur ntsc artifacts more.
    
-   float strength_modifier = mix(1.0, pixel_in.a, DO_NTSC_ARTIFACTS); 
-   float w = SAT_BLEED_STRENGTH * clamp (strength_modifier, (1-NTSC_ARTF_NOBLEED), 1.0 ); 
+   float strength_modifier = mix(1.0, pixel_in.a, DO_NTSC_ARTIFACTS);
+   float w = SAT_BLEED_STRENGTH * clamp (strength_modifier, (1-NTSC_ARTF_NOBLEED), 1.0 );
    vec3 blur_YIQ_l = pixel_in.rgb * mat3_RGB2YIQ;    //Work in YIQ space
    vec3 blur_YIQ_r = blur_YIQ_l;
 
@@ -149,7 +149,7 @@ vec3 pixel_bleed_side_NTSC(vec4 pixel_in, vec2 co, float size, sampler2D in_text
       vec3 smp_YIQ = texture(in_texture, co - i*off_l ).rgb * mat3_RGB2YIQ;
       //Blur Y, I and Q
       blur_YIQ_l = mix(blur_YIQ_l.xyz, smp_YIQ.xyz, w/vec3( bandwidth_mhz_Y_ntsc, bandwidth_mhz_I, bandwidth_mhz_Q));
-      
+     
       smp_YIQ = texture(in_texture, co - i*off_r ).rgb * mat3_RGB2YIQ;
       //Blur Y, I and Q
       blur_YIQ_r = mix(blur_YIQ_r.xyz, smp_YIQ.xyz, w/vec3( bandwidth_mhz_Y_ntsc, bandwidth_mhz_I, bandwidth_mhz_Q));
@@ -167,14 +167,14 @@ vec3 pixel_bleed_side_PAL(vec3 pixel_in, vec2 co, float size, sampler2D in_textu
    vec3 blur_YUV_r = blur_YUV_l;
    
    vec2 off_l = vec2(SIDE_LEFT  * sourcesize_z,0.0);
-   vec2 off_r = vec2(SIDE_RIGHT * sourcesize_z,0.0);   
+   vec2 off_r = vec2(SIDE_RIGHT * sourcesize_z,0.0);  
    for ( float i=1 ; i <= size ; i++ ){
       w=w/SAT_BLEED_FALLOFF;
       vec2 off = vec2(sourcesize_z*i,0.0);
       vec3 smp_YUV = texture(in_texture, co - i*off_l ).rgb * mat3_RGB2YUV;
       //Blur Y, U, V
       blur_YUV_l = mix(blur_YUV_l.xyz, smp_YUV.xyz, w/vec3( bandwidth_mhz_Y_pal, bandwidth_mhz_U, bandwidth_mhz_V));
-      
+     
       smp_YUV = texture(in_texture, co - i*off_r ).rgb * mat3_RGB2YUV;
       //Blur Y, U, V
       blur_YUV_r = mix(blur_YUV_r.xyz, smp_YUV.xyz, w/vec3( bandwidth_mhz_Y_pal, bandwidth_mhz_U, bandwidth_mhz_V));
@@ -187,13 +187,37 @@ vec3 pixel_bleed_side_PAL(vec3 pixel_in, vec2 co, float size, sampler2D in_textu
 
 }
 
-vec4 pixel_bleed(vec4 pixel_in, vec2 co, sampler2D in_texture, float sourcesize_z) {
+float dotc_carrier(float co_y, float OriginalSize_y) {
+   float dot_crawl_speed = 0.2;
+   float sin_crawl = sin(co_y*OriginalSize_y*0.5 *pi-params.FrameCount*dot_crawl_speed);
+   sin_crawl *= sin_crawl;      //Make sin positive, double freq.
+   sin_crawl *= DOT_C; //Modulate strength
+   return sin_crawl;
+}
+
+vec3 dotc(sampler2D in_texture, vec3 pixel_in, vec2 co, vec4 tex_size, mat3 rgb2x, mat3 x2rgb){
+   //Sample adiacent texels and switch colorspace.
+   vec3 cm = texture(in_texture, co).rgb * rgb2x;
+   vec3 cr = texture(in_texture, co + vec2(tex_size.z, 0.0)).rgb * rgb2x;
+   vec3 cl = texture(in_texture, co - vec2(tex_size.z, 0.0)).rgb * rgb2x;
+   //Compute max chroma change
+   float d = max(distance(cm.yz,cr.yz),  distance(cm.yz,cl.yz));
+   //crosstalk strength (powing d acts as a soft treshold, much less on lower chroma diffs)
+   float crosstalk = d * d * dotc_carrier(co.y, tex_size.y);
+   //chroma into luma
+   pixel_in *= rgb2x;
+   pixel_in.x = mix(pixel_in.x, (pixel_in.y+pixel_in.z)*0.5, crosstalk);
+   //return to rgb
+   return pixel_in*x2rgb;
+}
+
+vec4 pixel_bleed(vec4 pixel_in, vec2 co, sampler2D in_texture, float sourcesize_z) { //FIXME pixelin.a è passante, non serve vec4
    float size = SAT_BLEED_SIZE;
    #ifdef D3D_WORKAROUND
       // d3d11 compiler complains it is unable to unroll the loop because it is
       // clueless about the maximum pragma value; d3d12 hangs somewhere.
       size = min(5.0,SAT_BLEED_SIZE) ;
-   #else 
+   #else
       size = min(20.0,SAT_BLEED_SIZE) ;
    #endif
    
@@ -207,7 +231,7 @@ vec4 pixel_bleed(vec4 pixel_in, vec2 co, sampler2D in_texture, float sourcesize_
 void main() {
    vec4 pixel_out;
 
-   pixel_out = texture(upscale_pass, vTexCoord );
+   pixel_out = texture(upscale_pass, vTexCoord);
    
    // CVBS bleeding before deconvergence is better when CVBS bleeding is set to pal.
    // That way deconvergence does not completely succumb to PAL bleed.
@@ -217,13 +241,25 @@ void main() {
    //bleed
    if (DO_SAT_BLEED > 0.0)
       pixel_out = pixel_bleed(pixel_out, vTexCoord, upscale_pass, params.OriginalSize.z*0.5);
+
+
+   //pixel_out.rgb = dotc(upscale_pass, vTexCoord, params.OriginalSize, mat3_RGB2YIQ, mat3_YIQ2RGB);
+   if (DOT_C > 0.0) {
+      if (DOT_C_YUV > 0.0)
+         pixel_out.rgb = dotc(upscale_pass, pixel_out.rgb, vTexCoord, params.OriginalSize, mat3_RGB2YUV, mat3_YUV2RGB);
+      else
+         pixel_out.rgb = dotc(upscale_pass, pixel_out.rgb, vTexCoord, params.OriginalSize, mat3_RGB2YIQ, mat3_YIQ2RGB);
+   }
+   
    
    //... and shift
    if (vDecon_or_JustShadow > 0.0 )
-      pixel_out = deconvergence_shadow(vTexCoord, upscale_pass, pixel_out);
+      pixel_out.rgb = deconvergence_shadow(vTexCoord, upscale_pass, pixel_out.rgb);
 
 
+   
    //gamma-in
+   //pixel_out.rgb = max(vec3(0.0), pixel_out.rgb);  //<-- before powing make sure everything is over 0.0
    pixel_out.rgb = pow(pixel_out.rgb, vec3(IN_GLOW_GAMMA));
 
    FragColor = pixel_out;

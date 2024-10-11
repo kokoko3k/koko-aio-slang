@@ -629,6 +629,22 @@ float random_fast(vec2 seed) {
     return noise_out;
 }
 
+vec3 screen_space_dither(vec2 frag_coord) { 
+	// Iestyn's RGB dither (7 asm instructions) from Portal 2 X360, slightly modified for VR. 
+	vec3 dither = vec3(dot(vec2(171.0, 231.0), frag_coord)); 
+	dither.rgb = fract(dither.rgb / vec3(103.0, 71.0, 97.0)); 
+
+	// Subtract 0.5 to avoid slightly brightening the whole viewport. 
+	return (dither.rgb - 0.5) / 255.0; 
+} 
+
+
+vec2 screen_space_displacement(vec2 co, vec2 outputsize, float size) { 
+	// Based on // Iestyn's RGB dither (7 asm instructions) from Portal 2 X360, slightly modified for VR. 
+	vec2 d = vec2(dot(vec2(171.0, 231.0), co*outputsize.xy)); 
+	d.xy = fract(d.xy / vec2(97.0, 71.0)); 
+	return d*size;
+} 
 
 
 //CURVATURE
@@ -796,6 +812,7 @@ float random_fast(vec2 seed) {
 	}
 
 	float get_in_aspect() {
+		if (!border_needed()) return global.FinalViewportSize.x/global.FinalViewportSize.y; //image adapts to game window.
 		if (ASPECT_X ==  0) return 1.3333333333333; //all mame games, not rotated
 		if (ASPECT_X == -1) return 1.5;   // ntsc
 		if (ASPECT_X == -2) return 1.25;  // pal
@@ -803,6 +820,7 @@ float random_fast(vec2 seed) {
 		if (ASPECT_X == -4) return 1.428; // 10/7 megadrive
 		if (ASPECT_X == -5) return params.OriginalSize.x/params.OriginalSize.y; //uncorrected
 		if (ASPECT_X == -6) return 0.75;  // 3/4, pre-rotated (TATE) 1.33 games.
+
 		return ASPECT_X / ASPECT_Y ;
 	}
 
@@ -922,11 +940,6 @@ float random_fast(vec2 seed) {
 		return DO_GAME_GEOM_OVERRIDE * GAME_GEOM_INT_SCALE != 0.0;
 	}
 
-
-	float get_BEZEL_INNER_ZOOM() {
-		//Disables bezel inner zoom when using integer scaling
-		return BEZEL_INNER_ZOOM * float( !need_integer_scale() );
-	}
 
 	vec2 content_geom_override_shift(vec2 co, float aspect, float in_aspect, float vshift, float hshift, float out_zoom){
 		//Aspect (ASM PROOF: IFTHEN is better)
@@ -1721,9 +1734,15 @@ float distance_from_edge(vec2 co, float gamma) {
 }
 
 
-
 float distance_from_edge_linear(vec2 co, float aoe_inv) {
 	vec2 s = smoothstep_fast( vec2(0.5+eps), vec2(aoe_inv), abs(co-0.5));
 	float dfe=(s.x*s.y);
 	return dfe;
+}
+
+float get_rf_noise(vec2 seed) {
+	// Eg: seed = vTexCoord * mod(params.FrameCount, 120.0001);
+	float anoise = random_fast(seed);
+	return (anoise - 0.5) * RF_NOISE_STRENGTH*RF_NOISE_STRENGTH 
+	       + smoothstep_fast(0.98, 1.0, anoise) * RF_NOISE_SPARK;
 }

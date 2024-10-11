@@ -30,7 +30,7 @@ layout(location = 3) out float vIsRotated;
 layout(location = 4) out float vScanlinePeriod;
 layout(location = 5) out float vInterlace_offset;
 layout(location = 6) out float vIn_aspect;
-layout(location = 7) out float vBEZEL_INNER_ZOOM_adapted;
+                                                    //NOTE location 7 is free to use (freed, was a float)
 layout(location = 8) out float vDo_Tate;
 layout(location = 9) out vec3 vDotMat_Grid_Color;
 layout(location = 10) out vec4 vPG_offsets_and_size;
@@ -140,20 +140,19 @@ vec2 get_zooms_modifier(float do_tate, bool bNeed_NO_integer_scale, bool isrotat
         co_scaled_max = integer_scale(co_scaled_max, vIn_aspect, isrotated, do_tate, GAME_GEOM_INT_SCALE-1.0 );
     }
 
-
-    co_scaled_min = (zoom(co_scaled_min + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM ) * DO_GLOBAL_SHZO) +
-                (co_scaled_min * (1-DO_GLOBAL_SHZO) );
-    co_scaled_max = (zoom(co_scaled_max + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM ) * DO_GLOBAL_SHZO) +
-                (co_scaled_max * (1-DO_GLOBAL_SHZO) );
-
-    if (DO_BEZEL == 1.0) {
-        co_scaled_min = zoomout_coords(co_scaled_min, -vBEZEL_INNER_ZOOM_adapted);
-        co_scaled_max = zoomout_coords(co_scaled_max, -vBEZEL_INNER_ZOOM_adapted);
+    //Other zoom modifiers allowed only without integer scaling.
+    if ( bNeed_NO_integer_scale ) {
+        co_scaled_min = (zoom(co_scaled_min + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM ) * DO_GLOBAL_SHZO) +
+                    (co_scaled_min * (1-DO_GLOBAL_SHZO) );
+        co_scaled_max = (zoom(co_scaled_max + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM ) * DO_GLOBAL_SHZO) +
+                    (co_scaled_max * (1-DO_GLOBAL_SHZO) );
+        if (DO_GAME_GEOM_OVERRIDE == 1.0) {
+            co_scaled_min = content_geom_override_zoom(co_scaled_min, GAME_GEOM_ASPECT, vIn_aspect, GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
+            co_scaled_max = content_geom_override_zoom(co_scaled_max, GAME_GEOM_ASPECT, vIn_aspect, GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
+        }
     }
- 	if (DO_GAME_GEOM_OVERRIDE == 1.0) {
-		co_scaled_min = content_geom_override_zoom(co_scaled_min, GAME_GEOM_ASPECT, vIn_aspect, GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
-        co_scaled_max = content_geom_override_zoom(co_scaled_max, GAME_GEOM_ASPECT, vIn_aspect, GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
-    }
+    
+
 
     //vfprintvalue = 1/(co_scaled_max.y - co_scaled_min.y);
     return 1 / vec2(co_scaled_max.x - co_scaled_min.x,
@@ -183,17 +182,15 @@ void main() {
 
     
 
-    //if (DO_GLOBAL_SHZO >0.5)
-    //    vTexCoord = zoom(vTexCoord + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM );
-    //..unbranched previous
+    //Global zoom, but only if not integer scaling
+    if (bNeed_NO_integer_scale) {
         vTexCoord = (zoom(vTexCoord + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM ) * DO_GLOBAL_SHZO) +
-                    (vTexCoord * (1-DO_GLOBAL_SHZO) );
+                (vTexCoord * (1-DO_GLOBAL_SHZO) );
+    }
 
     vOutputCoord = TexCoord ;
 
     vBg_img_coords =  get_bg_image_coords(vOutputCoord, bIsRotated);
-
-    vBEZEL_INNER_ZOOM_adapted = get_BEZEL_INNER_ZOOM() * DO_BEZEL;
 
     //Help scanline/pixelgrid code too:
         bool bIs_Interlaced = is_interlaced();
@@ -389,8 +386,7 @@ layout(location = 3) in float vIsRotated;
 layout(location = 4) in float vScanlinePeriod;
 layout(location = 5) in float vInterlace_offset;
 layout(location = 6) in float vIn_aspect;
-
-layout(location = 7) in float vBEZEL_INNER_ZOOM_adapted;
+                                                    //NOTE location 7 is free to use (freed, was a float)
 layout(location = 8) in float vDo_Tate;
 layout(location = 9) in vec3 vDotMat_Grid_Color;
 layout(location = 10) in vec4 vPG_offsets_and_size;
@@ -429,6 +425,7 @@ layout(set = 0, binding = 12) uniform sampler2D halo_pass;
 #ifndef D3D_WORKAROUND
     layout(set = 0, binding = 13) uniform sampler2D final_passFeedback;
 #endif
+    layout(set = 0, binding = 14) uniform sampler2D helper_pass;
 layout(set = 0, binding = 15) uniform sampler2D DEBUG_TEXTURE;
 
 
@@ -550,8 +547,6 @@ vec3 downsample_x( sampler2D tex, vec2 uv, vec4 sourcesize, float sharpness_add 
 
 
 vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inLum) {
-
-
 
     //Tate ? (other outputsize,originalsize and outputcoords "tated" in vertex shader.)
         if (vDo_Tate == 1.0) in_coords.xy = in_coords.yx;
@@ -979,7 +974,6 @@ vec2 get_scaled_coords_for_bezel(vec2 co, float isrotated) {
     co.y = zoom1D(co.y, BEZEL_ASPECT_CORRECTION );
 
     if (DO_TILT == 1.0) {
-               
         return tilt_bezel( co, isrotated, TILT_X);
     } else {
         return co;
@@ -1139,8 +1133,7 @@ vec3 fn_pixel_content(vec2 coords) {
         }
 
     // Apply gamma out:
-        if (DO_CCORRECTION == 1.0)
-            pixel_out = pow(max(pixel_out, vec3(0.0)),vec3(GAMMA_OUT));
+        pixel_out = pow(max(pixel_out, vec3(0.0)),vec3(GAMMA_OUT));
 
     //Bloom
         if (DO_BLOOM == 1.0 ) {
@@ -1202,8 +1195,8 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
 
             //Sample the reflection pass with small offset to simulate the roughness
                 pixel_mirrored = texture(reflected_blurred_pass, coords_for_mirror + roughness);
-                float fcorners_shade = 1 - corners_shade(coords_for_bezel, 1.0) * BEZEL_CORNER_DARK;
-
+                //float fcorners_shade = 1 - corners_shade(coords_for_bezel, 1.0) * BEZEL_CORNER_DARK;
+                float fcorners_shade = pixel_mirrored.a;
             //Show less reflections in the corners
                 pixel_mirrored.rgb *= fcorners_shade;
 
@@ -1246,6 +1239,21 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
     return vec4(bezel_out, bezel_in.a);
 }
 
+float quasirandom(float n) {
+    //n has to be integer for this to work.
+  // https://extremelearning.com.au/unreasonable-effectiveness-of-quasirandom-sequences/
+  return fract(n*0.754877626895905);
+    //return abs(sin(n));
+}
+
+vec2 quasirandom(vec2 n) {
+    //n has to be integer for this to work.
+  // https://extremelearning.com.au/unreasonable-effectiveness-of-quasirandom-sequences/
+  return fract(n*0.754877626895905);
+    //return abs(sin(n));
+}
+
+
 
 void main() {
     //Initial content coords
@@ -1254,15 +1262,7 @@ void main() {
     //Tilt?
         if (DO_TILT == 1.0)
             co_content = tilt(co_content, vIsRotated, TILT_X);
-
-    //Precalc Bezel coords, since it modifies content coords.
-        vec2 co_bezel = vec2(0.0);
-        if (DO_BEZEL == 1.0) {
-            co_content = zoomout_coords(co_content, -vBEZEL_INNER_ZOOM_adapted);
-            co_bezel = get_scaled_coords_for_bezel(vTexCoord, vIsRotated);
-        }
-
-
+         
     //Curvature
         //Curvature has to come after inner zoom or bezel curved border will not match content
         //curved border when inner zoom changes.
@@ -1274,21 +1274,13 @@ void main() {
     //It is still not perfect but a reasonable tradeoff by now.
         vec2 co_mirror = zoom(co_content, 1/BEZEL_REFL_ZOOMOUT_ROOM);
         
-
-
-  /*  float anaborderstart = 0.5;
-    float anabordersize = anaborderstart + SERVICE1;
-    float side_zoom = 1-smoothstep_fast(anaborderstart-0.5, anabordersize-0.5,abs(co_content.x-0.5)) ;
-    co_content.x = zoom1D(co_content.x, 1/side_zoom);
-    //FragColor = vec4(side_zoom) ; return;
-    */
     
-    float canvas_busy = 0.0; //<-- this allow for paint over not painted areas (spares gpu cycles)
-    //Create an alpha mask to write content into, it holds opacity info that will be used to compose:
+    float canvas_busy = 0.0; //<-- Use this to save GPU cycles by skipping already processed areas.
+    //Create an alpha mask to store opacity information for composing content:
         if (DO_CURVATURE == 1.0)  {
             canvas_busy = fn_border(co_content);
         } else {
-            canvas_busy = float(is_first_inside_rect(co_content, RECT01)); //FIXME: is step() faster?
+            canvas_busy = float(is_first_inside_rect(co_content, RECT01));
         }
         
 
@@ -1307,7 +1299,7 @@ void main() {
     #endif
     
     
-        //Dynamic lum dependant full screen zoom?
+    //Dynamic lum dependant full screen zoom and autocrop
     #ifndef D3D_WORKAROUND
         if (DO_DYNZOOM > 0.0)
             co_content = zoom(co_content, get_dyn_zoom(avglum_pass) );
@@ -1318,13 +1310,11 @@ void main() {
 
 
 
-
-
     vec3 pixel_ambi = vec3(0.0);
     vec3 pixel_under_content = vec3(0.0);
     vec3 pixel_out = vec3(0.0);
     
-    //Draw content only over the alpha mask, and sample ambientlight outside it to spare gpu cycles.
+    //Draw content only over the alpha mask, and sample ambientlight outside it to save gpu cycles.
         if (canvas_busy > 0.5) {
             pixel_out = fn_pixel_content(co_content) * canvas_busy;
                       
@@ -1380,7 +1370,9 @@ void main() {
     //Draw Bezel
         vec4 pixel_bezel;
         //SKIP LOGIC is inside fn_pixel_bezel
+        vec2 co_bezel = vec2(0.0);
         if (DO_BEZEL == 1.0) {
+            co_bezel = get_scaled_coords_for_bezel(vTexCoord, vIsRotated);
             pixel_bezel = fn_pixel_bezel(co_bezel, co_mirror, BG_IMAGE_NIGHTIFY * DO_BG_IMAGE, pixel_ambi);
             //If we used a smooth_border, canvas_busy is it, but since the content is in the bezel,
             //we can safely use it to smooth/darken the game border
@@ -1400,32 +1392,19 @@ void main() {
                 //canvas_bezel_screen = rect_bezel - rect_bezel* pixel_bezel.a; //ASM PROOF: SLOWER
         }
 
+
     if (canvas_bezel_screen > 0.5) {
-
-        //Vignette
-            if (DO_VIGNETTE == 1.0) {
-                float spot_vignette_noise = random_fast(vTexCoord) * (NOISEPOWER*2);
-                vec2 sinco = cos((co_content-0.5) / V_SIZE) ;
-                pixel_out = (pixel_out * V_POWER) * (sinco.y * sinco.x) + spot_vignette_noise;
-            }
-
-        //Spot
-            if (DO_SPOT == 1.0) {
-                    float dist = length( vec2(  (co_content.x-0.5) * vIn_aspect, co_content.y-0.5) +
-                                         vec2(   S_POSITION_X      * vIn_aspect, S_POSITION_Y) );
-                    //pixel_out += smoothstep_fast(S_SIZE,0.0,dist) * (S_POWER * canvas_bezel_screen); //ASM PROOF FASTER
-                    //pixel_out += smoothstep_cos(S_SIZE,0.0,dist) * (S_POWER * canvas_bezel_screen); //ASM PROOF MORE INSTRUCTIONS, LESS CYCLES
-                    //pixel_out += smoothstep(S_SIZE,0.0,dist) * (S_POWER * canvas_bezel_screen);
-                    pixel_out += smoothstep_fast(S_SIZE * 0.90 ,0.0,dist) * (S_POWER * canvas_bezel_screen);
-                    //pixel_out = mix(pixel_out, vec3(1.0), smoothstep(S_SIZE,0.0,dist) * S_POWER * canvas_bezel_screen); //<-- this is a bit slower, but more realistic.
-            }
-            //CONTENT STROBING
-            //pixel_out = adaptive_strobe_checkerboard(pixel_out, vOutputCoord, global.FinalViewportSize.xy);
-            //pixel_out = adaptive_strobe(pixel_out);
-            //pixel_out = strobe(pixel_out);  
+        if ( DO_SPOT + DO_VIGNETTE > 0.0 ) {
+            float perlin = (random_fast(vTexCoord)-0.5) * (1/255.0);
+            vec2 vignette_spot = texture(helper_pass, vTexCoord).zw;
+            pixel_out = pixel_out * vignette_spot.x;
+            pixel_out = max(pixel_out, vignette_spot.y * canvas_bezel_screen);
+            pixel_out += perlin;
+        }
+  
     }
         //Background image have, no need to paint if not in the outer border:
-            if (DO_BG_IMAGE == 1.0 && BG_IMAGE_OVER == 0.0 && canvas_busy < 1.0) {
+            if ( (DO_BG_IMAGE == 1.0 && BG_IMAGE_OVER == 0.0) && (canvas_busy < 1.0) ) {
                 vec4 pixel_bg_image = fn_pixel_fgbg_image(bg_under);
 
                                                         //pixel_bg_image.rgb = scale_to_range_vec3(pixel_bg_image.rgb, -pixel_ambi, 1+pixel_ambi);
@@ -1523,7 +1502,7 @@ void main() {
         if (clip  > 1.0)
             pixel_out = 1-pixel_out;//;-clip;
     #endif
-
+   
     FragColor.rgb = pixel_out;
     
 }

@@ -101,7 +101,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float BEZEL_G;
 	float BEZEL_B;
 	float BEZEL_CON;
-	float BEZEL_INNER_ZOOM;
+
 	float BEZEL_FRAME_ZOOM;
 	float BEZEL_USE_STRAIGHT;
 	float BEZEL_RFL_BLR_SHD;
@@ -299,6 +299,9 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	
 	float RF_NOISE_SPARK;
 	
+	float DOT_C;
+	float DOT_C_YUV;
+	
 } global;
 
 
@@ -336,12 +339,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter LABEL0004 " " 0.0 0.0 0.0 1.0
 
 
-// RF Noise
-#pragma parameter DO_RF_NOISE	 "★ RF Noise enable? (rf) ==>"			0.0 	0.0  1.0     1.0
-#pragma parameter RF_NOISE_STRENGTH "        Strength"				0.05	0.0 1.0 0.01
-#pragma parameter RF_NOISE_SPARK    "        Add snow"				0.07		0.0 0.9 0.01
-#pragma parameter LABEL0005 " " 0.0 0.0 0.0 1.0
-
 // Dedithering
 #pragma parameter DO_DEDITHER         "★ Dedither enable? (not with NTSC artifacts) ==>"	0.0 	0.0 1.0 1.0
 #pragma parameter DEDITHER_TRESHMAX   "        Sensitivity"				1.2	0.0 3.0  0.1
@@ -369,12 +366,15 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 // YIQ/YUV bandwidth limited chroma bleeding.
 #pragma parameter DO_SAT_BLEED "★ CVBS: Bandwidth limited chroma enable? (cv) ==>"	0.0 	0.0 1.0 1.0
-#pragma parameter SAT_BLEED_PAL           "        Use PAL colorspace, not NTSC"	0.0 	 0.0 1.0 1.0
+#pragma parameter SAT_BLEED_PAL           "        Colorspace (NTSC, PAL)"	0.0 	 0.0 1.0 1.0
 #pragma parameter SAT_BLEED_STRENGTH      "        Strength"						1.0	 0.0 5.0  0.01
 #pragma parameter SAT_BLEED_SIZE          "        Size (capped to 5.0 in d3d)"		5.0  1.0 20.0  1.0
-#pragma parameter SAT_BLEED_FALLOFF  	  "        Falloff"				1.7 	 1.0 2.0 0.01
+#pragma parameter SAT_BLEED_FALLOFF  	  "        Falloff"				1.7 	 1.0 2.0 0.01        
 #pragma parameter LABEL0008 " " 0.0 0.0 0.0 1.0
 
+#pragma parameter DOT_C     "★ CVBS: Dot crawl ==>"		0.0 	 0.0 2.0 0.01
+#pragma parameter DOT_C_YUV "        Colorspace (NTSC, PAL)"		0.0 	 0.0 1.0 1.0
+#pragma parameter LABEL0055 " " 0.0 0.0 0.0 1.0
 
 //Phosphor persistence
 #pragma parameter DO_PPERSISTENCE       "★ Persistence of phosphors enable? (ppe) ==>"	0.0	 0.0 1.0 1.0
@@ -398,7 +398,11 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 #pragma parameter LABEL0010 " " 0.0 0.0 0.0 1.0
 
-
+// RF Noise
+#pragma parameter DO_RF_NOISE	 "★ RF Noise? (Pre glow, Off, Post glow)  ==>"			0.0 	-1.0  1.0     1.0
+#pragma parameter RF_NOISE_STRENGTH "        Uniform noise"				0.05	0.0 1.0 0.01
+#pragma parameter RF_NOISE_SPARK    "        Snow noise"				0.07		0.0 1.0 0.01
+#pragma parameter LABEL0005 " " 0.0 0.0 0.0 1.0
 
 // Input Blur / light glowing
 #pragma parameter DO_IN_GLOW               "★ Glow/Blur enable? (gl) ==>"	 					0.0	0.0 1.0 1.0
@@ -546,8 +550,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 //Bezel related
 #pragma parameter DO_BEZEL	      "★ Bezel enable? (be) ==>"				0.0   0.0 1.0 1.0
 #pragma parameter BEZEL_USE_STRAIGHT  "        Straight"				0.0	0.0 1.0  1.0 
-#pragma parameter BEZEL_INNER_ZOOM    "        Inner zoom (ignored with integer scaling)"	-0.18   -1.5 0.5 0.001
-#pragma parameter BEZEL_FRAME_ZOOM    "        Frame zoom"				0.0   -1.5 0.5 0.001
+#pragma parameter BEZEL_FRAME_ZOOM    "        Frame Alignment"			0.179   -1.5 0.5 0.001
 #pragma parameter BEZEL_R             "        Color: Red"				-0.35   -1.0 1.0  0.005
 #pragma parameter BEZEL_G             "        Color: Green"				-0.35  -1.0 1.0  0.005
 #pragma parameter BEZEL_B             "        Color: Blue"				-0.35   -1.0 1.0  0.005
@@ -560,11 +563,14 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BEZEL_SPCL_STRENGTH "        Specularity strength"			0.5    0.0 3.0 0.05
 #pragma parameter BEZEL_LIGHT_NO_FADEOUT "        Light fadeout distance"		0.5    0.0 1.0 0.01
 #pragma parameter BEZEL_CORNER_DARK   "        Darken corners"					0.8    0.0 2.0 0.05
-
-
 #pragma parameter LABEL0024 " " 0.0 0.0 0.0 1.0
 
-
+//Global Zoom/Offset
+#pragma parameter DO_GLOBAL_SHZO	 "★ Global shift/zoom enable? (ignored if integer scaling) ==>"	0.0   0.0  1.0 	  1.0
+#pragma parameter GLOBAL_OFFX	 "        X axis shift "			0.0  -1.0  1.0    0.0005
+#pragma parameter GLOBAL_OFFY	 "        Y axis shift "			0.0  -1.0  1.0    0.0005
+#pragma parameter GLOBAL_ZOOM	 "        Zoom"					1.2   0.0  3.0    0.0005
+#pragma parameter LABEL0029 " " 0.0 0.0 0.0 1.0
 
 //Background Image
 #pragma parameter DO_BG_IMAGE	     "★ Back/Foreground image enable? (ba) ==>"				 0.0  0.0  1.0     1.0
@@ -620,22 +626,14 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter LABEL0028 " " 0.0 0.0 0.0 1.0
 
 
-
-//Global Zoom/Offset
-#pragma parameter DO_GLOBAL_SHZO	 "★ Global shift/zoom enable? (zo) ==>"	0.0   0.0  1.0 	  1.0
-#pragma parameter GLOBAL_OFFX	 "        X axis shift "			0.0  -1.0  1.0    0.0005
-#pragma parameter GLOBAL_OFFY	 "        Y axis shift "			0.0  -1.0  1.0    0.0005
-#pragma parameter GLOBAL_ZOOM	 "        Zoom"					1.2   0.0  3.0    0.0005
-#pragma parameter LABEL0029 " " 0.0 0.0 0.0 1.0
-
 //Tilt
 #pragma parameter DO_TILT	  	"★ Tilt enable? (ti) ==>"				0.0   0.0  1.0 	  1.0
 #pragma parameter TILT_X	  	"        Tilt along X axis"				0.25    -0.5  0.5  0.01
 #pragma parameter LABEL0035 " " 0.0 0.0 0.0 1.0
 
 //Aspect Ratio
-#pragma parameter label_ar	 "★ Aspect Ratio (as) "							1.0  1.0  1.0     0.0
-#pragma parameter ASPECT_X       "        Aspect Ratio Numerator (<=0 for a preset)"   		0.0  -6.0 256. 1.0
+#pragma parameter label_ar	 "★ Aspect (active with ambient light or background image only)"							1.0  1.0  1.0     0.0
+#pragma parameter ASPECT_X       "        Aspect Ratio Numerator (<=0 for a preset)"   		0.0  -7.0 256. 1.0
 #pragma parameter ASPECT_Y       "        Aspect Ratio Denominator"	  				3.0   0.0 256. 1.0
 #pragma parameter LABEL0042 " " 0.0 0.0 0.0 1.0
 #pragma parameter LABEL0043 "        Presets reference list:" 0.0 0.0 0.0 1.0
@@ -649,11 +647,11 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter LABEL0051 " " 0.0 0.0 0.0 1.0
 
 //Modulate the image zooming depending on the image luminosity.
-#pragma parameter DO_DYNZOOM	     "★ Luminosity tied zoom (ignored with integer scaling) ==>"		0.015   0.0   1.0  0.005
+#pragma parameter DO_DYNZOOM	     "★ Luminosity tied zoom (ignored if integer scaling) ==>"		0.015   0.0   1.0  0.005
 #pragma parameter LABEL0032 " " 0.0 0.0 0.0 1.0
 
 //Autocrop
-#pragma parameter AUTOCROP_MAX	     "★ Autocrop: maximum amount (ignored with integer scaling) ==>"   0.0   0.0   0.5  0.01
+#pragma parameter AUTOCROP_MAX	     "★ Autocrop: maximum amount (ignored if integer scaling) ==>"   0.0   0.0   0.5  0.01
 #pragma parameter AUTOCROP_MIN	            "        Number of mandatory lines to crop"   1.0   0.0   10.0  1.0
 #pragma parameter AUTOCROP_SAMPLES          "        Samples per frame (faster response, higher gpu use)"     20.0   0.0   300.0 1.0
 #pragma parameter AUTOCROP_SAMPLE_SIZE      "        Sample size (big speedup, less accurate)" 2.0 0.0 5.0 1.0  

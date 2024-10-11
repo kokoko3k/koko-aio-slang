@@ -18,10 +18,10 @@
 
 
 //#define DEBUG
-   //#define DEBUG_COLOR_CALIB
+   #define DEBUG_COLOR_CALIB
    //#define DEBUG_TIME_FADE
    //#define DEBUG_SOLID_COLOR
-   #define DEBUG_STEP_GRADIENT
+   //#define DEBUG_STEP_GRADIENT
    //#define DEBUG_STEP_GRADIENT_V
    //#define DEBUG_BLINK
    //#define DEBUG_BLINK_CIRCLE
@@ -46,10 +46,9 @@ layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
 layout(location = 1) out vec3 vTemperature_rgb;
 layout(location = 2) out float vNTSC_FILTER_FC;
-layout(location = 3) out float vSubcarrierFrequency_mul_size_mul_TAU;
-layout(location = 4) out float vPixelgrid_intr_gamma_adj;
-layout(location = 5) out vec3 vDebug;
-layout(location = 6) out float vNTSC_weights[NTSC_FILTER_WIDTH_MAX];
+layout(location = 3) out float vPixelgrid_intr_gamma_adj;
+layout(location = 4) out vec3 vDebug;
+layout(location = 5) out float vNTSC_weights[NTSC_FILTER_WIDTH_MAX];
 
 
 #include "includes/functions.include.slang"
@@ -93,7 +92,6 @@ void main() {
    
    if (DO_NTSC_ARTIFACTS > 0.0) {
       vNTSC_FILTER_FC = NTSC_FILTER_FC * 0.1;
-      vSubcarrierFrequency_mul_size_mul_TAU = NTSC_FILTER_SCF * 0.1 * params.SourceSize.x * TAU;
       float sum = 0.0;
       float N = NTSC_FILTER_WIDTH;
       //  Compute sampling weights
@@ -188,10 +186,9 @@ void main() {
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in vec3 vTemperature_rgb;
 layout(location = 2) in float vNTSC_FILTER_FC;
-layout(location = 3) in float vSubcarrierFrequency_mul_size_mul_TAU;
-layout(location = 4) in float vPixelgrid_intr_gamma_adj;
-layout(location = 5) in vec3 vDebug;
-layout(location = 6) in float vNTSC_weights[NTSC_FILTER_WIDTH_MAX];
+layout(location = 3) in float vPixelgrid_intr_gamma_adj;
+layout(location = 4) in vec3 vDebug;
+layout(location = 5) in float vNTSC_weights[NTSC_FILTER_WIDTH_MAX];
 
 layout(location = 0) out vec4 FragColor;
 
@@ -221,7 +218,7 @@ vec4 ntscdec(vec2 uv, vec3 RGB_ori) {
    //	Sample composite signal and decode to YIQ
       vec2 YIQ_processed = vec2(0.0);
       
-      //vec2 YIQ_processed_shifted = vec2(0.0); (*)
+      //vec2 YIQ_processed_shifted = vec2(0.0); (*2)
          // by doing another ntsc filtering with this shifted phase, we're able to better identify
          // artifacts that will drive the blur modulation.
          // 
@@ -241,11 +238,13 @@ vec4 ntscdec(vec2 uv, vec3 RGB_ori) {
          //which is controlled by next pass filtering (What a mess RetroArch!)
          vec3 smp_mul_weight = vec3((texture_NEAREST(Source, pos, params.SourceSize).rgb * RGB2YIQ).x) * vNTSC_weights[n] ;
          
-         float phase =  vSubcarrierFrequency_mul_size_mul_TAU * pos.x;
-
-
-         float carrier = (pos.x*params.SourceSize.x * NTSC_FILTER_SCF ) - (pos.y*params.SourceSize.y * NTSC_PHASE_SHIFT);
-         phase = carrier * (pi * (2/3.0));
+         //you could animate the artifacts, unsure if it is a real thing (?)
+            float shift = 0.0;
+            //float slowness = 1; 
+            //shift = mod(params.FrameCount, params.SourceSize.y*slowness)*params.SourceSize.w/slowness;
+            
+         float carrier = ((pos.x-shift)* params.SourceSize.x * NTSC_FILTER_SCF ) - ((pos.y)*params.SourceSize.y * NTSC_PHASE_SHIFT);
+         float phase = carrier * (pi * (2/3.0));
          float phase_shift_for_blur = phase  + PHASE_SHIFT_FOR_BLUR_K;
          
          phase += ( pos.y * -pi10 ) * (NTSC_PHASE_SHIFT);
@@ -473,7 +472,7 @@ vec3 persistence(vec3 feedback, vec3 pixel_now, float start_decay, float late_pe
 void main() {
    vec2 co = vTexCoord;
    
-   if (AUTOCROP_MAX > 0.0)
+   if (AUTOCROP_MAX > 0.0 && need_NO_integer_scale() )
       co = clamp(co,  params.OriginalSize.zw * AUTOCROP_MIN, 
                     1-params.OriginalSize.zw * AUTOCROP_MIN );
    

@@ -3,7 +3,12 @@
 ---------------------------
 
 **REQUIREMENTS** <br>
-    koko-aio needs at least retroarch 1.16
+    koko-aio needs at least retroarch 1.16 <br>
+    Also it expects the following options set in Retroarch:
+    
+    Settings -> Core -> Allow Rotation: ON
+    Settings -> Video -> Scaling -> Aspect Ratio: Full
+    
 
 **RETROARCH OUTPUT DRIVERS** <br>
     koko-aio does not work by default on d3d12 and d3d11.<br>
@@ -102,8 +107,6 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
     Use it if you don't want to blur the image and you still don't like<br>
     jagged or too much pixelated images.<br>
 
-** RF Noise:**<br>
-    Emulates radio frequency noise with a given strength<br>
 
 ** Dedither:**<br>
     Try to smooth dithering patterns.<br>
@@ -148,6 +151,10 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
     It can be used with RGB shifting and image blurring to give the picture<br>
     an ntsc look without dealing with specific encoding/decoding stuffs. <br>
 
+**CVBS: Dot crawl**<br>
+    Emulates rolling chroma->luma crosstalks observed in composite signals.<br>
+    You can switch between pal and ntsc.<br>
+    
 **Persistence of phosphors:**<br>
     This emulates the unexcited phosphors that continue to emit light.
 
@@ -167,6 +174,17 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
     Focused Area:
         The area of the screen that will be in focus (affects previous 2 settings)
 
+        
+** RF Noise:**<br>
+    Emulates radio frequency noise with a given strength<br>
+    1 produce noise after the Glow/Blur pass, while -1 will move it before it.
+    Suggestions:
+    If you're blurring the image, is better to use 1.<br>
+    If you're glowing the image, prefer -1.<br>
+    
+    Uniform noise: Balanced noise that ranges from -x to +x.
+    Snow noise: Sparkling/Rarefied noise 
+        
         
 **Glow/Blur:**<br>
     Emulate the CRT glowing "feature", so that the brighter areas of<br>
@@ -524,26 +542,20 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
 **Bezel:**<br>
     Draws a monitor frame with simulated reflections from the game content.<br>
     The monitor frame is an image loaded by the shader and is shipped<br>
-    in the "textures" shader subdirectory, named:
-    monitor_body_curved.png and monitor_body_straight.png
-    It has been made with the following rules that may come handy<br>
-    only if you want to edit it; otherwise go on.<br>
-    - The red channel represents the luminance information<br>
-    - The green channel represents the highlights<br>
-    - The alpha channel in the inner frame represents the part of the bezel<br>
-      that will be filled by the game content<br>
-    - The blue channel represents the part of the bezel that will be filled by the game reflection.<br>
+    in the "textures" shader subdirectory, named:<br>
+    monitor_body_curved.png and monitor_body_straight.png<br>
+    It has been made with the following rules that may come handy
+    only if you want to edit it; otherwise go on:<br>
+    * The red channel represents the luminance information<br>
+    * The green channel represents the highlights<br>
+    * The alpha channel in the inner frame represents the part of the bezel that will be filled by the game content<br>
+    * The blue channel represents the part of the bezel that will be filled by the game reflection.<br>
     
     Straight
         Use a straight bezel instead of a curved one.
-    Inner zoom:
-        Allows to shrink or expand the game content to fit the monitor frame.
-        "Fitting the monitor frame" is the ONLY scope of this option.
-        To have a smaller or larger than bezel screen, please use "Override content geometry"
-        options, or the reflections on the bezel will be misaligned.p
-
-    Frame zoom:
-          Allows to shrink or expand the monitor frame to fit the game content.
+    Frame alignment:
+        Allows to shrink or expand the monitor frame to fit game content and align reflections.
+        "Aligning the reflections" is the ONLY scope of this option.
     Bezel color (red,green,blue) and contrast:
         Allows to choose the color of the monitor frame.
     Reflections strength
@@ -561,7 +573,9 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
     Darken corners
         How much the bezel corners should be darkened
     
-
+**Global shift/zoom:**<br>
+    Zoom and shift everything on screen, but background pictures.<br>
+    
 **Backgound image:**<br>
     Draws an image on screen picked from the "textures" shader subdirectory,<br>
     named by default background_over.png and background_under.png<br>
@@ -666,10 +680,13 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
 **Spot:**<br>
     Simulates external light reflected by the monitor glass.<br>
             
-**Aspect Ratio:**<br>
-    When using effects that need Retroarch aspect ratio option<br>
-    to be set to "full", you have to provide the source aspect<br>
-    ratio to the shader.<br>
+**Aspect (active with ambient light or background image only):**<br>
+    If you set retroarch aspect ratio option to full, you have to provide<br>
+    the core aspect ratio to the shader manually via the following parameters.<br>
+    NOTE: The following parameters are ignored when not using ambient lights
+    or background/foreground images.
+    In those cases, use options under "Override content geometry" section.
+    
     Use -6 for MAME cores that pre-rotates the game (TATE mode)<br>
     With Mame 2003 plus and fbneo cores, koko-aio detects if the<br>
     game is rotated or not without any user intervention.<br>
@@ -687,9 +704,6 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
     Aspect Ratio Denominator:
         As long as Aspect Ratio Numerator is positive, this will
         be used as the denominator of the fraction.
-
-**Global shift/zoom image:**<br>
-    Zoom and shift everything on screen, but background pictures.<br>
 
 **Luminosity tied zoom:**<br>
     On older CRT monitors, the picture gets bigger when the image was brighter.<br>
