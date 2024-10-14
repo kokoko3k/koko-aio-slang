@@ -13,6 +13,8 @@ layout(location = 3) out vec2 vB_offset;
 layout(location = 4) out float vDo_shadow_mode;
 layout(location = 5) out float vDecon_or_JustShadow;
 layout(location = 6) out float vShow_artifact_mask;
+layout(location = 7) out float vDo_noise;
+layout(location = 8) out float vDynamicSeed;
 #include "includes/functions.include.slang"
 
 void main()
@@ -43,6 +45,11 @@ void main()
    bool do_shadow = (DO_DOT_MATRIX == 1.0 && DOT_M_SHADOW_STR > 0.0);
    vDecon_or_JustShadow =  float(DO_SHIFT_RGB > 0.0 || do_shadow    );
    vShow_artifact_mask = float(NTSC_SHOW_ARTF_MASK + DO_NTSC_ARTIFACTS == 2.0);
+   
+   
+   //noise?
+   vDo_noise = float( DO_RF_NOISE < -0.5 || ( DO_RF_NOISE > 0.5 && DO_IN_GLOW < 0.5 ));
+   vDynamicSeed = mod(params.FrameCount, 120.0001);
 }
 
 
@@ -55,6 +62,8 @@ layout(location = 3) in vec2 vB_offset;
 layout(location = 4) in float vDo_shadow_mode;
 layout(location = 5) in float vDecon_or_JustShadow;
 layout(location = 6) in float vShow_artifact_mask;
+layout(location = 7) in float vDo_noise;
+layout(location = 8) in float vDynamicSeed;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -264,6 +273,10 @@ void main() {
    pixel_out.rgb = pow(pixel_out.rgb, vec3(IN_GLOW_GAMMA));
 
    //pixel_out.rgb = sign(pixel_out.rgb) * pow( max(vec3(0.0), pixel_out.rgb), vec3(IN_GLOW_GAMMA));
+   
+   if (vDo_noise > 0.5 ) {
+      pixel_out.rgb += get_rf_noise(vTexCoord * vDynamicSeed);
+   }
    
    FragColor = pixel_out;
 }
