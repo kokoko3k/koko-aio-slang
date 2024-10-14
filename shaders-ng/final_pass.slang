@@ -72,17 +72,19 @@ vec2 get_bg_image_coords(vec2 in_vOutputCoord, bool isrotated) {
     // >+1 = manual rotation for straight games
     // <-1 = manual rotation for rotated games
 
-    //Auto rotation, no user change allowed:
+    //handle automatic rotation of bg image for rotated games
     if (BG_IMAGE_ROTATION == 0.0 && isrotated ) {
-        //handle automatic rotation of bg image for rotated games
+        
         bg_img_coords.xy = bg_img_coords.yx;
         bg_img_coords.y = 1 - bg_img_coords.y;
+        bg_img_coords += vec2( BG_IMAGE_OFFX,BG_IMAGE_OFFY);
+        bg_img_coords=zoom(bg_img_coords, BG_IMAGE_ZOOM);
         return bg_img_coords; // <-- for legibility
     }
 
 
     //User say image is rotated (selected a negative value),
-    //flip coords but allow user customization.
+    //flip coords.
     //This is needed for correct aspect handling on rotated games.
     if (BG_IMAGE_ROTATION < 0.0) {
         bg_img_coords.xy = bg_img_coords.yx;

@@ -13,6 +13,9 @@ layout(location = 3) out vec2 vB_offset;
 layout(location = 4) out float vDo_shadow_mode;
 layout(location = 5) out float vDecon_or_JustShadow;
 layout(location = 6) out float vShow_artifact_mask;
+layout(location = 7) out float vDo_noise;
+layout(location = 8) out float vDynamicSeed;
+layout(location = 9) out float vDotCrawlShift;
 #include "includes/functions.include.slang"
 
 void main()
@@ -43,6 +46,19 @@ void main()
    bool do_shadow = (DO_DOT_MATRIX == 1.0 && DOT_M_SHADOW_STR > 0.0);
    vDecon_or_JustShadow =  float(DO_SHIFT_RGB > 0.0 || do_shadow    );
    vShow_artifact_mask = float(NTSC_SHOW_ARTF_MASK + DO_NTSC_ARTIFACTS == 2.0);
+   
+   //noise?
+   vDo_noise = float( DO_RF_NOISE < -0.5 || ( DO_RF_NOISE > 0.5 && DO_IN_GLOW < 0.5 ));
+   vDynamicSeed = mod(params.FrameCount, 120.0001);
+   
+   //Mod framecount for animating dot crawl (needed to avoid precision errors)
+   float dot_crawl_speed = pi*1.5;
+   vDotCrawlShift = mod(params.FrameCount * dot_crawl_speed, pi*2.0);
+   
+   float dot_c_steps = 6.0; // frames needed to reach sin period; higher = slower;
+   vDotCrawlShift =((pi*2)/dot_c_steps)   *   mod(params.FrameCount, dot_c_steps)     ;
+   
+   
 }
 
 
@@ -55,7 +71,9 @@ layout(location = 3) in vec2 vB_offset;
 layout(location = 4) in float vDo_shadow_mode;
 layout(location = 5) in float vDecon_or_JustShadow;
 layout(location = 6) in float vShow_artifact_mask;
-
+layout(location = 7) in float vDo_noise;
+layout(location = 8) in float vDynamicSeed;
+layout(location = 9) in float vDotCrawlShift;
 layout(location = 0) out vec4 FragColor;
 
 layout(set = 0, binding = 1) uniform sampler2D upscale_pass;
@@ -187,28 +205,36 @@ vec3 pixel_bleed_side_PAL(vec3 pixel_in, vec2 co, float size, sampler2D in_textu
 
 }
 
-float dotc_carrier(float co_y, float OriginalSize_y) {
-   float dot_crawl_speed = 0.2;
-   float sin_crawl = sin(co_y*OriginalSize_y*0.5 *pi-params.FrameCount*dot_crawl_speed);
-   sin_crawl *= sin_crawl;      //Make sin positive, double freq.
+float dotc_carrier(vec2 co, vec2 OriginalSize) {  
+   float sin_crawl = sin(co.x*OriginalSize.x*pi - vDotCrawlShift ) *
+                     sin(co.y*OriginalSize.y*pi);
+   
+   sin_crawl = step(0.0, sin_crawl);
+               
    sin_crawl *= DOT_C; //Modulate strength
    return sin_crawl;
 }
 
 vec3 dotc(sampler2D in_texture, vec3 pixel_in, vec2 co, vec4 tex_size, mat3 rgb2x, mat3 x2rgb){
    //Sample adiacent texels and switch colorspace.
+   const float dot_crawl_size = 1.0; //0.5, 1.0, 1.5
    vec3 cm = texture(in_texture, co).rgb * rgb2x;
-   vec3 cr = texture(in_texture, co + vec2(tex_size.z, 0.0)).rgb * rgb2x;
-   vec3 cl = texture(in_texture, co - vec2(tex_size.z, 0.0)).rgb * rgb2x;
+   vec3 cr = texture(in_texture, co + vec2(tex_size.z*dot_crawl_size, 0.0)).rgb * rgb2x;
+   vec3 cl = texture(in_texture, co - vec2(tex_size.z*dot_crawl_size, 0.0)).rgb * rgb2x;
    //Compute max chroma change
    float d = max(distance(cm.yz,cr.yz),  distance(cm.yz,cl.yz));
+   d = pow(d, 1.5);
    //crosstalk strength (powing d acts as a soft treshold, much less on lower chroma diffs)
-   float crosstalk = d * d * dotc_carrier(co.y, tex_size.y);
+   float crosstalk = d * dotc_carrier(co, tex_size.xy);
+   
+
+   //return vec3(dotc_carrier(co, tex_size.xy));
    //chroma into luma
    pixel_in *= rgb2x;
    pixel_in.x = mix(pixel_in.x, (pixel_in.y+pixel_in.z)*0.5, crosstalk);
-   //return to rgb
-   return pixel_in*x2rgb;
+   
+   return pixel_in * x2rgb;
+
 }
 
 vec4 pixel_bleed(vec4 pixel_in, vec2 co, sampler2D in_texture, float sourcesize_z) { //FIXME pixelin.a è passante, non serve vec4
@@ -259,8 +285,18 @@ void main() {
 
    
    //gamma-in
-   //pixel_out.rgb = max(vec3(0.0), pixel_out.rgb);  //<-- before powing make sure everything is over 0.0
+   pixel_out.rgb = max(vec3(0.0), pixel_out.rgb);  //<-- before powing make sure everything is over 0.0
+   
    pixel_out.rgb = pow(pixel_out.rgb, vec3(IN_GLOW_GAMMA));
-
+   
+   if (vDo_noise > 0.5 ) {
+      //Unfortunately we need to clamp to min 0.0 again after applying noise
+      //to avoid glitches on amd (and probably nvidi too).
+      //It should be possible to change the noise function to just emit positive
+      //numbers and pre-lowering the brightness of pixel_out in the very first pass tho.
+      pixel_out.rgb += get_rf_noise(vTexCoord * vDynamicSeed);
+      pixel_out.rgb = max(pixel_out.rgb, vec3(0.0));
+   }
+   
    FragColor = pixel_out;
 }
