@@ -271,11 +271,14 @@ void main() {
    pixel_out.rgb = max(vec3(0.0), pixel_out.rgb);  //<-- before powing make sure everything is over 0.0
    
    pixel_out.rgb = pow(pixel_out.rgb, vec3(IN_GLOW_GAMMA));
-
-   //pixel_out.rgb = sign(pixel_out.rgb) * pow( max(vec3(0.0), pixel_out.rgb), vec3(IN_GLOW_GAMMA));
    
    if (vDo_noise > 0.5 ) {
+      //Unfortunately we need to clamp to min 0.0 again after applying noise
+      //to avoid glitches on amd (and probably nvidi too).
+      //It should be possible to change the noise function to just emit positive
+      //numbers and pre-lowering the brightness of pixel_out in the very first pass tho.
       pixel_out.rgb += get_rf_noise(vTexCoord * vDynamicSeed);
+      pixel_out.rgb = max(pixel_out.rgb, vec3(0.0));
    }
    
    FragColor = pixel_out;

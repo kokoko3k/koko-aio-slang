@@ -193,9 +193,12 @@ void main() {
          pixel_glowed = glow_blur_bias(shift_and_bleed_pass, vTexCoord, pixel_glowed, in_glow_bias_faded);
       }
    
-   if (DO_RF_NOISE > 0.1)
+   if (DO_RF_NOISE > 0.1) {
       pixel_glowed += get_rf_noise(vTexCoord * vDynamicSeed);
-
+      pixel_glowed = max(pixel_glowed, vec3(0.0));
+   }
+   
+   
    FragColor = vec4(pixel_glowed * vGlow_Gain, warpedglow_or_DR);
    
 }
