@@ -94,7 +94,7 @@ void main() {
       }
       
    float fcorners_shade2 = 1 - corners_shade(vTexCoord, 1.125) * BEZEL_CORNER_DARK ;
-   FragColor.rgba = vec4(pixel_out, fcorners_shade2);
+   FragColor.rgb = pixel_out * fcorners_shade2;
  
    //FragColor = vec4(shade_sharp_blur);
    
