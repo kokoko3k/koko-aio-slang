@@ -215,6 +215,12 @@ float dotc_carrier(vec2 co, vec2 OriginalSize) {
    return sin_crawl;
 }
 
+float distance_approx(vec2 a, vec2 b, float p) {
+   // for p = 0.5 it acts like distance(), but with more cycles.
+   float d = dot( a-b, a-b );
+   return pow(d,p);
+}
+
 vec3 dotc(sampler2D in_texture, vec3 pixel_in, vec2 co, vec4 tex_size, mat3 rgb2x, mat3 x2rgb){
    //Sample adiacent texels and switch colorspace.
    const float dot_crawl_size = 1.0; //0.5, 1.0, 1.5
@@ -222,16 +228,19 @@ vec3 dotc(sampler2D in_texture, vec3 pixel_in, vec2 co, vec4 tex_size, mat3 rgb2
    vec3 cr = texture(in_texture, co + vec2(tex_size.z*dot_crawl_size, 0.0)).rgb * rgb2x;
    vec3 cl = texture(in_texture, co - vec2(tex_size.z*dot_crawl_size, 0.0)).rgb * rgb2x;
    //Compute max chroma change
-   float d = max(distance(cm.yz,cr.yz),  distance(cm.yz,cl.yz));
-   d = pow(d, 1.5);
-   //crosstalk strength (powing d acts as a soft treshold, much less on lower chroma diffs)
-   float crosstalk = d * dotc_carrier(co, tex_size.xy);
+      //float d = max(distance(cm.yz,cr.yz),  distance(cm.yz,cl.yz));
+      //d = pow(d, 1.5); // bias, less on lower distance.
+      //The following have less cycles, but same result.
+      const float p = 0.75;
+      float d = max(distance_approx(cm.yz,cr.yz,p),  distance_approx(cm.yz,cl.yz,p));
    
-
-   //return vec3(dotc_carrier(co, tex_size.xy));
-   //chroma into luma
-   pixel_in *= rgb2x;
-   pixel_in.x = mix(pixel_in.x, (pixel_in.y+pixel_in.z)*0.5, crosstalk);
+   //apply moving square carrier (already modulatd by strength) to the chroma distance
+      float crosstalk = d * dotc_carrier(co, tex_size.xy);
+      //return vec3(dotc_carrier(co, tex_size.xy));
+   
+   // chroma into luma
+      pixel_in *= rgb2x;
+      pixel_in.x = mix(pixel_in.x, (pixel_in.y+pixel_in.z)*0.5, crosstalk);
    
    return pixel_in * x2rgb;
 
