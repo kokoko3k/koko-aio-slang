@@ -9,6 +9,8 @@ layout(location = 0) out vec2 vTexCoord;
 layout(location = 1) out vec2 vFuzzy_main_pass_stage_1;
 layout(location = 2) out vec2 vCoords_zoomout;
 layout(location = 3) out float vDo_Curvature;
+layout(location = 4) out vec2 vTexCoord_rotated_maybe;
+layout(location = 5) out vec4 vShadesUDS;
 
 #include "includes/functions.include.slang"
 #include "includes/blooms.include.slang"
@@ -24,6 +26,21 @@ void main() {
       vCoords_zoomout = zoom(vTexCoord, BEZEL_REFL_ZOOMOUT_ROOM);
       
    vDo_Curvature = curvature_needed();
+   
+   
+   //...to Change bezel sides luminance
+      #define _shade_up   -0.07 
+      #define _shade_down +0.07  
+      #define _shade_side +0.00 
+      vTexCoord_rotated_maybe = vTexCoord;
+      vShadesUDS.x = _shade_up;
+      vShadesUDS.y = _shade_down;
+      vShadesUDS.z = _shade_side;
+      if (is_rotated()) {
+         vTexCoord_rotated_maybe.xy = vTexCoord.yx;
+         vShadesUDS.xy = vShadesUDS.yx;
+      }
+   //
 }
 
 #pragma stage fragment
@@ -31,6 +48,8 @@ layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in vec2 vFuzzy_main_pass_stage_1;
 layout(location = 2) in vec2 vCoords_zoomout;
 layout(location = 3) in float vDo_Curvature;
+layout(location = 4) in vec2 vTexCoord_rotated_maybe;
+layout(location = 5) in vec4 vShadesUDS;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -47,6 +66,13 @@ float light_fadeout(vec2 co) {
    return  (gradients.x * gradients.y ); 
 }
 
+float smooth_diags(vec2 co, float shade){
+   vec2 centeredCoord = vTexCoord - vec2(0.5, 0.5);
+   vec2 distsToDiag2 = vec2( abs(centeredCoord.y - centeredCoord.x),
+                             abs(centeredCoord.y + centeredCoord.x) );
+   vec2 dlines = smoothstep_fast(vec2(-shade), vec2(shade), distsToDiag2);
+   return 2-(dlines.x+dlines.y);
+}
 
 void main() {
    
@@ -85,16 +111,40 @@ void main() {
    //Apply gamma out to reflections here to so that we don't need to do it in final pass (heavier).
       //pixel_out = apply_fuzzy_main_pass_stage_2(pixel_out, vFuzzy_main_pass_stage_1);
       
-   //Border Reflection strength modulation
+   //Fadeout reflected lighe
       if (vDo_Curvature > 0.0) {
          vec2 curvedco = Warp_koko(vTexCoord, vec2(-GEOM_WARP_X, -GEOM_WARP_Y), 0.5);
          pixel_out *= vec3(light_fadeout(curvedco));
       } else {
          pixel_out *= vec3(light_fadeout(vTexCoord));
       }
+
+   
+
+   //Sides shade: split screen in 4 triangles, and shade them
+
+   
+      float side_shade;
+      vec2 centeredCoord = vTexCoord_rotated_maybe - vec2(0.5, 0.5);
       
-   float fcorners_shade2 = 1 - corners_shade(vTexCoord, 1.125) * BEZEL_CORNER_DARK ;
-   FragColor.rgb = pixel_out * fcorners_shade2;
+      const float s = 0.025; //side to side smoothing
+      float shade = smooth_diags(vTexCoord_rotated_maybe, s);
+
+      if (abs(centeredCoord.x) > abs(centeredCoord.y)) {
+         side_shade = mix(vShadesUDS.z, vShadesUDS.x, shade * float(vTexCoord_rotated_maybe.y <= 0.5)  ); // side up
+         side_shade = mix( side_shade, vShadesUDS.y, shade * float(vTexCoord_rotated_maybe.y > 0.5)  ); //side down
+      }
+      else if (centeredCoord.y > abs(centeredCoord.x))
+         side_shade = mix(vShadesUDS.y, vShadesUDS.z, shade ); //down
+      else if (centeredCoord.y < -abs(centeredCoord.x))
+         side_shade = mix(vShadesUDS.x, vShadesUDS.z, shade  ); // up
+   
+   
+   
+   //Corners: less reflections:
+   float fcorners_dark = 1 - corners_shade(vTexCoord, 1.125) * BEZEL_CORNER_DARK ;
+   
+   FragColor.rgb = (pixel_out * fcorners_dark)+side_shade;
  
    //FragColor = vec4(shade_sharp_blur);
    
