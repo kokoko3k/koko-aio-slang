@@ -560,6 +560,8 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
         Allows to choose the color of the monitor frame.
     Reflections strength
         The amount of reflections
+    Less reflections in corners
+        Show less reflections in corners
     Reflections sharpness
         Modulates from totally blurred to totally sharp reflection appearance.
     Reflections roughness
@@ -570,8 +572,7 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
         Modulates the reflected and diffused light fadeout. higher numbers -> no fadeout.
     Specularity strength
         The amount of specular reflection
-    Darken corners
-        How much the bezel corners should be darkened
+
     
 **Global shift/zoom:**<br>
     Zoom and shift everything on screen, but background pictures.<br>
