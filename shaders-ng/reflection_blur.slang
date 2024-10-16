@@ -10,7 +10,7 @@ layout(location = 1) out vec2 vFuzzy_main_pass_stage_1;
 layout(location = 2) out vec2 vCoords_zoomout;
 layout(location = 3) out float vDo_Curvature;
 layout(location = 4) out vec2 vTexCoord_rotated_maybe;
-layout(location = 5) out vec4 vShadesUDS;
+layout(location = 5) out vec3 vShadesUDS;
 
 #include "includes/functions.include.slang"
 #include "includes/blooms.include.slang"
@@ -29,13 +29,16 @@ void main() {
    
    
    //...to Change bezel sides luminance
-      #define _shade_up   -0.06 
-      #define _shade_down +0.06
-      #define _shade_side +0.00 
+      #define _shade_up   -0.11
+      #define _shade_side -0.04   
+      #define _shade_down +0.02
+      
       vTexCoord_rotated_maybe = vTexCoord;
       vShadesUDS.x = _shade_up;
       vShadesUDS.y = _shade_down;
       vShadesUDS.z = _shade_side;
+      
+      
       vTexCoord_rotated_maybe = vTexCoord; 
       
       if (is_rotated()) {
@@ -44,6 +47,7 @@ void main() {
       }
       //slight adaption to match bezel aspect ratio:
       vTexCoord_rotated_maybe.x = zoom1D(vTexCoord_rotated_maybe.x, 0.965);
+      
 }
 
 #pragma stage fragment
@@ -52,7 +56,7 @@ layout(location = 1) in vec2 vFuzzy_main_pass_stage_1;
 layout(location = 2) in vec2 vCoords_zoomout;
 layout(location = 3) in float vDo_Curvature;
 layout(location = 4) in vec2 vTexCoord_rotated_maybe;
-layout(location = 5) in vec4 vShadesUDS;
+layout(location = 5) in vec3 vShadesUDS;
 
 layout(location = 0) out vec4 FragColor;
 

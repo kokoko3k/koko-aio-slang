@@ -1747,7 +1747,10 @@ float get_rf_noise(vec2 seed) {
 	       + smoothstep_fast(0.98, 1.0, anoise) * RF_NOISE_SPARK;
 }
 
-
+vec3 bezel_color_apply_contrast(vec3 col){
+   float con_max = fma(0.5, BEZEL_CON, 0.5); // <<- same as: float con_max =  0.5 * BEZEL_CON + 0.5;
+   return scale_to_range_vec3(col, -con_max+1, con_max);
+}
 
 
 
