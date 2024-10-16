@@ -51,7 +51,7 @@
                 backdrop = "../textures/boothill.jpg"
          backdrop_linear = "true"
       backdrop_wrap_mode = "mirrored_repeat"
-         backdrop_mipmap = "true"
+         backdrop_mipmap = "false"
          
                 sideshade = "../textures/side_shade-helper.png"
          sideshade_linear = "true"
