@@ -56,7 +56,7 @@
                 sideshade = "textures/side_shade-helper.png"
          sideshade_linear = "true"
       sideshade_wrap_mode = "mirrored_repeat"
-          backdrop_mipmap = "false"
+         sideshade_mipmap = "false"
 
 shaders = 17
 

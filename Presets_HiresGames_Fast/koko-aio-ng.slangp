@@ -53,15 +53,10 @@
       backdrop_wrap_mode = "mirrored_repeat"
          backdrop_mipmap = "true"
          
-                backdrop = "../textures/boothill.jpg"
-         backdrop_linear = "true"
-      backdrop_wrap_mode = "mirrored_repeat"
-         backdrop_mipmap = "true"
-         
                 sideshade = "../textures/side_shade-helper.png"
          sideshade_linear = "true"
       sideshade_wrap_mode = "mirrored_repeat"
-          backdrop_mipmap = "false"
+         sideshade_mipmap = "false"
 
 shaders = 17
 
