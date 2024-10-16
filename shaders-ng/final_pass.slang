@@ -938,11 +938,11 @@ vec3 pixel_blank_alternate(vec3 strength, vec3 pixel_in) {
 }
 */
 
-
 vec3 bezel_color(float lum)  {
     //Colorize bezel frame
     vec3 col = vec3(BEZEL_R,BEZEL_G,BEZEL_B) + lum;
-    col = bezel_color_apply_contrast(col);
+    float con_max = fma(0.5, BEZEL_CON, 0.5); // <<- same as: float con_max =  0.5 * BEZEL_CON + 0.5;
+    col= scale_to_range_vec3(col, -con_max+1, con_max);  
     return clamp(col,0.0,1.0);
 }
 
