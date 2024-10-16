@@ -29,18 +29,21 @@ void main() {
    
    
    //...to Change bezel sides luminance
-      #define _shade_up   -0.07 
-      #define _shade_down +0.07  
+      #define _shade_up   -0.06 
+      #define _shade_down +0.06
       #define _shade_side +0.00 
       vTexCoord_rotated_maybe = vTexCoord;
       vShadesUDS.x = _shade_up;
       vShadesUDS.y = _shade_down;
       vShadesUDS.z = _shade_side;
+      vTexCoord_rotated_maybe = vTexCoord; 
+      
       if (is_rotated()) {
-         vTexCoord_rotated_maybe.xy = vTexCoord.yx;
+         vTexCoord_rotated_maybe.xy = vTexCoord.yx; 
          vShadesUDS.xy = vShadesUDS.yx;
       }
-   //
+      //slight adaption to match bezel aspect ratio:
+      vTexCoord_rotated_maybe.x = zoom1D(vTexCoord_rotated_maybe.x, 0.965);
 }
 
 #pragma stage fragment
@@ -54,7 +57,8 @@ layout(location = 5) in vec4 vShadesUDS;
 layout(location = 0) out vec4 FragColor;
 
 layout(set = 0, binding = 1) uniform sampler2D Source;
-layout(set = 0, binding = 3) uniform sampler2D colortools_and_ntsc_pass;
+layout(set = 0, binding = 2) uniform sampler2D colortools_and_ntsc_pass;
+layout(set = 0, binding = 3) uniform sampler2D sideshade;
 
 #include "includes/functions.include.slang"
 #include "includes/blooms.include.slang"
@@ -64,14 +68,6 @@ float light_fadeout(vec2 co) {
    const float shade_start = 1-BEZEL_REFL_FADEOUT_START ;  
    vec2 gradients = smoothstep_fast( vec2(BEZEL_LIGHT_NO_FADEOUT), vec2(0.5-(shade_start)   ), abs(co-0.5));
    return  (gradients.x * gradients.y ); 
-}
-
-float smooth_diags(vec2 co, float shade){
-   vec2 centeredCoord = vTexCoord - vec2(0.5, 0.5);
-   vec2 distsToDiag2 = vec2( abs(centeredCoord.y - centeredCoord.x),
-                             abs(centeredCoord.y + centeredCoord.x) );
-   vec2 dlines = smoothstep_fast(vec2(-shade), vec2(shade), distsToDiag2);
-   return 2-(dlines.x+dlines.y);
 }
 
 void main() {
@@ -119,35 +115,18 @@ void main() {
          pixel_out *= vec3(light_fadeout(vTexCoord));
       }
 
-   
 
-   //Sides shade: split screen in 4 triangles, and shade them
-
-   
-      float side_shade;
-      vec2 centeredCoord = vTexCoord_rotated_maybe - vec2(0.5, 0.5);
-      
-      const float s = 0.025; //side to side smoothing
-      float shade = smooth_diags(vTexCoord_rotated_maybe, s);
-
-      if (abs(centeredCoord.x) > abs(centeredCoord.y)) {
-         side_shade = mix(vShadesUDS.z, vShadesUDS.x, shade * float(vTexCoord_rotated_maybe.y <= 0.5)  ); // side up
-         side_shade = mix( side_shade, vShadesUDS.y, shade * float(vTexCoord_rotated_maybe.y > 0.5)  ); //side down
-      }
-      else if (centeredCoord.y > abs(centeredCoord.x))
-         side_shade = mix(vShadesUDS.y, vShadesUDS.z, shade ); //down
-      else if (centeredCoord.y < -abs(centeredCoord.x))
-         side_shade = mix(vShadesUDS.x, vShadesUDS.z, shade  ); // up
-   
-   
-   
+   // Load a lut containing 3 colored triangles red,blue,green.
+   // that identifies screen sides, we use them to shade the reflection area
+      vec3 side_shade_lut_DRUL = textureLod(sideshade, vTexCoord_rotated_maybe.xy, 0.0).rgb;
+      float side_shade = dot(side_shade_lut_DRUL, vShadesUDS.yzx );
+         
    //Corners: less reflections:
-   float fcorners_dark = 1 - corners_shade(vTexCoord, 1.125) * BEZEL_CORNER_DARK ;
+      float fcorners_dark = 1 - corners_shade(vTexCoord, 1.125) * BEZEL_CORNER_DARK ;
+
    
    FragColor.rgb = (pixel_out * fcorners_dark)+side_shade;
- 
-   //FragColor = vec4(shade_sharp_blur);
-   
+
 }
  
  

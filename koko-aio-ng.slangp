@@ -24,7 +24,7 @@
 #   - The blue channel represents the part of the bezel that will be filled by the game reflection.
 
 
-                textures = "monitor_body_curved;monitor_body_straight;bg_under;bg_over;backdrop"
+                textures = "monitor_body_curved;monitor_body_straight;bg_under;bg_over;backdrop;sideshade"
                 
             monitor_body_curved = "textures/monitor_body_curved.png"
      monitor_body_curved_linear = "true"
@@ -48,11 +48,15 @@
        bg_over_wrap_mode = "mirrored_repeat"
           bg_over_mipmap = "false"
 
-        #This is for support for arcade backdrop pictures, enable it in config.inc.
                 backdrop = "textures/boothill.jpg"
          backdrop_linear = "true"
       backdrop_wrap_mode = "mirrored_repeat"
          backdrop_mipmap = "true"
+         
+                sideshade = "textures/side_shade-helper.png"
+         sideshade_linear = "true"
+      sideshade_wrap_mode = "mirrored_repeat"
+          backdrop_mipmap = "false"
 
 shaders = 17
 

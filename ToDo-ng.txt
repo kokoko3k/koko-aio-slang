@@ -147,3 +147,7 @@ TODO:
 	    ...because is a big mess for all the shader.
 	    Optional linearization can be enabled via static config now.
 	[ ] Check for progressive blur correctness in the corners.
+	[ ] Try to disable mipmap generations for backdrop image, do it in main .slangp
+	[ ] Scattering sampling function for bezel reflection in final pass seems not effective near 
+		down right and left up corners.
+	
