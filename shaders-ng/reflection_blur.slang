@@ -29,8 +29,8 @@ void main() {
    
    
    //...to Change bezel sides luminance
-      #define _shade_up   -0.11
-      #define _shade_side -0.04   
+      #define _shade_up   -0.11 
+      #define _shade_side -0.04 
       #define _shade_down +0.02
       
       vTexCoord_rotated_maybe = vTexCoord;
@@ -38,6 +38,9 @@ void main() {
       vShadesUDS.y = _shade_down;
       vShadesUDS.z = _shade_side;
       
+      // multiply by 4 because the lut driving it has been divided by 4.0
+      // This would eventually allow to modify the lut to alter the shades.
+      vShadesUDS *= 4.0; 
       
       vTexCoord_rotated_maybe = vTexCoord; 
       

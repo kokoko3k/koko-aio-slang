@@ -59,7 +59,15 @@
         
     textures/monitor_body_curved.png, textures/monitor_body_straight.png
         This is the image used to draw the bezel.
-        Read further for details.
+        Read further in the bezel section of this document for details.
+        
+    textures/side_shade-helper.png
+        Bezel frame inner area, the reflective part, is shaded by default so that
+        upper area is less bright and lower area is a bit brighter.
+        While the shader does not expose controls to change that, if you want,
+        you can edit this file to alter the shades.
+        The more a primary color is saturated, the more the shade will turn to dark.
+        
         
 Texture "sources", including the main gimp project file for the <br>
 default curved and straight monitor frame are on the following repo: <br>
