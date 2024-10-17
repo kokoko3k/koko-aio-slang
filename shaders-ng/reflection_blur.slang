@@ -41,13 +41,17 @@ void main() {
       
       vTexCoord_rotated_maybe = vTexCoord; 
       
-      if (is_rotated()) {
-         vTexCoord_rotated_maybe.xy = vTexCoord.yx; 
-         vShadesUDS.xy = vShadesUDS.yx;
+      if (params.Rotation == 1.0) { //90
+         vTexCoord_rotated_maybe.xy = vTexCoord.yx; //rotate helper lut
+         vShadesUDS.xy = vShadesUDS.yx; //swap shade up and shade down.
+      } else
+      if (params.Rotation == 3.0) { // 270
+         vTexCoord_rotated_maybe.xy = vTexCoord.yx; //rotate helper lut
       }
+
       //slight adaption to match bezel aspect ratio:
-      vTexCoord_rotated_maybe.x = zoom1D(vTexCoord_rotated_maybe.x, 0.965);
-      
+         vTexCoord_rotated_maybe.x = zoom1D(vTexCoord_rotated_maybe.x, 0.965);
+         
 }
 
 #pragma stage fragment
@@ -62,6 +66,7 @@ layout(location = 0) out vec4 FragColor;
 
 layout(set = 0, binding = 1) uniform sampler2D Source;
 layout(set = 0, binding = 2) uniform sampler2D colortools_and_ntsc_pass;
+layout(set = 0, binding = 4) uniform sampler2D avglum_pass;
 layout(set = 0, binding = 3) uniform sampler2D sideshade;
 
 #include "includes/functions.include.slang"
