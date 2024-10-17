@@ -69,7 +69,6 @@ layout(location = 0) out vec4 FragColor;
 
 layout(set = 0, binding = 1) uniform sampler2D Source;
 layout(set = 0, binding = 2) uniform sampler2D colortools_and_ntsc_pass;
-layout(set = 0, binding = 4) uniform sampler2D avglum_pass;
 layout(set = 0, binding = 3) uniform sampler2D sideshade;
 
 #include "includes/functions.include.slang"
