@@ -572,7 +572,7 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
         Show less reflections in corners
     Reflections sharpness
         Modulates from totally blurred to totally sharp reflection appearance.
-    Reflections roughness
+    Surface roughness
         The amount of material roughness in reflection area
     Diffusion strength
         Mix an amount of high blurred reflection to simulate light diffusion

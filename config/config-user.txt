@@ -241,7 +241,7 @@
 // #define BEZEL_REFL_STRENGTH  0.5   //         Reflections strength
 // #define BEZEL_CORNER_DARK  0.8     //         Less reflections in corners
 // #define BEZEL_RFL_BLR_SHD  -0.2    //         Reflections sharpness
-// #define BEZEL_ROUGHNESS  1.0       //         Reflections roughness
+// #define BEZEL_ROUGHNESS  1.0       //         Surface roughness
 // #define BEZEL_DIFFUSION_STR  0.2   //         Diffusion strength
 // #define BEZEL_LIGHT_NO_FADEOUT 0.5 //         Specularity strength
 // #define BEZEL_SPCL_STRENGTH  0.5   //         Light fadeout distance
