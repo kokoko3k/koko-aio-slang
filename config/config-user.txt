@@ -97,6 +97,7 @@
 
 // #define DOT_C 0.0                    // ★ CVBS: Dot crawl
 // #define DOT_C_YUV 0.0                //         Colorspace (NTSC, PAL)
+// #define DOT_C_SPEED 8.0				//         Speed
 
 // #define DO_PPERSISTENCE  0.0         // ★ Persistence of phosphors enable?
 // #define PPERSISTENCE_START  0.9      //         Early decay

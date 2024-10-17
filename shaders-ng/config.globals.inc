@@ -144,6 +144,10 @@
     #define DOT_C_YUV		global.DOT_C_YUV
 #endif
 
+#ifndef DOT_C_SPEED
+    #define DOT_C_SPEED		global.DOT_C_SPEED
+#endif
+
 #ifndef SAT_BLEED_SIZE
     #define SAT_BLEED_SIZE	global.SAT_BLEED_SIZE
 #endif

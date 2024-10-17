@@ -16,6 +16,7 @@ layout(location = 6) out float vShow_artifact_mask;
 layout(location = 7) out float vDo_noise;
 layout(location = 8) out float vDynamicSeed;
 layout(location = 9) out float vDotCrawlShift;
+layout(location = 10) out vec4 vDotCrawlCoords_and_period;
 #include "includes/functions.include.slang"
 
 void main()
@@ -51,14 +52,16 @@ void main()
    vDo_noise = float( DO_RF_NOISE < -0.5 || ( DO_RF_NOISE > 0.5 && DO_IN_GLOW < 0.5 ));
    vDynamicSeed = mod(params.FrameCount, 120.0001);
    
-   //Mod framecount for animating dot crawl (needed to avoid precision errors)
-   float dot_crawl_speed = pi*1.5;
-   vDotCrawlShift = mod(params.FrameCount * dot_crawl_speed, pi*2.0);
+   //Mod framecount for animating dot crawl (needed to avoid precision errors)   
+      float dot_c_steps = 6.0; // frames needed to reach sin period; higher = slower;
+      dot_c_steps = 22-( abs(DOT_C_SPEED) *2)+0.0001;
+      vDotCrawlShift =((pi*2)/dot_c_steps) * mod(params.FrameCount, dot_c_steps);
    
-   float dot_c_steps = 6.0; // frames needed to reach sin period; higher = slower;
-   vDotCrawlShift =((pi*2)/dot_c_steps)   *   mod(params.FrameCount, dot_c_steps)     ;
+      vDotCrawlCoords_and_period = vec4(vTexCoord, params.OriginalSize.xy);
    
-   
+      // switch to vertical movement
+      if (DOT_C_SPEED < 0.0)
+         vDotCrawlCoords_and_period.xyzw = vDotCrawlCoords_and_period.yxwz;
 }
 
 
@@ -74,6 +77,8 @@ layout(location = 6) in float vShow_artifact_mask;
 layout(location = 7) in float vDo_noise;
 layout(location = 8) in float vDynamicSeed;
 layout(location = 9) in float vDotCrawlShift;
+layout(location = 10) in vec4 vDotCrawlCoords_and_period;
+
 layout(location = 0) out vec4 FragColor;
 
 layout(set = 0, binding = 1) uniform sampler2D upscale_pass;
@@ -235,7 +240,7 @@ vec3 dotc(sampler2D in_texture, vec3 pixel_in, vec2 co, vec4 tex_size, mat3 rgb2
       float d = max(distance_approx(cm.yz,cr.yz,p),  distance_approx(cm.yz,cl.yz,p));
    
    //apply moving square carrier (already modulatd by strength) to the chroma distance
-      float crosstalk = d * dotc_carrier(co, tex_size.xy);
+      float crosstalk = d * dotc_carrier(vDotCrawlCoords_and_period.xy, vDotCrawlCoords_and_period.zw);
       //return vec3(dotc_carrier(co, tex_size.xy));
    
    // chroma into luma
