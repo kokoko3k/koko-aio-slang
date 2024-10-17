@@ -21,7 +21,7 @@ layout(location = 1) out float lod;
 layout(location = 2) out vec2 vFuzzy_main_pass_stage_1;
 layout(location = 3) out float vReduced_sample_time_is_now;
 layout(location = 4) out float vAvglum_needed;
-layout(location = 5) out float vBezel_or_Bloom;
+
 layout(location = 6) out float vResSwitch_res_changed;
 layout(location = 7) out float vResChanged;
 layout(location = 8) out vec2 vTexCoord_unscaled;
@@ -45,8 +45,7 @@ void main() {
 
     vReduced_sample_time_is_now = mod(params.FrameCount,AMBI_AVGLUM_DIVIDER);
     
-    vAvglum_needed = DO_AMBILIGHT + DO_BEZEL + (DO_DYNZOOM*10.0) + DO_BLOOM + (RESSWITCH_GLITCH_SIZE*10.0) + AUTOCROP_MAX ;
-    vBezel_or_Bloom = DO_BEZEL + DO_BLOOM;
+    vAvglum_needed = DO_AMBILIGHT + DO_BEZEL + (DO_DYNZOOM*10.0) + (RESSWITCH_GLITCH_SIZE*10.0) + AUTOCROP_MAX ;
     
     //RESSWITCH shaking:
         vResSwitch_res_changed = 0.0;
@@ -73,7 +72,7 @@ layout(location = 1) in float lod;
 layout(location = 2) in vec2 vFuzzy_main_pass_stage_1;
 layout(location = 3) in float vReduced_sample_time_is_now;
 layout(location = 4) in float vAvglum_needed;
-layout(location = 5) in float vBezel_or_Bloom;
+
 layout(location = 6) in float vResSwitch_res_changed;
 layout(location = 7) in float vResChanged;
 layout(location = 8) in vec2 vTexCoord_unscaled;
@@ -108,8 +107,8 @@ float get_avg_lum_from_mip_nocc() {
     return rgb_to_gray(mip);
 }
 
-//0.1 seems like a good tradeoff that works well with bloom exposire and fullscreen zoom
-//...maybe bloom exposure works best at 0.05; you may consider another zone of smooth sampling.
+// 0.1 seems like a good tradeoff that works well with exposure and fullscreen zoom
+// ...maybe exposure works best at 0.05; you may consider another zone of smooth sampling.
 #define SMOOTHNESS_SPEED 0.1
 
 float get_avglum() {
@@ -378,7 +377,7 @@ void main() {
     
     //Create a small mipmap to be used to light the bezel corners
     //and by the bloom pass to identify bright areas.
-    if (vBezel_or_Bloom > 0.0) 
+    if (DO_BEZEL > 0.0) 
         pixel_out.rgb = textureLod(colortools_and_ntsc_pass, vTexCoord, mip_lod).rgb;
 
 
