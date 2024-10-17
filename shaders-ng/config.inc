@@ -375,7 +375,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 #pragma parameter DOT_C      "★ CVBS: Dot crawl ==>"		0.0 	 0.0 2.0 0.01
 #pragma parameter DOT_C_YUV  "        Colorspace (NTSC, PAL)"		0.0 	 0.0 1.0 1.0
-#pragma parameter DOT_C_SPEED "        Speed (<0.0 = vertical)"		1.0 	  -10.0 10.0 0.5 
+#pragma parameter DOT_C_SPEED "        Speed (<0.0 = vertical)"		10.0 	  -10.0 10.0 0.5 
 #pragma parameter LABEL0056 " " 0.0 0.0 0.0 1.0
 
 //Phosphor persistence
