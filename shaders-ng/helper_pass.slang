@@ -9,17 +9,26 @@ layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
 layout(location = 1) out float vIn_aspect;
+layout(location = 2) out vec2 vTexCoord_rotated_maybe;
 
 void main() {
 	gl_Position = global.MVP * Position;
 	vTexCoord = TexCoord + 0.0001;
 	vIn_aspect = get_in_aspect();
+	vTexCoord_rotated_maybe = vTexCoord;
+	if (params.Rotation == 3.0) { // 270
+		vTexCoord_rotated_maybe.x = 1-vTexCoord_rotated_maybe.x;
+	} else
+	if (params.Rotation == 1.0) { // 90
+		vTexCoord_rotated_maybe.y = 1-vTexCoord_rotated_maybe.y;
+	}
 }
 
 #pragma stage fragment
 
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in float vIn_aspect;
+layout(location = 2) in vec2 vTexCoord_rotated_maybe;
 
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D monitor_body_curved;
@@ -58,7 +67,7 @@ void main() {
 		}
 		//Spot:
 		if (DO_SPOT == 1.0) {
-			float dist = length( vec2(  (vTexCoord.x-0.5) * vIn_aspect, vTexCoord.y-0.5) +
+			float dist = length( vec2(  (vTexCoord_rotated_maybe.x-0.5) * vIn_aspect, vTexCoord_rotated_maybe.y-0.5) +
 			                     vec2(   S_POSITION_X     * vIn_aspect, S_POSITION_Y) );
 			FragColor.w = smoothstep(S_SIZE,0.0,dist) * S_POWER;
 		}
