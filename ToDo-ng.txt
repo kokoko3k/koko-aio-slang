@@ -147,6 +147,6 @@ TODO:
 	    ...because is a big mess for all the shader.
 	    Optional linearization can be enabled via static config now.
 	[ ] Check for progressive blur correctness in the corners.
-
-
+	[ ] Delta render: ditch DELTA_RENDER define and just check for DELTA_RENDER_FORCE_REFRESH
+	    put DELTA_RENDER_FORCE_REFRESH = 1.0 in config-user.txt
 	
