@@ -34,7 +34,7 @@ layout(location = 6) out float vIn_aspect;
 layout(location = 8) out float vDo_Tate;
 layout(location = 9) out vec3 vDotMat_Grid_Color;
 layout(location = 10) out vec4 vPG_offsets_and_size;
-                                                        layout(location = 11) out vec2 vCoords_for_bezel;
+
 layout(location = 12) out vec2 vPG_freq_base_screen_unfloored;
 layout(location = 13) out float vPG_period_multiplier_x;
 layout(location = 14) out vec2 vPG_OriginalSize_tated_mul_pi;
@@ -162,18 +162,6 @@ vec2 get_zooms_modifier(float do_tate, bool bNeed_NO_integer_scale, bool isrotat
 
 }
 
-vec2 get_scaled_coords_for_bezel(vec2 co, float isrotated) {
-
-    co = zoomout_coords(co, -BEZEL_FRAME_ZOOM); //FIXME COULD BE FASTER.
-    //co.y = zoom1D(co.y, BEZEL_ASPECT_CORRECTION );
-    //co = zoomxy(co, vec2(1+SERVICE1*0.001, 1-SERVICE1*0.001));
-    if (DO_TILT == 1.0) {
-        return tilt_bezel( co, isrotated, TILT_X);
-    } else {
-        return co;
-    }
-    
-}
 
 void main() {
     gl_Position = global.MVP * Position;
@@ -387,8 +375,6 @@ void main() {
             vInterlace_offset+=1.0;
     }
     
-
-    vCoords_for_bezel =  get_scaled_coords_for_bezel(vTexCoord, vIsRotated);
     
 }
 
@@ -406,7 +392,7 @@ layout(location = 6) in float vIn_aspect;
 layout(location = 8) in float vDo_Tate;
 layout(location = 9) in vec3 vDotMat_Grid_Color;
 layout(location = 10) in vec4 vPG_offsets_and_size;
-                                                                layout(location = 11) in vec2 vCoords_for_bezel;
+
 layout(location = 12) in vec2 vPG_freq_base_screen_unfloored;
 layout(location = 13) in float vPG_period_multiplier_x;
 layout(location = 14) in vec2 vPG_OriginalSize_tated_mul_pi;
@@ -458,6 +444,18 @@ vec2 get_vOutputCoord_adapted() {
     return vOutputCoord_adapted;
 }
 
+vec2 get_scaled_coords_for_bezel(vec2 co, float isrotated) {
+
+    co = zoomout_coords(co, -BEZEL_FRAME_ZOOM); //FIXME COULD BE FASTER.
+    //co.y = zoom1D(co.y, BEZEL_ASPECT_CORRECTION );
+    //co = zoomxy(co, vec2(1+SERVICE1*0.001, 1-SERVICE1*0.001));
+    if (DO_TILT == 1.0) {
+        return tilt_bezel( co, isrotated, TILT_X);
+    } else {
+        return co;
+    }
+    
+}
 
 vec3 fn_pixel_nightify(vec3 color_in, float strength, vec3 ambilight) {
     if (strength == 0.0) return color_in;
@@ -1375,7 +1373,7 @@ void main() {
         //SKIP LOGIC is inside fn_pixel_bezel
         vec2 co_bezel = vec2(0.0);
         if (DO_BEZEL == 1.0) {
-            co_bezel = vCoords_for_bezel;
+            co_bezel = get_scaled_coords_for_bezel(vTexCoord, vIsRotated);
             pixel_bezel = fn_pixel_bezel(co_bezel, co_mirror, BG_IMAGE_NIGHTIFY * DO_BG_IMAGE, pixel_ambi);
             //If we used a smooth_border, canvas_busy is it, but since the content is in the bezel,
             //we can safely use it to smooth/darken the game border
