@@ -29,7 +29,7 @@
 
 	//The following can slightly correct bezel aspect
 	//eg: #define BEZEL_ASPECT_CORRECTION (1.0 - 0.004) will make it shorter.
-#define BEZEL_ASPECT_CORRECTION (1.0)
+#define BEZEL_ASPECT_CORRECTION 1.0 //(1- ((SERVICE1-0.5) *0.01))  //(1.0 - 0.004)
 
 	//This is used to skip calculations in the reflection blur code.
 	//set it to minimum value that allows you to see reflection entirely
