@@ -166,7 +166,7 @@ vec2 get_scaled_coords_for_bezel(vec2 co, float isrotated) {
 
     co = zoomout_coords(co, -BEZEL_FRAME_ZOOM); //FIXME COULD BE FASTER.
     //co.y = zoom1D(co.y, BEZEL_ASPECT_CORRECTION );
-    co = zoomxy(co, vec2(1+SERVICE1*0.001, 1-SERVICE1*0.001));
+    //co = zoomxy(co, vec2(1+SERVICE1*0.001, 1-SERVICE1*0.001));
     if (DO_TILT == 1.0) {
         return tilt_bezel( co, isrotated, TILT_X);
     } else {
