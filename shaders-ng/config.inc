@@ -27,6 +27,7 @@ layout(push_constant) uniform Push {
 	float AMBI_STRETCH_VERTICAL;
 	float AMBI_INT_OFFSET ;
 	float AMBI_SMP_INT_OFFSET ;
+	
 } params;
 
 layout(std140, set = 0, binding = 0) uniform UBO {
@@ -302,6 +303,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float DOT_C;
 	float DOT_C_YUV;
 	float DOT_C_SPEED;
+	
 	
 } global;
 
