@@ -20,30 +20,30 @@ void main() {
    vTexCoord = TexCoord;
 
    //Get fuzzy mul and pow factor
-      vFuzzy_main_pass_stage_1 = apply_fuzzy_main_pass_stage_1_no_gamma_in();   
-      
+      vFuzzy_main_pass_stage_1 = apply_fuzzy_main_pass_stage_1_no_gamma_in();  
+     
    //Zoom out the image coordinates by the bezel border size to make room for reflections:
       vCoords_zoomout = zoom(vTexCoord, BEZEL_REFL_ZOOMOUT_ROOM);
-      
+     
    vDo_Curvature = curvature_needed();
    
    
    //...to Change bezel sides luminance
-      #define _shade_up   -0.11 
-      #define _shade_side -0.04 
+      #define _shade_up   -0.11
+      #define _shade_side -0.04
       #define _shade_down +0.02
-      
+     
       vTexCoord_rotated_maybe = vTexCoord;
       vShadesUDS.x = _shade_up;
       vShadesUDS.y = _shade_down;
       vShadesUDS.z = _shade_side;
-      
+     
       // multiply by 4 because the lut driving it has been divided by 4.0
       // This would eventually allow to modify the lut to alter the shades.
-      vShadesUDS *= 4.0; 
-      
-      vTexCoord_rotated_maybe = vTexCoord; 
-      
+      vShadesUDS *= 4.0;
+     
+      vTexCoord_rotated_maybe = vTexCoord;
+     
       if (params.Rotation == 1.0) { //90
          vTexCoord_rotated_maybe.xy = vTexCoord.yx; //rotate helper lut
          vShadesUDS.xy = vShadesUDS.yx; //swap shade up and shade down.
@@ -78,7 +78,7 @@ layout(set = 0, binding = 3) uniform sampler2D sideshade;
 float light_fadeout(vec2 co) {
    const float shade_start = 1-BEZEL_REFL_FADEOUT_START ;  
    vec2 gradients = smoothstep_fast( vec2(BEZEL_LIGHT_NO_FADEOUT), vec2(0.5-(shade_start)   ), abs(co-0.5));
-   return  (gradients.x * gradients.y ); 
+   return  (gradients.x * gradients.y );
 }
 
 void main() {
@@ -108,7 +108,7 @@ void main() {
 
       vec3 pixel_out = bloom(Source, vCoords_zoomout, global.FinalViewportSize, vec2(blur_radius), 1.0, start_offset, 0.0) ;
       pixel_out *= BEZEL_REFL_STRENGTH;
-      
+     
    //Next simulate a diffused light
       vec3 pixel_diffused = textureLod( colortools_and_ntsc_pass, vCoords_zoomout, 6.0).rgb;
       pixel_diffused = pow(pixel_diffused.rgb, vec3(IN_GLOW_GAMMA));
@@ -116,8 +116,8 @@ void main() {
       pixel_out += pixel_diffused * BEZEL_DIFFUSION_STR;
 
    //Apply gamma out to reflections here to so that we don't need to do it in final pass (heavier).
-      //pixel_out = apply_fuzzy_main_pass_stage_2(pixel_out, vFuzzy_main_pass_stage_1);
-      
+      pixel_out = apply_fuzzy_main_pass_stage_2(pixel_out, vFuzzy_main_pass_stage_1);
+     
    //Fadeout reflected lighe
       if (vDo_Curvature > 0.0) {
          vec2 curvedco = Warp_koko(vTexCoord, vec2(-GEOM_WARP_X, -GEOM_WARP_Y), 0.5);
@@ -139,6 +139,3 @@ void main() {
    FragColor.rgb = (pixel_out * fcorners_dark)+side_shade;
 
 }
- 
- 
-  
