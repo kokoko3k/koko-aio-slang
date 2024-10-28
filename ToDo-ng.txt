@@ -149,4 +149,5 @@ TODO:
 	[ ] Check for progressive blur correctness in the corners.
 	[ ] Delta render: ditch DELTA_RENDER define and just check for DELTA_RENDER_FORCE_REFRESH
 	    put DELTA_RENDER_FORCE_REFRESH = 1.0 in config-user.txt
-	
+	[ ] Support for upcoming optional include pragma
+	[ ] Support for upcoming OriginalAspect/Rot
