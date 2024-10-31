@@ -688,6 +688,9 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 // This is for a patched retroarch version I'm testing (24/03/04)
 #pragma inject_preset_code DEFINES_FROM_PRESET
 
+// Retroarch releases past October 2024 will support this:
+#pragma include_optional "../config/config-user-optional.txt"
+
 //User parameters goes here, they overrides almost everything:
 #include "../config/config-user.txt"
 
