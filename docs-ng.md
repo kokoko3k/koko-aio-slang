@@ -690,8 +690,8 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
     Simulates external light reflected by the monitor glass.<br>
             
 **Aspect (active with ambient light or background image only):**<br>
-    If you set retroarch aspect ratio option to full, you have to provide<br>
-    the core aspect ratio to the shader manually via the following parameters.<br>
+    With RetroArch <= 1.19.1, if you set retroarch aspect ratio option to full,<br>
+    you have to provide the core aspect ratio to the shader manually.<br>
     NOTE: The following parameters are ignored when not using ambient lights
     or background/foreground images.
     In those cases, use options under "Override content geometry" section.
@@ -710,6 +710,7 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
         -4 = 10/7 Megadrive 
         -5 = Uncorrected
         -6 = 0.75 MAME rotated 1.33 games in TATE mode
+        -7 = Use Core provided Aspect Ratio (requires RetroArch > 1.19.1)
     Aspect Ratio Denominator:
         As long as Aspect Ratio Numerator is positive, this will
         be used as the denominator of the fraction.
@@ -762,7 +763,8 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
         Permit integer overscale by:
             When doing integer scaling, allow the image to be slightly overscanned (goes off screen).
     Aspect:
-        Change aspect ratio.
+        Forces an aspect ratio.
+        Use a negative value to use Core provided aspect ratio (requires RetroArch > 1.19.1)
     Vertical/Horizontal position:
         Shifts the game position
     Zoom: 

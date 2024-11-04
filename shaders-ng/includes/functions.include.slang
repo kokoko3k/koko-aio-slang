@@ -820,7 +820,13 @@ vec2 screen_space_displacement(vec2 co, vec2 outputsize, float size) {
 		if (ASPECT_X == -4) return 1.428; // 10/7 megadrive
 		if (ASPECT_X == -5) return params.OriginalSize.x/params.OriginalSize.y; //uncorrected
 		if (ASPECT_X == -6) return 0.75;  // 3/4, pre-rotated (TATE) 1.33 games.
-
+		if (ASPECT_X == -7) {
+			#ifdef _HAS_ORIGINALASPECT_UNIFORMS
+				return global.OriginalAspectRotated;
+			#endif
+				return 1.333333; //fallback to 4:3 when uniform is not available.
+		}
+		
 		return ASPECT_X / ASPECT_Y ;
 	}
 
@@ -952,10 +958,20 @@ vec2 screen_space_displacement(vec2 co, vec2 outputsize, float size) {
 	vec2 content_geom_override_zoom(vec2 co, float aspect, float in_aspect, float vshift, float hshift, float out_zoom){
 		// see next (**)
 		float scale_y;
-		if (aspect > 0.01) 
+		bool OriginalAspectAvailable = false;
+		#ifdef _HAS_ORIGINALASPECT_UNIFORMS
+			OriginalAspectAvailable = true;
+		#endif
+		/* for aspect < 0.0, just use core aspect */
+		if (aspect < 0.0 && OriginalAspectAvailable) {
+			aspect = global.OriginalAspectRotated;
 			scale_y = aspect/in_aspect;
-				else
+		} 
+		else if (aspect > 0.01) 
+			scale_y = aspect/in_aspect;
+		else
 			scale_y = 1.0;
+
 		
 		float offset_y = (0.5 * scale_y ) - 0.5 ;
 		co.y = co.y*scale_y - offset_y;
