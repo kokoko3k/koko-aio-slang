@@ -958,16 +958,16 @@ vec2 screen_space_displacement(vec2 co, vec2 outputsize, float size) {
 	vec2 content_geom_override_zoom(vec2 co, float aspect, float in_aspect, float vshift, float hshift, float out_zoom){
 		// see next (**)
 		float scale_y;
-		bool OriginalAspectAvailable = false;
+		
 		#ifdef _HAS_ORIGINALASPECT_UNIFORMS
-			OriginalAspectAvailable = true;
+			/* for aspect < 0.0, just use core aspect */
+			if (aspect < 0.0) {
+				aspect = global.OriginalAspectRotated;
+				scale_y = aspect/in_aspect;
+			} else		
 		#endif
-		/* for aspect < 0.0, just use core aspect */
-		if (aspect < 0.0 && OriginalAspectAvailable) {
-			aspect = global.OriginalAspectRotated;
-			scale_y = aspect/in_aspect;
-		} 
-		else if (aspect > 0.01) 
+
+		if (aspect > 0.01) 
 			scale_y = aspect/in_aspect;
 		else
 			scale_y = 1.0;
