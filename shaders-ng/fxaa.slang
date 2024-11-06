@@ -798,13 +798,16 @@ vec3 FxaaPixelShader(vec2 pos, sampler2D tex, vec4 sourcesize, vec4 outputsize) 
    dstN = directionN ? dstN : dstP;
    float subPixelOffset = (0.5 + (dstN * (-1.0/spanLength))) * lengthSign;
 
+   
+   subPixelOffset *= 2.0; //<-- KOKO, hack.
+   
    vec2 smpco;
       
    if (horzSpan) {
       smpco.x = pos.x + 0.0;
-      smpco.y = coords_NEAREST( pos + subPixelOffset, params.SourceSize ).y;
+      smpco.y = coords_NEAREST( pos, params.SourceSize ).y + subPixelOffset;
    } else {
-      smpco.x = coords_NEAREST( pos + subPixelOffset, params.SourceSize ).x;
+      smpco.x = coords_NEAREST( pos, params.SourceSize ).x + subPixelOffset;
       smpco.y = pos.y + 0.0;
    }
 
