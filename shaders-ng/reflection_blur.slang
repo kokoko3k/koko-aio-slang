@@ -38,10 +38,15 @@ void main() {
       vShadesUDS.y = _shade_down;
       vShadesUDS.z = _shade_side;
      
+      vShadesUDS = mix(vec3(0.0), vShadesUDS, max(BEZEL_RFL_CONTRAST, 0.0)  );
+      if (BEZEL_RFL_CONTRAST < 0.0)
+         vShadesUDS += abs(BEZEL_RFL_CONTRAST*0.1);
+      
       // multiply by 4 because the lut driving it has been divided by 4.0
       // This would eventually allow to modify the lut to alter the shades.
       vShadesUDS *= 4.0;
      
+      
       vTexCoord_rotated_maybe = vTexCoord;
      
       if (params.Rotation == 1.0) { //90
@@ -79,6 +84,11 @@ float light_fadeout(vec2 co) {
    const float shade_start = 1-BEZEL_REFL_FADEOUT_START ;  
    vec2 gradients = smoothstep_fast( vec2(BEZEL_LIGHT_NO_FADEOUT), vec2(0.5-(shade_start)   ), abs(co-0.5));
    return  (gradients.x * gradients.y );
+}
+
+float contrast(float col, float contrast) {
+   float con_max = fma(0.5, contrast, 0.5);
+   return scale_to_range(col, -con_max+1, con_max);  
 }
 
 void main() {
@@ -131,7 +141,7 @@ void main() {
    // that identifies screen sides, we use them to shade the reflection area
       vec3 side_shade_lut_DRUL = textureLod(sideshade, vTexCoord_rotated_maybe.xy, 0.0).rgb;
       float side_shade = dot(side_shade_lut_DRUL, vShadesUDS.yzx );
-         
+            
    //Corners: less reflections:
       float fcorners_dark = 1 - corners_shade(vTexCoord, 1.125) * BEZEL_CORNER_DARK ;
 

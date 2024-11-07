@@ -421,6 +421,10 @@
     #define BEZEL_ROUGHNESS		global.BEZEL_ROUGHNESS
 #endif
 
+#ifndef BEZEL_RFL_CONTRAST
+    #define BEZEL_RFL_CONTRAST		global.BEZEL_RFL_CONTRAST
+#endif
+
 #ifndef DO_SPOT
     #define DO_SPOT		global.DO_SPOT
 #endif
