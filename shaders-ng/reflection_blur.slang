@@ -136,6 +136,6 @@ void main() {
       float fcorners_dark = 1 - corners_shade(vTexCoord, 1.125) * BEZEL_CORNER_DARK ;
 
    
-   FragColor.rgb = (pixel_out * fcorners_dark)+side_shade;
+   FragColor = vec4(pixel_out * fcorners_dark, side_shade);
 
 }

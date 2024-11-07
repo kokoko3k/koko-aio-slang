@@ -1205,7 +1205,11 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
             //Push it over the specular areas and apply the reflection modifier
                 //pixel_mirrored.rgb = pixel_mirrored.rgb * (1 + lut_specular);
                 //pixel_mirrored.rgb = pixel_mirrored.rgb + pixel_mirrored.rgb * lut_specular; //ASM PROOF: FASTER
-                pixel_mirrored.rgb = fma( pixel_mirrored.rgb, vec3(lut_specular), +pixel_mirrored.rgb); //ASM PROOF: FASTER  
+                //pixel_mirrored.rgb = fma( pixel_mirrored.rgb, vec3(lut_specular), +pixel_mirrored.rgb); //ASM PROOF: FASTER  
+                
+            pixel_mirrored.rgb = pixel_mirrored.rgb * (1 + lut_specular);
+            //apply shades over reflection area
+                pixel_mirrored.rgb += pixel_mirrored.a;
         }
 
     //Yes, we already passed ambilight as parameter, but if geometry content is overridden
