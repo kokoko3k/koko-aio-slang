@@ -68,6 +68,7 @@
 
 // #define DO_RF_NOISE  0.0             // ★ RF Noise enable?
 // #define RF_NOISE_STRENGTH  0.05      //         Strength
+// #define RF_NOISE_SPARK     0.07      //         Snow noise
 
 
 // #define DO_DEDITHER  0.0             // ★ Dedither enable? (not with NTSC artifacts) 
