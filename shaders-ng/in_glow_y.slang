@@ -193,8 +193,10 @@ void main() {
       }
    
    if (DO_RF_NOISE > 0.1) {
-      pixel_glowed += get_rf_noise(vTexCoord * vDynamicSeed);
-      pixel_glowed = max(pixel_glowed, vec3(0.0));
+      pixel_glowed.rgb = pow(pixel_glowed.rgb, vec3(IN_GLOW_GAMMA));
+         pixel_glowed += get_rf_noise(vTexCoord * vDynamicSeed);
+         pixel_glowed = max(pixel_glowed, vec3(0.0));
+      pixel_glowed.rgb = pow(pixel_glowed.rgb, vec3(1/IN_GLOW_GAMMA));
    }
    
    

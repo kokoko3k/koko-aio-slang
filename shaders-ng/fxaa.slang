@@ -897,15 +897,11 @@ void main() {
       //to avoid glitches on amd (and probably nvidia too).
       //It should be possible to change the noise function to just emit positive
       //numbers and pre-lowering the brightness of pixel_out in the very first pass tho.
-      
-      pixel_out.rgb = pow(pixel_out.rgb, vec3(IN_GLOW_GAMMA));
-      
+            
          float rfnoise = get_rf_noise(vTexCoord * vDynamicSeed);
          pixel_out.rgb += rfnoise;
          pixel_out.rgb = max(pixel_out.rgb, vec3(0.0));
          
-      pixel_out.rgb = pow(pixel_out.rgb, vec3(1/IN_GLOW_GAMMA));
-      
    }
    
     //pixel_out.rgb = max(vec3(0.0), pixel_out.rgb); 
