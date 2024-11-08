@@ -908,7 +908,7 @@ void main() {
       
    }
    
-    pixel_out.rgb = max(vec3(0.0), pixel_out.rgb); 
+    //pixel_out.rgb = max(vec3(0.0), pixel_out.rgb); 
     
    FragColor = pixel_out;
    
