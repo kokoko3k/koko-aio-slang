@@ -185,7 +185,7 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
         
 ** RF Noise:**<br>
     Emulates radio frequency noise with a given strength<br>
-    1 produce noise after the Glow/Blur pass, while -1 will move it before it.
+    1 produce noise before the Glow/Blur pass, while -1 will move it after.
     Suggestions:
     If you're blurring the image, is better to use 1.<br>
     If you're glowing the image, prefer -1.<br>

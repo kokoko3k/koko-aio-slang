@@ -103,6 +103,14 @@ vec3 blur_select_wrap(sampler2D texture_in, vec2 co, vec4 sourcesize, float shar
 }
 
 
+vec3 apply_noise_to(vec3 c) {
+   c.rgb = pow(c.rgb, vec3(1/IN_GLOW_GAMMA));
+      c += get_rf_noise(vTexCoord * vDynamicSeed);
+      c = max(c, vec3(0.0));
+   c.rgb = pow(c.rgb, vec3(IN_GLOW_GAMMA));
+   return c;
+}
+
 
 void main() { 
 
@@ -147,6 +155,10 @@ void main() {
    
    if (DO_IN_GLOW == 0.0) {
       FragColor = vec4(texture(shift_and_bleed_pass, vTexCoord).rgb * vGlow_Gain, warpedglow_or_DR);
+      
+      if (DO_RF_NOISE < -0.5)
+          FragColor.rgb = apply_noise_to(FragColor.rgb);
+      
       return;
    }
 
@@ -191,16 +203,10 @@ void main() {
          //return;
          pixel_glowed = glow_blur_bias(shift_and_bleed_pass, vTexCoord, pixel_glowed, in_glow_bias_faded);
       }
-   
-   if (DO_RF_NOISE > 0.1) {
-      pixel_glowed.rgb = pow(pixel_glowed.rgb, vec3(IN_GLOW_GAMMA));
-         pixel_glowed += get_rf_noise(vTexCoord * vDynamicSeed);
-         pixel_glowed = max(pixel_glowed, vec3(0.0));
-      pixel_glowed.rgb = pow(pixel_glowed.rgb, vec3(1/IN_GLOW_GAMMA));
-   }
-   
-   
+      
    FragColor = vec4(pixel_glowed * vGlow_Gain, warpedglow_or_DR);
    
+   if (DO_RF_NOISE < -0.5)
+       FragColor.rgb = apply_noise_to(FragColor.rgb);
 }
 
