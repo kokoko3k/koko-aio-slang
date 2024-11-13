@@ -1758,3 +1758,8 @@ float get_rf_noise(vec2 seed) {
 	       + smoothstep_fast(0.98, 1.0, anoise) * RF_NOISE_SPARK;
 }
 
+vec3 clip_to_white_maybe(vec3 c) {
+	vec3 clips = max(vec3(0), c - 1 );
+	c.rgb += vec3(  clips.g+clips.b, clips.r+clips.b, clips.r+clips.g ) * CLIP_TO_WHITE;
+	return c;
+}

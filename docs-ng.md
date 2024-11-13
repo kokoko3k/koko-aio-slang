@@ -78,12 +78,18 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
 
 **PARAMETERS:**
 
-**Gamma in:**
-        Input Gamma: set it around 2.2 to linearize values.
+**Gamma in:**<br>
+Input Gamma: set it around 2.2 to linearize values.
         
-**Gamma out:**
-        Output Gamma: set it around "1/Gamma in"; small tweaks allowed.
+**Gamma out:**<br>
+Output Gamma: set it around "1/Gamma in"; small tweaks allowed.
         
+**Clip to white:**<br>
+Human brain perceives strong colors as white, but <br>
+in crt shaders you don't want this to preserve colors.<br>
+However nice effects may be obtained (eg: with vector games). <br>
+        
+
 **Color corrections:**<br>
     Modify signal color at "input" stage.<br>
 

@@ -12,6 +12,10 @@
     #define GAMMA_OUT	global.GAMMA_OUT
 #endif
 
+#ifndef CLIP_TO_WHITE
+    #define CLIP_TO_WHITE	global.CLIP_TO_WHITE
+#endif
+
 #ifndef SATURATION
     #define SATURATION	global.SATURATION
 #endif
