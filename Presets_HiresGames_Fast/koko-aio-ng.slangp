@@ -119,7 +119,7 @@ float_framebuffer0 = "true"
            shader1 = ../shaders-ng/fxaa.slang
             alias1 = "upscale_pass"
        scale_type1 = source
-            scale1 = 2.0
+            scale1 = 1.0
      mipmap_input1 = "true"
         // This *has* to be mirrored repeat so that avglum mipmap sampling that samplese from previous
         // pass will not pick black.
