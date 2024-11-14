@@ -307,8 +307,9 @@ float_framebuffer6 = false
            shader15 = shaders-ng/helper_pass.slang
             alias15 = "helper_pass"
        scale_type15 = absolute
-// Helper pass does not need float framebuffer (by now)
-// float_framebuffer15 = false
+// Helper pass needs float framebuffer so that the noise over spot
+// and vignette does a (much) better job in debanding.
+float_framebuffer15 = true
             scale15 = 128
     filter_linear15 = true    
         wrap_mode15 = "mirrored_repeat"
