@@ -74,7 +74,6 @@ shaders = 17
 #ASMDEBUG GLSL27
            shader0 = shaders-ng/colortools_and_ntsc_pass.slang
             alias0 = "colortools_and_ntsc_pass"
-#float_framebuffer needed by phosphor persistance
        scale_type0 = source
             scale0 = 1.0
             
@@ -92,6 +91,8 @@ shaders = 17
 //      are set by colortools_and_ntsc_pass (the this pass)
 
 // Hence, we have to set colortools_and_ntsc_pass and next pass (upscale_pass) with the same filter and wrap_mode
+
+// float_framebuffer needed by phosphor persistance
 float_framebuffer0 = "true"
     filter_linear0 = "true"
         wrap_mode0 = "mirrored_repeat"
@@ -123,6 +124,8 @@ float_framebuffer0 = "true"
         // This *has* to be mirrored repeat so that avglum mipmap sampling that samplese from previous
         // pass will not pick black.
         wrap_mode1 = "mirrored_repeat"
+// this has to be float framebuffer, because colortools may push values over 1.0.
+// simple test is to push brightness and see the difference.
 float_framebuffer1 = "true"
     filter_linear1 = "true"
         
@@ -137,7 +140,8 @@ float_framebuffer1 = "true"
     filter_linear2 = true
             scale2 = 1.0
        scale_type2 = source
-float_framebuffer2 = true
+// As per fxaa pass, this has to be float framebuffer too, because colortools may push values over 1.0.
+// simple test is to push brightness and see the difference.
         wrap_mode2 = "mirrored_repeat"
 
         
@@ -151,6 +155,7 @@ float_framebuffer2 = true
     filter_linear3 = true
             scale3 = 1.0
        scale_type3 = source    
+//This needs to be signed because of WarpedGlow, so float_framebuffer.
 float_framebuffer3 = true
         wrap_mode3 = "clamp_to_edge"
      
@@ -160,6 +165,7 @@ float_framebuffer3 = true
     filter_linear4 = true
             scale4 = 1.0
        scale_type4 = source    
+//This needs to be signed because of WarpedGlow, so float_framebuffer.
 float_framebuffer4 = true
         wrap_mode4 = "clamp_to_border"
             
@@ -175,7 +181,8 @@ float_framebuffer4 = true
     filter_linear5 = true
             scale5 = 1.0
        scale_type5 = source
-float_framebuffer5 = true
+#float_framebuffer here seems not needed.
+float_framebuffer5 = false
         # This has to be clamp_to_border in order for the glow pass to return a black frame
         # around it, which is needed so that when using geometry override and zooming out the content,
         # it will have black surrounding.
@@ -187,7 +194,8 @@ float_framebuffer5 = true
     filter_linear6 = true
             scale6 = 1.0
        scale_type6 = source
-float_framebuffer6 = true
+#float_framebuffer here seems not needed.
+float_framebuffer6 = false
         wrap_mode6 = "clamp_to_border"
 
 
@@ -275,7 +283,8 @@ float_framebuffer6 = true
            scale_type13 = source
                 scale13 = 1.0
             wrap_mode13 = "mirrored_repeat"
-    float_framebuffer13 = "true"
+// Here float framebuffer seems not needed too.
+    float_framebuffer13 = "false"
 
 
 
@@ -298,7 +307,8 @@ float_framebuffer6 = true
            shader15 = shaders-ng/helper_pass.slang
             alias15 = "helper_pass"
        scale_type15 = absolute
-float_framebuffer15 = true
+//Helper pass does not need float framebuffer (by now)
+//float_framebuffer15 = false
             scale15 = 128
     filter_linear15 = true    
         wrap_mode15 = "mirrored_repeat"
