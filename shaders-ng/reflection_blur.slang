@@ -53,6 +53,9 @@ void main() {
          vTexCoord_rotated_maybe.xy = vTexCoord.yx; //rotate helper lut
          vShadesUDS.xy = vShadesUDS.yx; //swap shade up and shade down.
       } else
+      if (params.Rotation == 2.0) { // 180
+         vShadesUDS.xy = vShadesUDS.yx; //swap shade up and shade down.
+      } else
       if (params.Rotation == 3.0) { // 270
          vTexCoord_rotated_maybe.xy = vTexCoord.yx; //rotate helper lut
       }
