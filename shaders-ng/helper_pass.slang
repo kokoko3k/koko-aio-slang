@@ -19,16 +19,13 @@ void main() {
 	if (params.Rotation == 1.0) { // 90
 		vTexCoord_rotated_maybe.y = 1-vTexCoord_rotated_maybe.y;
 	} else
-	if (params.Rotation == 2.0){
+	if (params.Rotation == 2.0){ // 180
 		vTexCoord_rotated_maybe = 1-vTexCoord_rotated_maybe;
 	} else
 	if (params.Rotation == 3.0) { // 270
 		vTexCoord_rotated_maybe.x = 1-vTexCoord_rotated_maybe.x;
 	}
 
-
-		
-	
 }
 
 #pragma stage fragment
