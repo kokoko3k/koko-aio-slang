@@ -924,12 +924,17 @@ vec2 screen_space_displacement(vec2 co, vec2 outputsize, float size) {
 			izoom = params.OriginalSize.xy / global.FinalViewportSize.xy;
 			//Find the maximum zoom allowed
 			vec2 int_zoom = floor(global.FinalViewportSize.yx / (params.OriginalSize.yx/(GAME_GEOM_INT_SCALE_OVR) ));
-			int_zoom = clamp(int_zoom, 1.0, GAME_GEOM_INT_SCALE_MAX);
-			izoom *= min(int_zoom.x, int_zoom.y/adapted_aspect);
+			
+			int_zoom = clamp(int_zoom, vec2(1.0), vec2(GAME_GEOM_INT_SCALE_MAX));
+			
+			//int_zoom = vec2(2.0);
+
+			
+			izoom *= min(int_zoom.x*adapted_aspect, int_zoom.y);
 		} else {
 			izoom = params.OriginalSize.xy / global.FinalViewportSize.yx;
 			vec2 int_zoom = floor(global.FinalViewportSize.yx / (  (params.OriginalSize.xy*adapted_aspect)/(GAME_GEOM_INT_SCALE_OVR) ));
-			int_zoom = clamp(int_zoom, 1.0, GAME_GEOM_INT_SCALE_MAX);
+			int_zoom = clamp(int_zoom, vec2(1.0), vec2(GAME_GEOM_INT_SCALE_MAX));
 			izoom *= min(int_zoom.x, int_zoom.y*adapted_aspect);
 		}
 		return zoomxy(in_coords, izoom);
