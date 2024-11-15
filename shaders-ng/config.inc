@@ -675,7 +675,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter DO_GAME_GEOM_OVERRIDE	  "★ Override content geometry enable? (ov)==>"	0.0   0.0  1.0 	  1.0
 #pragma parameter GAME_GEOM_INT_SCALE     "        Integer scale (2=No keep aspect)"	0.0   0.0  2.0    1.0
 #pragma parameter GAME_GEOM_INT_SCALE_MAX "        .    Maximum integer scale" 			10.0  1.0  100.0  1.0
-#pragma parameter GAME_GEOM_INT_SCALE_OVR "        .    Permit integer overscale by" 			1.04   1.00  1.1  0.01
+#pragma parameter GAME_GEOM_INT_SCALE_OVR "        .    Permit integer overscale by" 			1.04   1.00  1.15  0.01
 #pragma parameter LABEL0052           "    !! The following will override integer scale" 0.0 0.0 0.0 1.0
 #pragma parameter GAME_GEOM_ASPECT	  "        Aspect (0=unchanged, <0=Core Aspect)"	0.0    -0.01  3.0	  0.005
 #pragma parameter GAME_GEOM_VSHIFT	  "        Vertical position"			0.0   -10.0 10.0  0.01
