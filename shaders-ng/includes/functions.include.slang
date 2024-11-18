@@ -1,3 +1,31 @@
+//#define _HAS_ROTATION_UNIFORM
+
+bool is_rotated_new(){
+	return (params.Rotation == 1.0 || params.Rotation == 3.0);
+}
+
+bool is_rotated_old(){
+	//Keep this to retain some sort of compatibility with Retroarch pre 1.17
+	const float ar_tolerance = 0.005;
+	/*
+		For some reason, probably retroarch rotates the view only on final viewport stage, transparent to the shader passes,
+		The OutputSize of a pass that scales to viewport will have different aspect from the real final viewport.
+		We exploit this to understand when a game is rotated.
+		-->> This function only works if the calling pass scales to viewport.
+		This will fail for very particular cases, eg: when output window is extremely tall 
+	*/
+	return (abs((params.OutputSize.x/params.OutputSize.y) - (global.FinalViewportSize.x/global.FinalViewportSize.y)) > ar_tolerance);
+}
+	
+bool is_rotated() {
+	#ifdef _HAS_ROTATION_UNIFORM
+		return is_rotated_new();
+	#else
+		return is_rotated_old();
+	#endif
+}
+
+
 //	Colorspace conversion matrix for YIQ-to-RGB
 const mat3 YIQ2RGB = mat3(1.000, 1.000, 1.000,
                           0.956,-0.272,-1.106,
@@ -798,19 +826,7 @@ vec2 screen_space_displacement(vec2 co, vec2 outputsize, float size) {
 		return  abs(pixel.a - alpha_mark) < 0.05; //<-- 0.05 allow about 20 alpha levels (1*0.05)
 	}
 
-	//#define ar_tolerance 0.005 //To compensate when comparing different A/R 
-	bool is_rotated() {
-		return (params.Rotation == 1.0 || params.Rotation == 3.0);
-		/*
-			For some reason, probably retroarch rotates the view only on final viewport stage, transparent to the shader passes,
-			The OutputSize of a pass that scales to viewport will have different aspect from the real final viewport.
-			We exploit this to understand when a game is rotated.
-			-->> This function only works if the calling pass scales to viewport.
-			This will fail for very particular cases, eg: when output window is extremely tall 
-		*/
-		//return (abs((params.OutputSize.x/params.OutputSize.y) - (global.FinalViewportSize.x/global.FinalViewportSize.y)) > ar_tolerance);
-	}
-
+	
 	float get_in_aspect() {
 		if (!border_needed()) return global.FinalViewportSize.x/global.FinalViewportSize.y; //image adapts to game window.
 		if (ASPECT_X ==  0) return 1.3333333333333; //all mame games, not rotated
