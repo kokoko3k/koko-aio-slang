@@ -283,8 +283,9 @@ float_framebuffer6 = false
            scale_type13 = source
                 scale13 = 1.0
             wrap_mode13 = "mirrored_repeat"
-// Here float framebuffer seems not needed too.
-    float_framebuffer13 = "false"
+// Here float framebuffer is needed because we need high resolution feedback
+// for time fades
+    float_framebuffer13 = "true"
 
 
 
