@@ -7,6 +7,8 @@
 /////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
+// STATIC FEATURES ENABLE/DISABLE
+
 // D3D/XBOX users should enable Direct3D workarounds to avoid glitches or crashes
 // by removing the leading "//" from the following line:
 
@@ -15,10 +17,8 @@
 // In case you're running an old Retrtoarch version (pre 1.16), please comment this (add leading //)
 #define _HAS_ROTATION_UNIFORM
 
-// STATIC FEATURES ENABLE/DISABLE
-	
 // Enable lcd antighosting by using values > 0.0 (try around 0.25)
-	#define LCD_ANTIGHOSTING 0.0
+//	#define LCD_ANTIGHOSTING 0.25
 
 
 // BEZEL STATIC CONFIG ////////////////////////////////////////////////////////

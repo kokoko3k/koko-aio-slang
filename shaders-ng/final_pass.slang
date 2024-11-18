@@ -1324,11 +1324,13 @@ void main() {
             pixel_out = fn_pixel_content(co_content) * canvas_busy;
                       
             #ifndef D3D_WORKAROUND
-                if (LCD_ANTIGHOSTING > 0.0) {
-                    vec3 feedback = texture(final_passFeedback, vOutputCoord).rgb;
-                    vec3 diff=(feedback - pixel_out);
-                    pixel_out = mix(pixel_out, pixel_out-diff, LCD_ANTIGHOSTING );
-                }
+                #ifdef LCD_ANTIGHOSTING
+                    if (LCD_ANTIGHOSTING > 0.0) {
+                        vec3 feedback = texture(final_passFeedback, vOutputCoord).rgb;
+                        vec3 diff=(feedback - pixel_out);
+                        pixel_out = mix(pixel_out, pixel_out-diff, LCD_ANTIGHOSTING );
+                    }
+                #endif
             #endif
 
         } else {
