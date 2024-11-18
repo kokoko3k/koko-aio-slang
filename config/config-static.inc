@@ -12,7 +12,7 @@
 
 // #define D3D_WORKAROUND
 
-// In case you're running an old Retrtoarch version (pre 1.16), please comment this 
+// In case you're running an old Retrtoarch version (pre 1.16), please comment this (add leading //)
 #define _HAS_ROTATION_UNIFORM
 
 // STATIC FEATURES ENABLE/DISABLE
