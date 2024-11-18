@@ -341,8 +341,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-//Renders only changed parts of screen; uncomment and set to 1.0 to lower power consumption / mitigate throttling:
-// #define DELTA_RENDER 0.0 
+// Renders only changed parts of screen; uncomment (remove leading //) to lower power consumption / mitigate throttling:
+// #define DELTA_RENDER 1.0
 
 // #define DELTA_RENDER_FORCE_REFRESH  4.0  //  Delta render force refresh interval
 // #define DELTA_RENDER_CHECK_AREA  1.0     //  Delta render area size

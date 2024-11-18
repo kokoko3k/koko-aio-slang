@@ -39,7 +39,10 @@ void main() {
    vDynamicSeed = mod(params.FrameCount, 120.0001);
    
    //flickering helper
-   vDo_flickering  = float ( scanline_have_to_flicker(is_interlaced()) || FLICKER_IN_MOTION == 1.0  ) ; 
+   vDo_flickering  = float ( scanline_have_to_flicker(is_interlaced()) ) ; 
+   #ifdef FLICKER_IN_MOTION
+      vDo_flickering = 1.0;
+   #endif
    if (vDo_flickering == 1.0) {
       //Flicker one over 3 frames:
          float ModFlicker = params.FrameCount % 3;
@@ -104,6 +107,8 @@ layout(location = 13) in vec2  vFlickerCoords;
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D Source;
 layout(set = 0, binding = 3) uniform sampler2D upscale_passFeedback;
+layout(set = 0, binding = 4) uniform sampler2D colortools_and_ntsc_pass;
+layout(set = 0, binding = 5) uniform sampler2D colortools_and_ntsc_passFeedback;
 
 //#define _KOKO_AA_PRELINEARIZE
 #define _KOKO_AA_PRELINEARIZE_IN  (2.0)
@@ -566,13 +571,13 @@ vec3 pixel_flickering(vec3 pixel_cur) {
 
    lumdiff = min(lumdiff * PIXELGRID_INTR_FLICK_POWR, 1.0);
    
-   /*if (FLICKER_IN_MOTION == 1.0) {
+   #ifdef FLICKER_IN_MOTION
       lumdiff = 0.4;
       vec3 prev_frame = texture(colortools_and_ntsc_passFeedback, vTexCoord).rgb;
       vec3 cur_frame = texture(colortools_and_ntsc_pass, vTexCoord).rgb;
       float is_moving = float(prev_frame != cur_frame);
       lumdiff *= is_moving;
-   }*/
+   #endif
    
    return mix(pixel_cur.rgb,flickline.rgb,lumdiff);
    //return vec4( mix(pixel_cur.rgb,flickline.rgb,lumdiff),

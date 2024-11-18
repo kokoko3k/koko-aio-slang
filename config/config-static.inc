@@ -14,11 +14,11 @@
 
 // #define D3D_WORKAROUND
 
-// In case you're running an old Retrtoarch version (pre 1.16), please comment this (add leading //)
+// In case you're running an old pRetrtoarch version (pre 1.16), please comment this (prepend: // )
 #define _HAS_ROTATION_UNIFORM
 
 // Enable lcd antighosting by using values > 0.0 (try around 0.25)
-//	#define LCD_ANTIGHOSTING 0.25
+// #define LCD_ANTIGHOSTING 0.25
 
 
 // BEZEL STATIC CONFIG ////////////////////////////////////////////////////////
@@ -158,7 +158,8 @@
 #define NOISEPOWER_AMBI_MUL 3.0
 
 // This is an attempt to improve preceived motion clarity by flickering the moving part of the game
-#define FLICKER_IN_MOTION 0.0
+// uncomment/remove leading // to enable
+// #define FLICKER_IN_MOTION
 
 
 // STATIC CONFIG ENDS HERE ##########################################################################################

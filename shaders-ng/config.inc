@@ -706,7 +706,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #include "config.globals.inc"
 
 
-// 2014-Jan-25
+// 2024-Jan-25
 // Since we moved some mandatory defines from config-static.inc to config-user.txt
 // It is possible that users overriding config-user.txt will run into errors
 // if they don't check for updated config-user.
