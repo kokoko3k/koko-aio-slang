@@ -1,4 +1,4 @@
-//#define _HAS_ROTATION_UNIFORM
+#define _HAS_ROTATION_UNIFORM
 
 bool is_rotated_new(){
 	return (params.Rotation == 1.0 || params.Rotation == 3.0);
