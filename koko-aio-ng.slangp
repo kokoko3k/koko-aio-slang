@@ -143,7 +143,8 @@ float_framebuffer1 = "true"
 // As per fxaa pass, this has to be float framebuffer too, because colortools may push values over 1.0.
 // simple test is to push brightness and see the difference.
         wrap_mode2 = "mirrored_repeat"
-
+// this has to be true to just to keep the precision needed by linearization
+float_framebuffer2 = true
         
         
 // Blur and/or glows and/or sharpens the image as requested 
@@ -221,6 +222,7 @@ float_framebuffer6 = false
            scale_type7 = source
                 scale7 = 0.5
             wrap_mode7 = "clamp_to_border"
+// temporal mixing needs high precision.
     float_framebuffer7 = "true"
          
          
@@ -300,6 +302,7 @@ float_framebuffer6 = false
            scale_type14 = viewport
                 scale14 = 0.05
             wrap_mode14 = "clamp_to_border"
+// temporal mix needs higher precision:
     float_framebuffer14 = true
     
 // This is a small helper pass i can use to store values and things
@@ -332,5 +335,6 @@ float_framebuffer15 = true
             scale16 = 1.0
         //This needs to be clamp_to_edge or displacing vignette would dark screen borders
         wrap_mode16 = "clamp_to_edge" 
+float_framebuffer16 = true
         
 
