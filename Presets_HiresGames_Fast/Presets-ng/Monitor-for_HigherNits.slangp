@@ -1,4 +1,4 @@
-#reference "/koko/koko-aio-slang/koko-aio-ng.slangp"
+#reference "../koko-aio-ng.slangp"
 
 IN_GLOW_GAMMA = "2.200000"
 GAMMA_OUT = "0.450000"
