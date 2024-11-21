@@ -262,7 +262,7 @@ float_framebuffer6 = false
                 scale10 = 1.0
             wrap_mode10 = "mirrored_repeat"
     
-// ASMDEBUG: GLSL54
+// ASMDEBUG: GLSL60
                shader11 = shaders-ng/bloom_pass_2.slang
                 alias11 = "bloom_pass_2"
         filter_linear11 = true
