@@ -427,11 +427,12 @@ However nice effects may be obtained (eg: with vector games). <br>
             Beware, this may produce moiree.
 
     Shadowmask:
-            Emulates crt's shadowmask, it is advised to turn off "Vertical cell Mask above" for accurate results
+        Emulates crt's shadowmask, it is advised to turn off "Vertical cell Mask above" for accurate results.
+        It is also advised to set phosphor width (in Horizontal mask section) to a resonable, not too low, value.
         X staggering
             how much even rows have to be shifted, probably you want 1.0 or 1.5 here
-            for 2 or 4 sized masks (gm,rgbx,rbgx,wx) use 1.5
-            for 3 sized masks (gmx,rgb,rbg) use 1.0
+            for 2 or 4 sized masks (gm,rgbx,rbgx,wx): use 1.5
+            for 3 sized masks (gmx,rgb,rbg): use 1.0
         Phosphor height
             If you are using a very High definition screen, you may want to set this higher than 1.0
             I also observed nice results by setting this to 3 when using 4 sized masks like rgbx or rbgx.
