@@ -1025,6 +1025,13 @@ vec2 screen_space_displacement(vec2 co, vec2 outputsize, float size) {
 //Blur/Glow
 #define PI 3.14159265359
 
+vec2 radius_blur_adapt_ext_inaspect(float bsize, float aspect){
+    vec2 r;
+    r.x = bsize / BLOOM_AND_HALO_SCALE_FACTOR;
+    r.y = r.x * aspect;
+    return r;
+}
+
 vec2 radius_blur_adapt(float bsize){
     vec2 r;
     r.x = bsize / BLOOM_AND_HALO_SCALE_FACTOR;
