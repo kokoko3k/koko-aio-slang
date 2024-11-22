@@ -10,11 +10,15 @@ layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
 layout(location = 1) out vec2 vFuzzy_main_pass_stage_1;
+layout(location = 5) out vec2 blur_radius_adpt;
+
 
 void main() {
     gl_Position = global.MVP * Position;
     vTexCoord = TexCoord;
 
+    blur_radius_adpt = radius_blur_adapt(BLOOM_SIZE);
+    
     //Get fuzzy mul and pow factor
         vFuzzy_main_pass_stage_1 = apply_fuzzy_main_pass_stage_1();
 }
@@ -23,12 +27,12 @@ void main() {
 
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in vec2 vFuzzy_main_pass_stage_1;
+layout(location = 5) in vec2 blur_radius_adpt;
 
 layout(location = 0) out vec4 FragColor;
 
 layout(set = 0, binding = 1) uniform sampler2D colortools_and_ntsc_pass;
 
-//#include "includes/functions.include.slang"
 #include "includes/blooms.include.slang"
 
 void main() {
@@ -38,7 +42,7 @@ void main() {
         colortools_and_ntsc_pass,
         vTexCoord,
         params.OriginalSize,
-        vec2(BLOOM_SIZE),
+        blur_radius_adpt,
         BLOOM_QUALITY,
         BLOOM_GAMMA, 1.0,
         0.0,

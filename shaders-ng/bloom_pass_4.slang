@@ -13,15 +13,13 @@ layout(location = 0) out vec2 vTexCoord;
 layout(location = 1) out vec2 vFuzzy_main_pass_stage_1;
 layout(location = 2) out vec3 vTemperature_rgb;
 layout(location = 3) out vec3 vTemperature_rgb_gamma_in;
-layout(location = 4) out float vIn_aspect;
-//layout(location = 5) out vec2 vCo_avglum;
+layout(location = 5) out vec2 blur_radius_adpt;
 
 void main() {
     gl_Position = global.MVP * Position;
     vTexCoord = TexCoord;
-    
-    vIn_aspect = get_in_aspect();
-    
+    blur_radius_adpt = radius_blur_adapt(BLOOM_SIZE);
+
     //Get fuzzy mul and pow factor
         vFuzzy_main_pass_stage_1 = apply_fuzzy_main_pass_stage_1();
 
@@ -34,7 +32,7 @@ void main() {
     * for pow(vTemperature_rgb, BLOOM_GAMMA), apply bloom gains and tweaks, and then 
     * multiply bloomed for vTemperature_rgb
     */
-    
+
     if (TEMPERATURE == 6500 || DO_CCORRECTION == 0.0) {
         vTemperature_rgb = vec3(1.0);
         vTemperature_rgb_gamma_in =  vec3(1.0);
@@ -45,7 +43,7 @@ void main() {
     //debug
     //vTemperature_rgb = vec3(1.0);
     //vTemperature_rgb_gamma_in = vec3(1.0);
-    
+
 }
 
 #pragma stage fragment
@@ -54,7 +52,7 @@ layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in vec2 vFuzzy_main_pass_stage_1;
 layout(location = 2) in vec3 vTemperature_rgb;
 layout(location = 3) in vec3 vTemperature_rgb_gamma_in;
-layout(location = 4) in float vIn_aspect;
+layout(location = 5) in vec2 blur_radius_adpt;
 //layout(location = 5) in vec2 vCo_avglum;
 
 layout(location = 0) out vec4 FragColor;
@@ -123,7 +121,7 @@ void main() {
         Source,
         vTexCoord,
         params.SourceSize,
-        vec2(BLOOM_SIZE),
+        blur_radius_adpt,
         BLOOM_QUALITY,
         offset,
         0.0
