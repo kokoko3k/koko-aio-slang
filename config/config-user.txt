@@ -377,7 +377,7 @@
 #define SKIP_WARPEDGLOW_Y 0.0
 
 // Enable Conditional FPS Halver (60->30, 30->30, 50->25, 25->25)
-#define FPS_HALVER
+// #define FPS_HALVER
 
 // Developer reminder: bash script to partially convert a shader preset 
 // edit: obsolete and incomplete since it does not recur references.
