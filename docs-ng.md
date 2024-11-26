@@ -817,9 +817,9 @@ To enable them, you have to edit the shader itself, save it, and reload.*
     on mobile devices and laptops.<br>
     This feature can, however, produce artifacts in some cases.<br><br>
     To use it, in file config-user.txt, turn the line: <br>
-    ```#define DELTA_RENDER 0.0```
+    ```// #define DELTA_RENDER```
     <br>into: <br>
-    ```#define DELTA_RENDER 1.0```
+    ```#define DELTA_RENDER```
     
     Force refresh interval:
         Forces a full screen refresh every #number of frames;

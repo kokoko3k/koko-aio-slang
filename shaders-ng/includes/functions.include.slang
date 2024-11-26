@@ -615,7 +615,9 @@ vec2 round_step(vec2 x, vec2 p) {
 #define RND_C 43758.5453
 
 float random(float power, vec2 seed) {
-	if (SKIP_RANDOM == 1.0) return 0.0;
+	#ifdef SKIP_RANDOM
+		return 0.0;
+	#endif 
     //From pal-singlepass.slang 
     //https://github.com/svofski/CRT
     //Copyright (c) 2016, Viacheslav Slavinsky
@@ -647,10 +649,11 @@ float deband_temporal(vec2 co, float power) {
 
 //The following produces weird results when with dynamic seed like framecount.
 float random_fast(vec2 seed) {
-	if (SKIP_RANDOM == 1.0) return 0.0;
-	//return 0.0;
-	//return deband_static(seed, 0.001);
-	
+	#ifdef SKIP_RANDOM
+		return 0.0;
+		//return 0.0;
+		//return deband_static(seed, 0.001);
+	#endif
 	float noise_out = fract(sin(dot(seed.xy, VEC2_RND_A_B)) * RND_C);
     return noise_out;
 }
@@ -1328,17 +1331,19 @@ vec2 rgb2hv(vec3 c) {
 }
 	
 float get_dyn_zoom(sampler2D tex) {
-	if (DELTA_RENDER == 0.0)
+	#ifndef DELTA_RENDER
 		return texture(tex, DYN_ZOOM_SAMPLING_POINT ).a * DO_DYNZOOM + 1.0 ;
-	else
+	#else
 		return 1.0;
+	#endif
 }
 
 float get_autocrop_zoom(sampler2D tex) {
-	if (DELTA_RENDER == 0.0)
+	#ifndef DELTA_RENDER
 		return texture(tex, AUTOCROP_SAMPLING_POINT).a;
-	else
+	#else
 		return 1.0;
+	#endif
 }
 
 
