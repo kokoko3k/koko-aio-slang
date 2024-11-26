@@ -126,9 +126,15 @@ void main() {
    //Delta render?
    float DR_changed = 1.0;
    #ifdef DELTA_RENDER
+   
+	int delta_render_check_area = 1.0;
+	#ifdef DELTA_RENDER_CHECK_AREA
+		delta_render_check_area = DELTA_RENDER_CHECK_AREA;
+	#endif
+   
      if (vDeltaRenderOk == 1.0) {
          DR_changed = delta_render_changed(colortools_and_ntsc_passFeedback, colortools_and_ntsc_pass,
-                                                      vTexCoord, DELTA_RENDER_CHECK_AREA);
+                                                      vTexCoord, delta_render_check_area);
      }
    #endif
    

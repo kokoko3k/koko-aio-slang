@@ -344,8 +344,8 @@
 // Renders only changed parts of screen; uncomment (remove leading //) to lower power consumption / mitigate throttling:
 // #define DELTA_RENDER
 
-#define DELTA_RENDER_FORCE_REFRESH  4.0  //  Delta render force refresh interval
-#define DELTA_RENDER_CHECK_AREA  1.0     //  Delta render area size
+// #define DELTA_RENDER_FORCE_REFRESH  4.0  //  Delta render force refresh interval, 4.0 is the default.
+// #define DELTA_RENDER_CHECK_AREA  1.0     //  Delta render area size, 1.0 is the default.
 
 // Use higher quality deconvergence flattering rgb scanlines when deconvergence is high
 // and by syncing them to the deconvergence settings

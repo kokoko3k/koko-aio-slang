@@ -259,8 +259,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	//float MOIRE_SWEET_SPOT;
 	
 	float PIXELGRID_BASAL_GRID;
-	float DELTA_RENDER_FORCE_REFRESH;
-	float DELTA_RENDER_CHECK_AREA;
 	
 	float DO_DEDITHER;
 	float DEDITHER_STRENGTH;
