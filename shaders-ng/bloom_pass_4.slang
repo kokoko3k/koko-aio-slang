@@ -92,7 +92,7 @@ float get_avg_lum_from_mip(sampler2D tex, vec2 co, float lod) {
     float eye_adaption_speed;
     float luminance_from_feedback = rgb_to_gray(mip);
     
-    #ifndef DELTA_RENDER
+    if (DELTA_RENDER == 0.0) {
         //The following makes the adaption speed more constant:
         eye_adaption_speed = BLOOM_PUPIL_ADAPTION_SPEED * ( luminance_first_pass / luminance_from_feedback ) ;
 
@@ -101,10 +101,10 @@ float get_avg_lum_from_mip(sampler2D tex, vec2 co, float lod) {
             
         //The following simulates pupil inertia
         eye_adaption_speed = clamp(eye_adaption_speed, 1.0/BLOOM_EYE_INERTIA, 1.0);
-    #else
+    } else {
         //Temporal adaption speed is no good with deltarenter.
         eye_adaption_speed = 1.0;
-    #endif
+    }
 
     float luminance = mix(luminance_first_pass, luminance_from_feedback, eye_adaption_speed);
     return luminance + eps;

@@ -342,7 +342,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 // Renders only changed parts of screen; uncomment (remove leading //) to lower power consumption / mitigate throttling:
-// #define DELTA_RENDER
+// #define DELTA_RENDER 1.0
 
 #define DELTA_RENDER_FORCE_REFRESH  4.0  //  Delta render force refresh interval
 #define DELTA_RENDER_CHECK_AREA  1.0     //  Delta render area size
@@ -359,12 +359,12 @@
 // But in that case the wrap mode has to be defined in the preset file.
 #define ALLOW_BG_IMAGE_TEXTURE_WRAP_IN_SHADER 1.0
 
-//Halve rendering refresh on bezel and ambilight uncomment to spare gpu cycles:
-// #define HALVE_BORDER_UPDATE
+//Halve rendering refresh on bezel and ambilight set to 1.0 to spare gpu cycles:
+#define HALVE_BORDER_UPDATE 0.0
 
 //Skip random() function used for noise/debanding/bezel roughness, 
-//Uncomment this spare gpu cycles:
-// #define SKIP_RANDOM
+//set to 1.0 to spare gpu cycles:
+#define SKIP_RANDOM 0.0
 
 //Uncommenting this is the only way to statically disable Warped Glow (X) and
 //spare a lookup in the final pass;

@@ -1059,11 +1059,7 @@ vec3 fn_pixel_content(vec2 coords) {
     
     vec2 warpedglow = vec2(0.0);
     #ifndef SKIP_WARPEDGLOW_Y
-        float delta_render = 0.0;
-        #ifdef DELTA_RENDER
-            delta_render = 1.0;
-        #endif
-        warpedglow.y = texture(in_glow_pass, coords + delta_render * eps).a;
+        warpedglow.y = texture(in_glow_pass, coords + DELTA_RENDER * eps).a;
         // ^^ Delta render performance suffer alot if not adding eps here on my haswell for unknown reasons.
         // ...probably some failed compiler optimization issue.
     #endif
@@ -1313,13 +1309,13 @@ void main() {
             co_content = content_geom_override_zoom(co_content, GAME_GEOM_ASPECT, vIn_aspect, GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
  
     #ifndef D3D_WORKAROUND
-        #ifdef DELTA_RENDER
+        if (DELTA_RENDER == 1.0) {
             bool reuse_old =  bool( float( texture(in_glow_pass, co_content).a == 0.0) * canvas_busy * vDeltaRenderOk ) ;
             if (reuse_old) {
                 FragColor.rgb = texture(final_passFeedback, vOutputCoord).rgb;
                 return;
             }
-        #endif
+        }
     #endif
     
     
@@ -1356,12 +1352,12 @@ void main() {
 
             //Can we halve refresh rate in the outside border to spare some cycles?
             #ifndef D3D_WORKAROUND
-                #ifdef HALVE_BORDER_UPDATE
+                if ( HALVE_BORDER_UPDATE == 1.0 ) {
                     if ((params.FrameCount % 2) != 1.0) {
                         FragColor.rgb = texture(final_passFeedback, vOutputCoord).rgb;
                         return;
                     }
-                #endif
+                }
             #endif
 
             //Ambient light
