@@ -127,7 +127,7 @@ void main() {
    float DR_changed = 1.0;
    #ifdef DELTA_RENDER
    
-	int delta_render_check_area = 1.0;
+	float delta_render_check_area = 1.0;
 	#ifdef DELTA_RENDER_CHECK_AREA
 		delta_render_check_area = DELTA_RENDER_CHECK_AREA;
 	#endif
