@@ -106,7 +106,7 @@ void main() {
    //Warped Glow X
    //The result will be stored in the alpha channel to be consumed by final pass.
    float warpedglow_x = 0.0;
-   if (SKIP_WARPEDGLOW_X == 0.0) {
+   #ifndef SKIP_WARPEDGLOW_X
       if (DO_IN_GLOW == 1.0) {
          float max_inLum = max( 1.0, DO_CCORRECTION * apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS));
          vec3 gx = texture(shift_and_bleed_pass, vTexCoord + vWarpedglow_offsets).rgb
@@ -120,7 +120,7 @@ void main() {
       
          warpedglow_x =  warpedglow_x * vWarpedglow_scale_tated;
       }
-   }
+   #endif
    //Modulate glow power via ntsc artifact mask:
       float ntsc_artifacts = texture(shift_and_bleed_pass, vTexCoord).a; //compiler is smart enough to reuse this lookup, no need to branch.
       
