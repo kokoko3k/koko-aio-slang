@@ -366,18 +366,18 @@
 //set to 1.0 to spare gpu cycles:
 #define SKIP_RANDOM 0.0
 
-//Uncommenting this is the only way to statically disable Warped Glow (X) and
+//Set this to 1.0 is the only way to statically disable Warped Glow (X) and
 //spare a lookup in the final pass;
 //When the screen is rotated, skipping SKIP_WARPEDGLOW_X means skipping SKIP_WARPEDGLOW_Y
-// #define SKIP_WARPEDGLOW_X
+#define SKIP_WARPEDGLOW_X 0.0
 
-//Uncommenting this is the only way to statically disable Warped Glow (X) and
+//Set this to 1.0 is the only way to statically disable Warped Glow (X) and
 //spare a lookup in the final pass.
 //When the screen is rotated, skipping SKIP_WARPEDGLOW_Y means skipping SKIP_WARPEDGLOW_X
-// #define SKIP_WARPEDGLOW_Y
+#define SKIP_WARPEDGLOW_Y 0.0
 
 // Enable Conditional FPS Halver (60->30, 30->30, 50->25, 25->25)
- #define FPS_HALVER
+// #define FPS_HALVER
 
 // Developer reminder: bash script to partially convert a shader preset 
 // edit: obsolete and incomplete since it does not recur references.
