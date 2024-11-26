@@ -35,6 +35,17 @@ layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 4) uniform sampler2D in_glow_pass;
 
 void main() {
+    
+    #ifdef FPS_HALVER
+        #ifdef _HAS_FRAMETIME_UNIFORMS
+            if (global.OriginalFPS >= 49){
+                if (mod(params.FrameCount, 2.0) == 0.0) {
+                    return;
+                }
+            }
+        #endif
+    #endif
+    
     if (DO_HALO == 0.0 ) return;
         
     vec3 pixel_haloed = texture(in_glow_pass, vTexCoord).rgb;

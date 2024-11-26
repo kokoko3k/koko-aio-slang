@@ -266,6 +266,17 @@ vec4 pixel_bleed(vec4 pixel_in, vec2 co, sampler2D in_texture, float sourcesize_
 }
 
 void main() {
+   
+   #ifdef FPS_HALVER
+      #ifdef _HAS_FRAMETIME_UNIFORMS
+         if (global.OriginalFPS >= 49){
+               if (mod(params.FrameCount, 2.0) == 0.0) {
+                  return;
+               }
+         }
+      #endif
+   #endif
+   
    vec4 pixel_out;
 
    pixel_out = texture(upscale_pass, vTexCoord);

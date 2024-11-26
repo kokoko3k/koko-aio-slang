@@ -334,7 +334,7 @@
 
 ////////////////////////////////////////////////////////////////////////////
 //
-// STATIC VALUES FOR PERFORMANCE SETTINGS
+// STATIC VALUES SETTINGS
 // The following are not Runtime configurable parameters
 // But they are here because they are meant to push performance as well.
 // They were previously defined in config-static.inc file.
@@ -347,12 +347,13 @@
 // #define DELTA_RENDER_FORCE_REFRESH  4.0  //  Delta render force refresh interval
 // #define DELTA_RENDER_CHECK_AREA  1.0     //  Delta render area size
 
-
 // Use higher quality deconvergence flattering rgb scanlines when deconvergence is high
 // and by syncing them to the deconvergence settings
 // To enable high quality deconvergence, remove leading "//"
 // #define HQ_DECON
 
+// Enable lcd antighosting by using values > 0.0 (try around 0.25)
+// #define LCD_ANTIGHOSTING 0.25
 
 // Allow texture wrapping as a shader parameter, set to 0.0 to gain some performance.
 // But in that case the wrap mode has to be defined in the preset file.
@@ -365,7 +366,6 @@
 //set to 1.0 to spare gpu cycles:
 #define SKIP_RANDOM 0.0
 
-
 //Set this to 1.0 is the only way to statically disable Warped Glow (X) and
 //spare a lookup in the final pass;
 //When the screen is rotated, skipping SKIP_WARPEDGLOW_X means skipping SKIP_WARPEDGLOW_Y
@@ -375,6 +375,9 @@
 //spare a lookup in the final pass.
 //When the screen is rotated, skipping SKIP_WARPEDGLOW_Y means skipping SKIP_WARPEDGLOW_X
 #define SKIP_WARPEDGLOW_Y 0.0
+
+// Enable Conditional FPS Halver (60->30, 30->30, 50->25, 25->25)
+#define FPS_HALVER
 
 // Developer reminder: bash script to partially convert a shader preset 
 // edit: obsolete and incomplete since it does not recur references.

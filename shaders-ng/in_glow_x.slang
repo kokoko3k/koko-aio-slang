@@ -92,7 +92,16 @@ vec3 blur_select_wrap(sampler2D texture_in, vec2 co, vec4 sourcesize, float shar
 
 
 void main() { 
-
+   
+   #ifdef FPS_HALVER
+      #ifdef _HAS_FRAMETIME_UNIFORMS
+         if (global.OriginalFPS >= 49){
+               if (mod(params.FrameCount, 2.0) == 0.0) {
+                  return;
+               }
+         }
+      #endif
+   #endif
    
    //Warped Glow X
    //The result will be stored in the alpha channel to be consumed by final pass.

@@ -828,6 +828,16 @@ vec3 FxaaPixelShader(vec2 pos, sampler2D tex, vec4 sourcesize, vec4 outputsize) 
 
 void main() {
    
+   #ifdef FPS_HALVER
+      #ifdef _HAS_FRAMETIME_UNIFORMS
+         if (global.OriginalFPS >= 49){
+               if (mod(params.FrameCount, 2.0) == 0.0) {
+                  return;
+               }
+         }
+      #endif
+   #endif
+   
    vec4 pixel_out;
    pixel_out.rgb = texture_NEAREST(Source, vTexCoord, params.SourceSize).rgb;
       

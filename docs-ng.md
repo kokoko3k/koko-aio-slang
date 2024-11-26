@@ -799,17 +799,27 @@ However nice effects may be obtained (eg: with vector games). <br>
     Bezel multiplier:
         Can be used to adjust the bezel rotation
         in relation to the game tilt amount
+
+---------------------------
         
+        
+**Static features**
+---------------------------
+
+*The following shader functionalities are disabled by default and cannot be enabled by using runtime shader parameters.<br>
+To enable them, you have to edit the shader itself, save it, and reload.*
+
+---------------------------
+     
 **Delta Render:**<br>
     Koko-aio can render only the part of the screen that has been changed,<br>
     leading to a measurable power consumption reduction and mitigate throttling
     on mobile devices and laptops.<br>
-    This feature can, however, produce artifacts in some cases, so the feature<br>
-    is statically disabled by default by now.<br>
-    To use it, you have to manually set to 1.0, in file config-user.txt: <br>
-    #define DELTA_RENDER 0.0 <br>
-    to <br>
-    #define DELTA_RENDER 1.0 <br>
+    This feature can, however, produce artifacts in some cases.<br><br>
+    To use it, in file config-user.txt, turn the line: <br>
+    ```#define DELTA_RENDER 0.0```
+    <br>into: <br>
+    ```#define DELTA_RENDER 1.0```
     
     Force refresh interval:
         Forces a full screen refresh every #number of frames;
@@ -821,4 +831,44 @@ However nice effects may be obtained (eg: with vector games). <br>
         By highering this value, Delta render can take higher blur radiouses
         into account.
         Power comsumption benefits will be lower.
+        
+        
+**Higher quality defocus:**<br>
+    Use higher quality deconvergence by flattering rgb scanlines when <br>
+    deconvergence is high and by syncing them to the deconvergence settings.<br>
+    This has a measurable performance impact on lower spec GPUs.<br><br>
+    To use it, in file config-user.txt, turn the line: <br>
+    ```// #define HQ_DECON```
+    <br>into: <br>
+    ```#define HQ_DECON```<br>
+
+    
+**LCD antighosting:**<br>
+    LCD displays often suffer from high pixel refresh times <br>
+    which produces ghosting when content changes on screen.<br>
+    By inducing larger color transitions, it prompts the LCD cells <br>
+    to adjust their states more rapidly, thereby reducing ghosting.<br><br>
+    To use it, in file config-user.txt, turn the line: <br>
+    ```// #define LCD_ANTIGHOSTING 0.25```
+    <br>into: <br>
+    ```#define LCD_ANTIGHOSTING 0.25```<br><br>
+    You can also try different values, but keep in mind <br>
+    that highering the value too much will be counterproductive.<br>
+    
+
+**Conditional FPS Halver**<br>
+    *Only on retroarch > 1.19.1*<br>
+    To optimize performance and battery life, this function halves the shader <br>
+    frame rate whenever the core frame rate surpasses 49 FPS.<br>
+    This is particularly useful for devices with weaker GPUs <br>
+    that may struggle to render shader at full speed. <br>
+    Furthermore, the shader frame rate will remain capped at 30 (/25) FPS <br>
+    if the core frame rate alternates between 60 (/50) and 30 (/25) FPS.<br><br>
+    To use it, in file config-user.txt, turn the line: <br>
+    ```// #define FPS_HALVER```
+    <br>into: <br>
+    ```#define FPS_HALVER```<br><br>
+    
+    
+    
     

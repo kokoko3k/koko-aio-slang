@@ -99,6 +99,16 @@ vec3 get_mask_helper() {
 
 void main() {
     
+    #ifdef FPS_HALVER
+        #ifdef _HAS_FRAMETIME_UNIFORMS
+            if (global.OriginalFPS >= 49){
+                if (mod(params.FrameCount, 2.0) == 0.0) {
+                    return;
+                }
+            }
+        #endif
+    #endif
+    
     if (DO_HALO == 0.0 ) return;
     
     vec3 mask_helper = vec3(0.0);

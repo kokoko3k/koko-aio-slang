@@ -59,6 +59,16 @@ float borders_gradient(vec2 co, float smoothness) {
 
 void main() {
    
+   #ifdef FPS_HALVER
+      #ifdef _HAS_FRAMETIME_UNIFORMS
+         if (global.OriginalFPS >= 49){
+               if (mod(params.FrameCount, 2.0) == 0.0) {
+                  return;
+               }
+         }
+      #endif
+   #endif
+   
    if (DO_BEZEL == 0.0) return;
    
    #define skip_border BEZEL_REFL_SKIP_SIZE

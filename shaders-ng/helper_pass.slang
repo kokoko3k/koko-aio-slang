@@ -44,7 +44,16 @@ layout(set = 0, binding = 2) uniform sampler2D monitor_body_curved;
 
 
 void main() {
-	
+    #ifdef FPS_HALVER
+        #ifdef _HAS_FRAMETIME_UNIFORMS
+            if (global.OriginalFPS >= 49){
+                if (mod(params.FrameCount, 2.0) == 0.0) {
+                    return;
+                }
+            }
+        #endif
+    #endif
+    
 	bool smp_range_1  = is_first_inside_rect(vTexCoord, SMP_RANGE1 );
 	
 	FragColor = vec4(0.0);

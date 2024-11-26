@@ -17,9 +17,6 @@
 // In case you're running an old pRetrtoarch version (pre 1.16), please comment this (prepend: // )
 #define _HAS_ROTATION_UNIFORM
 
-// Enable lcd antighosting by using values > 0.0 (try around 0.25)
-// #define LCD_ANTIGHOSTING 0.25
-
 
 // BEZEL STATIC CONFIG ////////////////////////////////////////////////////////
 

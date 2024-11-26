@@ -113,7 +113,15 @@ vec3 apply_noise_to(vec3 c) {
 
 
 void main() { 
-
+   #ifdef FPS_HALVER
+      #ifdef _HAS_FRAMETIME_UNIFORMS
+         if (global.OriginalFPS >= 49){
+               if (mod(params.FrameCount, 2.0) == 0.0) {
+                  return;
+               }
+         }
+      #endif
+   #endif
 
    //Delta render?
    float DR_changed = 1.0;
