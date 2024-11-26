@@ -1750,12 +1750,7 @@ float lodmax(vec2 texsize) {
 }
 float is_deltarender_allowed(bool is_interlaced) {
 	// Delta render, mandatory conditions:
-	float delta_render_force_refresh = 4.0;
-	#ifdef DELTA_RENDER_FORCE_REFRESH
-		delta_render_force_refresh = DELTA_RENDER_FORCE_REFRESH;
-	#endif
-	
-    return float( ( params.FrameCount % int(delta_render_force_refresh) != 0.0 ) &&              // - We are in a frame that is not forced for full refresh
+    return float( ( params.FrameCount % int(DELTA_RENDER_FORCE_REFRESH) != 0.0 ) &&              // - We are in a frame that is not forced for full refresh
     ( (! is_interlaced) || PIXELGRID_INTR_DISABLE_Y >= 1.0 || DO_PIXELGRID_H == 0.0)); // - screen is not interlaced or we disabled scanlines on interlaced content
 }
 
