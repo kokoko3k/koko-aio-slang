@@ -1,3 +1,7 @@
+bool frame_is_even() {
+	return ((int(params.FrameCount) & 1) == 0);
+}
+
 bool is_rotated_new(){
 	return (params.Rotation == 1.0 || params.Rotation == 3.0);
 }
@@ -1688,7 +1692,7 @@ vec4 PG_get_hmask_preset_unfloored() {
 vec3 strobe( vec3 c) {
     #define STRENGTH_1 0.075 //effect strength
 
-    if (mod(params.FrameCount, 2.0 ) == 0.0) {
+    if ( frame_is_even() ) {
        return c * (1+STRENGTH_1);
     }else {
        return c * (1-STRENGTH_1);
@@ -1713,7 +1717,7 @@ vec3 adaptive_strobe( vec3 c) {
     c = ( (1+contrast_adj+contrast_adj)* c)-contrast_adj;
     c *= gain_adj;
 
-    if (mod(params.FrameCount, 2.0 ) == 0.0) {
+    if ( frame_is_even() ) {
        return c +  room / BRIGHT_BIAS;
     }else {
        return c -  room * BRIGHT_BIAS;

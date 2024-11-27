@@ -205,7 +205,7 @@ void main() {
                 //Halve the scanline period, since they will interlace:
                 vScanlinePeriod = 0.5;
                 //Alternate scanlines on even/odd frames
-                if (params.FrameCount % 2 == 0.0)
+                if (frame_is_even())
                     vInterlace_offset = PI_15;
             }
 
@@ -1270,7 +1270,7 @@ void main() {
     #ifdef FPS_HALVER
         #ifdef _HAS_FRAMETIME_UNIFORMS
             if (global.OriginalFPS >= 49){
-                if (mod(params.FrameCount, 2.0) == 0.0) {
+                if ( frame_is_even() ) {
                     FragColor.rgb = texture(final_passFeedback, vOutputCoord).rgb ;
                     return;
                 }
@@ -1360,9 +1360,9 @@ void main() {
             #endif
             #ifndef D3D_WORKAROUND
                 if ( halve_border_update == 1.0 ) {
-                    // by using != 0.0 and not != 1.0, we solve the issue of inner frame jagged lines
+                    // by using !frame_is_even() and not frame_is_even(), we solve the issue of inner frame jagged lines
                     // when using HALVE_BORDER_UPDATE + DELTA_RENDER
-                    if ((params.FrameCount % 2) != 0.0) {
+                    if ( !frame_is_even() ) {
                         FragColor.rgb = texture(final_passFeedback, vOutputCoord).rgb;
                         return;
                     }
@@ -1375,7 +1375,10 @@ void main() {
                 
                 if (DO_BG_IMAGE != 1.0) {
                     const float noise_power = -NOISEPOWER * NOISEPOWER_AMBI_MUL;
-                    float dynamicseed = mod(params.FrameCount, 30.0001);
+                    float dynamicseed = 1.0;
+                    #ifndef SKIPRANDOM
+                        dynamicseed = mod(params.FrameCount, 30.0001); 
+                    #endif
                     float anoise1 = random_fast(vTexCoord*dynamicseed) * noise_power;
 
                     // anoise1 *=  (1 - pixel_ambi.g);

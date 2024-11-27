@@ -47,7 +47,7 @@ void main() {
     #ifdef FPS_HALVER
         #ifdef _HAS_FRAMETIME_UNIFORMS
             if (global.OriginalFPS >= 49){
-                if (mod(params.FrameCount, 2.0) == 0.0) {
+				if ( frame_is_even() ) {
                     return;
                 }
             }
