@@ -1349,8 +1349,12 @@ void main() {
         } else {
 
             //Can we halve refresh rate in the outside border to spare some cycles?
+            float halve_border_update = 0.0;
+            #ifdef HALVE_BORDER_UPDATE
+                halve_border_update = 1.0;
+            #endif
             #ifndef D3D_WORKAROUND
-                if ( HALVE_BORDER_UPDATE == 1.0 ) {
+                if ( halve_border_update == 1.0 ) {
                     if ((params.FrameCount % 2) != 1.0) {
                         FragColor.rgb = texture(final_passFeedback, vOutputCoord).rgb;
                         return;

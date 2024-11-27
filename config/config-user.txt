@@ -359,11 +359,11 @@
 // But in that case the wrap mode has to be defined in the preset file.
 // #define DISALLOW_BG_IMAGE_TEXTURE_WRAP_IN_SHADER
 
-//Halve rendering refresh on bezel and ambilight set to 1.0 to spare gpu cycles:
-#define HALVE_BORDER_UPDATE 0.0
+// Halve rendering refresh on bezel and ambilight, uncomment to gain performance:
+ #define HALVE_BORDER_UPDATE
 
-//Skip random() function used for noise/debanding/bezel roughness, 
-//set to 1.0 to spare gpu cycles:
+// Skip random() function used for noise/debanding/bezel roughness, 
+// set to 1.0 to spare gpu cycles:
 #define SKIP_RANDOM 0.0
 
 //Set this to 1.0 is the only way to statically disable Warped Glow (X) and
