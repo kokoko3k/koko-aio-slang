@@ -362,9 +362,10 @@
 // Halve rendering refresh on bezel and ambilight, uncomment to gain performance:
 // #define HALVE_BORDER_UPDATE
 
-// Skip random() function used for noise/debanding/bezel roughness, 
-// set to 1.0 to spare gpu cycles:
-#define SKIP_RANDOM 0.0
+// Skip random() function used for noise, debanding, bezel roughness.
+// uncomment to gain some performance, expect some banding on ambilight and
+// possibly heavier banding when using the spot feature.
+// #define SKIP_RANDOM
 
 //Set this to 1.0 is the only way to statically disable Warped Glow (X) and
 //spare a lookup in the final pass;

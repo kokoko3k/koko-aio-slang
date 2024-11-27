@@ -712,8 +712,3 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #ifndef DELTA_RENDER
 	#define DELTA_RENDER 0.0 
 #endif
-
-#ifndef SKIP_RANDOM
-	#define SKIP_RANDOM 0.0 
-#endif
-

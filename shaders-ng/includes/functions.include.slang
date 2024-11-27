@@ -615,7 +615,9 @@ vec2 round_step(vec2 x, vec2 p) {
 #define RND_C 43758.5453
 
 float random(float power, vec2 seed) {
-	if (SKIP_RANDOM == 1.0) return 0.0;
+	#ifdef SKIP_RANDOM 
+		return 0.0;
+	#endif
     //From pal-singlepass.slang 
     //https://github.com/svofski/CRT
     //Copyright (c) 2016, Viacheslav Slavinsky
@@ -647,7 +649,9 @@ float deband_temporal(vec2 co, float power) {
 
 //The following produces weird results when with dynamic seed like framecount.
 float random_fast(vec2 seed) {
-	if (SKIP_RANDOM == 1.0) return 0.0;
+	#ifdef SKIP_RANDOM 
+		return 0.0;
+	#endif
 	//return 0.0;
 	//return deband_static(seed, 0.001);
 	
