@@ -144,7 +144,7 @@
     #define DOT_C		global.DOT_C
 #endif
 
-#ifndef DOT_C_YIQ
+#ifndef DOT_C_YUV
     #define DOT_C_YUV		global.DOT_C_YUV
 #endif
 
