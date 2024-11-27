@@ -857,7 +857,9 @@ To enable them, you have to edit the shader itself, save it, and reload.*
     
 
 **Conditional FPS Halver**<br>
-    *Only on retroarch > 1.19.1*<br>
+    *[Warning:] Only on retroarch > 1.19.1*<br>
+    *[Warning:] This feature is not compatible with HALVE_BORDER_UPDATE* <br>
+    *[Warning:] This feature is not compatible with DELTA_RENDER* <br>
     To optimize performance and battery life, this function halves the shader <br>
     frame rate whenever the core frame rate surpasses 49 FPS.<br>
     This is particularly useful for devices with weaker GPUs <br>
