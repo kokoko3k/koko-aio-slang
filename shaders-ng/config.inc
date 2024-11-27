@@ -259,8 +259,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	//float MOIRE_SWEET_SPOT;
 	
 	float PIXELGRID_BASAL_GRID;
-	float DELTA_RENDER_FORCE_REFRESH;
-	float DELTA_RENDER_CHECK_AREA;
 	
 	float DO_DEDITHER;
 	float DEDITHER_STRENGTH;
@@ -701,14 +699,3 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 // The following translates global.PARAMETER to PARAMETER
 #include "config.globals.inc"
-
-
-// 2024-Jan-25
-// Since we moved some mandatory defines from config-static.inc to config-user.txt
-// It is possible that users overriding config-user.txt will run into errors
-// if they don't check for updated config-user.
-// Brave users don't deserve any headaches, so put some safety checks here.
-
-#ifndef DELTA_RENDER
-	#define DELTA_RENDER 0.0 
-#endif

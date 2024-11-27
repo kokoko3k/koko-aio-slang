@@ -92,7 +92,7 @@ float get_avg_lum_from_mip(sampler2D tex, vec2 co, float lod) {
     float eye_adaption_speed;
     float luminance_from_feedback = rgb_to_gray(mip);
     
-    if (DELTA_RENDER == 0.0) {
+    if (delta_render_enabled() == 0.0) {
         //The following makes the adaption speed more constant:
         eye_adaption_speed = BLOOM_PUPIL_ADAPTION_SPEED * ( luminance_first_pass / luminance_from_feedback ) ;
 

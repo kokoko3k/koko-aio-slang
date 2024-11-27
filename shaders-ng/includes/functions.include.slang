@@ -1330,16 +1330,40 @@ vec2 rgb2hv(vec3 c) {
     float d = q.x - min(q.w, q.y);
     return vec2(abs(q.z + (q.w - q.y) / (6.0 * d + 0.0001)), q.x);
 }
-	
+
+float delta_render_enabled(){
+    #ifdef DELTA_RENDER
+        return 1.0;
+    #else
+        return 0.0;
+    #endif
+}
+
+float delta_render_get_force_refresh() {
+	#ifdef DELTA_RENDER_FORCE_REFRESH
+		return DELTA_RENDER_FORCE_REFRESH;
+	#else
+		return 4.0;
+	#endif
+}
+
+float delta_render_get_check_area() {
+	#ifdef DELTA_RENDER_CHECK_AREA
+		return DELTA_RENDER_CHECK_AREA;
+	#else
+		return 1.0;
+	#endif
+}
+
 float get_dyn_zoom(sampler2D tex) {
-	if (DELTA_RENDER == 0.0)
+	if (delta_render_enabled() == 0.0)
 		return texture(tex, DYN_ZOOM_SAMPLING_POINT ).a * DO_DYNZOOM + 1.0 ;
 	else
 		return 1.0;
 }
 
 float get_autocrop_zoom(sampler2D tex) {
-	if (DELTA_RENDER == 0.0)
+	if (delta_render_enabled() == 0.0)
 		return texture(tex, AUTOCROP_SAMPLING_POINT).a;
 	else
 		return 1.0;
@@ -1749,7 +1773,7 @@ float lodmax(vec2 texsize) {
 }
 float is_deltarender_allowed(bool is_interlaced) {
 	// Delta render, mandatory conditions:
-    return float( ( params.FrameCount % int(DELTA_RENDER_FORCE_REFRESH) != 0.0 ) &&              // - We are in a frame that is not forced for full refresh
+    return float( ( params.FrameCount % int(delta_render_get_force_refresh()) != 0.0 ) &&              // - We are in a frame that is not forced for full refresh
     ( (! is_interlaced) || PIXELGRID_INTR_DISABLE_Y >= 1.0 || DO_PIXELGRID_H == 0.0)); // - screen is not interlaced or we disabled scanlines on interlaced content
 }
 

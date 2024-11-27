@@ -125,10 +125,10 @@ void main() {
 
    //Delta render?
    float DR_changed = 1.0;
-   if (DELTA_RENDER == 1.0) {
+   if (delta_render_enabled() == 1.0) {
      if (vDeltaRenderOk == 1.0) {
          DR_changed = delta_render_changed(colortools_and_ntsc_passFeedback, colortools_and_ntsc_pass,
-                                                      vTexCoord, DELTA_RENDER_CHECK_AREA);
+                                                      vTexCoord, delta_render_get_check_area() );
 
      }
    }
@@ -148,7 +148,7 @@ void main() {
                                  
          warpedglow_y = pow( abs(warpedglow_y), IN_GLOW_WARPSHARP_GAMMA) * sign(warpedglow_y);
          
-         warpedglow_y = warpedglow_y *  vWarpedglow + (eps * DELTA_RENDER); 
+         warpedglow_y = warpedglow_y *  vWarpedglow + (eps * delta_render_enabled()); 
                                  
          // (**) This eps is needed because we multiplex deltarender and warpedglow and we NEED to have dr = 0.0 (and not a positive number)
          //To reuse old pixels, only that way (using 0.0 to reuse pixels) multiplexing is possible.

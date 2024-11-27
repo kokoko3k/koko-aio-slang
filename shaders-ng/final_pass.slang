@@ -1049,6 +1049,8 @@ float gaussian_coefficient(float x, float sigma) {
     return coefficient * exp(exponent);
 }
 
+
+
 vec3 fn_pixel_content(vec2 coords) {
 
     vec3 pixel_out;
@@ -1058,8 +1060,10 @@ vec3 fn_pixel_content(vec2 coords) {
     //#define USE_QUILEZ
     
     vec2 warpedglow = vec2(0.0);
+    
+    
     #ifndef SKIP_WARPEDGLOW_Y
-        warpedglow.y = texture(in_glow_pass, coords + DELTA_RENDER * eps).a;
+        warpedglow.y = texture(in_glow_pass, coords + delta_render_enabled() * eps).a;
         // ^^ Delta render performance suffer alot if not adding eps here on my haswell for unknown reasons.
         // ...probably some failed compiler optimization issue.
     #endif
@@ -1308,10 +1312,10 @@ void main() {
             co_content = content_geom_override_zoom(co_content, GAME_GEOM_ASPECT, vIn_aspect, GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
  
     #ifndef D3D_WORKAROUND
-        if (DELTA_RENDER == 1.0) {
+        if (delta_render_enabled() == 1.0) {
             bool reuse_old =  bool( float( texture(in_glow_pass, co_content).a == 0.0) * canvas_busy * vDeltaRenderOk ) ;
             if (reuse_old) {
-                FragColor.rgb = texture(final_passFeedback, vOutputCoord).rgb;
+                FragColor.rgb = texture(final_passFeedback, vOutputCoord).rgb * vec3(1,0,0);
                 return;
             }
         }
