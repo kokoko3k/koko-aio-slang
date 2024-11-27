@@ -1315,7 +1315,7 @@ void main() {
         if (delta_render_enabled() == 1.0) {
             bool reuse_old =  bool( float( texture(in_glow_pass, co_content).a == 0.0) * canvas_busy * vDeltaRenderOk ) ;
             if (reuse_old) {
-                FragColor.rgb = texture(final_passFeedback, vOutputCoord).rgb * vec3(1,0,0);
+                FragColor.rgb = texture(final_passFeedback, vOutputCoord).rgb;
                 return;
             }
         }
