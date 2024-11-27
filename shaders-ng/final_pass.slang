@@ -1355,7 +1355,9 @@ void main() {
             #endif
             #ifndef D3D_WORKAROUND
                 if ( halve_border_update == 1.0 ) {
-                    if ((params.FrameCount % 2) != 1.0) {
+                    // by using != 0.0 and not != 1.0, we solve the issue of inner frame jagged lines
+                    // when using HALVE_BORDER_UPDATE + DELTA_RENDER
+                    if ((params.FrameCount % 2) != 0.0) {
                         FragColor.rgb = texture(final_passFeedback, vOutputCoord).rgb;
                         return;
                     }

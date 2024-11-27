@@ -125,7 +125,9 @@ TODO:
 	[v] Find a way to smooth borders without cropping the image
 		Done, via repeated lines
 	[v] bloom should bleed over when forcing geometry aspect
-
+	[v] Halve border update + Deltarender leads to jagged inner frame, why?
+	    Don't really know, but solved by gut feeling by using if ((params.FrameCount % 2) != 0.0)
+	    instead ov if ((params.FrameCount % 2) != 1.0)
 	[ ] reflection blurriness should not depend on input resolution
 	[ ] dedicated subtractive sharpness in glow section
 	[ ] erode/dilate setting in glow section
@@ -153,4 +155,3 @@ TODO:
 	[ ] Support for upcoming OriginalAspect/Rot
 	[ ] Check if is possible to turn halo's float framebuffers to 10bit unorm and if it provides a performance boost.
 	    If it's ok, check for other possible passes application.
-	[ ] Halve border update + Deltarender leads to jagged inner frame, why?
