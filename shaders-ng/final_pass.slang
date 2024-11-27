@@ -860,7 +860,7 @@ vec3 pixel_backdrop_image(float isrotated) {
 
 
 vec4 textureLod_wrap(sampler2D tex, vec2 co, float lod, float wrap_mode) {
-    #ifdef ALLOW_BG_IMAGE_TEXTURE_WRAP_IN_SHADER
+    #ifndef DISALLOW_BG_IMAGE_TEXTURE_WRAP_IN_SHADER
         /*
         // Mirrored repeat, once, useless since is done by default
         if (co.x > 1.0 || co.x < 0.0)
