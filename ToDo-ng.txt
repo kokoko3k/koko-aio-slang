@@ -152,3 +152,4 @@ TODO:
 	[ ] Support for upcoming optional include pragma
 	[ ] Support for upcoming OriginalAspect/Rot
 	[ ] Check if is possible to turn halo's float framebuffers to 10bit unorm and if it provides a performance boost.
+	[ ] Halve border update + Deltarender leads to jagged inner frame, why?
