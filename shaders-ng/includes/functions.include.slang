@@ -1650,10 +1650,15 @@ vec4 PG_get_hmask_preset_floored() {
     if (PIXELGRID_H_PRST == 7.0)
         return vec4( vec3(0.0), 2); //WX, mask size 2
 
-    //if (PIXELGRID_H_PRST == 8.0) // Implicit, because we need a default return value (DX/D3D)
+    if (PIXELGRID_H_PRST == 8.0)
 		return vec4( vec3(1.0,
 					2.0,
 					4.0), 4); //rgxb, mask size 4
+		
+    //if (PIXELGRID_H_PRST == 9.0) // Implicit, because we need a default return value (DX/D3D)
+        return vec4( vec3(2.0,
+						  2.0,
+						  2.0), 3); //wwx, mask size 3
 
 }
 
