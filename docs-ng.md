@@ -821,12 +821,15 @@ To enable them, you have to edit the shader itself, save it, and reload.*
     <br>into: <br>
     ```#define DELTA_RENDER```
     
-    Force refresh interval:
+**Delta Render configuration:**<br>
+    To configure delta render, uncomment DELTA_RENDER_FORCE_REFRESH and/or DELTA_RENDER_CHECK_AREA.
+
+    DELTA_RENDER_FORCE_REFRESH #number
         Forces a full screen refresh every #number of frames;
         if there was artifacts on the screen, they will be cleared.
         Power comsumption benefits will be lower.
-    Delta render area size
-        If you see artifacts, try to make this higher.
+    DELTA_RENDER_CHECK_AREA #number
+        If you see artifacts, try to make #number higher.
         Artifacts come basically from bloom.
         By highering this value, Delta render can take higher blur radiouses
         into account.
