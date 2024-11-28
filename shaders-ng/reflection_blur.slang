@@ -100,15 +100,8 @@ float contrast(float col, float contrast) {
 
 void main() {
    
-   #ifdef FPS_HALVER
-      #ifdef _HAS_FRAMETIME_UNIFORMS
-         if (global.OriginalFPS >= 49){
-               if (mod(params.FrameCount, 2.0) == 0.0) {
-                  return;
-               }
-         }
-      #endif
-   #endif
+   if (fps_halver_is_skipped_frame())
+      return;
    
    if (DO_BEZEL == 0.0) return;
    

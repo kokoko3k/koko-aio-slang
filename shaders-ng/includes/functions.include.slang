@@ -6,6 +6,20 @@ bool is_rotated_new(){
 	return (params.Rotation == 1.0 || params.Rotation == 3.0);
 }
 
+
+bool fps_halver_is_skipped_frame()  {
+	#ifdef FPS_HALVER
+		#ifdef _HAS_FRAMETIME_UNIFORMS
+			if (global.OriginalFPS >= 49) {
+				if ( frame_is_even() ) {
+					return true;
+				}
+			}
+		#endif
+	#endif
+    return false;
+}
+
 bool is_rotated_old(){
 	//Keep this to retain some sort of compatibility with Retroarch pre 1.17
 	const float ar_tolerance = 0.005;

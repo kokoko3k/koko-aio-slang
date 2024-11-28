@@ -59,15 +59,8 @@ float borders_gradient(vec2 co, float smoothness) {
 
 void main() {
    
-   #ifdef FPS_HALVER
-      #ifdef _HAS_FRAMETIME_UNIFORMS
-         if (global.OriginalFPS >= 49){
-            if ( frame_is_even() ) {
-               return;
-            }
-         }
-      #endif
-   #endif
+   if (fps_halver_is_skipped_frame())
+      return;
    
    if (DO_BEZEL == 0.0) return;
    

@@ -1267,17 +1267,11 @@ vec2 quasirandom(vec2 n) {
 
 
 void main() {
-    #ifdef FPS_HALVER
-        #ifdef _HAS_FRAMETIME_UNIFORMS
-            if (global.OriginalFPS >= 49){
-                if ( frame_is_even() ) {
-                    FragColor.rgb = texture(final_passFeedback, vOutputCoord).rgb ;
-                    return;
-                }
-            }
-        #endif
-    #endif
     
+    if (fps_halver_is_skipped_frame()) {
+        FragColor.rgb = texture(final_passFeedback, vOutputCoord).rgb ;
+        return;
+    }
     
     //Initial content coords
         vec2 co_content = vTexCoord;

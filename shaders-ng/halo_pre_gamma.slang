@@ -36,15 +36,8 @@ layout(set = 0, binding = 4) uniform sampler2D in_glow_pass;
 
 void main() {
     
-    #ifdef FPS_HALVER
-        #ifdef _HAS_FRAMETIME_UNIFORMS
-            if (global.OriginalFPS >= 49){
-                if ( frame_is_even() ) {
-                    return;
-                }
-            }
-        #endif
-    #endif
+    if (fps_halver_is_skipped_frame())
+        return;
     
     if (DO_HALO == 0.0 ) return;
         

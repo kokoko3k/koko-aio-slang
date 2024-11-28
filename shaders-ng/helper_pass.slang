@@ -44,15 +44,9 @@ layout(set = 0, binding = 2) uniform sampler2D monitor_body_curved;
 
 
 void main() {
-    #ifdef FPS_HALVER
-        #ifdef _HAS_FRAMETIME_UNIFORMS
-            if (global.OriginalFPS >= 49){
-				if ( frame_is_even() ) {
-                    return;
-                }
-            }
-        #endif
-    #endif
+	
+	if (fps_halver_is_skipped_frame())
+		return;
     
 	bool smp_range_1  = is_first_inside_rect(vTexCoord, SMP_RANGE1 );
 	
