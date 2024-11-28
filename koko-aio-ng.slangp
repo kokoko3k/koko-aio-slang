@@ -92,7 +92,7 @@ shaders = 17
 
 // Hence, we have to set colortools_and_ntsc_pass and next pass (upscale_pass) with the same filter and wrap_mode
 
-// float_framebuffer needed by phosphor persistance
+// high precision needed by phosphor persistance and values > 1.0 needed by color pushes
 float_framebuffer0 = "true"
     filter_linear0 = "true"
         wrap_mode0 = "mirrored_repeat"
