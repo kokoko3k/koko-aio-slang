@@ -359,9 +359,10 @@ However nice effects may be obtained (eg: with vector games). <br>
             if they appear too big.
         Mask type preset:
             You can have the shader generate a preconfigured mask for you:
-            1:gm 2:gmx 3:rgb 4:rgbx 5:rbg 6:rbgx 7:wx
+            1:gm 2:gmx 3:rgb 4:rgbx 5:rbg 6:rbgx 7:wx 8:rgxb 9:wwx
             1:GreenMagenta, 2:GreenMagentaGap, 3:RedGreenBlue, 4:RedGreenBlueGap, 5:RedBlueGreen, 6:RedBlueGreenGap
             7:WhiteGap (means r,g and b phosphors are completely overlapped, nice with scanline deconvergence)
+            8:RedGreenGapBlue 9:WhiteWhiteGap
             
             (beware that due to limitations of the actual implementation, masks ending in "x")
             works reliable when emulating slotmasks only at screen coordinates with multiplier = 1.0)
