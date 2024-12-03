@@ -167,7 +167,12 @@ However nice effects may be obtained (eg: with vector games). <br>
 
 **CVBS: Dot crawl**<br>
     Emulates rolling chroma->luma crosstalks observed in composite signals.<br>
-    You can switch between pal and ntsc.<br>
+    
+    Colorspace: You can switch between pal and ntsc behaviour.
+    Speed:
+        Lower absolute values gives a more visible effect.
+        A negative value will switch to verically crawling artifacts.
+    
     
 **Persistence of phosphors:**<br>
     This emulates the unexcited phosphors that continue to emit light.
@@ -700,7 +705,7 @@ However nice effects may be obtained (eg: with vector games). <br>
 **Spot:**<br>
     Simulates external light reflected by the monitor glass.<br>
             
-**Aspect (active with ambient light or background image only):**<br>
+**Aspect (bezel and content) (active with ambient light or background image only):**<br>
     With RetroArch <= 1.19.1, if you set retroarch aspect ratio option to full,<br>
     you have to provide the core aspect ratio to the shader manually.<br>
     NOTE: The following parameters are ignored when not using ambient lights
@@ -776,6 +781,7 @@ However nice effects may be obtained (eg: with vector games). <br>
     Aspect:
         Forces an aspect ratio.
         Use a negative value to use Core provided aspect ratio (requires RetroArch > 1.19.1)
+        Note that when 
     Vertical/Horizontal position:
         Shifts the game position
     Zoom: 
