@@ -821,6 +821,8 @@ vec2 screen_space_displacement(vec2 co, vec2 outputsize, float size) {
 
 //AMBILIGHT RELATED
 	bool border_needed() {
+		return true;
+		
 		//returns if we need to draw on the border
 		#ifdef STATIC_SUPPORT_BACKDROP
 		return true;
@@ -848,7 +850,9 @@ vec2 screen_space_displacement(vec2 co, vec2 outputsize, float size) {
 
 	
 	float get_in_aspect() {
-		if (!border_needed()) return global.FinalViewportSize.x/global.FinalViewportSize.y; //image adapts to game window.
+		// 2024/12/03: Always pretend we need a border
+		// if (!border_needed()) return global.FinalViewportSize.x/global.FinalViewportSize.y; //image adapts to game window.
+		
 		if (ASPECT_X ==  0) return 1.3333333333333; //all mame games, not rotated
 		if (ASPECT_X == -1) return 1.5;   // ntsc
 		if (ASPECT_X == -2) return 1.25;  // pal
@@ -867,8 +871,8 @@ vec2 screen_space_displacement(vec2 co, vec2 outputsize, float size) {
 	}
 
 	vec2 get_scaled_coords_aspect(vec2 pTexCoord, vec4 destsize, float in_aspect , bool is_rotated){
-		
-		if (!border_needed()) return pTexCoord;
+		// 2024/12/03: Always pretend we need a border
+		// if (!border_needed()) return pTexCoord;
 
 		vec2 scale = vec2(1.0);
 		vec2 offst = vec2(0.0);
@@ -893,8 +897,8 @@ vec2 screen_space_displacement(vec2 co, vec2 outputsize, float size) {
 
 	
 	vec2 get_scaled_coords_aspect_fgbg(vec2 pTexCoord, vec4 destsize, float aspect_image , bool is_rotated, float aspect_content){
-		
-		if (!border_needed()) return pTexCoord;
+		// 2024/12/03: Always pretend we need a border
+		// if (!border_needed()) return pTexCoord;
 
 		vec2 scale = vec2(1.0);
 		vec2 offst = vec2(0.0);
