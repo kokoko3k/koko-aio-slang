@@ -821,17 +821,11 @@ vec2 screen_space_displacement(vec2 co, vec2 outputsize, float size) {
 
 //AMBILIGHT RELATED
 	bool border_needed() {
-		return true;
-		
-		//returns if we need to draw on the border
-		#ifdef STATIC_SUPPORT_BACKDROP
-		return true;
-		#else
+		// Returns if we need to draw on the border
+		// Since 2024/12/03 we don't use this anymore.
 		return (DO_AMBILIGHT + DO_BG_IMAGE + DO_BACKDROP > 0.0);
-		#endif
 	}
 
-	
 	#define mark_useless(x) mark_outer_frame(x)	
 	vec4 mark_outer_frame(vec3 pixel) {
 		return vec4(pixel.rgb,0.0) ;
