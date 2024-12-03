@@ -784,11 +784,10 @@ However nice effects may be obtained (eg: with vector games). <br>
     Zoom: 
         Change the size
     Sharp fix through offset:
-        When using integer scaling, it may be not possible to
-        draw sharp rounded lines.
-        This hack add a small (the higher, the smaller) offset
-        to the image that allow for sharp lines at the cost of a slightly
-        lower draw precision. Use 0.0 to disable the hack.
+        When using integer scaling, it may be not possible to draw sharp rounded lines.
+        This hack add a small offset to the image that allows for sharp lines 
+        at the cost of a slightly lower draw precision.
+        Use 0.0 to disable the hack.
     
 
 **Tilt:**<br>
