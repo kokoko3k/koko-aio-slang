@@ -705,7 +705,7 @@ However nice effects may be obtained (eg: with vector games). <br>
 **Spot:**<br>
     Simulates external light reflected by the monitor glass.<br>
             
-**Aspect (bezel and content) (active with ambient light or background image only):**<br>
+**Aspect (applies to game and bezel):**<br>
     With RetroArch <= 1.19.1, if you set retroarch aspect ratio option to full,<br>
     you have to provide the core aspect ratio to the shader manually.<br>
     NOTE: The following parameters are ignored when not using ambient lights
