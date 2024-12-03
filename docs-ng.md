@@ -705,9 +705,8 @@ However nice effects may be obtained (eg: with vector games). <br>
 **Spot:**<br>
     Simulates external light reflected by the monitor glass.<br>
             
-**Aspect (applies to game and bezel):**<br>
-    With RetroArch <= 1.19.1, if you set retroarch aspect ratio option to full,<br>
-    you have to provide the core aspect ratio to the shader manually.<br>
+**Aspect (applies to virtual screen and bezel):**<br>
+    Manually forces an aspect for the virtual output screen.
     
     Use -6 for MAME cores that pre-rotates the game (TATE mode)<br>
     With Mame 2003 plus and fbneo cores, koko-aio detects if the<br>
@@ -716,7 +715,7 @@ However nice effects may be obtained (eg: with vector games). <br>
     Aspect Ratio Numerator:
         Setting non positive value here will switch to a predefined
         aspect ratio from the following list:
-        0  = 1.33 MAME
+         0 = 1.33 MAME
         -1 = 1.55 NTSC
         -2 = 1.25 PAL
         -3 = 8/7  Snes
@@ -765,8 +764,8 @@ However nice effects may be obtained (eg: with vector games). <br>
         This modulates the smoothness of the animation between various crop values.
 
 **Override game geometry:**<br>
-    Contrary to the global aspect ratio control, this changes only the game geometry.<br>
-    Bezel stays the same.<br>
+    Contrary to the aspect ratio control that affects the virtual screen dimensions,
+    this changes only the game geometry, so bezel stays the same.<br>
     
     Integer scale:
         Game zoom height is rounded to nearest integer.
