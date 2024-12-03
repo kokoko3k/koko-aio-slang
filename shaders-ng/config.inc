@@ -587,7 +587,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 //Background Image
 #pragma parameter DO_BG_IMAGE	     "★ Back/Foreground image enable? (ba) ==>"				 0.0  0.0  1.0     1.0
 #pragma parameter LABEL0039     "   !! RetroArch aspect needs to be set to Full"	 0.0 0.0 0.0 1.0
-#pragma parameter BG_IMAGE_OVER	     "      Image over content (alpha channel driven)?"	 0.0  0.0  1.0     1.0
+#pragma parameter BG_IMAGE_OVER	     "      Image over game (alpha channel driven)?"	 0.0  0.0  1.0     1.0
 #pragma parameter BG_IMAGE_OFFX	     "      Shift Image over X axis"				 0.0  -1.0  1.0    0.0005
 #pragma parameter BG_IMAGE_OFFY	     "      Shift Image over Y axis"				 0.0  -1.0  1.0    0.0005
 #pragma parameter BG_IMAGE_ZOOM	     "      Zoom Image"					 1.0  -1.0  3.0    0.0005
@@ -605,7 +605,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 
 //Back leds
-//Emulates leds under the monitor frame that slowly reacts to image contents
+//Emulates leds under the monitor frame that slowly reacts to game
 #pragma parameter DO_AMBILIGHT	            "★ Ambient light leds enable? (am) ==> "				1.0  0.0  1.0     1.0
 #pragma parameter LABEL0040            "    !! RetroArch aspect needs to be set to Full"		0.0 0.0 0.0 1.0
 #pragma parameter AMBI_STEPS	            "        Slowness"						60.0 5.0  1000.0  5.0
@@ -672,8 +672,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter AUTOCROP_TRANSITION_SPEED "        Transition speed"    		 0.1   0.05   1.0 0.05
 #pragma parameter LABEL0033 " " 0.0 0.0 0.0 1.0
 
-//Content geomerty overrides
-#pragma parameter DO_GAME_GEOM_OVERRIDE	  "★ Override content geometry enable? (ov)==>"	0.0   0.0  1.0 	  1.0
+//Game geomerty overrides
+#pragma parameter DO_GAME_GEOM_OVERRIDE	  "★ Override game geometry enable? (ov)==>"	0.0   0.0  1.0 	  1.0
 #pragma parameter GAME_GEOM_INT_SCALE     "        Integer scale (2=No keep aspect)"	0.0   0.0  2.0    1.0
 #pragma parameter GAME_GEOM_INT_SCALE_MAX "        .    Maximum integer scale" 			10.0  1.0  100.0  1.0
 #pragma parameter GAME_GEOM_INT_SCALE_OVR "        .    Permit integer overscale by" 			1.04   1.00  1.15  0.01

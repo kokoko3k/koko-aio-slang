@@ -50,11 +50,11 @@
         CON: The parameters can no longer be modified within Retroarch. 
         
     textures/background_under.png
-        This is the image that shown by default under the main content and under the bezel.
+        This is the image that shown by default under the game and the bezel.
         Read further for details. 
         
     textures/background_over.png
-        This is the image that shown by default over the main content and under the bezel.
+        This is the image that shown by default over the game and the bezel.
         Read further for details.
         
     textures/monitor_body_curved.png, textures/monitor_body_straight.png
@@ -246,12 +246,12 @@ However nice effects may be obtained (eg: with vector games). <br>
     The Hiher the value, the more the amplitude.
     
 **Hi-resolution scanlines handling:**<br>
-        There you can choose how to handle scanlines when a content is Hi-Resolution.<br>
+        There you can choose how to handle scanlines when a game is Hi-Resolution.<br>
         Special handling may be needed to mitigate glitches/moire at 1080p or lower resolutions.
         
     Consider Hi-Resolution above # lines:
         A value of 0.0 means that it will never consider anything hi-res.
-        A value of 1.0 means that it will always consider content hi-res.
+        A value of 1.0 means that it will always consider game hi-res.
         With values > 1.0, it will consider a frame as Hi-resolution if the lines number is above the configured value.
 
     Hi-Res scanlines type
@@ -294,7 +294,7 @@ However nice effects may be obtained (eg: with vector games). <br>
     Scanlines (*4)
             Scanlines emulation, set the strength of the effect here.
         Double-scan low input resolutions
-            Activate this if you want to double the number of scanlines when the content is low-res.
+            Activate this if you want to double the number of scanlines when the game is low-res.
             "low-res is defined via "Consider Hi-Resolution above # lines" parameter above.
             This option is useful if you want to emulate 30khz VGA CRT monitors.
             If you are on 1080p or lower, consider to activate 
@@ -305,7 +305,7 @@ However nice effects may be obtained (eg: with vector games). <br>
             A negative value will cause the shader to choose when it is appropriate to activate them.
               The decision will be based on the ratio of output dimensions and the core.
         Phosphors height Min, Max:
-            Try to keep scanline height between those values, depending on content brightness.
+            Try to keep scanline height between those values, depending on game brightness.
         Phosphors width min->max gamma:
             Since emulating phosphors with high Min-Max range changes the apparent gamma of the final image,
             it is advised, if needed, to use this option to compensate, instead of the main gamma correction.
@@ -321,7 +321,7 @@ However nice effects may be obtained (eg: with vector games). <br>
             When dealing with curvature and deep scanlines gaps, moire patterns could appear on screen.
             This setting staggers screen phosphors by the configured amount and that halps in mitigating
             the disturbing effect.
-            I observed that a value of 0.17 does a good job for low-res content rendered at 1080p height.
+            I observed that a value of 0.17 does a good job for low-res games rendered at 1080p height.
             Any value > 0.0 disables the, following functions: Slotmask(fake) and Deconvergence Y
         Slotmask(fake) offset(*):
             This will cause every cell to be vertically shifted by the configured amount to
@@ -562,7 +562,7 @@ However nice effects may be obtained (eg: with vector games). <br>
 
         
 **Bezel:**<br>
-    Draws a monitor frame with simulated reflections from the game content.<br>
+    Draws a monitor frame with simulated reflections from the game.<br>
     The monitor frame is an image loaded by the shader and is shipped<br>
     in the "textures" shader subdirectory, named:<br>
     monitor_body_curved.png and monitor_body_straight.png<br>
@@ -570,13 +570,13 @@ However nice effects may be obtained (eg: with vector games). <br>
     only if you want to edit it; otherwise go on:<br>
     * The red channel represents the luminance information<br>
     * The green channel represents the highlights<br>
-    * The alpha channel in the inner frame represents the part of the bezel that will be filled by the game content<br>
+    * The alpha channel in the inner frame represents the part of the bezel that will be filled by the game.<br>
     * The blue channel represents the part of the bezel that will be filled by the game reflection.<br>
     
     Straight
         Use a straight bezel instead of a curved one.
     Frame alignment:
-        Allows to shrink or expand the monitor frame to fit game content and align reflections.
+        Allows to shrink or expand the monitor frame to fit the game and align reflections.
         "Aligning the reflections" is the ONLY scope of this option.
     Bezel color (red,green,blue) and contrast:
         Allows to choose the color of the monitor frame.
@@ -610,20 +610,20 @@ However nice effects may be obtained (eg: with vector games). <br>
     <br>
     **-> It is needed that you set retroarch aspect to "Full" <-**<br>
     ( Settings, Video, Scaling, Aspect Ratio = Full )<br>
-    The image is painted "under" the game content and under the monitor frame by<br>
+    The image is painted "under" the game and under the monitor frame by<br>
     default, and his alpha channel will let you see ambient lighs (see next).<br>
 
-    Image over content (alpha channel driven)?:
-        ...however you can paint the image over the game content and over the
+    Image over game (alpha channel driven)?:
+        ...however you can paint the image over the game and over the
         monitor frame itself by selecting this option.
         If you do so, the alpha channel of the background image will be used to
-        let you view the underlying content.
+        let you view the underlying game.
     Shift(Zoom) Image over X(Y) axis:
         move or zoom the whole background image.
     Rotate/flip image
         This could be needed when dealing with vertical games
         or when the core flips the image for whatever reason.
-        0     =  let the shader try to guess if the game content is rotated.
+        0     =  let the shader guess if the game is rotated.
         1, -1 = no change
         >+1   = manual rotation for straight games
         <-1   = manual rotation for rotated games
@@ -638,7 +638,7 @@ However nice effects may be obtained (eg: with vector games). <br>
         
 **Backdrop support:**<br>
     Some old arcades used a mirror trick to overlay the<br>
-    game content over an high definition printed image.<br>
+    game over an high definition printed image.<br>
     The image used by default, picked from the "textures" shader subdirectory,<br>
     is named: boothill.jpg<br>
     
@@ -648,12 +648,12 @@ However nice effects may be obtained (eg: with vector games). <br>
         
 **Ambient light leds:**<br>
     Emulates the presence of led strips behind the monitor that lights the<br>
-    surroundings according to the edges of the game content.<br>
+    surroundings according to the edges of the game.<br>
     **-> It is needed that you set retroarch aspect to "Full" <-**<br>
     ( Settings, Video, Scaling, Aspect Ratio = Full )<br>
     
     Slowness: 
-        How much will the leds will take to reflect the game content.
+        How much will the leds will take to adapt to the game.
         It may sound silly to make them slow, but if they reacts too fast,
         they may distract you.
         Keep in mynd that there is a scene detection logic that will make them
@@ -663,7 +663,7 @@ However nice effects may be obtained (eg: with vector games). <br>
     Led saturation:
         Leds saturation post gain.      
     Internalness (Led position):
-        The distance between the virtual led strip and the content.
+        The distance between the virtual led strip and the game area.
         High values will move leds behind it, while lower values will move
         leds around it.
     Internalness (Sampling point):
@@ -671,7 +671,7 @@ However nice effects may be obtained (eg: with vector games). <br>
         follow the color of what is in the center of the screen, lowering the value will
         color the leds as the edge of the screen.
     Widen lights:
-        Dumb stretch of the visible texture, operates on the whole content, instead of the
+        Dumb stretch of the visible texture, operates on the whole light, instead of the
         single led.
         Note: To avoid burn-in effects, keep Light Falloff + Led power not too high.
     Bezel Colorization intensity:
@@ -708,9 +708,6 @@ However nice effects may be obtained (eg: with vector games). <br>
 **Aspect (applies to game and bezel):**<br>
     With RetroArch <= 1.19.1, if you set retroarch aspect ratio option to full,<br>
     you have to provide the core aspect ratio to the shader manually.<br>
-    NOTE: The following parameters are ignored when not using ambient lights
-    or background/foreground images.
-    In those cases, use options under "Override content geometry" section.
     
     Use -6 for MAME cores that pre-rotates the game (TATE mode)<br>
     With Mame 2003 plus and fbneo cores, koko-aio detects if the<br>
@@ -767,12 +764,12 @@ However nice effects may be obtained (eg: with vector games). <br>
     Transition speed
         This modulates the smoothness of the animation between various crop values.
 
-**Override content geometry:**<br>
+**Override game geometry:**<br>
     Contrary to the global aspect ratio control, this changes only the game geometry.<br>
     Bezel stays the same.<br>
     
     Integer scale:
-        Game content zoom height is rounded to nearest integer.
+        Game zoom height is rounded to nearest integer.
         Maximum integer scale: 
             Dont allow integer scaling more than this
             * beware: the following options in this group overrides the integer scale.
@@ -795,7 +792,7 @@ However nice effects may be obtained (eg: with vector games). <br>
     
 
 **Tilt:**<br>
-    Put the bezel and the game content into perspective.<br>
+    Put the bezel and the game into perspective.<br>
     The implementation is basic, you can expect correct<br>
     results when tilting alongside a single axis or when<br>
     using both, but with small values.<br>
@@ -855,7 +852,7 @@ To enable them, you have to edit the shader itself, save it, and reload.*
     
 **LCD antighosting:**<br>
     LCD displays often suffer from high pixel refresh times <br>
-    which produces ghosting when content changes on screen.<br>
+    which produces ghosting when game changes on screen.<br>
     By inducing larger color transitions, it prompts the LCD cells <br>
     to adjust their states more rapidly, thereby reducing ghosting.<br><br>
     To use it, in file config-user.txt, turn the line: <br>

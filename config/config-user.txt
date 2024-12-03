@@ -256,7 +256,7 @@
 // #define GLOBAL_ZOOM  2.0     //         Zoom
 
 // #define DO_BG_IMAGE  0.0           // ★ Back/Foreground image enable?
-// #define BG_IMAGE_OVER  0.0         //       Image over content (alpha channel driven)?
+// #define BG_IMAGE_OVER  0.0         //       Image over game (alpha channel driven)?
 // #define BG_IMAGE_OFFX  0.0         //       Shift Image over X axis
 // #define BG_IMAGE_OFFY  0.0         //       Shift Image over Y axis
 // #define BG_IMAGE_ZOOM  1.0         //       Zoom Image
@@ -316,7 +316,7 @@
 // #define AUTOCROP_STEADINESS 0.01    //         Scene change treshold (0 = continuous cropping) 
 // #define AUTOCROP_SAMPLES 0.02       //        Transition speed 
 
-// #define DO_GAME_GEOM_OVERRIDE  0.0     // ★ Override content geometry enable?
+// #define DO_GAME_GEOM_OVERRIDE  0.0     // ★ Override game geometry enable?
 // #define GAME_GEOM_INT_SCALE  0.0       //         Integer scale 2=No keep aspect
 // #define GAME_GEOM_INT_SCALE_MAX  10.0  //         .    Maximum integer scale
 // #define GAME_GEOM_INT_SCALE_OVR 1.0    //         .    Permit integer overscale by
