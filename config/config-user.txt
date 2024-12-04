@@ -356,6 +356,12 @@
 // To enable high quality deconvergence, remove leading "//"
 // #define HQ_DECON
 
+// FXAA tuning: select an FXAA preset here.
+// 1.0 is a dumb and fast preset, 2.0 is still fast, but rounder (the default)
+// Higher numbers are useful to antialias high resolution content.
+// Allowed values from 1.0 to 5.0.
+// #define FXAA_PRESET 2.0
+
 // Enable lcd antighosting by using values > 0.0 (try around 0.25)
 // #define LCD_ANTIGHOSTING 0.25
 

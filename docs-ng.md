@@ -848,6 +848,16 @@ To enable them, you have to edit the shader itself, save it, and reload.*
     ```#define HQ_DECON```<br>
 
     
+**FXAA tuning:**<br>
+    To change fxaa behaviour, in file config-user.txt, turn the line: <br>
+    ```// #define FXAA_PRESET 2.0```
+    <br>into: <br>
+    ```#define FXAA_PRESET 2.0```<br>
+    You can use values from 1.0 to 5.0, where:<br>
+    1.0 is the fastest one, limited effect.<br>
+    2.0 is the default one, still fast, good for low resolution content.<br>
+    3.0 to 5.0 smooth the image more and are good for high resolution games.<br>
+    
 **LCD antighosting:**<br>
     LCD displays often suffer from high pixel refresh times <br>
     which produces ghosting when game changes on screen.<br>

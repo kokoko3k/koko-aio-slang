@@ -586,10 +586,10 @@ vec3 pixel_flickering(vec3 pixel_cur) {
 
 
 #ifndef FXAA_PRESET
-    #define FXAA_PRESET 0
+    #define FXAA_PRESET 2
 #endif
 
-#if (FXAA_PRESET == 0)  //Dumb preset, looks like others for 2x scaling, but skip search.
+#if (FXAA_PRESET == 1)  //Dumb preset, looks like others for 2x scaling, but skip search.
     #define FXAA_EDGE_THRESHOLD      (1.0/8.0)
     #define FXAA_EDGE_THRESHOLD_MIN  (1.0/24.0)
     #define FXAA_SEARCH_STEPS        0
@@ -598,41 +598,43 @@ vec3 pixel_flickering(vec3 pixel_cur) {
     #define FXAA_SUBPIX_TRIM         (1.0/8.0)
 #endif
 
-#if (FXAA_PRESET == 6)
-    #define FXAA_EDGE_THRESHOLD      (1.0/16.0)
-    #define FXAA_EDGE_THRESHOLD_MIN  (1.0/12.0)
+#if (FXAA_PRESET == 2) // Limited search, rounder
+    #define FXAA_EDGE_THRESHOLD      (1.0/8.0)
+    #define FXAA_EDGE_THRESHOLD_MIN  (1.0/24.0)
     #define FXAA_SEARCH_STEPS        4
     #define FXAA_SEARCH_THRESHOLD    (1.0/4.0)
-    #define FXAA_SUBPIX_CAP          (7.0/8.0)
-    #define FXAA_SUBPIX_TRIM         (1.0/8.0)
+    #undef  FXAA_SUBPIX_TRIM                     //koko: brighter edges
+    #define FXAA_SUBPIX_CAP          (3.0/4.0)   //koko: unused when FXAA_SUBPIX_TRIM is not defined
 #endif
 
 #if (FXAA_PRESET == 3)
-    #define FXAA_EDGE_THRESHOLD      (1.0/16.0)
-    #define FXAA_EDGE_THRESHOLD_MIN  (1.0/16.0)
-    #define FXAA_SEARCH_STEPS        16
-    #define FXAA_SEARCH_THRESHOLD    (1.0/4.0)
-    #define FXAA_SUBPIX_CAP          (3.0/4.0)
-    #define FXAA_SUBPIX_TRIM         (1.0/4.0)
+    #define FXAA_EDGE_THRESHOLD      (1.0/8.0)  
+    #define FXAA_EDGE_THRESHOLD_MIN  (1.0/16.0) 
+    #define FXAA_SEARCH_STEPS        16         
+    #define FXAA_SEARCH_THRESHOLD    (1.0/4.0)  
+    #define FXAA_SUBPIX_CAP          (3.0/4.0)  
+    #define FXAA_SUBPIX_TRIM         (1.0/4.0)  
 #endif
 #if (FXAA_PRESET == 4)
     #define FXAA_EDGE_THRESHOLD      (1.0/8.0)
     #define FXAA_EDGE_THRESHOLD_MIN  (1.0/24.0)
-    #define FXAA_SEARCH_STEPS        1
+    #define FXAA_SEARCH_STEPS        24
     #define FXAA_SEARCH_THRESHOLD    (1.0/4.0)
     #define FXAA_SUBPIX_CAP          (3.0/4.0)
-    #define FXAA_SUBPIX_TRIM         (1.0/8.0)
+    #define FXAA_SUBPIX_TRIM         (1.0/4.0)
 #endif
 #if (FXAA_PRESET == 5)
-    #define FXAA_EDGE_THRESHOLD      (1.0/16.0)
-    #define FXAA_EDGE_THRESHOLD_MIN  (1.0/12.0)
+    #define FXAA_EDGE_THRESHOLD      (1.0/8.0)
+    #define FXAA_EDGE_THRESHOLD_MIN  (1.0/24.0)
     #define FXAA_SEARCH_STEPS        32
     #define FXAA_SEARCH_THRESHOLD    (1.0/4.0)
-    #define FXAA_SUBPIX_CAP          (7.0/8.0)
-    #define FXAA_SUBPIX_TRIM         (1.0/8.0)
+    #define FXAA_SUBPIX_CAP          (3.0/4.0)
+    #define FXAA_SUBPIX_TRIM         (1.0/4.0)
 #endif
 
-#define FXAA_SUBPIX_TRIM_SCALE (1.0/(1.0 - FXAA_SUBPIX_TRIM))
+#ifdef FXAA_SUBPIX_TRIM
+   #define FXAA_SUBPIX_TRIM_SCALE (1.0/(1.0 - FXAA_SUBPIX_TRIM))
+#endif
 
 // Return the luma, the estimation of luminance from rgb inputs.
 // This approximates luma using one FMA instruction,
@@ -688,9 +690,13 @@ vec3 FxaaPixelShader(vec2 pos, sampler2D tex, vec4 sourcesize, vec4 outputsize) 
    float lumaL = (lumaN + lumaW + lumaE + lumaS) * 0.25;
    float rangeL = abs(lumaL - lumaM);
 
-   float blendL = max(0.0, (rangeL / range) - FXAA_SUBPIX_TRIM) * FXAA_SUBPIX_TRIM_SCALE; 
-   blendL = min(FXAA_SUBPIX_CAP, blendL);
-
+   #ifdef FXAA_SUBPIX_TRIM
+      float blendL = max(0.0, (rangeL / range) - FXAA_SUBPIX_TRIM) * FXAA_SUBPIX_TRIM_SCALE; 
+      blendL = min(FXAA_SUBPIX_CAP, blendL);
+   #else
+      float blendL = 0.0;
+   #endif
+   
    vec3 rgbNW = FxaaTexOff(tex, pos.xy, ivec2(-1,-1), sourcesize, outputsize).xyz;
    vec3 rgbNE = FxaaTexOff(tex, pos.xy, ivec2( 1,-1), sourcesize, outputsize).xyz;
    vec3 rgbSW = FxaaTexOff(tex, pos.xy, ivec2(-1, 1), sourcesize, outputsize).xyz;
