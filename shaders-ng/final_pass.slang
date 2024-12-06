@@ -1427,6 +1427,7 @@ void main() {
             vec2 vignette_spot = texture(helper_pass, vTexCoord).zw;
             pixel_out = pixel_out * vignette_spot.x;
             pixel_out = max(pixel_out, vignette_spot.y * canvas_bezel_screen);
+            //pixel_out = mix(pixel_out, vec3(canvas_bezel_screen), vec3(vignette_spot.y) );
             pixel_out += perlin;
         }
   
