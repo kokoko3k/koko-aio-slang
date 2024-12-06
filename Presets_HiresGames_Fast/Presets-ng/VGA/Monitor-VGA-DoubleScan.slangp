@@ -1,4 +1,4 @@
-#reference "Base.slangp"
+#reference "../Base.slangp"
 BEZEL_R = "0.090000"
 BEZEL_G = "0.060000"
 BEZEL_B = "0.025000"
