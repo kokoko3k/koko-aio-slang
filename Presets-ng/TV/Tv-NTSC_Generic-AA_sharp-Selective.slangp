@@ -1,4 +1,4 @@
-#reference "Tv-NTSC_Megadrive-FXAA_sharp-Selective.slangp"
+#reference "Tv-NTSC_Megadrive-AA_sharp-Selective.slangp"
 
 NTSC_FILTER_WIDTH = "13.000000"
 NTSC_FILTER_FC = "2.500000"
