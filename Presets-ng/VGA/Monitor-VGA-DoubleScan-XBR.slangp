@@ -1,6 +1,6 @@
 #reference "Monitor-VGA-DoubleScan.slangp"
 
-DO_FXAA = "1.000000"
+DO_FXAA = "2.000000"
 DO_IN_GLOW = "1.000000"
 IN_GLOW_SPREAD = "1.000000"
 IN_GLOW_SPREAD_SHARPNESS = "1.750000"
