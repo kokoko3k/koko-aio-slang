@@ -1,4 +1,9 @@
 #reference "../Base.slangp"
+
+IN_GLOW_GAMMA = "2.200000"
+GAMMA_OUT = "0.450000"
+
+
 BEZEL_R = "0.090000"
 BEZEL_G = "0.060000"
 BEZEL_B = "0.025000"
