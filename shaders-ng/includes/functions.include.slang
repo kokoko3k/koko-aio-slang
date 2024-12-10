@@ -158,6 +158,11 @@ vec2 coords_NEAREST(vec2 co, vec4 texsize) {
    return (integerCoords + 0.5) * texsize.zw;
 }
 
+float coords_NEAREST_y(vec2 co, vec4 texsize) {
+   float integerCoords = floor(co.y * texsize.y);
+   return (integerCoords + 0.5) * texsize.w;
+}
+
 vec4 texture_NEAREST(sampler2D tex, vec2 co_linear, vec4 tex_size) {
    //return nearest sampling from a linear filtered texture
    vec2 integerCoords = floor(co_linear.xy * tex_size.xy);

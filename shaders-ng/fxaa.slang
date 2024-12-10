@@ -839,7 +839,7 @@ void main() {
    
    vec4 pixel_out;
    pixel_out.rgb = texture_NEAREST(Source, vTexCoord, params.SourceSize).rgb;
-      
+   
    // If we sample ntsc articacts from a mipmap, we can smooth them
    // which is good when slective blurring them.
    pixel_out.a = 0.0;
