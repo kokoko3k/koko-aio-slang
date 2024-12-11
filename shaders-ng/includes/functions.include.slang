@@ -1,3 +1,13 @@
+vec3 mask_enhance(vec3 mask, vec3 ref, float factor) {
+ return mix( factor * (mask - 0.5) + 0.5, mask, abs(ref - vec3(0.5)*2) );
+}
+
+float mask_enhance_float(float mask, vec3 ref, float factor) {
+	float fref = dot(ref, vec3(0.3333));
+ return mix( factor * (mask - 0.5) + 0.5, mask, abs(fref - 0.5*2) );
+}
+
+
 bool frame_is_even() {
 	return ((int(params.FrameCount) & 1) == 0);
 }

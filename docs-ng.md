@@ -457,12 +457,12 @@ However nice effects may be obtained (eg: with vector games). <br>
             How much should the grid be visible on background?
             More positive values -> more grid on bright
             More negative values -> more grid on dark
-    Refresh inertia:
+    Ghosting:
         Emulates a low refresh screen, set the power of the effect.<br>
-        Inertia on:
-            0: display is always slow to refresh
-            1: display is slow to refresh bright pixels
-            2: display is slow to refresh dark pixels
+        Apply on:
+            0: display is always slow to refresh (Game gear)
+            1: display is slow to refresh bright pixels (??)
+            2: display is slow to refresh dark pixels (Game Boy)
     Shadow strength:
         Emulates the typical shadow seen on Gameboy mono handhelds
         casted by on the underlying screen.
