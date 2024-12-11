@@ -550,6 +550,9 @@ void main() {
       // we need to ensure the mix will reach 0.0.
       // So we put it to 0.0 if the difference between past and present is low enough.
       // The difference is obtained by "abs(adaption)".
+      // All this is needed because, we are on the very first pass,
+      // so the feedback has no "float framebuffer".
+      // 
       vec3 m_blur_adapted = vec3(DOT_M_MBLUR_STR) * step(1/256.0, abs(adaption) );
       
       if (DOT_M_MBLUR_MODE > 0.0) {
