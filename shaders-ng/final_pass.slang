@@ -672,7 +672,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
 
             //Finally get 3 sines out of the previous one by applying height modifiers
                 rgb_h = morph_shape(rgb_h_sin, phosphor_height, PIXELGRID_NO_INTERBLEED_H, PIXELGRID_GAMMA_H);
-                
+
                 rgb_h = mix(vec3(1.0), rgb_h, DO_PIXELGRID_H);
                 
                 rgb_h = clamp(rgb_h, 0.0,1.0);
@@ -704,15 +704,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
                 rgb_w = mix(rgb_w, phosphor_width, dedot_mix);
 
             //lower strength via user parameter?
-                
-               // rgb_w = mask_enhance(rgb_w, pixel_in.rgb, SERVICE1);
-                
                 rgb_w = mix(vec3(1.0), rgb_w, DO_PIXELGRID_W);
-                
-                             
-                //rgb_w = mix( SERVICE1 * (rgb_w - 0.5) + 0.5, rgb_w, abs(pixel_in.rgb - vec3(0.5)*2) );
-                
-                //rgb_w = clamp(rgb_w, vec3(0.0), vec3(1.0));
                 
             //"export" naked vertical grille
                 rgb_grille_basal = (rgb_w * rgb_w) * (rgb_w * rgb_w) * (PIXELGRID_BASAL_GRID*0.0025);
@@ -764,36 +756,23 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
                 vec3 lum_adapted = (1-lum*PIXELGRID_Y_MASK_ON_WHITE);
             //Calc final mask visibility as the minimum between tha configured visibility and luminosity effect
                 vec3 V=min( lum_adapted, vec3(PIXELGRID_Y_MASK) );
-                
-               // mask_shape = mask_enhance_float(mask_shape, pixel_in.rgb, SERVICE1);
-                
             //apply user visibility modifier to the mask
                 darklines_mask = 1-(mask_shape*V);
             //Try to get a more brillant/sparkling look by highering the darklines
             //effect (sub) and pushing the source color, useful for slotmasks.
                 vec3 PG_spark = (PIXELGRID_Y_SPARK * V) * (0.5/vPG_mask_height);         
-                darklines_mask = (darklines_mask-0.5) * (1+PG_spark) + 0.5 ;
-                
-
-                
+                darklines_mask = (darklines_mask-0.5) * (1+PG_spark) + 0.5 ; 
         }
 
         
 
     //Finally put H mask, Scanlines and darklines masks together:
-        vec3 mask = rgb_h * clamp(mask_enhance( rgb_w * darklines_mask, pixel_in.rgb, SERVICE1), vec3(0.0) , vec3(1.0));
+        vec3 mask = rgb_w * rgb_h * darklines_mask;
 
 
     //Apply Overmask:
             mask = PIXELGRID_OVERMASK * (mask - 0.5) + 0.5;
-            
-
-            
-            
             pixel_in.rgb = mix(pixel_in.rgb, pixel_in.rgb * PIXELGRID_OVERMASK, PIXELGRID_OVERMASK);
-            
-
-           
             
             //mask = mix(vec3(1.0), mask * PIXELGRID_OVERMASK * 1.2, PIXELGRID_OVERMASK);
             
@@ -1553,33 +1532,6 @@ void main() {
             pixel_out = 1-pixel_out;//;-clip;
     #endif
    
-    vec3 sum1 = vec3(0.0);
-    vec3 sum2 = vec3(0.0);
-    vec2 d = params.OutputSize.zw;
-    float st1 = 1.0;
-    sum1+= texture(final_passFeedback, vOutputCoord + d * vec2(-1, -1) ).rgb * st1;
-    sum1+= texture(final_passFeedback, vOutputCoord + d * vec2(-1,  1) ).rgb * st1;
-    sum1+= texture(final_passFeedback, vOutputCoord + d * vec2(-1,  0) ).rgb * st1;
-    sum1+= texture(final_passFeedback, vOutputCoord + d * vec2( 1, -1) ).rgb * st1;
-    float st2 = 1.0;
-    sum2+= texture(final_passFeedback, vOutputCoord + d * vec2( 0, -1) ).rgb * st2;
-    sum2+= texture(final_passFeedback, vOutputCoord + d * vec2( 0,  0) ).rgb * st2;
-    sum2+= texture(final_passFeedback, vOutputCoord + d * vec2( 0,  1) ).rgb * st2;
-    sum2+= texture(final_passFeedback, vOutputCoord + d * vec2( 1,  0) ).rgb * st2;
-    
-    vec3 blur = (sum1 + (2 * sum2) + (4 * pixel_out)) / 16;
-    float coeff_blur = 0.9;
-    float coeff_orig = 1+coeff_blur;
-    
-    pixel_out = floor(pixel_out*255.0)/255.0;
-    pixel_out = clamp(pixel_out, vec3(0.0), vec3(1.0));
-
-    vec3 diff = abs(texture(final_passFeedback, vOutputCoord + d * vec2( 0,  0) ).rgb - pixel_out.rgb);
-    
-    
-    
-    
-    FragColor.rgb =  mix( coeff_orig*pixel_out - coeff_blur*blur, pixel_out, 1);
-    
+    FragColor.rgb = pixel_out;
     
 }
