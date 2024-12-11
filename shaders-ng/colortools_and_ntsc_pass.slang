@@ -541,18 +541,26 @@ void main() {
    if (DO_DOT_MATRIX + DOT_M_MBLUR_STR > 1.0) {
       vec3 feedback = texture(colortools_and_ntsc_passFeedback, co).rgb;
       
-      vec3 m_blur_adapted = vec3(DOT_M_MBLUR_STR);
-
       //Dot matrix motion blur inertia on white or black (not both)?
+      vec3 adaption = mix_step (pixel_out - feedback,
+                                feedback - pixel_out,
+                                DOT_M_MBLUR_MODE -1);
+
+      // Since m_blur_adapted will be used to mix present and past pixel,
+      // we need to ensure the mix will reach 0.0.
+      // So we put it to 0.0 if the difference between past and present is low enough.
+      // The difference is obtained by "abs(adaption)".
+      vec3 m_blur_adapted = vec3(DOT_M_MBLUR_STR) * step(1/256.0, abs(adaption) );
+      
       if (DOT_M_MBLUR_MODE > 0.0) {
-         vec3 adaption = mix_step (pixel_out - feedback,
-                                   feedback - pixel_out,
-                                   DOT_M_MBLUR_MODE -1);
-            
-         //adaption = mix_step(adaption, -adaption, DOT_M_MBLUR_MODE -1);
          m_blur_adapted *= clamp( adaption, 0.0, 1.0 );
          m_blur_adapted = pow(m_blur_adapted, vec3(0.25));
       }
+      
+      vec3 diff = abs(pixel_out - feedback);
+      
+      
+      m_blur_adapted *= step(vec3(1/128.0), m_blur_adapted);
       pixel_out = mix(pixel_out, feedback, m_blur_adapted  );
    }
    
