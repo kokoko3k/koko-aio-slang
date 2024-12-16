@@ -389,6 +389,10 @@
 // Enable Conditional FPS Halver (60->30, 30->30, 50->25, 25->25)
 // #define FPS_HALVER
 
+// Enable an hacky performance optimization that returns undefined values when
+// compositing bezels that may produce artifacts (it does at least on Windows + nvidia)
+// #define BEZEL_RETURN_UNDEF
+
 // Developer reminder: bash script to partially convert a shader preset 
 // edit: obsolete and incomplete since it does not recur references.
 // for l in $(cat /koko/.config/retroarch/shaders/test.slangp |grep ^[A-Z] ) ; do p=$(echo $l|cut -d " " -f 1) ; v=$(echo $l | cut -d \" -f 2); echo \// #define $p $v; done

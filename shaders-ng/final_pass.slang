@@ -1151,12 +1151,15 @@ vec3 fn_pixel_content(vec2 coords) {
 
 vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightify_str, vec3 pixel_ambilight) {
     
-    // Can we skip inner blank tube?  
+    #ifdef BEZEL_RETURN_UNDEF
+        vec3 undef;// Perf hack: returning undefined values is faster.
+    #else
+        vec3 undef = vec3(0.0); 
+    #endif
+    // Can we skip inner blank tube?  Can we skip outside border?
     if (is_first_outside_rect(coords_for_bezel, RECT01))
-        return vec4(0.0);
+        return vec4(undef, 0.0);
     #define _INNER_BLANK_RECT vec4(1-BEZEL_TUBE_BLANK_SIZE, 1-BEZEL_TUBE_BLANK_SIZE, BEZEL_TUBE_BLANK_SIZE, BEZEL_TUBE_BLANK_SIZE)
-    vec3 undef; // Perf hack: returning undefined values is faster, nvidia seems to not like that hack
-                // in the outer border, so it is disabled.
     if (is_first_inside_rect(coords_for_bezel, _INNER_BLANK_RECT)) 
         return vec4(undef, 0.0);
 
