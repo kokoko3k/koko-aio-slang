@@ -1408,13 +1408,9 @@ void main() {
             
             co_bezel = get_scaled_coords_for_bezel(vTexCoord, vIsRotated);
             
-            vec4 pixel_bezel;
-            pixel_bezel.a = 0.0;
-            
             if (is_bezel_paint_area(co_bezel)) {
-                pixel_bezel = fn_pixel_bezel(co_bezel, co_mirror, BG_IMAGE_NIGHTIFY * DO_BG_IMAGE, pixel_ambi);
+                vec4 pixel_bezel = fn_pixel_bezel(co_bezel, co_mirror, BG_IMAGE_NIGHTIFY * DO_BG_IMAGE, pixel_ambi);
                 pixel_out = mix(pixel_out, pixel_bezel.rgb, pixel_bezel.a);
-            }
             
             //Update alpha mask.
             //We can't use the bezel alpha channel to update the alpha mask since it is transparent ù
@@ -1422,11 +1418,11 @@ void main() {
                 float rect_bezel = float(is_first_inside_rect(co_bezel, vec4(BEZEL_FRAME_SURROUND_MARGIN, BEZEL_FRAME_SURROUND_MARGIN, 1.0 - BEZEL_FRAME_SURROUND_MARGIN, 1.0 - BEZEL_FRAME_SURROUND_MARGIN)));
                 canvas_busy = max(pixel_bezel.a, rect_bezel);
 
-                //FragColor = vec4(canvas_busy); return; // <- uncomment to debug BEZEL_FRAME_SURROUND_MARGIN
-
                 //Intersect rect_bezel and bezel alpha to get the inner tube alpha
                 canvas_bezel_screen = (1 - pixel_bezel.a) * rect_bezel;
                 //canvas_bezel_screen = rect_bezel - rect_bezel* pixel_bezel.a; //ASM PROOF: SLOWER
+            }
+            //FragColor = vec4(canvas_busy); return; // <- uncomment to debug BEZEL_FRAME_SURROUND_MARGIN
         }
 
 
