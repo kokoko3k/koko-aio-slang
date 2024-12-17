@@ -155,3 +155,7 @@ TODO:
 	[ ] Support for upcoming OriginalAspect/Rot
 	[ ] Check if is possible to turn halo's float framebuffers to 10bit unorm and if it provides a performance boost.
 	    If it's ok, check for other possible passes application.
+	[ ] co_bezel is used to create the ambi mask.
+		problem is: co_bezel is defined way before its use (used twice in the code)
+		and that often leads to performance degradation (registers are precious)
+		would it be possible to pre-compute ambi mask in the ambilight pass?
