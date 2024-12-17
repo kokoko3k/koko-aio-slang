@@ -1337,7 +1337,7 @@ void main() {
     
     //Draw content only over the alpha mask, and sample ambientlight outside it to save gpu cycles.
         if (canvas_busy > 0.5) {
-            pixel_out = fn_pixel_content(co_content) * canvas_busy;
+            pixel_out = fn_pixel_content(co_content);
                       
             #ifndef D3D_WORKAROUND
                 #ifdef LCD_ANTIGHOSTING
@@ -1393,6 +1393,8 @@ void main() {
             }
         }
 
+    pixel_out *= canvas_busy;
+        
     //This represents the inner bezel alpha (when using bezel)
     //or the pixel_content canvas (when not using bezel)
     //It is used to draw spot on the whole inner tube even when toe content does not
@@ -1402,9 +1404,6 @@ void main() {
     //Draw Bezel
         vec2 co_bezel = vec2(0.0);
         if (DO_BEZEL == 1.0) {
-            //If we used a smooth_border, canvas_busy is it, but since the content is in the bezel,
-            //we can safely use it to smooth/darken the game border
-            pixel_out *= canvas_busy;
             
             co_bezel = get_scaled_coords_for_bezel(vTexCoord, vIsRotated);
             
