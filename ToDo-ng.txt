@@ -159,4 +159,4 @@ TODO:
 		problem is: co_bezel is defined way before its use (used twice in the code)
 		and that often leads to performance degradation (registers are precious)
 		would it be possible to pre-compute ambi mask in the ambilight pass?
-	[ ] vertex shader, in final pass: are voutputcoord and vtexcoord the same?
+	[ ] fn_border can be superseeded by fuzzy_rect;  is it faster?
