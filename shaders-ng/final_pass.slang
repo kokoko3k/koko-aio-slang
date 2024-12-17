@@ -1148,21 +1148,19 @@ vec3 fn_pixel_content(vec2 coords) {
     return pixel_out;
 }
 
+bool is_bezel_paint_area(vec2 lcoords_for_bezel) {
+    // Can we skip inner blank tube?  Can we skip outside border?
+    if (is_first_outside_rect(lcoords_for_bezel, RECT01))
+        return false;
+    #define _INNER_BLANK_RECT vec4(1-BEZEL_TUBE_BLANK_SIZE, 1-BEZEL_TUBE_BLANK_SIZE, BEZEL_TUBE_BLANK_SIZE, BEZEL_TUBE_BLANK_SIZE)
+    if (is_first_inside_rect(lcoords_for_bezel, _INNER_BLANK_RECT)) 
+        return false;
+    
+    return true;
+}
 
 vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightify_str, vec3 pixel_ambilight) {
     
-    #ifdef BEZEL_RETURN_UNDEF
-        vec3 undef;// Perf hack: returning undefined values is faster.
-    #else
-        vec3 undef = vec3(0.0); 
-    #endif
-    // Can we skip inner blank tube?  Can we skip outside border?
-    if (is_first_outside_rect(coords_for_bezel, RECT01))
-        return vec4(undef, 0.0);
-    #define _INNER_BLANK_RECT vec4(1-BEZEL_TUBE_BLANK_SIZE, 1-BEZEL_TUBE_BLANK_SIZE, BEZEL_TUBE_BLANK_SIZE, BEZEL_TUBE_BLANK_SIZE)
-    if (is_first_inside_rect(coords_for_bezel, _INNER_BLANK_RECT)) 
-        return vec4(undef, 0.0);
-
     vec4 bezel_in;
 
     //Sample main bezel texture:
@@ -1402,17 +1400,22 @@ void main() {
         float canvas_bezel_screen = canvas_busy;
 
     //Draw Bezel
-        vec4 pixel_bezel;
-        //SKIP LOGIC is inside fn_pixel_bezel
         vec2 co_bezel = vec2(0.0);
         if (DO_BEZEL == 1.0) {
-            co_bezel = get_scaled_coords_for_bezel(vTexCoord, vIsRotated);
-            pixel_bezel = fn_pixel_bezel(co_bezel, co_mirror, BG_IMAGE_NIGHTIFY * DO_BG_IMAGE, pixel_ambi);
             //If we used a smooth_border, canvas_busy is it, but since the content is in the bezel,
             //we can safely use it to smooth/darken the game border
             pixel_out *= canvas_busy;
-            pixel_out = mix(pixel_out, pixel_bezel.rgb, pixel_bezel.a);
-
+            
+            co_bezel = get_scaled_coords_for_bezel(vTexCoord, vIsRotated);
+            
+            vec4 pixel_bezel;
+            pixel_bezel.a = 0.0;
+            
+            if (is_bezel_paint_area(co_bezel)) {
+                pixel_bezel = fn_pixel_bezel(co_bezel, co_mirror, BG_IMAGE_NIGHTIFY * DO_BG_IMAGE, pixel_ambi);
+                pixel_out = mix(pixel_out, pixel_bezel.rgb, pixel_bezel.a);
+            }
+            
             //Update alpha mask.
             //We can't use the bezel alpha channel to update the alpha mask since it is transparent ù
             //on the tube and we don't want to paint anything there, so use a dumb rect and add it to canvas_busy:
