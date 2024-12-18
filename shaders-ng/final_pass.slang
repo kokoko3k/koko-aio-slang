@@ -1381,7 +1381,7 @@ void main() {
             // Debanding when not using bg images.
             #ifndef SKIPRANDOM
             if (DO_BG_IMAGE != 1.0) {
-                const float noise_power = -NOISEPOWER * NOISEPOWER_AMBI_MUL;
+                const float noise_power = -NOISEPOWER_AMBI;
                 float dynamicseed = mod(params.FrameCount, 30.0001);
                 float anoise1 = random_fast(vTexCoord*dynamicseed) * noise_power;
                 // anoise1 *=  (1 - pixel_ambi.g);
