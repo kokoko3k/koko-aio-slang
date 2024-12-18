@@ -1378,20 +1378,19 @@ void main() {
         if (DO_AMBILIGHT == 1.0) {
             pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb ;
             
+            // Debanding when not using bg images.
+            #ifndef SKIPRANDOM
             if (DO_BG_IMAGE != 1.0) {
                 const float noise_power = -NOISEPOWER * NOISEPOWER_AMBI_MUL;
                 float dynamicseed = 1.0;
-                #ifndef SKIPRANDOM
                     dynamicseed = mod(params.FrameCount, 30.0001); 
-                #endif
                 float anoise1 = random_fast(vTexCoord*dynamicseed) * noise_power;
-
                 // anoise1 *=  (1 - pixel_ambi.g);
                 //anoise1 =  (anoise1 - anoise1 * pixel_ambi.g); //ASM PROOF FASTER
                 anoise1 =  fma(-anoise1, pixel_ambi.g, anoise1); //ASM PROOF FASTER
-                
                 pixel_ambi += anoise1;
             }
+            #endif
             //pixel_under_content = clamp(pixel_ambi, 0.0,1.0) * (1-canvas_busy); //<-- this one is better because will antialias borders
                                                                                     //    better (via canvas-busy) when ambientlight > 0.0
             //pixel_under_content = pixel_ambi * (1-canvas_busy);
