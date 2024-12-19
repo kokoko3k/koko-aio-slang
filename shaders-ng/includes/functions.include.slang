@@ -1451,42 +1451,37 @@ vec2 tilt(vec2 co, float is_rotated, float tilt) {
 		co = 0.5 + (co - 0.5) / (tilt_y_range * tilt_x_range);
 		
 	if (is_rotated > 0.5) //ASM PROOF
-		co.xy += -vec2(tilt, 0.0) * 0.5;
+		co.xy -= vec2(tilt, 0.0) * 0.5;
 	else
 		co.xy += vec2(0.0, tilt) * 0.5;
 		
 	return co;
 }
 	
-vec2 tilt_bezel(vec2 co, float is_rotated, float tilt ) {
-
-	tilt*=BEZEL_TILT_MULTIPLIER;
+vec2 tilt_bezel(vec2 co, float is_rotated, float btilt ) {
+	
+	btilt*=BEZEL_TILT_MULTIPLIER;
 	
 	//ASM PROOF: if then is worse.
-	vec2 r_tilt = vec2( mix_step(tilt, 0.0, is_rotated),
-	                    mix_step(0.0, -tilt, is_rotated)
+	vec2 r_tilt = vec2( mix_step(btilt, 0.0, is_rotated),
+	                    mix_step(0.0, -btilt, is_rotated)
 					);
 	
 	vec2 tilt_min = 1 - r_tilt;
 	vec2 tilt_max = 1 + r_tilt;
 
-	
 	// X Tilt
 		float tilt_x_range = scale_to_range(co.y, tilt_min.x, tilt_max.x);
-		co = vec2( zoom1D(co.x, tilt_x_range),
-		           zoom1D(co.y, tilt_x_range)
-			);
-
 	// Y Tilt
 		float tilt_y_range = scale_to_range(co.x, tilt_min.y, tilt_max.y);
-		co = vec2( zoom1D(co.x, tilt_y_range),
-		           zoom1D(co.y, tilt_y_range)
-			);
-	
+
+	// Zoom:
+		co = 0.5 + (co - 0.5) / (tilt_y_range * tilt_x_range);
+		
 	if (is_rotated > 0.5) { //ASM PROOF
-		co.xy += -vec2( (tilt - tilt*BEZEL_TILT_Y_SHIFT)*0.5 , 0.0);
+		co.xy -= vec2( (btilt - btilt*BEZEL_TILT_Y_SHIFT)*0.5 , 0.0);
 	} else {
-		co.xy += vec2(0.0, (tilt-tilt*BEZEL_TILT_Y_SHIFT)*0.5);
+		co.xy += vec2(0.0, (btilt-btilt*BEZEL_TILT_Y_SHIFT)*0.5);
 	}
 	
 	return co;
