@@ -1442,20 +1442,18 @@ vec2 tilt(vec2 co, float is_rotated, float tilt) {
 	vec2 tilt_min = 1 - r_tilt;
 	vec2 tilt_max = 1 + r_tilt;
 
-	
 	// X Tilt
 		float tilt_x_range = scale_to_range(co.y, tilt_min.x, tilt_max.x);
-		co = zoomxy(co, vec2(tilt_x_range));
-
 	// Y Tilt
 		float tilt_y_range = scale_to_range(co.x, tilt_min.y, tilt_max.y);
-		co = zoomxy(co, vec2(tilt_y_range));
-	
+		
+	// Zoom:
+		co = 0.5 + (co - 0.5) / (tilt_y_range * tilt_x_range);
+		
 	if (is_rotated > 0.5) //ASM PROOF
 		co.xy += -vec2(tilt, 0.0) * 0.5;
 	else
 		co.xy += vec2(0.0, tilt) * 0.5;
-	//	co.xy += mix_step(  vec2(0.0, tilt),   -vec2(tilt, 0.0), is_rotated) * 0.5;
 		
 	return co;
 }
