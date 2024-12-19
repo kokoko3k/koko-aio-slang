@@ -433,7 +433,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter RESSWITCH_GLITCH_SIZE		"★ Glitch amount if vertical resolution changes"		0.1		0.0 0.5 0.05
 #pragma parameter LABEL0013 " " 0.0 0.0 0.0 1.0
 
-#pragma parameter LABEL_INTERLACE           "★ Hi-resolution scanlines handling" 1.0 1.0 1.0 0.0
+#pragma parameter LABEL_INTERLACE           "★ Hi-resolution scanlines behaviour" 1.0 1.0 1.0 0.0
 #pragma parameter MIN_LINES_INTERLACED      "    . Consider Hi-Resolution above # lines (0=never):"		380.0 	0.0 1024 1.0
 #pragma parameter PIXELGRID_INTR_DISABLE_Y  "    . Hi-Res scanlines type (read docs):"   -1.0 -2.0 2.0 1.0
 #pragma parameter LABEL0036                 "      (-2: Faker-Interlaced, -1: Fake-Interlaced)"          0.0 0.0 0.0 1.0
