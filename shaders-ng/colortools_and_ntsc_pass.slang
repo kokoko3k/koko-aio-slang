@@ -116,7 +116,9 @@ void main() {
       vPixelgrid_intr_gamma_adj = 1.0;
       if (pixelgrid_h_needed() && scanlines_will_alternate(is_interlaced()))
           vPixelgrid_intr_gamma_adj = PIXELGRID_INTR_GAMMA_ADJ;
-     
+   
+   vDebug = vec3(0.0); //need to initialize to something.
+   
    if (DO_TEST == 1.0) {
       vDebug = vec3(0.0);
    }
