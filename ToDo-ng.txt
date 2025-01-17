@@ -160,3 +160,6 @@ TODO:
 		and that often leads to performance degradation (registers are precious)
 		would it be possible to pre-compute ambi mask in the ambilight pass?
 	[ ] fn_border can be superseeded by fuzzy_rect;  is it faster?
+	[ ] Move config-user to config-user-optional-template.txt 
+	[ ] Set default aspect ratio to core provided (check for exceptions)
+	
