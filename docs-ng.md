@@ -44,10 +44,15 @@
         Notable one is lcd antighosting feature.
         
     config/config-user.txt:
-        shader parameters that can be changed within Retroarch.
+        This file has been deprecated, since it could be overwritten by
+        a shader update, so use config/config-user-opional.txt
+        
+    config/config-user-optional.txt:    
+        Shader parameters that can be changed within Retroarch.
         can be set within this file too.
         PRO: The shader will be faster
         CON: The parameters can no longer be modified within Retroarch. 
+        Please read config-user-optional-template.txt for instructions.
         
     textures/background_under.png
         This is the image that shown by default under the game and the bezel.

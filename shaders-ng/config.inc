@@ -691,10 +691,11 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 // This is for a patched retroarch version I'm testing (24/03/04)
 #pragma inject_preset_code DEFINES_FROM_PRESET
 
-//User parameters goes here, they overrides almost everything:
-#include "../config/config-user.txt"
+// User parameters goes here, they overrides almost everything:
+// Deprecated on Jan, 25, 2025 in favour of config-user-optional.txt
+#pragma include_optional "../config/config-user.txt"
 
-// Retroarch releases past October 2024 will support this:
+// Retroarch releases past October 2024 (v1.17) support this:
 #pragma include_optional "../config/config-user-optional.txt"
 
 // The following translates global.PARAMETER to PARAMETER
