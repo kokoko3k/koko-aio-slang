@@ -95,7 +95,6 @@
 
 
 
-
 // GLOW STATIC CONFIG ##########################################################################################
 
 	//Setting the glow/halo sharpness parameter to this
