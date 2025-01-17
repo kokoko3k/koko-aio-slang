@@ -12,13 +12,6 @@
 //
 
 
-//   There yoy have a chance to boost your FPS,
-//   the more lines you insert (or uncomment), the more your FPS will be high.
-//   
-//   The downside of using this method is that every setting
-//   you will write here, will be static and so that 
-//   you will NOT BE ABLE RO MODIFY it "on-the-fly" in Retroarch anymore.
-//
 //   Lines have this format: //#define PARAMETER VALUE //DESCRIPTION
 //   where:
 //       "//" means a comment; read: Everything after "//" is simply ignored.
@@ -49,16 +42,105 @@
 //
 //       // #define DO_BEZEL 1.0
 //   
-//   ...that's it, you just need to copy the values from the
-//   preset you like to the right setting here.
 //   
 //   
-  
+
+////////////////////////////////////////////////////////////////////////////
+//
+// SPECIFIC SYSTEM PARAMETERS:
+//   There yoy have a chance to boost your FPS, or tune koko-aio for your specific
+//   the more lines you insert (or uncomment), the more your FPS will be high.
+//   
+//   The downside of using this method is that every setting
+//   you will write here, will be static and so that 
+//   you will NOT BE ABLE RO MODIFY it "on-the-fly" in Retroarch anymore.
+//
+////////////////////////////////////////////////////////////////////////////
+
+// D3D/XBOX users should enable Direct3D workarounds to avoid glitches or crashes
+// by removing the leading "//" from the following line:
+// #define D3D_WORKAROUND
+
+// Enable lcd antighosting by using values > 0.0 (try around 0.25)
+// #define LCD_ANTIGHOSTING 0.25
+
+
+////////////////////////////////////////////////////////////////////////////
+//
+// STATIC PERFORMANCE RELATED PARAMETERS:
+//   There yoy have a chance to boost your FPS, or tune koko-aio for your specific
+//   the more lines you insert (or uncomment), the more your FPS will be high.
+//   
+//   The downside of using this method is that every setting
+//   you will write here, will be static and so that 
+//   you will NOT BE ABLE RO MODIFY it "on-the-fly" in Retroarch anymore.
+//
+////////////////////////////////////////////////////////////////////////////
+
+// Renders only changed parts of screen; uncomment (remove leading //).
+// to lower power consumption / mitigate throttling, uncomment this:
+// #define DELTA_RENDER
+
+// #define DELTA_RENDER_FORCE_REFRESH   // Delta render force refresh interval.
+                                        // Defaults to 4.0 if commented 
+                                        
+// #define DELTA_RENDER_CHECK_AREA      // Delta render area size.
+                                        // Defaults to 1.0 if commented 
+
+// Use higher quality deconvergence flattering rgb scanlines when deconvergence is high
+// and by syncing them to the deconvergence settings
+// To enable high quality deconvergence, remove leading "//"
+// #define HQ_DECON
+
+// FXAA tuning: select an FXAA preset here.
+// 1.0 is a dumb and fast preset, 2.0 is still fast, but rounder (the default)
+// Higher numbers are useful to antialias high resolution content.
+// Allowed values from 1.0 to 5.0.
+// #define FXAA_PRESET 2.0
+
+// Disallow texture wrapping as a shader parameter, comment to gain some performance.
+// But in that case the wrap mode has to be defined in the preset file.
+// #define DISALLOW_BG_IMAGE_TEXTURE_WRAP_IN_SHADER
+
+// Halve rendering refresh on bezel and ambilight, uncomment to gain performance:
+// #define HALVE_BORDER_UPDATE
+
+// Skip random() function used for noise, debanding, bezel roughness.
+// uncomment to gain some performance, expect some banding on ambilight and
+// possibly heavier banding when using the spot feature.
+// #define SKIP_RANDOM
+
+// Uncommenting this is the only way to statically disable Warped Glow (X) and
+// spare a lookup in the final pass;
+// When the screen is rotated, skipping SKIP_WARPEDGLOW_X means skipping SKIP_WARPEDGLOW_Y
+// #define SKIP_WARPEDGLOW_X
+
+// Uncomment this is the only way to statically disable Warped Glow (Y)
+// When the screen is rotated, skipping SKIP_WARPEDGLOW_Y means skipping SKIP_WARPEDGLOW_X
+// #define SKIP_WARPEDGLOW_Y
+
+// Enable Conditional FPS Halver (60->30, 30->30, 50->25, 25->25)
+// #define FPS_HALVER
+
+
+
+////////////////////////////////////////////////////////////////////////////
+//
+// RUNTIME PARAMETERS OVERRIDES:
+//   There yoy have a chance to boost your FPS, or tune koko-aio for your specific
+//   the more lines you insert (or uncomment), the more your FPS will be high.
+//   
+//   The downside of using this method is that every setting
+//   you will write here, will be static and so that 
+//   you will NOT BE ABLE RO MODIFY it "on-the-fly" in Retroarch anymore.
+//
+////////////////////////////////////////////////////////////////////////////
+
 
 // #define IN_GLOW_GAMMA  2.0           //        Gamma In
 // #define GAMMA_OUT 0.4                //        Gamma out
 
-// #define DO_CCORRECTION 1.0           // ★ Color corrections enable?
+// #define DO_CCORRECTION 1.0           //        ★ Color corrections enable?
 // #define IN_GLOW_POWER 1.5            //        Input signal gain
 // #define LUMINANCE  0.2               //        Luminance push
 // #define BRIGHTNESS  0.0              //        Brightness in
@@ -339,68 +421,5 @@
 // #define GAME_GEOM_OFF_FIX  0.0  //         Sharp hack through offset (0.0=disable)
 
 
-
-
-
-////////////////////////////////////////////////////////////////////////////
-//
-// STATIC VALUES SETTINGS
-// The following are not Runtime configurable parameters
-// But they are here because they are meant to push performance as well.
-// They were previously defined in config-static.inc file.
-//
-////////////////////////////////////////////////////////////////////////////
-
-// Renders only changed parts of screen; uncomment (remove leading //).
-// to lower power consumption / mitigate throttling, uncomment this:
-// #define DELTA_RENDER
-
-// #define DELTA_RENDER_FORCE_REFRESH   // Delta render force refresh interval.
-                                        // Defaults to 4.0 if commented 
-                                        
-// #define DELTA_RENDER_CHECK_AREA      // Delta render area size.
-                                        // Defaults to 1.0 if commented 
-
-// Use higher quality deconvergence flattering rgb scanlines when deconvergence is high
-// and by syncing them to the deconvergence settings
-// To enable high quality deconvergence, remove leading "//"
-// #define HQ_DECON
-
-// FXAA tuning: select an FXAA preset here.
-// 1.0 is a dumb and fast preset, 2.0 is still fast, but rounder (the default)
-// Higher numbers are useful to antialias high resolution content.
-// Allowed values from 1.0 to 5.0.
-// #define FXAA_PRESET 2.0
-
-// Enable lcd antighosting by using values > 0.0 (try around 0.25)
-// #define LCD_ANTIGHOSTING 0.25
-
-// Disallow texture wrapping as a shader parameter, comment to gain some performance.
-// But in that case the wrap mode has to be defined in the preset file.
-// #define DISALLOW_BG_IMAGE_TEXTURE_WRAP_IN_SHADER
-
-// Halve rendering refresh on bezel and ambilight, uncomment to gain performance:
-// #define HALVE_BORDER_UPDATE
-
-// Skip random() function used for noise, debanding, bezel roughness.
-// uncomment to gain some performance, expect some banding on ambilight and
-// possibly heavier banding when using the spot feature.
-// #define SKIP_RANDOM
-
-// Uncommenting this is the only way to statically disable Warped Glow (X) and
-// spare a lookup in the final pass;
-// When the screen is rotated, skipping SKIP_WARPEDGLOW_X means skipping SKIP_WARPEDGLOW_Y
-// #define SKIP_WARPEDGLOW_X
-
-// Uncomment this is the only way to statically disable Warped Glow (Y)
-// When the screen is rotated, skipping SKIP_WARPEDGLOW_Y means skipping SKIP_WARPEDGLOW_X
-// #define SKIP_WARPEDGLOW_Y
-
-// Enable Conditional FPS Halver (60->30, 30->30, 50->25, 25->25)
-// #define FPS_HALVER
-
-// Developer reminder: bash script to partially convert a shader preset 
-// edit: obsolete and incomplete since it does not recur references.
-// for l in $(cat /koko/.config/retroarch/shaders/test.slangp |grep ^[A-Z] ) ; do p=$(echo $l|cut -d " " -f 1) ; v=$(echo $l | cut -d \" -f 2); echo \// #define $p $v; done
 
 //DONT DELETE THIS LINE
