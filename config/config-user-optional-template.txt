@@ -61,8 +61,8 @@
 // by removing the leading "//" from the following line:
 // #define D3D_WORKAROUND
 
-// Enable lcd antighosting by using values > 0.0 (try around 0.25)
-// #define LCD_ANTIGHOSTING 0.25
+// Enable lcd antighosting by using values > 0.0 (try around 0.5)
+// #define LCD_ANTIGHOSTING 0.5
 
 
 ////////////////////////////////////////////////////////////////////////////

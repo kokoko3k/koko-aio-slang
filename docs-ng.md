@@ -869,12 +869,9 @@ To enable them, you have to edit the shader itself, save it, and reload.*
     By inducing larger color transitions, it prompts the LCD cells <br>
     to adjust their states more rapidly, thereby reducing ghosting.<br><br>
     To use it, in file config-user.txt, turn the line: <br>
-    ```// #define LCD_ANTIGHOSTING 0.25```
+    ```// #define LCD_ANTIGHOSTING 0.5```
     <br>into: <br>
-    ```#define LCD_ANTIGHOSTING 0.25```<br><br>
-    You can also try different values, but keep in mind <br>
-    that highering the value too much will be counterproductive.<br>
-    
+    ```#define LCD_ANTIGHOSTING 0.5```<br><br>
 
 **Conditional FPS Halver**<br>
     *[Warning:] Only on retroarch > 1.19.1*<br>

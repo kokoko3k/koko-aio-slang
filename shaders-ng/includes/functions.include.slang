@@ -1353,7 +1353,7 @@ vec3 kelvin2rgb(float k) {
 	return pixel_out;
 }
 
-vec4 PG_get_hmask_preset_floored() {
+vec4 PG_get_hmask_preset_floored_wrapped() {
     if (PIXELGRID_H_PRST == 0.0) // manual mask and size
         return vec4( PIXELGRID_R_SHIFT, PIXELGRID_G_SHIFT, PIXELGRID_B_SHIFT, PIXELGRID_H_COUNT);
     
@@ -1401,7 +1401,7 @@ vec4 PG_get_hmask_preset_floored() {
 						  2.0), 3); //wwx, mask size 3
 }
 
-vec4 PG_get_hmask_preset_unfloored() {
+vec4 PG_get_hmask_preset_unfloored_wrapped() {
     if (PIXELGRID_H_PRST == 0.0) // manual mask and size
         return vec4( PIXELGRID_R_SHIFT, PIXELGRID_G_SHIFT, PIXELGRID_B_SHIFT, PIXELGRID_H_COUNT);
 
@@ -1447,6 +1447,30 @@ vec4 PG_get_hmask_preset_unfloored() {
         return vec4( vec3(0.0), 2); // WWX, mask size 2 can't be obtained, so just return  WX
 		                            // and user set a wider phosphor width
 		
+}
+
+vec4 PG_get_hmask_preset_floored() {
+	vec4 c = PG_get_hmask_preset_floored_wrapped();
+	//alternate submask color positions to help sample-and-hold induced blurring
+	#ifndef D3D_WORKAROUND
+		#ifdef LCD_ANTIGHOSTING
+			if (frame_is_even())
+			c.xyz = c.zxy;
+		#endif
+	#endif
+	return c;
+}
+
+vec4 PG_get_hmask_preset_unfloored() {
+	vec4 c = PG_get_hmask_preset_unfloored_wrapped();
+	//alternate submask color positions to help sample-and-hold induced blurring
+	#ifndef D3D_WORKAROUND
+		#ifdef LCD_ANTIGHOSTING
+			if (frame_is_even())
+			c.xyz = c.zxy;
+		#endif
+	#endif
+	return c;
 }
 
 vec3 strobe( vec3 c) {

@@ -1349,9 +1349,11 @@ void main() {
         #ifndef D3D_WORKAROUND
             #ifdef LCD_ANTIGHOSTING
                 if (LCD_ANTIGHOSTING > 0.0) {
-                    vec3 feedback = texture(final_passFeedback, vOutputCoord).rgb;
-                    vec3 diff=(feedback - pixel_out);
-                    pixel_out = mix(pixel_out, pixel_out-diff, LCD_ANTIGHOSTING );
+                    if (frame_is_even()) {
+                        vec3 feedback = texture(final_passFeedback, vOutputCoord).rgb;
+                        vec3 diff=(feedback - pixel_out);
+                        pixel_out = mix(pixel_out, pixel_out-diff, LCD_ANTIGHOSTING );
+                    }
                 }
             #endif
         #endif
