@@ -647,7 +647,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter label_ar	 "★ Aspect (applies to game and bezel) "							1.0  1.0  1.0     0.0
 #pragma parameter ASPECT_X       "        Aspect Ratio Numerator (<=0 for a preset)"   		-7.0  -7.0 256. 1.0
 #pragma parameter ASPECT_Y       "        Aspect Ratio Denominator"	  				3.0   0.0 256. 1.0
-#pragma parameter LABEL0042 " " 0.0 0.0 0.0 1.0
+#pragma parameter LABEL0042 " " 0.0 0.0 0.0 1.0 
 #pragma parameter LABEL0043 "        Presets reference list:" 0.0 0.0 0.0 1.0
 #pragma parameter LABEL0044 "          (0 =  MAME 1.33)" 0.0 0.0 0.0 1.0
 #pragma parameter LABEL0045 "          (-1 = NTSC 1.5)" 0.0 0.0 0.0 1.0
