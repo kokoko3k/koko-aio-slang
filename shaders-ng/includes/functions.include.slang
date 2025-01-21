@@ -324,7 +324,9 @@ vec3 PrintValueVec3( vec2 vStringCoords, vec2 FragCoord,  float fValue, float fM
 	}
 //REFLECTION RELATED ENDS
 
+
 vec3 pixel_push_luminance(vec3 c, float strength) {
+	//return c;
 	//if (strength == 0.0) return c; //lighter without the check.
 	float whiteness = clamp(max3(c), 0.0, 1.0);
 	//return c * (1 + ( (1-whiteness) * strength)	);
@@ -1291,15 +1293,15 @@ vec3 kelvin2rgb(float k) {
 		pixel_out.b = 138.51773122311 * log(k - 10) - 305.04479273072;
 
 	return pixel_out/255.0;
-	}
+}
 
-	vec3 adaptive_black(vec3 c_in, float lum_in, float range) {
-		float luminance_adapt = mix( 1-range, 1+range, lum_in);
-		return c_in * luminance_adapt - luminance_adapt + 1;
-		return fma(c_in, vec3(luminance_adapt), vec3(-luminance_adapt + 1)); //ASM_PROOF: SAME
-	}
+vec3 adaptive_black(vec3 c_in, float lum_in, float range) {
+	float luminance_adapt = mix( 1-range, 1+range, lum_in);
+	return c_in * luminance_adapt - luminance_adapt + 1;
+	return fma(c_in, vec3(luminance_adapt), vec3(-luminance_adapt + 1)); //ASM_PROOF: SAME
+}
 
-	vec3 color_tools(vec3 pixel_out, vec3 Temperature_rgb) {
+vec3 color_tools(vec3 pixel_out, vec3 Temperature_rgb) {
 	//Apply color corrections to input signal.
 
 	//Push luminance without clipping
@@ -1313,42 +1315,42 @@ vec3 kelvin2rgb(float k) {
 	//Modify color temperature
 		if (TEMPERATURE != 6500.0) pixel_out.rgb = pixel_out.rgb * Temperature_rgb;
 
-		//Colorization for monochrome display on hsv colorspace.
-		//Select different hues for dark and bright pixels and mix them depending on the brightness
-		if (COLOR_MONO_COLORIZE > 0.01) {
-			vec3 pixel_grayscale = vec3(dot(pixel_out.rgb, W_C_TO_GRAY));
-			vec3 pixel_in_hsv = rgb2hsv(pixel_grayscale); //FIXME needed? yes, checked.
-			float lum = pixel_in_hsv.z * pixel_in_hsv.z; //<-- looks way better!
+	//Colorization for monochrome display on hsv colorspace.
+	//Select different hues for dark and bright pixels and mix them depending on the brightness
+	if (COLOR_MONO_COLORIZE > 0.01) {
+		vec3 pixel_grayscale = vec3(dot(pixel_out.rgb, W_C_TO_GRAY));
+		vec3 pixel_in_hsv = rgb2hsv(pixel_grayscale); //FIXME needed? yes, checked.
+		float lum = pixel_in_hsv.z * pixel_in_hsv.z; //<-- looks way better!
 
-			//vec2 bias = mix_step( vec2(0.0, abs(COLOR_MONO_HUE_BIAS)), vec2(abs(COLOR_MONO_HUE_BIAS), 0.0), float(COLOR_MONO_HUE_BIAS > 0.0));
-			//Following should be faster (ASM PROOF)
-			vec2 bias;
-			if (COLOR_MONO_HUE_BIAS > 0.0) 
-				bias = vec2(abs(COLOR_MONO_HUE_BIAS),0.0);
-			else
-				bias = vec2(0.0,abs(COLOR_MONO_HUE_BIAS));
-				
-			lum=scale_to_range(lum, 0.0-bias.x, 1.0+bias.y);
-			pixel_in_hsv.y=1.0; //sat
+		//vec2 bias = mix_step( vec2(0.0, abs(COLOR_MONO_HUE_BIAS)), vec2(abs(COLOR_MONO_HUE_BIAS), 0.0), float(COLOR_MONO_HUE_BIAS > 0.0));
+		//Following should be faster (ASM PROOF)
+		vec2 bias;
+		if (COLOR_MONO_HUE_BIAS > 0.0) 
+			bias = vec2(abs(COLOR_MONO_HUE_BIAS),0.0);
+		else
+			bias = vec2(0.0,abs(COLOR_MONO_HUE_BIAS));
+			
+		lum=scale_to_range(lum, 0.0-bias.x, 1.0+bias.y);
+		pixel_in_hsv.y=1.0; //sat
 
-			//Mix hues in rgb colorspace:
-				vec3 pixel_rgb_hue1 = hsv2rgb( vec3(COLOR_MONO_HUE1, 1.0, pixel_in_hsv.z ) );
-				vec3 pixel_rgb_hue2 = hsv2rgb( vec3(COLOR_MONO_HUE2, 1.0, pixel_in_hsv.z ) );
-				vec3 pixel_rgb_hue12 = mix(pixel_rgb_hue2, pixel_rgb_hue1, vec3(lum));
-			//Mix original and colorized with a specified strength
-				pixel_out = mix(pixel_out, pixel_rgb_hue12, COLOR_MONO_COLORIZE);
-		}
+		//Mix hues in rgb colorspace:
+			vec3 pixel_rgb_hue1 = hsv2rgb( vec3(COLOR_MONO_HUE1, 1.0, pixel_in_hsv.z ) );
+			vec3 pixel_rgb_hue2 = hsv2rgb( vec3(COLOR_MONO_HUE2, 1.0, pixel_in_hsv.z ) );
+			vec3 pixel_rgb_hue12 = mix(pixel_rgb_hue2, pixel_rgb_hue1, vec3(lum));
+		//Mix original and colorized with a specified strength
+			pixel_out = mix(pixel_out, pixel_rgb_hue12, COLOR_MONO_COLORIZE);
+	}
 
-	//Modify Vibrance
-		if (VIBRANCE > 0.0) {
-			pixel_out.rgb = vibrance_set(pixel_out.rgb, VIBRANCE);
-		}
-		
-	//Modify saturation
-		if (SATURATION != 1.0) {
-			vec3 intensity = vec3(dot(pixel_out.rgb, W_C_TO_GRAY));
-			pixel_out.rgb = mix(intensity, pixel_out.rgb, SATURATION);
-		}
+//Modify Vibrance
+	if (VIBRANCE > 0.0) {
+		pixel_out.rgb = vibrance_set(pixel_out.rgb, VIBRANCE);
+	}
+	
+//Modify saturation
+	if (SATURATION != 1.0) {
+		vec3 intensity = vec3(dot(pixel_out.rgb, W_C_TO_GRAY));
+		pixel_out.rgb = mix(intensity, pixel_out.rgb, SATURATION);
+	}
 
 	return pixel_out;
 }
