@@ -104,12 +104,20 @@
     #define NTSC_PHASE_SHIFT		global.NTSC_PHASE_SHIFT
 #endif
 
-#ifndef NTSC_ARTF_NOBLUR
-    #define NTSC_ARTF_NOBLUR 		global.NTSC_ARTF_NOBLUR
+#ifndef DO_WTFL
+    #define DO_WTFL 		global.DO_WTFL
 #endif
 
-#ifndef NTSC_ARTF_NOBLEED
-    #define NTSC_ARTF_NOBLEED 		global.NTSC_ARTF_NOBLEED
+#ifndef WTFL_SHARPNESS_X
+    #define WTFL_SHARPNESS_X 		global.WTFL_SHARPNESS_X
+#endif
+
+#ifndef WTFL_SHARPNESS_Y
+    #define WTFL_SHARPNESS_Y 		global.WTFL_SHARPNESS_Y
+#endif
+
+#ifndef WTFL_THRESHOLD
+    #define WTFL_THRESHOLD 		global.WTFL_THRESHOLD
 #endif
 
 #ifndef NTSC_ARTF_TRSH

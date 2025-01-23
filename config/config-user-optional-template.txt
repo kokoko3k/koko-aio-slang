@@ -175,12 +175,9 @@
 // #define NTSC_FILTER_SCF  5.30        //         Subcarrier Frequency mul
 // #define NTSC_FILTER_FC  2.5          //         Frequency cutoff
 // #define NTSC_PHASE_SHIFT  0.0        //         Phase shift
-// #define NTSC_ARTF_TRSH  0.1          //       . Consider artifacts above this treshold
-// #define NTSC_SHOW_ARTF_MASK  0.0     //          . Show the mask of selected artifacts (debug)
-// #define NTSC_ARTF_NOBLUR  0.0        //          . 1* Under treshold: Cancel blur (Glow)
-// #define NTSC_ARTF_NOBLEED  0.0       //          . 2* Under treshold: Cancel Bandwidth limited chroma" 
-// #define NTSC_ARTF_ZAP  0.0           //          . 3* Under treshold: Cancel artifacts"				
-
+// #define NTSC_ARTF_TRSH  0.1          //         Artifacts upper treshold
+// #define NTSC_ARTF_ZAP  0.0           //         . Cancel artifacts under the treshold"
+// #define NTSC_SHOW_ARTF_MASK  0.0     //         . Show the mask of selected artifacts (debug)
 
 // #define DO_SAT_BLEED  0.0            // ★ CVBS: Bandwidth limited chroma enable?
 // #define SAT_BLEED_PAL  0.0           //         Colorspace (NTSC, PAL)
@@ -214,6 +211,9 @@
 // #define SHIFT_G  0.0                //         Green offset
 // #define SHIFT_B  20.0               //         Blue offset
 
+// #define DO_WTFL 0.0                  // ★ Megadrive fake transparencies enable?
+// #define WTFL_SHARPNESS 0.6           //         Overridden X-sharpness
+// #define WTFL_THRESHOLD 1.0           //         Detection threshold
 
 // #define DO_IN_GLOW  1.0             // ★ Glow/Blur enable?
 // #define IN_GLOW_BIAS  1.0           //         Glow to blur bias

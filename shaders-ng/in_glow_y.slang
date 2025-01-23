@@ -30,7 +30,14 @@ void main() {
                             (abs(IN_GLOW_W) < GLOW_SHARP_MAX || IN_GLOW_H < GLOW_SHARP_MAX) &&
                             (DO_NTSC_ARTIFACTS + NTSC_SHOW_ARTF_MASK < 1.5)   );
    
-   glow_h_inside_interval = float(IN_GLOW_H < GLOW_SHARP_MAX  && IN_GLOW_H > GLOW_SHARP_MAX_ALTERNATE);
+   //The following conditions are used to skip blur-x code.
+   bool bGlow_h_inside_interval = true;
+   if (IN_GLOW_H > GLOW_SHARP_MAX) bGlow_h_inside_interval = false;             // radius falls in the allowed interval
+   if (IN_GLOW_H < GLOW_SHARP_MAX_ALTERNATE) bGlow_h_inside_interval = false;   // radius falls in the allowed interval
+   if (DO_IN_GLOW < 0.5) bGlow_h_inside_interval = false;                       // Disabled if not user enabled
+   if (DO_WTFL > 0.9 && WTFL_SHARPNESS_Y < 3.0) bGlow_h_inside_interval = true; //always active if need to blur the waterfalls.
+
+   glow_h_inside_interval = float( bGlow_h_inside_interval);
    
    vGlow_Gain = mix(1.0, IN_GLOW_POWER, DO_CCORRECTION);
    
@@ -155,7 +162,19 @@ void main() {
       warpedglow_or_DR = DR_changed;
    }
    
-   if (DO_IN_GLOW == 0.0) {
+   //Passthrough
+   if (glow_h_inside_interval == 0.0) {
+      vec3 glowed_passthrough = texture(Source, vTexCoord).rgb;
+      glowed_passthrough*=vGlow_Gain;
+      glowed_passthrough = clip_to_white_maybe(glowed_passthrough.rgb);      
+      if (DO_RF_NOISE < -0.5)
+         glowed_passthrough = apply_noise_to(glowed_passthrough);
+      
+      FragColor = vec4(glowed_passthrough, warpedglow_or_DR);
+   }
+   
+   
+   if (DO_IN_GLOW == 0.0 && WTFL_SHARPNESS_Y == 3.0 ) {
       vec3 glowed = texture(shift_and_bleed_pass, vTexCoord).rgb * vGlow_Gain;
       glowed = clip_to_white_maybe(glowed.rgb);      
       FragColor = vec4(glowed, warpedglow_or_DR);
@@ -169,16 +188,15 @@ void main() {
    vec3 pixel_glowed;
    
    float IN_GLOW_H_ADAPTED = abs(IN_GLOW_H);
+         
+   //Override Megadrive fake transparencies (like Sonic waterfalls)
+      if (WTFL_SHARPNESS_Y < 3.0) {
+         float waterfall = texture(shift_and_bleed_pass, vTexCoord).a; //compiler is smart enough to reuse this lookup, no need to branch.
+         if (DO_IN_GLOW == 0.0)
+            IN_GLOW_H_ADAPTED = 7.0;
+         IN_GLOW_H_ADAPTED = mix(IN_GLOW_H_ADAPTED, WTFL_SHARPNESS_Y, waterfall);
+      }
    
-   if (DO_NTSC_ARTIFACTS == 1.0) {
-      float ntsc_artifacts = texture(shift_and_bleed_pass, vTexCoord).a;
-      //finally "add" them to the configured sharpness (-> less blur)
-      IN_GLOW_H_ADAPTED = IN_GLOW_H_ADAPTED +  ((1-ntsc_artifacts) * NTSC_ARTF_NOBLUR);
-   }
-
-   //don't allow lower values that look bad:
-   //   IN_GLOW_H_ADAPTED = max(IN_GLOW_H_ADAPTED, MIN_IN_GLOW_SHARP);
-
    //Make it resolution independent.
       IN_GLOW_H_ADAPTED = IN_GLOW_H_ADAPTED / NEW_SCALEMOD_Y;
 

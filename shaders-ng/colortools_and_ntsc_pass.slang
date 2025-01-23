@@ -358,6 +358,32 @@ bool first_in_range_strict(float a, float lo, float hi) {
    return a == bounded;
 }
 
+float get_waterfall() {
+   
+   vec2 d = params.OriginalSize.zw;
+   
+   vec3 me_centro = texture(Source, vTexCoord).rgb;
+   vec3 me_destra = texture(Source, vTexCoord + vec2(d.x,0.0) ).rgb;
+   vec3 me_sinistra = texture(Source, vTexCoord + vec2(-d.x,0.0) ).rgb;
+
+   float lc = rgb_to_gray(me_centro);
+   float ls = rgb_to_gray(me_sinistra);
+   float ld = rgb_to_gray(me_destra);
+   
+   float mask;
+   
+   bool m = ( (lc < ls && lc < ld) || (lc > ls && lc > ld) );
+   if (m) {
+      float side_symmetry = abs(ld-ls);
+      side_symmetry = pow(side_symmetry, 1.60);
+      mask = 1 - side_symmetry;
+   }
+   else
+      mask = 0.0;
+
+   return mask;
+}
+
 vec3 pixel_dedither(sampler2D tex, vec2 coords, vec4 sourcesize, float tmin, float tmax, float strength1, float strength2) {
    #define DX sourcesize.z
    #define DY sourcesize.w
@@ -493,27 +519,31 @@ void main() {
       pixel_in = vec3(0.0);
    
    vec3 pixel_out = pixel_in;
-   //This will go into alpha channel to make glow aware of it and blur more.
-   //It could be configurable.
-   float artifact_mask = 0.0;
 
+   float artifact_mask = 0.0;
    if (DO_NTSC_ARTIFACTS > 0.5) {
       //Get ntsc picture
          vec4 ntsc_decoded = ntscdec(co * 1.0001, pixel_in);
+         ntsc_decoded = clamp(ntsc_decoded, vec4(0.0), vec4(1.0));
+
       //apply the minimum treshold to artifact mask
          artifact_mask = smoothstep_fast(NTSC_ARTF_TRSH , 1.0, ntsc_decoded.a);
 
-         ntsc_decoded = clamp(ntsc_decoded, vec4(0.0), vec4(1.0));
-
       //Optionally completely cut-off artifacts under treshold:
          ntsc_decoded = mix(ntsc_decoded, vec4(pixel_in, 0.0) , (1-artifact_mask)*NTSC_ARTF_ZAP );
-         //Update the artifact mask if something has been cancelled
-            artifact_mask = min(artifact_mask, ntsc_decoded.a);
+      //Update the artifact mask if something has been cancelled
+         artifact_mask = min(artifact_mask, ntsc_decoded.a);
+         
 
-            //artifact_mask = clamp (artifact_mask*1.0, 0.0,1.0);
-            artifact_mask *= 2.0;
-            
-      pixel_out = ntsc_decoded.rgb;
+         artifact_mask *= 2.0;
+         artifact_mask = clamp (artifact_mask*1.0, 0.0,1.0); 
+         
+      if (NTSC_SHOW_ARTF_MASK == 1.0) {
+         FragColor = vec4(artifact_mask);
+         return;
+      } else {
+         pixel_out = ntsc_decoded.rgb;
+      }
       
    } else if (DO_DEDITHER > 0.5) {
       //vec3 pixel_dedither(vec2 coords, vec4 sourcesize, float tmin, float tmax, float strength) {
@@ -588,19 +618,18 @@ void main() {
    }
  
   
-   //Clamp artifacts to 0..1
    //Clamp RGB to 0..1000.0
    pixel_out = max(pixel_out, vec3(0.0));
    
-
    pixel_out.rgb = pow(pixel_out.rgb, vec3(vPixelgrid_intr_gamma_adj));
-        
-   artifact_mask = clamp(artifact_mask, 0.0, 1.0);
    
-   //pixel_out = pow(pixel_out, vec3(2.2));
-   
-   FragColor = vec4(pixel_out, artifact_mask);
-
+   // Store detected megadrive fake transparencies in the alpha channel
+   // to be consumed by in_glow_x and shift_and_bleed.
+   float waterfall = 0.0;
+   if (DO_WTFL == 1.0) {
+      waterfall = get_waterfall();
+   }
+   FragColor = vec4(pixel_out, waterfall);
 }
 
 
