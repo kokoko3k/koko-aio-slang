@@ -1,6 +1,5 @@
 #version 450
 
-
 /* This pass:
  * Composes the previous passes
  * Does masks, spot, bezel, vignette, background image (anything else?)
@@ -1345,14 +1344,17 @@ void main() {
     if (canvas_busy > 0.5) {
         
         pixel_out = fn_pixel_content(co_content);
-                    
         #ifndef D3D_WORKAROUND
             #ifdef LCD_ANTIGHOSTING
+                #ifndef LCD_ANTIGHOSTING_CEIL
+                    #define LCD_ANTIGHOSTING_CEIL 1.0
+                #endif
                 if (LCD_ANTIGHOSTING > 0.0) {
                     if (frame_is_even()) {
                         vec3 feedback = texture(final_passFeedback, vOutputCoord).rgb;
-                        vec3 diff=(feedback - pixel_out);
-                        pixel_out = mix(pixel_out, pixel_out-diff, LCD_ANTIGHOSTING );
+                        vec3 diff=(feedback - pixel_out)*LCD_ANTIGHOSTING;
+                        diff = sign(diff) * min( abs(diff), vec3(LCD_ANTIGHOSTING_CEIL));
+                        pixel_out = mix(pixel_out, pixel_out-diff, 0.5);
                     }
                 }
             #endif

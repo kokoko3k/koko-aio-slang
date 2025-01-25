@@ -1,6 +1,6 @@
 // THIS FILE HAS BEEN DEPRECATED IN FAVOUR OF config-user-optional.txt
 
-// Assuming retroarch is >= 1.17,
+// Assuming retroarch is >= 1.19,
 // This file WOULD BE OVERWRITTEN by an update, so it has been deprecated
 // in favour of the new config-user-optional.txt
 // So my advice is to migrate the usage of config-user.txt to config-user-optional.txt

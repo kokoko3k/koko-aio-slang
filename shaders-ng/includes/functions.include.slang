@@ -1455,7 +1455,7 @@ vec4 PG_get_hmask_preset_floored() {
 	vec4 c = PG_get_hmask_preset_floored_wrapped();
 	//alternate submask color positions to help sample-and-hold induced blurring
 	#ifndef D3D_WORKAROUND
-		#ifdef LCD_ANTIGHOSTING
+		#ifdef ANTIGHOSTING_FLIP_MASK
 			if (frame_is_even())
 			c.xyz = c.zxy;
 		#endif
@@ -1467,7 +1467,7 @@ vec4 PG_get_hmask_preset_unfloored() {
 	vec4 c = PG_get_hmask_preset_unfloored_wrapped();
 	//alternate submask color positions to help sample-and-hold induced blurring
 	#ifndef D3D_WORKAROUND
-		#ifdef LCD_ANTIGHOSTING
+		#ifdef ANTIGHOSTING_FLIP_MASK
 			if (frame_is_even())
 			c.xyz = c.zxy;
 		#endif
