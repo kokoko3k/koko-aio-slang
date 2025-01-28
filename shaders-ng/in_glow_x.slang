@@ -12,6 +12,7 @@ layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
 layout(location = 2) out float glow_w_inside_interval;
 layout(location = 3) out float vSharp_sub;
+layout(location = 4) out float vDo_wtfl;
 layout(location = 12) out float vWarpedglow_scale_tated;
 layout(location = 13) out vec2 vWarpedglow_offsets;
 layout(location = 14) out float vIn_glow_edge_sharpness;
@@ -21,12 +22,15 @@ void main() {
    gl_Position = global.MVP * Position;
    vTexCoord = TexCoord ;  
    
+   bool bDo_wtfl = (DO_WTFL > 0.9 && WTFL_SHARPNESS_X < 3.0);
+   vDo_wtfl = float(bDo_wtfl);
+   
    //The following conditions are used to skip blur-x code.
    bool bGlow_w_inside_interval = true;
    if (IN_GLOW_W > GLOW_SHARP_MAX) bGlow_w_inside_interval = false;             // radius falls in the allowed interval
    if (IN_GLOW_W < GLOW_SHARP_MAX_ALTERNATE) bGlow_w_inside_interval = false;   // radius falls in the allowed interval
    if (DO_IN_GLOW < 0.5) bGlow_w_inside_interval = false;                       // Disabled if not user enabled
-   if (DO_WTFL > 0.9 || WTFL_SHARPNESS_X < 3.0) bGlow_w_inside_interval = true; //always active if need to blur the waterfalls.
+   if (bDo_wtfl) bGlow_w_inside_interval = true; //always active if need to blur the waterfalls.
 
    glow_w_inside_interval = float( bGlow_w_inside_interval);
 
@@ -68,13 +72,13 @@ void main() {
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 2) in float glow_w_inside_interval;
 layout(location = 3) in float vSharp_sub;
+layout(location = 4) in float vDo_wtfl;
 layout(location = 12) in float vWarpedglow_scale_tated;
 layout(location = 13) in vec2 vWarpedglow_offsets;
 layout(location = 14) in float vIn_glow_edge_sharpness;
 layout(location = 15) in float vIn_glow_edge_defocus_normalized;
 
 layout(location = 0) out vec4 FragColor;
-
 layout(set = 0, binding = 5) uniform sampler2D colortools_and_ntsc_pass;
 layout(set = 0, binding = 6) uniform sampler2D colortools_and_ntsc_passFeedback;
 layout(set = 0, binding = 7) uniform sampler2D shift_and_bleed_pass;
@@ -124,11 +128,17 @@ void main() {
       float in_glow_w_adapted = IN_GLOW_W;
       
       //Override Megadrive fake transparencies (like Sonic waterfalls)
-         if (WTFL_SHARPNESS_X < 3.0) {
-            float waterfall = texture(shift_and_bleed_pass, vTexCoord).a; //compiler is smart enough to reuse this lookup, no need to branch.
+         if (vDo_wtfl == 1.0) {
+            float waterfall = texture(colortools_and_ntsc_pass, vTexCoord).a;//, params.OriginalSize, 0.0).a; //somehow there is no need to use texture_nearest here.
+            waterfall = unpack_21(waterfall, 1.2).x;
+               
+            //FragColor = vec4(vec3(waterfall),0.0);return;
+            
             if (DO_IN_GLOW == 0.0)
                in_glow_w_adapted = 7.0;
+            
             in_glow_w_adapted = mix(in_glow_w_adapted, WTFL_SHARPNESS_X, waterfall);
+
          }
       
       //Scale it for box

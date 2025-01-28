@@ -1,5 +1,6 @@
 #version 450
 
+//#pragma format R32G32B32A32_SFLOAT
 
 #define CWHITE  vec3(1.0)
 #define CGRAY   vec3(0.5)
@@ -362,27 +363,141 @@ float get_waterfall() {
    
    vec2 d = params.OriginalSize.zw;
    
-   vec3 me_centro = texture(Source, vTexCoord).rgb;
-   vec3 me_destra = texture(Source, vTexCoord + vec2(d.x,0.0) ).rgb;
-   vec3 me_sinistra = texture(Source, vTexCoord + vec2(-d.x,0.0) ).rgb;
+   vec3 me_center = texture(Source, vTexCoord).rgb;
+   float lc = rgb_to_gray(me_center);
+   
+   float xblur = 0.0;
+   
+   if (WTFL_SHARPNESS_X < 3.0) {
+      vec3 me_est = texture(Source, vTexCoord + vec2(d.x,0.0) ).rgb;
+      vec3 me_west = texture(Source, vTexCoord + vec2(-d.x,0.0) ).rgb;
+      
+      //vec3 me_est2 = texture(Source, vTexCoord + vec2(d.x*2,0.0) ).rgb;
+      //vec3 me_west2 = texture(Source, vTexCoord + vec2(-d.x*2,0.0) ).rgb;   
 
-   float lc = rgb_to_gray(me_centro);
-   float ls = rgb_to_gray(me_sinistra);
-   float ld = rgb_to_gray(me_destra);
-   
-   float mask;
-   
-   bool m = ( (lc < ls && lc < ld) || (lc > ls && lc > ld) );
-   if (m) {
-      float side_symmetry = abs(ld-ls);
-      side_symmetry = pow(side_symmetry, 1.60);
-      mask = 1 - side_symmetry;
+      float lw = rgb_to_gray(me_west);
+      float le = rgb_to_gray(me_est);
+      //float lw2 = rgb_to_gray(me_west2);
+      //float le2 = rgb_to_gray(me_est2);
+      
+     // bool m = ( (lc < lw && lc < le && (lw > lw2 || le > le2) ) || 
+     //          (  lc > lw && lc > le && (lw < lw2 || le < le2) ) );
+      
+     bool m = (  lc < lw && lc < le || 
+                 lc > lw && lc > le    );
+      if (m) {      
+         xblur = 1.0;
+         xblur = xblur - abs(lw - le);
+         //xblur = xblur - abs(lc - le2);
+         //xblur = xblur - abs(lc - lw2);
+         xblur = clamp(xblur, 0.0,1.0);
+      }
    }
-   else
-      mask = 0.0;
 
-   return mask;
+      
+   float yblur = 0.0;
+   if (WTFL_SHARPNESS_Y < 3.0) {
+      vec3 me_nord = texture(Source, vTexCoord +    vec2(0.0, d.y) ).rgb;
+      vec3 me_nord2 = texture(Source, vTexCoord + vec2(0.0, 2*d.y) ).rgb;
+      vec3 me_sud = texture(Source, vTexCoord + vec2(0.0, -d.y) ).rgb;
+      vec3 me_sud2 =  texture(Source, vTexCoord + vec2(0.0, 2*-d.y) ).rgb;
+      float ln = rgb_to_gray(me_nord);
+      float ls = rgb_to_gray(me_sud);
+      float ln2 = rgb_to_gray(me_nord2);
+      float ls2 = rgb_to_gray(me_sud2);
+      
+      bool n = ( (lc < ls && lc < ln &&  (ls > ls2 || ln > ln2) ) ||
+               (  lc > ls && lc > ln &&  (ls < ls2 || ln < ln2) ) );
+      
+      if (n) {
+         yblur = 1;
+         yblur -= abs(ls-ln);
+         yblur -= abs(lc-ln2);
+         yblur -= abs(lc-ls2);
+         yblur = clamp(yblur, 0.0,1.0);
+      }
+   }
+   
+   return pack_21(vec2(xblur, yblur));
 }
+
+vec3  pixel_dedither2(float strength1, float strength2) {
+   
+   vec2 d = params.OriginalSize.zw;
+   
+   vec3 me_center = texture(Source, vTexCoord).rgb;
+   vec3 me_est = texture(Source, vTexCoord + vec2(d.x,0.0) ).rgb;
+   vec3 me_est2 = texture(Source, vTexCoord + vec2(d.x*2,0.0) ).rgb;
+   
+   vec3 me_west = texture(Source, vTexCoord + vec2(-d.x,0.0) ).rgb;
+   vec3 me_west2 = texture(Source, vTexCoord + vec2(-d.x*2,0.0) ).rgb;
+   
+   float lc = rgb_to_gray(me_center);
+   float lw = rgb_to_gray(me_west);
+   float le = rgb_to_gray(me_est);
+   float lw2 = rgb_to_gray(me_west2);
+   float le2 = rgb_to_gray(me_est2);
+   
+   float xblur = 0.0;
+   
+   bool m = ( (lc < lw && lc < le && (lw > lw2 || le > le2) ) || 
+            (  lc > lw && lc > le && (lw < lw2 || le < le2) ) );
+   if (m) {      
+      xblur = 1.0;
+      xblur = xblur - abs(lw - le);
+      xblur = xblur - abs(lc - le2)*2.0;
+      xblur = xblur - abs(lc - lw2)*2.0;
+      xblur = clamp(xblur, 0.0,1.0);
+   }
+   
+   vec3 me_nord =  texture(Source, vTexCoord + vec2(0.0, d.y) ).rgb;
+   vec3 me_nord2 = texture(Source, vTexCoord + vec2(0.0, 2*d.y) ).rgb;
+   vec3 me_sud =   texture(Source, vTexCoord + vec2(0.0, -d.y) ).rgb;
+   vec3 me_sud2 =  texture(Source, vTexCoord + vec2(0.0, 2*-d.y) ).rgb;
+
+   float yblur = 0.0;
+   if (WTFL_SHARPNESS_Y < 3.0) {
+      float ln = rgb_to_gray(me_nord);
+      float ls = rgb_to_gray(me_sud);
+      float ln2 = rgb_to_gray(me_nord2);
+      float ls2 = rgb_to_gray(me_sud2);
+      
+      m = ( (lc < ls && lc < ln &&  (ls > ls2 || ln > ln2) ) ||
+          (  lc > ls && lc > ln &&  (ls < ls2 || ln < ln2) ) );
+      if (m) {
+         yblur = 1;
+         yblur -= abs(ls-ln);
+         yblur -= abs(lc-ln2)*2.0;
+         yblur -= abs(lc-ls2)*2.0;
+         yblur = clamp(yblur, 0.0,1.0);
+         
+         
+         
+      }
+   }
+   
+//yblur = pow(yblur, 2.0);
+//xblur = pow(xblur, 2.0);
+   
+   vec3 x_blend = mix( me_center,  (me_west + me_est)/2.0, xblur * 0.5 * strength1);
+   vec3 y_blend = mix( me_center,  (me_sud + me_nord)/2.0, yblur * 0.5 * strength2);
+  
+  //return y_blend;
+   //devo ora prendere il blend che più si discosta dal pixel originale.
+
+   float x_blend_l = dot(x_blend , vec3(1/3.0));
+   float y_blend_l = dot(y_blend , vec3(1/3.0));
+   
+   float diff_x = abs(x_blend_l- lc);
+   float diff_y = abs(y_blend_l- lc);
+   
+   if (diff_x > diff_y)
+      return x_blend;
+   return y_blend;
+
+   
+}
+
 
 vec3 pixel_dedither(sampler2D tex, vec2 coords, vec4 sourcesize, float tmin, float tmax, float strength1, float strength2) {
    #define DX sourcesize.z
@@ -548,7 +663,8 @@ void main() {
    } else if (DO_DEDITHER > 0.5) {
       //vec3 pixel_dedither(vec2 coords, vec4 sourcesize, float tmin, float tmax, float strength) {
       float tmin = 0.0;
-      pixel_out = pixel_dedither(Source, co, params.SourceSize, tmin, DEDITHER_TRESHMAX, DEDITHER_STRENGTH, DEDITHER_STRENGTH2);
+      //pixel_out = pixel_dedither(Source, co, params.SourceSize, tmin, DEDITHER_TRESHMAX, DEDITHER_STRENGTH, DEDITHER_STRENGTH2);
+      pixel_out = pixel_dedither2(DEDITHER_STRENGTH, DEDITHER_STRENGTH2);
    }
 
    pixel_out.rgb = mix(pixel_out, vDebug, min(DO_TEST, 1.0)  );

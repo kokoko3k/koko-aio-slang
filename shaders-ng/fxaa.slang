@@ -838,14 +838,14 @@ void main() {
    vec4 pixel_out;
    pixel_out.rgb = texture_NEAREST(colortools_and_ntsc_pass, vTexCoord, params.SourceSize).rgb;
    
-   
+   pixel_out.a = texture(colortools_and_ntsc_pass, vTexCoord).a;//, params.SourceSize).a;
    
    // If we need to smooth waterfalls, it is good to smooth
    // their detection mask too, maybe using an higher lod ist good tho,
    // but we still require linear sampling.
    pixel_out.a = 0.0;
    if (DO_WTFL > 0.5) {
-      pixel_out.a = textureLod(colortools_and_ntsc_pass, vTexCoord, 0.0).a;
+      pixel_out.a = texture(colortools_and_ntsc_pass, vTexCoord).a;
    }
 
 
