@@ -129,7 +129,7 @@ However nice effects may be obtained (eg: with vector games). <br>
 
 ** Dedither:**<br>
     Try to smooth dithering patterns.<br>
-    Enabling dedithering automatically disables  NTSC color artifacts:** generation.
+    Dedithering does not work as long as NTSC color artifacts are enabled.
     
     Sensitivity: Avoid to dedither "legit" zones by lowering this.
     Basic search strength: Blends basic dedithering and original image.
@@ -147,8 +147,9 @@ However nice effects may be obtained (eg: with vector games). <br>
     the image will be blurred in a way or another.<br>
     You can selectively keep the part of the image which does not contain<br>
     artifacts sharp by using the followin controls.<br>
-    This allow to selectively blend artifacts.
-
+    This allow to selectively blend artifacts.<br>
+    <br>Enabling this features automatically disabled dedithering feature.
+    
     Consider artifacts above this treshold:
         Tune this to select more or less artifacts, depending on their strength.
     Show selected artifacts mask (need glow/blur enabled)
@@ -208,8 +209,8 @@ However nice effects may be obtained (eg: with vector games). <br>
     Detect patterns used in some Megadrive/Genesis games to
     fake transparent colors and blends them.
     
-    Overridden X-sharpness: The lower, the blurrier.
-    Detection threshold: Catch more or less patterns
+    Overridden X(Y)-sharpness: The lower, the blurrier.
+
 
         
 **Glow/Blur:**<br>
