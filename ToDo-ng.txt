@@ -128,6 +128,18 @@ TODO:
 	[v] Halve border update + Deltarender leads to jagged inner frame, why?
 	    Don't really know, but solved by gut feeling by using if ((params.FrameCount % 2) != 0.0)
 	    instead ov if ((params.FrameCount % 2) != 1.0)
+	[v] Move config-user to config-user-optional-template.txt 
+	[v] Set default aspect ratio to core provided (check for exceptions)
+	[v] At least 2 scaling algorithm needs linear color space to work good
+	    This requires powing on colortools pass, which i didn't because... can't remember.
+	    ...because is a big mess for all the shader.
+	    Optional linearization can be enabled via static config now.
+	[v] Support for upcoming optional include pragma
+	[v] Support for upcoming OriginalAspect/Rot
+	[x] Delta render: ditch DELTA_RENDER define and just check for DELTA_RENDER_FORCE_REFRESH
+	    put DELTA_RENDER_FORCE_REFRESH = 1.0 in config-user.txt
+		Nope: it would spare some characters but it would increase usage complexity.
+		
 	[ ] reflection blurriness should not depend on input resolution
 	[ ] dedicated subtractive sharpness in glow section
 	[ ] erode/dilate setting in glow section
@@ -144,15 +156,9 @@ TODO:
 	[ ] Unexcited phosphor grid is not dependant on hmask strength.
 	    easy but not mandatory to fix, it would costs performance and need presets update, unsure what to do.
 	[ ] Make bloom power not dependant on input signal gain ? Not sure.
-	[v] At least 2 scaling algorithm needs linear color space to work good
-	    This requires powing on colortools pass, which i didn't because... can't remember.
-	    ...because is a big mess for all the shader.
-	    Optional linearization can be enabled via static config now.
 	[ ] Check for progressive blur correctness in the corners.
-	[ ] Delta render: ditch DELTA_RENDER define and just check for DELTA_RENDER_FORCE_REFRESH
-	    put DELTA_RENDER_FORCE_REFRESH = 1.0 in config-user.txt
-	[ ] Support for upcoming optional include pragma
-	[ ] Support for upcoming OriginalAspect/Rot
+
+		
 	[ ] Check if is possible to turn halo's float framebuffers to 10bit unorm and if it provides a performance boost.
 	    If it's ok, check for other possible passes application.
 	[ ] co_bezel is used to create the ambi mask.
@@ -160,6 +166,5 @@ TODO:
 		and that often leads to performance degradation (registers are precious)
 		would it be possible to pre-compute ambi mask in the ambilight pass?
 	[ ] fn_border can be superseeded by fuzzy_rect;  is it faster?
-	[ ] Move config-user to config-user-optional-template.txt 
-	[ ] Set default aspect ratio to core provided (check for exceptions)
+
 	

@@ -28,6 +28,8 @@ layout(push_constant) uniform Push {
 	float AMBI_INT_OFFSET ;
 	float AMBI_SMP_INT_OFFSET ;
 	
+	int FrameDirection;
+	
 } params;
 
 layout(std140, set = 0, binding = 0) uniform UBO {
