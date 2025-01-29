@@ -663,8 +663,8 @@ void main() {
    } else if (DO_DEDITHER > 0.5) {
       //vec3 pixel_dedither(vec2 coords, vec4 sourcesize, float tmin, float tmax, float strength) {
       float tmin = 0.0;
-      //pixel_out = pixel_dedither(Source, co, params.SourceSize, tmin, DEDITHER_TRESHMAX, DEDITHER_STRENGTH, DEDITHER_STRENGTH2);
-      pixel_out = pixel_dedither2(DEDITHER_STRENGTH, DEDITHER_STRENGTH2);
+      pixel_out = pixel_dedither(Source, co, params.SourceSize, tmin, DEDITHER_TRESHMAX, DEDITHER_STRENGTH, DEDITHER_STRENGTH2);
+      //pixel_out = pixel_dedither2(DEDITHER_STRENGTH, DEDITHER_STRENGTH2);
    }
 
    pixel_out.rgb = mix(pixel_out, vDebug, min(DO_TEST, 1.0)  );
