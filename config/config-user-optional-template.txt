@@ -132,10 +132,10 @@
 // #define FPS_HALVER
 
 // Some cores may produce glitches in the very first frame, so koko-aio renders
-// it just black; however this has a little performanc hit.
-// You could set Retroarch Menu -> Video -> Auto Shader delay to ~35 and
-// uncomment the following line to resolve the issue as well without performance hits.
-// #define KEEP_FIRST_FRAME
+// it just black; however this check has a little performance hit.
+// Uncomment the following line to keep the glitch in some cores
+// and avoid performance hits.
+// #define RENDER_FIRST_FRAME
 
 ////////////////////////////////////////////////////////////////////////////
 //
