@@ -131,7 +131,11 @@
 // Enable Conditional FPS Halver (60->30, 30->30, 50->25, 25->25)
 // #define FPS_HALVER
 
-
+// Some cores may produce glitches in the very first frame, so koko-aio renders
+// it just black; however this has a little performanc hit.
+// You could set Retroarch Menu -> Video -> Auto Shader delay to ~35 and
+// uncomment the following line to resolve the issue as well without performance hits.
+// #define KEEP_FIRST_FRAME
 
 ////////////////////////////////////////////////////////////////////////////
 //

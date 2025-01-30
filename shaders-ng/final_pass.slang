@@ -1270,6 +1270,13 @@ vec2 quasirandom(vec2 n) {
 
 
 void main() {
+   #ifndef KEEP_FIRST_FRAME
+        //Some cores set first frame size to 1x1 which may cause glitches
+        if (params.FrameCount == 0.0) {
+            FragColor.rgb = vec3(0.0); //float(params.FrameCount > 1.0);
+            return;
+        }
+    #endif
     
     // If fps halver is active, stop processing asap
     if (fps_halver_is_skipped_frame()) {
@@ -1549,5 +1556,5 @@ void main() {
     #endif
    
     FragColor.rgb = pixel_out;
-    
+
 }
