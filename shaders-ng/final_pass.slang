@@ -1274,7 +1274,7 @@ void main() {
         //Some cores set first frame size to 1x1 which may cause glitches
         //Software mode swanstation needs 7 frames to hide the glitch.
         //Setting to 8 to stay safe.
-        if (params.FrameCount < 8) {
+        if (params.OriginalSize.x < 4) {
             FragColor.rgb = vec3(0.0); //float(params.FrameCount > 1.0);
             return;
         }
