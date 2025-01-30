@@ -135,7 +135,7 @@
 // it just black; however this check has a little performance hit.
 // Uncomment the following line to keep the glitch in some cores
 // and avoid performance hits.
-// #define RENDER_FIRST_FRAMES
+// #define RENDER_BOGUS_FRAMES
 
 ////////////////////////////////////////////////////////////////////////////
 //
