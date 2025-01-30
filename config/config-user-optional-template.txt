@@ -131,11 +131,11 @@
 // Enable Conditional FPS Halver (60->30, 30->30, 50->25, 25->25)
 // #define FPS_HALVER
 
-// Some cores may produce glitches in the very first frame, so koko-aio renders
+// Some cores may produce glitches in the first frames, so koko-aio renders
 // it just black; however this check has a little performance hit.
 // Uncomment the following line to keep the glitch in some cores
 // and avoid performance hits.
-// #define RENDER_FIRST_FRAME
+// #define RENDER_FIRST_FRAMES
 
 ////////////////////////////////////////////////////////////////////////////
 //

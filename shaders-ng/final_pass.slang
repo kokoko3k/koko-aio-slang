@@ -1270,9 +1270,9 @@ vec2 quasirandom(vec2 n) {
 
 
 void main() {
-   #ifndef RENDER_FIRST_FRAME
+   #ifndef RENDER_FIRST_FRAMES
         //Some cores set first frame size to 1x1 which may cause glitches
-        if (params.FrameCount == 0.0) {
+        if (params.FrameCount < 5.0) {
             FragColor.rgb = vec3(0.0); //float(params.FrameCount > 1.0);
             return;
         }
