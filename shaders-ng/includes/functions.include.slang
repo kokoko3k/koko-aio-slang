@@ -747,7 +747,7 @@ vec2 Warp_koko(vec2 co, vec2 w, float protrusion) {
 }
 	
 float get_in_aspect() {	
-	if (ASPECT_X ==  0) return 1.3333333333333; //all mame games, not rotated
+	if (ASPECT_X ==  0) return 1.333333; //all mame games, not rotated
 	if (ASPECT_X == -1) return 1.5;   // ntsc
 	if (ASPECT_X == -2) return 1.25;  // pal
 	if (ASPECT_X == -3) return 1.143; // 8/7 snes
