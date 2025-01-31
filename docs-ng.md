@@ -720,6 +720,11 @@ However nice effects may be obtained (eg: with vector games). <br>
     With Mame 2003 plus and fbneo cores, koko-aio detects if the<br>
     game is rotated or not without any user intervention.<br>
     
+    -7 and -8 will take the value as set by the core itself and
+    requires at least retroarch 1.20.
+    -7 will ignore aspect set by the core and returns 1.333
+    if a background or foreground image is used.
+    
     Aspect Ratio Numerator:
         Setting non positive value here will switch to a predefined
         aspect ratio from the following list:
@@ -730,7 +735,8 @@ However nice effects may be obtained (eg: with vector games). <br>
         -4 = 10/7 Megadrive 
         -5 = Uncorrected
         -6 = 0.75 MAME rotated 1.33 games in TATE mode
-        -7 = Use Core provided Aspect Ratio (requires RetroArch > 1.19.1)
+        -7 = Use Core provided Aspect Ratio auto-off
+        -8 = Use Core provided Aspect Ratio always on
     Aspect Ratio Denominator:
         As long as Aspect Ratio Numerator is positive, this will
         be used as the denominator of the fraction.

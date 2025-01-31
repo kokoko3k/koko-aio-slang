@@ -651,18 +651,13 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 //Aspect Ratio
 #pragma parameter label_ar	 "★ Aspect (applies to game and bezel) "							1.0  1.0  1.0     0.0
-#pragma parameter ASPECT_X       "        Aspect Ratio Numerator (<=0 for a preset)"   		-7.0  -7.0 256. 1.0
-#pragma parameter ASPECT_Y       "        Aspect Ratio Denominator"	  				3.0   0.0 256. 1.0
-#pragma parameter LABEL0042 " " 0.0 0.0 0.0 1.0 
-#pragma parameter LABEL0043 "        Presets reference list:" 0.0 0.0 0.0 1.0
-#pragma parameter LABEL0044 "          (0 =  MAME 1.33)" 0.0 0.0 0.0 1.0
-#pragma parameter LABEL0045 "          (-1 = NTSC 1.5)" 0.0 0.0 0.0 1.0
-#pragma parameter LABEL0046 "          (-2 = PAL 1.25)" 0.0 0.0 0.0 1.0
-#pragma parameter LABEL0047 "          (-3 = Snes 8/7)" 0.0 0.0 0.0 1.0
-#pragma parameter LABEL0048 "          (-4 = Megadrive 10/7)" 0.0 0.0 0.0 1.0
-#pragma parameter LABEL0049 "          (-5 = Uncorrected)" 0.0 0.0 0.0 1.0
-#pragma parameter LABEL0050 "          (-6 = MAME rotated/TATE 0.75)" 0.0 0.0 0.0 1.0
-#pragma parameter LABEL0055 "          (-7 = Use Core Provided Aspect)" 0.0 0.0 0.0 1.0
+#pragma parameter ASPECT_X   "       Aspect Ratio Numerator (<=0 for a preset)"   		-7.0  -8.0 256. 1.0
+#pragma parameter ASPECT_Y   "       Aspect Ratio Denominator"	  				3.0   0.0 256. 1.0
+//#pragma parameter LABEL0042 " " 0.0 0.0 0.0 1.0 
+#pragma parameter LABEL0043  "       Presets:" 0.0 0.0 0.0 1.0
+#pragma parameter LABEL0044  "       -0=Mame:4/3 -1=NTSC:1.5 -2=PAL:1.25 -3=SNES:8/7" 0.0 0.0 0.0 1.0
+#pragma parameter LABEL0045  "       -4=Megadrive:10/7 -5=Uncorrected -6=Mame Rotated:3/4" 0.0 0.0 0.0 1.0
+#pragma parameter LABEL0047  "       -7=Core provided (auto off) -8=Core provided (always on)" 0.0 0.0 0.0 1.0
 #pragma parameter LABEL0051 " " 0.0 0.0 0.0 1.0
 
 //Modulate the image zooming depending on the image luminosity.

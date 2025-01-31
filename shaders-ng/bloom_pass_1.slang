@@ -28,7 +28,7 @@ void main() {
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in vec2 vFuzzy_main_pass_stage_1;
 layout(location = 5) in vec2 blur_radius_adpt;
-
+ 
 layout(location = 0) out vec4 FragColor;
 
 layout(set = 0, binding = 1) uniform sampler2D colortools_and_ntsc_pass;

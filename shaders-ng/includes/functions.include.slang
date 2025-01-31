@@ -754,12 +754,27 @@ float get_in_aspect() {
 	if (ASPECT_X == -4) return 1.428; // 10/7 megadrive
 	if (ASPECT_X == -5) return params.OriginalSize.x/params.OriginalSize.y; //uncorrected
 	if (ASPECT_X == -6) return 0.75;  // 3/4, pre-rotated (TATE) 1.33 games.
-	if (ASPECT_X == -7) {
+	
+	//Handle cases when core aspect cannot be retrived and just return 4/3.
+		bool HasOriginalAspectUniform = false;
 		#ifdef _HAS_ORIGINALASPECT_UNIFORMS
-			return global.OriginalAspectRotated;
+			HasOriginalAspectUniform = true;
 		#endif
-			return 1.333333; //fallback to 4:3 when uniform is not available.
+		if (ASPECT_X == -7 || ASPECT_X == -8 ){
+			if (!HasOriginalAspectUniform){
+				return 1.33333;
+			}
+		}
+	
+	if (ASPECT_X == -7) {
+		if (DO_BG_IMAGE==0.0)
+			return global.OriginalAspectRotated;
+		else
+			return 1.333333; //fallback to 4:3 when using background or foreground images.
 	}
+	
+	if (ASPECT_X == -8)
+			return global.OriginalAspectRotated;
 	
 	return ASPECT_X / ASPECT_Y ;
 }
