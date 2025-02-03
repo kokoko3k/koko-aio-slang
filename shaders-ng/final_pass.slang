@@ -63,26 +63,52 @@ layout(location = 22) out float vPG_y_shift;
 #define PI_15 4.71238898038469 //pi*1.5
 
 
-vec2 get_bg_image_coords(vec2 in_vOutputCoord, bool isrotated) {
+vec2 get_bg_image_coords(vec2 in_vOutputCoord) {
     vec2 bg_img_coords = in_vOutputCoord;
 
+	#ifdef _HAS_ROTATION_UNIFORM
+        uint Rotation=params.Rotation;
+	#else
+		uint Rotation=uint(is_rotated_old());
+	#endif
+    
+    
     //   0 = auto
     //   1, -1 = identity
     // >+1 = manual rotation for straight games
     // <-1 = manual rotation for rotated games
 
-    //handle automatic rotation of bg image for rotated games
-    if (BG_IMAGE_ROTATION == 0.0 && isrotated ) {
+    //user selected auto rotation handling, so query params.Rotation.
+    if (BG_IMAGE_ROTATION == 0.0 ) {
         
-        bg_img_coords.xy = bg_img_coords.yx;
-        bg_img_coords.y = 1 - bg_img_coords.y;
+        //0
+        //nothing to do.
+        
+        //90
+        if (Rotation == 1) {
+            bg_img_coords.xy = bg_img_coords.yx;
+            bg_img_coords.y = 1 - bg_img_coords.y;
+        } else
+        
+        //180
+        if (Rotation == 2) {
+            bg_img_coords.y = 1 - bg_img_coords.y;
+        } else
+        
+        //270
+        if (Rotation == 3) {
+            bg_img_coords.xy = bg_img_coords.yx;        
+        } 
+        
         bg_img_coords += vec2( BG_IMAGE_OFFX,BG_IMAGE_OFFY);
         bg_img_coords=zoom(bg_img_coords, BG_IMAGE_ZOOM);
-        return bg_img_coords; // <-- for legibility
+        return bg_img_coords;
     }
 
 
-    //User say image is rotated (selected a negative value),
+    //User forced a rotation, handle manually.
+    
+    //User selected a negative value (force rotation),
     //flip coords.
     //This is needed for correct aspect handling on rotated games.
     if (BG_IMAGE_ROTATION < 0.0) {
@@ -115,9 +141,7 @@ vec2 get_bg_image_coords(vec2 in_vOutputCoord, bool isrotated) {
         bg_img_coords.xy = vec2(1-bg_img_coords.y, 1- bg_img_coords.x);
 
     bg_img_coords += vec2( BG_IMAGE_OFFX,BG_IMAGE_OFFY);
-
     bg_img_coords=zoom(bg_img_coords, BG_IMAGE_ZOOM);
-
     return bg_img_coords;
 }
 
@@ -191,7 +215,7 @@ void main() {
 
     vOutputCoord = TexCoord ;
 
-    vBg_img_coords =  get_bg_image_coords(vOutputCoord, bIsRotated);
+    vBg_img_coords =  get_bg_image_coords(vOutputCoord);
 
     //Help scanline/pixelgrid code too:
         bool bIs_Interlaced = is_interlaced();
