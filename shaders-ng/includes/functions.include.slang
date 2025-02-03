@@ -756,25 +756,20 @@ float get_in_aspect() {
 	if (ASPECT_X == -6) return 0.75;  // 3/4, pre-rotated (TATE) 1.33 games.
 	
 	//Handle cases when core aspect cannot be retrived and just return 4/3.
-		bool HasOriginalAspectUniform = false;
-		#ifdef _HAS_ORIGINALASPECT_UNIFORMS
-			HasOriginalAspectUniform = true;
-		#endif
-		if (ASPECT_X == -7 || ASPECT_X == -8 ){
-			if (!HasOriginalAspectUniform){
-				return 1.33333;
-			}
-		}
+	float OriginalAspectRotated = 1.33333;
+	#ifdef _HAS_ORIGINALASPECT_UNIFORMS
+		OriginalAspectRotated = global.OriginalAspectRotated;
+	#endif
 	
 	if (ASPECT_X == -7) {
 		if (DO_BG_IMAGE==0.0)
-			return global.OriginalAspectRotated;
+			return OriginalAspectRotated;
 		else
 			return 1.333333; //fallback to 4:3 when using background or foreground images.
 	}
 	
 	if (ASPECT_X == -8)
-			return global.OriginalAspectRotated;
+			return OriginalAspectRotated;
 	
 	return ASPECT_X / ASPECT_Y ;
 }
