@@ -36,3 +36,5 @@ GLOBAL_ZOOM = "0.832500"
 V_SIZE = "1.0"
 S_SIZE = "1.3"
 S_POWER = "0.1"
+
+ASPECT_X = "0.0"

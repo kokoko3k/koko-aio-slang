@@ -11,8 +11,6 @@ layout(location = 1) in vec2 TexCoord;
 
 layout(location = 0) out vec2 vTexCoord;
 layout(location = 1) out vec2 vFuzzy_main_pass_stage_1;
-layout(location = 2) out vec3 vTemperature_rgb;
-layout(location = 3) out vec3 vTemperature_rgb_gamma_in;
 layout(location = 5) out vec2 blur_radius_adpt;
 
 void main() {
@@ -23,35 +21,12 @@ void main() {
     //Get fuzzy mul and pow factor
         vFuzzy_main_pass_stage_1 = apply_fuzzy_main_pass_stage_1();
 
-    //BLOOM temperature note (**)    
-    /*  We would need to revert color temperature before the bloom 
-    * and then re-apply the temperature or bloom would colorize whites with the color
-    * temperature value!
-    * in theory the temperature "revert" should be done before the BLOOM_GAMMA (gamma in) application,
-    * so before bloom pass 1, but it seems we can do it in the final stage by dividing bloomed 
-    * for pow(vTemperature_rgb, BLOOM_GAMMA), apply bloom gains and tweaks, and then 
-    * multiply bloomed for vTemperature_rgb
-    */
-
-    if (TEMPERATURE == 6500 || DO_CCORRECTION == 0.0) {
-        vTemperature_rgb = vec3(1.0);
-        vTemperature_rgb_gamma_in =  vec3(1.0);
-    } else {
-        vTemperature_rgb = kelvin2rgb(TEMPERATURE);
-        vTemperature_rgb_gamma_in = pow(vTemperature_rgb, vec3(BLOOM_GAMMA));
-    }
-    //debug
-    //vTemperature_rgb = vec3(1.0);
-    //vTemperature_rgb_gamma_in = vec3(1.0);
-
 }
 
 #pragma stage fragment
 
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in vec2 vFuzzy_main_pass_stage_1;
-layout(location = 2) in vec3 vTemperature_rgb;
-layout(location = 3) in vec3 vTemperature_rgb_gamma_in;
 layout(location = 5) in vec2 blur_radius_adpt;
 //layout(location = 5) in vec2 vCo_avglum;
 
@@ -127,9 +102,7 @@ void main() {
         0.0
     );
     
-    bloomed = bloomed / vTemperature_rgb_gamma_in;  //see note (**) in vertex shader
-    
-    
+
     bloomed = pow(bloomed,vec3(BLOOM_GAMMA_OUT));
     bloomed = pixel_push_luminance(bloomed, BLOOM_POWER);
     
@@ -172,8 +145,6 @@ void main() {
     if (BLOOM_BYPASS != 1.0)
         bloomed = bloomed * bloom_mix_adapted * over_white_correction ;
     
-
-    bloomed = bloomed * vTemperature_rgb; //see note (**) in vertex shader
     
     FragColor = vec4(bloomed, zone_luminance);   
     
