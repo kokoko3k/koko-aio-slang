@@ -63,7 +63,8 @@
 
 // Enable lcd antighosting by using values > 0.0 (try around 0.5)
 // It works by temporal sharpening pixels, and the  
-// effect is proportional to the color difference over time:
+// effect is proportional to the color difference over time.
+// It is NOT compatible with DELTA_RENDER
 // #define LCD_ANTIGHOSTING 0.5
 
 // Defines  maximum to the temporal sharpening effect.

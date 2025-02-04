@@ -276,7 +276,7 @@ However nice effects may be obtained (eg: with vector games). <br>
         *Lowering* this parameter compensates that and usually
         Values around 0.8 to 0.95 usually work good, for affected monitors.
         On low latency panels such as OLEDs, microleds, this is not an issue,
-        so you should keep it to 1.0, possibly locking its value too in config-user.txt
+        so you should keep it to 1.0, possibly locking its value too in config-user-optional.txt
          
     Scanlines flicker (0=off,1=on,2=if Hi-res):
         This setting emulates the flickering issues present on crt interlaced screens
@@ -832,7 +832,7 @@ To enable them, you have to edit the shader itself, save it, and reload.*
     leading to a measurable power consumption reduction and mitigate throttling
     on mobile devices and laptops.<br>
     This feature can, however, produce artifacts in some cases.<br><br>
-    To use it, in file config-user.txt, turn the line: <br>
+    To use it, in file config-user-optional.txt, turn the line: <br>
     ```// #define DELTA_RENDER```
     <br>into: <br>
     ```#define DELTA_RENDER```
@@ -856,14 +856,14 @@ To enable them, you have to edit the shader itself, save it, and reload.*
     Use higher quality deconvergence by flattering rgb scanlines when <br>
     deconvergence is high and by syncing them to the deconvergence settings.<br>
     This has a measurable performance impact on lower spec GPUs.<br><br>
-    To use it, in file config-user.txt, turn the line: <br>
+    To use it, in file config-user-optional.txt, turn the line: <br>
     ```// #define HQ_DECON```
     <br>into: <br>
     ```#define HQ_DECON```<br>
 
     
 **FXAA tuning:**<br>
-    To change fxaa behaviour, in file config-user.txt, turn the line: <br>
+    To change fxaa behaviour, in file config-user-optional.txt, turn the line: <br>
     ```// #define FXAA_PRESET 2.0```
     <br>into: <br>
     ```#define FXAA_PRESET 2.0```<br>
@@ -872,16 +872,18 @@ To enable them, you have to edit the shader itself, save it, and reload.*
     2.0 is the default one, still fast, good for low resolution content.<br>
     3.0 to 5.0 smooth the image more and are good for high resolution games.<br>
     
-**LCD antighosting:**<br>
+**LCD antighosting:** (not compatible with delta render)<br>
     LCD displays often suffer from high pixel refresh times <br>
     which produces ghosting when game changes on screen.<br>
     By inducing larger color transitions, it prompts the LCD cells <br>
     to adjust their states more rapidly, thereby reducing ghosting.<br><br>
-    To use it, in file config-user.txt, turn the line: <br>
+    To use it, in file config-user-optional.txt, turn the line: <br>
     ```// #define LCD_ANTIGHOSTING 0.5```
     <br>into: <br>
     ```#define LCD_ANTIGHOSTING 0.5```<br><br>
 
+    
+    
 **Conditional FPS Halver**<br>
     *[Warning:] Only on retroarch > 1.19.1*<br>
     *[Warning:] This feature is not compatible with HALVE_BORDER_UPDATE* <br>
@@ -892,7 +894,7 @@ To enable them, you have to edit the shader itself, save it, and reload.*
     that may struggle to render shader at full speed. <br>
     Furthermore, the shader frame rate will remain capped at 30 (/25) FPS <br>
     if the core frame rate alternates between 60 (/50) and 30 (/25) FPS.<br><br>
-    To use it, in file config-user.txt, turn the line: <br>
+    To use it, in file config-user-optional.txt, turn the line: <br>
     ```// #define FPS_HALVER```
     <br>into: <br>
     ```#define FPS_HALVER```<br><br>
