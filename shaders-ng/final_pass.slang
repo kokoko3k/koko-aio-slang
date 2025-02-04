@@ -1005,6 +1005,26 @@ float create_ambi_colorize_shade(vec2 co) {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
+vec3 antighost(vec3 c) {
+    #ifndef D3D_WORKAROUND
+        #ifdef LCD_ANTIGHOSTING
+            #ifndef LCD_ANTIGHOSTING_CEIL
+                #define LCD_ANTIGHOSTING_CEIL 1.0
+            #endif
+            if (LCD_ANTIGHOSTING > 0.0) {
+                if (frame_is_even()) {
+                    vec3 feedback = texture(final_passFeedback, vOutputCoord).rgb;
+                    vec3 diff=(feedback - c)*LCD_ANTIGHOSTING;
+                    diff = sign(diff) * min( abs(diff), vec3(LCD_ANTIGHOSTING_CEIL));
+                    c = mix(c, c-diff, 0.5);
+                    //c = max(c, vec3(0.0));
+                }
+            }
+        #endif
+    #endif
+    return c;
+}
+
 
 vec4 fn_pixel_fgbg_image(sampler2D smp) {
     vec2 tex_size = textureSize(smp, 0); // * BG_ZOOM;
@@ -1292,8 +1312,6 @@ vec2 quasirandom(vec2 n) {
     //return abs(sin(n));
 }
 
-
-
 void main() {
    #ifndef RENDER_BOGUS_FRAMES
         //Some cores set first frame size to 1x1 which may cause glitches
@@ -1376,21 +1394,6 @@ void main() {
     if (canvas_busy > 0.5) {
         
         pixel_out = fn_pixel_content(co_content);
-        #ifndef D3D_WORKAROUND
-            #ifdef LCD_ANTIGHOSTING
-                #ifndef LCD_ANTIGHOSTING_CEIL
-                    #define LCD_ANTIGHOSTING_CEIL 1.0
-                #endif
-                if (LCD_ANTIGHOSTING > 0.0) {
-                    if (frame_is_even()) {
-                        vec3 feedback = texture(final_passFeedback, vOutputCoord).rgb;
-                        vec3 diff=(feedback - pixel_out)*LCD_ANTIGHOSTING;
-                        diff = sign(diff) * min( abs(diff), vec3(LCD_ANTIGHOSTING_CEIL));
-                        pixel_out = mix(pixel_out, pixel_out-diff, 0.5);
-                    }
-                }
-            #endif
-        #endif
 
     } else {
 
@@ -1479,6 +1482,8 @@ void main() {
             pixel_out = pixel_out * vignette_spot.x;
             pixel_out = mix(pixel_out+perlin, vec3(canvas_bezel_screen), vec3(vignette_spot.y) );
         }
+        
+            pixel_out = antighost(pixel_out);
     }
     
     
