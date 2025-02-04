@@ -90,7 +90,12 @@ float get_avg_lum_from_mip(sampler2D tex, vec2 co, float lod) {
 
 
 void main() {
-    if (DO_BLOOM == 0.0) return;
+    if (DO_BLOOM == 0.0) {
+        // Initialize bloom "Feedback" alpha to avoid glitches
+        // When enabling the effect runtime
+        FragColor.a = 1.0;
+        return;
+    }
     
     vec3 bloomed = bloom(
         Source,
