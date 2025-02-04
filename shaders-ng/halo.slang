@@ -42,7 +42,7 @@ void main() {
     //Horizontal mask helper variables:
         //Lower strength if the mask saturated too late and have no visible room to reach full bright.
         //(Use a gray gamma ramp to debug)
-        vMask_helper_max_power = smoothstep_fast( 1.0, 3.0, IN_GLOW_POWER ) * HALO_DO_MASK_HELPER;   
+        vMask_helper_max_power = smoothstep_fast( 1.0, 3.0, IN_GLOW_POWER * DO_CCORRECTION ) * HALO_DO_MASK_HELPER;   
     
         vMask_helper_max_power *= DO_PIXELGRID_W;
         
