@@ -27,8 +27,8 @@ void main() {
    
    //The following conditions are used to skip blur-x code.
    bool bGlow_w_inside_interval = true;
-   if (IN_GLOW_W > GLOW_SHARP_MAX) bGlow_w_inside_interval = false;             // radius falls in the allowed interval
-   if (IN_GLOW_W < GLOW_SHARP_MAX_ALTERNATE) bGlow_w_inside_interval = false;   // radius falls in the allowed interval
+   if (IN_GLOW_W >= GLOW_SHARP_MAX) bGlow_w_inside_interval = false;             // radius falls in the allowed interval
+   if (IN_GLOW_W <= GLOW_SHARP_MAX_ALTERNATE) bGlow_w_inside_interval = false;   // radius falls in the allowed interval
    if (DO_IN_GLOW < 0.5) bGlow_w_inside_interval = false;                       // Disabled if not user enabled
    if (bDo_wtfl) bGlow_w_inside_interval = true; //always active if need to blur the waterfalls.
 
