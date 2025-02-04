@@ -131,20 +131,23 @@ void main() {
       vDebug = vec3(1.0);
    }   
    else if (DO_TEST == 4.0) {
+      vDebug = vec3(vTexCoord.x);
+   }   
+   else if (DO_TEST == 5.0) {
       float cycle = mod(params.FrameCount / DEBUG_BLINK_TIME, 4);
            if (cycle <= 0) vDebug = vec3(vTexCoord.x);
       else if (cycle <= 1) vDebug = vec3(vTexCoord.x, 0.0, 0.0);
       else if (cycle <= 2) vDebug = vec3(0.0,vTexCoord.x,0.0);
       else if (cycle <= 3) vDebug = vec3(0.0,0.0,vTexCoord.x);
    }   
-   else if (DO_TEST == 5.0) {
+   else if (DO_TEST == 6.0) {
       float cycle = mod(params.FrameCount / DEBUG_BLINK_TIME, 4);
            if (cycle <= 0) vDebug = vec3(vTexCoord.y);
       else if (cycle <= 1) vDebug = vec3(vTexCoord.y, 0.0, 0.0);
       else if (cycle <= 2) vDebug = vec3(0.0,vTexCoord.y,0.0);
       else if (cycle <= 3) vDebug = vec3(0.0,0.0,vTexCoord.y);
    }   
-   else if (DO_TEST == 6.0) {
+   else if (DO_TEST == 7.0) {
       float cycle = mod(params.FrameCount / DEBUG_BLINK_TIME, 6);
            if (cycle <= 0) vDebug = vec3(vTexCoord.x, vTexCoord.y, 0.0);
       else if (cycle <= 1) vDebug = vec3(vTexCoord.x, 0.0,         vTexCoord.y);
@@ -153,28 +156,28 @@ void main() {
       else if (cycle <= 4) vDebug = vec3(0.0,         vTexCoord.x, vTexCoord.y);
       else if (cycle <= 5) vDebug = vec3(0.0,         vTexCoord.y, vTexCoord.x);
    }   
-   else if (DO_TEST == 7.0) {
+   else if (DO_TEST == 8.0) {
       if (mod(params.FrameCount, DEBUG_BLINK_TIME*2) < DEBUG_BLINK_TIME) 
          vDebug = vec3(0.0) ;
       else 
          vDebug = vec3(1.0) ;
    }
-   else if (DO_TEST == 8.0) {
+   else if (DO_TEST == 9.0) {
       float time_fade = abs(sin(params.FrameCount/3.14/20));
       vec3 color_fade = vec3(1.0) * time_fade;
       vDebug = color_fade;
    }      
-   else if (DO_TEST == 9.0) {
+   else if (DO_TEST == 10.0) {
       float time_fade = abs(sin(params.FrameCount/3.14/20));
       vec3 color_fade = vec3(1.0,0.0,0.0) * time_fade;
       vDebug = color_fade;
    }      
-   else if (DO_TEST == 10.0) {
+   else if (DO_TEST == 11.0) {
       float time_fade = abs(sin(params.FrameCount/3.14/20));
       vec3 color_fade = vec3(0.0, 1.0, 0.0) * time_fade;
       vDebug = color_fade;
    }      
-   else if (DO_TEST == 11.0) {
+   else if (DO_TEST == 12.0) {
       float time_fade = abs(sin(params.FrameCount/3.14/20));
       vec3 color_fade = vec3(0.0, 0.0, 1.0) * time_fade;
       vDebug = color_fade;
