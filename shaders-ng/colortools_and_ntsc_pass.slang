@@ -110,6 +110,7 @@ void main() {
          vNTSC_weights[n] /= sum;
       }
    }
+   vTemperature_rgb = vec3(1.0);
    if (TEMPERATURE != 6500)
       vTemperature_rgb = kelvin2rgb(TEMPERATURE);
    
