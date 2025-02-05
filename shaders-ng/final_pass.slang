@@ -1313,14 +1313,7 @@ vec2 quasirandom(vec2 n) {
 }
 
 void main() {
-   #ifndef RENDER_BOGUS_FRAMES
-        //Some cores set first frame size to 1x1 which may cause glitches
-        if (params.OriginalSize.x < 4) {
-            FragColor.rgb = vec3(0.0); //float(params.FrameCount > 1.0);
-            return;
-        }
-    #endif
-    
+
     // If fps halver is active, stop processing asap
     if (fps_halver_is_skipped_frame()) {
         FragColor.rgb = texture(final_passFeedback, vOutputCoord).rgb ;
@@ -1543,48 +1536,58 @@ void main() {
         }
     }
 
+    #ifndef RENDER_BOGUS_FRAMES
+        // Some cores set first frame size to 1x1 which may cause glitches.
+        // This has less performance impact if kept here, at the end of the shader.
+        if (params.OriginalSize.x < 4) {
+            FragColor.rgb = vec3(0.0); //float(params.FrameCount > 1.0);
+            return;
+        }
+    #endif
 
     // Debug functions:
-    #ifdef DEBUG_QUAD_SPLIT
-        if ( vOutputCoord.x < 0.5  && vOutputCoord.y > 0.5 || vOutputCoord.x > 0.5  && vOutputCoord.y < 0.5 )
-        pixel_out = texture(DEBUG_TEXTURE,vOutputCoord).rgb;
-    #endif
+        #ifdef DEBUG_QUAD_SPLIT
+            if ( vOutputCoord.x < 0.5  && vOutputCoord.y > 0.5 || vOutputCoord.x > 0.5  && vOutputCoord.y < 0.5 )
+            pixel_out = texture(DEBUG_TEXTURE,vOutputCoord).rgb;
+        #endif
 
-    #ifdef DEBUG_DUAL_SPLIT_Y
-        if (vTexCoord.y < 0.5) pixel_out = texture(DEBUG_TEXTURE,vTexCoord).rgb;
-    #endif
+        #ifdef DEBUG_DUAL_SPLIT_Y
+            if (vTexCoord.y < 0.5) pixel_out = texture(DEBUG_TEXTURE,vTexCoord).rgb;
+        #endif
 
-    #ifdef DEBUG_DUAL_SPLIT_Y_GAMMA
-        if (vTexCoord.y < 0.5) pixel_out = pow(texture(DEBUG_TEXTURE,vTexCoord).rgb, vec3(1.08));
-    #endif
+        #ifdef DEBUG_DUAL_SPLIT_Y_GAMMA
+            if (vTexCoord.y < 0.5) pixel_out = pow(texture(DEBUG_TEXTURE,vTexCoord).rgb, vec3(1.08));
+        #endif
 
-    #ifdef DEBUG_DUAL_SPLIT_X
-        if (vTexCoord.x > 0.5) pixel_out = texture(DEBUG_TEXTURE,vTexCoord).rgb;
-    #endif
+        #ifdef DEBUG_DUAL_SPLIT_X
+            if (vTexCoord.x > 0.5) pixel_out = texture(DEBUG_TEXTURE,vTexCoord).rgb;
+        #endif
 
-    #ifdef DEBUG_DUAL_SPLIT_MIRROR_X
-        if (vTexCoord.x > 0.5) pixel_out = texture(DEBUG_TEXTURE,vec2(1-vTexCoord.x, vTexCoord.y) ).rgb;
-    #endif
+        #ifdef DEBUG_DUAL_SPLIT_MIRROR_X
+            if (vTexCoord.x > 0.5) pixel_out = texture(DEBUG_TEXTURE,vec2(1-vTexCoord.x, vTexCoord.y) ).rgb;
+        #endif
 
-    #ifdef DEBUG_DUAL_SPLIT_MIRROR_X_GAMMA
-        if (vTexCoord.x > 0.5) pixel_out = pow(texture(DEBUG_TEXTURE,vec2(1-vTexCoord.x, vTexCoord.y) ).rgb, vec3(1.11));
-    #endif
+        #ifdef DEBUG_DUAL_SPLIT_MIRROR_X_GAMMA
+            if (vTexCoord.x > 0.5) pixel_out = pow(texture(DEBUG_TEXTURE,vec2(1-vTexCoord.x, vTexCoord.y) ).rgb, vec3(1.11));
+        #endif
 
-    #ifdef DEBUG_PRINT_VALUE
-        float maxdigits = 10.0;
-        float decimalplaces = 2.0;
-        float fvalue = vfprintvalue;
-        vec2 vFragCoord = vec2( floor(vOutputCoord.x * params.OutputSize.x),
-                            floor(vOutputCoord.y * params.OutputSize.y));
-        pixel_out += PrintValueVec3( vTexCoord, vFragCoord, fvalue, maxdigits, decimalplaces );
-    #endif
+        #ifdef DEBUG_PRINT_VALUE
+            float maxdigits = 10.0;
+            float decimalplaces = 2.0;
+            float fvalue = vfprintvalue;
+            vec2 vFragCoord = vec2( floor(vOutputCoord.x * params.OutputSize.x),
+                                floor(vOutputCoord.y * params.OutputSize.y));
+            pixel_out += PrintValueVec3( vTexCoord, vFragCoord, fvalue, maxdigits, decimalplaces );
+        #endif
 
-    #ifdef DEBUG_SHOW_CLIP
-        float clip = max(max(pixel_out.r, pixel_out.g), pixel_out.b) ;
-        if (clip  > 1.0)
-            pixel_out = 1-pixel_out;//;-clip;
-    #endif
-   
+        #ifdef DEBUG_SHOW_CLIP
+            float clip = max(max(pixel_out.r, pixel_out.g), pixel_out.b) ;
+            if (clip  > 1.0)
+                pixel_out = 1-pixel_out;//;-clip;
+        #endif
+
+
+    
     FragColor.rgb = pixel_out;
 
 }
