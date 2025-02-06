@@ -1,9 +1,6 @@
 #version 450
 #include "config.inc"
 
-//Dumbify glow under this treshold.
-#define GLOW_SHARP_MAX_ALTERNATE -2.0 
-
 #include "includes/functions.include.slang" 
 
 #pragma stage vertex
@@ -30,7 +27,6 @@ void main() {
    //The following conditions are used to skip blur-x code.
    bool bGlow_w_inside_interval = true;
    if (IN_GLOW_W >= GLOW_SHARP_MAX) bGlow_w_inside_interval = false;             // radius falls in the allowed interval
-   if (IN_GLOW_W <= GLOW_SHARP_MAX_ALTERNATE) bGlow_w_inside_interval = false;   // radius falls in the allowed interval
    if (DO_IN_GLOW < 0.5) bGlow_w_inside_interval = false;                       // Disabled if not user enabled
    if (bDo_wtfl) bGlow_w_inside_interval = true;    //always active if need to blur the waterfalls.
    if (bDo_defocus) bGlow_w_inside_interval = true; //always active if need to do defocusing.
