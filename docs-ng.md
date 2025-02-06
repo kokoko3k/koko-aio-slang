@@ -189,8 +189,8 @@ However nice effects may be obtained (eg: with vector games). <br>
         The channels deconvergence offsets
     Deconvergence increases near edges:
         Increase the offsets near screen edge
-    Blur increases near edges when glow/blur is enabled:
-        When using Glow/Blur feature, the blur increases near screen edge.
+    Blur screen edges
+        Screen edges are blurred
     Focused Area:
         The area of the screen that will be in focus (affects previous 2 settings)
 

@@ -23,6 +23,8 @@ void main() {
    vTexCoord = TexCoord ;  
    
    bool bDo_wtfl = (DO_WTFL > 0.9 && WTFL_SHARPNESS_X < 3.0);
+   bool bDo_defocus = (DO_SHIFT_RGB > 0.5 && EDGE_DEFOCUS_DO_BLUR > 0.0);
+   
    vDo_wtfl = float(bDo_wtfl);
    
    //The following conditions are used to skip blur-x code.
@@ -31,7 +33,8 @@ void main() {
    if (IN_GLOW_W <= GLOW_SHARP_MAX_ALTERNATE) bGlow_w_inside_interval = false;   // radius falls in the allowed interval
    if (DO_IN_GLOW < 0.5) bGlow_w_inside_interval = false;                       // Disabled if not user enabled
    if (bDo_wtfl) bGlow_w_inside_interval = true; //always active if need to blur the waterfalls.
-
+   if (bDo_defocus) bGlow_w_inside_interval = true; //always active if need to do defocusing.
+   
    glow_w_inside_interval = float( bGlow_w_inside_interval);
 
 
