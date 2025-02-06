@@ -694,6 +694,12 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
             // Phosphor height computation has been moved
             // outside the branch to help parallelism a bit
 
+               // #ifdef HQ_DECON
+
+                //phosphor_height = mix(phosphor_height,  vec3(1.0)    , (1-dist_from_edge) * (DO_SHIFT_RGB * EDGE_DEFOCUS_DO_BLUR) );
+
+                //#endif
+                
             //Finally get 3 sines out of the previous one by applying height modifiers
                 rgb_h = morph_shape(rgb_h_sin, phosphor_height, PIXELGRID_NO_INTERBLEED_H, PIXELGRID_GAMMA_H);
 
@@ -702,7 +708,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
                 rgb_h = clamp(rgb_h, 0.0,1.0);
                 
                 #ifdef HQ_DECON
-                    rgb_h = mix(rgb_h, pixel_in.rgb, (1-dist_from_edge) * (DO_SHIFT_RGB * EDGE_DEFOCUS_DO_BLUR) );
+                    rgb_h = mix(rgb_h,  mix(vec3(1.0),pixel_in.rgb, 0.9), (1-dist_from_edge) * (DO_SHIFT_RGB * EDGE_DEFOCUS_DO_BLUR) );
                 #endif
         }
 
