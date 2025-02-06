@@ -125,7 +125,7 @@ void main() {
          return;
       }
       
-      float in_glow_w_adapted = IN_GLOW_W;
+      float in_glow_w_adapted = abs(IN_GLOW_W);
       
       //Override Megadrive fake transparencies (like Sonic waterfalls)
          if (vDo_wtfl == 1.0) {
