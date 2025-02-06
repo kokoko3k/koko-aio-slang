@@ -107,10 +107,6 @@ void main() {
    if (vIn_glow_edge_defocus_strength > 0.0 && DO_IN_GLOW == 0.0)
       vIn_glow_h_adapted = 7.0;
  
-   //Also, subtractive sharpness looks bad with defocus. (seems fine for x blurring tho).
-   if (vIn_glow_edge_defocus_strength > 0.0)
-      vSharp_sub = 0.0;
-   
 }
 
 
@@ -147,11 +143,11 @@ vec3 glow_blur_bias(sampler2D source_tex, vec2 co, vec3 pixel_glowed, float bias
    return mix(proper_glow, pixel_glowed, max(0.0, bias));            
 }
 
-vec3 blur_select_wrap(sampler2D texture_in, vec2 co, vec4 sourcesize, float sharpness, bool use_gauss) {
+vec3 blur_select_wrap(sampler2D texture_in, vec2 co, vec4 sourcesize, float sharpness, bool use_gauss, float sharp_sub) {
    if (use_gauss)
       return blur9_y(texture_in, co, sourcesize.xy, sharpness);
          else
-      return blur9_y_box(texture_in, co, sourcesize.xy, sharpness, vSharp_sub);      
+      return blur9_y_box(texture_in, co, sourcesize.xy, sharpness, sharp_sub);      
 }
 
 
@@ -242,11 +238,14 @@ void main() {
          in_glow_h_adapted = mix(in_glow_h_adapted, WTFL_SHARPNESS_Y, waterfall);
       }
    
+   float sharp_sub_adapted = vSharp_sub;
+   
    // Edge defocus:
       float dist_from_edge = 1.0;
       if (vIn_glow_edge_defocus_strength > 0.0) {
          dist_from_edge = distance_from_edge_linear(vTexCoord, EDGE_DEFOCUS_AREA_INV);
          in_glow_h_adapted = mix(vIn_glow_edge_sharpness, in_glow_h_adapted,  dist_from_edge );
+         sharp_sub_adapted = vSharp_sub * (dist_from_edge);
          //FragColor = vec4(vec3(dist_from_edge), 0.0); return;
       }
    
@@ -259,7 +258,7 @@ void main() {
       
    //If over the max sharp, then just passthrough, else do the blur.
       if (glow_h_inside_interval == 1.0) {
-         pixel_glowed = blur_select_wrap(Source, vTexCoord, global.upscale_passSize, in_glow_h_adapted, (IN_GLOW_H >= 0.0) );
+         pixel_glowed = blur_select_wrap(Source, vTexCoord, global.upscale_passSize, in_glow_h_adapted, (IN_GLOW_H >= 0.0), sharp_sub_adapted );
       } else {
          pixel_glowed = texture(Source, vTexCoord).rgb;
       }
