@@ -18,6 +18,8 @@ layout(location = 11) out float vDeltaRenderOk;
 layout(location = 12) out float vWarpedglow;
 layout(location = 13) out vec2 vWarpedglow_offsets;
 layout(location = 14) out float vDynamicSeed;
+layout(location = 15) out float vIn_glow_edge_sharpness;
+layout(location = 16) out float vIn_glow_edge_defocus_strength;
 
 void main() {
    gl_Position = global.MVP * Position;
@@ -32,6 +34,8 @@ void main() {
                             (DO_NTSC_ARTIFACTS + NTSC_SHOW_ARTF_MASK < 1.5)   );
    
    bool bDo_wtfl = (DO_WTFL > 0.9 && WTFL_SHARPNESS_Y < 3.0);
+   bool bDo_defocus = (DO_SHIFT_RGB > 0.5 && EDGE_DEFOCUS_DO_BLUR > 0.0);
+   
    vDo_wtfl = float(bDo_wtfl);
    
    //The following conditions are used to skip blur-x code.
@@ -39,7 +43,8 @@ void main() {
    if (IN_GLOW_H >= GLOW_SHARP_MAX) bGlow_h_inside_interval = false;             // radius falls in the allowed interval
    if (IN_GLOW_H <= GLOW_SHARP_MAX_ALTERNATE) bGlow_h_inside_interval = false;   // radius falls in the allowed interval
    if (DO_IN_GLOW < 0.5) bGlow_h_inside_interval = false;                       // Disabled if not user enabled
-   if (bDo_wtfl) bGlow_h_inside_interval = true; //always active if need to blur the waterfalls.
+   if (bDo_wtfl) bGlow_h_inside_interval = true;    //always active if need to blur the waterfalls.
+   if (bDo_defocus) bGlow_h_inside_interval = true; //always active if need to do defocusing.
 
    glow_h_inside_interval = float( bGlow_h_inside_interval);
 
@@ -75,6 +80,24 @@ void main() {
    
    //Generate a seed that changes over time for temporal random noise
    vDynamicSeed = mod(params.FrameCount, 120.0001);
+   
+   if (EDGE_DEFOCUS_DO_BLUR*DO_SHIFT_RGB > 0.001) {
+      vIn_glow_edge_defocus_strength = EDGE_DEFOCUS_DO_BLUR;
+      //defocusing produces double scanlines, which is not the intended effect.
+      //so lower the effect when we use strong scanlines.
+         vIn_glow_edge_defocus_strength = mix(vIn_glow_edge_defocus_strength, 0.0, DO_PIXELGRID_H);
+         vIn_glow_edge_defocus_strength = max(0.0, vIn_glow_edge_defocus_strength);
+      //for legibility here, if pixelgrid is totally disabled (no scalnlines) use full defocus.
+         if (DO_PIXELGRID == 0.0) vIn_glow_edge_defocus_strength = EDGE_DEFOCUS_DO_BLUR;
+      //again, for legibility, if using HQ_DECON we can blur
+         #ifdef HQ_DECON
+            vIn_glow_edge_defocus_strength = EDGE_DEFOCUS_DO_BLUR;
+         #endif
+   } else {
+      vIn_glow_edge_defocus_strength = 0.0;
+   }
+   vIn_glow_edge_sharpness = mix(abs(in_glow_h), 0.3, vIn_glow_edge_defocus_strength);
+   //vIn_glow_edge_sharpness = max(vIn_glow_edge_sharpness, MIN_IN_GLOW_SHARP);
 }
 
 
@@ -90,6 +113,8 @@ layout(location = 11) in float vDeltaRenderOk;
 layout(location = 12) in float vWarpedglow;
 layout(location = 13) in vec2 vWarpedglow_offsets;
 layout(location = 14) in float vDynamicSeed;
+layout(location = 15) in float vIn_glow_edge_sharpness;
+layout(location = 16) in float vIn_glow_edge_defocus_strength;
 
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 4) uniform sampler2D upscale_pass;
@@ -198,18 +223,20 @@ void main() {
    //Override Megadrive fake transparencies (like Sonic waterfalls)
       if (vDo_wtfl == 1.0) {
          float waterfall = texture_NEAREST_lod(colortools_and_ntsc_pass, vTexCoord, params.OriginalSize,0.0).a;
-         
-   
          waterfall = unpack_21(waterfall, 1.2).y;
-   
-         
-         
          //FragColor = vec4(vec3(waterfall),0.0);return;
-         
-
          if (DO_IN_GLOW == 0.0)
             IN_GLOW_H_ADAPTED = 7.0;
          IN_GLOW_H_ADAPTED = mix(IN_GLOW_H_ADAPTED, WTFL_SHARPNESS_Y, waterfall);
+      }
+   
+   // Edge defocus:
+      float dist_from_edge = 1.0;
+      if (vIn_glow_edge_defocus_strength > 0.0) {
+         dist_from_edge = distance_from_edge_linear(vTexCoord, EDGE_DEFOCUS_AREA_INV);
+         IN_GLOW_H_ADAPTED = mix(vIn_glow_edge_sharpness, IN_GLOW_H_ADAPTED,  dist_from_edge );
+         //FragColor = vec4(vec3(dist_from_edge), 0.0); return;
+         
       }
    
    //Make it resolution independent.
