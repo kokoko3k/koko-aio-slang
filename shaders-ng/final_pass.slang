@@ -666,12 +666,12 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
                 vec3 decon_stagger = vec3( PIXELGRID_DECON_R_H, PIXELGRID_DECON_G_H, PIXELGRID_DECON_B_H);
                 
             #ifdef HQ_DECON
-                float dist_from_edge = distance_from_edge_linear(in_coords, EDGE_DEFOCUS_AREA_INV)*(DO_SHIFT_RGB);
-                float offset_multiplier = mix(EDGE_DEFOCUS, 1.0, dist_from_edge) * NEW_SCALEMOD_Y;
-                decon_stagger = vec3(DECON_RY,DECON_GY,DECON_BY)*pi/2.0;
-                decon_stagger *= offset_multiplier;
+                //Sync decon stagger to deconvergence set in shift_and_bleed pass.
+                float dist_from_edge = distance_from_edge_linear(in_coords, EDGE_DEFOCUS_AREA_INV);
+                float offset_multiplier = mix(EDGE_DEFOCUS, 0.0, dist_from_edge) * (DO_SHIFT_RGB * OFFSET_STRENGTH);
+                decon_stagger = vec3(DECON_RY,DECON_GY,DECON_BY)*pi/2.0 * (offset_multiplier * NEW_SCALEMOD_Y) ;
             #endif
-            
+          
             vec3 rgb_h_sin = vec3(1.0);
             
             if (PIXELGRID_H_ANTIMOIRE > 0.0) {
