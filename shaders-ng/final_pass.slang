@@ -699,7 +699,15 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
                 rgb_h = clamp(rgb_h, 0.0,1.0);
                 
                 #ifdef HQ_DECON
-                    rgb_h = mix(rgb_h,  mix(vec3(1.0),pixel_in.rgb, 0.9), (1-dist_from_edge) * (DO_SHIFT_RGB * EDGE_DEFOCUS_DO_BLUR) );
+                    // Y Defocusing causes scanlines gaps to blend, so mix the scanlines mask with the original color
+                    // since the original color will be multiplied again for rgb_h later on, pow it to 0.9 to avoid excessive gamma increase.
+                    
+                        float mixing_factor =         // the mixing factor will depend on:
+                              (DO_SHIFT_RGB           // the fact that we are doing defocusing
+                            * EDGE_DEFOCUS_DO_BLUR) 
+                            * ((1-dist_from_edge)     // the distance from the center
+                            * DO_PIXELGRID_H) ;       //the scanline strength
+                    rgb_h = mix( rgb_h,  mix(vec3(1.0), pixel_in.rgb, 0.9), mixing_factor);
                 #endif
         }
 
