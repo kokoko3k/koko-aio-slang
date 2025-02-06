@@ -245,7 +245,7 @@ void main() {
       if (vIn_glow_edge_defocus_strength > 0.0) {
          dist_from_edge = distance_from_edge_linear(vTexCoord, EDGE_DEFOCUS_AREA_INV);
          in_glow_h_adapted = mix(vIn_glow_edge_sharpness, in_glow_h_adapted,  dist_from_edge );
-         sharp_sub_adapted = vSharp_sub * (dist_from_edge);
+         sharp_sub_adapted = mix(vSharp_sub, 1.0, (1-dist_from_edge)*vIn_glow_edge_defocus_strength);
          //FragColor = vec4(vec3(dist_from_edge), 0.0); return;
       }
    
