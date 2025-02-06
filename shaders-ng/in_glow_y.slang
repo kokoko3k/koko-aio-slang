@@ -11,6 +11,7 @@ layout(location = 2) out float vDoInGlowBias;
 layout(location = 3) out float vGlow_Gain;
 layout(location = 4) out float vSharp_sub;
 layout(location = 5) out float vDo_wtfl;
+layout(location = 6) out float vIn_glow_h_adapted;
 layout(location = 11) out float vDeltaRenderOk;
 layout(location = 12) out float vWarpedglow;
 layout(location = 13) out vec2 vWarpedglow_offsets;
@@ -94,6 +95,22 @@ void main() {
    }
    vIn_glow_edge_sharpness = mix(abs(in_glow_h), 0.3, vIn_glow_edge_defocus_strength);
    //vIn_glow_edge_sharpness = max(vIn_glow_edge_sharpness, MIN_IN_GLOW_SHARP);
+   
+   vIn_glow_h_adapted = abs(IN_GLOW_H);
+   
+   
+  
+   //when not using glow/blur, set it to 7.0 if needed by fake transparency blurring
+   if (vDo_wtfl == 1.0  && DO_IN_GLOW == 0.0) 
+      vIn_glow_h_adapted = 7.0;
+   //..same goes for defocus
+   if (vIn_glow_edge_defocus_strength > 0.0 && DO_IN_GLOW == 0.0)
+      vIn_glow_h_adapted = 7.0;
+ 
+   //Also, subtractive sharpness looks bad with defocus. (seems fine for x blurring tho).
+   if (vIn_glow_edge_defocus_strength > 0.0)
+      vSharp_sub = 0.0;
+   
 }
 
 
@@ -105,6 +122,7 @@ layout(location = 2) in float vDoInGlowBias;
 layout(location = 3) in float vGlow_Gain;
 layout(location = 4) in float vSharp_sub;
 layout(location = 5) in float vDo_wtfl;
+layout(location = 6) in float vIn_glow_h_adapted;
 layout(location = 11) in float vDeltaRenderOk;
 layout(location = 12) in float vWarpedglow;
 layout(location = 13) in vec2 vWarpedglow_offsets;
@@ -212,40 +230,36 @@ void main() {
       return;
    }
 
+   float in_glow_h_adapted = vIn_glow_h_adapted;
+   
    vec3 pixel_glowed;
    
-   float IN_GLOW_H_ADAPTED = abs(IN_GLOW_H);
-         
    //Override Megadrive fake transparencies (like Sonic waterfalls)
       if (vDo_wtfl == 1.0) {
          float waterfall = texture_NEAREST_lod(colortools_and_ntsc_pass, vTexCoord, params.OriginalSize,0.0).a;
          waterfall = unpack_21(waterfall, 1.2).y;
          //FragColor = vec4(vec3(waterfall),0.0);return;
-         if (DO_IN_GLOW == 0.0)
-            IN_GLOW_H_ADAPTED = 7.0;
-         IN_GLOW_H_ADAPTED = mix(IN_GLOW_H_ADAPTED, WTFL_SHARPNESS_Y, waterfall);
+         in_glow_h_adapted = mix(in_glow_h_adapted, WTFL_SHARPNESS_Y, waterfall);
       }
    
    // Edge defocus:
       float dist_from_edge = 1.0;
       if (vIn_glow_edge_defocus_strength > 0.0) {
          dist_from_edge = distance_from_edge_linear(vTexCoord, EDGE_DEFOCUS_AREA_INV);
-         IN_GLOW_H_ADAPTED = mix(vIn_glow_edge_sharpness, IN_GLOW_H_ADAPTED,  dist_from_edge );
+         in_glow_h_adapted = mix(vIn_glow_edge_sharpness, in_glow_h_adapted,  dist_from_edge );
          //FragColor = vec4(vec3(dist_from_edge), 0.0); return;
-         
       }
    
    //Make it resolution independent.
-      IN_GLOW_H_ADAPTED = IN_GLOW_H_ADAPTED / NEW_SCALEMOD_Y;
+      in_glow_h_adapted = in_glow_h_adapted / NEW_SCALEMOD_Y;
 
    //Also, a little hacky adaption for when upscale_pass does not scale to 2X
       if (params.OutputSize.xy == params.OriginalSize.xy)
-         IN_GLOW_H_ADAPTED*=1.5;
+         in_glow_h_adapted*=1.5;
       
    //If over the max sharp, then just passthrough, else do the blur.
       if (glow_h_inside_interval == 1.0) {
-         pixel_glowed = blur_select_wrap(Source, vTexCoord, global.upscale_passSize, IN_GLOW_H_ADAPTED, (IN_GLOW_H >= 0.0) );
-         //pixel_glowed = blur9_y(Source, vTexCoord, params.SourceSize.xy, IN_GLOW_H_ADAPTED);
+         pixel_glowed = blur_select_wrap(Source, vTexCoord, global.upscale_passSize, in_glow_h_adapted, (IN_GLOW_H >= 0.0) );
       } else {
          pixel_glowed = texture(Source, vTexCoord).rgb;
       }
