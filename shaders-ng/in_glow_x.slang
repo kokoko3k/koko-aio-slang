@@ -16,7 +16,7 @@ layout(location = 4) out float vDo_wtfl;
 layout(location = 12) out float vWarpedglow_scale_tated;
 layout(location = 13) out vec2 vWarpedglow_offsets;
 layout(location = 14) out float vIn_glow_edge_sharpness;
-layout(location = 15) out float vIn_glow_edge_defocus_normalized;
+layout(location = 15) out float vIn_glow_edge_defocus_strength;
 
 void main() {
    gl_Position = global.MVP * Position;
@@ -61,11 +61,11 @@ void main() {
    vWarpedglow_scale_tated = vWarpedglow_scale_tated * 0.6 / 1400.0 * 3.0;
 
    if (EDGE_DEFOCUS_DO_BLUR*DO_SHIFT_RGB > 0.001) {
-      vIn_glow_edge_defocus_normalized = EDGE_DEFOCUS_DO_BLUR;
+      vIn_glow_edge_defocus_strength = EDGE_DEFOCUS_DO_BLUR;
    } else {
-      vIn_glow_edge_defocus_normalized = 0.0;
+      vIn_glow_edge_defocus_strength = 0.0;
    }
-   vIn_glow_edge_sharpness = mix(abs(in_glow_w), 0.3, vIn_glow_edge_defocus_normalized);
+   vIn_glow_edge_sharpness = mix(abs(in_glow_w), 0.3, vIn_glow_edge_defocus_strength);
    //vIn_glow_edge_sharpness = max(vIn_glow_edge_sharpness, MIN_IN_GLOW_SHARP);
 }
 
@@ -79,7 +79,7 @@ layout(location = 4) in float vDo_wtfl;
 layout(location = 12) in float vWarpedglow_scale_tated;
 layout(location = 13) in vec2 vWarpedglow_offsets;
 layout(location = 14) in float vIn_glow_edge_sharpness;
-layout(location = 15) in float vIn_glow_edge_defocus_normalized;
+layout(location = 15) in float vIn_glow_edge_defocus_strength;
 
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 5) uniform sampler2D colortools_and_ntsc_pass;
@@ -150,7 +150,7 @@ void main() {
       
       // Edge defocus:
          float dist_from_edge = 1.0;
-         if (vIn_glow_edge_defocus_normalized > 0.0) {
+         if (vIn_glow_edge_defocus_strength > 0.0) {
             dist_from_edge = distance_from_edge_linear(vTexCoord, EDGE_DEFOCUS_AREA_INV);
             in_glow_w_adapted = mix(vIn_glow_edge_sharpness, in_glow_w_adapted,  dist_from_edge );
             //FragColor = vec4(vec3(dist_from_edge), 0.0); return;
@@ -166,7 +166,7 @@ void main() {
          
 
          //sharp_sub goes to 1.0 (no unsharp mask) as the picture gets unfocused near edges
-            float sharp_sub = mix(vSharp_sub, 1.0, (1-dist_from_edge)*vIn_glow_edge_defocus_normalized );
+            float sharp_sub = mix(vSharp_sub, 1.0, (1-dist_from_edge)*vIn_glow_edge_defocus_strength );
          FragColor = vec4(blur_select_wrap(shift_and_bleed_pass, vTexCoord, global.upscale_passSize, in_glow_w_adapted, sharp_sub, (IN_GLOW_W >= 0.0)), warpedglow_x);
 
    
