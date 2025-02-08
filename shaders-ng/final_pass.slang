@@ -92,7 +92,7 @@ vec2 get_bg_image_coords(vec2 in_vOutputCoord) {
         
         //180
         if (Rotation == 2) {
-            bg_img_coords.y = 1 - bg_img_coords.y;
+            bg_img_coords = 1 - bg_img_coords;
         } else
         
         //270
