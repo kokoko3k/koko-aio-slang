@@ -92,7 +92,7 @@ shaders = 17
 
 // Hence, we have to set colortools_and_ntsc_pass and next pass (upscale_pass) with the same filter and wrap_mode
 
-// float_framebuffer needed by phosphor persistance
+// high precision needed by phosphor persistance and values > 1.0 needed by color pushes
 float_framebuffer0 = "true"
     filter_linear0 = "true"
         wrap_mode0 = "mirrored_repeat"
@@ -143,7 +143,8 @@ float_framebuffer1 = "true"
 // As per fxaa pass, this has to be float framebuffer too, because colortools may push values over 1.0.
 // simple test is to push brightness and see the difference.
         wrap_mode2 = "mirrored_repeat"
-
+// this has to be true to just to keep the precision needed by linearization
+float_framebuffer2 = true
         
         
 // Blur and/or glows and/or sharpens the image as requested 
@@ -181,8 +182,9 @@ float_framebuffer4 = true
     filter_linear5 = true
             scale5 = 1.0
        scale_type5 = source
-// float_framebuffer here seems not needed.
-float_framebuffer5 = false
+// float_framebuffer here is needed to avoid visible bandings
+// check flycast:D.O.A. intro.
+float_framebuffer5 = true
         // This has to be clamp_to_border in order for the glow pass to return a black frame
         // around it, which is needed so that when using geometry override and zooming out the content,
         // it will have black surrounding.
@@ -194,8 +196,9 @@ float_framebuffer5 = false
     filter_linear6 = true
             scale6 = 1.0
        scale_type6 = source
-// float_framebuffer here seems not needed.
-float_framebuffer6 = false
+// float_framebuffer here is needed to avoid visible bandings
+// check flycast:D.O.A. intro.
+float_framebuffer6 = true
         wrap_mode6 = "clamp_to_border"
 
 
@@ -221,6 +224,7 @@ float_framebuffer6 = false
            scale_type7 = source
                 scale7 = 0.5
             wrap_mode7 = "clamp_to_border"
+// temporal mixing needs high precision.
     float_framebuffer7 = "true"
          
          
@@ -260,7 +264,7 @@ float_framebuffer6 = false
                 scale10 = 1.0
             wrap_mode10 = "mirrored_repeat"
     
-// ASMDEBUG: GLSL54
+// ASMDEBUG: GLSL60
                shader11 = ../shaders-ng/bloom_pass_2.slang
                 alias11 = "bloom_pass_2"
         filter_linear11 = true
@@ -283,8 +287,9 @@ float_framebuffer6 = false
            scale_type13 = source
                 scale13 = 1.0
             wrap_mode13 = "mirrored_repeat"
-// Here float framebuffer seems not needed too.
-    float_framebuffer13 = "false"
+// Here float framebuffer is needed because we need high resolution feedback
+// for time fades
+    float_framebuffer13 = "true"
 
 
 
@@ -299,6 +304,7 @@ float_framebuffer6 = false
            scale_type14 = viewport
                 scale14 = 0.05
             wrap_mode14 = "clamp_to_border"
+// temporal mix needs higher precision:
     float_framebuffer14 = true
     
 // This is a small helper pass i can use to store values and things
@@ -331,5 +337,6 @@ float_framebuffer15 = true
             scale16 = 1.0
         //This needs to be clamp_to_edge or displacing vignette would dark screen borders
         wrap_mode16 = "clamp_to_edge" 
+
         
 
