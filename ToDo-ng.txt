@@ -139,26 +139,23 @@ TODO:
 	[x] Delta render: ditch DELTA_RENDER define and just check for DELTA_RENDER_FORCE_REFRESH
 	    put DELTA_RENDER_FORCE_REFRESH = 1.0 in config-user.txt
 		Nope: it would spare some characters but it would increase usage complexity.
-		
-	[ ] reflection blurriness should not depend on input resolution
-	[ ] dedicated subtractive sharpness in glow section
-	[ ] erode/dilate setting in glow section
-	[ ] why altering glow power alters scanline shape?
-
-	[ ] Can we add a slight random error to slotmask height to mitigate moire?
+	[v] Why bezel does not scale correctly when using integer scale?
+	[v] Better reflections in presets by scaling reflections by 3/4 and raising diffusion to 0.25
+	[v] reflection blurriness should not depend on input resolution
+	[x] erode/dilate setting in glow section
 	
-	[ ] Better reflections in presets by scaling reflections by 3/4 and raising diffusion to 0.25
+	
+	[ ] dedicated subtractive sharpness in glow section
+	[ ] why altering glow power alters scanline shape?
+	[ ] Can we add a slight random error to slotmask height to mitigate moire?
 	[ ] Antimoire to 0.17 works not so good in (eg) super cars 2, can we find a correlation between scanline numbers and the sweet spot?
 	    on super cars 2 it is better set to 0.19.
-	[ ] Why bezel does not scale correctly when using integer scale?
 	[ ] why blink debug option does not trig scene change when going from 0.2 to 1.0?
 	[ ] joind dynamic zoom and override zoom into one zoom?
 	[ ] Unexcited phosphor grid is not dependant on hmask strength.
 	    easy but not mandatory to fix, it would costs performance and need presets update, unsure what to do.
 	[ ] Make bloom power not dependant on input signal gain ? Not sure.
 	[ ] Check for progressive blur correctness in the corners.
-
-		
 	[ ] Check if is possible to turn halo's float framebuffers to 10bit unorm and if it provides a performance boost.
 	    If it's ok, check for other possible passes application.
 	[ ] co_bezel is used to create the ambi mask.
