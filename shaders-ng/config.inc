@@ -694,7 +694,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 // User parameters goes here, they overrides almost everything:
 // Deprecated on Jan, 25, 2025 in favour of config-user-optional.txt
-#pragma include_optional "../config/config-user.txt"
+#pragma include "../config/config-user.txt"
 
 // Retroarch releases past October 2024 (v1.17) support this:
 #pragma include_optional "../config/config-user-optional.txt"
