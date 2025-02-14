@@ -700,9 +700,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 // We still support config-user.txt in old retroarch versions.
 // We test for non include_optional support by querying _HAS_FRAMETIME_UNIFORMS that was merged
 // a month after  include_optional support (Oct 21, 2024 |-> Nov 13, 2024)
-// I'll push a proper define to retroarch asap.
 #ifndef _HAS_FRAMETIME_UNIFORMS
-	#include "../config/config-user.txt"
+#include "../config/config-user.txt" //Don't indent this!
 #endif
 
 // The following translates global.PARAMETER to PARAMETER
