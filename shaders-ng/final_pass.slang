@@ -1231,8 +1231,7 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
     //Exit if the bezel is completely transparent (the tube)
         if (bezel_in.a == 0.0) return vec4(0.0);
 
-    //Colorize the bezel (bezel.r expresses the luminance)
-        vec3 bezel_out = bezel_color(bezel_in.r);
+
 
     float lut_specular = bezel_in.g * BEZEL_SPCL_STRENGTH;
     float reflection_modifier = 0.0;
@@ -1284,7 +1283,10 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
             vec3 ambi_over_bezel = (AMBI_OVER_BEZEL * pixel_ambilight) *
                                    (bezel_in.a * ambi_colorize_shade) *
                                    (1-reflection_modifier) ;
-
+                                   
+    //Colorize the bezel (bezel.r expresses the luminance)
+        vec3 bezel_out = bezel_color(bezel_in.r);
+    //Nightify the bezel
         bezel_out.rgb = fn_pixel_nightify(bezel_out.rgb, nightify_str, ambi_over_bezel )   ;
 
 
