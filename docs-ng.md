@@ -734,6 +734,7 @@ However nice effects may be obtained (eg: with vector games). <br>
         -6 = 0.75 MAME rotated 1.33 games in TATE mode
         -7 = Use Core provided Aspect Ratio auto-off
         -8 = Use Core provided Aspect Ratio always on
+        -9 = Stretch to window
     Aspect Ratio Denominator:
         As long as Aspect Ratio Numerator is positive, this will
         be used as the denominator of the fraction.
