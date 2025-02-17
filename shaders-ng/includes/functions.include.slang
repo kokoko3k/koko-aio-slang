@@ -58,6 +58,11 @@ float max3(vec3 v){
 	return max((v.x,v.y),v.z);
 }
 
+float min3(vec3 v){
+	return max((v.x,v.y),v.z);
+}
+
+
 vec3 mask_enhance(vec3 mask, vec3 ref, float factor) {
  return mix( factor * (mask - 0.5) + 0.5, mask, abs(ref - vec3(0.5)*2) );
 }

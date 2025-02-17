@@ -482,9 +482,10 @@ vec2 get_scaled_coords_for_bezel(vec2 co, float isrotated) {
 }
 
 vec3 fn_pixel_nightify(vec3 color_in, float strength, vec3 ambilight) {
+       
     if (strength == 0.0) return color_in;
 
-    color_in = clamp(color_in, 0.0, 1.0);
+    //color_in = clamp(color_in, 0.0, 1.0); //useless because bezel_color already clamps and fg/bg images are in 0-1 range.
 
     vec3 color_hsv_in = rgb2hsv(color_in);
 
@@ -984,7 +985,7 @@ vec3 bezel_color(float lum)  {
     //Colorize bezel frame
     vec3 col = vec3(BEZEL_R,BEZEL_G,BEZEL_B) + lum;
     float con_max = fma(0.5, BEZEL_CON, 0.5); // <<- same as: float con_max =  0.5 * BEZEL_CON + 0.5;
-    col= scale_to_range_vec3(col, -con_max+1, con_max);  
+    col= scale_to_range_vec3(col, -con_max+1, con_max); 
     return clamp(col,0.0,1.0);
 }
 
