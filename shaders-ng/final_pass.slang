@@ -491,7 +491,9 @@ vec3 fn_pixel_nightify(vec3 color_in, float strength, vec3 ambilight) {
 
     //If there is an ambientlight, then the strangth has to be lowered:
     vec3 strength_vec3 = vec3(strength - ambilight);
-    strength_vec3 = clamp(strength_vec3, 0.0,1.0);
+    strength_vec3 = clamp(strength_vec3, 0.0,1.0); //clamp under 1.0 should be useless, max(x,0.0) should suffice.
+                                                   //but cycles somehow increases, so keep clamp.
+    
     vec3 color_hsv_min = color_hsv_in;
     color_hsv_min.yz = scale_to_range_vec2(color_hsv_min.yz, -0.1, 0.1);
 
