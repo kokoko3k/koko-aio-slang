@@ -395,7 +395,6 @@ float get_waterfall() {
          //xblur = xblur - abs(lc - le2);
          //xblur = xblur - abs(lc - lw2);
          xblur = clamp(xblur, 0.0,1.0);
-         xblur = max(xblur, 0.0);
       }
    }
 
@@ -419,8 +418,7 @@ float get_waterfall() {
          yblur -= abs(ls-ln);
          yblur -= abs(lc-ln2);
          yblur -= abs(lc-ls2);
-         //yblur = clamp(yblur, 0.0,1.0);
-         yblur = max(yblur, 0.0);
+         yblur = clamp(yblur, 0.0,1.0);
       }
    }
    
