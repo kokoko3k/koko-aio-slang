@@ -1347,11 +1347,6 @@ void main() {
     }
 
     
-    // Mirror/reflection coords need to be calculated here, before geom override, but after curvature.
-    // It is still not perfect but a reasonable tradeoff by now.
-    vec2 co_mirror = zoom(co_content, 1/BEZEL_REFL_ZOOMOUT_ROOM);
-        
-    
     // canvas_busy is a mask used to save GPU cycles by skipping already processed areas.
     // It is initialized as inner/outer border mask. 
     float canvas_busy = 0.0;
@@ -1360,7 +1355,10 @@ void main() {
     } else {
         canvas_busy = float(is_first_inside_rect(co_content, RECT01));
     }
-        
+
+    // Mirror/reflection coords need to be calculated here, before geom override, but after curvature.
+    // It is still not perfect but a reasonable tradeoff by now.
+    vec2 co_mirror = zoom(co_content, 1/BEZEL_REFL_ZOOMOUT_ROOM);
 
     // Apply other content coords modifiers
     if (DO_GAME_GEOM_OVERRIDE == 1.0)
