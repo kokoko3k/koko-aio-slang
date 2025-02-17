@@ -699,7 +699,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
 
                 rgb_h = mix(vec3(1.0), rgb_h, DO_PIXELGRID_H);
                 
-                rgb_h = clamp(rgb_h, 0.0,1.0);
+                rgb_h = clamp(rgb_h, 0.0,1.0); //max(x,0.0) should suffice, but somehos produces slower code.
                 
                 #ifdef HQ_DECON
                     // Y Defocusing causes scanlines gaps to blend, so mix the scanlines mask with the original color
@@ -783,7 +783,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
                 // return vec4(mask_shape);
 
             //Get per channel input luminance by clamping pixel_in and applying hmask
-                vec3 lum = clamp(pixel_in.rgb * rgb_w, 0.0, 1.0);
+                vec3 lum = clamp(pixel_in.rgb * rgb_w, 0.0, 1.0); //2 cycles less when using max or min, didn't bother.
             //Adapt the luminance effect via input parameter
                 vec3 lum_adapted = (1-lum*PIXELGRID_Y_MASK_ON_WHITE);
             //Calc final mask visibility as the minimum between tha configured visibility and luminosity effect
@@ -1540,7 +1540,9 @@ void main() {
         //   that have a low alpha channel, that part would be black.
         if (DO_AMBILIGHT + AMBI_BG_IMAGE_BLEND_MODE == 2.0) {
             float ambi_mask = create_ambi_colorize_shade(co_bezel);
-            float alpha_selective = clamp(  pixel_fg_image.a + (1- canvas_busy) , 0.0, 1.0); 
+            float alpha_selective = clamp( pixel_fg_image.a + (1-canvas_busy) , 0.0, 1.0); 
+            //float alpha_selective = min( pixel_fg_image.a + (1-canvas_busy) , 1.0);  //<- this is enough, but cycles won't scale.
+            
             pixel_out = mix(pixel_out, pixel_fg_image.rgb, alpha_selective );
             float fg_image_alpha_adapted = max(pixel_fg_image.a - AMBI_BG_IMAGE_FORCE, 0.0);
             vec3 light = pixel_ambi.rgb * (ambi_mask) * (1- fg_image_alpha_adapted);
