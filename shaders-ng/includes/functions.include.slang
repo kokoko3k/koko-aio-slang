@@ -763,9 +763,11 @@ float get_in_aspect() {
 	//Handle cases when core aspect cannot be retrived and just return 4/3.
 	float OriginalAspectRotated = 1.33333;
 	float StretchedAspect = global.FinalViewportSize.x/global.FinalViewportSize.y;
+	if ( is_rotated() )
+		StretchedAspect = global.FinalViewportSize.y/global.FinalViewportSize.x;
+	
 	#ifdef _HAS_ORIGINALASPECT_UNIFORMS
 		OriginalAspectRotated = global.OriginalAspectRotated;
-		StretchedAspect = global.FinalViewportSize.y/global.FinalViewportSize.x;
 	#endif
 	
 	if (ASPECT_X == -7) {
