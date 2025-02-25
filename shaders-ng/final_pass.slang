@@ -679,8 +679,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
             if (PIXELGRID_H_ANTIMOIRE > 0.0) {
                 //Antimoire experiment:
                 float anti_moire_freq = sin(vPG_freq_base_screen_unfloored.x * vPG_offsets_and_size.a );
-                float anti_moire_amp = PIXELGRID_H_ANTIMOIRE;
-                rgb_h_sin = sin( ( freq_base_core.yyy * interlacing_adapt_period) + ( anti_moire_freq * anti_moire_amp ) + vInterlace_offset);
+                rgb_h_sin = sin( ( freq_base_core.yyy * interlacing_adapt_period) + ( anti_moire_freq * PIXELGRID_H_ANTIMOIRE ) + vInterlace_offset);
             } else {
                    rgb_h_sin = sin( (freq_base_core.y * interlacing_adapt_period) + fakeslot_stagger_offset - decon_stagger + vInterlace_offset );
             }
