@@ -653,7 +653,6 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
     //Scanlines and fake slotmask =========================================================================
         vec3 rgb_h = vec3(1.0);
         vec3 dedot_mix = vec3(0.0);
-
         //Pixelgrid: do horizontal if enabled, but skip it if user doesn't want it on interlaced content.
         //if (DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0)) { //103.1
         if (vDo_pixelgrid_h > 0.5) {
@@ -788,6 +787,19 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
                 vec3 lum_adapted = (1-lum*PIXELGRID_Y_MASK_ON_WHITE);
             //Calc final mask visibility as the minimum between tha configured visibility and luminosity effect
                 vec3 V=min( lum_adapted, vec3(PIXELGRID_Y_MASK) );
+                
+                //SlotMask de-Hive take 1: draws slotmask only on edges on dark parts. 109.45
+                //vec3 V_EVERYWHERE = V;
+                //vec3 V_JUST_EDGES =  V * (1-rgb_h);
+                //V = mix(V_EVERYWHERE, V_JUST_EDGES, pixel_in.rgb*max_inLum);
+
+                //SlotMask de-Hive Take 2: simply modulates slotmask visibility on dark colors. 109.5
+                //V=V* pow(pixel_in.rgb,vec3(SERVICE1));
+
+                //SlotMask de-Hive Take 3, takes care of phosphor height and scanlines visibility. 109.2
+                //vec3 slot_dehived = V*pow(phosphor_height,vec3(SERVICE1));
+                //V = mix(V, slot_dehived, vec3(DO_PIXELGRID_H));
+                
             //apply user visibility modifier to the mask
                 darklines_mask = 1-(mask_shape*V);
             //Try to get a more brillant/sparkling look by highering the darklines
