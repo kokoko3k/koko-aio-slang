@@ -747,7 +747,6 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
     // can be used for slotmask,aperturegrille ... or scanlines, but they would have a boxed shape.
         vec3 darklines_mask=vec3(1.0);
 
-        vec3 pixel_in_unsparkled = pixel_in.rgb;
         if (PIXELGRID_Y_MASK > 0.0) {
             //Compute phosphors height mask with the right reference coords.
             // Faster than if/then (ASM proof and tests):
