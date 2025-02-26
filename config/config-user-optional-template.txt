@@ -256,19 +256,19 @@
 // #define DO_PIXELGRID  1.0           // ★  Low level Phosphor grid enable?
 // #define PIXELGRID_OVERMASK  1.0     //       Overmask (1.0 = neutral)
 
-// #define DO_PIXELGRID_H  1.0             //       ★ Scanlines (0 to disable)
-// #define PIXELGRID_DOUBLESCAN 0.0        //          . Double-scan low input resolutions 
-// #define PIXELGRID_COREY_FAKE_SCAN  0.0  // 
-// #define PIXELGRID_MIN_H  0.3            //          . Fake integer scanlines (-1=auto)
-// #define PIXELGRID_MAX_H  0.7            //          . Phosphors height Max
-// #define PIXELGRID_GAMMA_H  5.2          //          . Phosphors height min->max gamma:
-// #define PIXELGRID_NO_INTERBLEED_H  1.0  //          . Inter line extra steepness (1.0 to disable)
-// #define PIXELGRID_H_ANTIMOIRE  0.0      //          . Anti-moire sweet spot (disables Y deconvergence)
-// #define PIXELGRID_OFFSET_CORE  0.0      //          . Slotmask(fake) offset (not with anti-moire) 
-// #define PIXELGRID_DECON_R_H  0.0        //          . Deconvergence Y: R phosphor
-// #define PIXELGRID_DECON_G_H  0.0        //          . Deconvergence Y: G phosphor
-// #define PIXELGRID_DECON_B_H  0.0        //          . Deconvergence Y: B phosphor
-// #define PIXELGRID_H_DEDOT  0.0          //          . Dedot mask between scanlines (use only if needed!)
+// #define DO_PIXELGRID_H  1.0               //       ★ Scanlines (0 to disable)
+// #define PIXELGRID_DOUBLESCAN 0.0          //          . Double-scan low input resolutions 
+// #define PIXELGRID_COREY_FAKE_SCAN  0.0    //          . Slotmask(fake) offset 
+// #define PIXELGRID_COREY_FAKE_SCAN_W  0.0  //          . Slotmask(fake) width override (0=no override)
+// #define PIXELGRID_MIN_H  0.3              //          . Fake integer scanlines (-1=auto)
+// #define PIXELGRID_MAX_H  0.7              //          . Phosphors height Max
+// #define PIXELGRID_GAMMA_H  5.2            //          . Phosphors height min->max gamma:
+// #define PIXELGRID_NO_INTERBLEED_H  1.0    //          . Inter line extra steepness (1.0 to disable)
+// #define PIXELGRID_OFFSET_CORE  0.0        //          . Slotmask(fake) offset (not with anti-moire) 
+// #define PIXELGRID_DECON_R_H  0.0          //          . Deconvergence Y: R phosphor
+// #define PIXELGRID_DECON_G_H  0.0          //          . Deconvergence Y: G phosphor
+// #define PIXELGRID_DECON_B_H  0.0          //          . Deconvergence Y: B phosphor
+// #define PIXELGRID_H_DEDOT  0.0            //          . Dedot mask between scanlines (use only if needed!)
 
 // #define DO_PIXELGRID_W  1.0         //       ★ Horizontal mask (0 to disable)
 // #define PIXELGRID_SIZE_W  1.0       //            . Resolution: (core or screen)

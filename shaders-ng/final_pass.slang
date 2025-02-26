@@ -251,9 +251,9 @@ void main() {
             vPG_offsets_and_size = PG_get_hmask_preset_unfloored() ;
                 else
             vPG_offsets_and_size = PG_get_hmask_preset_floored() ;
+    
        //scale offsets to be used by sin:
-        #define PG_H_COUNT vPG_offsets_and_size.a
-        vPG_offsets_and_size.rgb *= (pi / PG_H_COUNT);
+        vPG_offsets_and_size.rgb *= (pi / vPG_offsets_and_size.a);
 
     //Pixelgrid: Calc base freqs
         //Tate ?
@@ -272,7 +272,13 @@ void main() {
             vPG_period_multiplier_x = 1/PIXELGRID_MUL_X;
 
         //the following unfloored coords are needed by sin/cos later to understand if we are on an even or odd mask
-            vPG_freq_base_screen_unfloored = pi * vec2(1/PG_H_COUNT, 0.5) * (vPG_OutputCoord_tated * vPG_OutputSize_tated);
+            float rgbw_size;
+            if (PIXELGRID_COREY_FAKE_SCAN_W == 0.0 && PIXELGRID_COREY_FAKE_SCAN > 0.0)
+                rgbw_size = 1/vPG_offsets_and_size.a;
+            else
+                rgbw_size = 1/PIXELGRID_COREY_FAKE_SCAN_W;
+    
+            vPG_freq_base_screen_unfloored = pi * vec2(rgbw_size, 0.5) * (vPG_OutputCoord_tated * vPG_OutputSize_tated);
 
     //pixelgrid: doublescan?
                 if (need_doublescan() )
@@ -621,6 +627,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
             freq_base.x = freq_base_screen.x * vPG_period_multiplier_x;
             freq_base_unfloored.x = vPG_freq_base_screen_unfloored.x * vPG_period_multiplier_x;
         }
+        //freq_base_unfloored.x *= SERVICE1;
     
     // Shadowmask
     // Works by staggering odd rows by 1.5X triad
@@ -674,15 +681,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
                 decon_stagger = vec3(DECON_RY,DECON_GY,DECON_BY)*pi/2.0 * (offset_multiplier * NEW_SCALEMOD_Y) ;
             #endif
           
-            vec3 rgb_h_sin = vec3(1.0);
-            
-            if (PIXELGRID_H_ANTIMOIRE > 0.0) {
-                //Antimoire experiment:
-                float anti_moire_freq = sin(vPG_freq_base_screen_unfloored.x * vPG_offsets_and_size.a );
-                rgb_h_sin = sin( ( freq_base_core.yyy * interlacing_adapt_period) + ( anti_moire_freq * PIXELGRID_H_ANTIMOIRE ) + vInterlace_offset);
-            } else {
-                   rgb_h_sin = sin( (freq_base_core.y * interlacing_adapt_period) + fakeslot_stagger_offset - decon_stagger + vInterlace_offset );
-            }
+            vec3 rgb_h_sin = sin( (freq_base_core.y * interlacing_adapt_period) + fakeslot_stagger_offset - decon_stagger + vInterlace_offset );
 
             //make it positve with doubled frequency:
                 rgb_h_sin = (rgb_h_sin * rgb_h_sin);

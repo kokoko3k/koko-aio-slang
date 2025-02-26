@@ -292,7 +292,7 @@ However nice effects may be obtained (eg: with vector games). <br>
     
     Overmask (1.0 = neutral):
         Values > 1.0 give a gritty/gariny look to the whole mask.
-          It may cause moiree if combined with curvature, dedot, or sparkling look punch.
+          It may cause moire if combined with curvature, dedot, or sparkling look punch.
         Values < 1.0 tend to nullify the whole mask effect.
         
         
@@ -329,20 +329,22 @@ However nice effects may be obtained (eg: with vector games). <br>
             I observed that a value of 0.17 does a good job for low-res games rendered at 1080p height.
             Any value > 0.0 disables the, following functions: Slotmask(fake) and Deconvergence Y
         Slotmask(fake) offset(*):
-            This will cause every cell to be vertically shifted by the configured amount to
-            emulate a slotmask phosphors layout.
+            This will cause every triad to be vertically shifted by the configured amount to
+            fake a slotmask phosphors layout.
             It is true that for accurate reproduction of them, slotmasks are commonly emulated
-            at screen size, but this causes, on low resolution displays, weird artifacts,
-            primarily when using curvature and when you try to draw scanlines -and- slotmasks.
+            at screen size, but on low resolution displays this may cause weird artifacts.
             Here there is an added value given by the fact that the shift itself
-            can be relative to not only to the screen pixel height, but to game pixel height. (**)
+            can be made relative to game pixel height. (**)
             By selecting Y resolution=0 (so core coordinates**) and enabling this slotmask offset,
             you will have a staggered scanline.
             This allows you to not drawing a scanline -and- a slotmask, but to draw a "slotmasked"
             scanline.
-            While this does not exist at all in crt technology, it greatly mitigates the artifacts
-            just explained while producing a fairly convincing effect, very similar to a screen
-            with visible scanlines and visible slotmask.
+            While this does not exist at all in crt technology, it greatly mitigates the afromentioned
+            artifacts, and produces a fairly convincing scanlined+slotmasked effect.
+        Slotmask(fake) width override (0=no override)
+            The previous effect staggers scanlines at "triad width interval", but here you can alter
+            that interval.
+            Setting an interval of 1.0 can be used to hide moire patterns.
         Deconvergence Y: R,G,B phosphor" 
             This emulates Y deconvergence on phosphor level rather than on image level as seen in
             the previous deconvergence section.
