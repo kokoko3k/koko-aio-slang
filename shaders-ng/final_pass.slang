@@ -273,10 +273,10 @@ void main() {
 
         //the following unfloored coords are needed by sin/cos later to understand if we are on an even or odd mask
             float rgbw_size;
-            if (PIXELGRID_COREY_FAKE_SCAN_W == 0.0 && PIXELGRID_COREY_FAKE_SCAN > 0.0)
-                rgbw_size = 1/vPG_offsets_and_size.a;
+            if (PIXELGRID_OFFSET_CORE * PIXELGRID_OFFSET_CORE_W > 0.0)
+                rgbw_size = 1/PIXELGRID_OFFSET_CORE_W;
             else
-                rgbw_size = 1/PIXELGRID_COREY_FAKE_SCAN_W;
+                rgbw_size = 1/vPG_offsets_and_size.a;
     
             vPG_freq_base_screen_unfloored = pi * vec2(rgbw_size, 0.5) * (vPG_OutputCoord_tated * vPG_OutputSize_tated);
 

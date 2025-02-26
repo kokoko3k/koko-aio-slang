@@ -258,13 +258,13 @@
 
 // #define DO_PIXELGRID_H  1.0               //       ★ Scanlines (0 to disable)
 // #define PIXELGRID_DOUBLESCAN 0.0          //          . Double-scan low input resolutions 
-// #define PIXELGRID_COREY_FAKE_SCAN  0.0    //          . Slotmask(fake) offset 
-// #define PIXELGRID_COREY_FAKE_SCAN_W  0.0  //          . Slotmask(fake) width override (0=no override)
-// #define PIXELGRID_MIN_H  0.3              //          . Fake integer scanlines (-1=auto)
+// #define PIXELGRID_COREY_FAKE_SCAN  0.0    //          . Fake integer scanlines (-1=auto)
+// #define PIXELGRID_MIN_H  0.3              //          . Phosphors height min 
 // #define PIXELGRID_MAX_H  0.7              //          . Phosphors height Max
 // #define PIXELGRID_GAMMA_H  5.2            //          . Phosphors height min->max gamma:
 // #define PIXELGRID_NO_INTERBLEED_H  1.0    //          . Inter line extra steepness (1.0 to disable)
-// #define PIXELGRID_OFFSET_CORE  0.0        //          . Slotmask(fake) offset (not with anti-moire) 
+// #define PIXELGRID_OFFSET_CORE   0.0       //          . Slotmask(fake) offset
+// #define PIXELGRID_OFFSET_CORE_W 0.0       //            . Slotmask(fake) width override (0=no override)
 // #define PIXELGRID_DECON_R_H  0.0          //          . Deconvergence Y: R phosphor
 // #define PIXELGRID_DECON_G_H  0.0          //          . Deconvergence Y: G phosphor
 // #define PIXELGRID_DECON_B_H  0.0          //          . Deconvergence Y: B phosphor

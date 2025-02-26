@@ -209,7 +209,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float PIXELGRID_OVERMASK;
 	float DO_PIXELGRID_W;
 	float DO_PIXELGRID_H;
-	float PIXELGRID_COREY_FAKE_SCAN_W;
 	float PIXELGRID_COREY_FAKE_SCAN;
 	float PIXELGRID_DOUBLESCAN;
 	float PIXELGRID_MIN_H;
@@ -224,6 +223,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float PIXELGRID_MUL_X;
 													
 	float PIXELGRID_OFFSET_CORE;
+	float PIXELGRID_OFFSET_CORE_W;
 	float PIXELGRID_NO_INTERBLEED_W;
 	float PIXELGRID_NO_INTERBLEED_H;
 	float PIXELGRID_H_DEDOT;
@@ -465,7 +465,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter PIXELGRID_GAMMA_H         "         . Phosphors height min->max gamma:"	4.2 1.0 8.00 0.1
 #pragma parameter PIXELGRID_NO_INTERBLEED_H	  "         . Inter line extra steepness (1.0 to disable)"	1.0 1.0 11.0 0.1
 #pragma parameter PIXELGRID_OFFSET_CORE       "         . Slotmask(fake) offset" 0.0 0.0 1.0 0.01
-#pragma parameter PIXELGRID_COREY_FAKE_SCAN_W "           . Slotmask(fake) width override (0=no override)"  0.0 0.0 4.0 1.0
+#pragma parameter PIXELGRID_OFFSET_CORE_W     "           . Slotmask(fake) width override (0=no override)"  0.0 0.0 4.0 1.0
 #pragma parameter PIXELGRID_DECON_R_H         "         . Deconvergence Y: R phosphor" 0.0 -1.6 1.6 0.1
 #pragma parameter PIXELGRID_DECON_G_H         "         . Deconvergence Y: G phosphor" 0.0 -1.6 1.6 0.1
 #pragma parameter PIXELGRID_DECON_B_H       "         . Deconvergence Y: B phosphor" 0.0   -1.6 1.6 0.1
