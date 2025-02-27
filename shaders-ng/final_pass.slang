@@ -33,12 +33,11 @@ layout(location = 6) out float vIn_aspect;
 layout(location = 8) out float vDo_Tate;
 layout(location = 9) out vec3 vDotMat_Grid_Color;
 layout(location = 10) out vec4 vPG_offsets_and_size;
-
+layout(location = 11) out float vInteger_fragment_x;
 layout(location = 12) out vec2 vPG_freq_base_screen_unfloored;
 layout(location = 13) out float vPG_period_multiplier_x;
 layout(location = 14) out vec2 vPG_OriginalSize_tated_mul_pi;
-layout(location = 15) out vec2 vPG_OutputSize_tated;
-layout(location = 16) out vec2 vPG_OutputCoord_tated;
+
 layout(location = 17) out float vDotMat_Grid_Sharpness;
 layout(location = 18) out float vPG_mask_height;
 layout(location = 19) out float vDeltaRenderOk;
@@ -256,17 +255,20 @@ void main() {
         vPG_offsets_and_size.rgb *= (pi / vPG_offsets_and_size.a);
 
     //Pixelgrid: Calc base freqs
+            vec2 PG_OutputCoord_tated;
+            vec2 PG_OutputSize_tated;
         //Tate ?
             if (vDo_Tate == 0.0) { 
-                vPG_OutputSize_tated   = params.OutputSize.xy;
-                vPG_OutputCoord_tated  = vOutputCoord.xy + vec2(0.00001);
+                PG_OutputSize_tated   = params.OutputSize.xy;
+                PG_OutputCoord_tated  = vOutputCoord.xy + vec2(0.00001);
                 vPG_OriginalSize_tated_mul_pi = params.OriginalSize.xy * pi;
             } else {
-                vPG_OutputSize_tated   = params.OutputSize.yx;
-                vPG_OutputCoord_tated  = vOutputCoord.yx;
+                PG_OutputSize_tated   = params.OutputSize.yx;
+                PG_OutputCoord_tated  = vOutputCoord.yx;
                 vPG_OriginalSize_tated_mul_pi = params.OriginalSize.yx * pi;
             }
 
+        vInteger_fragment_x = PG_OutputCoord_tated.x * PG_OutputSize_tated.x; //will be floored in fragment shader.
 
         // screen coords needs flooring, but unfortunately floor() does not work well in vertex shader, so calc as much as possible without floor()
             vPG_period_multiplier_x = 1/PIXELGRID_MUL_X;
@@ -278,7 +280,7 @@ void main() {
             else
                 rgbw_size = 1/vPG_offsets_and_size.a;
     
-            vPG_freq_base_screen_unfloored = pi * vec2(rgbw_size, 0.5) * (vPG_OutputCoord_tated * vPG_OutputSize_tated);
+            vPG_freq_base_screen_unfloored = pi * vec2(rgbw_size, 0.5) * (PG_OutputCoord_tated * PG_OutputSize_tated);
 
     //pixelgrid: doublescan?
                 if (need_doublescan() )
@@ -422,12 +424,11 @@ layout(location = 6) in float vIn_aspect;
 layout(location = 8) in float vDo_Tate;
 layout(location = 9) in vec3 vDotMat_Grid_Color;
 layout(location = 10) in vec4 vPG_offsets_and_size;
-
+layout(location = 11) in float vInteger_fragment_x;
 layout(location = 12) in vec2 vPG_freq_base_screen_unfloored;
 layout(location = 13) in float vPG_period_multiplier_x;
 layout(location = 14) in vec2 vPG_OriginalSize_tated_mul_pi;
-layout(location = 15) in vec2 vPG_OutputSize_tated;
-layout(location = 16) in vec2 vPG_OutputCoord_tated;
+
 layout(location = 17) in float vDotMat_Grid_Sharpness;
 layout(location = 18) in float vPG_mask_height;
 layout(location = 19) in float vDeltaRenderOk;
@@ -611,7 +612,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
         vec2 freq_base_screen;
         #define PG_freq_base_screen_x (pi/vPG_offsets_and_size.a)
         if (PIXELGRID_MUL_X == 1.0) {
-            freq_base_screen = vec2( (PG_freq_base_screen_x) * floor(vPG_OutputCoord_tated.x * vPG_OutputSize_tated.x ), vPG_freq_base_screen_unfloored.y);
+            freq_base_screen = vec2( (PG_freq_base_screen_x) * floor(vInteger_fragment_x), vPG_freq_base_screen_unfloored.y);
         } else {
             freq_base_screen = vPG_freq_base_screen_unfloored;
         }
