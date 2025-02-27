@@ -29,21 +29,19 @@ layout(location = 3) out float vIsRotated;
 layout(location = 4) out float vScanlinePeriod;
 layout(location = 5) out float vInterlace_offset;
 layout(location = 6) out float vIn_aspect;
-                                                    //NOTE location 7 is free to use (freed, was a float)
-layout(location = 8) out float vDo_Tate;
-layout(location = 9) out vec3 vDotMat_Grid_Color;
-layout(location = 10) out vec4 vPG_offsets_and_size;
-layout(location = 11) out float vInteger_fragment_x;
-layout(location = 12) out vec2 vPG_freq_base_screen_unfloored;
-layout(location = 13) out float vPG_period_multiplier_x;
-layout(location = 14) out vec2 vPG_OriginalSize_tated_mul_pi;
-
-layout(location = 17) out float vDotMat_Grid_Sharpness;
-layout(location = 18) out float vPG_mask_height;
-layout(location = 19) out float vDeltaRenderOk;
-layout(location = 20) out float vDo_pixelgrid_h;
-layout(location = 21) out float vFake_scanline_period;
-layout(location = 22) out float vPG_y_shift;
+layout(location = 7) out float vDo_Tate;
+layout(location = 8) out vec3 vDotMat_Grid_Color;
+layout(location = 9) out vec4 vPG_offsets_and_size;
+layout(location = 10) out float vInteger_fragment_x;
+layout(location = 11) out vec2 vPG_freq_base_screen_unfloored;
+layout(location = 12) out float vPG_period_multiplier_x;
+layout(location = 13) out vec2 vPG_OriginalSize_tated_mul_pi;
+layout(location = 14) out float vDotMat_Grid_Sharpness;
+layout(location = 15) out float vPG_mask_height;
+layout(location = 16) out float vDeltaRenderOk;
+layout(location = 17) out float vDo_pixelgrid_h;
+layout(location = 18) out float vFake_scanline_period;
+layout(location = 19) out float vPG_y_shift;
 
 #ifdef DEBUG_PRINT_VALUE
     layout(location = 31) out float vfprintvalue; 
@@ -419,22 +417,20 @@ layout(location = 2) in vec2 vBg_img_coords;
 layout(location = 3) in float vIsRotated;
 layout(location = 4) in float vScanlinePeriod;
 layout(location = 5) in float vInterlace_offset;
-layout(location = 6) in float vIn_aspect;
-                                                    //NOTE location 7 is free to use (freed, was a float)
-layout(location = 8) in float vDo_Tate;
-layout(location = 9) in vec3 vDotMat_Grid_Color;
-layout(location = 10) in vec4 vPG_offsets_and_size;
-layout(location = 11) in float vInteger_fragment_x;
-layout(location = 12) in vec2 vPG_freq_base_screen_unfloored;
-layout(location = 13) in float vPG_period_multiplier_x;
-layout(location = 14) in vec2 vPG_OriginalSize_tated_mul_pi;
-
-layout(location = 17) in float vDotMat_Grid_Sharpness;
-layout(location = 18) in float vPG_mask_height;
-layout(location = 19) in float vDeltaRenderOk;
-layout(location = 20) in float vDo_pixelgrid_h;
-layout(location = 21) in float vFake_scanline_period;
-layout(location = 22) in float vPG_y_shift;
+layout(location = 6) in float vIn_aspect;                              
+layout(location = 7) in float vDo_Tate;
+layout(location = 8) in vec3 vDotMat_Grid_Color;
+layout(location = 9) in vec4 vPG_offsets_and_size;
+layout(location = 10) in float vInteger_fragment_x;
+layout(location = 11) in vec2 vPG_freq_base_screen_unfloored;
+layout(location = 12) in float vPG_period_multiplier_x;
+layout(location = 13) in vec2 vPG_OriginalSize_tated_mul_pi;
+layout(location = 14) in float vDotMat_Grid_Sharpness;
+layout(location = 15) in float vPG_mask_height;
+layout(location = 16) in float vDeltaRenderOk;
+layout(location = 17) in float vDo_pixelgrid_h;
+layout(location = 18) in float vFake_scanline_period;
+layout(location = 19) in float vPG_y_shift;
 
 #ifdef DEBUG_PRINT_VALUE
     layout(location = 31) in float vfprintvalue;
