@@ -619,7 +619,6 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
             freq_base.x = freq_base_screen.x * vPG_period_multiplier_x;
             freq_base_unfloored.x = vPG_freq_base_screen_unfloored.x * vPG_period_multiplier_x;
         }
-        //freq_base_unfloored.x *= SERVICE1;
     
     // Shadowmask
     // Works by staggering odd rows by 1.5X triad
@@ -640,14 +639,10 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
         //decon_stagger.r,g,b to stagger single phosphors.
         //And that way, i could blend staggered triads together
         //without "cuts" between them.
-        //FIXME FIXME: Unsurer if the previous statement is still valid.
+        //FIXME FIXME: Unsure if the previous statement is still valid.
 
-    //Moving it up there provides a small speed up due to
-    //increased parallalism, I guess.
-    
         float sin_check_offset = sin(freq_base_unfloored.x);
         float is_even = step(sin_check_offset, 0.0);
-
 
     //Scanlines and fake slotmask =========================================================================
         vec3 rgb_h = vec3(1.0);
@@ -657,7 +652,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
         //if (DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0)) { //103.1
         if (vDo_pixelgrid_h > 0.5) {
             //Scanlines: compute each phosphor height according to input luminance
-                vec3 phosphor_height = map_range(pixel_in.rgb, min_inLum, max_inLum, PIXELGRID_MIN_H, clamp(PIXELGRID_MAX_H, PIXELGRID_MIN_H, 1.0));
+                vec3 phosphor_height = map_range(pixel_in.rgb, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
                 
             //Since we emulate scanlines, take into account current scanline phase:
                 float interlacing_adapt_period = vScanlinePeriod;
