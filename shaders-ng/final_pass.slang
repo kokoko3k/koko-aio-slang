@@ -597,7 +597,6 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
 
     //Tate ? (other outputsize,originalsize and outputcoords "tated" in vertex shader.)
         in_coords.xy = mix_step(in_coords.xy, in_coords.yx, vDo_Tate);
-        
     //in_coords = in_coords - global.flick_and_noise_passSize.zw*0.5; //<-- needed if for whatever reason you want to draw scanlines and vgaps in first_pass
 
     //Get preset masks on ".rgb" and mask size on ".a" , mask and period for every phosphor done in vertex shader.
@@ -606,9 +605,8 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
         vec2 freq_base_core = in_coords * vPG_OriginalSize_tated_mul_pi ;
 
         //Use fake scanlines?
-        //if (vFake_scanline_period > 0.0)
-        //    freq_base_core.y = vFake_scanline_period;
-        freq_base_core.y = mix(freq_base_core.y, vFake_scanline_period, ceil(vFake_scanline_period));
+        if (vFake_scanline_period > 0.0)
+            freq_base_core.y = vFake_scanline_period;
 
     //Screen coords:
     //Floor x screen coords when using non 1.0x sizes.
