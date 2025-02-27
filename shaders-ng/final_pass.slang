@@ -251,7 +251,7 @@ void main() {
     
        //scale offsets to be used by sin:
         vPG_offsets_and_size.rgb *= (pi / vPG_offsets_and_size.a);
-
+        
     //Pixelgrid: Calc base freqs
             vec2 PG_OutputCoord_tated;
             vec2 PG_OutputSize_tated;
@@ -405,7 +405,8 @@ void main() {
             vInterlace_offset+=1.0;
     }
     
-    
+    //Fragment shader will use that just one time, that way, precalc.
+    vPG_offsets_and_size.a = pi/vPG_offsets_and_size.a;
 }
 
 
@@ -606,7 +607,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
     //Floor x screen coords when using non 1.0x sizes.
     //y screen coords appear to work just fine even if we don't floor them,
         vec2 freq_base_screen;
-        #define PG_freq_base_screen_x (pi/vPG_offsets_and_size.a)
+        #define PG_freq_base_screen_x vPG_offsets_and_size.a
         if (PIXELGRID_MUL_X == 1.0) {
             freq_base_screen = vec2( (PG_freq_base_screen_x) * floor(vInteger_fragment_x), vPG_freq_base_screen_unfloored.y);
         } else {
