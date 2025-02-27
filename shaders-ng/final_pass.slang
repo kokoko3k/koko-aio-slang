@@ -597,10 +597,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
 
     //Tate ? (other outputsize,originalsize and outputcoords "tated" in vertex shader.)
         in_coords.xy = mix_step(in_coords.xy, in_coords.yx, vDo_Tate);
-    //in_coords = in_coords - global.flick_and_noise_passSize.zw*0.5; //<-- needed if for whatever reason you want to draw scanlines and vgaps in first_pass
-
-    //Get preset masks on ".rgb" and mask size on ".a" , mask and period for every phosphor done in vertex shader.
-        vec3 PG_offsets = vPG_offsets_and_size.rgb;
+       //in_coords = in_coords - global.flick_and_noise_passSize.zw*0.5; //<-- needed if for whatever reason you want to draw scanlines and vgaps in first_pass
 
         vec2 freq_base_core = in_coords * vPG_OriginalSize_tated_mul_pi ;
 
@@ -631,7 +628,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
     // Shadowmask
     // Works by staggering odd rows by 1.5X triad
     // Pay attention to phosphor width; if too low may, vanify shadowmask.
-    PG_offsets = vPG_offsets_and_size.rgb + //base offsets staggered (+)
+    vec3 PG_offsets = vPG_offsets_and_size.rgb + //base offsets staggered (+)
                 float( PIXELGRID_DO_SHADOWMASK *                                      // user wants shadowmask
                        sin(freq_base_screen.y * 2.0 / PIXELGRID_SHADOWMASK_H ) > 0.0  // sin > 0.0 means the row is even
                       ) * PIXELGRID_SHADOWMASK_SHIFT ;                                // stagger by 1.5
