@@ -268,9 +268,6 @@ void main() {
 
         vInteger_fragment_x = PG_OutputCoord_tated.x * PG_OutputSize_tated.x; //will be floored in fragment shader.
 
-        // screen coords needs flooring, but unfortunately floor() does not work well in vertex shader, so calc as much as possible without floor()
-            vPG_period_multiplier_x = 1/PIXELGRID_MUL_X;
-
         //the following unfloored coords are needed by sin/cos later to understand if we are on an even or odd mask
             float rgbw_size;
             if (PIXELGRID_OFFSET_CORE * PIXELGRID_OFFSET_CORE_W > 0.0)
@@ -285,6 +282,7 @@ void main() {
                     vPG_OriginalSize_tated_mul_pi *= 2.0;
 
     //Pixelgrid: adapt period multiplier
+        vPG_period_multiplier_x = 1/PIXELGRID_MUL_X;
         if (vPG_period_multiplier_x < 0.0) vPG_period_multiplier_x = 1/-vPG_period_multiplier_x;
 
 
@@ -405,7 +403,7 @@ void main() {
             vInterlace_offset+=1.0;
     }
     
-    //Fragment shader will use that just one time, that way, precalc.
+    //Fragment shader will use that just one time that way. => precalc.
     vPG_offsets_and_size.a = pi/vPG_offsets_and_size.a;
 }
 
