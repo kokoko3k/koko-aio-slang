@@ -647,9 +647,8 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
     //Scanlines and fake slotmask =========================================================================
         vec3 rgb_h = vec3(1.0);
         vec3 dedot_mix = vec3(0.0);
+        
         //vec3 phosphor_height = vec3(1.0);
-        //Pixelgrid: do horizontal if enabled, but skip it if user doesn't want it on interlaced content.
-        //if (DO_PIXELGRID_H > 0.0 && !(PIXELGRID_INTR_DISABLE_Y==1.0 && vIsInterlaced==1.0)) { //103.1
         if (vDo_pixelgrid_h > 0.5) {
             //Scanlines: compute each phosphor height according to input luminance
                 vec3 phosphor_height = map_range(pixel_in.rgb, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
