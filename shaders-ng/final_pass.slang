@@ -1159,27 +1159,8 @@ vec3 fn_pixel_content(vec2 coords) {
 
     //Halo
         if (DO_HALO == 1.0 ) {
-            //vec2 cq = coords_QULEZ(coords, global.in_glow_passSize);
-            //vec2 ch = mix(coords, cq, SERVICE1);
-            //pixel_haloed = texture(halo_pass,ch).rgb;
-
-            vec2 halo_coords = coords;
-
-
-            vec3 pixel_haloed = texture(halo_pass, halo_coords).rgb;                
-            //Halo only on scanlines:
-            //pixel_out += pixel_haloed * dot_mat_or_pixelgrid ;
-            //Halo over scanlines gap too:
-            //pixel_out += (pixel_haloed * HALO_VS_SCAN) * (1 - dot_mat_or_pixelgrid) ;
-            
-            //ASM proof faster: less operations/cycles:
-            //p=p+h⋅(m+b⋅(1−m))
-            //pixel_out = pixel_out + pixel_haloed * (dot_mat_or_pixelgrid + HALO_VS_SCAN * (1-dot_mat_or_pixelgrid));
-            //same, clearer.
-            pixel_out = pixel_out + pixel_haloed * mix( dot_mat_or_pixelgrid  , 1.0,  HALO_VS_SCAN);
-
-            //pixel_out = pixel_haloed;
-            
+            vec3 pixel_haloed = texture(halo_pass, coords).rgb;                
+            pixel_out = pixel_out + pixel_haloed * mix( dot_mat_or_pixelgrid, 1.0, HALO_VS_SCAN);            
         }
 
     // Apply gamma out:
