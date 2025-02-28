@@ -1098,16 +1098,8 @@ float gaussian_coefficient(float x, float sigma) {
 
 
 
-vec3 fn_pixel_content(vec2 coords) {
-
-    vec3 pixel_out;
-    vec4 pixel_glowed;
-    float dot_mat_or_pixelgrid = 1.0; //init dot grid or scanline mask to 1.0
-
-    //#define USE_QUILEZ
-    
+vec3 fn_pixel_content(vec2 coords) { 
     vec2 warpedglow = vec2(0.0);
-    
     
     #ifndef SKIP_WARPEDGLOW_Y
         warpedglow.y = texture(in_glow_pass, coords + delta_render_enabled() * eps).a;
@@ -1119,61 +1111,57 @@ vec3 fn_pixel_content(vec2 coords) {
     #endif
     coords += warpedglow.xy;
 
-
-    
+    //#define USE_QUILEZ   
     #ifdef USE_QUILEZ
-        pixel_glowed = texture(in_glow_pass, coords_QULEZ(coords, global.upscale_passSize));
-        pixel_out = pixel_glowed.rgb;
+        vec4 pixel_out = texture(in_glow_pass, coords_QULEZ(coords, global.upscale_passSize));
     #else
-        pixel_glowed = texture(in_glow_pass, coords);
-        pixel_out = pixel_glowed.rgb;
-    #endif        
+        vec4 pixel_out = texture(in_glow_pass, coords);
+    #endif
+        
+    float dot_mat_or_pixelgrid = 1.0; //init dot grid or scanline mask to 1.0
+    
     //Pixel grid
         if (DO_PIXELGRID == 1.0) {
             //1264,20488,22262, 108.5
             float vMax_inLum = mix( 1.0, 
                                     apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS) * max(IN_GLOW_POWER, 1.0), 
-                                    DO_CCORRECTION );
-            //1266,20491,22282 108.4
-            //float vMax_inLum = max( 1.0, DO_CCORRECTION * apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS)) *
-            //                   max( 1.0, mix(1.0, IN_GLOW_POWER, DO_CCORRECTION));
-            
+                                    DO_CCORRECTION );           
             //1268,20501,22268 108.3
             /*float vMax_inLum = 1.0;
             if (DO_CCORRECTION == 1.0)
                  vMax_inLum = apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS) * max(IN_GLOW_POWER, 1.0);
             */
-            vec4 pixel_grid = fn_pixel_grid(coords, pixel_glowed, 0.0, vMax_inLum);
+            vec4 pixel_grid = fn_pixel_grid(coords, pixel_out, 0.0, vMax_inLum);
             //grid mask only is needed by halo to selectively light the grid.
                 dot_mat_or_pixelgrid = pixel_grid.a;
-                pixel_out = pixel_grid.rgb;
+                pixel_out.rgb = pixel_grid.rgb;
         }
     //Dot mask
         if (DO_DOT_MATRIX == 1.0) {
-            vec4 pixel_dotmat = fn_pixel_dotmat(coords, pixel_out);
+            vec4 pixel_dotmat = fn_pixel_dotmat(coords, pixel_out.rgb);
             //grid mask only is needed by halo to selectively light the grid.
                 dot_mat_or_pixelgrid = pixel_dotmat.a;
             //rgb channel goes to pixel_out
-            pixel_out = pixel_dotmat.rgb;
+            pixel_out.rgb = pixel_dotmat.rgb;
         }
 
     //Halo
         if (DO_HALO == 1.0 ) {
             vec3 pixel_haloed = texture(halo_pass, coords).rgb;                
-            pixel_out = pixel_out + pixel_haloed * mix( dot_mat_or_pixelgrid, 1.0, HALO_VS_SCAN);            
+            pixel_out.rgb = pixel_out.rgb + pixel_haloed * mix( dot_mat_or_pixelgrid, 1.0, HALO_VS_SCAN);            
         }
 
     // Apply gamma out:
-        pixel_out = pow(max(pixel_out, vec3(0.0)),vec3(GAMMA_OUT));
+        pixel_out.rgb = pow(max(pixel_out.rgb, vec3(0.0)),vec3(GAMMA_OUT));
 
     //Bloom
         if (DO_BLOOM == 1.0 ) {
             vec3 bloomed=texture(bloom_pass_final, coords).rgb ;
-            pixel_out = float(BLOOM_BYPASS < 0.5) * pixel_out + bloomed;
+            pixel_out.rgb = float(BLOOM_BYPASS < 0.5) * pixel_out.rgb + bloomed;
         }
 
 
-    return pixel_out;
+    return pixel_out.rgb;
 }
 
 bool is_bezel_paint_area(vec2 lcoords_for_bezel) {
