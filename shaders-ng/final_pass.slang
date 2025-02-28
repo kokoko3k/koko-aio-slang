@@ -781,12 +781,13 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
                 //V=V* pow(pixel_in.rgb,vec3(SERVICE1));
 
                 //SlotMask de-Hive Take 3, takes care of phosphor height and scanlines visibility. 109.2
-                //vec3 keep_slot = smoothstep_fast( vec3(PIXELGRID_Y_MASK_OFFSET_DEHIVE-1), vec3(0.8),   phosphor_height);
-                //keep_slot = mix( vec3(1-PIXELGRID_Y_MASK_OFFSET_DEHIVE), vec3(1.0), phosphor_height);
-                //keep_slot = clamp(keep_slot, vec3(0.0), vec3(1.0));
-                //vec3 slot_dehived = V*keep_slot;
-                vec3 V_dehived = V*pow(phosphor_height,vec3(PIXELGRID_Y_MASK_OFFSET_DEHIVE));
-                
+                //vec3 V_dehived = V*pow(phosphor_height,vec3(PIXELGRID_Y_MASK_OFFSET_DEHIVE));
+                //V = mix(V, V_dehived, vec3(DO_PIXELGRID_H));
+
+                //SlotMask de-Hive Take 4, takes care of phosphor height,scanlines visibility and keep edge slotmask.
+                //the slower, but way better, keep this.
+                vec3 V_JUST_EDGES =  V * (1-rgb_h);
+                vec3 V_dehived = mix(V_JUST_EDGES, V, pow(phosphor_height,vec3(PIXELGRID_Y_MASK_OFFSET_DEHIVE)));
                 V = mix(V, V_dehived, vec3(DO_PIXELGRID_H));
                 
             //apply user visibility modifier to the mask
