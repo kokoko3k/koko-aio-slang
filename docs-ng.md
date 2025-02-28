@@ -425,6 +425,9 @@ However nice effects may be obtained (eg: with vector games). <br>
             You can draw slotmasks at screen coordinates to emulate real crts or choose to paint
             them at core coordinates to have a more defined slotmask
             ...if you like slotmasks so much :-)
+        Clears "hives" patterns (slotmask)
+            When using steep/high visible slotmasks alongside visible scanlines, there could be
+            weird hive-like patterns on screen. Use this function to hide them.
         Vertical shift (neg = auto):
             This parameter allows you to move the whole vertical mask along the Y axis.
             * When used with core resolution(*1) and integer divider/multiplier(*2), it is useful to mitigate

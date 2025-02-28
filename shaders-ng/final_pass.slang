@@ -650,10 +650,10 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
         vec3 rgb_h = vec3(1.0);
         vec3 dedot_mix = vec3(0.0);
         
-        //vec3 phosphor_height = vec3(1.0);
+        vec3 phosphor_height = vec3(1.0);
         if (vDo_pixelgrid_h > 0.5) {
             //Scanlines: compute each phosphor height according to input luminance
-                vec3 phosphor_height = map_range(pixel_in.rgb, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
+                phosphor_height = map_range(pixel_in.rgb, min_inLum, max_inLum, PIXELGRID_MIN_H, PIXELGRID_MAX_H);
                 
             //We can offset trias to emulate fake core level slotmask by applying the optional offset to emulate the slotmask on even cells
                 float fakeslot_stagger_offset =  is_even * PIXELGRID_OFFSET_CORE * pi;
@@ -781,8 +781,13 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
                 //V=V* pow(pixel_in.rgb,vec3(SERVICE1));
 
                 //SlotMask de-Hive Take 3, takes care of phosphor height and scanlines visibility. 109.2
-                //vec3 slot_dehived = V*pow(phosphor_height,vec3(SERVICE1));
-                //V = mix(V, slot_dehived, vec3(DO_PIXELGRID_H));
+                //vec3 keep_slot = smoothstep_fast( vec3(PIXELGRID_Y_MASK_OFFSET_DEHIVE-1), vec3(0.8),   phosphor_height);
+                //keep_slot = mix( vec3(1-PIXELGRID_Y_MASK_OFFSET_DEHIVE), vec3(1.0), phosphor_height);
+                //keep_slot = clamp(keep_slot, vec3(0.0), vec3(1.0));
+                //vec3 slot_dehived = V*keep_slot;
+                vec3 V_dehived = V*pow(phosphor_height,vec3(PIXELGRID_Y_MASK_OFFSET_DEHIVE));
+                
+                V = mix(V, V_dehived, vec3(DO_PIXELGRID_H));
                 
             //apply user visibility modifier to the mask
                 darklines_mask = 1-(mask_shape*V);

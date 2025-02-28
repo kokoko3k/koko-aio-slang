@@ -287,6 +287,7 @@
 // #define PIXELGRID_Y_MASK_COORDS  0.0    //            . Resolution: (core or screen)
 // #define PIXELGRID_Y_MASK_HEIGHT  1.0    //            . Height divider (neg = multiplier):
 // #define PIXELGRID_Y_MASK_OFFSET  1.0    //            . Even/odd Y offset (slotmask)
+// #define PIXELGRID_Y_MASK_OFFSET_DEHIVE  //            . Clears "hives" patterns (slotmask)
 // #define PIXELGRID_Y_MASK_SHIFT  0.15    //            . Vertical shift (neg = auto)
 // #define PIXELGRID_Y_MASK_STEEP  1.0     //            . Steepness
 // #define PIXELGRID_Y_MASK_ON_WHITE  0.0  //            . Fadeout under light
