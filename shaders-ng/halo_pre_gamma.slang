@@ -45,7 +45,7 @@ void main() {
         
     vec3 pixel_haloed = texture(in_glow_pass, vTexCoord).rgb;
 
-    if (HALO_NO_PREGAIN == 1.0)  pixel_haloed/= vHALO_UNGAIN_FACTOR;
+    if (HALO_NO_PREGAIN == 1.0) pixel_haloed/=vHALO_UNGAIN_FACTOR;
     
     pixel_haloed = pow(pixel_haloed, vec3(HALO_GAMMA));
     
