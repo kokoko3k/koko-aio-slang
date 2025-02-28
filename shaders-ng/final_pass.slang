@@ -514,9 +514,9 @@ vec3 fn_pixel_nightify(vec3 color_in, float strength, vec3 ambilight) {
 }
 
 
-vec3 morph_shape_full_vec3(vec3 shape, vec3 l, float steep, float gamma ) {    
+vec3 morph_shape_full_vec3(vec3 shape, vec3 l, float steep, float gamma ) {
     vec3 l_pow = pow(l,vec3(gamma));
-    vec3 l2 = min(l_pow * 16, steep);
+    vec3 l2 = min(l_pow * 16, steep); //min faster than clamp
     vec3 s1 = pow(shape, inversesqrt(l2));
     //vec3 s2 = (1-s1) * l_pow;
         //==  lpow - lpow * s1;
@@ -525,9 +525,10 @@ vec3 morph_shape_full_vec3(vec3 shape, vec3 l, float steep, float gamma ) {
     return (s2/(steep)) + s1;
 }
 
+
 vec3 morph_shape_full_no_steepness_vec3(vec3 shape, vec3 l, float gamma) {
     vec3 l_pow = pow(l,vec3(gamma));
-    vec3 l2 = min(l_pow * 16, 1);
+    vec3 l2 = clamp(l_pow * 16, 0,1); //clamp faster than min.
     vec3 s1 = pow(shape, inversesqrt(l2));
     vec3 s2 = (1-s1) * l_pow;
         // == 1*l_pow  - s1*l_pow
@@ -590,6 +591,7 @@ vec3 downsample_x( sampler2D tex, vec2 uv, vec4 sourcesize, float sharpness_add 
 
 
 vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inLum) {
+    //^ 15fps ^
 
     //Tate ? (other outputsize,originalsize and outputcoords "tated" in vertex shader.)
         in_coords.xy = mix_step(in_coords.xy, in_coords.yx, vDo_Tate);
