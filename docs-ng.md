@@ -820,7 +820,8 @@ However nice effects may be obtained (eg: with vector games). <br>
 ---------------------------
 
 *The following shader functionalities are disabled by default and cannot be enabled by using runtime shader parameters.<br>
-To enable them, you have to edit the shader itself, save it, and reload.*
+To enable them, you have to edit the file config-user-optional.txt (use config-user-optional-template).txt as a guide.<br>
+Changes are applied after a shader reload.*<br>
 
 ---------------------------
      
@@ -845,7 +846,6 @@ To enable them, you have to edit the shader itself, save it, and reload.*
         By highering this value, Delta render can take higher blur radiouses
         into account.
         Power comsumption benefits will be lower.
-        
         
 **Higher quality defocus:**<br>
     Use higher quality deconvergence by flattering rgb scanlines when <br>
