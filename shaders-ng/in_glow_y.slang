@@ -74,8 +74,8 @@ void main() {
    vWarpedglow = (IN_GLOW_WARPSHARP_TATED * warpedglow_scale) * 0.6 / 1400.0 * 3.0;   //*3.0 needed because we scale to 0->1 to use pow in the fragment.
 
    float warpedglow_delta = params.OriginalSize.w * 0.5;
-   vWarpedglow_vtexcoord_offsets_minus = vTexCoord - warpedglow_delta;
-   vWarpedglow_vtexcoord_offsets_plus = vTexCoord + warpedglow_delta;
+   vWarpedglow_vtexcoord_offsets_minus = vTexCoord - vec2(0.0, warpedglow_delta);
+   vWarpedglow_vtexcoord_offsets_plus =  vTexCoord + vec2(0.0, warpedglow_delta); 
    
    
    //Generate a seed that changes over time for temporal random noise

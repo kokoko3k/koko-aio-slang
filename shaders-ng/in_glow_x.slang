@@ -50,8 +50,8 @@ void main() {
    
    float warpedglow_delta = params.OriginalSize.z * 0.5;
       
-   vWarpedglow_vtexcoord_offsets_plus = vTexCoord  + vec2(+warpedglow_delta, 0.0); 
-   vWarpedglow_vtexcoord_offsets_minus = vTexCoord - vec2(+warpedglow_delta, 0.0); 
+   vWarpedglow_vtexcoord_offsets_plus = vTexCoord  + vec2(warpedglow_delta, 0.0); 
+   vWarpedglow_vtexcoord_offsets_minus = vTexCoord - vec2(warpedglow_delta, 0.0); 
    
    vWarpedglow_scale_tated = IN_GLOW_WARPSHARP_X;
    if (need_tate(is_rotated()) == 1.0)
