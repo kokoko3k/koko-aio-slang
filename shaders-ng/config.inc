@@ -494,7 +494,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter PIXELGRID_Y_MASK_COORDS        "           . Resolution: (core or screen)"	1.0 0.0 1.0 1.0
 #pragma parameter PIXELGRID_Y_MASK_HEIGHT        "           . Height divider (neg = multiplier):"	0.5 -8.0 8.0 0.125
 #pragma parameter PIXELGRID_Y_MASK_OFFSET        "           . Even/odd Y offset (slotmask)"	1.0 0.0 1.0 1.0
-#pragma parameter PIXELGRID_Y_MASK_OFFSET_DEHIVE "           . Clears ''hives'' patterns (slotmask)"	0.00 0.00 4.0 0.2
+#pragma parameter PIXELGRID_Y_MASK_OFFSET_DEHIVE "           . Clears ''hives'' patterns (slotmask)"	0.00 0.00 4.0 0.1
 #pragma parameter PIXELGRID_Y_MASK_SHIFT         "           . Vertical shift (neg = auto)"	-0.01 -0.01 1.0 0.01
 #pragma parameter PIXELGRID_Y_MASK_STEEP         "           . Steepness"	2.0 1.0 30.0 1.0
 #pragma parameter PIXELGRID_Y_MASK_ON_WHITE      "           . Fadeout under light"	0.5 0.0 2.0 0.01
