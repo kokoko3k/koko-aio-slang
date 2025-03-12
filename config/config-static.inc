@@ -15,12 +15,6 @@
 
 // BEZEL STATIC CONFIG ////////////////////////////////////////////////////////
 
-	//The following defines the monitor frame resolution in textures/monitor_body_[curved/straight].png
-	//and are used to calculate the sampling lod.
-	//Change if you change the texture resolution or
-	//you can comment it to let the shader calculates them at runtime (heavier).
-#define BEZEL_RES vec2(2927, 2178)
-
 	//The following can slightly correct bezel aspect
 	//eg: #define BEZEL_ASPECT_CORRECTION (1.0 - 0.004) will make it shorter.
 #define BEZEL_ASPECT_CORRECTION 1.0 //(1- ((SERVICE1-0.5) *0.01))  //(1.0 - 0.004)
