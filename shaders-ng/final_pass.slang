@@ -617,6 +617,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
     //Switch frequency between core and screen and apply asked multipliers
         vec2 freq_base = freq_base_core * vec2(vPG_period_multiplier_x, 1.0) ;
         vec2 freq_base_unfloored = freq_base_core;
+        //vec2 freq_base_unfloored = freq_base_core * vec2(vPG_period_multiplier_x, 1.0) ; <--- core can be multiplied too, why not?
         if (PIXELGRID_SIZE_W == 1.0) {
             freq_base.x = freq_base_screen.x * vPG_period_multiplier_x;
             freq_base_unfloored.x = vPG_freq_base_screen_unfloored.x * vPG_period_multiplier_x;
