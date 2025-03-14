@@ -880,8 +880,7 @@ vec3 pixel_backdrop_image(float isrotated) {
     vec2 backdrop_offset=vec2(BACKDROP_OFFX,BACKDROP_OFFY);
 
     vec2 backdrop_tex_size = textureSize(backdrop, 0);
-    //float backdrop_lod = log2(backdrop_tex_size.y * global.FinalViewportSize.w);
-    float backdrop_lod = 0.0;
+    float backdrop_lod = log2(backdrop_tex_size.y * global.FinalViewportSize.w);
 
     vec2 backdrop_coords =  get_scaled_coords_aspect(
                             vOutputCoord+backdrop_offset,
@@ -1050,8 +1049,7 @@ vec4 fn_pixel_fgbg_image(sampler2D smp) {
     vec2 back_coords = get_scaled_coords_aspect_fgbg(vBg_img_coords, global.FinalViewportSize, tex_size.x/tex_size.y, rotated, vIn_aspect);
 
 
-    //float bg_over_lod = log2(tex_size.y * global.FinalViewportSize.w);
-    float bg_over_lod = 0.0;
+    float bg_over_lod = log2(tex_size.y * global.FinalViewportSize.w);
     vec4 pixel_bgover = textureLod_wrap(smp, back_coords, bg_over_lod, BG_IMAGE_WRAP_MODE);
     return pixel_bgover;
 }
@@ -1189,18 +1187,18 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
 
     //Sample main bezel texture:
     //We assume straight and curved textures are the same size. WARNING
-       /* #ifndef BEZEL_RES
+        #ifndef BEZEL_RES
             vec2 bezel_lut_size = textureSize(monitor_body_curved, 0);
             float bezel_frame_lod = log2(bezel_lut_size.y * (BEZEL_FRAME_ZOOM+1.0) * global.FinalViewportSize.w);
         #else
             //float bezel_frame_lod = log2(    fma( BEZEL_RES.y,  BEZEL_FRAME_ZOOM,  BEZEL_RES.y) * global.FinalViewportSize.w); //ASM PROOF: UNDECIDED
             float bezel_frame_lod = log2( BEZEL_RES.y * (BEZEL_FRAME_ZOOM+1.0) * global.FinalViewportSize.w); 
-        #endif*/
+        #endif
 
         if (BEZEL_USE_STRAIGHT < 0.5)
-            bezel_in = texture(monitor_body_curved,coords_for_bezel);
+            bezel_in = textureLod(monitor_body_curved,coords_for_bezel,bezel_frame_lod);
                 else
-            bezel_in = texture(monitor_body_straight,coords_for_bezel);
+            bezel_in = textureLod(monitor_body_straight,coords_for_bezel,bezel_frame_lod);
 
 
     //Exit if the bezel is completely transparent (the tube)
