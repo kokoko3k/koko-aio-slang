@@ -225,9 +225,10 @@ void main() {
             if (scanlines_will_alternate(bIs_Interlaced))  {
                 //Halve the scanline period, since they will interlace:
                 vScanlinePeriod = 0.5;
+                vInterlace_offset = PI_15*0.5;
                 //Alternate scanlines on even/odd frames
                 if (frame_is_even())
-                    vInterlace_offset = PI_15;
+                    vInterlace_offset += PI_15;
             }
 
 
