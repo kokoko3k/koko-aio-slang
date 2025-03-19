@@ -346,7 +346,8 @@ void main() {
                 ori_size.xyzw = ori_size.yxwz;
                 zoom_modifier.xy = zoom_modifier.yx;
             }
-            if (need_doublescan()) ori_size.yw*=vec2(2.0, 1/2.0);
+            if (need_doublescan()) ori_size.yw*=vec2(2.0, 1/2.0); //double period?
+            ori_size.y*=vScanlinePeriod; //helve period?
             float OutputHeightZoomed = out_size.y*zoom_modifier.y;
             float screen_core_ratio = OutputHeightZoomed / ori_size.y;
             if (screen_core_ratio < MIN_SCREEN_CORE_RATIO)
