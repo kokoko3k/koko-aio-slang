@@ -10,6 +10,13 @@
 //#define AA_MODE_SUPER2XSAI           // 106.5 // less Dirty.
 
 
+#ifndef D3D_WORKAROUND
+   #define FPS_ESTIMATE_PASS halo_pre_gamma_passFeedback
+#else
+   #define FPS_ESTIMATE_PASS Original
+#endif
+
+
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
@@ -108,10 +115,8 @@ layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 3) uniform sampler2D upscale_passFeedback;
 layout(set = 0, binding = 4) uniform sampler2D colortools_and_ntsc_pass;
 layout(set = 0, binding = 5) uniform sampler2D colortools_and_ntsc_passFeedback;
+layout(set = 0, binding = 6) uniform sampler2D FPS_ESTIMATE_PASS;
 
-#ifndef D3D_WORKAROUND
-   layout(set = 0, binding = 6) uniform sampler2D halo_pre_gamma_passFeedback;
-#endif
    
 //#define _KOKO_AA_PRELINEARIZE
 #define _KOKO_AA_PRELINEARIZE_IN  (2.0)
@@ -568,13 +573,8 @@ vec3 pixel_flickering(vec3 pixel_cur) {
    float lumdiff = abs( dot(flickline.rgb, vec3(1.0)) - dot(pixel_cur.rgb, vec3(1.0)));// 1685 1750 2948 //ASM PROOF: Faster on SIMD8 and SIMD16, slower on SIMD32
 
    
-   /*#ifdef _HAS_FRAMETIME_UNIFORMS
-      #ifndef D3D_WORKAROUND
-         float fps_avg = texture(halo_pre_gamma_passFeedback, vec2(0.5)).a;
-         if (fps_avg < 41.25) // no flickering on low fps
-            lumdiff=0.0;    
-      #endif
-   #endif*/
+   // disable flickering on 25 and 30fps content:
+   //if (low_fps(FPS_ESTIMATE_PASS)) lumdiff = 0.0;
 
    
    lumdiff = min(lumdiff * PIXELGRID_INTR_FLICK_POWR, 1.0);
