@@ -574,14 +574,11 @@ vec3 pixel_flickering(vec3 pixel_cur) {
 
    
    // disable flickering on 25 and 30fps content:
-   //if (low_fps(FPS_ESTIMATE_PASS)) lumdiff = 0.0;
-
+   if (low_fps(FPS_ESTIMATE_PASS)) lumdiff = 0.0;
    
    lumdiff = min(lumdiff * PIXELGRID_INTR_FLICK_POWR, 1.0);
    
 
-
-   
    #ifdef FLICKER_IN_MOTION
       lumdiff = 0.4;
       vec3 prev_frame = texture(colortools_and_ntsc_passFeedback, vTexCoord).rgb;
