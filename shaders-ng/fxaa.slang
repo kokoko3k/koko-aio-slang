@@ -109,6 +109,10 @@ layout(set = 0, binding = 3) uniform sampler2D upscale_passFeedback;
 layout(set = 0, binding = 4) uniform sampler2D colortools_and_ntsc_pass;
 layout(set = 0, binding = 5) uniform sampler2D colortools_and_ntsc_passFeedback;
 
+#ifndef D3D_WORKAROUND
+   layout(set = 0, binding = 6) uniform sampler2D halo_pre_gamma_passFeedback;
+#endif
+   
 //#define _KOKO_AA_PRELINEARIZE
 #define _KOKO_AA_PRELINEARIZE_IN  (2.0)
 #define _KOKO_AA_PRELINEARIZE_OUT (1/_KOKO_AA_PRELINEARIZE_IN)
@@ -564,17 +568,14 @@ vec3 pixel_flickering(vec3 pixel_cur) {
    float lumdiff = abs( dot(flickline.rgb, vec3(1.0)) - dot(pixel_cur.rgb, vec3(1.0)));// 1685 1750 2948 //ASM PROOF: Faster on SIMD8 and SIMD16, slower on SIMD32
 
    
-/*   #ifdef _HAS_FRAMETIME_UNIFORMS
-      float flick_adjustment = map_range( float( global.FrameTimeDelta/1000000.0 ), 1/1, 1/60.0, 0, 1);
-      flick_adjustment = 1.0;
-      if  (global.FrameTimeDelta/1000000.0 > 1/40.0)  {
-         flick_adjustment = 0.0;
-         return vec3(1.0);
-      }
-      
-      lumdiff*=flick_adjustment; 
-   #endif
-*/
+   /*#ifdef _HAS_FRAMETIME_UNIFORMS
+      #ifndef D3D_WORKAROUND
+         float fps_avg = texture(halo_pre_gamma_passFeedback, vec2(0.5)).a;
+         if (fps_avg < 41.25) // no flickering on low fps
+            lumdiff=0.0;    
+      #endif
+   #endif*/
+
    
    lumdiff = min(lumdiff * PIXELGRID_INTR_FLICK_POWR, 1.0);
    

@@ -8,8 +8,10 @@
                                 //#define DEBUG_TEXTURE Original
                                 //#define DEBUG_TEXTURE colortools_and_ntsc_pass
                                 #define DEBUG_TEXTURE halo_pre_gamma_pass
-//#define DEBUG_PRINT_VALUE
-//#define PRINTED_VALUE texture(halo_pre_gamma_pass, vTexCoord).a
+#define DEBUG_PRINT_VALUE
+    #define PRINTED_VALUE texture(DEBUG_TEXTURE, vec2(0.5)).a
+    //#define PRINTED_VALUE global.OriginalFPS
+    
 //#define DEBUG_QUAD_SPLIT
 //#define DEBUG_DUAL_SPLIT_X
 //#define DEBUG_DUAL_SPLIT_Y
