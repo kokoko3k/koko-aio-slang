@@ -763,21 +763,25 @@ void main() {
    
    
 
-   
+
    // Past field interlace emulation:
    if (is_interlaced()) {
       if ( !low_fps(FPS_ESTIMATE_PASS) ) {
+         
          bool even_line = line_is_even(vTexCoord.y, params.OriginalSize.y);
+         vec3 past =  texture(colortools_and_ntsc_passFeedback, vTexCoord).rgb;
+         vec3 mymix = mix(pixel_out.rgb, past, PIXELGRID_INTR_PAST_FIELD);
+         
          if (frame_is_even()) {
             if (!even_line)
-               pixel_out.rgb = mix(pixel_out.rgb, texture(colortools_and_ntsc_passFeedback, vTexCoord).rgb, PIXELGRID_INTR_PAST_FIELD);
+               pixel_out.rgb = mymix;
          } else {
             if (even_line)
-               pixel_out.rgb = mix(pixel_out.rgb, texture(colortools_and_ntsc_passFeedback, vTexCoord).rgb , PIXELGRID_INTR_PAST_FIELD);
+               pixel_out.rgb = mymix;
          }
       }
    }
-   
+
    
    FragColor = vec4(pixel_out, waterfall);
 }
