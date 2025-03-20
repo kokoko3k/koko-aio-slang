@@ -231,7 +231,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float PIXELGRID_INTR_FLICK_MODE;
 	float PIXELGRID_INTR_FLICK_POWR;
 	float PIXELGRID_INTR_DISABLE_Y;
-	
+	float PIXELGRID_INTR_PAST_FIELD;
 	
 	float PIXELGRID_DECON_R_H;
 	float PIXELGRID_DECON_G_H;
@@ -443,7 +443,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 #pragma parameter LABEL_INTERLACE           "★ Hi-resolution scanlines behaviour" 1.0 1.0 1.0 0.0
 #pragma parameter MIN_LINES_INTERLACED      "    . Consider Hi-Resolution above # lines (0=never):"		380.0 	0.0 1024 1.0
-#pragma parameter PIXELGRID_INTR_DISABLE_Y  "    . Hi-Res scanlines type (read docs):"   -1.0 -2.0 2.0 1.0
+#pragma parameter PIXELGRID_INTR_PAST_FIELD "    . Real interlacing (display previous field)"    0.0 0.0 1.0 0.1
+#pragma parameter PIXELGRID_INTR_DISABLE_Y  "    . Hi-Res scanlines type (read docs):"           -1.0 -2.0 2.0 1.0
 #pragma parameter LABEL0036                 "      (-2: Faker-Interlaced, -1: Fake-Interlaced)"          0.0 0.0 0.0 1.0
 #pragma parameter LABEL0037                 "      ( 0: Interlaced, 1: No scanlines, 2: Don't interlace)" 0.0 0.0 0.0 1.0
 #pragma parameter PIXELGRID_INTR_GAMMA_ADJ  "    . Interlaced brighness push (less is more, not for OLEDs)" 0.9 0.5 1.0 0.01

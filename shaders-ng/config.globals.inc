@@ -739,6 +739,10 @@
     #define MIN_LINES_INTERLACED global.MIN_LINES_INTERLACED
 #endif
 
+#ifndef PIXELGRID_INTR_PAST_FIELD
+    #define PIXELGRID_INTR_PAST_FIELD  global.PIXELGRID_INTR_PAST_FIELD
+#endif
+
 #ifndef DO_PIXELGRID
     #define DO_PIXELGRID			global.DO_PIXELGRID
 #endif

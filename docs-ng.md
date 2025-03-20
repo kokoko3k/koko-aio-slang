@@ -259,6 +259,10 @@ However nice effects may be obtained (eg: with vector games). <br>
         A value of 1.0 means that it will always consider game hi-res.
         With values > 1.0, it will consider a frame as Hi-resolution if the lines number is above the configured value.
 
+    Real interlacing:
+        This convert progressive input to interlaced one.
+        And will display previous odd/even lines alternating on even/odd frames.
+    
     Hi-Res scanlines type
        -1: Use a number of scanlines that perfectly fits the screen, a good glitches/moire free tradeoff.
        -2: As above, but tighter (~1.5x), another good glitches/moire free tradeoff.

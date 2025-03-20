@@ -112,7 +112,7 @@ layout(location = 12) in float vDo_flickering;
 layout(location = 13) in vec2  vFlickerCoords;
 
 layout(location = 0) out vec4 FragColor;
-layout(set = 0, binding = 3) uniform sampler2D upscale_passFeedback;
+
 layout(set = 0, binding = 4) uniform sampler2D colortools_and_ntsc_pass;
 layout(set = 0, binding = 5) uniform sampler2D colortools_and_ntsc_passFeedback;
 layout(set = 0, binding = 6) uniform sampler2D FPS_ESTIMATE_PASS;
@@ -926,18 +926,7 @@ void main() {
    
     //pixel_out.rgb = max(vec3(0.0), pixel_out.rgb); 
    
-   /*
-    * Proper interlace emulation (first pass, needs final pass scanline alternation)
-    * bool even_line = line_is_even(vTexCoord.y, params.OriginalSize.y);
-   if (frame_is_even()) {
-      if (!even_line)
-         pixel_out.rgb = mix(pixel_out.rgb, texture(upscale_passFeedback, vTexCoord).rgb, 0.5);
-   } else {
-      if (even_line)
-         pixel_out.rgb = mix(pixel_out.rgb, texture(upscale_passFeedback, vTexCoord).rgb , 0.5);
-         
-   }
-   */
+
 
    
    FragColor = pixel_out;

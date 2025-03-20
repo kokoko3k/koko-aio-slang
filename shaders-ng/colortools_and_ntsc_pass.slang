@@ -40,6 +40,13 @@
 //Clamp min and max artifacts loop to unroll loops? Can't observe any speed increase (maybe a bit lower)
 //#define UNROLL_N
 
+#ifndef D3D_WORKAROUND
+   #define FPS_ESTIMATE_PASS halo_pre_gamma_passFeedback
+#else
+   #define FPS_ESTIMATE_PASS Original
+#endif
+
+
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
@@ -204,6 +211,7 @@ layout(set = 0, binding = 3) uniform sampler2D colortools_and_ntsc_passFeedback;
 #ifndef D3D_WORKAROUND
 layout(set = 0, binding = 4) uniform sampler2D avglum_passFeedback;
 #endif
+layout(set = 0, binding = 5) uniform sampler2D FPS_ESTIMATE_PASS;
 
 vec3 colorwheel(vec2 uv){
    float timeoffset = params.FrameCount / 120.0;
@@ -752,6 +760,25 @@ void main() {
    if (DO_WTFL == 1.0) {
       waterfall = get_waterfall();
    }
+   
+   
+
+   
+   // Past field interlace emulation:
+   if (is_interlaced()) {
+      if ( !low_fps(FPS_ESTIMATE_PASS) ) {
+         bool even_line = line_is_even(vTexCoord.y, params.OriginalSize.y);
+         if (frame_is_even()) {
+            if (!even_line)
+               pixel_out.rgb = mix(pixel_out.rgb, texture(colortools_and_ntsc_passFeedback, vTexCoord).rgb, PIXELGRID_INTR_PAST_FIELD);
+         } else {
+            if (even_line)
+               pixel_out.rgb = mix(pixel_out.rgb, texture(colortools_and_ntsc_passFeedback, vTexCoord).rgb , PIXELGRID_INTR_PAST_FIELD);
+         }
+      }
+   }
+   
+   
    FragColor = vec4(pixel_out, waterfall);
 }
 
