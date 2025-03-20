@@ -308,6 +308,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float CLIP_TO_WHITE;
 	
 	float OriginalFPS;
+	uint FrameTimeDelta;
 	
 	float DO_WTFL;
 	float WTFL_SHARPNESS_X;

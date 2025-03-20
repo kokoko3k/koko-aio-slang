@@ -5,9 +5,11 @@
  * Does masks, spot, bezel, vignette, background image (anything else?)
  */
 
-                                #define DEBUG_TEXTURE Original
+                                //#define DEBUG_TEXTURE Original
                                 //#define DEBUG_TEXTURE colortools_and_ntsc_pass
+                                #define DEBUG_TEXTURE halo_pre_gamma_pass
 //#define DEBUG_PRINT_VALUE
+//#define PRINTED_VALUE texture(halo_pre_gamma_pass, vTexCoord).a
 //#define DEBUG_QUAD_SPLIT
 //#define DEBUG_DUAL_SPLIT_X
 //#define DEBUG_DUAL_SPLIT_Y
@@ -315,9 +317,6 @@ void main() {
             float zooms_modifier  = get_zooms_modifier(vDo_Tate, bNeed_NO_integer_scale, bIsRotated).y;
             float dotmat_insize  = global.upscale_passSize.y;
             float dotmat_outsize = global.FinalViewportSize.y  * zooms_modifier;
-            #ifdef DEBUG_PRINT_VALUE
-                vfprintvalue = dotmat_outsize / dotmat_insize;
-            #endif
             vDotMat_Grid_Sharpness = (dotmat_outsize / dotmat_insize);
             vDotMat_Grid_Sharpness = vDotMat_Grid_Sharpness * 3.6 - 3.1;
             vDotMat_Grid_Sharpness = clamp(vDotMat_Grid_Sharpness, 0.1, 20.0);
@@ -407,6 +406,7 @@ void main() {
     
     //Fragment shader will use that just one time that way. => precalc.
     vPG_offsets_and_size.a = pi/vPG_offsets_and_size.a;
+
 }
 
 
@@ -1562,7 +1562,11 @@ void main() {
         #ifdef DEBUG_PRINT_VALUE
             float maxdigits = 10.0;
             float decimalplaces = 2.0;
-            float fvalue = vfprintvalue;
+            #ifdef PRINTED_VALUE
+                float fvalue = PRINTED_VALUE;
+            #else
+                float fvalue = vfprintvalue;
+            #endif
             vec2 vFragCoord = vec2( floor(vOutputCoord.x * params.OutputSize.x),
                                 floor(vOutputCoord.y * params.OutputSize.y));
             pixel_out += PrintValueVec3( vTexCoord, vFragCoord, fvalue, maxdigits, decimalplaces );

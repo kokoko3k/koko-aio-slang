@@ -72,6 +72,10 @@ float mask_enhance_float(float mask, vec3 ref, float factor) {
  return mix( factor * (mask - 0.5) + 0.5, mask, abs(fref - 0.5*2) );
 }
 
+bool line_is_even(float co_y, float size_y) {
+	float line = floor(co_y*size_y);
+	return (int(line) & 1) == 0;
+}
 
 bool frame_is_even() {
 	return ((int(params.FrameCount) & 1) == 0);

@@ -557,18 +557,29 @@ vec3 pixel_flickering(vec3 pixel_cur) {
  * to see the effect (the lcd panel would just mix the pixels by itself (meh).
  */
 
-   //vec3 pixel_cur = texture_NEAREST(Source,vTexCoord, params.OriginalSize).rgb;
-   //vec3 pixel_cur = texture(Source,vTexCoord).rgb;      
-   //vec3 flickline = texture_NEAREST(upscale_passFeedback,vFlickerCoords, params.OriginalSize).rgb;
-   //vec3 flickline = texture(upscale_passFeedback,vFlickerCoords).rgb;
    vec3 flickline = texture(colortools_and_ntsc_pass,vFlickerCoords).rgb;
-   //vec3 flickline = texture_NEAREST(Source,vFlickerCoords, params.OriginalSize).rgb;
    
    //float lumdiff = abs( flickline.r + flickline.g + flickline.b - pixel_cur.r - pixel_cur.g - pixel_cur.b);
    //float lumdiff = abs( (flickline.r + flickline.g) + (flickline.b - pixel_cur.r) - (pixel_cur.g + pixel_cur.b) ); //1687 1754 2946   ASM PROOF: FASTER
    float lumdiff = abs( dot(flickline.rgb, vec3(1.0)) - dot(pixel_cur.rgb, vec3(1.0)));// 1685 1750 2948 //ASM PROOF: Faster on SIMD8 and SIMD16, slower on SIMD32
 
+   
+/*   #ifdef _HAS_FRAMETIME_UNIFORMS
+      float flick_adjustment = map_range( float( global.FrameTimeDelta/1000000.0 ), 1/1, 1/60.0, 0, 1);
+      flick_adjustment = 1.0;
+      if  (global.FrameTimeDelta/1000000.0 > 1/40.0)  {
+         flick_adjustment = 0.0;
+         return vec3(1.0);
+      }
+      
+      lumdiff*=flick_adjustment; 
+   #endif
+*/
+   
    lumdiff = min(lumdiff * PIXELGRID_INTR_FLICK_POWR, 1.0);
+   
+
+
    
    #ifdef FLICKER_IN_MOTION
       lumdiff = 0.4;
@@ -916,7 +927,21 @@ void main() {
    }
    
     //pixel_out.rgb = max(vec3(0.0), pixel_out.rgb); 
-    
+   
+   /*
+    * Proper interlace emulation (first pass, needs final pass scanline alternation)
+    * bool even_line = line_is_even(vTexCoord.y, params.OriginalSize.y);
+   if (frame_is_even()) {
+      if (!even_line)
+         pixel_out.rgb = mix(pixel_out.rgb, texture(upscale_passFeedback, vTexCoord).rgb, 0.5);
+   } else {
+      if (even_line)
+         pixel_out.rgb = mix(pixel_out.rgb, texture(upscale_passFeedback, vTexCoord).rgb , 0.5);
+         
+   }
+   */
+
+   
    FragColor = pixel_out;
    
 }
