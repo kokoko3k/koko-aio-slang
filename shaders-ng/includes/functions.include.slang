@@ -29,6 +29,12 @@ float _pack_21(vec2 in_float){
 	return in_float.x*pack_floats_precision + in_float.y;
 }
 
+float get_lod(vec2 smp_size, vec2 out_size) {
+	vec2 ratio = out_size/smp_size;
+    float maxRatio = max(ratio.x, ratio.y);
+    return log2(maxRatio);
+}
+
 bool low_fps(sampler2D estimatesampler) {
 	/* returns if core fps is inside [25..30] interval */
 
