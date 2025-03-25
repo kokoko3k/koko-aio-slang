@@ -163,5 +163,10 @@ TODO:
 		and that often leads to performance degradation (registers are precious)
 		would it be possible to pre-compute ambi mask in the ambilight pass?
 	[ ] fn_border can be superseeded by fuzzy_rect;  is it faster?
-
+	[ ] In final_pass (fn_pixel_content) we can restore sharpness for hiresgame fast presets that way,
+	    but it causes 0.5fps drop.
+			vec2 coords_smp = coords;
+		    //if (global.upscale_passSize.y == params.OriginalSize.y)
+		    //    coords_smp = coords_NEAREST(coords, global.upscale_passSize);
+		    vec4 pixel_out = texture(in_glow_pass, coords_smp);
 	
