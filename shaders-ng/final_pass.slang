@@ -1418,10 +1418,6 @@ void main() {
             pixel_under_content = fma(vec3(-canvas_busy), pixel_ambi, pixel_ambi); //ASM PROOF: FASTER
         }
     }
-
-    // Apply smooth border to soften jagged edges.
-    pixel_out *= canvas_busy;
-       
     
     // This represents the inner bezel alpha (when using bezel)
     // or the pixel_content canvas (when not using bezel)
