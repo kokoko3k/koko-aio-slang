@@ -1247,7 +1247,7 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
         //Use a shaded box to apply ambilight on external borders only
         float ambi_colorize_shade = create_ambi_colorize_shade(coords_for_bezel);
 
-        vec3 ambi_over_bezel = (AMBI_OVER_BEZEL * pixel_ambilight) *
+        ambi_over_bezel = (AMBI_OVER_BEZEL * pixel_ambilight) *
                                (bezel_in.a * ambi_colorize_shade) *
                                 (1-reflection_modifier) ;
     }                                   
