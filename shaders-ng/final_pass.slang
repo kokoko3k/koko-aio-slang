@@ -1415,7 +1415,7 @@ void main() {
 
 
     // Draw spot and vignette
-    if (canvas_bezel_screen > 0.5) {
+    if (canvas_bezel_screen > 0.01) {
         if ( DO_SPOT + DO_VIGNETTE > 0.0 ) {
             float perlin = (random_fast(vTexCoord)-0.5) * (1/255.0);
             vec2 vignette_spot = texture(helper_pass, vTexCoord).zw;
@@ -1425,8 +1425,8 @@ void main() {
         
             pixel_out = antighost(pixel_out);
             
-    } else {
-
+    }
+    if (canvas_bezel_screen < 1-0.01) {
         if (DO_AMBILIGHT == 1.0) {
             pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb;
             
