@@ -1373,6 +1373,22 @@ void main() {
     
     if (canvas_busy > 0.5) {
         pixel_out = fn_pixel_content(co_content);
+    } else {
+        // Can we halve refresh rate in the outside border to spare some cycles?
+        float halve_border_update = 0.0;
+        #ifdef HALVE_BORDER_UPDATE
+            halve_border_update = 1.0;
+        #endif
+        #ifndef D3D_WORKAROUND
+            if ( halve_border_update == 1.0 ) {
+                // By using !frame_is_even() and not frame_is_even(), we solve the issue of inner frame jagged lines
+                // when using HALVE_BORDER_UPDATE + DELTA_RENDER
+                if ( !frame_is_even() ) {
+                    FragColor.rgb = texture(final_passFeedback, vOutputCoord).rgb;
+                    return;
+                }
+            }
+        #endif
     }
 
     
@@ -1420,24 +1436,7 @@ void main() {
             pixel_out = antighost(pixel_out);
             
     } else {
-        
-        // Can we halve refresh rate in the outside border to spare some cycles?
-        float halve_border_update = 0.0;
-        #ifdef HALVE_BORDER_UPDATE
-            halve_border_update = 1.0;
-        #endif
-        #ifndef D3D_WORKAROUND
-            if ( halve_border_update == 1.0 ) {
-                // By using !frame_is_even() and not frame_is_even(), we solve the issue of inner frame jagged lines
-                // when using HALVE_BORDER_UPDATE + DELTA_RENDER
-                if ( !frame_is_even() ) {
-                    FragColor.rgb = texture(final_passFeedback, vOutputCoord).rgb;
-                    return;
-                }
-            }
-        #endif
 
-        // Ambient light
         if (DO_AMBILIGHT == 1.0) {
             pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb;
             
