@@ -1186,7 +1186,7 @@ bool is_bezel_paint_area(vec2 lcoords_for_bezel) {
     return true;
 }
 
-vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightify_str, vec3 pixel_ambilight) {
+vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightify_str) {
     
     vec4 bezel_in;
 
@@ -1250,23 +1250,22 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
 
     //Yes, we already passed ambilight as parameter, but if geometry content is overridden
     //then ambientlight may have not been sampled yet due to some skip logic made in the main()
-        if (DO_AMBILIGHT == 1.0) 
-            pixel_ambilight = texture(ambi_temporal_pass, vOutputCoord).rgb;
+    vec3 ambi_over_bezel = vec3(0.0);
+    if (DO_AMBILIGHT == 1.0) {
+        vec3 pixel_ambilight = texture(ambi_temporal_pass, vOutputCoord).rgb;
 
-    //Apply nightification, the strength is modulated by ambient light.
         //Use a shaded box to apply ambilight on external borders only
-            float ambi_colorize_shade = create_ambi_colorize_shade(coords_for_bezel);
+        float ambi_colorize_shade = create_ambi_colorize_shade(coords_for_bezel);
 
-
-            vec3 ambi_over_bezel = (AMBI_OVER_BEZEL * pixel_ambilight) *
-                                   (bezel_in.a * ambi_colorize_shade) *
-                                   (1-reflection_modifier) ;
-                                   
+        vec3 ambi_over_bezel = (AMBI_OVER_BEZEL * pixel_ambilight) *
+                               (bezel_in.a * ambi_colorize_shade) *
+                                (1-reflection_modifier) ;
+    }                                   
     //Colorize the bezel (bezel.r expresses the luminance)
-        vec3 bezel_out = bezel_color(bezel_in.r);
-    //Nightify the bezel
-        bezel_out.rgb = fn_pixel_nightify(bezel_out.rgb, nightify_str, ambi_over_bezel )   ;
-
+    vec3 bezel_out = bezel_color(bezel_in.r);
+    
+    //Apply nightification, the strength is modulated by ambient light.
+    bezel_out.rgb = fn_pixel_nightify(bezel_out.rgb, nightify_str, ambi_over_bezel )   ;
 
     //Add reflections after nightification
             bezel_out += (pixel_mirrored.rgb * reflection_modifier);
@@ -1373,11 +1372,55 @@ void main() {
     vec3 pixel_out = vec3(0.0);
     
     if (canvas_busy > 0.5) {
-        
         pixel_out = fn_pixel_content(co_content);
+    }
 
+    
+    // This represents the inner bezel alpha (when using bezel)
+    // or the pixel_content canvas (when not using bezel)
+    // It is used to draw spot on the whole inner tube even when toe content does not
+    // fill the whole tube.
+    float canvas_bezel_screen = canvas_busy;
+
+    // Draw Bezel
+    vec2 co_bezel = vec2(0.0);
+    if (DO_BEZEL == 1.0) {
+        
+        co_bezel = get_scaled_coords_for_bezel(vTexCoord, vIsRotated);
+        
+        if (is_bezel_paint_area(co_bezel)) {
+            
+            vec4 pixel_bezel = fn_pixel_bezel(co_bezel, co_mirror, BG_IMAGE_NIGHTIFY * DO_BG_IMAGE);
+            pixel_out = mix(pixel_out, pixel_bezel.rgb, pixel_bezel.a);
+        
+            // Update alpha mask.
+            // We can't use the bezel alpha channel to update the alpha mask since it is transparent
+            // on the tube and we don't want to paint anything there, so use a dumb rect and add it to canvas_busy:
+            float rect_bezel = float(is_first_inside_rect(co_bezel, vec4(BEZEL_FRAME_SURROUND_MARGIN, BEZEL_FRAME_SURROUND_MARGIN, 1.0 - BEZEL_FRAME_SURROUND_MARGIN, 1.0 - BEZEL_FRAME_SURROUND_MARGIN)));
+            canvas_busy = max(pixel_bezel.a, rect_bezel);
+
+            // Intersect rect_bezel and bezel alpha to get the inner tube alpha
+            canvas_bezel_screen = (1 - pixel_bezel.a) * rect_bezel;
+            //canvas_bezel_screen = rect_bezel - rect_bezel* pixel_bezel.a; //ASM PROOF: SLOWER
+            
+        }
+        //FragColor = vec4(canvas_busy); return; // <- uncomment to debug BEZEL_FRAME_SURROUND_MARGIN
+    }
+
+
+    // Draw spot and vignette
+    if (canvas_bezel_screen > 0.5) {
+        if ( DO_SPOT + DO_VIGNETTE > 0.0 ) {
+            float perlin = (random_fast(vTexCoord)-0.5) * (1/255.0);
+            vec2 vignette_spot = texture(helper_pass, vTexCoord).zw;
+            pixel_out = pixel_out * vignette_spot.x;
+            pixel_out = mix(pixel_out+perlin, vec3(canvas_bezel_screen), vec3(vignette_spot.y) );
+        }
+        
+            pixel_out = antighost(pixel_out);
+            
     } else {
-
+        
         // Can we halve refresh rate in the outside border to spare some cycles?
         float halve_border_update = 0.0;
         #ifdef HALVE_BORDER_UPDATE
@@ -1417,50 +1460,6 @@ void main() {
             //pixel_under_content = pixel_ambi - canvas_busy * pixel_ambi; //ASM PROOF: FASTER
             pixel_under_content = fma(vec3(-canvas_busy), pixel_ambi, pixel_ambi); //ASM PROOF: FASTER
         }
-    }
-    
-    // This represents the inner bezel alpha (when using bezel)
-    // or the pixel_content canvas (when not using bezel)
-    // It is used to draw spot on the whole inner tube even when toe content does not
-    // fill the whole tube.
-    float canvas_bezel_screen = canvas_busy;
-
-    // Draw Bezel
-    vec2 co_bezel = vec2(0.0);
-    if (DO_BEZEL == 1.0) {
-        
-        co_bezel = get_scaled_coords_for_bezel(vTexCoord, vIsRotated);
-        
-        if (is_bezel_paint_area(co_bezel)) {
-            
-            vec4 pixel_bezel = fn_pixel_bezel(co_bezel, co_mirror, BG_IMAGE_NIGHTIFY * DO_BG_IMAGE, pixel_ambi);
-            pixel_out = mix(pixel_out, pixel_bezel.rgb, pixel_bezel.a);
-        
-            // Update alpha mask.
-            // We can't use the bezel alpha channel to update the alpha mask since it is transparent
-            // on the tube and we don't want to paint anything there, so use a dumb rect and add it to canvas_busy:
-            float rect_bezel = float(is_first_inside_rect(co_bezel, vec4(BEZEL_FRAME_SURROUND_MARGIN, BEZEL_FRAME_SURROUND_MARGIN, 1.0 - BEZEL_FRAME_SURROUND_MARGIN, 1.0 - BEZEL_FRAME_SURROUND_MARGIN)));
-            canvas_busy = max(pixel_bezel.a, rect_bezel);
-
-            // Intersect rect_bezel and bezel alpha to get the inner tube alpha
-            canvas_bezel_screen = (1 - pixel_bezel.a) * rect_bezel;
-            //canvas_bezel_screen = rect_bezel - rect_bezel* pixel_bezel.a; //ASM PROOF: SLOWER
-            
-        }
-        //FragColor = vec4(canvas_busy); return; // <- uncomment to debug BEZEL_FRAME_SURROUND_MARGIN
-    }
-
-
-    // Draw spot and vignette
-    if (canvas_bezel_screen > 0.5) {
-        if ( DO_SPOT + DO_VIGNETTE > 0.0 ) {
-            float perlin = (random_fast(vTexCoord)-0.5) * (1/255.0);
-            vec2 vignette_spot = texture(helper_pass, vTexCoord).zw;
-            pixel_out = pixel_out * vignette_spot.x;
-            pixel_out = mix(pixel_out+perlin, vec3(canvas_bezel_screen), vec3(vignette_spot.y) );
-        }
-        
-            pixel_out = antighost(pixel_out);
     }
     
     
