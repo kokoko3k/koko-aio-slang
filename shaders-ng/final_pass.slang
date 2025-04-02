@@ -1391,7 +1391,7 @@ void main() {
         if (is_bezel_paint_area(co_bezel)) {
             
             vec4 pixel_bezel = fn_pixel_bezel(co_bezel, co_mirror, BG_IMAGE_NIGHTIFY * DO_BG_IMAGE);
-            pixel_out = mix(pixel_out, pixel_bezel.rgb, pixel_bezel.a);
+            pixel_out = mix(pixel_out * canvas_busy, pixel_bezel.rgb, pixel_bezel.a);
         
             // Update alpha mask.
             // We can't use the bezel alpha channel to update the alpha mask since it is transparent
