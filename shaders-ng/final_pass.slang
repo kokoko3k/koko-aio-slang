@@ -1186,7 +1186,7 @@ bool is_bezel_paint_area(vec2 lcoords_for_bezel) {
     return true;
 }
 
-vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightify_str, vec3 pixel_ambilight) {
+vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightify_str) {
     
     vec4 bezel_in;
 
@@ -1248,19 +1248,19 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
                 pixel_mirrored.rgb += pixel_mirrored.a;
         }
 
-    //Yes, we already passed ambilight as parameter, but if geometry content is overridden
-    //then ambientlight may have not been sampled yet due to some skip logic made in the main()
-        if (DO_AMBILIGHT == 1.0) 
-            pixel_ambilight = texture(ambi_temporal_pass, vOutputCoord).rgb;
+    vec3 ambi_over_bezel = vec3(0.0);
+    if (DO_AMBILIGHT == 1.0) {
+        vec3 pixel_ambilight = texture(ambi_temporal_pass, vOutputCoord).rgb;
 
-    //Apply nightification, the strength is modulated by ambient light.
+        //Apply nightification, the strength is modulated by ambient light.
         //Use a shaded box to apply ambilight on external borders only
-            float ambi_colorize_shade = create_ambi_colorize_shade(coords_for_bezel);
+        float ambi_colorize_shade = create_ambi_colorize_shade(coords_for_bezel);
 
 
-            vec3 ambi_over_bezel = (AMBI_OVER_BEZEL * pixel_ambilight) *
-                                   (bezel_in.a * ambi_colorize_shade) *
-                                   (1-reflection_modifier) ;
+        ambi_over_bezel = (AMBI_OVER_BEZEL * pixel_ambilight) *
+                                (bezel_in.a * ambi_colorize_shade) *
+                                (1-reflection_modifier) ;
+    }
                                    
     //Colorize the bezel (bezel.r expresses the luminance)
         vec3 bezel_out = bezel_color(bezel_in.r);
@@ -1433,7 +1433,7 @@ void main() {
         
         if (is_bezel_paint_area(co_bezel)) {
             
-            vec4 pixel_bezel = fn_pixel_bezel(co_bezel, co_mirror, BG_IMAGE_NIGHTIFY * DO_BG_IMAGE, pixel_ambi);
+            vec4 pixel_bezel = fn_pixel_bezel(co_bezel, co_mirror, BG_IMAGE_NIGHTIFY * DO_BG_IMAGE);
             pixel_out = mix(pixel_out, pixel_bezel.rgb, pixel_bezel.a);
         
             // Update alpha mask.
@@ -1486,10 +1486,11 @@ void main() {
     if (DO_BACKDROP == 1.0)
         pixel_out += pixel_backdrop_image(vIsRotated);
 
-
+//FragColor = vec4(canvas_busy) ; return;
     //Foreground image
     if (DO_BG_IMAGE + BG_IMAGE_OVER == 2.0) {
         vec4 pixel_fg_image = fn_pixel_fgbg_image(bg_over);
+        
         // if geometry content is overridden, ambientlight may have not been sample yet due to some skip logic
         if (DO_AMBILIGHT == 1.0 && (pixel_fg_image.a+AMBI_BG_IMAGE_FORCE) > 0.0  && canvas_busy < 0.01) {
             pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb * (1- canvas_busy ); //ALREADY TRIED COMMON fma() optimization, failed.
