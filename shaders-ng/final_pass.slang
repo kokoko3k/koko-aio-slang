@@ -1250,8 +1250,8 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
 
     //Yes, we already passed ambilight as parameter, but if geometry content is overridden
     //then ambientlight may have not been sampled yet due to some skip logic made in the main()
-        if (DO_AMBILIGHT == 1.0) 
-            pixel_ambilight = texture(ambi_temporal_pass, vOutputCoord).rgb;
+    //    if (DO_AMBILIGHT == 1.0) 
+    //        pixel_ambilight = texture(ambi_temporal_pass, vOutputCoord).rgb;
 
     //Apply nightification, the strength is modulated by ambient light.
         //Use a shaded box to apply ambilight on external borders only
@@ -1489,11 +1489,7 @@ void main() {
     //Foreground image
     if (DO_BG_IMAGE + BG_IMAGE_OVER == 2.0) {
         vec4 pixel_fg_image = fn_pixel_fgbg_image(bg_over);
-        // if geometry content is overridden, ambientlight may have not been sample yet due to some skip logic
-        /*if (DO_AMBILIGHT == 1.0 && (pixel_fg_image.a+AMBI_BG_IMAGE_FORCE) > 0.0  && content_and_bezel_area_mask < 0.01) {
-            pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb * (1- content_and_bezel_area_mask ); //ALREADY TRIED COMMON fma() optimization, failed.
-        }*/
-        vec3 anti_nightify_ambi = (pixel_ambi * AMBI_BG_IMAGE_BLEND_MODE) *
+        vec3 anti_nightify_ambi =  (pixel_ambi * AMBI_BG_IMAGE_BLEND_MODE) *
                                     max(AMBI_BG_IMAGE_FORCE, 1-pixel_fg_image.a) ;
 
         pixel_fg_image.rgb = fn_pixel_nightify(pixel_fg_image.rgb, BG_IMAGE_NIGHTIFY, anti_nightify_ambi );
@@ -1509,9 +1505,7 @@ void main() {
         //   that have a low alpha channel, that part would be black.
         if (DO_AMBILIGHT + AMBI_BG_IMAGE_BLEND_MODE == 2.0) {
             float ambi_mask = create_ambi_colorize_shade(co_bezel);
-            float alpha_selective = clamp( pixel_fg_image.a + (1-content_and_bezel_area_mask) , 0.0, 1.0); 
-            //float alpha_selective = min( pixel_fg_image.a + (1-content_and_bezel_area_mask) , 1.0);  //<- this is enough, but cycles won't scale.
-            
+            float alpha_selective = clamp( pixel_fg_image.a + (1-content_and_bezel_area_mask) , 0.0, 1.0);           
             pixel_out = mix(pixel_out, pixel_fg_image.rgb, alpha_selective );
             float fg_image_alpha_adapted = max(pixel_fg_image.a - AMBI_BG_IMAGE_FORCE, 0.0);
             vec3 light = pixel_ambi.rgb * (ambi_mask) * (1- fg_image_alpha_adapted);
