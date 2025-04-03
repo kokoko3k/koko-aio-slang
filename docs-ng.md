@@ -619,7 +619,7 @@ However nice effects may be obtained (eg: with vector games). <br>
 **Mid Overlay image (backdrop, scratches):**<br>
     Display an image over the content.<br>
     The image used by default, picked from the "textures" shader subdirectory,<br>
-    is named: boothill.jpg<br>
+    is named: backdrop.jpg<br>
     Of course you can use other path/names, but then you have to edit the preset <br>
     by modifying the "backdrop =" line.<br>
     <br>
