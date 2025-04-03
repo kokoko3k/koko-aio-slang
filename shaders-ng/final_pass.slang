@@ -1427,7 +1427,7 @@ void main() {
     // or the pixel_content canvas (when not using bezel)
     // It is used to draw spot on the whole inner tube even when toe content does not
     // fill the whole tube.
-    float canvas_bezel_screen = content_area_mask;
+    float content_and_bezel_area_mask = content_area_mask;
 
     // Draw Bezel
     vec2 co_bezel = vec2(0.0);
@@ -1444,11 +1444,11 @@ void main() {
             // We can't use the bezel alpha channel to update the alpha mask since it is transparent
             // on the tube and we don't want to paint anything there, so use a dumb rect and add it to content_area_mask:
             float rect_bezel = float(is_first_inside_rect(co_bezel, vec4(BEZEL_FRAME_SURROUND_MARGIN, BEZEL_FRAME_SURROUND_MARGIN, 1.0 - BEZEL_FRAME_SURROUND_MARGIN, 1.0 - BEZEL_FRAME_SURROUND_MARGIN)));
-            content_area_mask = max(pixel_bezel.a, rect_bezel);
+            content_and_bezel_area_mask = max(pixel_bezel.a, rect_bezel);
 
             // Intersect rect_bezel and bezel alpha to get the inner tube alpha
-            canvas_bezel_screen = (1 - pixel_bezel.a) * rect_bezel;
-            //canvas_bezel_screen = rect_bezel - rect_bezel* pixel_bezel.a; //ASM PROOF: SLOWER
+            content_area_mask = (1 - pixel_bezel.a) * rect_bezel;
+            //content_area_mask = rect_bezel - rect_bezel* pixel_bezel.a; //ASM PROOF: SLOWER
          
         }
         //FragColor = vec4(content_area_mask); return; // <- uncomment to debug BEZEL_FRAME_SURROUND_MARGIN
@@ -1456,12 +1456,12 @@ void main() {
 
 
     // Draw spot and vignette
-    if (canvas_bezel_screen > 0.5) {
+    if (content_area_mask > 0.5) {
         if ( DO_SPOT + DO_VIGNETTE > 0.0 ) {
             float perlin = (random_fast(vTexCoord)-0.5) * (1/255.0);
             vec2 vignette_spot = texture(helper_pass, vTexCoord).zw;
             pixel_out = pixel_out * vignette_spot.x;
-            pixel_out = mix(pixel_out+perlin, vec3(canvas_bezel_screen), vec3(vignette_spot.y) );
+            pixel_out = mix(pixel_out+perlin, vec3(content_area_mask), vec3(vignette_spot.y) );
         }
         
             pixel_out = antighost(pixel_out);
@@ -1469,7 +1469,7 @@ void main() {
     
     
     // Background image have no need to paint if not in the outer border:
-    if ( (DO_BG_IMAGE == 1.0 && BG_IMAGE_OVER == 0.0) && (content_area_mask < 1.0) ) {
+    if ( (DO_BG_IMAGE == 1.0 && BG_IMAGE_OVER == 0.0) && (content_and_bezel_area_mask < 1.0) ) {
         vec4 pixel_bg_image = fn_pixel_fgbg_image(bg_under);
 
         vec3 anti_nightify_ambi = (pixel_ambi * AMBI_BG_IMAGE_BLEND_MODE) *
@@ -1483,7 +1483,7 @@ void main() {
 
 
     // Blend content and border:
-    pixel_out = mix (pixel_under_content, pixel_out, content_area_mask);
+    pixel_out = mix (pixel_under_content, pixel_out, content_and_bezel_area_mask);
 
 
     // Backdrop
@@ -1495,8 +1495,8 @@ void main() {
     if (DO_BG_IMAGE + BG_IMAGE_OVER == 2.0) {
         vec4 pixel_fg_image = fn_pixel_fgbg_image(bg_over);
         // if geometry content is overridden, ambientlight may have not been sample yet due to some skip logic
-        if (DO_AMBILIGHT == 1.0 && (pixel_fg_image.a+AMBI_BG_IMAGE_FORCE) > 0.0  && content_area_mask < 0.01) {
-            pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb * (1- content_area_mask ); //ALREADY TRIED COMMON fma() optimization, failed.
+        if (DO_AMBILIGHT == 1.0 && (pixel_fg_image.a+AMBI_BG_IMAGE_FORCE) > 0.0  && content_and_bezel_area_mask < 0.01) {
+            pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb * (1- content_and_bezel_area_mask ); //ALREADY TRIED COMMON fma() optimization, failed.
         }
         vec3 anti_nightify_ambi = (pixel_ambi * AMBI_BG_IMAGE_BLEND_MODE) *
                                     max(AMBI_BG_IMAGE_FORCE, 1-pixel_fg_image.a) ;
@@ -1514,8 +1514,8 @@ void main() {
         //   that have a low alpha channel, that part would be black.
         if (DO_AMBILIGHT + AMBI_BG_IMAGE_BLEND_MODE == 2.0) {
             float ambi_mask = create_ambi_colorize_shade(co_bezel);
-            float alpha_selective = clamp( pixel_fg_image.a + (1-content_area_mask) , 0.0, 1.0); 
-            //float alpha_selective = min( pixel_fg_image.a + (1-content_area_mask) , 1.0);  //<- this is enough, but cycles won't scale.
+            float alpha_selective = clamp( pixel_fg_image.a + (1-content_and_bezel_area_mask) , 0.0, 1.0); 
+            //float alpha_selective = min( pixel_fg_image.a + (1-content_and_bezel_area_mask) , 1.0);  //<- this is enough, but cycles won't scale.
             
             pixel_out = mix(pixel_out, pixel_fg_image.rgb, alpha_selective );
             float fg_image_alpha_adapted = max(pixel_fg_image.a - AMBI_BG_IMAGE_FORCE, 0.0);
