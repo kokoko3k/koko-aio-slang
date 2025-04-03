@@ -614,13 +614,33 @@ However nice effects may be obtained (eg: with vector games). <br>
     
 **Global shift/zoom:**<br>
     Zoom and shift everything on screen, but background pictures.<br>
+
     
+**Mid Overlay image (backdrop, scratches):**<br>
+    Display an image over the content.<br>
+    The image used by default, picked from the "textures" shader subdirectory,<br>
+    is named: boothill.jpg<br>
+    Of course you can use other path/names, but then you have to edit the preset <br>
+    by modifying the "backdrop =" line.<br>
+    <br>
+    You can choose to emulate a "backdrop", as seen in some old arcades which 
+    used a mirror trick to overlay the game over an high definition printed image.<br>
+    Or you can use some image representing tube glass reflections, scratches and so on.
+    
+        Shift(Zoom) Backdrop over X(Y) axis:
+            move or zoom the whole background image.
+        Display only on content (no shift/zoom)
+            Choose to display the image just over the content
+            ...that way it will be tied to the content geometry 
+            and no zoom/shift will be allowed
+    
+        
 **Backgound image:**<br>
     Draws an image on screen picked from the "textures" shader subdirectory,<br>
     named by default background_over.png and background_under.png<br>
     <br>
     Of course you can use other path/names, but then you have to edit the preset by modifying<br>
-    bg_over and/or bg_under.
+    "bg_over=" and/or "bg_under=" lines.
     <br>
     **-> It is needed that you set retroarch aspect to "Full" <-**<br>
     ( Settings, Video, Scaling, Aspect Ratio = Full )<br>
@@ -649,16 +669,6 @@ However nice effects may be obtained (eg: with vector games). <br>
         2  Clamp to edge and means that it repeats the edge color.
         3  Plain repeat without mirroring.
 
-        
-**Backdrop support:**<br>
-    Some old arcades used a mirror trick to overlay the<br>
-    game over an high definition printed image.<br>
-    The image used by default, picked from the "textures" shader subdirectory,<br>
-    is named: boothill.jpg<br>
-    
-        Shift(Zoom) Backdrop over X(Y) axis:
-            move or zoom the whole background image.
-    
         
 **Ambient light leds:**<br>
     Emulates the presence of led strips behind the monitor that lights the<br>

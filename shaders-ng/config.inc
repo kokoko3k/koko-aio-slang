@@ -183,6 +183,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float AUTOCROP_STEADINESS;
 	
 	float DO_BACKDROP; 
+	float BACKDROP_JUST_TUBE; 
 	float BACKDROP_OFFX;
 	float BACKDROP_OFFY;
 	float BACKDROP_ZOOM;
@@ -594,6 +595,15 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter GLOBAL_ZOOM	 "        Zoom"					1.2   0.0  3.0    0.0005
 #pragma parameter LABEL0029 " " 0.0 0.0 0.0 1.0
 
+
+//Backdrop image
+#pragma parameter DO_BACKDROP		 "★ Mid Overlay image (backdrop, scratches) enable? ==>"		 0.0  0.0  1.0     1.0
+#pragma parameter BACKDROP_OFFX		 "        Shift backdrop over X axis"				0.0  -1.0  1.0    0.0005
+#pragma parameter BACKDROP_OFFY 	 "        Shift backdrop over Y axis"				0.0  -1.0  1.0    0.0005
+#pragma parameter BACKDROP_ZOOM 	 "        Zoom backdrop"					 		1.0  -1.0  3.0    0.0005
+#pragma parameter BACKDROP_JUST_TUBE "        Display only on content (no shift/zoom)"	0.0  0.0  1.0     1.0
+#pragma parameter LABEL0026 " " 0.0 0.0 0.0 1.0
+
 //Background Image
 #pragma parameter DO_BG_IMAGE	     "★ Back/Foreground image enable? (ba) ==>"				 0.0  0.0  1.0     1.0
 #pragma parameter LABEL0039     "   !! RetroArch aspect needs to be set to Full"	 0.0 0.0 0.0 1.0
@@ -605,13 +615,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BG_IMAGE_NIGHTIFY  "      Nightify image"                                 0.0   0.0  1.0    0.1
 #pragma parameter BG_IMAGE_WRAP_MODE "      Wrap mode: default, clamp to border, edge, repeat" 0.0  0.0    3.0    1.0
 #pragma parameter LABEL0025 " " 0.0 0.0 0.0 1.0
-
-//Backdrop image
-#pragma parameter DO_BACKDROP		"★ Backdrop mirrored image enable? ==>"		 0.0  0.0  1.0     1.0
-#pragma parameter BACKDROP_OFFX		"        Shift backdrop over X axis"				 0.0  -1.0  1.0    0.0005
-#pragma parameter BACKDROP_OFFY 	"        Shift backdrop over Y axis"				 0.0  -1.0  1.0    0.0005
-#pragma parameter BACKDROP_ZOOM 	"        Zoom backdrop"					 1.0  -1.0  3.0    0.0005
-#pragma parameter LABEL0026 " " 0.0 0.0 0.0 1.0
 
 
 //Back leds
