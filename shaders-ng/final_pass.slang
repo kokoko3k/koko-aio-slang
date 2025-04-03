@@ -1389,13 +1389,12 @@ void main() {
 
     
     // Draw content only over the alpha mask, and sample ambientlight outside it.
-    vec3 pixel_ambi = get_ambientlight_color();
-    vec3 pixel_under_content = vec3(0.0);
+
     vec3 pixel_out = vec3(0.0);
     
     if (content_area_mask > 0.5) {
         
-        pixel_out = fn_pixel_content(co_content);
+        pixel_out = fn_pixel_content(co_content) * content_area_mask;
 
     } else {
 
@@ -1415,15 +1414,14 @@ void main() {
             }
         #endif
 
-        // Ambient light
-            pixel_under_content = fma(vec3(-content_area_mask), pixel_ambi, pixel_ambi); //ASM PROOF: FASTER
-
     }
 
-    // Apply smooth border to soften jagged edges.
-    pixel_out *= content_area_mask;
-       
+    vec3 pixel_ambi = get_ambientlight_color();
+    vec3 pixel_under_content = pixel_ambi;
     
+    //FragColor.rgb = mix(pixel_ambi, pixel_out, content_area_mask);// vec3(pixel_under_content);return;// vec3(fma(vec3(-content_area_mask), pixel_ambi, pixel_ambi)); return;
+    
+
     // This represents the inner bezel alpha (when using bezel)
     // or the pixel_content canvas (when not using bezel)
     // It is used to draw spot on the whole inner tube even when toe content does not
