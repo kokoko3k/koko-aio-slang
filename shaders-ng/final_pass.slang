@@ -1417,11 +1417,7 @@ void main() {
     }
 
     vec3 pixel_ambi = get_ambientlight_color();
-    vec3 pixel_under_content = pixel_ambi;
-    
-    //FragColor.rgb = mix(pixel_ambi, pixel_out, content_area_mask);// vec3(pixel_under_content);return;// vec3(fma(vec3(-content_area_mask), pixel_ambi, pixel_ambi)); return;
-    
-
+       
     // This represents the inner bezel alpha (when using bezel)
     // or the pixel_content canvas (when not using bezel)
     // It is used to draw spot on the whole inner tube even when toe content does not
@@ -1466,7 +1462,7 @@ void main() {
             pixel_out = antighost(pixel_out);
     }
     
-    
+    vec3 pixel_under_content = pixel_ambi;
     // Background image have no need to paint if not in the outer border:
     if ( (DO_BG_IMAGE == 1.0 && BG_IMAGE_OVER == 0.0) && (content_and_bezel_area_mask < 1.0) ) {
         vec4 pixel_bg_image = fn_pixel_fgbg_image(bg_under);
@@ -1494,9 +1490,9 @@ void main() {
     if (DO_BG_IMAGE + BG_IMAGE_OVER == 2.0) {
         vec4 pixel_fg_image = fn_pixel_fgbg_image(bg_over);
         // if geometry content is overridden, ambientlight may have not been sample yet due to some skip logic
-        if (DO_AMBILIGHT == 1.0 && (pixel_fg_image.a+AMBI_BG_IMAGE_FORCE) > 0.0  && content_and_bezel_area_mask < 0.01) {
+        /*if (DO_AMBILIGHT == 1.0 && (pixel_fg_image.a+AMBI_BG_IMAGE_FORCE) > 0.0  && content_and_bezel_area_mask < 0.01) {
             pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb * (1- content_and_bezel_area_mask ); //ALREADY TRIED COMMON fma() optimization, failed.
-        }
+        }*/
         vec3 anti_nightify_ambi = (pixel_ambi * AMBI_BG_IMAGE_BLEND_MODE) *
                                     max(AMBI_BG_IMAGE_FORCE, 1-pixel_fg_image.a) ;
 
