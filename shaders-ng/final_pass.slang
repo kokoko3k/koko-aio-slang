@@ -1478,12 +1478,9 @@ void main() {
     pixel_out = mix (pixel_under_content, pixel_out, content_and_bezel_area_mask);
 
 
-    // Backdrop
-    if (DO_BACKDROP == 1.0)
-        pixel_out += pixel_backdrop_image(vIsRotated);
-
 
     //Foreground image
+    float backdrop_mask = 1.0;
     if (DO_BG_IMAGE + BG_IMAGE_OVER == 2.0) {
         vec4 pixel_fg_image = fn_pixel_fgbg_image(bg_over);
         // if geometry content is overridden, ambientlight may have not been sample yet due to some skip logic
@@ -1516,8 +1513,16 @@ void main() {
         } else {
             pixel_out = mix(pixel_out, pixel_fg_image.rgb, pixel_fg_image.a);
         }
+        backdrop_mask = (1-pixel_fg_image.a);
     }
 
+    
+    // Backdrop
+    if (DO_BACKDROP == 1.0) {
+        pixel_out += pixel_backdrop_image(vIsRotated) * backdrop_mask;
+    }
+    
+    
     #ifndef RENDER_BOGUS_FRAMES
         // Some cores set first frame size to 1x1 which may cause glitches.
         // This has less performance impact if kept here, at the end of the shader.
