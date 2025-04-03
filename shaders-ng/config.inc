@@ -597,10 +597,10 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 
 //Backdrop image
-#pragma parameter DO_BACKDROP		 "★ Mid Overlay image (backdrop, scratches) enable? ==>"		 0.0  0.0  1.0     1.0
-#pragma parameter BACKDROP_OFFX		 "        Shift backdrop over X axis"				0.0  -1.0  1.0    0.0005
-#pragma parameter BACKDROP_OFFY 	 "        Shift backdrop over Y axis"				0.0  -1.0  1.0    0.0005
-#pragma parameter BACKDROP_ZOOM 	 "        Zoom backdrop"					 		1.0  -1.0  3.0    0.0005
+#pragma parameter DO_BACKDROP		 "★ Mid Overlay image (backdrop, scratches) enable? ==>"	0.0  0.0  1.0   0.05
+#pragma parameter BACKDROP_OFFX		 "        Shift Overlay image over X axis"				0.0  -1.0  1.0    0.0005
+#pragma parameter BACKDROP_OFFY 	 "        Shift Overlay image over Y axis"				0.0  -1.0  1.0    0.0005
+#pragma parameter BACKDROP_ZOOM 	 "        Zoom Overlay image"					 		1.0  -1.0  3.0    0.0005
 #pragma parameter BACKDROP_JUST_TUBE "        Display only on content (no shift/zoom)"	0.0  0.0  1.0     1.0
 #pragma parameter LABEL0026 " " 0.0 0.0 0.0 1.0
 

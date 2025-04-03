@@ -1480,7 +1480,7 @@ void main() {
 
 
     //Foreground image
-    float backdrop_anti_mask = 1.0;
+    float backdrop_anti_mask = DO_BACKDROP;
     if (DO_BG_IMAGE + BG_IMAGE_OVER == 2.0) {
         vec4 pixel_fg_image = fn_pixel_fgbg_image(bg_over);
         // if geometry content is overridden, ambientlight may have not been sample yet due to some skip logic
@@ -1521,12 +1521,13 @@ void main() {
 
     
     // Backdrop
-    if (DO_BACKDROP == 1.0) {
+    if (DO_BACKDROP > 0.0 ) {
         if (BACKDROP_JUST_TUBE == 0.0) {
             pixel_out += pixel_backdrop_image(vIsRotated) * backdrop_anti_mask;
             vec2 backdrop_coords = mix(vOutputCoord, co_content, BACKDROP_JUST_TUBE);
         } else {
-            pixel_out += texture(backdrop, co_content).rgb * content_mask * backdrop_anti_mask;
+            vec3 b =  texture(backdrop, co_content).rgb * content_mask * backdrop_anti_mask;           
+            pixel_out = max(pixel_out, b);
         }
     }
     
