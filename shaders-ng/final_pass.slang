@@ -1229,29 +1229,21 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
             //Sample the reflection pass with small offset to simulate the roughness
                 pixel_mirrored = texture(reflected_blurred_pass, coords_for_mirror + roughness);
             //Show less reflections in the corners
-                 //oldest way, all done in final pass.
-                    //float fcorners_shade = 1 - corners_shade(coords_for_bezel, 1.0) * BEZEL_CORNER_DARK;
-                    //pixel_mirrored.rgb *= fcorners_shade;
-                //successive way, reflection pass did half of the job
-                    //float fcorners_shade = pixel_mirrored.a; //modified way
-                    //pixel_mirrored.rgb *= fcorners_shade;
-                //Actual way, all done in reflection pass.
+                // (all done in reflection pass)
 
-                    
             //Push it over the specular areas and apply the reflection modifier
-                //pixel_mirrored.rgb = pixel_mirrored.rgb * (1 + lut_specular);
-                //pixel_mirrored.rgb = pixel_mirrored.rgb + pixel_mirrored.rgb * lut_specular; //ASM PROOF: FASTER
-                //pixel_mirrored.rgb = fma( pixel_mirrored.rgb, vec3(lut_specular), +pixel_mirrored.rgb); //ASM PROOF: FASTER  
+                pixel_mirrored.rgb = pixel_mirrored.rgb * (1 + lut_specular);
+                //pixel_mirrored.rgb = pixel_mirrored.rgb + pixel_mirrored.rgb * lut_specular; //ASM PROOF: SLOWER
+                //pixel_mirrored.rgb = fma( pixel_mirrored.rgb, vec3(lut_specular), +pixel_mirrored.rgb); //ASM PROOF: SLOWER
                 
-            pixel_mirrored.rgb = pixel_mirrored.rgb * (1 + lut_specular);
             //apply shades over reflection area
                 pixel_mirrored.rgb += pixel_mirrored.a;
         }
 
     //Yes, we already passed ambilight as parameter, but if geometry content is overridden
     //then ambientlight may have not been sampled yet due to some skip logic made in the main()
-        if (DO_AMBILIGHT == 1.0) 
-            pixel_ambilight = texture(ambi_temporal_pass, vOutputCoord).rgb;
+       // if (DO_AMBILIGHT == 1.0) 
+       //     pixel_ambilight = texture(ambi_temporal_pass, vOutputCoord).rgb;
 
     //Apply nightification, the strength is modulated by ambient light.
         //Use a shaded box to apply ambilight on external borders only
