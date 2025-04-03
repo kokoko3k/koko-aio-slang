@@ -1297,6 +1297,27 @@ vec2 quasirandom(vec2 n) {
     //return abs(sin(n));
 }
 
+vec3 get_ambientlight_color() {
+    if (DO_AMBILIGHT == 1.0) {
+        vec3 c = texture(ambi_temporal_pass, vOutputCoord).rgb ;
+        // Debanding when not using bg images.
+        #ifndef SKIPRANDOM
+        if (DO_BG_IMAGE != 1.0) {
+            const float noise_power = -NOISEPOWER_AMBI;
+            float dynamicseed = mod(params.FrameCount, 30.0001);
+            float anoise1 = random_fast(vTexCoord*dynamicseed) * noise_power;
+            // anoise1 *=  (1 - c.g);
+            //anoise1 =  (anoise1 - anoise1 * c.g); //ASM PROOF FASTER
+            anoise1 =  fma(-anoise1, c.g, anoise1); //ASM PROOF FASTER
+            c += anoise1;
+        }
+        #endif
+        return c;
+    } else {
+        return vec3(0.0);
+    }
+}
+
 void main() {
 
     // If fps halver is active, stop processing asap
@@ -1368,7 +1389,7 @@ void main() {
 
     
     // Draw content only over the alpha mask, and sample ambientlight outside it.
-    vec3 pixel_ambi = vec3(0.0);
+    vec3 pixel_ambi = get_ambientlight_color();
     vec3 pixel_under_content = vec3(0.0);
     vec3 pixel_out = vec3(0.0);
     
@@ -1395,28 +1416,8 @@ void main() {
         #endif
 
         // Ambient light
-        if (DO_AMBILIGHT == 1.0) {
-            pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb ;
-            
-            // Debanding when not using bg images.
-            #ifndef SKIPRANDOM
-            if (DO_BG_IMAGE != 1.0) {
-                const float noise_power = -NOISEPOWER_AMBI;
-                float dynamicseed = mod(params.FrameCount, 30.0001);
-                float anoise1 = random_fast(vTexCoord*dynamicseed) * noise_power;
-                // anoise1 *=  (1 - pixel_ambi.g);
-                //anoise1 =  (anoise1 - anoise1 * pixel_ambi.g); //ASM PROOF FASTER
-                anoise1 =  fma(-anoise1, pixel_ambi.g, anoise1); //ASM PROOF FASTER
-                pixel_ambi += anoise1;
-            }
-            #endif
-            
-            //pixel_under_content = clamp(pixel_ambi, 0.0,1.0) * (1-content_area_mask); //<-- this one is better because will antialias borders
-                                                                                    //    better (via canvas-busy) when ambientlight > 0.0
-            //pixel_under_content = pixel_ambi * (1-content_area_mask);
-            //pixel_under_content = pixel_ambi - content_area_mask * pixel_ambi; //ASM PROOF: FASTER
             pixel_under_content = fma(vec3(-content_area_mask), pixel_ambi, pixel_ambi); //ASM PROOF: FASTER
-        }
+
     }
 
     // Apply smooth border to soften jagged edges.
