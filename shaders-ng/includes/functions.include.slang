@@ -753,7 +753,7 @@ float fn_border(vec2 coord) {
 	coord = min(coord, vec2(1.0) - coord) * corner_aspect;
 	vec2 delta = GEOM_CORNER_SIZE - coord;
 	float dist = length(max(delta, vec2(0.0)));
-	float o = clamp( (GEOM_CORNER_SIZE - dist) * GEOM_CORNER_SMOOTH + 0.75, 0.0, 1.0);
+	float o = clamp( (GEOM_CORNER_SIZE - dist) * 350 + 0.75, 0.0, 1.0);
 	return o;
 }
 
@@ -801,12 +801,8 @@ float get_in_aspect() {
 		OriginalAspectRotated = global.OriginalAspectRotated;
 	#endif
 	
-	if (ASPECT_X == -7) {
-		if (DO_BG_IMAGE==0.0)
+	if (ASPECT_X == -7)
 			return OriginalAspectRotated;
-		else
-			return 1.333333; //fallback to 4:3 when using background or foreground images.
-	}
 	
 	if (ASPECT_X == -8)
 			return OriginalAspectRotated;
@@ -836,46 +832,6 @@ vec2 get_scaled_coords_aspect(vec2 pTexCoord, vec4 destsize, float in_aspect , b
 	vec2 scale_coord = pTexCoord * scale - offst;
 	return scale_coord;
 }
-
-
-vec2 get_scaled_coords_aspect_fgbg(vec2 pTexCoord, vec4 destsize, float aspect_image , bool is_rotated, float aspect_content){
-	vec2 scale = vec2(1.0);
-	vec2 offst = vec2(0.0);
-
-	if (is_rotated)
-		destsize.xy=destsize.yx;
-
-	vec2 off_adj = vec2(0.0);
-	
-	if (destsize.x > destsize.y*aspect_content) {
-		// fit width
-		scale.x = destsize.x/(destsize.y * aspect_image);
-					
-		off_adj.x = -BG_IMAGE_OFFX *
-						(1 - destsize.x/destsize.y) /
-						aspect_image /
-						BG_IMAGE_ZOOM;
-	} else {
-		// fit height
-		scale.x = aspect_content * (1.0/aspect_image);
-		scale.y = (destsize.y/destsize.x) * aspect_content ;			  
-		
-		off_adj.x = -BG_IMAGE_OFFX *
-					(1-aspect_content) /
-					aspect_image /
-					BG_IMAGE_ZOOM;
-		
-		off_adj.y = -BG_IMAGE_OFFY *
-						(1 - (destsize.y*aspect_content)/destsize.x) /
-						BG_IMAGE_ZOOM;
-	}	
-	
-	offst = 0.5 * scale + off_adj - 0.5;
-
-	vec2 scale_coord = pTexCoord * scale - offst;
-	return scale_coord;
-}
-
 
 vec2 integer_scale(vec2 in_coords, float target_aspect, bool is_rotated, float do_tate, float uncorrected_aspect) {
 

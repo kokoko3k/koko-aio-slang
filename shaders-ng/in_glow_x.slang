@@ -9,7 +9,6 @@ layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
 layout(location = 2) out float glow_w_inside_interval;
 layout(location = 3) out float vSharp_sub;
-layout(location = 4) out float vDo_wtfl;
 layout(location = 12) out float vWarpedglow_scale_tated;
 layout(location = 14) out float vIn_glow_edge_sharpness;
 layout(location = 15) out float vIn_glow_edge_defocus_strength;
@@ -20,22 +19,18 @@ void main() {
    gl_Position = global.MVP * Position;
    vTexCoord = TexCoord ;  
    
-   bool bDo_wtfl = (DO_WTFL > 0.9 && WTFL_SHARPNESS_X < 3.0);
    bool bDo_defocus = (DO_SHIFT_RGB > 0.5 && EDGE_DEFOCUS_DO_BLUR > 0.0);
    
-   vDo_wtfl = float(bDo_wtfl);
    
    //The following conditions are used to skip blur-x code.
    bool bGlow_w_inside_interval = true;
    if (IN_GLOW_W >= GLOW_SHARP_MAX) bGlow_w_inside_interval = false;             // radius falls in the allowed interval
    if (DO_IN_GLOW < 0.5) bGlow_w_inside_interval = false;                       // Disabled if not user enabled
-   if (bDo_wtfl) bGlow_w_inside_interval = true;    //always active if need to blur the waterfalls.
    if (bDo_defocus) bGlow_w_inside_interval = true; //always active if need to do defocusing.
    
    glow_w_inside_interval = float( bGlow_w_inside_interval);
 
 
-   //if (IN_GLOW_W < 0.0) {
       //Compute subtractive sharpening via blur sharpness strength:
       //For sharpness 0.45, no unsharp mask
       //For sharpness 0.8, 0.65 unsharp mask
@@ -45,7 +40,7 @@ void main() {
       vSharp_sub = 0.8125 * in_glow_w;
       vSharp_sub = clamp(vSharp_sub, 0.0,1.0);
       vSharp_sub = -2*vSharp_sub+1;
-   //}
+
       
    
    float warpedglow_delta = params.OriginalSize.z * 0.5;
@@ -65,7 +60,6 @@ void main() {
       vIn_glow_edge_defocus_strength = 0.0;
    }
    vIn_glow_edge_sharpness = mix(abs(in_glow_w), 0.3, vIn_glow_edge_defocus_strength);
-   //vIn_glow_edge_sharpness = max(vIn_glow_edge_sharpness, MIN_IN_GLOW_SHARP);
 }
 
 
@@ -134,20 +128,7 @@ void main() {
       
    float in_glow_w_adapted = abs(IN_GLOW_W);
    float sharp_sub_adapted = vSharp_sub;
-   
-   float waterfall = 0.0;
-   //Override Megadrive fake transparencies (like Sonic waterfalls)
-      if (vDo_wtfl == 1.0) {
-         waterfall = texture(colortools_and_ntsc_pass, vTexCoord).a; //somehow there is no need to use texture_nearest here.
-         waterfall = unpack_21(waterfall, 1.2).x; //FragColor = vec4(vec3(waterfall),0.0);return;
-      
-         if (DO_IN_GLOW == 0.0)
-            in_glow_w_adapted = 7.0;
-         in_glow_w_adapted = mix(in_glow_w_adapted, WTFL_SHARPNESS_X, waterfall);
-         //cancel sharp sub when doing fake transparencies blur.
-         sharp_sub_adapted = mix(sharp_sub_adapted, 1.0, waterfall );
-      }
-   
+     
    //Scale it for box
       if (IN_GLOW_W < 0.0)
          in_glow_w_adapted = in_glow_w_adapted/1.2;

@@ -22,17 +22,13 @@ layout(push_constant) uniform Push {
 	
 	float DO_BLOOM ; //4
  	float BLOOM_QUALITY ; //1
-	float AMBI_ADD_ON_BLACK;
-	float AMBI_STRETCH;
-	float AMBI_STRETCH_VERTICAL;
-	float AMBI_INT_OFFSET ;
-	float AMBI_SMP_INT_OFFSET ;
+
 
 } params;
 
 layout(std140, set = 0, binding = 0) uniform UBO {
 	mat4 MVP;
-	
+		float DO_CURVATURE;
 	vec4 FinalViewportSize;
 	vec4 final_passFeedbackSize;
 	vec4 in_glow_passSize;
@@ -43,11 +39,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	vec4 colortools_and_ntsc_passSize;
 	vec4 colortools_and_ntsc_passFeedbackSize;
 
-	float COLOR_MONO_COLORIZE;
-	float COLOR_MONO_HUE1;
-	float COLOR_MONO_HUE2;
-	float COLOR_MONO_HUE_BIAS;
-	
 	float DO_IN_GLOW;
 
 	float DO_HALO ;
@@ -70,14 +61,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float BLOOM_OVER_WHITE;
   	float BLOOM_GAMMA_OUT;
 	
-	float DO_FXAA;
-	
-	float DO_SAT_BLEED;
-	float SAT_BLEED_SIZE;
-	float SAT_BLEED_FALLOFF;
-	float SAT_BLEED_STRENGTH;
-	float SAT_BLEED_PAL;
-	
+
 	float DO_PPERSISTENCE;
 	float PPERSISTENCE_START;
 	float PPERSISTENCE_END;
@@ -87,123 +71,33 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float LUMINANCE;
 	float VIBRANCE;
 	float CONTRAST;
-	float ADAPTIVE_BLACK;
 	float BRIGHTNESS;
 	float TEMPERATURE;
 	
-	float DO_CURVATURE;
-	float GEOM_WARP_X;
-	float GEOM_WARP_Y;
-	float GEOM_CORNER_SIZE;
-	float GEOM_CORNER_SMOOTH;
-
-	float DO_BEZEL;
-	float BEZEL_R;
-	float BEZEL_G;
-	float BEZEL_B;
-	float BEZEL_CON;
-
-	float BEZEL_FRAME_ZOOM;
-	float BEZEL_USE_STRAIGHT;
-	float BEZEL_RFL_BLR_SHD;
-	float BEZEL_RFL_ZOOM;
-	float BEZEL_REFL_STRENGTH;
-	float BEZEL_DIFFUSION_STR;
-	float BEZEL_SPCL_STRENGTH;
-	float BEZEL_ROUGHNESS;
-	float BEZEL_CORNER_DARK;
-	
-	float DO_SPOT;
-	float S_POSITION_X; 
-	float S_POSITION_Y; 
-	float S_SIZE;
-	float S_POWER;
-
 	float DO_VIGNETTE;
 	float V_SIZE;
 	float V_POWER;
-
-	float DO_DYNZOOM;
-
-	float DO_AMBILIGHT;
-	float AMBI_FALLOFF;
-	float AMBI_POWER;
-	float AMBI_GAMMA;
-
-	float AMBI_OVER_BEZEL;
-	float AMBI_OVER_BEZEL_SIZE;
-	float AMBI_STEPS;
-	float AMBI_BG_IMAGE_BLEND_MODE;
-	float AMBI_BG_IMAGE_FORCE;
-
 	
+	float CLIP_TO_WHITE;
+	
+
+	float GEOM_WARP_X;
+	float GEOM_WARP_Y;
+	float GEOM_CORNER_SIZE;
+
 	float ASPECT_X;
 	float ASPECT_Y;
 	
-	float DO_BG_IMAGE;
-	float BG_IMAGE_OVER;
-	float BG_IMAGE_OFFY;
-	float BG_IMAGE_OFFX;
-	float BG_IMAGE_ZOOM;
-	float BG_IMAGE_ROTATION;
-	float BG_IMAGE_NIGHTIFY;
-	float BG_IMAGE_WRAP_MODE;
-
 	float DO_SHIFT_RGB;
 	float OFFSET_STRENGTH;
 	
-	float DO_GLOBAL_SHZO;
-	float GLOBAL_ZOOM;
-	float GLOBAL_OFFX;
-	float GLOBAL_OFFY;
-
-	float DO_RF_NOISE;
-	float RF_NOISE_STRENGTH;
-	
-	float DO_GAME_GEOM_OVERRIDE;
-	float GAME_GEOM_INT_SCALE;
-	float GAME_GEOM_INT_SCALE_OVR;
-	float GAME_GEOM_INT_SCALE_MAX;
-	float GAME_GEOM_ASPECT;
-	float GAME_GEOM_VSHIFT;
-	float GAME_GEOM_HSHIFT;
-	float GAME_GEOM_ZOOM;
-	float GAME_GEOM_OFF_FIX; 
-	
-	float DO_TILT;
-	float TILT_X;
-		
 	float PIXELGRID_INTR_GAMMA_ADJ;
 
-	float AUTOCROP_MAX;
-	float AUTOCROP_MIN;
-	float AUTOCROP_SAMPLES;
-	float AUTOCROP_SAMPLE_SIZE;
-	float AUTOCROP_TRANSITION_SPEED;
-	float AUTOCROP_STEADINESS;
-	
-	float DO_BACKDROP; 
-	float BACKDROP_JUST_TUBE; 
-	float BACKDROP_OFFX;
-	float BACKDROP_OFFY;
-	float BACKDROP_ZOOM;
-	
-	float RESSWITCH_GLITCH_SIZE;
 	float TATE;
 
-	float DO_DOT_MATRIX;
-	float DOT_M_G_SHARP;
-	float DOT_M_G_TRESH;
-	float DOT_M_G_STR;
-	float DOT_M_G_BRT;
-	float DOT_M_RGB_SHARP;
-	float DOT_M_RGB_STR;
-	float DOT_M_G_GAIN;
-	float DOT_M_MBLUR_STR;
-	float DOT_M_MBLUR_MODE;
-	float DOT_M_MULTIPLY;
-	float DOT_M_SHADOW_STR;
-	float DOT_M_SHADOW_OFF;
+	float DO_RF_NOISE;
+	float RF_NOISE_SPARK;
+	float RF_NOISE_STRENGTH;
 	
 	float MIN_LINES_INTERLACED;
 	float DO_PIXELGRID;
@@ -218,7 +112,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float PIXELGRID_MAX_W;
 	float PIXELGRID_SIZE_W;
 	
-	float BEZEL_LIGHT_NO_FADEOUT;
 	float IN_GLOW_SPREAD_SHARPNESS;
 
 	float PIXELGRID_MUL_X;
@@ -257,26 +150,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float PIXELGRID_DO_SHADOWMASK;
 	float PIXELGRID_SHADOWMASK_H;
 	float PIXELGRID_SHADOWMASK_SHIFT;
-	//float PIXELGRID_HMASK_NO_BRIGHT;
-	//float MOIRE_SWEET_SPOT;
 	
 	float PIXELGRID_BASAL_GRID;
-	
-	float DO_DEDITHER;
-	float DEDITHER_STRENGTH;
-	float DEDITHER_STRENGTH2;
-	float DEDITHER_TRESHMAX;
-	
-	float DO_NTSC_ARTIFACTS;
-	float NTSC_FILTER_WIDTH;
-	float NTSC_FILTER_SCF;
-	float NTSC_FILTER_FC;
-	float NTSC_MIX;
-	float NTSC_PHASE_SHIFT;
-
-	float NTSC_ARTF_TRSH;
-	float NTSC_SHOW_ARTF_MASK;
-	float NTSC_ARTF_ZAP;
 	
 	float SERVICE1;
 	
@@ -285,6 +160,11 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float IN_GLOW_WARPSHARP_GAMMA;
 	
 	float DO_TEST ;
+	
+	float COLOR_MONO_COLORIZE;
+	float COLOR_MONO_HUE1;
+	float COLOR_MONO_HUE2;
+	float COLOR_MONO_HUE_BIAS;
 	
 	float DECON_RX;
 	float DECON_RY;
@@ -296,26 +176,21 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float EDGE_DEFOCUS_AREA_INV;
 	float EDGE_DEFOCUS_DO_BLUR;
 	
-	float RF_NOISE_SPARK;
-	
-	float DOT_C;
-	float DOT_C_YUV;
-	float DOT_C_SPEED;
-	
 	float OriginalAspectRotated;
-	
-	float BEZEL_RFL_CONTRAST;
-	
-	float CLIP_TO_WHITE;
+
+
+	float DO_GAME_GEOM_OVERRIDE;
+	float GAME_GEOM_INT_SCALE;
+	float GAME_GEOM_INT_SCALE_MAX;
+	float GAME_GEOM_INT_SCALE_OVR;
+	float GAME_GEOM_OFF_FIX;
+
+
 	
 	float OriginalFPS;
 	uint FrameTimeDelta;
 	
-	float DO_WTFL;
-	float WTFL_SHARPNESS_X;
-	float WTFL_SHARPNESS_Y;
-	//float WTFL_THRESHOLD;
-	
+
 } global;
 
 
@@ -337,7 +212,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter LUMINANCE      "       Luminance push (>1.0=clip)"		0.0	 0.0 1.5 0.05
 #pragma parameter BRIGHTNESS     "       Brightness in   (0.0=off)"		0.0	-1.0 1.0 0.01
 #pragma parameter CONTRAST       "       Contrast in     (0.0=off)"		0.0	-1.0 1.0 0.01
-#pragma parameter ADAPTIVE_BLACK "       Adaptive black level range"	0.0 0.0  1.0 0.01
 #pragma parameter TEMPERATURE    "       Temperature in (6500=off)"		6500.0	3000 14000.0 50.0
 #pragma parameter COLOR_MONO_COLORIZE	"       Monochrome screen colorization"	0.0  0.0 1.0 0.1
 #pragma parameter COLOR_MONO_HUE1       "          . Hue bright"					0.25 0.0 1.0 0.01
@@ -347,47 +221,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter VIBRANCE              "       Vibrance in   (0.0=off)"		0.0	0.0  5.0 0.01
 #pragma parameter LABEL0003 " " 0.0 0.0 0.0 1.0
 
-
-// AA
-// Apply an antialiasing filters.
-#pragma parameter DO_FXAA "★ Antialiasing enable? (fxaa|ddt-xbr-lv1) ==>"	0.0 	0.0 2.0 1.0
-#pragma parameter LABEL0004 " " 0.0 0.0 0.0 1.0
-
-
-// Dedithering
-#pragma parameter DO_DEDITHER         "★ Dedither enable? (not with NTSC artifacts) ==>"	0.0 	0.0 1.0 1.0
-#pragma parameter DEDITHER_TRESHMAX   "        Sensitivity"				1.2	0.0 3.0  0.1
-#pragma parameter DEDITHER_STRENGTH   "        Basic search strength"				0.8	0.0 1.0  0.1
-#pragma parameter DEDITHER_STRENGTH2  "        Extensive search strength"			0.0	0.0 1.0  0.1
-
-#pragma parameter LABEL0006 " " 0.0 0.0 0.0 1.0
-
-// NTSC color artifacting
-#pragma parameter DO_NTSC_ARTIFACTS "★ CVBS: NTSC color artifacts enable? (nt) ==>"	0.0 	0.0 1.0 1.0
-#pragma parameter NTSC_MIX          "        Strength"				0.5	0.0 3.0  0.1
-#pragma parameter NTSC_FILTER_WIDTH "        Filter width"			17.0	5.0 21.0 4.0
-#pragma parameter NTSC_FILTER_SCF   "        Subcarrier Frequency mul"		4.57	1.0 10.0 0.01
-#pragma parameter NTSC_FILTER_FC    "        Frequency cutoff"			2.5	0.0 10.0 0.1
-#pragma parameter NTSC_PHASE_SHIFT  "        Phase shift"			0.0	0.0 1.0  1.0
-#pragma parameter NTSC_ARTF_TRSH      "      Artifacts upper treshold"			0.1	0.0 1.0 0.01
-#pragma parameter NTSC_ARTF_ZAP       "      . Cancel artifacts under the treshold"		0.0	0.0 1.0 0.01
-#pragma parameter NTSC_SHOW_ARTF_MASK "      . Show selected artifacts mask (need glow/blur enabled)"				0.0	0.0 1.0 1.0
-
-#pragma parameter LABEL0007 " " 0.0 0.0 0.0 1.0
-
-
-// YIQ/YUV bandwidth limited chroma bleeding.
-#pragma parameter DO_SAT_BLEED "★ CVBS: Bandwidth limited chroma enable? (cv) ==>"	0.0 	0.0 1.0 1.0
-#pragma parameter SAT_BLEED_PAL           "        Colorspace (NTSC, PAL)"	0.0 	 0.0 1.0 1.0
-#pragma parameter SAT_BLEED_STRENGTH      "        Strength"						1.0	 0.0 5.0  0.01
-#pragma parameter SAT_BLEED_SIZE          "        Size (capped to 5.0 in d3d)"		5.0  1.0 20.0  1.0
-#pragma parameter SAT_BLEED_FALLOFF  	  "        Falloff"				1.7 	 1.0 2.0 0.01        
-#pragma parameter LABEL0008 " " 0.0 0.0 0.0 1.0
-
-#pragma parameter DOT_C      "★ CVBS: Dot crawl ==>"		0.0 	 0.0 2.0 0.01
-#pragma parameter DOT_C_YUV  "        Colorspace (NTSC, PAL)"		0.0 	 0.0 1.0 1.0
-#pragma parameter DOT_C_SPEED "        Speed (<0.0 = vertical)"		10.0 	  -10.0 10.0 0.5 
-#pragma parameter LABEL0056 " " 0.0 0.0 0.0 1.0
 
 //Phosphor persistence
 #pragma parameter DO_PPERSISTENCE       "★ Persistence of phosphors enable? (ppe) ==>"	0.0	 0.0 1.0 1.0
@@ -416,12 +249,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter RF_NOISE_SPARK    "        Snow noise"				0.07		0.0 1.0 0.01
 #pragma parameter LABEL0005 " " 0.0 0.0 0.0 1.0
 
-// Megadrive Fake transparency handling
-#pragma parameter DO_WTFL             "★ Megadrive fake transparencies enable?"    0.0 0.0 1.0 1.0
-#pragma parameter WTFL_SHARPNESS_X      "        Overridden X-sharpness"             0.6 0.35 3.0 0.05
-#pragma parameter WTFL_SHARPNESS_Y      "        Overridden Y-sharpness"             0.6 0.35 3.0 0.05
-//#pragma parameter WTFL_THRESHOLD      "        Detection threshold"                1.0 0.0 2.0 0.01
-#pragma parameter LABEL0057 " " 0.0 0.0 0.0 1.0
 
 // Input Blur / light glowing
 #pragma parameter DO_IN_GLOW               "★ Glow/Blur enable? (gl) ==>"	 					0.0	0.0 1.0 1.0
@@ -435,12 +262,9 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter IN_GLOW_WARPSHARP_GAMMA  "        Warped glow dynamics (1.0=linear)"  1.0  0.01 1.0 0.01
 #pragma parameter LABEL0011 " " 0.0 0.0 0.0 1.0
 
-
 #pragma parameter TATE                     "★ Tate mode (0:disabled 1:auto 2:forced)"		1.0 	0.0 2.0 1.0
 #pragma parameter LABEL0012 " " 0.0 0.0 0.0 1.0
 
-#pragma parameter RESSWITCH_GLITCH_SIZE		"★ Glitch amount if vertical resolution changes"		0.1		0.0 0.5 0.05
-#pragma parameter LABEL0013 " " 0.0 0.0 0.0 1.0
 
 #pragma parameter LABEL_INTERLACE           "★ Hi-resolution scanlines behaviour" 1.0 1.0 1.0 0.0
 #pragma parameter MIN_LINES_INTERLACED      "    . Consider Hi-Resolution above # lines (0=never):"		380.0 	0.0 1024 1.0
@@ -510,24 +334,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter label_shadowmask2          "       !! phosphor width is not too low." 0.0 0.0 0.0 1.0
 #pragma parameter PIXELGRID_SHADOWMASK_SHIFT "           . X staggering    "	1.0 0.5 4.0 0.5
 #pragma parameter PIXELGRID_SHADOWMASK_H     "           . Phosphor height "	1.0 1.0 10.0 1.0
-
-
 #pragma parameter LABEL0019 " " 0.0 0.0 0.0 1.0
-
-
-// Dot matrix emulation
-#pragma parameter DO_DOT_MATRIX		"★  Dot matrix emulation enable? (NOT with scanlines!) ==>"	0.0 0.0 1.0 1.0
-#pragma parameter DOT_M_G_STR		"        Grid strength"					0.0 0.0 1.0 0.01
-#pragma parameter DOT_M_G_TRESH		"           . Paint on bright (<0 on black)"	1.1 -1.1 1.1 0.01
-#pragma parameter DOT_M_G_BRT		"           . Grid brightness"					0.0 0.0 1.0 0.01
-#pragma parameter DOT_M_G_SHARP		"           . Grid sharpness (0.0 for auto)"	0.0 0.0 20.0 0.25
-#pragma parameter DOT_M_MBLUR_STR	"        Ghosting"				0.45  0.0 0.9 0.05
-#pragma parameter DOT_M_MBLUR_MODE  "           . Apply on: both,white,black"	0.0  0.0 2.0 1.0
-#pragma parameter DOT_M_SHADOW_STR  "        Shadow strength (disables deconvergence)"	0.0  0.0 1.0 0.01
-#pragma parameter DOT_M_SHADOW_OFF  "           . Shadow offset"								0.0  -1.0 1.0 0.01
-#pragma parameter LABEL0020 " " 0.0 0.0 0.0 1.0
-
-
 
 
 // Halo
@@ -541,7 +348,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter LABEL_HALO_HELP     "         (Mask helper: read docs-ng.md for help)" 	0.0 0.0 0.0 1.0
 #pragma parameter HALO_VS_SCAN        "     Both: Light scanlines and dot grid gaps"				0.0	0.0  1.0  0.01
 #pragma parameter LABEL0021 " " 0.0 0.0 0.0 1.0
-
 
 
 // Bloom
@@ -565,76 +371,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter GEOM_WARP_X        "        Warp X"				0.28   0.0 6.0 0.01
 #pragma parameter GEOM_WARP_Y        "        Warp Y"				0.32   0.0 6.0 0.01
 #pragma parameter GEOM_CORNER_SIZE   "        Corners radius"			0.008 0.002 0.1 0.001
-#pragma parameter GEOM_CORNER_SMOOTH "        Edges sharpness"			200.0 50.0 1000.0 10.0
 #pragma parameter LABEL0023 " " 0.0 0.0 0.0 1.0
-
-
-//Bezel related
-#pragma parameter DO_BEZEL	      "★ Bezel enable? (be) ==>"				0.0   0.0 1.0 1.0
-#pragma parameter BEZEL_USE_STRAIGHT  "        Straight"				0.0	0.0 1.0  1.0 
-#pragma parameter BEZEL_FRAME_ZOOM    "        Frame Alignment"			0.179   -1.5 0.5 0.001
-#pragma parameter BEZEL_R             "        Color: Red"				-0.35   -1.0 1.0  0.005
-#pragma parameter BEZEL_G             "        Color: Green"				-0.35  -1.0 1.0  0.005
-#pragma parameter BEZEL_B             "        Color: Blue"				-0.35   -1.0 1.0  0.005
-#pragma parameter BEZEL_CON           "        Contrast"				1.3   0.0  10.0 0.01
-#pragma parameter BEZEL_RFL_ZOOM      "        Reflections zoom"			0.05   -1.5 0.5 0.01
-#pragma parameter BEZEL_REFL_STRENGTH "        Reflections strength"			0.5    0.0 2.0 0.01
-#pragma parameter BEZEL_CORNER_DARK   "        Less reflections in corners"		0.8    0.0 1.0 0.05
-#pragma parameter BEZEL_RFL_BLR_SHD   "        Reflections sharpness"			-0.2  -1.5 0.8 0.01
-#pragma parameter BEZEL_ROUGHNESS     "            Inner surface roughness"			1.0    0.0 5.0 0.1
-#pragma parameter BEZEL_RFL_CONTRAST  "            Inner shadows contrast"			 	1.0    -1.0 2.0 0.1
-#pragma parameter BEZEL_DIFFUSION_STR "        Diffusion strength"             0.2     0.0 1.0 0.01
-#pragma parameter BEZEL_SPCL_STRENGTH "        Specularity strength"			0.5    0.0 3.0 0.05
-#pragma parameter BEZEL_LIGHT_NO_FADEOUT "        Light fadeout distance"		0.5    0.0 1.0 0.01
-#pragma parameter LABEL0024 " " 0.0 0.0 0.0 1.0
-
-//Global Zoom/Offset
-#pragma parameter DO_GLOBAL_SHZO	 "★ Global shift/zoom enable? (ignored if integer scaling) ==>"	0.0   0.0  1.0 	  1.0
-#pragma parameter GLOBAL_OFFX	 "        X axis shift "			0.0  -1.0  1.0    0.0005
-#pragma parameter GLOBAL_OFFY	 "        Y axis shift "			0.0  -1.0  1.0    0.0005
-#pragma parameter GLOBAL_ZOOM	 "        Zoom"					1.2   0.0  3.0    0.0005
-#pragma parameter LABEL0029 " " 0.0 0.0 0.0 1.0
-
-
-//Backdrop image
-#pragma parameter DO_BACKDROP		 "★ Mid Overlay image (backdrop, scratches) enable? ==>"	0.0  0.0  1.0   0.05
-#pragma parameter BACKDROP_OFFX		 "        Shift Overlay image over X axis"				0.0  -1.0  1.0    0.0005
-#pragma parameter BACKDROP_OFFY 	 "        Shift Overlay image over Y axis"				0.0  -1.0  1.0    0.0005
-#pragma parameter BACKDROP_ZOOM 	 "        Zoom Overlay image"					 		1.0  -1.0  3.0    0.0005
-#pragma parameter BACKDROP_JUST_TUBE "        Display only on content (no shift/zoom)"	0.0  0.0  1.0     1.0
-#pragma parameter LABEL0026 " " 0.0 0.0 0.0 1.0
-
-//Background Image
-#pragma parameter DO_BG_IMAGE	     "★ Back/Foreground image enable? (ba) ==>"				 0.0  0.0  1.0     1.0
-#pragma parameter LABEL0039     "   !! RetroArch aspect needs to be set to Full"	 0.0 0.0 0.0 1.0
-#pragma parameter BG_IMAGE_OVER	     "      Image over game (alpha channel driven)?"	 0.0  0.0  1.0     1.0
-#pragma parameter BG_IMAGE_OFFX	     "      Shift Image over X axis"				 0.0  -1.0  1.0    0.0005
-#pragma parameter BG_IMAGE_OFFY	     "      Shift Image over Y axis"				 0.0  -1.0  1.0    0.0005
-#pragma parameter BG_IMAGE_ZOOM	     "      Zoom Image"					 1.0  -1.0  3.0    0.0005
-#pragma parameter BG_IMAGE_ROTATION  "      Rotate/flip (0=auto,1=no change,<0 for rotated games)"  0.0  -8.0  8.0    1.0
-#pragma parameter BG_IMAGE_NIGHTIFY  "      Nightify image"                                 0.0   0.0  1.0    0.1
-#pragma parameter BG_IMAGE_WRAP_MODE "      Wrap mode: default, clamp to border, edge, repeat" 0.0  0.0    3.0    1.0
-#pragma parameter LABEL0025 " " 0.0 0.0 0.0 1.0
-
-
-//Back leds
-//Emulates leds under the monitor frame that slowly reacts to game
-#pragma parameter DO_AMBILIGHT	            "★ Ambient light leds enable? (am) ==> "				1.0  0.0  1.0     1.0
-#pragma parameter LABEL0040            "    !! RetroArch aspect needs to be set to Full"		0.0 0.0 0.0 1.0
-#pragma parameter AMBI_STEPS	            "        Slowness"						60.0 5.0  1000.0  5.0
-#pragma parameter AMBI_FALLOFF              "        Led power/falloff"			0.4  0.1  3.0     0.01
-#pragma parameter AMBI_POWER                "        Led Saturation"						1.8  0.0  100.0     0.05
-#pragma parameter AMBI_INT_OFFSET           "        Internalness (Led position)"      0.07 -1.0 1.0 0.01
-#pragma parameter AMBI_SMP_INT_OFFSET       "        Internalness (Sampling point) "   0.07 0.07 1.0 0.01 
-#pragma parameter AMBI_STRETCH              "        Widen lights (horizontal games)"	0.0  0.0  1.0     0.01
-#pragma parameter AMBI_STRETCH_VERTICAL     "        Widen lights (vertical games)"		0.35  0.0  1.0     0.01
-#pragma parameter AMBI_GAMMA                "        Output Gamma"						1.3  0.1  8.0     0.1
-#pragma parameter AMBI_OVER_BEZEL           "        Bezel Colorization intensity"		0.2  0.0  5.0     0.05
-#pragma parameter AMBI_OVER_BEZEL_SIZE      "        Bezel Colorization size"			0.15 0.001  0.5   0.001 ///hacky, but keep min to 0.001 plz.
-#pragma parameter AMBI_BG_IMAGE_BLEND_MODE  "        Back/Foreground image alpha blend (0=mix, 1=add)"	0.0   0.0  1.0    1.0
-#pragma parameter AMBI_ADD_ON_BLACK         "        Foggy (power on dark colors, add mode only)    "		1.0   0.0  1.0    0.05
-#pragma parameter AMBI_BG_IMAGE_FORCE       "        Always colorize Back/Foreground image (add mode only) "		0.0   0.0  1.0    0.1
-#pragma parameter LABEL0027 " " 0.0 0.0 0.0 1.0
 
 
 
@@ -643,18 +380,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter V_SIZE	"        Size"			0.7  0.3  2.0  0.02
 #pragma parameter V_POWER	"        Power"			1.0  0.05 1.0  0.01
 
-#pragma parameter DO_SPOT	"★ Spot enable? (sp) ==>"		0.0   0.0   1.0 1.0
-#pragma parameter S_POSITION_X 	"        X Position"	   -0.5   -2.0 2.0 0.05
-#pragma parameter S_POSITION_Y 	"        Y Position"		0.5   -2.0 2.0 0.05
-#pragma parameter S_SIZE	"        Size"			0.36    0.0   3.0 0.01
-#pragma parameter S_POWER	"        Power" 		0.12   0.01  1.0 0.01
-#pragma parameter LABEL0028 " " 0.0 0.0 0.0 1.0
-
-
-//Tilt
-#pragma parameter DO_TILT	  	"★ Tilt enable? (ti) ==>"				0.0   0.0  1.0 	  1.0
-#pragma parameter TILT_X	  	"        Tilt along X axis"				0.25    -0.5  0.5  0.01
-#pragma parameter LABEL0035 " " 0.0 0.0 0.0 1.0
 
 //Aspect Ratio
 #pragma parameter label_ar	 "★ Aspect (applies to game and bezel) "							1.0  1.0  1.0     0.0
@@ -668,18 +393,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter LABEL0048  "       -9=Stretch to window" 0.0 0.0 0.0 1.0
 #pragma parameter LABEL0051 " " 0.0 0.0 0.0 1.0
 
-//Modulate the image zooming depending on the image luminosity.
-#pragma parameter DO_DYNZOOM	     "★ Luminosity tied zoom (ignored if integer scaling) ==>"		0.015   0.0   1.0  0.005
-#pragma parameter LABEL0032 " " 0.0 0.0 0.0 1.0
-
-//Autocrop
-#pragma parameter AUTOCROP_MAX	     "★ Autocrop: maximum amount (ignored if integer scaling) ==>"   0.0   0.0   0.5  0.01
-#pragma parameter AUTOCROP_MIN	            "        Number of mandatory lines to crop"   1.0   0.0   10.0  1.0
-#pragma parameter AUTOCROP_SAMPLES          "        Samples per frame (faster response, higher gpu use)"     20.0   0.0   300.0 1.0
-#pragma parameter AUTOCROP_SAMPLE_SIZE      "        Sample size (big speedup, less accurate)" 2.0 0.0 5.0 1.0  
-#pragma parameter AUTOCROP_STEADINESS       "        Scene change treshold (0 = continuous cropping)"     0.2   0.0   0.5 0.01
-#pragma parameter AUTOCROP_TRANSITION_SPEED "        Transition speed"    		 0.1   0.05   1.0 0.05
-#pragma parameter LABEL0033 " " 0.0 0.0 0.0 1.0
 
 //Game geomerty overrides
 #pragma parameter DO_GAME_GEOM_OVERRIDE	  "★ Override game geometry enable? (ov)==>"	0.0   0.0  1.0 	  1.0
@@ -687,18 +400,9 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter GAME_GEOM_INT_SCALE_MAX "        .    Maximum integer scale" 			10.0  1.0  100.0  1.0
 #pragma parameter GAME_GEOM_INT_SCALE_OVR "        .    Permit integer overscale by" 			1.04   1.00  1.15  0.01
 #pragma parameter GAME_GEOM_OFF_FIX	      "        .    Sharp hack through offset (0.0=disable)"	0.0    0.0  100.0  1
-#pragma parameter LABEL0052           "    !! The following will override integer scale" 0.0 0.0 0.0 1.0
-#pragma parameter GAME_GEOM_ASPECT	  "        Aspect (0=unchanged, <0=Core Aspect)"	-0.01    -0.01  3.0	  0.005
-#pragma parameter GAME_GEOM_VSHIFT	  "        Vertical position"			0.0   -10.0 10.0  0.01
-#pragma parameter GAME_GEOM_HSHIFT	  "        Horizontal position"			0.0   -10.0 10.0  0.01
-#pragma parameter GAME_GEOM_ZOOM	  "        Zoom"					1.0    0.0  2.0  0.01
-
 #pragma parameter LABEL0034 " " 0.0 0.0 0.0 1.0
 
 #pragma parameter SERVICE1 "Don't use me, for debug purposes only" 	0.0 -5.0 5.0 0.01
-
-// This is for a patched retroarch version I'm testing (24/03/04)
-#pragma inject_preset_code DEFINES_FROM_PRESET
 
 // User parameters goes here, they overrides almost everything:
 // Retroarch releases past October 2024 (v1.17) support this:

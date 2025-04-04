@@ -10,9 +10,7 @@ layout(location = 1) out float glow_h_inside_interval;
 layout(location = 2) out float vDoInGlowBias;
 layout(location = 3) out float vGlow_Gain;
 layout(location = 4) out float vSharp_sub;
-layout(location = 5) out float vDo_wtfl;
 layout(location = 6) out float vIn_glow_h_adapted;
-layout(location = 7) out float vDeltaRenderOk;
 layout(location = 8) out float vWarpedglow;
 layout(location = 9) out float vDynamicSeed;
 layout(location = 10) out float vIn_glow_edge_sharpness;
@@ -29,19 +27,15 @@ void main() {
    //    * we don't want to show ntsc artifact masks if we're doing ntsc artifacts
    // Then do in glow bias
    vDoInGlowBias = float (  IN_GLOW_BIAS < IN_GLOW_BIAS_MAX && 
-                            (abs(IN_GLOW_W) < GLOW_SHARP_MAX || IN_GLOW_H < GLOW_SHARP_MAX) &&
-                            (DO_NTSC_ARTIFACTS + NTSC_SHOW_ARTF_MASK < 1.5)   );
+                            (abs(IN_GLOW_W) < GLOW_SHARP_MAX || IN_GLOW_H < GLOW_SHARP_MAX) );
    
-   bool bDo_wtfl = (DO_WTFL > 0.9 && WTFL_SHARPNESS_Y < 3.0);
    bool bDo_defocus = (DO_SHIFT_RGB > 0.5 && EDGE_DEFOCUS_DO_BLUR > 0.0);
-   
-   vDo_wtfl = float(bDo_wtfl);
+
    
    //The following conditions are used to skip blur-x code.
    bool bGlow_h_inside_interval = true;
    if (IN_GLOW_H >= GLOW_SHARP_MAX) bGlow_h_inside_interval = false;             // radius falls in the allowed interval
    if (DO_IN_GLOW < 0.5) bGlow_h_inside_interval = false;                       // Disabled if not user enabled
-   if (bDo_wtfl) bGlow_h_inside_interval = true;    //always active if need to blur the waterfalls.
    if (bDo_defocus) bGlow_h_inside_interval = true; //always active if need to do defocusing.
 
    glow_h_inside_interval = float( bGlow_h_inside_interval);
@@ -61,7 +55,6 @@ void main() {
    //}
       
    bool bIs_Interlaced = is_interlaced();
-   vDeltaRenderOk = is_deltarender_allowed(bIs_Interlaced); //carries DR mandatory conditions, including forced refreshed frames
 
    float warpedglow_scale = 1.0;
    if (DO_PIXELGRID > 0.0 && DO_PIXELGRID_H > 0.0)
@@ -103,10 +96,7 @@ void main() {
    
    
   
-   //when not using glow/blur, set it to 7.0 if needed by fake transparency blurring
-   if (vDo_wtfl == 1.0  && DO_IN_GLOW == 0.0) 
-      vIn_glow_h_adapted = 7.0;
-   //..same goes for defocus
+   //when not using glow/blur, set it to 7.0 if needed by defocus
    if (vIn_glow_edge_defocus_strength > 0.0 && DO_IN_GLOW == 0.0)
       vIn_glow_h_adapted = 7.0;
  
@@ -120,9 +110,7 @@ layout(location = 1) in float glow_h_inside_interval;
 layout(location = 2) in float vDoInGlowBias;
 layout(location = 3) in float vGlow_Gain;
 layout(location = 4) in float vSharp_sub;
-layout(location = 5) in float vDo_wtfl;
 layout(location = 6) in float vIn_glow_h_adapted;
-layout(location = 7) in float vDeltaRenderOk;
 layout(location = 8) in float vWarpedglow;
 layout(location = 9) in float vDynamicSeed;
 layout(location = 10) in float vIn_glow_edge_sharpness;
@@ -170,16 +158,6 @@ void main() {
       if (fps_halver_is_skipped_frame())
          return;
    #endif
-
-   //Delta render?
-   float DR_changed = 1.0;
-   if (delta_render_enabled() == 1.0) {
-     if (vDeltaRenderOk == 1.0) {
-         DR_changed = delta_render_changed(colortools_and_ntsc_passFeedback, colortools_and_ntsc_pass,
-                                                      vTexCoord, delta_render_get_check_area() );
-
-     }
-   }
    
    //Warped Glow Y
    //The result will be stored in the alpha channel to be consumed by final pass.
@@ -205,9 +183,6 @@ void main() {
 
 
    float warpedglow_or_DR = warpedglow_y;
-   if (DR_changed == 0.0) {
-      warpedglow_or_DR = DR_changed;
-   }
    
    //Passthrough
    if (glow_h_inside_interval == 0.0) {
@@ -221,7 +196,7 @@ void main() {
    }
    
    
-   if (DO_IN_GLOW == 0.0 && WTFL_SHARPNESS_Y == 3.0 ) {
+   if (DO_IN_GLOW == 0.0) {
       vec3 glowed = texture(shift_and_bleed_pass, vTexCoord).rgb * vGlow_Gain;
       glowed = clip_to_white_maybe(glowed.rgb);      
       FragColor = vec4(glowed, warpedglow_or_DR);
@@ -237,17 +212,7 @@ void main() {
    vec3 pixel_glowed;
    
    float sharp_sub_adapted = vSharp_sub;
-   
-   //Override Megadrive fake transparencies (like Sonic waterfalls)
-      if (vDo_wtfl == 1.0) {
-         float waterfall = texture_NEAREST_lod(colortools_and_ntsc_pass, vTexCoord, params.OriginalSize,0.0).a;
-         waterfall = unpack_21(waterfall, 1.2).y;
-         //FragColor = vec4(vec3(waterfall),0.0);return;
-         in_glow_h_adapted = mix(in_glow_h_adapted, WTFL_SHARPNESS_Y, waterfall);
-         //cancel sharp sub when doing fake transparencies blur.
-         sharp_sub_adapted = mix(sharp_sub_adapted, 1.0, waterfall );
-      }
-   
+
    // Edge defocus:
       float dist_from_edge = 1.0;
       if (vIn_glow_edge_defocus_strength > 0.0) {
