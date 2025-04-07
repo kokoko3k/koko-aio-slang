@@ -46,6 +46,7 @@ layout(location = 16) out float vDeltaRenderOk;
 layout(location = 17) out float vDo_pixelgrid_h;
 layout(location = 18) out float vFake_scanline_period;
 layout(location = 19) out float vPG_y_shift;
+layout(location = 20) out vec2 vUnrotated_Output_coords;
 
 #ifdef DEBUG_PRINT_VALUE
     layout(location = 31) out float vfprintvalue; 
@@ -63,7 +64,35 @@ layout(location = 19) out float vPG_y_shift;
 
 #define PI_15 4.71238898038469 //pi*1.5
 
-
+vec2 get_unrotated_output_coords(vec2 in_coords) {
+	#ifdef _HAS_ROTATION_UNIFORM
+        uint Rotation=params.Rotation;
+	#else
+		uint Rotation=uint(is_rotated_old());
+	#endif
+    //0
+    //nothing to do.
+    
+    //90
+    if (Rotation == 1) {
+        in_coords.xy = in_coords.yx;
+        in_coords.y = 1 - in_coords.y;
+    } else
+    
+    //180
+    if (Rotation == 2) {
+        in_coords = 1 - in_coords;
+    } else
+    
+    //270
+    if (Rotation == 3) {
+        in_coords.xy = in_coords.yx;      
+        in_coords.x = 1 - in_coords.x;
+    } 
+    
+    return in_coords;
+}
+    
 vec2 get_bg_image_coords(vec2 in_vOutputCoord) {
     vec2 bg_img_coords = in_vOutputCoord;
 
@@ -217,8 +246,9 @@ void main() {
 
     vOutputCoord = TexCoord ;
 
-    vBg_img_coords =  get_bg_image_coords(vOutputCoord);
-
+    vBg_img_coords = get_bg_image_coords(vOutputCoord);
+    vUnrotated_Output_coords = get_unrotated_output_coords(vOutputCoord);
+    
     //Help scanline/pixelgrid code too:
         bool bIs_Interlaced = is_interlaced();
 
@@ -434,6 +464,7 @@ layout(location = 16) in float vDeltaRenderOk;
 layout(location = 17) in float vDo_pixelgrid_h;
 layout(location = 18) in float vFake_scanline_period;
 layout(location = 19) in float vPG_y_shift;
+layout(location = 20) in vec2 vUnrotated_Output_coords;
 
 #ifdef DEBUG_PRINT_VALUE
     layout(location = 31) in float vfprintvalue;
@@ -881,17 +912,17 @@ float get_clamped_white_reference(vec3 pixel_in){
     return white_reference;
 }
 
-vec3 pixel_backdrop_image(float isrotated) {
+vec3 pixel_backdrop_image() {
     vec2 backdrop_offset=vec2(BACKDROP_OFFX,BACKDROP_OFFY);
 
     vec2 backdrop_tex_size = textureSize(backdrop, 0);
     //float backdrop_lod = log2(backdrop_tex_size.y * global.FinalViewportSize.w);
 
     vec2 backdrop_coords =  get_scaled_coords_aspect(
-                            vOutputCoord+backdrop_offset,
+                            vUnrotated_Output_coords+backdrop_offset,
                             global.FinalViewportSize,
                             backdrop_tex_size.x/backdrop_tex_size.y,
-                            bool(isrotated));
+                            false);
 
     backdrop_coords=zoom(backdrop_coords, BACKDROP_ZOOM);
     //return textureLod(backdrop, backdrop_coords, backdrop_lod).rgb;
@@ -1370,8 +1401,9 @@ void main() {
         pixel_out = fn_pixel_content(co_content);
 
         if (DO_BACKDROP * BACKDROP_JUST_TUBE > 0.0) {
-                vec3 backdrop = texture(backdrop, vTexCoord).rgb;
-                pixel_out = max(pixel_out, backdrop*DO_BACKDROP);
+            vec3 backdrop = pixel_backdrop_image().rgb;
+            //pixel_out = mix(pixel_out, pixel_out + backdrop,  (1 - dot(pixel_out,vec3(1/3.0)), 0,1) * DO_BACKDROP   );
+            pixel_out = max(pixel_out, backdrop*DO_BACKDROP);
         }
 
 
@@ -1527,8 +1559,7 @@ void main() {
     // Backdrop
     if (DO_BACKDROP > 0.0 ) {
         if (BACKDROP_JUST_TUBE == 0.0) {
-            pixel_out += pixel_backdrop_image(vIsRotated) * DO_BACKDROP;
-            vec2 backdrop_coords = mix(vOutputCoord, co_content, BACKDROP_JUST_TUBE);
+            pixel_out += pixel_backdrop_image();
         }
     }
     
