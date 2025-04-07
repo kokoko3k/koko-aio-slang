@@ -885,7 +885,7 @@ vec3 pixel_backdrop_image(float isrotated) {
     vec2 backdrop_offset=vec2(BACKDROP_OFFX,BACKDROP_OFFY);
 
     vec2 backdrop_tex_size = textureSize(backdrop, 0);
-    float backdrop_lod = log2(backdrop_tex_size.y * global.FinalViewportSize.w);
+    //float backdrop_lod = log2(backdrop_tex_size.y * global.FinalViewportSize.w);
 
     vec2 backdrop_coords =  get_scaled_coords_aspect(
                             vOutputCoord+backdrop_offset,
@@ -894,7 +894,8 @@ vec3 pixel_backdrop_image(float isrotated) {
                             bool(isrotated));
 
     backdrop_coords=zoom(backdrop_coords, BACKDROP_ZOOM);
-    return textureLod(backdrop, backdrop_coords, backdrop_lod).rgb;
+    //return textureLod(backdrop, backdrop_coords, backdrop_lod).rgb;
+    return texture(backdrop, backdrop_coords).rgb;
 }
 
 
