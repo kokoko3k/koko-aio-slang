@@ -169,4 +169,4 @@ TODO:
 		    //if (global.upscale_passSize.y == params.OriginalSize.y)
 		    //    coords_smp = coords_NEAREST(coords, global.upscale_passSize);
 		    vec4 pixel_out = texture(in_glow_pass, coords_smp);
-	
+	] ] add new backdrop on tube option in optional config file template

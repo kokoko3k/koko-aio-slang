@@ -1369,6 +1369,12 @@ void main() {
         
         pixel_out = fn_pixel_content(co_content);
 
+        if (DO_BACKDROP * BACKDROP_JUST_TUBE > 0.0) {
+                vec3 backdrop = texture(backdrop, vTexCoord).rgb;
+                pixel_out = max(pixel_out, backdrop*DO_BACKDROP);
+        }
+
+
     } else {
 
         // Can we halve refresh rate in the outside border to spare some cycles?
@@ -1481,7 +1487,6 @@ void main() {
 
 
     //Foreground image
-    float backdrop_anti_mask = 1.0;
     if (DO_BG_IMAGE + BG_IMAGE_OVER == 2.0) {
         vec4 pixel_fg_image = fn_pixel_fgbg_image(bg_over);
         // if geometry content is overridden, ambientlight may have not been sample yet due to some skip logic
@@ -1516,19 +1521,14 @@ void main() {
         }
         
         //FragColor = vec4(pixel_fg_image.a) ; return;
-        
-        backdrop_anti_mask = 1-pixel_fg_image.a;
     }
 
     
     // Backdrop
     if (DO_BACKDROP > 0.0 ) {
         if (BACKDROP_JUST_TUBE == 0.0) {
-            pixel_out += pixel_backdrop_image(vIsRotated) * backdrop_anti_mask * DO_BACKDROP;
+            pixel_out += pixel_backdrop_image(vIsRotated) * DO_BACKDROP;
             vec2 backdrop_coords = mix(vOutputCoord, co_content, BACKDROP_JUST_TUBE);
-        } else {
-            vec3 b =  texture(backdrop, co_content).rgb * content_mask * backdrop_anti_mask * DO_BACKDROP ;           
-            pixel_out = max(pixel_out, b);
         }
     }
     
