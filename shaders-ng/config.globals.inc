@@ -509,7 +509,6 @@
     #define BACKDROP_JUST_TUBE		global.BACKDROP_JUST_TUBE
 #endif
 
-
 #ifndef BACKDROP_OFFX
     #define BACKDROP_OFFX		global.BACKDROP_OFFX
 #endif

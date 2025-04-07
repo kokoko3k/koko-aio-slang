@@ -379,6 +379,7 @@
 
 
 // #define DO_BACKDROP  0.0           // ★ Backdrop mirrored image enable?
+// #define BACKDROP_JUST_TUBE 1.0     //         Display only on content
 // #define BACKDROP_OFFX  0.0         //         Shift backdrop over X axis
 // #define BACKDROP_OFFY  0.0         //         Shift backdrop over Y axis
 // #define BACKDROP_ZOOM  1.0         //         Zoom backdrop
