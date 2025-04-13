@@ -15,9 +15,9 @@ DO_SAT_BLEED = "1.000000"
 	SAT_BLEED_FALLOFF    = "1.7"
 
 
-DOT_C = "1.0"
+DOT_C = "0.45"
 	DOT_C_YUV = "1.0"
-	DOT_C_SPEED = "10.0"
+	DOT_C_SPEED = "9.0"
 	
 IN_GLOW_POWER = "1.3"
 IN_GLOW_BIAS = "1.0"
