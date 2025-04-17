@@ -38,15 +38,14 @@ layout(location = 8) out vec3 vDotMat_Grid_Color;
 layout(location = 9) out vec4 vPG_offsets_and_size;
 layout(location = 10) out float vInteger_fragment_x;
 layout(location = 11) out vec2 vPG_freq_base_screen_unfloored;
-layout(location = 12) out float vPG_period_multiplier_x;
-layout(location = 13) out vec2 vPG_OriginalSize_tated_mul_pi;
-layout(location = 14) out float vDotMat_Grid_Sharpness;
-layout(location = 15) out float vPG_mask_height;
-layout(location = 16) out float vDeltaRenderOk;
-layout(location = 17) out float vDo_pixelgrid_h;
-layout(location = 18) out float vFake_scanline_period;
-layout(location = 19) out float vPG_y_shift;
-layout(location = 20) out vec2 vUnrotated_Output_coords;
+layout(location = 12) out vec2 vPG_OriginalSize_tated_mul_pi;
+layout(location = 13) out float vDotMat_Grid_Sharpness;
+layout(location = 14) out float vPG_mask_height;
+layout(location = 15) out float vDeltaRenderOk;
+layout(location = 16) out float vDo_pixelgrid_h;
+layout(location = 17) out float vFake_scanline_period;
+layout(location = 18) out float vPG_y_shift;
+layout(location = 19) out vec2 vUnrotated_Output_coords;
 
 #ifdef DEBUG_PRINT_VALUE
     layout(location = 31) out float vfprintvalue; 
@@ -317,11 +316,12 @@ void main() {
                     vPG_OriginalSize_tated_mul_pi *= 2.0;
 
     //Pixelgrid: adapt period multiplier
-        vPG_period_multiplier_x = 1/PIXELGRID_MUL_X;
-        if (vPG_period_multiplier_x < 0.0) vPG_period_multiplier_x = 1/-vPG_period_multiplier_x;
+        float PG_period_multiplier_x = 1/PIXELGRID_MUL_X;
+        if (PG_period_multiplier_x < 0.0) PG_period_multiplier_x = 1/-PG_period_multiplier_x;
 
-        vPG_OriginalSize_tated_mul_pi *=  vec2(vPG_period_multiplier_x, 1.0) ;
-
+        //apply it:
+            vPG_OriginalSize_tated_mul_pi *=  vec2(PG_period_multiplier_x, 1.0) ; //for core coords
+            vPG_freq_base_screen_unfloored *= vec2(PG_period_multiplier_x, 1.0) ; //for screen coords
 
     //Pixelgrid Y mask: adapt mask height
         vPG_mask_height = PIXELGRID_Y_MASK_HEIGHT;
@@ -457,15 +457,14 @@ layout(location = 8) in vec3 vDotMat_Grid_Color;
 layout(location = 9) in vec4 vPG_offsets_and_size;
 layout(location = 10) in float vInteger_fragment_x;
 layout(location = 11) in vec2 vPG_freq_base_screen_unfloored;
-layout(location = 12) in float vPG_period_multiplier_x;
-layout(location = 13) in vec2 vPG_OriginalSize_tated_mul_pi;
-layout(location = 14) in float vDotMat_Grid_Sharpness;
-layout(location = 15) in float vPG_mask_height;
-layout(location = 16) in float vDeltaRenderOk;
-layout(location = 17) in float vDo_pixelgrid_h;
-layout(location = 18) in float vFake_scanline_period;
-layout(location = 19) in float vPG_y_shift;
-layout(location = 20) in vec2 vUnrotated_Output_coords;
+layout(location = 12) in vec2 vPG_OriginalSize_tated_mul_pi;
+layout(location = 13) in float vDotMat_Grid_Sharpness;
+layout(location = 14) in float vPG_mask_height;
+layout(location = 15) in float vDeltaRenderOk;
+layout(location = 16) in float vDo_pixelgrid_h;
+layout(location = 17) in float vFake_scanline_period;
+layout(location = 18) in float vPG_y_shift;
+layout(location = 19) in vec2 vUnrotated_Output_coords;
 
 #ifdef DEBUG_PRINT_VALUE
     layout(location = 31) in float vfprintvalue;
@@ -655,7 +654,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
         //vec2 freq_base_unfloored = freq_base_core;
         vec2 freq_base_unfloored = freq_base_core;
         if (PIXELGRID_SIZE_W == 1.0) {
-            freq_base.x = freq_base_screen.x * vPG_period_multiplier_x;
+            freq_base.x = freq_base_screen.x;
             freq_base_unfloored.x = vPG_freq_base_screen_unfloored.x;
         }
     
