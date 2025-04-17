@@ -320,6 +320,7 @@ void main() {
         vPG_period_multiplier_x = 1/PIXELGRID_MUL_X;
         if (vPG_period_multiplier_x < 0.0) vPG_period_multiplier_x = 1/-vPG_period_multiplier_x;
 
+        vPG_OriginalSize_tated_mul_pi *=  vec2(vPG_period_multiplier_x, 1.0) ;
 
 
     //Pixelgrid Y mask: adapt mask height
@@ -632,7 +633,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
         in_coords.xy = mix_step(in_coords.xy, in_coords.yx, vDo_Tate);
        //in_coords = in_coords - global.flick_and_noise_passSize.zw*0.5; //<-- needed if for whatever reason you want to draw scanlines and vgaps in first_pass
 
-        vec2 freq_base_core = in_coords * vPG_OriginalSize_tated_mul_pi ;
+        vec2 freq_base_core = in_coords * vPG_OriginalSize_tated_mul_pi; 
 
         //Use fake scanlines?
         if (vFake_scanline_period > 0.0)
@@ -650,12 +651,12 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
         }
 
     //Switch frequency between core and screen and apply asked multipliers
-        vec2 freq_base = freq_base_core * vec2(vPG_period_multiplier_x, 1.0) ;
+        vec2 freq_base = freq_base_core;
+        //vec2 freq_base_unfloored = freq_base_core;
         vec2 freq_base_unfloored = freq_base_core;
-        //vec2 freq_base_unfloored = freq_base_core * vec2(vPG_period_multiplier_x, 1.0) ; <--- core can be multiplied too, why not?
         if (PIXELGRID_SIZE_W == 1.0) {
             freq_base.x = freq_base_screen.x * vPG_period_multiplier_x;
-            freq_base_unfloored.x = vPG_freq_base_screen_unfloored.x * vPG_period_multiplier_x;
+            freq_base_unfloored.x = vPG_freq_base_screen_unfloored.x;
         }
     
     // Shadowmask
