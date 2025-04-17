@@ -320,8 +320,8 @@ void main() {
         if (PG_period_multiplier_x < 0.0) PG_period_multiplier_x = 1/-PG_period_multiplier_x;
 
         //apply it:
-            vPG_OriginalSize_tated_mul_pi *=  vec2(PG_period_multiplier_x, 1.0) ; //for core coords
-            vPG_freq_base_screen_unfloored *= vec2(PG_period_multiplier_x, 1.0) ; //for screen coords
+            vPG_OriginalSize_tated_mul_pi.x *=  PG_period_multiplier_x ; //for core coords
+            vPG_freq_base_screen_unfloored.x *= PG_period_multiplier_x ; //for screen coords
 
     //Pixelgrid Y mask: adapt mask height
         vPG_mask_height = PIXELGRID_Y_MASK_HEIGHT;
