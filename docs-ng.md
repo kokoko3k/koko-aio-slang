@@ -375,13 +375,13 @@ However nice effects may be obtained (eg: with vector games). <br>
         TVL: core resolution only. >0 overrrides previous
             If you use core resolution and this parameter is not 0.0,
             the phosphor width will be computed so that the screen will
-            contain the number the number of the specified rgb triads.
+            contain the specified rgb triads amount.
             Using core resolution means that the triads will follow the
             screen curvature, hence possibly exposing moire artifacts at higher TVLs.
             To mitigate that, it is advised to set a proper
             "Phosphor width min" value.
             Tests shows that on a 1080p screen you can easilly target a (typical of mid range consumer TVs)
-            with a TVL-400, provided that you set minimum phosphor width of at least 35 
+            with a TVL-410, provided that you set minimum phosphor width of at least 30
             and a phosphor width min->max less than 5.0.
 
         Mask type preset:
