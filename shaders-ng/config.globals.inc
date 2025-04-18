@@ -799,6 +799,10 @@
     #define PIXELGRID_MUL_X 	global.PIXELGRID_MUL_X
 #endif
 
+#ifndef PIXELGRID_TVL_X
+    #define PIXELGRID_TVL_X 	global.PIXELGRID_TVL_X
+#endif
+
 #ifndef PIXELGRID_NO_INTERBLEED_H
     #define PIXELGRID_NO_INTERBLEED_H global.PIXELGRID_NO_INTERBLEED_H
 #endif

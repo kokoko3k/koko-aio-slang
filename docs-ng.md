@@ -366,13 +366,24 @@ However nice effects may be obtained (eg: with vector games). <br>
             0: Phosphors width will be relative to the pixel width of the core (game).
             1: Phosphors width will be relative to the pixel width of the screen.
         Cell size multiplier x (neg=divider):
-            Multiply (or divide if the parameter is < 0) the mask (cell) size by a factor.
-            As stated(**), the size may be relative to screen or core, this allow you to
-            "zoom" the cell horizontally and can be useful if you have an HiDPI screen.
-            For example, you may choose to use screen sized masks and zoom them by a factor
-            of 2 or 3 to make room for phosphors and see them visually grow in width.
-            Likewise, you can use core/game(**) sized masks and divide them by a factor
-            if they appear too big.
+            Multiplies (or divide if the parameter is < 0) the phosphors width by a factor.
+            As stated(**), the width may be relative to screen or core.
+            For example, you may choose to use screen relative width and enlarge phosphors
+            by 2 or 3 to allow them to visually grow in width as signel gets stronger/brighter.
+            Likewise, you can use core/game(**) sized masks to emulate LCD screens as seen in
+            handhelds consoles.
+        TVL: core resolution only. >0 overrrides previous
+            If you use core resolution and this parameter is not 0.0,
+            the phosphor width will be computed so that the screen will
+            contain the number the number of the specified rgb triads.
+            Using core resolution means that the triads will follow the
+            screen curvature, hence possibly exposing moire artifacts at higher TVLs.
+            To mitigate that, it is advised to set a proper
+            "Phosphor width min" value.
+            Tests shows that on a 1080p screen you can easilly target a (typical of mid range consumer TVs)
+            with a TVL-400, provided that you set minimum phosphor width of at least 35 
+            and a phosphor width min->max less than 5.0.
+
         Mask type preset:
             You can have the shader generate a preconfigured mask for you:
             1:gm 2:gmx 3:rgb 4:rgbx 5:rbg 6:rbgx 7:wx 8:rgxb 9:wwx

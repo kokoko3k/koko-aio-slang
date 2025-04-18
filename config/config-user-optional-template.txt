@@ -279,6 +279,7 @@
 // #define DO_PIXELGRID_W  1.0         //       ★ Horizontal mask (0 to disable)
 // #define PIXELGRID_SIZE_W  1.0       //            . Resolution: (core or screen)
 // #define PIXELGRID_MUL_X  1.0        //            . Cell size multiplier x (neg=divider):
+// #define PIXELGRID_TVL_X  0.0        //            . TVL: core resolution only  >0=overrrides previous
 // #define PIXELGRID_H_PRST  3.0       //            . Mask type preset (0: for manual)
 // #define PIXELGRID_H_COUNT  3.0      //                 . 0: Phosphors+gap count (mask size) 
 // #define PIXELGRID_R_SHIFT  0.0      //                 . 0: R phospor position

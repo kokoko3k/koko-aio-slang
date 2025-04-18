@@ -278,7 +278,7 @@ void main() {
     //we use 2 different layouts for floored and unfloored coords, because
     //with unfloored coords we move the gap half beginning, half end,
     //while with floored coords it must have its own integer spot.
-        if (PIXELGRID_SIZE_W == 0.0 || PIXELGRID_MUL_X != 1.0)
+        if (PIXELGRID_SIZE_W == 0.0 || PIXELGRID_MUL_X != 1.0 || PIXELGRID_TVL_X !=0.0)
             vPG_offsets_and_size = PG_get_hmask_preset_unfloored() ;
                 else
             vPG_offsets_and_size = PG_get_hmask_preset_floored() ;
@@ -319,6 +319,10 @@ void main() {
         float PG_period_multiplier_x = 1/PIXELGRID_MUL_X;
         if (PG_period_multiplier_x < 0.0) PG_period_multiplier_x = 1/-PG_period_multiplier_x;
 
+        //if using core coords for rgb mask and tvl is not 0.0, compute multiplier to match tvl.
+        if (PIXELGRID_SIZE_W == 0.0 && PIXELGRID_TVL_X > 0.0)
+            PG_period_multiplier_x = PIXELGRID_TVL_X / params.OriginalSize.x;
+            
         //apply it:
             vPG_OriginalSize_tated_mul_pi.x *=  PG_period_multiplier_x ; //for core coords
             vPG_freq_base_screen_unfloored.x *= PG_period_multiplier_x ; //for screen coords

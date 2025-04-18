@@ -222,7 +222,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float IN_GLOW_SPREAD_SHARPNESS;
 
 	float PIXELGRID_MUL_X;
-													
+	float PIXELGRID_TVL_X;													
+	
 	float PIXELGRID_OFFSET_CORE;
 	float PIXELGRID_OFFSET_CORE_W;
 	float PIXELGRID_NO_INTERBLEED_W;
@@ -481,6 +482,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter DO_PIXELGRID_W     "    ★ Horizontal mask (0 to disable)"    	1.0 0.0 1.0 0.01
 #pragma parameter PIXELGRID_SIZE_W   "       . Resolution: (core or screen)"	1.0 0.0 1.0 1.0
 #pragma parameter PIXELGRID_MUL_X    "       . Cell size multiplier x (neg=divider):"	1.0 -8.0 8.0 0.125
+#pragma parameter PIXELGRID_TVL_X    "       . TVL: core resolution only. >0 overrrides previous."	0.0 0.0 2048.0 5.0
 #pragma parameter PIXELGRID_H_PRST   "       . Mask type preset (0: for manual)"  3.0 0.0 9.0 1.0
 #pragma parameter LABEL0038          "         1:gm 2:gmx 3:rgb 4:rgbx 5:rbg 6:rbgx 7:wx 8:rgxb 9:wwx"  0.0 0.0 0.0 1.0
 #pragma parameter PIXELGRID_H_COUNT  "           . 0: Phosphors+gap count (mask size)"	3.0 1.0 4.0  1.0
