@@ -313,7 +313,7 @@ void main() {
 
     //pixelgrid: doublescan?
                 if (need_doublescan() )
-                    vPG_OriginalSize_tated_mul_pi *= 2.0;
+                    vPG_OriginalSize_tated_mul_pi.y *= 2.0;
 
     //Pixelgrid: adapt period multiplier
         float PG_period_multiplier_x = 1/PIXELGRID_MUL_X;
