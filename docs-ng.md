@@ -380,8 +380,8 @@ However nice effects may be obtained (eg: with vector games). <br>
             screen curvature, hence possibly exposing moire artifacts at higher TVLs.
             To mitigate that, it is advised to set a proper
             "Phosphor width min" value.
-            Tests shows that on a 1080p screen you can easilly target a (typical of mid range consumer TVs)
-            with a TVL-410, provided that you set minimum phosphor width of at least 30
+            Tests shows that on a 1080p screen you can easilly target a typical of mid-range consumer TVs
+            with a TVL of 410, provided that you set minimum phosphor width of at least 30
             and a phosphor width min->max less than 5.0.
 
         Mask type preset:
