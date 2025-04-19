@@ -1513,47 +1513,66 @@ vec4 PG_get_hmask_preset_floored_wrapped() {
 }
 
 vec4 PG_get_hmask_preset_unfloored_wrapped() {
+	//following offsets allow the phosphor to bleed more precisely.
+	//we may want to set them to 0.0 when user want a proper non bleeding mask.
+	float offset_mask_size_3 = 0.25;
+	float offset_mask_size_4 = 0.5;
+	
+	if (PIXELGRID_MIN_W <= 0.051) {
+		offset_mask_size_3 = 0.0;
+	}
+	
+	//offset_mask_size_3 = mix(0.0, offset_mask_size_3, clamp((PIXELGRID_MAX_W-0.05)*3 ,  0.0, 1.0) );
+	
+	offset_mask_size_4 = SERVICE1;
+
     if (PIXELGRID_H_PRST == 0.0) // manual mask and size
         return vec4( PIXELGRID_R_SHIFT, PIXELGRID_G_SHIFT, PIXELGRID_B_SHIFT, PIXELGRID_H_COUNT);
 
     if (PIXELGRID_H_PRST == 1.0)
-        return vec4( vec3(+0.25,
-						  -0.25,
-						  +0.25)*2, 2); // gm, mask size 2
+        return vec4( vec3(-0.25,
+						  +0.25,
+						  -0.25)*2, 2); // gm, mask size 2
 
     if (PIXELGRID_H_PRST == 2.0)
-        return vec4( vec3(+1/6.0,
-						  -1/6.0,
-						  +1/6.0)*3, 3); //gmx, mask size 3
-
-    if (PIXELGRID_H_PRST == 3.0)
-        return vec4( vec3(-1/3.0,
-						  0.0,
-						  1/3.0)*3, 3); //rgb, mask size 3
-
-    if (PIXELGRID_H_PRST == 4.0)
-        return vec4( vec3(-1/4.0,
-						  0.0,
-						  +1/4.0)*4, 4); //rgbx, mask size 4
-
-    if (PIXELGRID_H_PRST == 5.0)
         return vec4( vec3(-1/3.0,
 						  +1/3.0,
-						  0.0   )*3, 3); //rbg, mask size 3
+						  -1/3.0)*3 + offset_mask_size_3, 3); //gmx, mask size 3
+
+    if (PIXELGRID_H_PRST == 3.0)
+        return vec4( vec3(+1/3.0,
+						  -1/3.0,
+						  0.0)*3 + offset_mask_size_3, 3); //rgb, mask size 3
+
+    if (PIXELGRID_H_PRST == 4.0)
+        return vec4( vec3(-0.25,
+						  +0.0,	
+						  +0.25)*4 + offset_mask_size_4, 4); //rgbx, mask size 4
+
+    if (PIXELGRID_H_PRST == 5.0)
+        return vec4( vec3(+1/3.0,
+						  0.0,
+						  -1/3.0)*3 + offset_mask_size_3, 3); //rbg, mask size 3
 
     if (PIXELGRID_H_PRST == 6.0)
-        return vec4( vec3(-1/4.0,
-						  +1/4.0,
-						  0.0   )*4, 4); //rbgx, mask size 4
-
-    if (PIXELGRID_H_PRST == 7.0) 
-        return vec4( vec3(0.0), 2); //WX, mask size 2
+        return vec4( vec3(-0.25,
+						  +0.25,
+						  0.0  )*4 + offset_mask_size_4, 4); //rbgx, mask size 4
 		
-    if (PIXELGRID_H_PRST == 8.0) // Implicit, because we need a default return value (DX/D3D)
-        return vec4( vec3(-1/4.0,
-						  0.0,
-						  +2/4.0)*4, 4); //rgxb, mask size 4  cambialo
+    if (PIXELGRID_H_PRST == 7.0)
+        return vec4( vec3(-0.25,
+						  -0.25,
+						  -0.25)*2, 2); // wx, mask size 2
+		
+    if (PIXELGRID_H_PRST == 8.0)
+        return vec4( vec3(0.0,
+						  +0.25,
+						  -0.25)*4 + offset_mask_size_4, 4); //brgx, mask size 4  cambialo
     //if (PIXELGRID_H_PRST == 9.0) // Implicit, because we need a default return value (DX/D3D)
+		
+       // return vec4( vec3(+1/3.0,
+	//					  +1/3.0,
+	//					  +1/3.0)*3 + offset_mask_size_3, 3); //wwx, mask size 3
 		
         return vec4( vec3(0.0), 2); // WWX, mask size 2 can't be obtained, so just return  WX
 		                            // and user set a wider phosphor width
