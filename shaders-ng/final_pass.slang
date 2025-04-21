@@ -278,10 +278,10 @@ void main() {
     //we use 2 different layouts for floored and unfloored coords, because
     //with unfloored coords we move the gap half beginning, half end,
     //while with floored coords it must have its own integer spot.
-      //  if (PIXELGRID_SIZE_W == 0.0 || PIXELGRID_MUL_X != 1.0 || PIXELGRID_TVL_X !=0.0)
+        if (PIXELGRID_SIZE_W == 0.0 || PIXELGRID_MUL_X != 1.0 || PIXELGRID_TVL_X !=0.0)
             vPG_offsets_and_size = PG_get_hmask_preset_unfloored() ;
-      //          else
-      //      vPG_offsets_and_size = PG_get_hmask_preset_floored() ;
+                else
+            vPG_offsets_and_size = PG_get_hmask_preset_floored() ;
     
        //scale offsets to be used by sin:
         vPG_offsets_and_size.rgb *= (pi / vPG_offsets_and_size.a);
@@ -647,11 +647,11 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
     //y screen coords appear to work just fine even if we don't floor them,
         vec2 freq_base_screen;
         #define PG_freq_base_screen_x vPG_offsets_and_size.a
-        //if (PIXELGRID_MUL_X == 1.0) {
-        //    freq_base_screen = vec2( (PG_freq_base_screen_x) * floor(vInteger_fragment_x), vPG_freq_base_screen_unfloored.y);
-        //} else {
+        if (PIXELGRID_MUL_X == 1.0) {
+            freq_base_screen = vec2( (PG_freq_base_screen_x) * floor(vInteger_fragment_x), vPG_freq_base_screen_unfloored.y);
+        } else {
             freq_base_screen = vPG_freq_base_screen_unfloored;
-        //}
+        }
 
     //Switch frequency between core and screen and apply asked multipliers
         vec2 freq_base = freq_base_core;
