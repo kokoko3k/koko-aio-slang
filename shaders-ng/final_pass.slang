@@ -37,7 +37,7 @@ layout(location = 7) out float vDo_Tate;
 layout(location = 8) out vec3 vDotMat_Grid_Color;
 layout(location = 9) out vec4 vPG_offsets_and_size;
 layout(location = 10) out float vInteger_fragment_x;
-layout(location = 11) out vec2 vPG_freq_base_screen_unfloored;
+layout(location = 11) out vec2 vPG_freq_base_screen;
 layout(location = 12) out vec2 vPG_OriginalSize_tated_mul_pi;
 layout(location = 13) out float vDotMat_Grid_Sharpness;
 layout(location = 14) out float vPG_mask_height;
@@ -273,16 +273,9 @@ void main() {
                 vDotMat_Grid_Color *= DOT_M_G_BRT ;
         }
 
-
     //Pixelgrid: get mask type; .rgb contains layout, .a contains the size.
-    //we use 2 different layouts for floored and unfloored coords, because
-    //with unfloored coords we move the gap half beginning, half end,
-    //while with floored coords it must have its own integer spot.
-        if (PIXELGRID_SIZE_W == 0.0 || PIXELGRID_MUL_X != 1.0 || PIXELGRID_TVL_X !=0.0)
-            vPG_offsets_and_size = PG_get_hmask_preset_unfloored() ;
-                else
-            vPG_offsets_and_size = PG_get_hmask_preset_floored() ;
-    
+        vPG_offsets_and_size = PG_get_hmask_preset() ;
+
        //scale offsets to be used by sin:
         vPG_offsets_and_size.rgb *= (pi / vPG_offsets_and_size.a);
         
@@ -309,7 +302,7 @@ void main() {
             else
                 rgbw_size = 1/vPG_offsets_and_size.a;
     
-            vPG_freq_base_screen_unfloored = pi * vec2(rgbw_size, 0.5) * (PG_OutputCoord_tated * PG_OutputSize_tated);
+            vPG_freq_base_screen = pi * vec2(rgbw_size, 0.5) * (PG_OutputCoord_tated * PG_OutputSize_tated);
 
     //pixelgrid: doublescan?
                 if (need_doublescan() )
@@ -325,7 +318,7 @@ void main() {
             
         //apply it:
             vPG_OriginalSize_tated_mul_pi.x *=  PG_period_multiplier_x ; //for core coords
-            vPG_freq_base_screen_unfloored.x *= PG_period_multiplier_x ; //for screen coords
+            vPG_freq_base_screen.x *= PG_period_multiplier_x ; //for screen coords
 
     //Pixelgrid Y mask: adapt mask height
         vPG_mask_height = PIXELGRID_Y_MASK_HEIGHT;
@@ -460,7 +453,7 @@ layout(location = 7) in float vDo_Tate;
 layout(location = 8) in vec3 vDotMat_Grid_Color;
 layout(location = 9) in vec4 vPG_offsets_and_size;
 layout(location = 10) in float vInteger_fragment_x;
-layout(location = 11) in vec2 vPG_freq_base_screen_unfloored;
+layout(location = 11) in vec2 vPG_freq_base_screen;
 layout(location = 12) in vec2 vPG_OriginalSize_tated_mul_pi;
 layout(location = 13) in float vDotMat_Grid_Sharpness;
 layout(location = 14) in float vPG_mask_height;
@@ -647,11 +640,11 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
     //y screen coords appear to work just fine even if we don't floor them,
         vec2 freq_base_screen;
         #define PG_freq_base_screen_x vPG_offsets_and_size.a
-        if (PIXELGRID_MUL_X == 1.0) {
-            freq_base_screen = vec2( (PG_freq_base_screen_x) * floor(vInteger_fragment_x), vPG_freq_base_screen_unfloored.y);
-        } else {
-            freq_base_screen = vPG_freq_base_screen_unfloored;
-        }
+        //if (PIXELGRID_MUL_X == 1.0) {
+        //    freq_base_screen = vec2( (PG_freq_base_screen_x) * floor(vInteger_fragment_x), vPG_freq_base_screen_unfloored.y);
+        //} else {
+            freq_base_screen = vPG_freq_base_screen;
+        //}
 
     //Switch frequency between core and screen and apply asked multipliers
         vec2 freq_base = freq_base_core;
@@ -659,7 +652,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
         vec2 freq_base_unfloored = freq_base_core;
         if (PIXELGRID_SIZE_W == 1.0) {
             freq_base.x = freq_base_screen.x;
-            freq_base_unfloored.x = vPG_freq_base_screen_unfloored.x;
+            freq_base_unfloored.x = vPG_freq_base_screen.x;
         }
     
     // Shadowmask
@@ -1621,8 +1614,6 @@ void main() {
             if (clip  > 1.0)
                 pixel_out = 1-pixel_out;//;-clip;
         #endif
-
-
     
     FragColor.rgb = pixel_out;
 

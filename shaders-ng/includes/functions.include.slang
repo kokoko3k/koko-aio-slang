@@ -1464,116 +1464,58 @@ vec3 color_tools(vec3 pixel_out, vec3 Temperature_rgb) {
 	return pixel_out;
 }
 
-vec4 PG_get_hmask_preset_floored_wrapped() {
-    if (PIXELGRID_H_PRST == 0.0) // manual mask and size
-        return vec4( PIXELGRID_R_SHIFT, PIXELGRID_G_SHIFT, PIXELGRID_B_SHIFT, PIXELGRID_H_COUNT);
-    
-    if (PIXELGRID_H_PRST == 1.0)
-        return vec4( vec3(0,
-						  1,
-						  0), 2); // gm, mask size 2
-
-    if (PIXELGRID_H_PRST == 2.0)
-        return vec4( vec3(2.5,
-						  1.5,
-						  2.5), 3); //gmx, mask size 3
-
-    if (PIXELGRID_H_PRST == 3.0)
-        return vec4( vec3(1.5,
-						  2.5,
-						  3.5), 3); //rgb, mask size 3
-
-    if (PIXELGRID_H_PRST == 4.0)
-        return vec4( vec3(2.0,
-						  3.0,
-						  4.0), 4); //rgbx, mask size 4
-
-    if (PIXELGRID_H_PRST == 5.0)
-        return vec4( vec3(1.5,
-						  3.5,
-						  2.5), 3); //rbg, mask size 3
-
-    if (PIXELGRID_H_PRST == 6.0)
-        return vec4( vec3(2.0,
-						  4.0,
-						  3.0), 4); //rbgx, mask size 4
-		
-    if (PIXELGRID_H_PRST == 7.0)
-        return vec4( vec3(0.0), 2); //WX, mask size 2
-
-    if (PIXELGRID_H_PRST == 8.0)
-		return vec4( vec3(1.0,
-					2.0,
-					4.0), 4); //rgxb, mask size 4
-		
-    //if (PIXELGRID_H_PRST == 9.0) // Implicit, because we need a default return value (DX/D3D)
-        return vec4( vec3(2.0,
-						  2.0,
-						  2.0), 3); //wwx, mask size 3
-}
-
-vec4 PG_get_hmask_preset_unfloored_wrapped() {
+vec4 PG_get_hmask_preset_wrapped() {
+	
+	vec3 gm, gmx, rgb, rgbx, rbg, rbgx, wx, rgxb, wwx;
+	
+	/* "snapped" masks acts like floored ones, they are fine centered so they looks
+	 * sharp at screen/pixel coordinates.
+	 * Contrary, not snapped/relaxed masks are centered in the RGB cell so that tey can
+	 * "bleed" better.
+	 * 
+	 * We use snapped positioning only when screen coords and multiplicator = 1.0 are both used-
+	 * is 1.0 (-1.0 is not) or either a TVL is requested.
+	*/
+	bool snap = PIXELGRID_SIZE_W == 1.0 && PIXELGRID_MUL_X == 1.0;
+	
+	 if (snap) {
+		gm   = vec3(0.5, -0.5, 0.5);
+		gmx  = vec3(0, 2, 0);
+		rgb  = vec3(2, 3, 1);
+		rgbx = vec3(2.5, 3.5, 0.5); 
+		rbg  = vec3(2, 1, 3);
+		rbgx = vec3(2.5, 0.5, 3.5); 
+		wx   = vec3(0.5, 0.5, 0.5);
+		rgxb = vec3(2.5, 3.5, 1.5);
+		wwx  = vec3(0.5, 0.5, 0.5); //not possible with snapping
+	 } else {
+		gm   = vec3(0.5, -0.5, 0.5);
+		gmx  = vec3(0.5, -0.5, 0.5);
+		rgb  = vec3(-1, 0, 1);
+		rgbx  = vec3(-1, 0, 1);
+		rbg  = vec3(-1, 1, 0);
+		rbgx  = vec3(-1, 1, 0);
+		wx   = vec3(0,  0, 0);
+		rgxb = vec3(0, 1, -1);
+		wwx  = vec3(0, 0, 0); 
+	 }
+	
     if (PIXELGRID_H_PRST == 0.0) // manual mask and size
         return vec4( PIXELGRID_R_SHIFT, PIXELGRID_G_SHIFT, PIXELGRID_B_SHIFT, PIXELGRID_H_COUNT);
 
-    if (PIXELGRID_H_PRST == 1.0)
-        return vec4( vec3(+0.25,
-						  -0.25,
-						  +0.25)*2, 2); // gm, mask size 2
-
-    if (PIXELGRID_H_PRST == 2.0)
-        return vec4( vec3(+1/6.0,
-						  -1/6.0,
-						  +1/6.0)*3, 3); //gmx, mask size 3
-
-    if (PIXELGRID_H_PRST == 3.0)
-        return vec4( vec3(-1/3.0,
-						  0.0,
-						  1/3.0)*3, 3); //rgb, mask size 3
-
-    if (PIXELGRID_H_PRST == 4.0)
-        return vec4( vec3(-1/4.0,
-						  0.0,
-						  +1/4.0)*4, 4); //rgbx, mask size 4
-
-    if (PIXELGRID_H_PRST == 5.0)
-        return vec4( vec3(-1/3.0,
-						  +1/3.0,
-						  0.0   )*3, 3); //rbg, mask size 3
-
-    if (PIXELGRID_H_PRST == 6.0)
-        return vec4( vec3(-1/4.0,
-						  +1/4.0,
-						  0.0   )*4, 4); //rbgx, mask size 4
-
-    if (PIXELGRID_H_PRST == 7.0) 
-        return vec4( vec3(0.0), 2); //WX, mask size 2
-		
-    if (PIXELGRID_H_PRST == 8.0) // Implicit, because we need a default return value (DX/D3D)
-        return vec4( vec3(-1/4.0,
-						  0.0,
-						  +2/4.0)*4, 4); //rgxb, mask size 4  cambialo
-    //if (PIXELGRID_H_PRST == 9.0) // Implicit, because we need a default return value (DX/D3D)
-		
-        return vec4( vec3(0.0), 2); // WWX, mask size 2 can't be obtained, so just return  WX
-		                            // and user set a wider phosphor width
-		
+    if (PIXELGRID_H_PRST == 1.0) return vec4( gm  , 2);
+    if (PIXELGRID_H_PRST == 2.0) return vec4( gmx , 3);
+    if (PIXELGRID_H_PRST == 3.0) return vec4( rgb , 3);
+    if (PIXELGRID_H_PRST == 4.0) return vec4( rgbx, 4);
+	if (PIXELGRID_H_PRST == 5.0) return vec4( rbg , 3);
+    if (PIXELGRID_H_PRST == 6.0) return vec4( rbgx, 4);
+    if (PIXELGRID_H_PRST == 7.0) return vec4( wx  , 2);
+    if (PIXELGRID_H_PRST == 8.0) return vec4( rgxb, 4);		
+	                             return vec4( wwx,  2);
 }
 
-vec4 PG_get_hmask_preset_floored() {
-	vec4 c = PG_get_hmask_preset_floored_wrapped();
-	//alternate submask color positions to help sample-and-hold induced blurring
-	#ifndef D3D_WORKAROUND
-		#ifdef ANTIGHOSTING_FLIP_MASK
-			if (frame_is_even())
-			c.xyz = c.zxy;
-		#endif
-	#endif
-	return c;
-}
-
-vec4 PG_get_hmask_preset_unfloored() {
-	vec4 c = PG_get_hmask_preset_unfloored_wrapped();
+vec4 PG_get_hmask_preset() {
+	vec4 c = PG_get_hmask_preset_wrapped();
 	//alternate submask color positions to help sample-and-hold induced blurring
 	#ifndef D3D_WORKAROUND
 		#ifdef ANTIGHOSTING_FLIP_MASK
