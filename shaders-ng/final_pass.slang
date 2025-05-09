@@ -10,7 +10,7 @@
                                 #define DEBUG_TEXTURE halo_pre_gamma_pass
 //#define DEBUG_PRINT_VALUE
 //#define PRINTED_VALUE texture(DEBUG_TEXTURE, vec2(0.5)).a
-//#define PRINTED_VALUE global.OriginalFPS
+//#define PRINTED_VALUE global.CurrentSubFrame
     
 //#define DEBUG_QUAD_SPLIT
 //#define DEBUG_DUAL_SPLIT_X

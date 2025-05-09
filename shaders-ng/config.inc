@@ -320,6 +320,9 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float LCD_ANTIGHOSTING_CEIL;
 	float LCD_ANTIGHOSTING_FLIP_MASK;
 	
+	uint TotalSubFrames;
+	uint CurrentSubFrame;
+	
 } global;
 
 

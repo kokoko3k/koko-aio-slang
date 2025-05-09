@@ -108,6 +108,14 @@ bool frame_is_even() {
 	return ((int(params.FrameCount) & 1) == 0);
 }
 
+bool subframe_is_even() {
+    return ((params.FrameCount * global.TotalSubFrames + global.CurrentSubFrame) & 1) == 0;
+}
+
+bool is_subframe() {
+    return global.CurrentSubFrame > 1;
+}
+
 bool is_rotated_new(){
 	return (params.Rotation == 1.0 || params.Rotation == 3.0);
 }
