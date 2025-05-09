@@ -842,7 +842,7 @@ vec3 FxaaPixelShader(vec2 pos, sampler2D tex, vec4 sourcesize, vec4 outputsize) 
 void main() {
    
    #ifndef D3D_WORKAROUND
-      if (fps_halver_is_skipped_frame())
+      if (is_skipped_frame())
          return;
    #endif
    

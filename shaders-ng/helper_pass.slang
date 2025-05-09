@@ -46,7 +46,7 @@ layout(set = 0, binding = 2) uniform sampler2D monitor_body_curved;
 void main() {
 	
    #ifndef D3D_WORKAROUND
-      if (fps_halver_is_skipped_frame())
+      if (is_skipped_frame())
          return;
    #endif
     

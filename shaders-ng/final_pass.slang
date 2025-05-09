@@ -1315,9 +1315,14 @@ vec2 quasirandom(vec2 n) {
 
 void main() {
 
-    // If fps halver is active, stop processing asap
     #ifndef D3D_WORKAROUND
-        if (fps_halver_is_skipped_frame()) {
+        // When using subframes, it may be desiderable to return the pass feedback and completely skip rendering.
+        if (skip_subframe()) {
+            FragColor.rgb = texture(final_passFeedback, vOutputCoord).rgb;
+            return;
+        }
+        // If fps halver is active, stop processing asap        
+        if (is_skipped_frame()) {
             FragColor.rgb = texture(final_passFeedback, vOutputCoord).rgb ;
             return;
         }
@@ -1371,8 +1376,7 @@ void main() {
             }
         }
     #endif
-    
-    
+        
     // Dynamic lum dependant full screen zoom and autocrop
     #ifndef D3D_WORKAROUND
         if (DO_DYNZOOM > 0.0)

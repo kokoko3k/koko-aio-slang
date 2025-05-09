@@ -134,6 +134,20 @@ bool fps_halver_is_skipped_frame()  {
     return false;
 }
 
+bool skip_subframe() {
+	#ifdef SKIP_SUBFRAMES
+		if (is_subframe()) return true;
+	#endif
+		return false;
+}
+
+bool is_skipped_frame() {
+	if (skip_subframe()) return true;
+	if (fps_halver_is_skipped_frame()) return true;
+	return false;
+}
+
+
 bool is_rotated_old(){
 	//Keep this to retain some sort of compatibility with Retroarch pre 1.17
 	const float ar_tolerance = 0.005;

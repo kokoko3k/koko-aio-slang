@@ -922,3 +922,10 @@ Changes are applied after a shader reload.*<br>
     To use it, in file config-user-optional.txt, write:<br>
     ```#define FPS_HALVER```<br><br>
     
+**Skipping Subframes rendering**<br>
+    By enabling this options, shader will skip full subframes rendering
+    and will display the previous rendered frame if possible, gaining performance.
+    Enable it only if using subframes, as it has a performance cost itself.
+    To use it, in file config-user-optional.txt, write:<br>
+    ```#define SKIP_SUBFRAMES```<br><br>
+    

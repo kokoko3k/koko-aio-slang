@@ -167,7 +167,7 @@ vec3 apply_noise_to(vec3 c) {
 void main() { 
    
    #ifndef D3D_WORKAROUND
-      if (fps_halver_is_skipped_frame())
+      if (is_skipped_frame())
          return;
    #endif
 

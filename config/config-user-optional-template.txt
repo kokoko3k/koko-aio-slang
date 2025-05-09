@@ -57,6 +57,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+// By enabling this options, shader will skip full subframes rendering
+// and will display the previous rendered frame if possible, gaining performance.
+// Enable it only if using subframes, as it has a performance cost itself.
+// #define SKIP_SUBFRAMES
+
 // D3D/XBOX users should enable Direct3D workarounds to avoid glitches or crashes
 // by removing the leading "//" from the following line:
 // #define D3D_WORKAROUND
