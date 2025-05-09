@@ -34,15 +34,6 @@
 ---------------------------
     
 **USEFUL LOCATIONS/FILES:**
-
-    config/config-static.inc:
-        Some shader parameters can't be changed within retroarch,
-        use this file instead.
-        Notable one is lcd antighosting feature.
-        
-    config/config-user.txt:
-        This file has been deprecated, since it could be overwritten by
-        a shader update, so use config/config-user-opional.txt
         
     config/config-user-optional.txt:    
         Shader parameters that can be changed within Retroarch.
@@ -50,7 +41,7 @@
         PRO: The shader will be faster
         CON: The parameters can no longer be modified within Retroarch. 
         Please read config-user-optional-template.txt for instructions.
-        
+               
     textures/background_under.png
         This is the image that shown by default under the game and the bezel.
         Read further for details. 
@@ -70,6 +61,9 @@
         you can edit this file to alter the shades.
         The more a primary color is saturated, the more the shade will turn to dark.
         
+    config/config-static.inc:
+        Some obscure shader parameters can't be changed within retroarch,
+        use this file instead.
         
 Texture "sources", including the main gimp project file for the <br>
 default curved and straight monitor frame are on the following repo: <br>
@@ -896,13 +890,24 @@ Changes are applied after a shader reload.*<br>
     To activate that ffeature, in config-user-optional.txt, write:<br>
     ```#define HALVE_BORDER_UPDATE```<br>
   
-**LCD antighosting:** (not compatible with delta render)<br>
+**LCD antighosting:** (not compatible with delta render and Direct3D)<br>
     LCD displays often suffer from high pixel refresh times <br>
     which produces ghosting when game changes on screen.<br>
     By inducing larger color transitions, it prompts the LCD cells <br>
     to adjust their states more rapidly, thereby reducing ghosting.<br><br>
     To use it, in file config-user-optional.txt, write:<br>
-    ```#define LCD_ANTIGHOSTING 0.5```<br><br>
+    ```#define DO_LCD_ANTIGHOSTING```<br><br>
+    Once you do that, the following parameters can be changed runtime:
+    
+    Strength:
+        The effect strength; it has to be tuned depending on your LCD response time.
+    Ceil:
+        The effect is proportional to the color difference over time,
+        however you can set an hard maximum here.
+    Flip Mask:
+        Enabling this will cause the horizontal mask to be flipped at every frame.
+        It is an experimental measure to mitigate ghosting that could work or not,
+        depending on your display.
     
 **Conditional FPS Halver**<br>
     *[Warning:] Only on retroarch > 1.19.1*<br>

@@ -61,19 +61,11 @@
 // by removing the leading "//" from the following line:
 // #define D3D_WORKAROUND
 
-// Enable lcd antighosting by using values > 0.0 (try around 0.5)
+// Enable lcd antighosting.
 // It works by temporal sharpening pixels, and the  
 // effect is proportional to the color difference over time.
 // It is NOT compatible with DELTA_RENDER
-// #define LCD_ANTIGHOSTING 0.5
-
-// Defines  maximum to the temporal sharpening effect.
-// Valid range: 0..1
-// #define LCD_ANTIGHOSTING_CEIL 1.0
-
-// If uncommented, flips mask subpixels over time, produces an intersting flicker
-// if combined with LCD_ANTIGHOSTING
-// #define ANTIGHOSTING_FLIP_MASK    
+// #define DO_LCD_ANTIGHOSTING
 
 ////////////////////////////////////////////////////////////////////////////
 //
@@ -443,6 +435,9 @@
 // #define GAME_GEOM_ZOOM  1.0     //         Zoom	
 // #define GAME_GEOM_OFF_FIX  0.0  //         Sharp hack through offset (0.0=disable)
 
-
+// LCD Antighosting 
+// #define LCD_ANTIGHOSTING            0.5 //    Strength
+// #define LCD_ANTIGHOSTING_CEIL       1.0 //    Ceil
+// #define LCD_ANTIGHOSTING_FLIP_MASK  0.0 //    Flip Mask
 
 //DONT DELETE THIS LINE

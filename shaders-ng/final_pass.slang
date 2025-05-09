@@ -1051,17 +1051,12 @@ float create_ambi_colorize_shade(vec2 co) {
 
 vec3 antighost(vec3 c) {
     #ifndef D3D_WORKAROUND
-        #ifdef LCD_ANTIGHOSTING
-            #ifndef LCD_ANTIGHOSTING_CEIL
-                #define LCD_ANTIGHOSTING_CEIL 1.0
-            #endif
-            if (LCD_ANTIGHOSTING > 0.0) {
-                if (frame_is_even()) {
-                    vec3 feedback = texture(final_passFeedback, vOutputCoord).rgb;
-                    vec3 diff=(feedback - c)*LCD_ANTIGHOSTING;
-                    diff = sign(diff) * min( abs(diff), vec3(LCD_ANTIGHOSTING_CEIL));
-                    c = mix(c, c-diff, 0.5);
-                }
+        #ifdef DO_LCD_ANTIGHOSTING
+            if (frame_is_even()) {
+                vec3 feedback = texture(final_passFeedback, vOutputCoord).rgb;
+                vec3 diff=(feedback - c)*LCD_ANTIGHOSTING;
+                diff = sign(diff) * min( abs(diff), vec3(LCD_ANTIGHOSTING_CEIL));
+                c = mix(c, c-diff, 0.5);
             }
         #endif
     #endif
