@@ -323,6 +323,10 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	uint TotalSubFrames;
 	uint CurrentSubFrame;
 	
+	float ADPT_STROBE_STR;
+	float ADPT_STROBE_GAIN_ADJ;
+	float ADPT_STROBE_GAMMA_ADJ;
+	
 } global;
 
 
@@ -700,7 +704,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter GAME_GEOM_VSHIFT	  "        Vertical position"			0.0   -10.0 10.0  0.01
 #pragma parameter GAME_GEOM_HSHIFT	  "        Horizontal position"			0.0   -10.0 10.0  0.01
 #pragma parameter GAME_GEOM_ZOOM	  "        Zoom"					1.0    0.0  2.0  0.01
-
 #pragma parameter LABEL0034 " " 0 0 0 1
 
 #pragma parameter LABEL0058	  "==============================================================="	0 0 0 1
@@ -712,8 +715,14 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter LCD_ANTIGHOSTING            "    .    Strength"    0.5   0.0  2.0  0.01
 #pragma parameter LCD_ANTIGHOSTING_CEIL       "    .    Ceil"        1.0   0.0  1.0  0.01
 #pragma parameter LCD_ANTIGHOSTING_FLIP_MASK  "    .    Flip Mask"   0.0   0.0  1.0  1.0
-
 #pragma parameter LABEL0063 " " 0 0 0 1
+
+#pragma parameter LABEL0064	                  "[#] Adaptive Strobe (~BFI):"   0 0 0 1
+#pragma parameter ADPT_STROBE_STR            "    .    Strength"    0.25   0.0  0.5  0.01
+#pragma parameter ADPT_STROBE_GAIN_ADJ       "    .    Gain adjustment"    0.9   0.0  1.0  0.01
+#pragma parameter ADPT_STROBE_GAMMA_ADJ      "    .    Gamma adjustment"   0.9   0.0  2.0  0.01
+
+#pragma parameter LABEL9999 " " 0 0 0 1
 
 
 

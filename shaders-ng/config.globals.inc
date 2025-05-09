@@ -935,14 +935,6 @@
 	#define PPERSISTENCE_END	global.PPERSISTENCE_END
 #endif
 
-#ifndef SERVICE1
-    #define SERVICE1 global.SERVICE1
-#endif
-
-#ifndef SERVICE2
-    #define SERVICE2 global.SERVICE2
-#endif
-
 #ifndef LCD_ANTIGHOSTING
     #define LCD_ANTIGHOSTING global.LCD_ANTIGHOSTING
 #endif
@@ -955,3 +947,22 @@
     #define LCD_ANTIGHOSTING_FLIP_MASK global.LCD_ANTIGHOSTING_FLIP_MASK
 #endif
 
+#ifndef ADPT_STROBE_STR
+    #define ADPT_STROBE_STR global.ADPT_STROBE_STR
+#endif
+
+#ifndef ADPT_STROBE_GAIN_ADJ
+    #define ADPT_STROBE_GAIN_ADJ global.ADPT_STROBE_GAIN_ADJ
+#endif
+
+#ifndef ADPT_STROBE_GAMMA_ADJ
+    #define ADPT_STROBE_GAMMA_ADJ global.ADPT_STROBE_GAMMA_ADJ
+#endif
+
+#ifndef SERVICE1
+    #define SERVICE1 global.SERVICE1
+#endif
+
+#ifndef SERVICE2
+    #define SERVICE2 global.SERVICE2
+#endif

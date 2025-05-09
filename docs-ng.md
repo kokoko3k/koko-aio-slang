@@ -909,6 +909,24 @@ Changes are applied after a shader reload.*<br>
         It is an experimental measure to mitigate ghosting that could work or not,
         depending on your display.
     
+** Adaptive strobe (not compatible with LCD_ANTIGHOSTING):**
+    Similar to black frame insertion, this works by alternating the image 
+    brightness across frames and subframes (enabling the latter is recommended).
+    Doing so, will reduce the motion induced blur and image clarity, hopefully
+    approaching CRT behaviour.
+    To use it, in file config-user-optional.txt, write:<br>
+    ```#define DO_ADPT_STROBE```<br><br>
+    Once you do that, the following parameters can be changed runtime:
+    
+    Strength:
+        This modulates the clarity and the perceived flickering.
+    Gain adjustment:
+        Since the perceived image depends on the display pixel refresh speed,
+        it may be needed to adjust this.
+    Gamma adjustment:
+        Since the perceived image depends on the display pixel refresh speed,
+        it may be needed to adjust this.    
+        
 **Conditional FPS Halver**<br>
     *[Warning:] Only on retroarch > 1.19.1*<br>
     *[Warning:] This feature is not compatible with HALVE_BORDER_UPDATE* <br>
@@ -922,10 +940,10 @@ Changes are applied after a shader reload.*<br>
     To use it, in file config-user-optional.txt, write:<br>
     ```#define FPS_HALVER```<br><br>
     
-**Skipping Subframes rendering**<br>
-    By enabling this options, shader will skip full subframes rendering
-    and will display the previous rendered frame if possible, gaining performance.
+**Subframes rendering optimizations**<br>
+    By enabling this options, shader will take steps to speed-up subframes processing.
+    It could  display the previous rendered frame if possible or just part of it.
     Enable it only if using subframes, as it has a performance cost itself.
     To use it, in file config-user-optional.txt, write:<br>
-    ```#define SKIP_SUBFRAMES```<br><br>
+    ```#define SUBFRAMES_OPTIMIZATIONS```<br><br>
     

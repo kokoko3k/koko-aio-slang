@@ -57,20 +57,28 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-// By enabling this options, shader will skip full subframes rendering
-// and will display the previous rendered frame if possible, gaining performance.
-// Enable it only if using subframes, as it has a performance cost itself.
-// #define SKIP_SUBFRAMES
-
 // D3D/XBOX users should enable Direct3D workarounds to avoid glitches or crashes
 // by removing the leading "//" from the following line:
 // #define D3D_WORKAROUND
 
 // Enable lcd antighosting.
 // It works by temporal sharpening pixels, and the  
-// effect is proportional to the color difference over time.
-// It is NOT compatible with DELTA_RENDER
+// effect is proportional to the color difference over time on a full frame base.
+// It is NOT compatible with DELTA_RENDER and not designed for subframes.
+// Enabling this will make related shader parameter actually work.
 // #define DO_LCD_ANTIGHOSTING
+
+// Enable Adaptive strobe (similar to black frame insertion)
+// This works by alternating the image brightness across frames and subframes.
+// Doing so, will reduce the motion induced blur and image clarity, hopefully
+// approaching CRT behaviour.
+// Enabling this will make related shader parameter actually work.
+// #define DO_ADPT_STROBE
+
+// By enabling this options, shader will take steps to speed-up subframes processing.
+// It could  display the previous rendered frame if possible or just part of it.
+// Enable it only if using subframes, as it has a performance cost itself.
+// #define SUBFRAMES_OPTIMIZATIONS
 
 ////////////////////////////////////////////////////////////////////////////
 //
@@ -444,5 +452,10 @@
 // #define LCD_ANTIGHOSTING            0.5 //    Strength
 // #define LCD_ANTIGHOSTING_CEIL       1.0 //    Ceil
 // #define LCD_ANTIGHOSTING_FLIP_MASK  0.0 //    Flip Mask
+
+// Adaptive Strobe
+// #define ADPT_STROBE_STR            0.25   // Strength
+// #define ADPT_STROBE_GAIN_ADJ       0.9    // Gain adjustment
+// #define ADPT_STROBE_GAMMA_ADJ      0.9    // Gamma adjustment
 
 //DONT DELETE THIS LINE

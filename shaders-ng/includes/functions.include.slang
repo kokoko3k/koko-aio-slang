@@ -108,7 +108,7 @@ bool frame_is_even() {
 	return ((int(params.FrameCount) & 1) == 0);
 }
 
-bool subframe_is_even() {
+bool frame_subframe_is_even() {
     return ((params.FrameCount * global.TotalSubFrames + global.CurrentSubFrame) & 1) == 0;
 }
 
@@ -135,10 +135,15 @@ bool fps_halver_is_skipped_frame()  {
 }
 
 bool skip_subframe() {
-	#ifdef SKIP_SUBFRAMES
+	#ifdef DO_ADPT_STROBE
+		return false;
+	#endif
+		
+	#ifdef SUBFRAMES_OPTIMIZATIONS
 		if (is_subframe()) return true;
 	#endif
-		return false;
+	
+	return false;
 }
 
 bool is_skipped_frame() {
@@ -1561,7 +1566,39 @@ vec3 strobe( vec3 c) {
 }
 
 
-vec3 adaptive_strobe( vec3 c) {
+vec3 adaptive_strobe(vec3 c) {
+	
+	// if c is from the feedback, it already has a subframe applied.
+	// we need to double the room to counteract the previous applied
+	// strobe.
+	
+	#ifndef DO_ADPT_STROBE
+		return c;
+	#endif
+		
+	vec3 c2 = clamp(c, vec3(0.0), vec3(1.0));
+
+	float gain_adj =   ADPT_STROBE_GAIN_ADJ ; 
+	float gamma_adj =  ADPT_STROBE_GAMMA_ADJ;
+	
+	gain_adj =  mix(1.0, gain_adj, ADPT_STROBE_STR * 2.0);
+	gamma_adj = mix(1.0, gamma_adj, ADPT_STROBE_STR * 2.0);
+
+    vec3 room = (0.5 - abs(0.5-c2));
+	room = min(room, vec3(ADPT_STROBE_STR));
+
+	if ( frame_subframe_is_even() ) {
+		c= c +  room;
+	} else {
+		c= c -  room;
+	}
+
+	c*=gain_adj;
+	return pow(c, vec3(gamma_adj));
+	return clamp(c, vec3(0.0), vec3(1.0));
+}
+
+vec3 adaptive_strobe_old( vec3 c) {
     #define STRENGTH 0.1375; //effect strength
     #define BRIGHT_BIAS 1.0 //brightness compensation
     #define CONTRAST_COMPENSATION 0.5 //maximum contrast compensation

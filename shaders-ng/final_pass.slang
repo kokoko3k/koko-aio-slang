@@ -5,20 +5,21 @@
  * Does masks, spot, bezel, vignette, background image (anything else?)
  */
 
-                                //#define DEBUG_TEXTURE Original
-                                //#define DEBUG_TEXTURE colortools_and_ntsc_pass
-                                #define DEBUG_TEXTURE halo_pre_gamma_pass
-//#define DEBUG_PRINT_VALUE
-//#define PRINTED_VALUE texture(DEBUG_TEXTURE, vec2(0.5)).a
-//#define PRINTED_VALUE global.CurrentSubFrame
+// #define DEBUG_TEXTURE Original
+// #define DEBUG_TEXTURE colortools_and_ntsc_pass
+#define DEBUG_TEXTURE halo_pre_gamma_pass
+
+// #define DEBUG_PRINT_VALUE
+// #define PRINTED_VALUE texture(DEBUG_TEXTURE, vec2(0.5)).a
+// #define PRINTED_VALUE (1000.0/(global.FrameTimeDelta/1000.0)) 
     
-//#define DEBUG_QUAD_SPLIT
-//#define DEBUG_DUAL_SPLIT_X
-//#define DEBUG_DUAL_SPLIT_Y
-//#define DEBUG_DUAL_SPLIT_Y_GAMMA
-//#define DEBUG_DUAL_SPLIT_MIRROR_X
-//#define DEBUG_DUAL_SPLIT_MIRROR_X_GAMMA
-//#define DEBUG_SHOW_CLIP
+// #define DEBUG_QUAD_SPLIT
+// #define DEBUG_DUAL_SPLIT_X
+// #define DEBUG_DUAL_SPLIT_Y
+// #define DEBUG_DUAL_SPLIT_Y_GAMMA
+// #define DEBUG_DUAL_SPLIT_MIRROR_X
+// #define DEBUG_DUAL_SPLIT_MIRROR_X_GAMMA
+// #define DEBUG_SHOW_CLIP
 
 
 #include "config.inc"
@@ -1315,23 +1316,21 @@ vec2 quasirandom(vec2 n) {
 
 void main() {
 
+    // Early whole frameskipping
     #ifndef D3D_WORKAROUND
-        // When using subframes, it may be desiderable to return the pass feedback and completely skip rendering.
-        if (skip_subframe()) {
-            FragColor.rgb = texture(final_passFeedback, vOutputCoord).rgb;
-            return;
-        }
-        // If fps halver is active, stop processing asap        
-        if (is_skipped_frame()) {
+        bool skipframe = false;
+        if (skip_subframe()) skipframe = true;
+        if (fps_halver_is_skipped_frame()) skipframe = true;
+            
+        if (skipframe) {
             FragColor.rgb = texture(final_passFeedback, vOutputCoord).rgb ;
             return;
         }
     #endif
-    
+  
     // Initial content coords
     vec2 co_content = vTexCoord;
 
-    
     // Tilt?
     if (DO_TILT == 1.0)
         co_content = tilt(co_content, vIsRotated, TILT_X);
@@ -1395,7 +1394,7 @@ void main() {
     if (content_mask > 0.5) {
         
         pixel_out = fn_pixel_content(co_content);
-
+        
         if (DO_BACKDROP * BACKDROP_JUST_TUBE > 0.0) {
             vec3 backdrop = pixel_backdrop_image().rgb;
             //pixel_out = mix(pixel_out, pixel_out + backdrop,  (1 - dot(pixel_out,vec3(1/3.0)), 0,1) * DO_BACKDROP   );
@@ -1405,19 +1404,26 @@ void main() {
 
     } else {
 
-        // Can we halve refresh rate in the outside border to spare some cycles?
-        float halve_border_update = 0.0;
+        // Can we halve border update to spare some cycles?
+        bool skip_border = false;
         #ifdef HALVE_BORDER_UPDATE
-            halve_border_update = 1.0;
+            // By using !frame_is_even() and not frame_is_even(), we solve the issue of inner frame jagged lines
+            // when using HALVE_BORDER_UPDATE + DELTA_RENDER
+            if (!frame_is_even()) skip_border = true;
         #endif
+        
+        // We can skip border update on subframes.
+        // The following may seem redundant because we skip whole subframes already
+        // But when we use strobing, we always reach this point/code.
+        bool skip_because_is_subframe = false;
+        #ifdef SUBFRAMES_OPTIMIZATIONS
+            if (is_subframe()) skip_border = true;
+        #endif
+            
         #ifndef D3D_WORKAROUND
-            if ( halve_border_update == 1.0 ) {
-                // By using !frame_is_even() and not frame_is_even(), we solve the issue of inner frame jagged lines
-                // when using HALVE_BORDER_UPDATE + DELTA_RENDER
-                if ( !frame_is_even() ) {
-                    FragColor.rgb = texture(final_passFeedback, vOutputCoord).rgb;
-                    return;
-                }
+            if ( skip_border ) {
+                FragColor.rgb = texture(final_passFeedback, vOutputCoord).rgb;
+                return;
             }
         #endif
 
@@ -1491,7 +1497,10 @@ void main() {
             pixel_out = mix(pixel_out+perlin, vec3(content_mask), vec3(vignette_spot.y) );
         }
         
-            pixel_out = antighost(pixel_out);
+        pixel_out = antighost(pixel_out);
+        #ifdef DO_ADPT_STROBE
+            pixel_out = adaptive_strobe(pixel_out);
+        #endif
     }
     
     
