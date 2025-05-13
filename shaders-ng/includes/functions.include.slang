@@ -1567,15 +1567,15 @@ vec3 strobe( vec3 c) {
 
 
 vec3 adaptive_strobe(vec3 c) {
-	
-	// if c is from the feedback, it already has a subframe applied.
-	// we need to double the room to counteract the previous applied
-	// strobe.
-	
+
 	#ifndef DO_ADPT_STROBE
 		return c;
 	#endif
-		
+
+	// Test:
+	// if (mod(params.FrameCount, 100) > 50)
+	//   return c;
+
 	vec3 c2 = clamp(c, vec3(0.0), vec3(1.0));
 
 	float gain_adj =   ADPT_STROBE_GAIN_ADJ ; 

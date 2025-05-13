@@ -19,7 +19,7 @@
 
 
 //#define DEBUG
-   #define DEBUG_COLOR_CALIB
+   //#define DEBUG_COLOR_CALIB
    //#define DEBUG_TIME_FADE
    //#define DEBUG_SOLID_COLOR
    //#define DEBUG_STEP_GRADIENT
@@ -27,6 +27,7 @@
    //#define DEBUG_BLINK
    //#define DEBUG_BLINK_CIRCLE
    //#define DEBUG_WALKING_CIRCLE
+   #define DEBUG_WALKING_LINES
    //#define DEBUG_COLORWHEEL
    
    
@@ -335,7 +336,21 @@ vec3 debug() {
       float radius = 0.05;
       pixel_debug = vec3(1 - step(radius, length(center)));
       pixel_debug *= DEBUG_COLOR;
-      
+
+      #elif defined DEBUG_WALKING_LINES
+      vec2 co = vTexCoord;
+      float slow=90;
+      co.x += mod(params.FrameCount, slow)/slow ;
+      bool line = (sin(co.x*pi*100.0) > 0.9);
+
+      if (line)
+            pixel_debug = vec3(0.75);
+      else
+            pixel_debug = vec3(0.25);
+
+      pixel_debug *= DEBUG_COLOR;
+
+
    #elif defined DEBUG_COLORWHEEL   
       pixel_debug = colorwheel(vTexCoord);   
    
