@@ -651,7 +651,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter LABEL0027 " " 0 0 0 1
 
 
-r
 //Vignette and spot
 #pragma parameter DO_VIGNETTE	"★ Vignette enable? (vi) ==>"	0.0  0.0  1.0  1.0
 #pragma parameter V_SIZE	 "        Size"					0.7  0.3  5.0  0.02
