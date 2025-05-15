@@ -502,7 +502,7 @@ vec2 apply_fuzzy_main_pass_stage_1() {
 	}
 	
 	if (DO_VIGNETTE == 1.0)
-		color_out *= 0.8 * (V_POWER);
+		color_out *= 0.8;
 	
 	return vec2(color_out/color_in, gamma_out );
 }
@@ -547,7 +547,7 @@ vec2 apply_fuzzy_main_pass_stage_1_no_gamma_in() {
 	}
 	
 	if (DO_VIGNETTE == 1.0)
-		color_out *= 0.8 * (V_POWER);
+		color_out *= 0.8;
 	
 	return vec2(color_out/color_in, gamma_out );
 }

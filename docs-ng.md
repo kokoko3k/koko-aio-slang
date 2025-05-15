@@ -731,6 +731,11 @@ However nice effects may be obtained (eg: with vector games). <br>
     Will cause uneven brightness of the image, more at the center,<br>
     less at the edges.<br>
     
+    Vignette size:
+        Modulates the size of the circular shade.
+    Screen brightness uniformity:
+        Modulates the strength of random uneven brightness across the screen.
+        
 **Spot:**<br>
     Simulates external light reflected by the monitor glass.<br>
       

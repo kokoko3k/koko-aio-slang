@@ -465,8 +465,8 @@
     #define V_SIZE		global.V_SIZE
 #endif
 
-#ifndef V_POWER
-    #define V_POWER		global.V_POWER
+#ifndef UNIFORMITY
+    #define UNIFORMITY		global.UNIFORMITY
 #endif
 
 #ifndef DO_BG_IMAGE

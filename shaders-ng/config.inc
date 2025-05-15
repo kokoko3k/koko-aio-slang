@@ -327,6 +327,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float ADPT_STROBE_GAIN_ADJ;
 	float ADPT_STROBE_GAMMA_ADJ;
 	
+	float UNIFORMITY;
+	
 } global;
 
 
@@ -652,8 +654,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 //Vignette and spot
 #pragma parameter DO_VIGNETTE	"★ Vignette enable? (vi) ==>"	0.0  0.0  1.0  1.0
-#pragma parameter V_SIZE	"        Size"			0.7  0.3  2.0  0.02
-#pragma parameter V_POWER	"        Power"			1.0  0.05 1.0  0.01
+#pragma parameter V_SIZE	 "        Size"					0.7  0.3  2.0  0.02
+#pragma parameter UNIFORMITY "     Screen brightness uniformity"	0.95  0.0  1.0  0.01
 
 #pragma parameter DO_SPOT	"★ Spot enable? (sp) ==>"		0.0   0.0   1.0 1.0
 #pragma parameter S_POSITION_X 	"        X Position"	   -0.5   -2.0 2.0 0.05

@@ -409,7 +409,7 @@
 
 // #define DO_VIGNETTE  1.0     // ★ Vignette enable?
 // #define V_SIZE  1.08         //         Size
-// #define V_POWER  1.00        //         Power
+// #define UNIFORMITY 1.00      //         Screen brightness uniformity
 
 // #define DO_SPOT  1.0         // ★ Spot enable? 
 // #define S_POSITION_X  1.0    //         X Position
