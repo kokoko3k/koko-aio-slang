@@ -52,7 +52,9 @@ float screen_uniformity() {
     float uniformity = sin(co.x * subscale.x + t) * cos(co.y * subscale.y - t);
     uniformity += sin(co.y * subscale.z * sin(t * 0.5)) * cos(co.x * subscale.w + t);
 	uniformity *= uniformity;
-    uniformity = map_range(uniformity, -1, 1, UNIFORMITY, 1.0);
+
+	
+    uniformity = map_range(uniformity, -1, 1, UNIFORMITY,  (1-UNIFORMITY)/2.0 +1 );
 	return uniformity;
 }
 
