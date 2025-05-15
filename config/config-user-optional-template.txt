@@ -426,10 +426,10 @@
 // #define ASPECT_Y  3.0    //         Aspect Ratio Denominator
 
 
-// #define DO_DYNZOOM  0.015    // ★ Luminosity tied zoom (!!OBSTRUCTS integer scale!!)
+// #define DO_DYNZOOM  0.015    // * Breathing (Luma tied zoom, ignored if integer scaling)
 
 
-// #define AUTOCROP_MAX 0.0            //★ Autocrop: maximum amount (!!OBSTRUCTS integer scale!!) 
+// #define AUTOCROP_MAX 0.0            //★ Autocrop: maximum amount (ignored if integer scale!!) 
 // #define AUTOCROP_MIN 1.0            //        Number of mandatory lines to crop
 // #define AUTOCROP_SAMPLES 10         //        Samples per frame (faster response, higher gpu use)
 // #define AUTOCROP_SAMPLE_SIZE 2.0    //        Sample size (big speedup, less accurate)

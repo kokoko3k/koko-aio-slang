@@ -773,11 +773,11 @@ However nice effects may be obtained (eg: with vector games). <br>
         As long as Aspect Ratio Numerator is positive, this will
         be used as the denominator of the fraction.
 
-**Luminosity tied zoom:**<br>
+**Breathing (Luminosity tied zoom):**<br>
     On older CRT monitors, the picture gets bigger when the image was brighter.<br>
-    Please TURN THIS OFF if you want to use integer scaling, since this obstructs it.
     The higher, the more prominent the effect.
-
+    This is ignored if integer scaling is selected.
+    
 **Autocrop**: 
     Clears solid bars around the frame.
     

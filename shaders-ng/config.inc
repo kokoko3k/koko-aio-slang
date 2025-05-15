@@ -681,7 +681,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter LABEL0051 " " 0 0 0 1
 
 //Modulate the image zooming depending on the image luminosity.
-#pragma parameter DO_DYNZOOM	     "★ Luminosity tied zoom (ignored if integer scaling) ==>"		0.015   0.0   1.0  0.005
+#pragma parameter DO_DYNZOOM	     "★ Breathing (Luma tied zoom, ignored if integer scaling) ==>"		0.015   0.0   1.0  0.005
 #pragma parameter LABEL0032 " " 0 0 0 1
 
 //Autocrop
