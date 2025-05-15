@@ -54,7 +54,7 @@ float screen_uniformity() {
 	uniformity *= uniformity;
 
 	
-    uniformity = map_range(uniformity, -1, 1, UNIFORMITY,  (1-UNIFORMITY)/2.0 +1 );
+    uniformity = map_range(uniformity, -1, 1, UNIFORMITY,  (1-UNIFORMITY)/2.5 +1 );
 	return uniformity;
 }
 
