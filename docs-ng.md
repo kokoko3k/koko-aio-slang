@@ -895,7 +895,7 @@ Changes are applied after a shader reload.*<br>
     To activate that ffeature, in config-user-optional.txt, write:<br>
     ```#define HALVE_BORDER_UPDATE```<br>
   
-**LCD antighosting:** (not compatible with delta render and Direct3D)<br>
+**LCD antighosting:** (not compatible Direct3D and disabled with DELTA_RENDER)<br>
     LCD displays often suffer from high pixel refresh times <br>
     which produces ghosting when game changes on screen.<br>
     By inducing larger color transitions, it prompts the LCD cells <br>

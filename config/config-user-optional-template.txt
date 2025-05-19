@@ -64,7 +64,7 @@
 // Enable lcd antighosting.
 // It works by temporal sharpening pixels, and the  
 // effect is proportional to the color difference over time on a full frame base.
-// It is NOT compatible with DELTA_RENDER and not designed for subframes.
+// It is DISABLED if DELTA_RENDER is enabled and not designed for subframes.
 // Enabling this will make related shader parameter actually work.
 // #define DO_LCD_ANTIGHOSTING
 

@@ -1052,14 +1052,19 @@ float create_ambi_colorize_shade(vec2 co) {
 
 vec3 antighost(vec3 c) {
     #ifndef D3D_WORKAROUND
-        #ifdef DO_LCD_ANTIGHOSTING
-            if (frame_is_even()) {
-                vec3 feedback = texture(final_passFeedback, vOutputCoord).rgb;
-                vec3 diff=(feedback - c)*LCD_ANTIGHOSTING;
-                diff = sign(diff) * min( abs(diff), vec3(LCD_ANTIGHOSTING_CEIL));
-                c = mix(c, c-diff, 0.5);
-            }
-        #endif
+        if (!bdelta_render_enabled()) {
+            float dumb; //<-- fake declaration to put something in the statement
+                        //...could prevent some picky compilers from complaining about empty
+                        //   if() -> then (maybe unneeded but unharmful)
+            #ifdef DO_LCD_ANTIGHOSTING
+                if (frame_is_even()) {
+                    vec3 feedback = texture(final_passFeedback, vOutputCoord).rgb;
+                    vec3 diff=(feedback - c)*LCD_ANTIGHOSTING;
+                    diff = sign(diff) * min( abs(diff), vec3(LCD_ANTIGHOSTING_CEIL));
+                    c = mix(c, c-diff, 0.5);
+                }
+            #endif
+        }
     #endif
     return c;
 }
