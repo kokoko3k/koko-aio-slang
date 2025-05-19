@@ -108,8 +108,12 @@ bool frame_is_even() {
 	return ((int(params.FrameCount) & 1) == 0);
 }
 
+uint frame_subframe() {
+  return params.FrameCount * global.TotalSubFrames + global.CurrentSubFrame;
+}
+
 bool frame_subframe_is_even() {
-    return ((params.FrameCount * global.TotalSubFrames + global.CurrentSubFrame) & 1) == 0;
+  return (frame_subframe() & 1) == 0;
 }
 
 bool is_subframe() {
@@ -1563,6 +1567,27 @@ vec4 PG_get_hmask_preset() {
 	return c;
 }
 
+vec3 antighost(vec3 c) {
+	#ifndef DO_ADPT_STROBE
+		#ifndef D3D_WORKAROUND
+			if (!bdelta_render_enabled()) {
+				float dumb; //<-- fake declaration to put something in the statement
+							//...could prevent some picky compilers from complaining about empty
+							//   if() -> then (maybe unneeded but unharmful)
+				#ifdef DO_LCD_ANTIGHOSTING
+					if (frame_is_even()) {
+						vec3 feedback = texture(final_passFeedback, vOutputCoord).rgb;
+						vec3 diff=(feedback - c)*LCD_ANTIGHOSTING;
+						diff = sign(diff) * min( abs(diff), vec3(LCD_ANTIGHOSTING_CEIL));
+						c = mix(c, c-diff, 0.5);
+					}
+				#endif
+			}
+		#endif
+	#endif
+	return c;
+}
+
 vec3 strobe( vec3 c) {
     #define STRENGTH_1 0.075 //effect strength
 
@@ -1574,36 +1599,28 @@ vec3 strobe( vec3 c) {
 }
 
 
-vec3 adaptive_strobe(vec3 c) {
+vec3 adaptive_strobe(vec3 c, float osc) {
 
 	#ifndef DO_ADPT_STROBE
 		return c;
 	#endif
 
-	// Test:
-	// if (mod(params.FrameCount, 100) > 50)
-	//   return c;
+	c = clamp(c, vec3(0.0), vec3(1.0));
 
-	vec3 c2 = clamp(c, vec3(0.0), vec3(1.0));
+	float gain_adj =  mix(1.0, ADPT_STROBE_GAIN_ADJ,  ADPT_STROBE_STR);
 
-	float gain_adj =   ADPT_STROBE_GAIN_ADJ ; 
-	float gamma_adj =  ADPT_STROBE_GAMMA_ADJ;
-	
-	gain_adj =  mix(1.0, gain_adj, ADPT_STROBE_STR * 2.0);
-	gamma_adj = mix(1.0, gamma_adj, ADPT_STROBE_STR * 2.0);
-
-    vec3 room = (0.5 - abs(0.5-c2));
-	room = min(room, vec3(ADPT_STROBE_STR));
-
-	if ( frame_subframe_is_even() ) {
-		c= c +  room;
-	} else {
-		c= c -  room;
+	vec3 osc3 = vec3(osc);
+	if (osc > 0.0) {		
+		osc3 = mix( osc3*gain_adj, osc3 * gain_adj * c, ADPT_STROBE_GAIN_ADJ_NODARK) ;
 	}
 
-	c*=gain_adj;
-	return pow(c, vec3(gamma_adj));
-	return clamp(c, vec3(0.0), vec3(1.0));
+	vec3 room = (0.5 - abs(0.5-c));
+	c += room * osc3 * ADPT_STROBE_STR ;
+
+	float gamma_adj = mix(1.0, ADPT_STROBE_GAMMA_ADJ, ADPT_STROBE_STR);
+	c = pow(c, vec3(gamma_adj));
+
+	return c;
 }
 
 vec3 adaptive_strobe_old( vec3 c) {

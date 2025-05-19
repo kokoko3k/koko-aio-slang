@@ -47,7 +47,10 @@ layout(location = 16) out float vDo_pixelgrid_h;
 layout(location = 17) out float vFake_scanline_period;
 layout(location = 18) out float vPG_y_shift;
 layout(location = 19) out vec2 vUnrotated_Output_coords;
-
+#ifdef DO_ADPT_STROBE
+    layout(location = 20) out float vAdaptive_strobe_oscillator;
+#endif
+    
 #ifdef DEBUG_PRINT_VALUE
     layout(location = 31) out float vfprintvalue; 
 #endif
@@ -438,6 +441,17 @@ void main() {
     //Fragment shader will use that just one time that way. => precalc.
     vPG_offsets_and_size.a = pi/vPG_offsets_and_size.a;
 
+    #ifdef DO_ADPT_STROBE
+        float iFrameMod = 0.0;
+        //+1 should take care of oscillator invertion to avoid voltage accumuation in IPS panels (?)
+        if (ADPT_LCD_RETENTION_FIX > 0.0)
+            iFrameMod = mod(frame_subframe(), global.TotalSubFrames * ADPT_LCD_RETENTION_FIX + 1) ;
+        else
+            iFrameMod = mod(frame_subframe(), global.TotalSubFrames * 300.0); //mod needed to avoid drifting sin precision errors
+        
+        vAdaptive_strobe_oscillator = cos(iFrameMod * pi);
+    #endif
+    
 }
 
 
@@ -463,6 +477,10 @@ layout(location = 16) in float vDo_pixelgrid_h;
 layout(location = 17) in float vFake_scanline_period;
 layout(location = 18) in float vPG_y_shift;
 layout(location = 19) in vec2 vUnrotated_Output_coords;
+#ifdef DO_ADPT_STROBE
+    layout(location = 20) in float vAdaptive_strobe_oscillator;
+#endif
+
 
 #ifdef DEBUG_PRINT_VALUE
     layout(location = 31) in float vfprintvalue;
@@ -1050,26 +1068,6 @@ float create_ambi_colorize_shade(vec2 co) {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
-vec3 antighost(vec3 c) {
-    #ifndef D3D_WORKAROUND
-        if (!bdelta_render_enabled()) {
-            float dumb; //<-- fake declaration to put something in the statement
-                        //...could prevent some picky compilers from complaining about empty
-                        //   if() -> then (maybe unneeded but unharmful)
-            #ifdef DO_LCD_ANTIGHOSTING
-                if (frame_is_even()) {
-                    vec3 feedback = texture(final_passFeedback, vOutputCoord).rgb;
-                    vec3 diff=(feedback - c)*LCD_ANTIGHOSTING;
-                    diff = sign(diff) * min( abs(diff), vec3(LCD_ANTIGHOSTING_CEIL));
-                    c = mix(c, c-diff, 0.5);
-                }
-            #endif
-        }
-    #endif
-    return c;
-}
-
-
 vec4 fn_pixel_fgbg_image(sampler2D smp) {
     vec2 tex_size = textureSize(smp, 0); // * BG_ZOOM;
     //if (BG_IMAGE_ROTATION > 0.0  || ( BG_IMAGE_ROTATION < 0.0 && bool(vIsRotated) )  ) tex_size.xy = tex_size.yx;
@@ -1502,10 +1500,9 @@ void main() {
             pixel_out = mix(pixel_out+perlin, vec3(content_mask), vec3(vignette_spot.y) );
         }
         
-        pixel_out = antighost(pixel_out);
-        #ifdef DO_ADPT_STROBE
-            pixel_out = adaptive_strobe(pixel_out);
-        #endif
+        
+        pixel_out = adaptive_strobe(pixel_out, vAdaptive_strobe_oscillator);
+        pixel_out = antighost(pixel_out);        
     }
     
     

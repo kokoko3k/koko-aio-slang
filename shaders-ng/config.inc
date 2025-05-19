@@ -326,6 +326,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float ADPT_STROBE_STR;
 	float ADPT_STROBE_GAIN_ADJ;
 	float ADPT_STROBE_GAMMA_ADJ;
+	float ADPT_LCD_RETENTION_FIX;
+	float ADPT_STROBE_GAIN_ADJ_NODARK;
 	
 	float UNIFORMITY;
 	
@@ -718,10 +720,12 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter LCD_ANTIGHOSTING_FLIP_MASK  "    .    Flip Mask"   0.0   0.0  1.0  1.0
 #pragma parameter LABEL0063 " " 0 0 0 1
 
-#pragma parameter LABEL0064	                  "[#] Adaptive Strobe/BFI (#define DO_ADPT_STROBE):"   0 0 0 1
-#pragma parameter ADPT_STROBE_STR            "    .    Strength"    0.25   0.0  0.5  0.01
-#pragma parameter ADPT_STROBE_GAIN_ADJ       "    .    Gain adjustment"    0.9   0.0  1.0  0.01
-#pragma parameter ADPT_STROBE_GAMMA_ADJ      "    .    Gamma adjustment"   0.9   0.0  2.0  0.01
+#pragma parameter ADPT_STROBE_STR	            "[#] Adaptive Strobe ≈BFI Strength (#define DO_ADPT_STROBE):"   0.8   0.0  1.0  0.05
+#pragma parameter ADPT_STROBE_GAIN_ADJ          "   .   Gain adjustment"    0.9   0.0  1.0  0.05
+#pragma parameter ADPT_STROBE_GAIN_ADJ_NODARK   "          Less gain on dark colors"    1.0   0.0  1.0  0.05
+#pragma parameter ADPT_STROBE_GAMMA_ADJ         "   .   Post Gamma adjustment"   0.9   0.5  4.0  0.05
+#pragma parameter ADPT_LCD_RETENTION_FIX        "   .   LCD Retention workaround cadence (frames)"   3600.0   0.0  300000.0  50.0
+
 
 #pragma parameter LABEL9999 " " 0 0 0 1
 

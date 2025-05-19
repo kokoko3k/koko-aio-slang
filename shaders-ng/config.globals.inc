@@ -959,6 +959,14 @@
     #define ADPT_STROBE_GAMMA_ADJ global.ADPT_STROBE_GAMMA_ADJ
 #endif
 
+#ifndef ADPT_STROBE_GAIN_ADJ_NODARK
+    #define ADPT_STROBE_GAIN_ADJ_NODARK global.ADPT_STROBE_GAIN_ADJ_NODARK
+#endif
+
+#ifndef ADPT_LCD_RETENTION_FIX
+    #define ADPT_LCD_RETENTION_FIX global.ADPT_LCD_RETENTION_FIX
+#endif
+
 #ifndef SERVICE1
     #define SERVICE1 global.SERVICE1
 #endif

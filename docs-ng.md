@@ -895,7 +895,30 @@ Changes are applied after a shader reload.*<br>
     To activate that ffeature, in config-user-optional.txt, write:<br>
     ```#define HALVE_BORDER_UPDATE```<br>
   
-**LCD antighosting:** (not compatible Direct3D and disabled with DELTA_RENDER)<br>
+** Adaptive strobe (not compatible with LCD_ANTIGHOSTING):**
+    Similar to black frame insertion, this works by alternating the image 
+    brightness across frames and subframes (enabling the latter is recommended).
+    Doing so, will reduce the motion induced blur and image clarity, hopefully
+    approaching CRT behaviour.
+    To use it, in file config-user-optional.txt, write:<br>
+    ```#define DO_ADPT_STROBE```<br><br>
+    Once you do that, the following parameters can be changed runtime:
+    
+    Strength:
+        This modulates the clarity and the perceived flickering.
+    Gain adjustment, post gamma adjustment, Less gain on dark colors:
+        Since the perceived image depends on the display pixel refresh speed,
+        it may be needed to adjust this.
+    LCD Retention workaround cadence (frames):
+        Some (IPS?) panels may suffer from temporary image retention when BFI/like is used.
+        This parameter will invert the flipping every number of frames configured
+        hopefully preventing that issue.
+  
+**LCD antighosting:**
+    . Not compatible Direct3D<br>
+    . Disabled with DELTA_RENDER)<br>
+    . Disabled with Adaptive strobe<br>
+    
     LCD displays often suffer from high pixel refresh times <br>
     which produces ghosting when game changes on screen.<br>
     By inducing larger color transitions, it prompts the LCD cells <br>
@@ -914,23 +937,7 @@ Changes are applied after a shader reload.*<br>
         It is an experimental measure to mitigate ghosting that could work or not,
         depending on your display.
     
-** Adaptive strobe (not compatible with LCD_ANTIGHOSTING):**
-    Similar to black frame insertion, this works by alternating the image 
-    brightness across frames and subframes (enabling the latter is recommended).
-    Doing so, will reduce the motion induced blur and image clarity, hopefully
-    approaching CRT behaviour.
-    To use it, in file config-user-optional.txt, write:<br>
-    ```#define DO_ADPT_STROBE```<br><br>
-    Once you do that, the following parameters can be changed runtime:
-    
-    Strength:
-        This modulates the clarity and the perceived flickering.
-    Gain adjustment:
-        Since the perceived image depends on the display pixel refresh speed,
-        it may be needed to adjust this.
-    Gamma adjustment:
-        Since the perceived image depends on the display pixel refresh speed,
-        it may be needed to adjust this.    
+
         
 **Conditional FPS Halver**<br>
     *[Warning:] Only on retroarch > 1.19.1*<br>
