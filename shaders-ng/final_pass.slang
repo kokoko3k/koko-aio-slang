@@ -1500,8 +1500,9 @@ void main() {
             pixel_out = mix(pixel_out+perlin, vec3(content_mask), vec3(vignette_spot.y) );
         }
         
-        
-        pixel_out = adaptive_strobe(pixel_out, vAdaptive_strobe_oscillator);
+        #ifdef DO_ADPT_STROBE
+            pixel_out = adaptive_strobe(pixel_out, vAdaptive_strobe_oscillator);
+        #endif
         pixel_out = antighost(pixel_out);        
     }
     
