@@ -1261,6 +1261,14 @@ float delta_render_enabled(){
     #endif
 }
 
+bool bdelta_render_enabled(){
+    #ifdef DELTA_RENDER
+        return true;
+    #else
+        return false;
+    #endif
+}
+
 float delta_render_get_force_refresh() {
 	#ifdef DELTA_RENDER_FORCE_REFRESH
 		return DELTA_RENDER_FORCE_REFRESH;
@@ -1673,10 +1681,26 @@ float lodmax(vec2 texsize) {
 	//lod needed to average all texture points.
     return log2(max(texsize.x, texsize.y));
 }
+
+bool deltarender_frame_is_forced_refresh() {
+	 // - We are in a frame that is forced for full refresh
+	return params.FrameCount % int(delta_render_get_force_refresh()) == 0.0 ;
+}
+
+bool deltarender_frame_is_not_forced_refresh() {
+	 // - We are in a frame that is forced for full refresh
+	return params.FrameCount % int(delta_render_get_force_refresh()) != 0.0 ;
+}
+
+bool deltarender_preconditions_met(bool is_interlaced) {
+	return ( (! is_interlaced) || PIXELGRID_INTR_DISABLE_Y >= 1.0 || DO_PIXELGRID_H == 0.0);
+}
+
+
 float is_deltarender_allowed(bool is_interlaced) {
 	// Delta render, mandatory conditions:
-    return float( ( params.FrameCount % int(delta_render_get_force_refresh()) != 0.0 ) &&              // - We are in a frame that is not forced for full refresh
-    ( (! is_interlaced) || PIXELGRID_INTR_DISABLE_Y >= 1.0 || DO_PIXELGRID_H == 0.0)); // - screen is not interlaced or we disabled scanlines on interlaced content
+    return float(deltarender_frame_is_not_forced_refresh() &&   // - We are in a frame that is not forced for full refresh
+           deltarender_preconditions_met(is_interlaced)); // - screen is not interlaced or we disabled scanlines on interlaced content
 }
 
 float delta_render_changed(sampler2D smp_past, sampler2D smp_now, vec2 co, float lod) {
