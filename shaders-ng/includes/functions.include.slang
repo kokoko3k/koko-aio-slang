@@ -1567,26 +1567,6 @@ vec4 PG_get_hmask_preset() {
 	return c;
 }
 
-vec3 antighost(vec3 c) {
-	#ifndef DO_ADPT_STROBE
-		#ifndef D3D_WORKAROUND
-			if (!bdelta_render_enabled()) {
-				float dumb; //<-- fake declaration to put something in the statement
-							//...could prevent some picky compilers from complaining about empty
-							//   if() -> then (maybe unneeded but unharmful)
-				#ifdef DO_LCD_ANTIGHOSTING
-					if (frame_is_even()) {
-						vec3 feedback = texture(final_passFeedback, vOutputCoord).rgb;
-						vec3 diff=(feedback - c)*LCD_ANTIGHOSTING;
-						diff = sign(diff) * min( abs(diff), vec3(LCD_ANTIGHOSTING_CEIL));
-						c = mix(c, c-diff, 0.5);
-					}
-				#endif
-			}
-		#endif
-	#endif
-	return c;
-}
 
 vec3 strobe( vec3 c) {
     #define STRENGTH_1 0.075 //effect strength

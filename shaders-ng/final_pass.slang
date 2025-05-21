@@ -1317,6 +1317,20 @@ vec2 quasirandom(vec2 n) {
     //return abs(sin(n));
 }
 
+vec3 antighost(vec3 c) {
+	#ifndef D3D_WORKAROUND
+		if (!bdelta_render_enabled()) {
+				if (frame_is_even()) {
+					vec3 feedback = texture(final_passFeedback, vOutputCoord).rgb;
+					vec3 diff=(feedback - c)*LCD_ANTIGHOSTING;
+					diff = sign(diff) * min( abs(diff), vec3(LCD_ANTIGHOSTING_CEIL));
+					c = mix(c, c-diff, 0.5);
+				}
+		}
+	#endif
+	return c;
+}
+
 void main() {
 
     // Early whole frameskipping
@@ -1502,8 +1516,11 @@ void main() {
         
         #ifdef DO_ADPT_STROBE
             pixel_out = adaptive_strobe(pixel_out, vAdaptive_strobe_oscillator);
+        #else
+            #ifdef DO_LCD_ANTIGHOSTING
+                pixel_out = antighost(pixel_out);
+            #endif
         #endif
-        pixel_out = antighost(pixel_out);        
     }
     
     
