@@ -1509,7 +1509,7 @@ void main() {
     if (content_mask > 0.5) {
         if ( DO_SPOT + DO_VIGNETTE > 0.0 ) {
             float perlin = (random_fast(vTexCoord)-0.5) * (1/255.0);
-            vec2 vignette_spot = texture(helper_pass, vTexCoord).zw;
+            vec2 vignette_spot = texture(helper_pass, co_content).zw;
             pixel_out = pixel_out * vignette_spot.x;
             pixel_out = mix(pixel_out+perlin, vec3(content_mask), vec3(vignette_spot.y) );
         }

@@ -53,9 +53,21 @@ layout(set = 0, binding = 3) uniform sampler2D helper_passFeedback;
 layout(set = 0, binding = 4) uniform sampler2D colortools_and_ntsc_pass;
 layout(set = 0, binding = 5) uniform sampler2D colortools_and_ntsc_passFeedback;
 
-float vignette(){
+
+float vignette_new(){
 	
-	vec2 sinxy = cos((vTexCoord-0.5) / V_SIZE) ;
+	float v_size_adj;
+	//higher precision on values between 0.32 and 0.5:
+	float min_value = 1/pi;
+	float max_value = 0.5;
+	if (V_SIZE < max_value) {
+		float t = pow( (V_SIZE - min_value)/(max_value - min_value), 2.0);
+		v_size_adj = mix( min_value, max_value, t);
+	} else {
+		v_size_adj = V_SIZE;
+	}
+	
+	vec2 sinxy = cos((vTexCoord-0.5) / v_size_adj) ;
 	
 	if (V_SHAPE < 0.0)
 		sinxy.y = 1.0; //switch to tube shape
@@ -64,6 +76,31 @@ float vignette(){
 	float shape_exp_min = 0.2;
 	float v = (sinxy.y * sinxy.x);
  	return pow(v, shape_adj);
+}
+
+
+float vignette(){
+		
+	vec2 cosxy = cos((vTexCoord-0.5) / V_SIZE) ;
+	
+	//pillow related:
+		float pillow_exp = mix(0.0, 0.3, 1-abs(V_SHAPE));
+		vec2 xo=1-abs(vTexCoord*2-1);
+		xo=pow(xo, vec2(pillow_exp));
+		vec2 pillowedxy = smoothstep(0.4,0.9,xo);
+	
+	if (V_SHAPE < 0.0) {
+		cosxy.y = 1.0;      //switch to tube shape
+		pillowedxy.y = 1.0; //switch to tube shape
+	}
+	
+	float v = (cosxy.y * cosxy.x);
+	float pillowed = pillowedxy.x*pillowedxy.y;
+	
+	v*= pillowed;
+	
+	return v;
+
 }
 
 
