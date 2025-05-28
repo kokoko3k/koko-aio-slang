@@ -734,7 +734,8 @@ However nice effects may be obtained (eg: with vector games). <br>
     Vignette size:
         Modulates the size of the circular shade.
         Shape (Pillow/Tube):
-           * Modulate from a bell shape to a pillow one.
+           * Modulate from a bell shape to a pillow one (near 0.0).
+             For pillow shapes it is advised to keep vignette size very very low.
            * Negative values will switch render the vignette with a tube shape.
     Screen brightness uniformity:
         Modulates the strength of random uneven brightness across the screen.
