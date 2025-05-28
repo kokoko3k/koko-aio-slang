@@ -465,6 +465,10 @@
     #define V_SIZE		global.V_SIZE
 #endif
 
+#ifndef V_SHAPE
+    #define V_SHAPE		global.V_SHAPE
+#endif
+
 #ifndef UNIFORMITY
     #define UNIFORMITY		global.UNIFORMITY
 #endif

@@ -330,6 +330,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float ADPT_STROBE_GAIN_ADJ_NODARK;
 	
 	float UNIFORMITY;
+	float V_SHAPE;
 	
 } global;
 
@@ -655,7 +656,9 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 //Vignette and spot
 #pragma parameter DO_VIGNETTE	"★ Vignette enable? (vi) ==>"	0.0  0.0  1.0  1.0
-#pragma parameter V_SIZE	 "        Size"					0.7  0.3  5.0  0.02
+#pragma parameter V_SHAPE	 "        Shape (<0.0: tube, near 0.0: pillow)"	1.0  -1.0  1.0  0.01
+//V_SIZE has to be greater than 1/pi (0.318)
+#pragma parameter V_SIZE	 "        Size"					0.7  0.32  5.0  0.02 
 #pragma parameter UNIFORMITY "     Screen brightness uniformity"	0.95  0.80  1.0  0.01
 
 #pragma parameter DO_SPOT	"★ Spot enable? (sp) ==>"		0.0   0.0   1.0 1.0

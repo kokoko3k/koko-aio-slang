@@ -53,10 +53,48 @@ layout(set = 0, binding = 3) uniform sampler2D helper_passFeedback;
 layout(set = 0, binding = 4) uniform sampler2D colortools_and_ntsc_pass;
 layout(set = 0, binding = 5) uniform sampler2D colortools_and_ntsc_passFeedback;
 
-
 float vignette(){
-	vec2 sinco = cos((vTexCoord-0.5) / V_SIZE) ;
-	return (sinco.y * sinco.x);
+	
+	vec2 sinxy = cos((vTexCoord-0.5) / V_SIZE) ;
+	
+	if (V_SHAPE < 0.0)
+		sinxy.y = 1.0; //switch to tube shape
+	
+	float shape_adj = abs(V_SHAPE);
+	float shape_exp_min = 0.2;
+	float v = (sinxy.y * sinxy.x);
+ 	return pow(v, shape_adj);
+}
+
+
+float vignette_test(){
+	float v_size_adpt = V_SIZE+0.05;
+	
+	
+	float p = v_size_adpt;
+	
+	p = mix(1/pi, 1.0, v_size_adpt-1);
+	
+	p = max(p, 1/pi);  //period 1+
+
+	float shape_exp = 1.0;
+	
+	
+	float shape_exp_min = 0.1; //the lower, the more the center flatness
+	
+	
+
+	
+	shape_exp = mix(  1.0   , shape_exp_min  , v_size_adpt);
+	shape_exp = max(shape_exp, shape_exp_min); //shape_exp: 0.2+
+
+	
+	vec2 cosxy = cos((vTexCoord-0.5)/p) ;
+	float v = (cosxy.y * cosxy.x);
+	v=pow(v, shape_exp);
+	
+	
+	return v;
 }
 
 float screen_uniformity() {

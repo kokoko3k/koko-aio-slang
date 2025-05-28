@@ -408,6 +408,7 @@
 
 
 // #define DO_VIGNETTE  1.0     // ★ Vignette enable?
+// #define V_SHAPE 1.00         //         Shape (pillow/tube)
 // #define V_SIZE  1.08         //         Size
 // #define UNIFORMITY 1.00      //         Screen brightness uniformity
 
