@@ -54,100 +54,53 @@ layout(set = 0, binding = 4) uniform sampler2D colortools_and_ntsc_pass;
 layout(set = 0, binding = 5) uniform sampler2D colortools_and_ntsc_passFeedback;
 
 
-float vignette_new(){
-	
-	float v_size_adj;
-	//higher precision on values between 0.32 and 0.5:
-	float min_value = 1/pi;
-	float max_value = 0.5;
-	if (V_SIZE < max_value) {
-		float t = pow( (V_SIZE - min_value)/(max_value - min_value), 2.0);
-		v_size_adj = mix( min_value, max_value, t);
-	} else {
-		v_size_adj = V_SIZE;
-	}
-	
-	vec2 sinxy = cos((vTexCoord-0.5) / v_size_adj) ;
-	
-	if (V_SHAPE < 0.0)
-		sinxy.y = 1.0; //switch to tube shape
-	
-	float shape_adj = abs(V_SHAPE);
-	float shape_exp_min = 0.2;
-	float v = (sinxy.y * sinxy.x);
- 	return pow(v, shape_adj);
-}
 
+float vignette(vec2 co){	
+	//pillow:
+	co=zoom(co, 1.05);
+	float s = mix(0.3, 0.8,abs(V_SHAPE) );	
+	
+	
+	
+	float pillow_exp = mix(0.0, 0.30, 1-abs(V_SHAPE));
+	vec2 xo=1-abs(co*2-1);
+	//vec2 veryedge = 1-pow(cos(co*pi), vec2(500.0));
+	//vec2 veryedge = smoothstep_fast(0.00, 0.06, xo);	
+	//veryedge = mix( veryedge, vec2(1.0), clamp(abs(V_SHAPE-0.8), 0.0, 1.0)  );
+	
+	xo=pow(xo, vec2(pillow_exp));
+	vec2 pillow = smoothstep(s,0.9,xo);
 
-float vignette(){
-		
-	vec2 cosxy = cos((vTexCoord-0.5) / V_SIZE) ;
+	//Vignette
+	vec2 vignette = cos((co-0.5) / V_SIZE);
 	
-	//pillow related:
-		float pillow_exp = mix(0.0, 0.3, 1-abs(V_SHAPE));
-		vec2 xo=1-abs(vTexCoord*2-1);
-		xo=pow(xo, vec2(pillow_exp));
-		vec2 pillowedxy = smoothstep(0.4,0.9,xo);
-	
+	//Tube shape
 	if (V_SHAPE < 0.0) {
-		cosxy.y = 1.0;      //switch to tube shape
-		pillowedxy.y = 1.0; //switch to tube shape
+		vignette.y = 1.0; 
+		pillow.y = 1.0;
+	    //veryedge.y = 1.0;
 	}
 	
-	float v = (cosxy.y * cosxy.x);
-	float pillowed = pillowedxy.x*pillowedxy.y;
-	
-	v*= pillowed;
-	
-	return v;
+	//veryedge = vec2(1.0);
+	return (vignette.x * vignette.y) * (pillow.x * pillow.y); // * (veryedge.x * veryedge.y);
 
 }
 
 
-float vignette_test(){
-	float v_size_adpt = V_SIZE+0.05;
-	
-	
-	float p = v_size_adpt;
-	
-	p = mix(1/pi, 1.0, v_size_adpt-1);
-	
-	p = max(p, 1/pi);  //period 1+
-
-	float shape_exp = 1.0;
-	
-	
-	float shape_exp_min = 0.1; //the lower, the more the center flatness
-	
-	
-
-	
-	shape_exp = mix(  1.0   , shape_exp_min  , v_size_adpt);
-	shape_exp = max(shape_exp, shape_exp_min); //shape_exp: 0.2+
-
-	
-	vec2 cosxy = cos((vTexCoord-0.5)/p) ;
-	float v = (cosxy.y * cosxy.x);
-	v=pow(v, shape_exp);
-	
-	
-	return v;
-}
-
-float screen_uniformity() {
+float screen_uniformity(vec2 co) {
 
 	#define _USPOTSIZE 100
 	#define _USPOTSIZE_INV 100/_USPOTSIZE
 	#define _USPEED 0.005
 	
     vec4  subscale=vec4(5,3,7,4);
-    vec2 co = vTexCoord * _USPOTSIZE_INV;
+    co *= _USPOTSIZE_INV;
 	float t = params.FrameCount*_USPEED;
     float uniformity = sin(co.x * subscale.x + t) * cos(co.y * subscale.y - t);
     uniformity += sin(co.y * subscale.z * sin(t * 0.5)) * cos(co.x * subscale.w + t);
 	uniformity *= uniformity;
     uniformity = map_range(uniformity, -1, 1, UNIFORMITY,  (1-UNIFORMITY)/2.5 +1 );
-	return uniformity * vignette();
+	return uniformity * vignette(co);
 }
 
 bool DR_uniformity_safe_update() {
@@ -165,10 +118,10 @@ bool DR_uniformity_safe_update() {
 }
 
 
-float screen_uniformity_wrap(){
+float screen_uniformity_wrap(vec2 co){
 	//wrap screen uniformity for deltarender support
 	
-	float current_uniformity = screen_uniformity();
+	float current_uniformity = screen_uniformity(co);
 	
 	//no DR? -> update uniformity.
 	if (vUniformity_return_current == 1.0)
@@ -188,6 +141,13 @@ float screen_uniformity_wrap(){
 }
 
 
+vec2 get_curved_coords(vec2 co) {
+    if ( curvature_needed() > 0.0 ) {
+        co = Warp_koko(co, vec2(GEOM_WARP_X, GEOM_WARP_Y*float(need_NO_integer_scale())), 0.5);
+    }
+	return co; //stub
+}
+
 void main() {
 	
    #ifndef D3D_WORKAROUND
@@ -195,30 +155,16 @@ void main() {
          return;
    #endif
     
-	bool smp_range_1  = is_first_inside_rect(vTexCoord, SMP_RANGE1 );
+   FragColor = vec4(0.0);
 	
-	FragColor = vec4(0.0);
-	
-	/*if ( smp_range_1 ) {
-		//x
-			FragColor.x = float(DO_CURVATURE * (GEOM_WARP_X + GEOM_WARP_Y) > 0.0 );
-		//y
-			#ifndef BEZEL_RES
-				vec2 bezel_lut_size = textureSize(monitor_body_curved, 0);
-				float bezel_frame_lod = log2(bezel_lut_size.y * (BEZEL_FRAME_ZOOM+1.0) * global.FinalViewportSize.w);
-			#else
-				//float bezel_frame_lod = log2(    fma( BEZEL_RES.y,  BEZEL_FRAME_ZOOM,  BEZEL_RES.y) * global.FinalViewportSize.w); //ASM PROOF: UNDECIDED
-				float bezel_frame_lod = log2( BEZEL_RES.y * (BEZEL_FRAME_ZOOM+1.0) * global.FinalViewportSize.w); 
-			#endif
-			FragColor.y = bezel_frame_lod;
-	}*/
-	
+
 	//Vignette/Spot:
+		vec2 curved_coords = get_curved_coords(vTexCoord);
 		//Vignette defaults to 1.0 (multiplied in final pass), spot to 0.0 (added in final pass)
 		FragColor.zw = vec2(1.0, 0.0); 
 		
 		if (DO_VIGNETTE == 1.0) {
-			FragColor.z = screen_uniformity_wrap();
+			FragColor.z = screen_uniformity_wrap(curved_coords);
 		}
 		
 		//Spot:
