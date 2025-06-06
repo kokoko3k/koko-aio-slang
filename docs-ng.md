@@ -850,7 +850,7 @@ However nice effects may be obtained (eg: with vector games). <br>
 ---------------------------
 
 *The following shader functionalities are disabled by default and cannot be enabled by using runtime shader parameters.<br>
-To enable them, you have to edit the file config-user-optional.txt (use config-user-optional-template).txt as a guide.<br>
+To enable them, you have to edit the file config/config-user-optional.txt (use config-user-optional-template).txt as a guide.<br>
 Changes are applied after a shader reload.*<br>
 
 ---------------------------
