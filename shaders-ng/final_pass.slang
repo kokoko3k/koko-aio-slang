@@ -1138,9 +1138,6 @@ float gaussian_coefficient(float x, float sigma) {
 
 vec2 antiburn(vec2 coords) {
     
-    #define ANTIBURN_X 1.0
-    #define ANTIBURN_Y 1.0
-    
     #ifdef ANTIBURN_Y
         coords.y += sin(params.FrameCount*pi*ANTIBURN_Y/1000.0)*params.OriginalSize.w*0.5;
     #endif
