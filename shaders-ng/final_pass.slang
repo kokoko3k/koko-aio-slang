@@ -641,6 +641,27 @@ vec3 downsample_x( sampler2D tex, vec2 uv, vec4 sourcesize, float sharpness_add 
 }
 
 
+float antiburn_flip_even(float toflip){
+    #ifdef ANTIBURN_Y
+        bool flip = sin(params.FrameCount*pi*ANTIBURN_Y/2000.0) >= 0.0;
+        if (flip) return 1-toflip;
+    #endif
+    return toflip;
+}
+
+vec2 antiburn(vec2 coords) {
+    #ifdef ANTIBURN_Y
+        coords.y += sin(params.FrameCount*pi*ANTIBURN_Y/1000.0)*params.OriginalSize.w*0.5;
+    #endif
+        
+    #ifdef ANTIBURN_X
+        coords.x += cos(params.FrameCount*pi*ANTIBURN_X/100.0)*global.FinalViewportSize.z*0.5;
+    #endif
+        
+    return coords;
+}
+
+
 vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inLum) {
     //^ 15fps ^
 
@@ -802,7 +823,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
                 
             //Use abs(cos) (later 1-abs(cos) to get horizontal gaps, use pow to make them steep.
             //Stagger them by PH_MASH_OFFSET on even triads
-                float mask_shape = abs(cos(  vPG_y_shift  + ph_mask_height  + (PH_MASH_OFFSET * is_even)) ) ;
+                float mask_shape = abs(cos(  vPG_y_shift  + ph_mask_height  + (PH_MASH_OFFSET * antiburn_flip_even(is_even))) ) ;
                 mask_shape = pow(mask_shape, PIXELGRID_Y_MASK_STEEP);
 
 
@@ -1135,19 +1156,6 @@ float gaussian_coefficient(float x, float sigma) {
     return coefficient * exp(exponent);
 }
 
-
-vec2 antiburn(vec2 coords) {
-    
-    #ifdef ANTIBURN_Y
-        coords.y += sin(params.FrameCount*pi*ANTIBURN_Y/1000.0)*params.OriginalSize.w*0.5;
-    #endif
-        
-    #ifdef ANTIBURN_X
-        coords.x += cos(params.FrameCount*pi*ANTIBURN_X/100.0)*global.FinalViewportSize.z*0.5;
-    #endif
-        
-    return coords;
-}
 
 vec3 fn_pixel_content(vec2 coords) { 
     
