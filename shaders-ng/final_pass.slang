@@ -1136,8 +1136,26 @@ float gaussian_coefficient(float x, float sigma) {
 }
 
 
+vec2 antiburn(vec2 coords) {
+    
+    #define ANTIBURN_X 1.0
+    #define ANTIBURN_Y 1.0
+    
+    #ifdef ANTIBURN_Y
+        coords.y += sin(params.FrameCount*pi*ANTIBURN_Y/1000.0)*params.OriginalSize.w*0.5;
+    #endif
+        
+    #ifdef ANTIBURN_X
+        coords.x += cos(params.FrameCount*pi*ANTIBURN_X/100.0)*global.FinalViewportSize.z*0.5;
+    #endif
+        
+    return coords;
+}
 
 vec3 fn_pixel_content(vec2 coords) { 
+    
+    coords = antiburn(coords);
+        
     vec2 warpedglow = vec2(0.0);
     
     #ifndef SKIP_WARPEDGLOW_Y

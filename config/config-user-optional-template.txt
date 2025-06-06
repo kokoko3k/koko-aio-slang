@@ -61,6 +61,14 @@
 // by removing the leading "//" from the following line:
 // #define D3D_WORKAROUND
 
+
+// Enable Antiburn protection (OLEDs)
+// It works by slowly shaking the content image in order to prevent image retention
+// The value defines the speed of the effect, leave it to 1.0 if unsure.
+// #define ANTIBURN_Y 1.0
+// #define ANTIBURN_X 1.0
+
+
 // Enable lcd antighosting.
 // It works by temporal sharpening pixels, and the  
 // effect is proportional to the color difference over time on a full frame base.

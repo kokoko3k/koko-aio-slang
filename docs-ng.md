@@ -940,8 +940,6 @@ Changes are applied after a shader reload.*<br>
         It is an experimental measure to mitigate ghosting that could work or not,
         depending on your display.
     
-
-        
 **Conditional FPS Halver**<br>
     *[Warning:] Only on retroarch > 1.19.1*<br>
     *[Warning:] This feature is not compatible with HALVE_BORDER_UPDATE* <br>
@@ -962,3 +960,10 @@ Changes are applied after a shader reload.*<br>
     To use it, in file config-user-optional.txt, write:<br>
     ```#define SUBFRAMES_OPTIMIZATIONS```<br><br>
     
+**Antiburn protection**<br>
+    By enabling this options, shader will slowly shake the content over Y/X axis to
+    prevent image retention on affected screens like OLEDs.<br>
+    To use it, in file config-user-optional.txt, write one or both:<br>
+    ```#define ANTIBURN_Y 1.0```<br>
+    ```#define ANTIBURN_X 1.0```<br><br>
+    (1.0 is the effect speed).<br>
