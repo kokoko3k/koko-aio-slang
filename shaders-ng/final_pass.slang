@@ -1437,8 +1437,11 @@ void main() {
         
         if (DO_BACKDROP * BACKDROP_JUST_TUBE > 0.0) {
             vec3 backdrop = pixel_backdrop_image().rgb;
-            //pixel_out = mix(pixel_out, pixel_out + backdrop,  (1 - dot(pixel_out,vec3(1/3.0)), 0,1) * DO_BACKDROP   );
-            pixel_out = max(pixel_out, backdrop*DO_BACKDROP);
+
+            pixel_out.rgb += (DO_BACKDROP*backdrop) * (1-pixel_out.rgb);
+
+             
+            //pixel_out = max(pixel_out, backdrop*DO_BACKDROP);
         }
 
 
