@@ -1439,11 +1439,24 @@ void main() {
             vec3 backdrop = pixel_backdrop_image().rgb;
 
             pixel_out.rgb += (DO_BACKDROP*backdrop) * (1-pixel_out.rgb);
-
-             
             //pixel_out = max(pixel_out, backdrop*DO_BACKDROP);
         }
 
+        if ( DO_SPOT + DO_VIGNETTE > 0.0 ) {
+            float perlin = (random_fast(vTexCoord)-0.5) * (1/255.0);
+            vec2 vignette_spot = texture(helper_pass, vTexCoord).zw;
+            pixel_out = pixel_out * vignette_spot.x;
+            pixel_out = mix(pixel_out+perlin, vec3(content_mask), vec3(vignette_spot.y) );
+        }
+        
+        #ifdef DO_ADPT_STROBE
+            pixel_out = adaptive_strobe(pixel_out, vAdaptive_strobe_oscillator);
+        #else
+            #ifdef DO_LCD_ANTIGHOSTING
+                pixel_out = antighost(pixel_out);
+            #endif
+        #endif
+        
 
     } else {
 
@@ -1521,35 +1534,10 @@ void main() {
             // on the tube and we don't want to paint anything there, so use a dumb rect and add it to content_mask:
             float rect_bezel = float(is_first_inside_rect(co_bezel, vec4(BEZEL_FRAME_SURROUND_MARGIN, BEZEL_FRAME_SURROUND_MARGIN, 1.0 - BEZEL_FRAME_SURROUND_MARGIN, 1.0 - BEZEL_FRAME_SURROUND_MARGIN)));
             content_and_bezel_mask = max(pixel_bezel.a, rect_bezel);
-
-            // Intersect rect_bezel and bezel alpha to get the inner tube alpha
-            content_mask = (1 - pixel_bezel.a) * rect_bezel;
-            //content_mask = rect_bezel - rect_bezel* pixel_bezel.a; //ASM PROOF: SLOWER
-         
         }
-        //FragColor = vec4(content_mask); return; // <- uncomment to debug BEZEL_FRAME_SURROUND_MARGIN
+        //FragColor = vec4(content_and_bezel_mask); return; // <- uncomment to debug BEZEL_FRAME_SURROUND_MARGIN
     }
 
-
-    // Draw spot and vignette
-    if (content_mask > 0.5) {
-        if ( DO_SPOT + DO_VIGNETTE > 0.0 ) {
-            float perlin = (random_fast(vTexCoord)-0.5) * (1/255.0);
-            vec2 vignette_spot = texture(helper_pass, vTexCoord).zw;
-            pixel_out = pixel_out * vignette_spot.x;
-            pixel_out = mix(pixel_out+perlin, vec3(content_mask), vec3(vignette_spot.y) );
-        }
-        
-        #ifdef DO_ADPT_STROBE
-            pixel_out = adaptive_strobe(pixel_out, vAdaptive_strobe_oscillator);
-        #else
-            #ifdef DO_LCD_ANTIGHOSTING
-                pixel_out = antighost(pixel_out);
-            #endif
-        #endif
-    }
-    
-    
     // Background image have no need to paint if not in the outer border:
     if ( (DO_BG_IMAGE == 1.0 && BG_IMAGE_OVER == 0.0) && (content_and_bezel_mask < 1.0) ) {
         vec4 pixel_bg_image = fn_pixel_fgbg_image(bg_under);
@@ -1566,8 +1554,6 @@ void main() {
 
     // Blend content and border:
     pixel_out = mix (pixel_under_content, pixel_out, content_and_bezel_mask);
-
-
 
     //Foreground image
     if (DO_BG_IMAGE + BG_IMAGE_OVER == 2.0) {
