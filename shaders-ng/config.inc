@@ -656,6 +656,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 //Vignette and spot
 #pragma parameter DO_VIGNETTE	"★ Vignette enable? (vi) ==>"	0.0  0.0  1.0  1.0
+#pragma parameter LABEL0064     "    !! Parameters application delayed when using DeltaRender"	0 0 0 1
 //V_SIZE has to be greater than 1/pi (0.318)
 #pragma parameter V_SIZE	 "        Size"					0.7  0.32  5.0  0.01 
 #pragma parameter V_SHAPE	 "        Pillow/Tube (<0.0: tube, near 0.0: pillow)"	1.0  -1.0  1.0  0.01
