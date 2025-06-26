@@ -245,22 +245,22 @@ float ambi_step(float start, float end, float mystep) {
         return start + mystep;
 }
 
-/*float ambi_step_rgb(float start, float end, float mystep) {
+float ambi_step_rgb(float start, float end, float mystep) {
     //same output, maybe faster, maybe not.
     float diff = abs(start-end);
     if (abs(diff) < mystep) return end;
     float t = mystep / abs(diff);
     return mix(start, end, t);
 }
-*/
 
-vec3 ambi_step_rgb(vec3 s,vec3 d, vec3 mystep){
+
+/*vec3 ambi_step_rgb(vec3 s,vec3 d, vec3 mystep){
     //step fade from s to d
     return vec3 ( ambi_step(s.r, d.r, mystep.r),
                   ambi_step(s.g, d.g, mystep.g),
                   ambi_step(s.b, d.b, mystep.b)
                 );
-}
+}*/
 
 
 vec4 pixel_ambilight(vec2 local_pre_pass_coords) {
