@@ -297,7 +297,7 @@ vec4 pixel_ambilight(vec2 local_pre_pass_coords) {
         
         //needed to avoid a small "dark square glitch" visible in some rare cases
         //https://forums.libretro.com/t/koko-aio-shader-discussions-and-updates/38455/1887
-        mystep = clamp(mystep, 1/500.0, 1.0);
+        mystep = clamp(mystep, 1/256.0, 1.0);
 
     }
         

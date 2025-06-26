@@ -638,7 +638,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 //Emulates leds under the monitor frame that slowly reacts to game
 #pragma parameter DO_AMBILIGHT	            "★ Ambient light leds enable? (am) ==> "				1.0  0.0  1.0     1.0
 #pragma parameter LABEL0040            "    !! RetroArch aspect needs to be set to Full"		0 0 0 1
-#pragma parameter AMBI_STEPS	            "        Slowness"						60.0 5.0  500.0  5.0
+#pragma parameter AMBI_STEPS	            "        Slowness"						60.0 5.0  256.0  5.0
 #pragma parameter AMBI_FALLOFF              "        Led power/falloff"			0.4  0.1  3.0     0.01
 #pragma parameter AMBI_POWER                "        Led Saturation"						1.8  0.0  100.0     0.05
 #pragma parameter AMBI_INT_OFFSET           "        Internalness (Led position)"      0.07 -1.0 1.0 0.01
