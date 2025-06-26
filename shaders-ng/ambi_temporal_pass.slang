@@ -243,8 +243,16 @@ float ambi_step(float start, float end, float mystep) {
         return start - mystep;
             else
         return start + mystep;
-
 }
+
+/*float ambi_step_rgb(float start, float end, float mystep) {
+    //same output, maybe faster, maybe not.
+    float diff = abs(start-end);
+    if (abs(diff) < mystep) return end;
+    float t = mystep / abs(diff);
+    return mix(start, end, t);
+}
+*/
 
 vec3 ambi_step_rgb(vec3 s,vec3 d, vec3 mystep){
     //step fade from s to d
@@ -286,6 +294,11 @@ vec4 pixel_ambilight(vec2 local_pre_pass_coords) {
         scene_change_remaining -=  AMBI_FAST_STEP;
     } else {
         mystep = abs((past_pixel.rgb - present_pixel) / MAX_STEPS); //OK
+        
+        //needed to avoid a small "dark square glitch" visible in some rare cases
+        //https://forums.libretro.com/t/koko-aio-shader-discussions-and-updates/38455/1887
+        mystep = clamp(mystep, 1/500.0, 1.0);
+
     }
         
     return vec4(ambi_step_rgb(past_pixel.rgb, present_pixel, mystep), scene_change_remaining);
