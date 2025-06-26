@@ -235,7 +235,7 @@ vec3 ambi_pre_pass(vec2 coords) {
 
 #define MAX_STEPS AMBI_STEPS
 
-/*float ambi_step(float start, float end, float mystep) {
+float ambi_step(float start, float end, float mystep) {
     float diff = start-end;
     if (abs(diff) < mystep) return end;
     //Does not worth to try to unbranch:
@@ -243,16 +243,16 @@ vec3 ambi_pre_pass(vec2 coords) {
         return start - mystep;
             else
         return start + mystep;
-}*/
+}
 
-float ambi_step(float start, float end, float mystep) {
+/*float ambi_step_rgb(float start, float end, float mystep) {
     //same output, maybe faster, maybe not.
     float diff = abs(start-end);
     if (abs(diff) < mystep) return end;
     float t = mystep / abs(diff);
     return mix(start, end, t);
 }
-
+*/
 
 vec3 ambi_step_rgb(vec3 s,vec3 d, vec3 mystep){
     //step fade from s to d
