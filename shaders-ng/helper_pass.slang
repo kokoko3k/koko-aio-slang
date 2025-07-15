@@ -123,6 +123,10 @@ float screen_uniformity_wrap(vec2 co) {
 	//wrap screen uniformity for deltarender support
 	
 	float current_uniformity = screen_uniformity(co);
+
+	//no DR (faster version at compile time)? -> update uniformity.
+	if (!bdelta_render_enabled())
+		return current_uniformity;
 	
 	//no DR? -> update uniformity.
 	if (vUniformity_return_current == 1.0)
@@ -140,7 +144,6 @@ float screen_uniformity_wrap(vec2 co) {
 	if (global.colortools_and_ntsc_passFeedbackSize != global.colortools_and_ntsc_passSize)
 		return current_uniformity;
 
-	
 	//dr enabled and working, return feedback
 	return texture(helper_passFeedback, vTexCoord).z;
 	
