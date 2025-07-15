@@ -118,7 +118,8 @@ bool DR_uniformity_safe_update() {
 }
 
 
-float screen_uniformity_wrap(vec2 co){
+float screen_uniformity_wrap(vec2 co) {
+	
 	//wrap screen uniformity for deltarender support
 	
 	float current_uniformity = screen_uniformity(co);
@@ -135,10 +136,16 @@ float screen_uniformity_wrap(vec2 co){
 	if (params.FrameCount < 10.0)
 		return current_uniformity;
 	
+	//unreliable feedback, update uniformity.
+	if (global.colortools_and_ntsc_passFeedbackSize != global.colortools_and_ntsc_passSize)
+		return current_uniformity;
+
+	
 	//dr enabled and working, return feedback
 	return texture(helper_passFeedback, vTexCoord).z;
 	
 }
+
 
 
 vec2 get_curved_coords(vec2 co) {
