@@ -859,24 +859,29 @@ Changes are applied after a shader reload.*<br>
     Koko-aio can render only the part of the screen that has been changed,<br>
     leading to a measurable power consumption reduction and mitigate throttling
     on mobile devices and laptops.<br>
-    This feature can, however, produce artifacts in some cases.<br><br>
+    This feature can, however, produce artifacts in some cases.<br>
+    Also, please be aware that enabling delta render disables some effects like rf noise,
+    interlace flickering screen breathing, possibly more.
     To use it, in file config-user-optional.txt, write:<br>
     ```#define DELTA_RENDER```
     
 **Delta Render configuration:**<br>
-    To configure delta render, uncomment DELTA_RENDER_FORCE_REFRESH and/or DELTA_RENDER_CHECK_AREA.
+    To configure delta render, write/uncomment DELTA_RENDER_FORCE_REFRESH and/or DELTA_RENDER_CHECK_AREA.
 
-    #define DELTA_RENDER_FORCE_REFRESH #number
-        Forces a full screen refresh every #number of frames;
+    #define DELTA_RENDER_FORCE_REFRESH 10.0
+        Forces a full screen refresh every 10.0 frames;
         if there was artifacts on the screen, they will be cleared.
-        Power comsumption benefits will be lower.
-    #define DELTA_RENDER_CHECK_AREA #number
-        If you see artifacts, try to make #number higher.
+        The higher the number, the less the power consumption.
+        
+        
+    #define DELTA_RENDER_CHECK_AREA 3.0
+        If you see artifacts, try to make 3.0 higher.
         Artifacts come basically from bloom.
         By highering this value, Delta render can take higher blur radiouses
         into account.
-        Power comsumption benefits will be lower.
+        The higher the number the more the power consumption.
         
+
 **Higher quality defocus:**<br>
     Use higher quality deconvergence by flattering rgb scanlines when <br>
     deconvergence is high and by syncing them to the deconvergence settings.<br>
