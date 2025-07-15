@@ -93,22 +93,15 @@ float screen_uniformity(vec2 co) {
 	#define _USPOTSIZE_INV 100/_USPOTSIZE
 	#define _USPEED 0.005
 	
-    vec4 subscale = vec4(5,3,7,4);
+    vec4  subscale=vec4(5,3,7,4);
     co *= _USPOTSIZE_INV;
 	float t = params.FrameCount*_USPEED;
     float uniformity = sin(co.x * subscale.x + t) * cos(co.y * subscale.y - t);
     uniformity += sin(co.y * subscale.z * sin(t * 0.5)) * cos(co.x * subscale.w + t);
 	uniformity *= uniformity;
     uniformity = map_range(uniformity, -1, 1, UNIFORMITY,  (1-UNIFORMITY)/2.5 +1 );
-	// clamp 0~1 is a safe measure for some edge cases i found on SD865 SoC which leads to black content
-	// when the core resolution changes
-	// check Delirium_v1.0_Deform Amiga demo with PUAE set to Automatic crop and shader Aspect parameterr 
-	// set to "core provided"
-	uniformity = clamp(uniformity, 0,1);
 	return uniformity * vignette(co);
-	
 }
-
 
 bool DR_uniformity_safe_update() {
 	//when it is ok to update uniformity when deltarender is enabled
