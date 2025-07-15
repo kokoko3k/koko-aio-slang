@@ -156,6 +156,9 @@ vec3 blur_select_wrap(sampler2D texture_in, vec2 co, vec4 sourcesize, float shar
 
 
 vec3 apply_noise_to(vec3 c) {
+   if (bdelta_render_enabled())
+      return c;
+   
    c.rgb = pow(c.rgb, vec3(1/IN_GLOW_GAMMA));
       c += get_rf_noise(vTexCoord * vDynamicSeed);
       c = max(c, vec3(0.0));
