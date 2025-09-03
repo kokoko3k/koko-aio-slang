@@ -659,7 +659,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter LABEL0064     "    !! Parameters application delayed when using DeltaRender"	0 0 0 1
 //V_SIZE has to be greater than 1/pi (0.318)
 #pragma parameter V_SIZE	 "        Size"					0.7  0.32  5.0  0.01 
-#pragma parameter V_SHAPE	 "        Pillow/Tube (<0.0: tube, near 0.0: pillow)"	1.0  -1.0  1.0  0.01
+#pragma parameter V_SHAPE	 "        Pillow/Tube: <0.0=tube, near 0.0=pillow (bad with TILT)"	1.0  -1.0  1.0  0.01
 #pragma parameter UNIFORMITY "     Screen brightness uniformity"	0.95  0.80  1.0  0.01
 
 #pragma parameter DO_SPOT	"★ Spot enable? (sp) ==>"		0.0   0.0   1.0 1.0
