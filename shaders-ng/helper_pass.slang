@@ -66,10 +66,7 @@ float vignette(vec2 co){
 	
 	float pillow_exp = mix(0.0, 0.30, 1-abs(V_SHAPE));
 	vec2 xo=1-abs(co*2-1);
-	//vec2 veryedge = 1-pow(cos(co*pi), vec2(500.0));
-	//vec2 veryedge = smoothstep_fast(0.00, 0.06, xo);	
-	//veryedge = mix( veryedge, vec2(1.0), clamp(abs( abs(V_SHAPE)-0.8), 0.0, 1.0)  );
-	
+
 	xo=pow(xo, vec2(pillow_exp));
 	vec2 pillow = smoothstep(s,0.9,xo);
 	
