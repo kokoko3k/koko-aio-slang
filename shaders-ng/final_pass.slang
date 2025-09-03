@@ -1251,10 +1251,12 @@ vec4 fn_pixel_bezel(vec2 coords_for_bezel, vec2 coords_for_mirror, float nightif
             float bezel_frame_lod = log2( BEZEL_RES.y * (BEZEL_FRAME_ZOOM+1.0) * global.FinalViewportSize.w); 
         #endif
 
+        
+        //Add +1 to lod when using tilt to avoid aliasing along specular straight lines on the bezel frame.
         if (BEZEL_USE_STRAIGHT < 0.5)
-            bezel_in = textureLod(monitor_body_curved,coords_for_bezel,bezel_frame_lod);
+            bezel_in = textureLod(monitor_body_curved,coords_for_bezel,bezel_frame_lod + DO_TILT);
                 else
-            bezel_in = textureLod(monitor_body_straight,coords_for_bezel,bezel_frame_lod);
+            bezel_in = textureLod(monitor_body_straight,coords_for_bezel,bezel_frame_lod + DO_TILT);
 
 
     //Exit if the bezel is completely transparent (the tube)
