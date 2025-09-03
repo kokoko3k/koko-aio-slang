@@ -11,11 +11,15 @@ layout(location = 0) out vec2 vTexCoord;
 layout(location = 1) out float vIn_aspect;
 layout(location = 2) out vec2 vTexCoord_rotated_maybe;
 layout(location = 3) out float vUniformity_return_current; //or feedback
-
+layout(location = 4) out float vIsRotated;
 
 void main() {
 	gl_Position = global.MVP * Position;
 	vTexCoord = TexCoord;// + 0.0001;
+	
+    bool bIsRotated = is_rotated();
+    vIsRotated = float(bIsRotated);
+	
 	vIn_aspect = get_in_aspect();
 	vTexCoord_rotated_maybe = vTexCoord;
 	#ifdef _HAS_ROTATION_UNIFORM
@@ -44,7 +48,7 @@ layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in float vIn_aspect;
 layout(location = 2) in vec2 vTexCoord_rotated_maybe;
 layout(location = 3) in float vUniformity_return_current; //or feedback
-
+layout(location = 4) in float vIsRotated;
 
 
 layout(location = 0) out vec4 FragColor;
@@ -60,8 +64,6 @@ float vignette(vec2 co){
 	co=zoom(co, 1.05);
 	float s = mix(0.3, 0.8,abs(V_SHAPE) );	
 	
-	
-	
 	float pillow_exp = mix(0.0, 0.30, 1-abs(V_SHAPE));
 	vec2 xo=1-abs(co*2-1);
 	//vec2 veryedge = 1-pow(cos(co*pi), vec2(500.0));
@@ -70,7 +72,7 @@ float vignette(vec2 co){
 	
 	xo=pow(xo, vec2(pillow_exp));
 	vec2 pillow = smoothstep(s,0.9,xo);
-
+	
 	//Vignette
 	vec2 vignette = cos((co-0.5) / V_SIZE);
 	
@@ -81,7 +83,6 @@ float vignette(vec2 co){
 	    //veryedge.y = 1.0;
 	}
 	
-	//veryedge = vec2(1.0);
 	return (vignette.x * vignette.y) * (pillow.x * pillow.y); // * (veryedge.x * veryedge.y);
 
 }
@@ -155,7 +156,7 @@ vec2 get_curved_coords(vec2 co) {
     if ( curvature_needed() > 0.0 ) {
         co = Warp_koko(co, vec2(GEOM_WARP_X, GEOM_WARP_Y*float(need_NO_integer_scale())), 0.5);
     }
-	return co; //stub
+	return co;
 }
 
 void main() {
@@ -167,14 +168,18 @@ void main() {
     
    FragColor = vec4(0.0);
 	
-
+    // Tilt?
+	vec2 co = vTexCoord_rotated_maybe;
+    if (DO_TILT == 1.0)
+        co = tilt(co, vIsRotated, TILT_X);
+   
 	//Vignette/Spot:
-		vec2 curved_coords = get_curved_coords(vTexCoord);
+		co = get_curved_coords(co);
 		//Vignette defaults to 1.0 (multiplied in final pass), spot to 0.0 (added in final pass)
 		FragColor.zw = vec2(1.0, 0.0); 
 		
 		if (DO_VIGNETTE == 1.0) {
-			FragColor.z = screen_uniformity_wrap(curved_coords);
+			FragColor.z = screen_uniformity_wrap(co);
 		}
 		
 		//Spot:
