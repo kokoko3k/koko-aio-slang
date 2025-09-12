@@ -589,10 +589,6 @@ vec3 morph_shape_full_no_steepness_vec3(vec3 shape, vec3 l, float gamma) {
 }
 
 
-vec3 morph_shape(vec3 shape, vec3 power, float steep, float gamma ) {
-   return morph_shape_full_vec3(shape, power, steep, gamma);
-}
-
 vec3 downsample( sampler2D tex, vec2 uv, vec4 sourcesize,  float sharpness_add ) {
     vec2 sharpness = vec2(1.0)+sharpness_add;
     vec2 scale = sourcesize.xy * sharpness;
@@ -752,7 +748,8 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
                 dedot_mix = dedot_mix *(pixel_in.rgb/max_inLum);
                                 
             //Finally get 3 sines out of the previous one by applying height modifiers
-                rgb_h = morph_shape(rgb_h_sin, phosphor_height, PIXELGRID_NO_INTERBLEED_H, PIXELGRID_GAMMA_H);
+                phosphor_height = pow(phosphor_height, vec3(PIXELGRID_GAMMA_H));
+                rgb_h = morph_shape_full_vec3(rgb_h_sin, phosphor_height, PIXELGRID_NO_INTERBLEED_H, 1);
 
                 rgb_h = mix(vec3(1.0), rgb_h, DO_PIXELGRID_H);
                 
