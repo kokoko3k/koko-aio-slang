@@ -242,13 +242,14 @@ However nice effects may be obtained (eg: with vector games). <br>
         nearby pixels, thereby altering their "Warped" shape.
 
 
-**Tate mode:**<br>
+**Tate mode (use horizontal scanlines):**<br>
     Rotates (or not) mask and scanlines by 90°<br>
     
-    0: Never rotate.
-    1: Rotate only for rotated content (typical 3:4 aspect arcade games)
-    2: Always rotate/Force rotation.
-        
+    1: Use horizontal scanlines and vertical mask only for rotated content (typical 3:4 aspect arcade games)
+    2: Always.
+    0: Never.
+    
+    
 **Glitch if vertical resolution changes:**<br>
     Emulates the crt circuits syncing to the new signal timing.<br>
     Will shake the screen for a while when the resolution changes.<br>

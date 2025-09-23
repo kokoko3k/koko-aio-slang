@@ -452,7 +452,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter LABEL0011 " " 0 0 0 1
 
 
-#pragma parameter TATE                     "★ Tate mode (0:disabled 1:auto 2:forced)"		1.0 	0.0 2.0 1.0
+#pragma parameter TATE                     "★ Tate, use horizontal scanlines (0:disabled 1:auto 2:forced)"		1.0 	0.0 2.0 1.0
 #pragma parameter LABEL0012 " " 0 0 0 1
 
 #pragma parameter RESSWITCH_GLITCH_SIZE		"★ Glitch amount if vertical resolution changes"		0.1		0.0 0.5 0.05
