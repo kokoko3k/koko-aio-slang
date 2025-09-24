@@ -546,25 +546,27 @@ However nice effects may be obtained (eg: with vector games). <br>
         cost of some graphical artifacts visible on high contrasted areas.
         The same apply for the grid emulated via dot matrix emulation feature.
  
-**Bloom:**<br>
+**Bloom/Halation:**<br>
     Acts like Halo, but affects a much wider area and is more configurable.<br>
     By using this effect and playing with its parameters, you can achieve funny<br>
     or even artistic results.<br>
     
-    Final mix:
+    Bloom Final mix:
         Modulates between the original images and the bloomed one.
-    Radius:
+    Bloom Radius:
         Controls how much the bloom has to be wide.
-    Quality:
+    Bloom Quality:
         How much the shape of the bloomed picture will reflect the original one.
-    Input Gamma (threshold):
+    Bloom Input Gamma (threshold):
         Use this as a threshold to control how much a pixel has to be bright
         to produce a bloom effect.
-    Output Gamma (contour smoothness):
+    Bloom Output Gamma (contour smoothness):
         Lowering it will make the bloom contour more pronunced.
         Handy to simulate well defined "Aura" effects.
-    Power multiplier:
+    Bloom Power multiplier:
         Just apply a gain to the final bloom.
+    Halation strength:
+        Emulates a very wide halo from light scattering in CRT glass.
     Modulate: Local exposure eye adaption strength
         Simulate the process through which the pupil adapt itself to different
         light conditions.

@@ -33,8 +33,8 @@ layout(location = 5) in vec2 blur_radius_adpt;
 layout(location = 0) out vec4 FragColor;
 
 layout(set = 0, binding = 1) uniform sampler2D Source;
-//layout(set = 0, binding = 2) uniform sampler2D avglum_pass;
-layout(set = 0, binding = 3) uniform sampler2D colortools_and_ntsc_pass;
+layout(set = 0, binding = 2) uniform sampler2D colortools_and_ntsc_pass;
+layout(set = 0, binding = 3) uniform sampler2D colortools_and_ntsc_passFeedback;
 layout(set = 0, binding = 4) uniform sampler2D bloom_pass_finalFeedback;
 
 
@@ -145,11 +145,29 @@ void main() {
     float pow_exp = BLOOM_PUPIL_EXPOSURE_CURVE_SHOULDER - smoothed_avglum * BLOOM_PUPIL_EXPOSURE_CURVE_SHOULDER;
     pow_exp = max(0.0, pow_exp); //avoid negative exps.
     bloom_mix_adapted = fbloom_mix * ( 1- pow(smoothed_avglum, pow_exp) );
-    
-    
-    if (BLOOM_BYPASS != 1.0)
-        bloomed = bloomed * bloom_mix_adapted * over_white_correction ;
-    
+       
+    //Halation
+        float halation_lod = 5.0;
+        vec2 mipsize = global.colortools_and_ntsc_passSize.zw * pow(2, halation_lod) * 0.5;
+        vec3 h1 = textureLod(colortools_and_ntsc_pass, vTexCoord + vec2(0.0,mipsize.y)  , halation_lod).rgb;
+        vec3 h2 = textureLod(colortools_and_ntsc_pass, vTexCoord + vec2(0.0,-mipsize.y) , halation_lod).rgb;
+        vec3 h3 = textureLod(colortools_and_ntsc_pass, vTexCoord + vec2(mipsize.x, 0.0) , halation_lod).rgb;
+        vec3 h4 = textureLod(colortools_and_ntsc_pass, vTexCoord + vec2(-mipsize.x, 0.0) , halation_lod).rgb;
+        
+        vec3 h5 = textureLod(colortools_and_ntsc_passFeedback, vTexCoord + vec2(mipsize.x, mipsize.y)  , halation_lod).rgb;
+        vec3 h6 = textureLod(colortools_and_ntsc_passFeedback, vTexCoord + vec2(mipsize.x,-mipsize.y) , halation_lod).rgb;
+        vec3 h7 = textureLod(colortools_and_ntsc_passFeedback, vTexCoord + vec2(-mipsize.x,mipsize.y) , halation_lod).rgb;
+        vec3 h8 = textureLod(colortools_and_ntsc_passFeedback, vTexCoord + vec2(-mipsize.x,-mipsize.y) , halation_lod).rgb;
+
+        vec3 halation = (h1+h2+h3+h4+h5+h6+h7+h8)/8.0;
+        halation = pow(halation, vec3(4.0))*BLOOM_HALATION_MIX;
+
+    if (BLOOM_BYPASS != 1.0) {
+        bloomed = bloomed * bloom_mix_adapted;
+        bloomed = max(bloomed,halation);
+        bloomed *= over_white_correction ;
+    }
+
     
     FragColor = vec4(bloomed, zone_luminance);   
     

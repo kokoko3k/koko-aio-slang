@@ -317,6 +317,10 @@
     #define BLOOM_MIX		global.BLOOM_MIX
 #endif
 
+#ifndef BLOOM_HALATION_MIX
+    #define BLOOM_HALATION_MIX		global.BLOOM_HALATION_MIX
+#endif
+
 #ifndef BLOOM_EYE_ADPT_SRT
     #define BLOOM_EYE_ADPT_SRT	global.BLOOM_EYE_ADPT_SRT
 #endif
