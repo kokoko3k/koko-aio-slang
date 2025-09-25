@@ -333,6 +333,9 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float UNIFORMITY;
 	float V_SHAPE;
 	
+	float PHOSPHOR_HALO;
+	float PHOSPHOR_HALO_STR;
+	
 } global;
 
 
@@ -507,6 +510,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter PIXELGRID_B_SHIFT  "           . 0: B phospor position"      2.0  0.0 4.0 0.1
 #pragma parameter PIXELGRID_MIN_W    "      . Phosphors width Min"			0.25 0.05 1.0 0.05
 #pragma parameter PIXELGRID_MAX_W    "      . Phosphors width Max"			0.25 0.05 1.0 0.05
+#pragma parameter PHOSPHOR_HALO      "      . Phosphor halo width factor"		1.0	 1.0  10.0 0.1
+#pragma parameter PHOSPHOR_HALO_STR  "      . Phosphor halo visibility"			0.0	 0.0  1.0 0.01
 #pragma parameter PIXELGRID_GAMMA_W  "      . Phosphors width min->max gamma:"	4.2 1.0 8.00 0.1
 #pragma parameter PIXELGRID_BASAL_GRID  "      . Black level of the unexcided phosphor grid"	0.0 0.0 10.0 0.01
 #pragma parameter LABEL0017 " " 0 0 0 1
@@ -611,7 +616,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter DO_GLOBAL_SHZO	 "★ Global shift/zoom enable? (ignored if integer scaling) ==>"	0.0   0.0  1.0 	  1.0
 #pragma parameter GLOBAL_OFFX	 "        X axis shift "			0.0  -1.0  1.0    0.0005
 #pragma parameter GLOBAL_OFFY	 "        Y axis shift "			0.0  -1.0  1.0    0.0005
-#pragma parameter GLOBAL_ZOOM	 "        Zoom"					1.2   0.0  3.0    0.0005
+#pragma parameter GLOBAL_ZOOM	 "        Zoom"					1.2   0.0  10.0    0.01
 #pragma parameter LABEL0029 " " 0 0 0 1
 
 

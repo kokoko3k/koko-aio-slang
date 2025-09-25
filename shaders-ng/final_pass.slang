@@ -774,7 +774,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
         vec3 rgb_w = vec3(1.0);
         vec3 rgb_grille_basal = vec3(0.0);
 
-        if (DO_PIXELGRID_W > 0.0) { //4%
+       if (DO_PIXELGRID_W > 0.0) { //4%
             // get 3 sines in black/white,   | sin(freq_rgb)
             // make them always positive and double frequency  | sin(freq_rgb) * sin(freq_rgb)
             // and scale Max width according to pre-gains:
@@ -782,6 +782,13 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
         
             //Get final phosphor width:
                 rgb_w = morph_shape_full_no_steepness_vec3( sin(freq_rgb) * sin(freq_rgb), phosphor_width, PIXELGRID_GAMMA_W); //2%
+
+
+                vec3 phosphor_width2 = map_range(pixel_in.rgb, min_inLum, max_inLum, PIXELGRID_MIN_W*0.25*PHOSPHOR_HALO, PIXELGRID_MAX_W*2.0*PHOSPHOR_HALO);
+
+                vec3 rgb_w2 = morph_shape_full_no_steepness_vec3( sin(freq_rgb) * sin(freq_rgb), phosphor_width2, PIXELGRID_GAMMA_W*2.0); //2%
+                rgb_w = max(rgb_w, rgb_w2*PHOSPHOR_HALO_STR);
+
                 
             //Dedot rgb mask between h mask.
             //This work only when there are dots and have the countereffect when there are not.
@@ -789,8 +796,14 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
             //more evident, so this has to be used only when needed.
                 rgb_w = mix(rgb_w, phosphor_width, dedot_mix);
 
+                
+
             //lower strength via user parameter?
                 rgb_w = mix(vec3(1.0), rgb_w, DO_PIXELGRID_W);
+                
+                
+
+                
                 
             //"export" naked vertical grille
                 rgb_grille_basal = (rgb_w * rgb_w) * (rgb_w * rgb_w) * (PIXELGRID_BASAL_GRID*0.0025);

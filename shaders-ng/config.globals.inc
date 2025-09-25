@@ -982,3 +982,11 @@
 #ifndef SERVICE2
     #define SERVICE2 global.SERVICE2
 #endif
+
+#ifndef PHOSPHOR_HALO
+    #define PHOSPHOR_HALO global.PHOSPHOR_HALO
+#endif
+
+#ifndef PHOSPHOR_HALO_STR
+    #define PHOSPHOR_HALO_STR global.PHOSPHOR_HALO_STR
+#endif
