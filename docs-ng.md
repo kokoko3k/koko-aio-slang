@@ -551,7 +551,7 @@ However nice effects may be obtained (eg: with vector games). <br>
     By using this effect and playing with its parameters, you can achieve funny<br>
     or even artistic results.<br>
     
-    Bloom Final mix:
+    Bloom strength:
         Modulates between the original images and the bloomed one.
     Bloom Radius:
         Controls how much the bloom has to be wide.
@@ -565,8 +565,6 @@ However nice effects may be obtained (eg: with vector games). <br>
         Handy to simulate well defined "Aura" effects.
     Bloom Power multiplier:
         Just apply a gain to the final bloom.
-    Halation strength:
-        Emulates a very wide halo from light scattering in CRT glass.
     Modulate: Local exposure eye adaption strength
         Simulate the process through which the pupil adapt itself to different
         light conditions.
@@ -574,8 +572,10 @@ However nice effects may be obtained (eg: with vector games). <br>
         Since the light produced by the bloom effect is added to the underlying
         image, it can produce clipping effects on the already bright areas.
         This is actually an hack that will avoid to bloom them.
+    Halation strength:
+        Emulates a very wide halo from light scattering in CRT glass.
     Bypass/Solo:
-        See how the bloomed image looks alone.
+        See how the bloom and halation image look without the main content.
         Use 1.0 to see naked bloom without any modulation applied
         Use 2.0 to see naked bloom with modulation applied 
 

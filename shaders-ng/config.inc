@@ -564,16 +564,16 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 // Bloom
 #pragma parameter DO_BLOOM           "★ Bloom/Halation enable? (bl) ==>" 						0.0  0.0  1.0  1.0
-#pragma parameter BLOOM_MIX          "        Bloom Final mix, (0.0=off)"					0.45 0.0 1.0  0.01
-#pragma parameter BLOOM_SIZE         "        Bloom Radius"							4.0  0.25 30.0 0.25
-#pragma parameter BLOOM_QUALITY      "        Bloom Quality: more is better but slower"			1.0  1.0 8.0 1.0
-#pragma parameter BLOOM_GAMMA        "        Bloom Gamma in (threshold)"					8.0  1.0 10.0 0.5
-#pragma parameter BLOOM_GAMMA_OUT    "        Bloom Gamma out (contour smoothness)"				1.0  0.1 10.0 0.1
-#pragma parameter BLOOM_POWER        "        Bloom Power multiplier"						1.5  0.5 20.0 0.05  
+#pragma parameter BLOOM_MIX          "        Bloom Strength"					0.45 0.0 1.0  0.01
+#pragma parameter BLOOM_SIZE         "           . Radius"							4.0  0.25 30.0 0.25
+#pragma parameter BLOOM_QUALITY      "           . Quality: more is better but slower"			1.0  1.0 8.0 1.0
+#pragma parameter BLOOM_GAMMA        "           . Gamma in (threshold)"					8.0  1.0 10.0 0.5
+#pragma parameter BLOOM_GAMMA_OUT    "           . Gamma out (contour smoothness)"				1.0  0.1 10.0 0.1
+#pragma parameter BLOOM_POWER        "           . Power/Vibrance multiplier"						1.5  0.5 20.0 0.05  
+#pragma parameter BLOOM_EYE_ADPT_SRT "           . Modulate: Local exposure eye adaption strength"		0.45   0.0 10.0 0.05
+#pragma parameter BLOOM_EYE_INERTIA  "           . Modulate: Time before eye adaption starts"		1500  10.0 10000 50.0
+#pragma parameter BLOOM_OVER_WHITE   "           . Modulate: Strength on bright areas (0 = aura)"		0.5  0.0 1.0  0.05
 #pragma parameter BLOOM_HALATION_MIX "        Halation strength" 						0.0  0.0 2.0 0.05
-#pragma parameter BLOOM_EYE_ADPT_SRT "        Modulate: Local exposure eye adaption strength"		0.45   0.0 10.0 0.05
-#pragma parameter BLOOM_EYE_INERTIA  "        Modulate: Time before eye adaption starts"		1500  10.0 10000 50.0
-#pragma parameter BLOOM_OVER_WHITE   "        Modulate: Strength on bright areas (0 = aura)"		0.5  0.0 1.0  0.05
 #pragma parameter BLOOM_BYPASS       "        Bypass/Solo (1=Unmodulated, 2=Modulated)"			0.0  0.0 2.0  1.0
 #pragma parameter LABEL0022 " " 0 0 0 1
 

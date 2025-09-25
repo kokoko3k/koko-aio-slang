@@ -164,8 +164,8 @@ void main() {
 
     if (BLOOM_BYPASS != 1.0) {
         bloomed = bloomed * bloom_mix_adapted;
-        bloomed = max(bloomed,halation);
         bloomed *= over_white_correction ;
+        bloomed = max(bloomed,halation);
     }
 
     

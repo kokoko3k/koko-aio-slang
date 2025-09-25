@@ -340,7 +340,7 @@
 
 
 // #define DO_BLOOM  1.0             // ★ Bloom enable?
-// #define BLOOM_MIX 0.40            //         Final mix, (0.0=off)
+// #define BLOOM_MIX 0.40            //         Bloom strength
 // #define BLOOM_SIZE  4.0           //         Radius
 // #define BLOOM_QUALITY  1.0        //         Quality: more is better but slower
 // #define BLOOM_GAMMA  8.0          //         Gamma in (threshold)
@@ -350,6 +350,7 @@
 // #define BLOOM_EYE_ADPT_SRT  0.6   //         Modulate: Local exposure eye adaption strength
 // #define BLOOM_EYE_INERTIA  750    //         Modulate: Time before eye adaption starts
 // #define BLOOM_OVER_WHITE  0.5     //         Modulate: Strength on bright areas (0 = aura)
+// #define BLOOM_HALATION_MIX "      //         Halation strength 	
 // #define BLOOM_BYPASS  0.0         //         Bypass/Solo (1=Unmodulated, 2=Modulated)
 
 
