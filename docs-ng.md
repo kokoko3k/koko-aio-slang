@@ -505,39 +505,22 @@ However nice effects may be obtained (eg: with vector games). <br>
     So you can use this to restore the brightness and color saturation<br>
     loss when using features like scanlines, darklines or RGB masks.<br>
     
-    (Halo): Pre-attenuate input signal gain to 1x:
+    Pre-attenuate input signal gain to 1x:
         Nullifies the input gain applied in the color correction section.
         This way the halo effect will be consistent and will not depend on 
         it, avoiding hard to manage cascading effects.
-    (Halo): Strength (negative = 10x precision)
+    Strength (negative = 10x precision)
         The effect strength.
         Negative values are interpreted as positive ones, divided by 10,
         when fine tuning is needed.
-    (Halo): Sharpness
+    Sharpness
         The lower, the wider the halo.
-    (Halo): Gamma in
+    Gamma in
         Act like a soft treshold; the higher, the less the darker colors
         will be "haloed"
-    (Halo): Gamma out
+    Gamma out
         Post-gamma correction applied to the halo.
-    Mask Helper: Additional brighness if horizontal mask clips
-        This function will add more color to the subpixel mask (eg: RGB, RBGX...)
-        when it is unable to reach the enough brightness.
-        This will allow to fully exploit subpixel mask capacity while retaining
-        the desidered brightness.
-        Please note that a well calibrated monitor is needed.
-        
-        How to Use Mask Helper:
-        -----------------------
-            Adjust "Input signal gain" based on mask size:
-               ~2.0..3.0 for 2-sized (gm, wx)
-               ~3.0..4.0 for 3-sized (gmx, rgb,rbg)
-               ~4.0..5.0 for 4-sized (rgbx, rbgx)
-                
-            Activate the "Horizontal mask" parameter.
-               Set "Phosphors width Min, Max" to the minimum.
-               Set "Phosphors width min->max gamma" to the maximum.
-               
+    
     Light up scanline gaps and dot grid gaps too:
         Theoretically Halo has to be applied
         "over" everything, because that is the way it works in nature.
