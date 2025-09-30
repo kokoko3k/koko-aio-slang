@@ -185,8 +185,6 @@ void main() {
         bloomed *= over_white_correction ;
         bloomed = max(bloomed,halation);
     }
-
-bloomed = halation;
     
     FragColor = vec4(bloomed, zone_luminance);   
     
