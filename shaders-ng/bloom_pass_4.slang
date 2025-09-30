@@ -93,7 +93,7 @@ vec3 get_halation(sampler2D mip_texture, vec4 mip_textureSize, vec2 co) {
 	//too much lod will cause halation to be visible only when there are wide solid areas (outrun)
 	//a lower low will allow to "colorize" smaller parts too
 	//too much low lod will produce visible artifacts.
-		float halation_lod = 4.0;
+		float halation_lod = 5.0;
 
 	//sample and blur mip to clear artifacts:
 		vec2 mipsize = mip_textureSize.zw * pow(2, halation_lod) * 0.5;
