@@ -89,33 +89,35 @@ float get_avg_lum_from_mip(sampler2D tex, vec2 co, float lod) {
 }
 
 
+
 vec3 get_halation(sampler2D mip_texture, vec4 mip_textureSize, vec2 co) {
-	//too much lod will cause halation to be visible only when there are wide solid areas (outrun)
-	//a lower low will allow to "colorize" smaller parts too
-	//too much low lod will produce visible artifacts.
-		float halation_lod = 5.0;
+    //too much lod will cause halation to be visible only when there are wide solid areas (outrun)
+    //a lower low will allow to "colorize" smaller parts too
+    //too much low lod will produce visible artifacts.
+    float halation_lod = 6.0;
 
-	//sample and blur mip to clear artifacts:
-		vec2 mipsize = mip_textureSize.zw * pow(2, halation_lod) * 0.5;
-		vec3 h1 = textureLod(mip_texture, co + vec2(0.0,mipsize.y)  , halation_lod).rgb;
-		vec3 h2 = textureLod(mip_texture, co + vec2(0.0,-mipsize.y) , halation_lod).rgb;
-		vec3 h3 = textureLod(mip_texture, co + vec2(mipsize.x, 0.0) , halation_lod).rgb;
-		vec3 h4 = textureLod(mip_texture, co + vec2(-mipsize.x, 0.0) , halation_lod).rgb;
-		vec3 halation = (h1+h2+h3+h4)/4.0;
         
-		/*vec3 h5 = textureLod(mip_textureFeedback, co + vec2(mipsize.x, mipsize.y)  , halation_lod).rgb;
-		vec3 h6 = textureLod(mip_textureFeedback, co + vec2(mipsize.x,-mipsize.y) , halation_lod).rgb;
-		vec3 h7 = textureLod(mip_textureFeedback, co + vec2(-mipsize.x,mipsize.y) , halation_lod).rgb;
-		vec3 h8 = textureLod(mip_textureFeedback, co + vec2(-mipsize.x,-mipsize.y) , halation_lod).rgb;
-		vec3 halation = (h1+h2+h3+h4+h5+h6+h7+h8)/8.0;*/
+    //sample and blur mip to clear artifacts:
+    vec2 mipsize = mip_textureSize.zw * pow(2, halation_lod) * 1.0;
+    vec3 h0 = textureLod(mip_texture, co , halation_lod).rgb;
+    vec3 h1 = textureLod(mip_texture, co + vec2(0.0,mipsize.y) , halation_lod).rgb;
+    vec3 h2 = textureLod(mip_texture, co + vec2(0.0,-mipsize.y) , halation_lod).rgb;
+    vec3 h3 = textureLod(mip_texture, co + vec2(mipsize.x, 0.0) , halation_lod).rgb;
+    vec3 h4 = textureLod(mip_texture, co + vec2(-mipsize.x, 0.0) , halation_lod).rgb;
+    vec3 halation = (h1+h2+h3+h4)/4.0;
 
-	//make it colorful
-		halation = pow(halation, vec3(4.0));
-		halation = pixel_push_luminance(halation, 1.0);
+    /*vec3 h5 = textureLod(mip_textureFeedback, co + vec2(mipsize.x, mipsize.y) , halation_lod).rgb;
+    vec3 h6 = textureLod(mip_textureFeedback, co + vec2(mipsize.x,-mipsize.y) , halation_lod).rgb;
+    vec3 h7 = textureLod(mip_textureFeedback, co + vec2(-mipsize.x,mipsize.y) , halation_lod).rgb;
+    vec3 h8 = textureLod(mip_textureFeedback, co + vec2(-mipsize.x,-mipsize.y) , halation_lod).rgb;
+    vec3 halation = (h1+h2+h3+h4+h5+h6+h7+h8)/8.0;*/
 
-	return halation;
+    //make it colorful
+    halation = pow(halation, vec3(4.0));
+    halation = pixel_push_luminance(halation, 1.5);
+
+    return halation;
 }
-
 
 void main() {
     if (DO_BLOOM == 0.0) {
@@ -179,6 +181,8 @@ void main() {
         float lum = texture(avglum_pass, vec2(0.5)).a;
         float halation_mix_adapted = mix(BLOOM_HALATION_MIX, 0.0, pow(lum, 0.5) );
         halation*=halation_mix_adapted;
+    
+        //bloomed = halation;
         
     if (BLOOM_BYPASS != 1.0) {
         bloomed = bloomed * bloom_mix_adapted;
