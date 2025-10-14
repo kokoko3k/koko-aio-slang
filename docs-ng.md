@@ -204,13 +204,6 @@ However nice effects may be obtained (eg: with vector games). <br>
     Uniform noise: Balanced noise that ranges from -x to +x.
     Snow noise: Sparkling/Rarefied noise 
         
-**Megadrive fake transparencies:**<br>
-    Detect patterns used in some Megadrive/Genesis games to
-    fake transparent colors and blends them.
-    
-    Overridden X(Y)-sharpness: The lower, the blurrier.
-
-
         
 **Glow/Blur:**<br>
 	Blur the image and/or embolds bright pixels.
@@ -219,6 +212,7 @@ However nice effects may be obtained (eg: with vector games). <br>
         Higher negative values -> more glow : brighter colors expands over darker ones.
         Higher positive values -> means blur: all the colors are blurred.
         0.0 means no blur, no glow.
+        Please note that this always reverts to full blur (1.0) when using "Fake transparencies/blending" feature
     Glow spread amount:
         The higher, the more the bright colors will smoothly expand.
         It emulates the natural antialiasing you see on CRTs on bright areas.
@@ -242,6 +236,14 @@ However nice effects may be obtained (eg: with vector games). <br>
         nearby pixels, thereby altering their "Warped" shape.
 
 
+** Fake Transparencies blending:**<br>
+    Detect vertical patterns used in some games to
+    fake transparent colors and blends them.
+    (eg Sonic waterfalls or Kirby's dreamland 3 water)
+    
+    Overridden X(Y)-sharpness: The lower, the blurrier.
+    
+    
 **Tate mode (use horizontal scanlines):**<br>
     Rotates (or not) mask and scanlines by 90°<br>
     
