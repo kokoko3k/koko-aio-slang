@@ -241,9 +241,10 @@ void main() {
    
    float sharp_sub_adapted = vSharp_sub;
    
-   //Override Megadrive fake transparencies (like Sonic waterfalls)
+   //Override blur radius for fake transparencies (like Sonic waterfalls)
+   float waterfall = 0.0;
       if (vDo_wtfl == 1.0) {
-         float waterfall = texture_NEAREST_lod(colortools_and_ntsc_pass, vTexCoord, params.OriginalSize,0.0).a;
+         waterfall = texture_NEAREST_lod(colortools_and_ntsc_pass, vTexCoord, params.OriginalSize,0.0).a;
          waterfall = unpack_21(waterfall, 1.2).y;
          //FragColor = vec4(vec3(waterfall),0.0);return;
          in_glow_h_adapted = mix(in_glow_h_adapted, WTFL_SHARPNESS_Y, waterfall);
@@ -285,10 +286,12 @@ void main() {
    //Series of conditions to do in glow bias done in vertex shader:
       if (vDoInGlowBias == 1.0) {
          //edge defocus: the more near edge, the more the blur
-         float in_glow_bias_faded = mix(IN_GLOW_BIAS, 1.0,  (1-dist_from_edge) *  (DO_SHIFT_RGB * EDGE_DEFOCUS_DO_BLUR ) );
-         //FragColor = vec4(vec3(in_glow_bias_faded), 0.0);
-         //return;
-         pixel_glowed = glow_blur_bias(shift_and_bleed_pass, vTexCoord, pixel_glowed, in_glow_bias_faded);
+         float in_glow_bias_adj = mix(IN_GLOW_BIAS, 1.0,  (1-dist_from_edge) *  (DO_SHIFT_RGB * EDGE_DEFOCUS_DO_BLUR ) );
+         //FragColor = vec4(vec3(in_glow_bias_faded), 0.0); return;
+         
+         //fake transparencies: always prefer blur.
+         in_glow_bias_adj = mix(IN_GLOW_BIAS, 1.0, waterfall);
+         pixel_glowed = glow_blur_bias(shift_and_bleed_pass, vTexCoord, pixel_glowed, 1.0);
       }
    
    pixel_glowed = pixel_glowed * vGlow_Gain;

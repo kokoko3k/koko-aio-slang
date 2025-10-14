@@ -138,7 +138,7 @@ void main() {
    float sharp_sub_adapted = vSharp_sub;
    
    float waterfall = 0.0;
-   //Override Megadrive fake transparencies (like Sonic waterfalls)
+   //Override blur radius for fake transparencies (like Sonic waterfalls)
       if (vDo_wtfl == 1.0) {
          waterfall = texture(colortools_and_ntsc_pass, vTexCoord).a; //somehow there is no need to use texture_nearest here.
          waterfall = unpack_21(waterfall, 1.2).x; //FragColor = vec4(vec3(waterfall),0.0);return;
