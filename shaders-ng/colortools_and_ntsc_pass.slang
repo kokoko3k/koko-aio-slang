@@ -229,7 +229,7 @@ vec3 colorwheel(vec2 uv){
 #define PHASE_SHIFT_FOR_BLUR_K pi/3
 vec4 ntscdec(vec2 uv, vec3 RGB_ori) {
    
-   vec3 YIQ_ori = RGB_ori * RGB2YIQ;
+   vec3 YIQ_ori = rgb2yiq(RGB_ori);
    
    //	Sample composite signal and decode to YIQ
       vec2 YIQ_processed = vec2(0.0);
@@ -252,7 +252,7 @@ vec4 ntscdec(vec2 uv, vec3 RGB_ori) {
          //In turn, because we need linear feedback from this pass (linear feedback mipmaps needed by deltarender)
          //and linear feedback is controlled by this pass filtering, contrary to the present linear filtering
          //which is controlled by next pass filtering (What a mess RetroArch!)
-         vec3 smp_mul_weight = vec3((texture_NEAREST(Source, pos, params.SourceSize).rgb * RGB2YIQ).x) * vNTSC_weights[n] ;
+         vec3 smp_mul_weight = vec3( rgb2yiq(texture_NEAREST(Source, pos, params.SourceSize).rgb).x ) * vNTSC_weights[n] ;
          
          //you could animate the artifacts, unsure if it is a real thing (?)
             float shift = 0.0;
@@ -274,7 +274,7 @@ vec4 ntscdec(vec2 uv, vec3 RGB_ori) {
       }
 
    
-   vec3 YIQ_result_to_RGB = vec3(YIQ_ori.x, YIQ_ori.yz + YIQ_processed.xy * NTSC_MIX) * YIQ2RGB ;
+   vec3 YIQ_result_to_RGB = yiq2rgb(vec3(YIQ_ori.x, YIQ_ori.yz + YIQ_processed.xy * NTSC_MIX)) ;
    
    YIQ_processed = abs(YIQ_processed);
 
