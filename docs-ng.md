@@ -168,7 +168,6 @@ However nice effects may be obtained (eg: with vector games). <br>
 **CVBS: Dot crawl**<br>
     Emulates rolling chroma->luma crosstalks observed in composite signals.<br>
     
-    Colorspace: You can switch between pal and ntsc behaviour.
     Speed:
         Lower absolute values gives a more visible effect.
         A negative value will switch to verically crawling artifacts.

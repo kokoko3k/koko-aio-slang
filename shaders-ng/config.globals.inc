@@ -152,10 +152,6 @@
     #define DOT_C		global.DOT_C
 #endif
 
-#ifndef DOT_C_YUV
-    #define DOT_C_YUV		global.DOT_C_YUV
-#endif
-
 #ifndef DOT_C_SPEED
     #define DOT_C_SPEED		global.DOT_C_SPEED
 #endif

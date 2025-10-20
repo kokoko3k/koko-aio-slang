@@ -218,12 +218,12 @@ float distance_approx(vec2 a, vec2 b, float p) {
    return pow(d,p);
 }
 
-vec3 dotc(sampler2D in_texture, vec3 pixel_in, vec2 co, vec4 tex_size, mat3 rgb2x, mat3 x2rgb){
+vec3 dotc(sampler2D in_texture, vec3 pixel_in, vec2 co, vec4 tex_size){
    //Sample adiacent texels and switch colorspace.
    const float dot_crawl_size = 1.0; //0.5, 1.0, 1.5
-   vec3 cm = texture(in_texture, co).rgb * rgb2x;
-   vec3 cr = texture(in_texture, co + vec2(tex_size.z*dot_crawl_size, 0.0)).rgb * rgb2x;
-   vec3 cl = texture(in_texture, co - vec2(tex_size.z*dot_crawl_size, 0.0)).rgb * rgb2x;
+   vec3 cm = rgb2yiq( texture(in_texture, co).rgb );
+   vec3 cr = rgb2yiq( texture(in_texture, co + vec2(tex_size.z*dot_crawl_size, 0.0)).rgb );
+   vec3 cl = rgb2yiq( texture(in_texture, co - vec2(tex_size.z*dot_crawl_size, 0.0)).rgb );
    //Compute max chroma change
       //float d = max(distance(cm.yz,cr.yz),  distance(cm.yz,cl.yz));
       //d = pow(d, 1.5); // bias, less on lower distance.
@@ -236,11 +236,10 @@ vec3 dotc(sampler2D in_texture, vec3 pixel_in, vec2 co, vec4 tex_size, mat3 rgb2
       //return vec3(dotc_carrier(co, tex_size.xy));
    
    // chroma into luma
-      pixel_in *= rgb2x;
+      pixel_in = rgb2yiq( pixel_in );
       pixel_in.x = mix(pixel_in.x, (pixel_in.y+pixel_in.z)*0.5, crosstalk);
    
-   return pixel_in * x2rgb;
-
+   return yiq2rgb( pixel_in );
 }
 
 vec4 pixel_bleed(vec4 pixel_in, vec2 co, sampler2D in_texture, float sourcesize_z) { //FIXME pixelin.a è passante, non serve vec4
@@ -279,31 +278,16 @@ void main() {
       pixel_out = pixel_bleed(pixel_out, vTexCoord, upscale_pass, params.OriginalSize.z*0.5);
 
    //pixel_out.rgb = dotc(upscale_pass, vTexCoord, params.OriginalSize, mat3_RGB2YIQ, mat3_YIQ2RGB);
-   if (DOT_C > 0.0) {
-      if (DOT_C_YUV > 0.0)
-         pixel_out.rgb = dotc(upscale_pass, pixel_out.rgb, vTexCoord, params.OriginalSize, mat3_RGB2YUV, mat3_YUV2RGB);
-      else
-         pixel_out.rgb = dotc(upscale_pass, pixel_out.rgb, vTexCoord, params.OriginalSize, mat3_RGB2YIQ, mat3_YIQ2RGB);
-   }
-   
-   
+   if (DOT_C > 0.0)
+      pixel_out.rgb = dotc(upscale_pass, pixel_out.rgb, vTexCoord, params.OriginalSize);
+
    //... and shift
    if (vDecon_or_JustShadow > 0.0 )
       pixel_out.rgb = deconvergence_shadow(vTexCoord, upscale_pass, pixel_out.rgb);
 
-
-   
-
    pixel_out.rgb = max(vec3(0.0), pixel_out.rgb);  //make sure everything is over 0.0
 
-   
-   /*float waterfall = pixel_out.a;
-   float blur_radius = (1-smoothstep(0.9, 1.0, waterfall))*7.0+0.5;
-   pixel_out.rgb = blur9_x(upscale_pass, vTexCoord, params.SourceSize.xy, blur_radius).rgb;
-   */
    pixel_out.rgb = pow(pixel_out.rgb, vec3(IN_GLOW_GAMMA)); //apply gamma in 
-   
-
-   
+      
    FragColor = pixel_out;
 }
