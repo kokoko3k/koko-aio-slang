@@ -179,15 +179,38 @@ bool is_rotated() {
 }
 
 
-//	Colorspace conversion matrix for YIQ-to-RGB
-const mat3 YIQ2RGB = mat3(1.000, 1.000, 1.000,
-                          0.956,-0.272,-1.106,
-                          0.621,-0.647, 1.703);
-
 const mat3 RGB2YIQ = mat3(
-         0.2989, 0.5959, 0.2115,
-         0.5870, -0.2744, -0.5229,
-         0.1140, -0.3216, 0.3114);
+	0.2989,  0.5959,  0.2115,
+	0.5870, -0.2744, -0.5229,
+	0.1140, -0.3216,  0.3114);
+
+const mat3 YIQ2RGB = mat3(
+	1.0,     1.0,     1.0,
+	0.956,  -0.2720, -1.1060,
+	0.6210, -0.6474,  1.7046);
+
+/*const mat3 RGB2YUV = mat3(
+   0.299,     0.587,     0.114,
+   -0.14713, -0.28886,   0.436,
+   0.615,    -0.514991, -0.10001);
+const mat3 YUV2RGB = mat3(
+   1.000, 0.000,   1.13983,
+   1.000,-0.39465,-0.58060,
+   1.000, 2.03211, 0.00000);
+*/
+ //New:
+ const mat3 RGB2YUV = mat3(
+    0.299,-0.14713,0.615,
+    0.587,-0.28886,-0.51499,
+    0.114,0.436,-0.10001
+);
+const mat3 YUV2RGB = mat3(
+	1.0,1.0,1.0,
+    0.0,-0.39465,2.03211,
+    1.13983,-0.58060,0.0
+);
+
+
 
 float need_tate(bool is_rotated) {
     if ( (TATE == 1.0 && is_rotated) || TATE == 2.0)
@@ -1226,11 +1249,30 @@ vec3 blur5_y(sampler2D image, vec2 uv, float sourcesize_y, float sharpness_y, fl
 	return color;
 }
 
-#define RGB2GRAY_VEC3 vec3(0.299, 0.587, 0.114)
+
+
+
+
 float rgb_to_gray(vec3 rgb) {
+	const vec3 RGB2GRAY_VEC3 = vec3(0.299, 0.587, 0.114);
     return dot(rgb, RGB2GRAY_VEC3);
 }
 	
+vec3 rgb2yuv(vec3 rgb){
+	return RGB2YUV * rgb;
+}
+
+vec3 rgb2yiq(vec3 rgb){
+	return RGB2YIQ * rgb;
+}
+
+vec3 yiq2rgb(vec3 yiq){
+	return YIQ2RGB * yiq;
+}
+
+vec3 yuv2rgb(vec3 yuv){
+	return YUV2RGB * yuv;
+}
 
 vec3 hsv2rgb(vec3 c){
 	vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
@@ -1507,6 +1549,19 @@ vec3 color_tools(vec3 pixel_out, vec3 Temperature_rgb) {
 		pixel_out.rgb = vibrance_set(pixel_out.rgb, VIBRANCE);
 	}
 	
+//Modify composite chroma
+/*	if (DO_SAT_BLEED > 0.0) {
+		mat3 mat3_in = RGB2YIQ;
+		mat3 mat3_out = YIQ2RGB;
+		if (SAT_BLEED_PAL == 1.0){
+			mat3_in = RGB2YUV;
+			mat3_out = YUV2RGB;
+		}
+		vec3 composite = mat3_in * pixel_out.rgb;
+		composite.yz *= vec2(CVBS_SAT);
+		pixel_out = mat3_out * composite;
+	}
+*/
 //Modify saturation
 	if (SATURATION != 1.0) {
 		vec3 intensity = vec3(dot(pixel_out.rgb, W_C_TO_GRAY));
