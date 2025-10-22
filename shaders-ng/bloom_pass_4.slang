@@ -103,8 +103,7 @@ void main() {
     bloomed = pow(bloomed,vec3(BLOOM_GAMMA_OUT));
     bloomed = pixel_push_luminance(bloomed, BLOOM_POWER);
     
-    float fbloom_mix = BLOOM_MIX;
-    float bloom_mix_adapted = 1.0;
+
     float over_white_correction = 1.0;
     
     
@@ -127,11 +126,11 @@ void main() {
     // (Branching with (if BLOOM_EYE_ADPT_SRT == 0.0) does not gain anything.)
     float zone_luminance = get_avg_lum_from_mip(colortools_and_ntsc_pass, vTexCoord, BLOOM_PUPIL_LUM_ZONE_W);
     float smoothed_avglum = zone_luminance * BLOOM_EYE_ADPT_SRT;
-    bloom_mix_adapted = max(0.0, BLOOM_MIX - smoothed_avglum);
+    float bloom_mix_adapted = max(0.0, BLOOM_MIX - smoothed_avglum);
         
     float pow_exp = BLOOM_PUPIL_EXPOSURE_CURVE_SHOULDER - smoothed_avglum * BLOOM_PUPIL_EXPOSURE_CURVE_SHOULDER;
     pow_exp = max(0.0, pow_exp); //avoid negative exps.
-    bloom_mix_adapted = fbloom_mix * ( 1- pow(smoothed_avglum, pow_exp) );
+    bloom_mix_adapted = BLOOM_MIX * ( 1- pow(smoothed_avglum, pow_exp) );
        
     //Halation
     vec3 halation = vec3(0.0);

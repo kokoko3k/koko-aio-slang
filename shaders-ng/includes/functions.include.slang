@@ -1820,7 +1820,7 @@ vec3 soft_limiter01(vec3 in_color, float m, float knee) {
 	//knees > 1.0 lead to a non Monotonically increasing function
 	//clamping is needed, since the compression function lowers the values unded m for in_color > 1.0
 	vec3 in_color01 = clamp(in_color, vec3(0.0), vec3(1.0));
-	vec3 limited = m * (2.0 * in_color - in_color*in_color);
+	vec3 limited = m * (2.0 * in_color01 - in_color01*in_color01);
 	return mix( in_color * m, limited, knee); 
 }
 
@@ -1828,8 +1828,8 @@ vec3 soft_limiter01_chroma_safe(vec3 in_color, float m, float knee) {
 	//see soft_limiter01, but keep colors.
     //float c_max=rgb_to_gray(in_color);
 	float c_max = max3(in_color)+eps;
-	c_max = clamp(c_max, 0.0, 1.0);
-    float limited = m * (2.0 * c_max - c_max*c_max);
+	float c_max01 = clamp(c_max, 0.0, 1.0);
+    float limited = m * (2.0 * c_max01 - c_max01*c_max01);
 	limited = mix(c_max * m , limited, knee);
     float scale_factor = limited / c_max;
     return in_color * scale_factor;
