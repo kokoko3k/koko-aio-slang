@@ -1811,3 +1811,21 @@ vec3 clip_to_white_maybe(vec3 c) {
 	c.rgb += vec3(  clips.g+clips.b, clips.r+clips.b, clips.r+clips.g ) * CLIP_TO_WHITE;
 	return c;
 }
+
+vec3 soft_limiter01(vec3 c, float m) {
+    //apply a compression curve to c to be at max "m"
+    //c has to stay between 0 and 1
+		vec3 o = m * (2.0 * c - c*c);
+		return mix( o,c,(m*m)*(m*m));
+	//return mix(c,m*c,c); //<- this one keeps the mid tone higher, despite the target m
+}
+
+vec3 soft_limiter01_chroma_safe(vec3 c, float m) {
+	//see soft_limiter01, but keep colors.
+    float c_mean=rgb_to_gray(c);
+    //float c_mean_compressed = mix(c_mean,m*c_mean,c_mean);
+    float c_mean_compressed = m * (2.0 * c_mean - c_mean*c_mean);
+	c_mean_compressed = mix(c_mean_compressed,c_mean,(m*m)*(m*m));
+    float scale_factor = c_mean_compressed / c_mean;
+    return c * scale_factor;
+}
