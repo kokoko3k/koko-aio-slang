@@ -145,7 +145,7 @@ void main() {
         
     if (BLOOM_BYPASS != 1.0) {
         //bloomed = bloomed * bloom_mix_adapted;
-        bloomed = soft_limiter01_chroma_safe(bloomed, bloom_mix_adapted, SERVICE1);
+        bloomed = soft_limiter01_chroma_safe(bloomed, bloom_mix_adapted, BLOOM_SOFT_LIMITER);
         bloomed *= over_white_correction ;
         if (!bdelta_render_enabled())
             bloomed = max(bloomed,halation);
