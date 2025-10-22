@@ -150,7 +150,8 @@ void main() {
         bloomed = max(bloomed,halation);
     }
     
-    FragColor = vec4(bloomed, zone_luminance);   
+    FragColor.rgb = bloomed;
+    //FragColor = vec4(bloomed, zone_luminance);   
     
     //FragColor = vec4(zone_luminance); //Use me to see luminosity zones
     
