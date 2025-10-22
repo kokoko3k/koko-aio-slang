@@ -134,17 +134,21 @@ void main() {
     bloom_mix_adapted = fbloom_mix * ( 1- pow(smoothed_avglum, pow_exp) );
        
     //Halation
-        vec3 halation = get_halation(colortools_and_ntsc_pass, global.colortools_and_ntsc_passSize, vTexCoord);
+    vec3 halation = vec3(0.0);
+    if (!bdelta_render_enabled()) {
+        halation = get_halation(colortools_and_ntsc_pass, global.colortools_and_ntsc_passSize, vTexCoord);
         float lum = texture(avglum_pass, vec2(0.5)).a;
         float halation_mix_adapted = mix(BLOOM_HALATION_MIX, 0.0, pow(lum, 0.5) );
         halation*=halation_mix_adapted;
         //bloomed = halation;
+    }
         
     if (BLOOM_BYPASS != 1.0) {
         //bloomed = bloomed * bloom_mix_adapted;
         bloomed = soft_limiter01_chroma_safe(bloomed, bloom_mix_adapted, SERVICE1);
         bloomed *= over_white_correction ;
-        bloomed = max(bloomed,halation);
+        if (!bdelta_render_enabled())
+            bloomed = max(bloomed,halation);
     }
     
     FragColor.rgb = bloomed;
