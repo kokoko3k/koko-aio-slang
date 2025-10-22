@@ -556,7 +556,7 @@ However nice effects may be obtained (eg: with vector games). <br>
     Modulate: Reduce bloom strength over wide bright areas
         Lower bloom strength on wide bright areas.
     Modulate: Push dark/mid bloom shades visibility (safe range: 0-1)
-        By using a a soft Roll-off curve, thie causes the darker to mid bloom shades 
+        By using a a soft Roll-off curve, this causes the darker to mid bloom shades 
         to be more visible and pronounced, while rolling off the intensity of the brightest areas.
         Use with caution for values > 1.0, because mid bloom tones will becomes brighter than bright ones.
     Halation strength:
