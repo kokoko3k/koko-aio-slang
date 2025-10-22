@@ -549,12 +549,12 @@ However nice effects may be obtained (eg: with vector games). <br>
         Handy to simulate well defined "Aura" effects.
     Power/Vibrance multiplier:
         Push bloom vibrance/saturation and gain.
-    Modulate: Strength on bright areas (0 = aura)
+    Modulate: Target strength over narrow bright areas (0 = aura)
         Since the light produced by the bloom effect is added to the underlying
         image, it can produce clipping effects on the already bright areas.
         This is actually an hack that will avoid to bloom them.
-    Modulate: Strength on wide bright areas
-        Operates like the previous effect, but it considers a mean of a wider area.
+    Modulate: Reduce bloom strength over wide bright areas
+        Lower bloom strength on wide bright areas.
     Halation strength:
         Emulates a very wide halo from light scattering in CRT glass.
     Bypass/Solo:

@@ -566,8 +566,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BLOOM_GAMMA        "           . Gamma in (threshold)"					8.0  1.0 10.0 0.5
 #pragma parameter BLOOM_GAMMA_OUT    "           . Gamma out (contour smoothness)"				1.0  0.1 10.0 0.1
 #pragma parameter BLOOM_POWER        "           . Power/Vibrance multiplier"						1.5  0.5 20.0 0.05  
-#pragma parameter BLOOM_OVER_WHITE   "           . Modulate: Strength on bright areas (0 = aura)"		0.5  0.0 1.0  0.05
-#pragma parameter BLOOM_EYE_ADPT_SRT "           . Modulate: Strength on wide bright areas "		0.45   0.0 10.0 0.05
+#pragma parameter BLOOM_OVER_WHITE   "           . Modulate: Target strength over narrow bright areas (0 = aura)"		0.5  0.0 1.0  0.05
+#pragma parameter BLOOM_EYE_ADPT_SRT "           . Modulate: Reduce bloom strength over wide bright areas"		0.45   0.0 10.0 0.05
 #pragma parameter BLOOM_HALATION_MIX "        Halation strength" 						0.0  0.0 2.0 0.05
 #pragma parameter BLOOM_BYPASS       "        Bypass/Solo (1=Unmodulated, 2=Modulated)"			0.0  0.0 2.0  1.0
 #pragma parameter LABEL0022 " " 0 0 0 1
