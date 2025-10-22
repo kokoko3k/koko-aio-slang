@@ -535,27 +535,26 @@ However nice effects may be obtained (eg: with vector games). <br>
     By using this effect and playing with its parameters, you can achieve funny<br>
     or even artistic results.<br>
     
-    Bloom strength:
+    Strength:
         Modulates between the original images and the bloomed one.
-    Bloom Radius:
+    Radius:
         Controls how much the bloom has to be wide.
-    Bloom Quality:
+    Quality:
         How much the shape of the bloomed picture will reflect the original one.
-    Bloom Input Gamma (threshold):
+    Input Gamma (threshold):
         Use this as a threshold to control how much a pixel has to be bright
         to produce a bloom effect.
-    Bloom Output Gamma (contour smoothness):
+    Output Gamma (contour smoothness):
         Lowering it will make the bloom contour more pronunced.
         Handy to simulate well defined "Aura" effects.
-    Bloom Power multiplier:
-        Just apply a gain to the final bloom.
-    Modulate: Local exposure eye adaption strength
-        Simulate the process through which the pupil adapt itself to different
-        light conditions.
+    Power/Vibrance multiplier:
+        Push bloom vibrance/saturation and gain.
     Modulate: Strength on bright areas (0 = aura)
         Since the light produced by the bloom effect is added to the underlying
         image, it can produce clipping effects on the already bright areas.
         This is actually an hack that will avoid to bloom them.
+    Modulate: Strength on wide bright areas
+        Operates like the previous effect, but it considers a mean of a wider area.
     Halation strength:
         Emulates a very wide halo from light scattering in CRT glass.
     Bypass/Solo:

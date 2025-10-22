@@ -50,42 +50,10 @@ layout(set = 0, binding = 5) uniform sampler2D avglum_pass;
 //How big is the zone in which the luminance will be computed for puple temporal adaption (range 2..20)
 #define BLOOM_PUPIL_LUM_ZONE_W 6
 
-//The speed of the pupil adaption
-#define BLOOM_PUPIL_ADAPTION_SPEED 0.2
-
-
 float get_avg_lum_from_mip(sampler2D tex, vec2 co, float lod) {
     vec3 mip = textureLod(colortools_and_ntsc_pass, co, lod).rgb;
     mip = apply_fuzzy_main_pass_stage_2(mip, vFuzzy_main_pass_stage_1);
-    //return (mip.r+mip.g+mip.b)/3.0;
-
-    float luminance_first_pass = texture(bloom_pass_finalFeedback,vTexCoord).a;
-    luminance_first_pass = max(luminance_first_pass, 0.0); // <- Sanitize input to avoid glitches when enabling the option runtime.
-    //temporal smooth.
-    //the defined emulated eye adaption speed needs to be divided 
-    //by the eye adaption strength (BLOOM_EYE_ADPT_SRT)
-
-    float eye_adaption_speed;
-    float luminance_from_feedback = rgb_to_gray(mip);
-    
-    if (delta_render_enabled() == 0.0) {
-        //The following makes the adaption speed more constant:
-        eye_adaption_speed = BLOOM_PUPIL_ADAPTION_SPEED * ( luminance_first_pass / luminance_from_feedback ) ;
-
-        //The following is needed so that the speed is the same even for higher strength
-        eye_adaption_speed = (eye_adaption_speed / BLOOM_EYE_ADPT_SRT);
-            
-        //The following simulates pupil inertia
-        eye_adaption_speed = clamp(eye_adaption_speed, 1.0/BLOOM_EYE_INERTIA, 1.0);
-    } else {
-        //Temporal adaption speed is no good with deltarenter.
-        eye_adaption_speed = 1.0;
-    }
-
-    float luminance = mix(luminance_first_pass, luminance_from_feedback, eye_adaption_speed);
-    return luminance + eps;
-    
-    
+    return rgb_to_gray(mip) + eps;
 }
 
 

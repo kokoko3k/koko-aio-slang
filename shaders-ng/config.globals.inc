@@ -317,10 +317,6 @@
     #define BLOOM_EYE_ADPT_SRT	global.BLOOM_EYE_ADPT_SRT
 #endif
 
-#ifndef BLOOM_EYE_INERTIA
-    #define BLOOM_EYE_INERTIA	global.BLOOM_EYE_INERTIA
-#endif
-
 #ifndef BLOOM_QUALITY
     #define BLOOM_QUALITY		params.BLOOM_QUALITY
 #endif
