@@ -19,7 +19,7 @@ void main() {
     blur_radius_adpt = radius_blur_adapt(BLOOM_SIZE);
 
     //Get fuzzy mul and pow factor
-        vFuzzy_main_pass_stage_1 = apply_fuzzy_main_pass_stage_1();
+    vFuzzy_main_pass_stage_1 = apply_fuzzy_main_pass_stage_1();
 
 }
 
@@ -28,7 +28,6 @@ void main() {
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in vec2 vFuzzy_main_pass_stage_1;
 layout(location = 5) in vec2 blur_radius_adpt;
-//layout(location = 5) in vec2 vCo_avglum;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -38,8 +37,6 @@ layout(set = 0, binding = 3) uniform sampler2D colortools_and_ntsc_passFeedback;
 layout(set = 0, binding = 4) uniform sampler2D bloom_pass_finalFeedback;
 layout(set = 0, binding = 5) uniform sampler2D avglum_pass;
 
-
-//#include "includes/functions.include.slang"
 #include "includes/blooms.include.slang"
 
 #define offset 0.5890486225480862 // TAU/8.0/4.0*3.0
@@ -55,7 +52,6 @@ float get_avg_lum_from_mip(sampler2D tex, vec2 co, float lod) {
     mip = apply_fuzzy_main_pass_stage_2(mip, vFuzzy_main_pass_stage_1);
     return rgb_to_gray(mip) + eps;
 }
-
 
 
 vec3 get_halation(sampler2D mip_texture, vec4 mip_textureSize, vec2 co) {
@@ -116,7 +112,6 @@ void main() {
     
     if (BLOOM_OVER_WHITE < 1.0) {
         
-
     //Apply other content coords modifiers        
         //Use mipmap available in colortools_and_ntsc_pass to identify bright areas.
         #define ZONE_LUMINANCE_LOD 2.0 //Higher values lead to ugly glitch when panning or banding in static content.
@@ -129,16 +124,14 @@ void main() {
     
     bloomed*=BLOOM_POWER;
     
-    //                                                  (Branching with (if BLOOM_EYE_ADPT_SRT == 0.0) does not gain anything.)
     // Modulate exposure over time too.
     //Smooth luminance with specified lod in this alpha channel
+    // (Branching with (if BLOOM_EYE_ADPT_SRT == 0.0) does not gain anything.)
     float zone_luminance = get_avg_lum_from_mip(colortools_and_ntsc_pass, vTexCoord, BLOOM_PUPIL_LUM_ZONE_W);
     float smoothed_avglum = zone_luminance * BLOOM_EYE_ADPT_SRT;
     bloom_mix_adapted = max(0.0, BLOOM_MIX - smoothed_avglum);
     
-    
     if (BLOOM_BYPASS == 2.0) fbloom_mix = 1.0;
-    
     
     float pow_exp = BLOOM_PUPIL_EXPOSURE_CURVE_SHOULDER - smoothed_avglum * BLOOM_PUPIL_EXPOSURE_CURVE_SHOULDER;
     pow_exp = max(0.0, pow_exp); //avoid negative exps.
@@ -149,7 +142,6 @@ void main() {
         float lum = texture(avglum_pass, vec2(0.5)).a;
         float halation_mix_adapted = mix(BLOOM_HALATION_MIX, 0.0, pow(lum, 0.5) );
         halation*=halation_mix_adapted;
-    
         //bloomed = halation;
         
     if (BLOOM_BYPASS != 1.0) {
