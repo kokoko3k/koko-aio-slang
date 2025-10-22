@@ -347,6 +347,7 @@
 // #define BLOOM_HALATION_MIX        //         Halation strength
 // #define BLOOM_OVER_WHITE  0.5     //         Modulate: Target strength over narrow bright areas
 // #define BLOOM_EYE_ADPT_SRT  0.6   //         Modulate: Reduce bloom strength over wide bright areas
+// #DEFINE BLOOM_SOFT_LIMITER  0.0   //         Modulate: Use a soft Roll-off curve (safe range: 0-1)
 // #define BLOOM_HALATION_MIX "      //         Halation strength 	
 // #define BLOOM_BYPASS  0.0         //         Bypass/Solo (1=Unmodulated, 2=Modulated)
 

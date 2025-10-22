@@ -33,8 +33,6 @@ layout(location = 0) out vec4 FragColor;
 
 layout(set = 0, binding = 1) uniform sampler2D Source;
 layout(set = 0, binding = 2) uniform sampler2D colortools_and_ntsc_pass;
-layout(set = 0, binding = 3) uniform sampler2D colortools_and_ntsc_passFeedback;
-layout(set = 0, binding = 4) uniform sampler2D bloom_pass_finalFeedback;
 layout(set = 0, binding = 5) uniform sampler2D avglum_pass;
 
 #include "includes/blooms.include.slang"
@@ -143,7 +141,8 @@ void main() {
         //bloomed = halation;
         
     if (BLOOM_BYPASS != 1.0) {
-        bloomed = bloomed * bloom_mix_adapted;
+        //bloomed = bloomed * bloom_mix_adapted;
+        bloomed = soft_limiter01_chroma_safe(bloomed, bloom_mix_adapted, SERVICE1);
         bloomed *= over_white_correction ;
         bloomed = max(bloomed,halation);
     }

@@ -317,6 +317,10 @@
     #define BLOOM_EYE_ADPT_SRT	global.BLOOM_EYE_ADPT_SRT
 #endif
 
+#ifndef BLOOM_SOFT_LIMITER
+    #define BLOOM_SOFT_LIMITER	global.BLOOM_SOFT_LIMITER
+#endif
+
 #ifndef BLOOM_QUALITY
     #define BLOOM_QUALITY		params.BLOOM_QUALITY
 #endif
