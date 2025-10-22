@@ -130,9 +130,7 @@ void main() {
     float zone_luminance = get_avg_lum_from_mip(colortools_and_ntsc_pass, vTexCoord, BLOOM_PUPIL_LUM_ZONE_W);
     float smoothed_avglum = zone_luminance * BLOOM_EYE_ADPT_SRT;
     bloom_mix_adapted = max(0.0, BLOOM_MIX - smoothed_avglum);
-    
-    if (BLOOM_BYPASS == 2.0) fbloom_mix = 1.0;
-    
+        
     float pow_exp = BLOOM_PUPIL_EXPOSURE_CURVE_SHOULDER - smoothed_avglum * BLOOM_PUPIL_EXPOSURE_CURVE_SHOULDER;
     pow_exp = max(0.0, pow_exp); //avoid negative exps.
     bloom_mix_adapted = fbloom_mix * ( 1- pow(smoothed_avglum, pow_exp) );
