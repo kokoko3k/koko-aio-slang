@@ -1831,7 +1831,7 @@ vec3 soft_limiter01_chroma_safe(vec3 in_color, float m, float knee) {
 	float c_max = max3(in_color)+eps;
 	float c_max01 = clamp(c_max, 0.0, 1.0);
     float limited = m * (2.0 * c_max01 - c_max01*c_max01);
-	//limited = mix(c_max * m , limited, knee);
+	limited = mix(c_max * m , limited, knee);
 	limited = clamp(limited, 0,1);
     float scale_factor = limited / c_max;
     return in_color * scale_factor;
