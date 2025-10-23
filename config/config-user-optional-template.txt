@@ -345,9 +345,9 @@
 // #define BLOOM_GAMMA_OUT  1.2      //         Gamma out (contour smoothness)
 // #define BLOOM_POWER  1.20         //         Power multiplier
 // #define BLOOM_HALATION_MIX        //         Halation strength
-// #define BLOOM_OVER_WHITE  0.5     //         Modulate: Target strength over narrow bright areas
-// #define BLOOM_EYE_ADPT_SRT  0.6   //         Modulate: Reduce bloom strength over wide bright areas
-// #DEFINE BLOOM_SOFT_LIMITER  0.0   //         Modulate: Use a soft Roll-off curve (safe range: 0-1)
+// #define BLOOM_OVER_WHITE  0.5     //         Target strength over narrow bright areas
+// #define BLOOM_EYE_ADPT_SRT  0.6   //         Reduce bloom strength over wide bright areas
+// #DEFINE BLOOM_SOFT_LIMITER  0.0   //         Use a soft Roll-off curve (safe range: 0-1)
 // #define BLOOM_HALATION_MIX "      //         Halation strength 	
 // #define BLOOM_BYPASS  0.0         //         Solo
 
