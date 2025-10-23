@@ -1216,7 +1216,9 @@ vec3 fn_pixel_content(vec2 coords) {
     //Bloom
         if (DO_BLOOM == 1.0 ) {
             vec3 bloomed=texture(bloom_pass_final, coords).rgb ;
-            pixel_out.rgb = float(BLOOM_BYPASS < 0.5) * pixel_out.rgb + bloomed;
+            vec3 bloomed_adj = mix(bloomed * (1-pixel_out.rgb), bloomed, BLOOM_OVER_WHITE); 
+            pixel_out.rgb = bloomed_adj + pixel_out.rgb;
+            if (BLOOM_BYPASS == 1.0) pixel_out.rgb = bloomed_adj;
         }
 
 

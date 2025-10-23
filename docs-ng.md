@@ -549,22 +549,20 @@ However nice effects may be obtained (eg: with vector games). <br>
         Handy to simulate well defined "Aura" effects.
     Power/Vibrance multiplier:
         Push bloom vibrance/saturation and gain.
-    Modulate: Target strength over narrow bright areas
+    Target strength over narrow bright areas
         Since the light produced by the bloom effect is added to the underlying
         image, it can produce clipping effects on the already bright areas.
         This is actually an hack that will avoid to bloom them.
-    Modulate: Reduce bloom strength over wide bright areas
+    Reduce bloom strength over wide bright areas
         Lower bloom strength on wide bright areas.
-    Modulate: Push dark/mid bloom shades visibility (safe range: 0-1)
+    Push dark/mid bloom shades visibility (safe range: 0-1)
         By using a a soft Roll-off curve, this causes the darker to mid bloom shades 
         to be more visible and pronounced, while rolling off the intensity of the brightest areas.
         Use with caution for values > 1.0, because mid bloom tones will becomes brighter than bright ones.
     Halation strength:
         Emulates a very wide halo from light scattering in CRT glass.
-    Bypass/Solo:
+    Solo:
         See how the bloom and halation image look without the main content.
-        Use 1.0 to see naked bloom without any modulation applied
-        Use 2.0 to see naked bloom with modulation applied 
 
 **Curvature:**<br>
     Emulates a curved CRT display.<br>

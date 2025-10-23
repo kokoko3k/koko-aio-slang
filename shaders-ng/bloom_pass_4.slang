@@ -82,13 +82,7 @@ vec3 get_halation(sampler2D mip_texture, vec4 mip_textureSize, vec2 co) {
 }
 
 void main() {
-    if (DO_BLOOM == 0.0) {
-        // Initialize bloom "Feedback" alpha to avoid glitches
-        // When enabling the effect runtime
-        FragColor.a = 1.0;
-        return;
-    }
-    
+  
     vec3 bloomed = bloom(
         Source,
         vTexCoord,
@@ -102,22 +96,6 @@ void main() {
 
     bloomed = pow(bloomed,vec3(BLOOM_GAMMA_OUT));
     bloomed = pixel_push_luminance(bloomed, BLOOM_POWER);
-    
-
-    float over_white_correction = 1.0;
-    
-    
-    if (BLOOM_OVER_WHITE < 1.0) {
-        
-    //Apply other content coords modifiers        
-        //Use mipmap available in colortools_and_ntsc_pass to identify bright areas.
-        #define ZONE_LUMINANCE_LOD 2.0 //Higher values lead to ugly glitch when panning or banding in static content.
-        
-        vec3 avglum = textureLod(colortools_and_ntsc_pass, vTexCoord, ZONE_LUMINANCE_LOD).rgb;
-        float b_brightness = max(avglum.b,max(avglum.r,avglum.g));
-        b_brightness *= 1-BLOOM_OVER_WHITE;
-        over_white_correction =1- b_brightness;
-    }
     
     bloomed*=BLOOM_POWER;
     
@@ -141,18 +119,12 @@ void main() {
         halation*=halation_mix_adapted;
         //bloomed = halation;
     }
-        
-    if (BLOOM_BYPASS != 1.0) {
-        //bloomed = bloomed * bloom_mix_adapted;
-        bloomed = soft_limiter01_chroma_safe(bloomed, bloom_mix_adapted, BLOOM_SOFT_LIMITER);
-        bloomed *= over_white_correction ;
-        if (!bdelta_render_enabled())
-            bloomed = max(bloomed,halation);
-    }
+
+    bloomed = soft_limiter01_chroma_safe(bloomed, bloom_mix_adapted, BLOOM_SOFT_LIMITER);
     
-    FragColor.rgb = bloomed;
-    //FragColor = vec4(bloomed, zone_luminance);   
+    if (!bdelta_render_enabled())
+        bloomed = max(bloomed,halation);
+
     
-    //FragColor = vec4(zone_luminance); //Use me to see luminosity zones
-    
+    FragColor.rgb = bloomed;    
 }
