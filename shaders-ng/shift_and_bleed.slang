@@ -161,8 +161,9 @@ vec3 dotc(sampler2D in_texture, vec3 pixel_in, vec2 co, vec4 tex_size){
    
    // chroma into luma
       pixel_in = rgb2yiq( pixel_in );
-      pixel_in.x = mix(pixel_in.x, (pixel_in.y+pixel_in.z)*0.5, crosstalk);
-   
+      //pixel_in.x = mix(pixel_in.x, (pixel_in.y+pixel_in.z)*0.5, crosstalk);
+      
+      pixel_in.x = pixel_in.x - (abs(pixel_in.y)+abs(pixel_in.z)) * crosstalk;      
    return yiq2rgb( pixel_in );
 }
 

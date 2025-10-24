@@ -399,7 +399,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter SAT_BLEED_FALLOFF  	  "        Falloff"				1.7 	 1.0 2.0 0.01        
 #pragma parameter LABEL0008 " " 0 0 0 1
 
-#pragma parameter DOT_C      "★ CVBS: Dot crawl ==>"		0.0 	 0.0 2.0 0.01
+#pragma parameter DOT_C      "★ CVBS: Dot crawl ==>"		0.0 	 0.0 3.0 0.02
 #pragma parameter DOT_C_SPEED "        Speed (<0.0 = vertical)"		10.0 	  -10.0 10.0 0.5 
 #pragma parameter LABEL0056 " " 0 0 0 1
 
