@@ -154,7 +154,8 @@ vec3 dotc(sampler2D in_texture, vec3 pixel_in, vec2 co, vec4 tex_size){
       //The following have less cycles, but same result.
       const float p = 0.75;
       float d = max(distance_approx(cm.yz,cr.yz,p),  distance_approx(cm.yz,cl.yz,p));
-   
+      d=pow(d, 0.5);
+      
    //apply moving square carrier (already modulatd by strength) to the chroma distance
       float crosstalk = d * dotc_carrier(vDotCrawlCoords_and_period.xy, vDotCrawlCoords_and_period.zw);
       //return vec3(dotc_carrier(co, tex_size.xy));
@@ -162,8 +163,8 @@ vec3 dotc(sampler2D in_texture, vec3 pixel_in, vec2 co, vec4 tex_size){
    // chroma into luma
       pixel_in = rgb2yiq( pixel_in );
       //pixel_in.x = mix(pixel_in.x, (pixel_in.y+pixel_in.z)*0.5, crosstalk);
+      pixel_in.x = pixel_in.x - (abs(pixel_in.y)+abs(pixel_in.z)) * crosstalk;
       
-      pixel_in.x = pixel_in.x - (abs(pixel_in.y)+abs(pixel_in.z)) * crosstalk;      
    return yiq2rgb( pixel_in );
 }
 
