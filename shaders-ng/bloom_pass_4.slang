@@ -78,6 +78,28 @@ vec3 get_halation(sampler2D mip_texture, vec4 mip_textureSize, vec2 co) {
     halation = pow(halation, vec3(4.0));
     halation = pixel_push_luminance(halation, 1.5);
 
+    float lum = max3(textureLod(colortools_and_ntsc_pass, vTexCoord, 7.0).rgb ); //  texture(avglum_pass, vec2(0.5)).a;
+    float halation_mix_adapted = BLOOM_HALATION_MIX  * mix(1.0, 0.125, pow(lum, 0.5));
+    halation*=halation_mix_adapted;
+
+
+    
+/*  halation = pow(halation, vec3(4.0));
+    halation = pixel_push_luminance(halation, 1.5);   
+    
+    float s_source = saturation_get(halation) ;
+    float sat_source_k = mix(1.0, 4.0, s_source);
+    
+    float s_target = saturation_get(textureLod(colortools_and_ntsc_pass, vTexCoord, 6.0).rgb);
+    float sat_target_k = mix(1.0, 0.25, s_target ); //don't oversturate
+
+    
+    float lum_target = max3(textureLod(colortools_and_ntsc_pass, vTexCoord, 7.0).rgb );
+    float lum_target_k = mix(1,0.125, pow(lum_target, 0.5)); //don't clip
+
+    halation = halation * BLOOM_HALATION_MIX * sat_source_k * sat_target_k * min(sat_target_k,lum_target_k);
+*/
+    
     return halation;
 }
 
@@ -109,21 +131,14 @@ void main() {
     float pow_exp = BLOOM_PUPIL_EXPOSURE_CURVE_SHOULDER - smoothed_avglum * BLOOM_PUPIL_EXPOSURE_CURVE_SHOULDER;
     pow_exp = max(0.0, pow_exp); //avoid negative exps.
     bloom_mix_adapted = BLOOM_MIX * ( 1- pow(smoothed_avglum, pow_exp) );
-       
-    //Halation
-    vec3 halation = vec3(0.0);
-    if (!bdelta_render_enabled()) {
-        halation = get_halation(colortools_and_ntsc_pass, global.colortools_and_ntsc_passSize, vTexCoord);
-        float lum = texture(avglum_pass, vec2(0.5)).a;
-        float halation_mix_adapted = mix(BLOOM_HALATION_MIX, 0.0, pow(lum, 0.5) );
-        halation*=halation_mix_adapted;
-        //bloomed = halation;
-    }
-
     bloomed = soft_limiter01_chroma_safe(bloomed, bloom_mix_adapted, BLOOM_SOFT_LIMITER);
     
+    //Halation
+    vec3 halation = vec3(0.0);
     if (!bdelta_render_enabled())
-        bloomed = max(bloomed,halation);
+        halation = get_halation(colortools_and_ntsc_pass, global.colortools_and_ntsc_passSize, vTexCoord);
+        
+    bloomed = max(bloomed,halation);
 
     
     FragColor.rgb = bloomed;    
