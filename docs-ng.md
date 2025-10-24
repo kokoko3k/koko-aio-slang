@@ -561,6 +561,7 @@ However nice effects may be obtained (eg: with vector games). <br>
         Use with caution for values > 1.0, because mid bloom tones will becomes brighter than bright ones.
     Halation strength:
         Emulates a very wide halo from light scattering in CRT glass.
+        Since the implementation targets a good looking image, it is heavily tweaked and so not accurate.
     Solo:
         See how the bloom and halation image look without the main content.
 
