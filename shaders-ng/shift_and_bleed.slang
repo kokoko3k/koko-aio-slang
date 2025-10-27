@@ -122,10 +122,6 @@ vec3 deconvergence_shadow(vec2 coords, sampler2D in_texture, vec3 source_pixel) 
       return mix_step(deconvergence_mode, shadow_mode, vDo_shadow_mode);
 }
 
-#define SIDE_RIGHT 1
-#define SIDE_LEFT -1
-
-
 float dotc_carrier(vec2 co, vec2 OriginalSize) {  
    float sin_crawl = sin(co.x*OriginalSize.x*pi - vDotCrawlShift ) *
                      sin(co.y*OriginalSize.y*pi);
@@ -169,39 +165,36 @@ vec3 dotc(sampler2D in_texture, vec3 pixel_in, vec2 co, vec4 tex_size){
 }
 
 vec4 pixel_bleed(vec4 pixel_in, vec2 co, sampler2D in_texture, float sourcesize_z) { //FIXME pixelin.a è passante, non serve vec4
-   float size = SAT_BLEED_SIZE;
+
    #ifdef D3D_WORKAROUND
       // d3d11 compiler complains it is unable to unroll the loop because it is
       // clueless about the maximum pragma value; d3d12 hangs somewhere.
-      size = min(5.0,SAT_BLEED_SIZE) ;
+      float size = min(5.0,SAT_BLEED_SIZE) ;
    #else
-      size = min(20.0,SAT_BLEED_SIZE) ;
+      float size = min(20.0,SAT_BLEED_SIZE) ;
    #endif
    
-   //apply strength modifier to blur ntsc artifacts more.
+   //Initial mix strength.
    float w = SAT_BLEED_STRENGTH;
-      
-   vec3 blur_YIQ_l = rgb2yiq( pixel_in.rgb );    //Work in YIQ space
-   vec3 blur_YIQ_r = blur_YIQ_l;
 
-   vec2 off_l = vec2(SIDE_LEFT  * sourcesize_z,0.0);
-   vec2 off_r = vec2(SIDE_RIGHT * sourcesize_z,0.0);
+   //Initial color in yiq space
+   vec3 out_YIQ = rgb2yiq( pixel_in.rgb );
    
-   for ( float i=1 ; i <= size ; i++ ){
+   for ( float off = sourcesize_z ; off <= sourcesize_z*size ; off+=sourcesize_z ){
+      //float new_offset = i*initial_offset;
+      vec3 smp_YIQ  = rgb2yiq( texture(in_texture, co - vec2(off,0.0) ).rgb) * 0.5; //sample left
+           smp_YIQ += rgb2yiq( texture(in_texture, co + vec2(off,0.0) ).rgb) * 0.5; //sample right
+
+      //Blur Y,I,Q
       w=w/SAT_BLEED_FALLOFF;  //w = w * exp(i*i*(1-SAT_BLEED_FALLOFF)*0.1);
-      vec3 smp_YIQ = rgb2yiq( texture(in_texture, co - i*off_l ).rgb);
-      //Blur Y, I and Q
-      blur_YIQ_l = mix(blur_YIQ_l.xyz, smp_YIQ.xyz, w/vCVBS_bandwidths);
+      //out_YIQ = mix(out_YIQ.xyz, smp_YIQ.xyz, w/vCVBS_bandwidths);
+      out_YIQ = mix(out_YIQ.xyz,smp_YIQ.xyz, clamp(w/vCVBS_bandwidths, 0.0, 1.0));
      
-      smp_YIQ = rgb2yiq(  texture(in_texture, co - i*off_r ).rgb);
-      //Blur Y, I and Q
-      blur_YIQ_r = mix(blur_YIQ_r.xyz, smp_YIQ.xyz, w/vCVBS_bandwidths);
    }
-   vec3 blur_RGB_l = yiq2rgb( blur_YIQ_l ); //return to RGB colorspace
-   vec3 blur_RGB_r = yiq2rgb( blur_YIQ_r ); //return to RGB colorspace
-   
+   vec3 pixel_bleeded = yiq2rgb( out_YIQ ); //return to RGB colorspace
+
    // Clamping min to 0.0 is needed for nvidia to avoid bad graphical glitches, why?
-   vec3 pixel_bleeded = max(mix(blur_RGB_l,blur_RGB_r,0.5), 0.0);
+   pixel_bleeded = clamp(pixel_bleeded, 0.0, 1.0);
    
    return vec4( pixel_bleeded, pixel_in.a);
 }

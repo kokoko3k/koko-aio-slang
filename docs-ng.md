@@ -159,9 +159,9 @@ However nice effects may be obtained (eg: with vector games). <br>
 		Switch bandwidths to match different standards.
 	Strength
 		Self explanatory.
-	Size
-		Maximum bleed size.
-	Falloff
+	Size/Quality
+		Maximum bleed size (the higher, the slower).
+	Shrpness
 		The bleed falloff speed.
 
 

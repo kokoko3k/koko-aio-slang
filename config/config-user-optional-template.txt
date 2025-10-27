@@ -214,8 +214,8 @@
 // #define DO_SAT_BLEED  0.0            // ★ CVBS: Bandwidth limited chroma enable?
 // #define SAT_BLEED_PAL  0.0           //         Colorspace (NTSC, PAL)
 // #define SAT_BLEED_STRENGTH  1.0      //         Strength
-// #define SAT_BLEED_SIZE  5.0          //         Size (capped to 5.0 in d3d)
-// #define SAT_BLEED_FALLOFF  1.7       //         Falloff
+// #define SAT_BLEED_SIZE  5.0          //         Size/Quality (capped to 5.0 in d3d)
+// #define SAT_BLEED_FALLOFF  1.7       //         Sharpness
 
 // #define DOT_C 0.0                    // ★ CVBS: Dot crawl
 // #define DOT_C_SPEED 8.0				//         Speed
