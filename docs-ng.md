@@ -130,6 +130,14 @@ However nice effects may be obtained (eg: with vector games). <br>
                                may produce posterization effects.
 
 
+** Fake Transparencies blending:**<br>
+    Detect vertical patterns used in some games to
+    fake transparent colors and blends them.
+    (eg Sonic waterfalls or Kirby's dreamland 3 water)
+    
+    Overridden X(Y)-sharpness: The lower, the blurrier.
+    
+    
 **CVBS: NTSC color artifacts:**<br>
     Emulate typical NTSC color artifacting<br>
     It is able to emulate straight rainbowing effects as seen on Megadrive<br>
@@ -235,14 +243,7 @@ However nice effects may be obtained (eg: with vector games). <br>
         nearby pixels, thereby altering their "Warped" shape.
 
 
-** Fake Transparencies blending:**<br>
-    Detect vertical patterns used in some games to
-    fake transparent colors and blends them.
-    (eg Sonic waterfalls or Kirby's dreamland 3 water)
-    
-    Overridden X(Y)-sharpness: The lower, the blurrier.
-    
-    
+
 **Tate mode (use horizontal scanlines):**<br>
     Rotates (or not) mask and scanlines by 90°<br>
     

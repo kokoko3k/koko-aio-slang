@@ -374,8 +374,16 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter DEDITHER_TRESHMAX   "        Sensitivity"				1.2	0.0 3.0  0.1
 #pragma parameter DEDITHER_STRENGTH   "        Basic search strength"				0.8	0.0 1.0  0.1
 #pragma parameter DEDITHER_STRENGTH2  "        Extensive search strength"			0.0	0.0 1.0  0.1
-
 #pragma parameter LABEL0006 " " 0 0 0 1
+
+
+// Fake transparency handling
+#pragma parameter DO_WTFL             "★ Fake transparencies blending enable (eg: sonic waterfall)?"    0.0 0.0 1.0 1.0
+#pragma parameter WTFL_SHARPNESS_X      "        Overridden X-sharpness"             0.6 0.35 3.0 0.05
+#pragma parameter WTFL_SHARPNESS_Y      "        Overridden Y-sharpness"             0.6 0.35 3.0 0.05
+//#pragma parameter WTFL_THRESHOLD      "        Detection threshold"                1.0 0.0 2.0 0.01
+#pragma parameter LABEL0057 " " 0 0 0 1
+
 
 // NTSC color artifacting
 #pragma parameter DO_NTSC_ARTIFACTS "★ CVBS: NTSC color artifacts enable? (nt) ==>"	0.0 	0.0 1.0 1.0
@@ -442,14 +450,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter IN_GLOW_WARPSHARP_Y      "        Warped glow (Y)"               0.4  0.0  2.0 0.01
 #pragma parameter IN_GLOW_WARPSHARP_GAMMA  "        Warped glow dynamics (1.0=linear)"  1.0  0.2 1.0 0.01
 #pragma parameter LABEL0011 " " 0 0 0 1
-
-
-// Fake transparency handling
-#pragma parameter DO_WTFL             "★ Fake transparencies blending enable (eg: sonic waterfall)?"    0.0 0.0 1.0 1.0
-#pragma parameter WTFL_SHARPNESS_X      "        Overridden X-sharpness"             0.6 0.35 3.0 0.05
-#pragma parameter WTFL_SHARPNESS_Y      "        Overridden Y-sharpness"             0.6 0.35 3.0 0.05
-//#pragma parameter WTFL_THRESHOLD      "        Detection threshold"                1.0 0.0 2.0 0.01
-#pragma parameter LABEL0057 " " 0 0 0 1
 
 
 #pragma parameter TATE                     "★ Tate, use horizontal scanlines (0:disabled 1:auto 2:forced)"		1.0 	0.0 2.0 1.0

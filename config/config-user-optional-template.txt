@@ -201,6 +201,11 @@
 // #define DEDITHER_STRENGTH2  0.0      //         Extensive search strength
 
 
+// #define DO_WTFL 0.0                  // ★ Megadrive fake transparencies enable?
+// #define WTFL_SHARPNESS 0.6           //         Overridden X-sharpness
+// #define WTFL_THRESHOLD 1.0           //         Detection threshold
+
+
 // #define DO_NTSC_ARTIFACTS  0.0       // ★ CVBS: NTSC color artifacts enable? 
 // #define NTSC_MIX  0.5                //         Strength
 // #define NTSC_FILTER_WIDTH  17.0      //         Filter width
@@ -228,6 +233,7 @@
 // #define DO_SHIFT_RGB  1.0           // ★ Deconvergence enable?
 // #define OFFSET_STRENGTH  0.3        //         Strength
 
+
 // #define DECON_RX 0.0                   // Red x offset
 // #define DECON_RY -1.0                  // Red y offset
 // #define DECON_GX 1.0                   // Green x offset
@@ -238,13 +244,11 @@
 // #define EDGE_DEFOCUS_DO_BLUR 0.0       // Blur screen edges
 // #define EDGE_DEFOCUS_AREA_INV 0.4      // Focused Area
 
+
 // #define SHIFT_R  -20.0              //         Red offset
 // #define SHIFT_G  0.0                //         Green offset
 // #define SHIFT_B  20.0               //         Blue offset
 
-// #define DO_WTFL 0.0                  // ★ Megadrive fake transparencies enable?
-// #define WTFL_SHARPNESS 0.6           //         Overridden X-sharpness
-// #define WTFL_THRESHOLD 1.0           //         Detection threshold
 
 // #define DO_IN_GLOW  1.0             // ★ Glow/Blur enable?
 // #define IN_GLOW_BIAS  1.0           //         Glow to blur bias
