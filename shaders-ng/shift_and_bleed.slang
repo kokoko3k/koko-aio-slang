@@ -166,6 +166,18 @@ vec3 dotc(sampler2D in_texture, vec3 pixel_in, vec2 co, vec4 tex_size){
 
 vec4 pixel_bleed(vec4 pixel_in, vec2 co, sampler2D in_texture, float sourcesize_z) { //FIXME pixelin.a è passante, non serve vec4
 
+   mat3 colorspace_out;
+   mat3 colorspace_rgb;
+
+   //https://www.sciencedirect.com/topics/computer-science/color-subcarrier
+   if (SAT_BLEED_PAL > 0.5) {
+      colorspace_out = RGB2YUV;
+      colorspace_rgb = YUV2RGB;
+   } else {
+      colorspace_out = RGB2YIQ;
+      colorspace_rgb = YIQ2RGB;
+   }
+   
    #ifdef D3D_WORKAROUND
       // d3d11 compiler complains it is unable to unroll the loop because it is
       // clueless about the maximum pragma value; d3d12 hangs somewhere.
@@ -178,12 +190,12 @@ vec4 pixel_bleed(vec4 pixel_in, vec2 co, sampler2D in_texture, float sourcesize_
    float w = SAT_BLEED_STRENGTH;
 
    //Initial color in yiq space
-   vec3 out_YIQ = rgb2yiq( pixel_in.rgb );
+   vec3 out_YIQ = colorspace_out * ( pixel_in.rgb );
    
    for ( float off = sourcesize_z ; off <= sourcesize_z*size ; off+=sourcesize_z ){
       //float new_offset = i*initial_offset;
-      vec3 smp_YIQ  = rgb2yiq( texture(in_texture, co - vec2(off,0.0) ).rgb) * 0.5; //sample left
-           smp_YIQ += rgb2yiq( texture(in_texture, co + vec2(off,0.0) ).rgb) * 0.5; //sample right
+      vec3 smp_YIQ  = colorspace_out * ( texture(in_texture, co - vec2(off,0.0) ).rgb) * 0.5; //sample left
+           smp_YIQ += colorspace_out * ( texture(in_texture, co + vec2(off,0.0) ).rgb) * 0.5; //sample right
 
       //Blur Y,I,Q
       w=w/SAT_BLEED_FALLOFF;  //w = w * exp(i*i*(1-SAT_BLEED_FALLOFF)*0.1);
@@ -191,7 +203,7 @@ vec4 pixel_bleed(vec4 pixel_in, vec2 co, sampler2D in_texture, float sourcesize_
       out_YIQ = mix(out_YIQ.xyz,smp_YIQ.xyz, clamp(w/vCVBS_bandwidths, 0.0, 1.0));
      
    }
-   vec3 pixel_bleeded = yiq2rgb( out_YIQ ); //return to RGB colorspace
+   vec3 pixel_bleeded = colorspace_rgb * ( out_YIQ ); //return to RGB colorspace
 
    // Clamping min to 0.0 is needed for nvidia to avoid bad graphical glitches, why?
    pixel_bleeded = clamp(pixel_bleeded, 0.0, 1.0);
