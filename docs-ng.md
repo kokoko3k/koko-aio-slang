@@ -638,7 +638,7 @@ However nice effects may be obtained (eg: with vector games). <br>
             and no zoom/shift will be allowed
     
         
-**Backgound image:**<br>
+**Background image:**<br>
     Draws an image on screen picked from the "textures" shader subdirectory,<br>
     named by default background_over.png and background_under.png<br>
     <br>
