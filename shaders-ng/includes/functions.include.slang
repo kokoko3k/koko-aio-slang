@@ -837,6 +837,7 @@ vec2 Warp_koko(vec2 co, vec2 w, float protrusion) {
 }
 	
 float get_in_aspect() {	
+
 	if (ASPECT_X ==  0) return 1.333333; //all mame games, not rotated
 	if (ASPECT_X == -1) return 1.5;   // ntsc
 	if (ASPECT_X == -2) return 1.25;  // pal
@@ -892,13 +893,19 @@ vec2 get_scaled_coords_aspect(vec2 pTexCoord, vec4 destsize, float in_aspect , b
 }
 
 
-vec2 get_scaled_coords_aspect_fgbg(vec2 pTexCoord, vec4 destsize, float aspect_image , bool is_rotated, float aspect_content){
+vec2 get_scaled_coords_aspect_fgbg(vec2 pTexCoord, vec4 destsize, float aspect_image , bool is_rotated_bg, float is_rotated_content, float aspect_content){
 	vec2 scale = vec2(1.0);
 	vec2 offst = vec2(0.0);
 
-	if (is_rotated)
+		
+	if (is_rotated_bg) {
 		destsize.xy=destsize.yx;
-
+	}
+	
+	if (is_rotated_content == 1.0) {
+		aspect_content = 1/aspect_content;
+	}
+	
 	vec2 off_adj = vec2(0.0);
 	
 	if (destsize.x > destsize.y*aspect_content) {
@@ -923,6 +930,7 @@ vec2 get_scaled_coords_aspect_fgbg(vec2 pTexCoord, vec4 destsize, float aspect_i
 						(1 - (destsize.y*aspect_content)/destsize.x) /
 						BG_IMAGE_ZOOM;
 	}	
+	
 	
 	offst = 0.5 * scale + off_adj - 0.5;
 
