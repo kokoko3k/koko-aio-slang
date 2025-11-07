@@ -792,6 +792,9 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
             //lower strength via user parameter?
                 rgb_w = mix(vec3(1.0), rgb_w, DO_PIXELGRID_W);
                 
+                
+                //rgb_w = mix(vec3(1.0), rgb_w, abs(pixel_in.rgb-vec3(max_inLum)) );
+                
             //"export" naked vertical grille
                 rgb_grille_basal = (rgb_w * rgb_w) * (rgb_w * rgb_w) * (PIXELGRID_BASAL_GRID*0.0025);
                 
@@ -1174,8 +1177,10 @@ vec3 fn_pixel_content(vec2 coords) {
     #ifdef USE_QUILEZ
         vec4 pixel_out = texture(in_glow_pass, coords_QULEZ(coords, global.upscale_passSize));
     #else
-        vec4 pixel_out = texture(in_glow_pass, coords);
+        vec2 co2 = mix(coords,coords_NEAREST(coords, global.upscale_passSize), clamp(SERVICE1*10.0, 0.0, 1.0) );
+        vec4 pixel_out = texture(in_glow_pass, co2);
     #endif
+    
         
     float dot_mat_or_pixelgrid = 1.0; //init dot grid or scanline mask to 1.0
     
