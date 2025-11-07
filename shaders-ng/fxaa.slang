@@ -847,12 +847,7 @@ void main() {
    #endif
    
    vec4 pixel_out;
-   
-   vec2 co2 = coords_NEAREST(vTexCoord, params.SourceSize);
-   if (SERVICE1 < 0.0)
-      co2 = mix(co2, vTexCoord, -SERVICE1*10.0);
-   
-   pixel_out.rgb = texture(colortools_and_ntsc_pass, co2).rgb;
+   pixel_out.rgb = texture_NEAREST(colortools_and_ntsc_pass, vTexCoord, params.SourceSize).rgb;
    
    pixel_out.a = texture(colortools_and_ntsc_pass, vTexCoord).a;//, params.SourceSize).a;
    

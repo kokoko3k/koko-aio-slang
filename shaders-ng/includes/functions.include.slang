@@ -655,7 +655,7 @@ vec2 zoomout_coords(vec2 in_coords, float zoom_out) {
 
 bool need_doublescan() {
 	return (PIXELGRID_DOUBLESCAN == 1.0) && 
-	       ( params.OriginalSize.y < MIN_LINES_INTERLACED|| MIN_LINES_INTERLACED == 0.0);
+	       (params.OriginalSize.y < MIN_LINES_INTERLACED) ;
 }
 
 bool is_interlaced() {
