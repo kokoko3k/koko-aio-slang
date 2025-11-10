@@ -709,9 +709,9 @@ void main() {
       pixel_out = color_tools(pixel_out, vTemperature_rgb);
       //pixel_out = color_tools(pixel_out, vec3(1.0));
       #ifndef D3D_WORKAROUND
-         if (ADAPTIVE_BLACK > 0.0) {
+         if (ADAPTIVE_BLACK != 0.0) {
             float avglum = texture(avglum_passFeedback, vec2(0.5,0.5)).a ;
-            pixel_out = adaptive_black(pixel_out,  avglum, ADAPTIVE_BLACK);
+            pixel_out = adaptive_black(pixel_out,  avglum, abs(ADAPTIVE_BLACK), ADAPTIVE_BLACK > 0.0);
          }
       #endif
 	}

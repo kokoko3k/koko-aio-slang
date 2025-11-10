@@ -1493,23 +1493,14 @@ vec3 kelvin2rgb(float k) {
 	return pixel_out/255.0;
 }
 
-vec3 adaptive_black(vec3 c_in, float lum_in, float range) {
-	//the less the brightness, the less the gamma.
-	
-	float contrast = mix(range*0.5, 0.0, pow(lum_in*8, 0.25));
-	contrast = clamp(contrast,0.0,1.0);
-	return apply_contrast_brightness(c_in, -contrast , +contrast);
-	
-	
-	
-	
-	
-	/*
-	float luminance_adapt = mix( 1-range, 1+range, lum_in);
-	return c_in * luminance_adapt - luminance_adapt + 1;
-	return fma(c_in, vec3(luminance_adapt), vec3(-luminance_adapt + 1)); //ASM_PROOF: SAME
-	*/
-	
+vec3 adaptive_black(vec3 c, float lum_in, float range, bool dark_crush) {	
+	if (dark_crush) {
+		//Black crush
+		return clamp(scale_to_range_vec3(c, -lum_in*range,1.0), 0,1);
+	} else {
+		//Increase gamma
+		return pow(c, vec3(1+lum_in*2.0*range));
+	}
 }
 
 vec3 color_tools(vec3 pixel_out, vec3 Temperature_rgb) {

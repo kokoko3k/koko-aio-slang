@@ -177,7 +177,7 @@
 // #define LUMINANCE  0.2               //        Luminance push
 // #define BRIGHTNESS  0.0              //        Brightness in
 // #define CONTRAST  0.0                //        Contrast in
-// #define ADAPTIVE_BLACK 0.1           //        Adaptive Black level range
+// #define ADAPTIVE_BLACK 0.1           //        CRT Black crush
 // #define TEMPERATURE  7700.0          //        Temperature in (6500=off)
 // #define COLOR_MONO_COLORIZE  0.0     //        Monochrome screen colorization
 // #define COLOR_MONO_HUE1  0.25        //        . Hue bright

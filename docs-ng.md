@@ -94,11 +94,12 @@ However nice effects may be obtained (eg: with vector games). <br>
         self explanatory.
     Input signal gain:
         Gain applied in the chain just before the crt emulation stages.
-    Adaptive black level range:
-        On old CRTs the contrast was higher on high luminosity content,
-        and lower on low luminosity content.
-        This setting modulate the range of the effect; 0.0 disables it.
-
+    CRT Black crush:
+        Emulate an old or low-quality CRT behaviour:
+        Clips dark tones to black as the overall image brightness increases.
+        For a less destructive behaviour, a negative value will modify the
+        gamma ramp instead of clipping dark tones.
+        
     It is also possible to emulate a monochrome display with custom colors:
     
         Monochrome screen colorization:
