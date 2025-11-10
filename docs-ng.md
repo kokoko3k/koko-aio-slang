@@ -97,8 +97,6 @@ However nice effects may be obtained (eg: with vector games). <br>
     CRT Black crush:
         Emulate an old or low-quality CRT behaviour:
         Clips dark tones to black as the overall image brightness increases.
-        For a less destructive behaviour, a negative value will modify the
-        gamma ramp instead of clipping dark tones.
         
     It is also possible to emulate a monochrome display with custom colors:
     

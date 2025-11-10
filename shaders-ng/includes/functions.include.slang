@@ -1493,15 +1493,6 @@ vec3 kelvin2rgb(float k) {
 	return pixel_out/255.0;
 }
 
-vec3 adaptive_black(vec3 c, float lum_in, float range, bool dark_crush) {	
-	if (dark_crush) {
-		//Black crush
-		return clamp(scale_to_range_vec3(c, -lum_in*range,1.0), 0,1);
-	} else {
-		//Increase gamma
-		return pow(c, vec3(1+lum_in*2.0*range));
-	}
-}
 
 vec3 color_tools(vec3 pixel_out, vec3 Temperature_rgb) {
 	//Apply color corrections to input signal.
@@ -1834,4 +1825,8 @@ vec3 soft_limiter01_chroma_safe(vec3 in_color, float m, float knee) {
 	limited = clamp(limited, 0,1);
     float scale_factor = limited / c_max;
     return in_color * scale_factor;
+}
+
+vec3 adaptive_black(vec3 c, float lum_in, float range, bool dark_crush) {	
+	return (scale_to_range_vec3(c, -lum_in*range,1.0);
 }
