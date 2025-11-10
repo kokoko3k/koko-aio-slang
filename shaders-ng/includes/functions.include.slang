@@ -1828,5 +1828,5 @@ vec3 soft_limiter01_chroma_safe(vec3 in_color, float m, float knee) {
 }
 
 vec3 adaptive_black(vec3 c, float lum_in, float range, bool dark_crush) {	
-	return (scale_to_range_vec3(c, -lum_in*range,1.0);
+	return scale_to_range_vec3(c, -lum_in*range,1.0);
 }
