@@ -18,7 +18,7 @@
 
 
 
-//#define DEBUG
+#define DEBUG
    //#define DEBUG_COLOR_CALIB
    //#define DEBUG_TIME_FADE
    //#define DEBUG_SOLID_COLOR
@@ -26,8 +26,8 @@
    //#define DEBUG_STEP_GRADIENT_V
    //#define DEBUG_BLINK
    //#define DEBUG_BLINK_CIRCLE
-   //#define DEBUG_WALKING_CIRCLE
-   #define DEBUG_WALKING_LINES
+   #define DEBUG_WALKING_CIRCLE
+   //#define DEBUG_WALKING_LINES
    //#define DEBUG_COLORWHEEL
    
    
@@ -755,6 +755,12 @@ void main() {
       pixel_out = vec3(0.0);    
    */
 
+  
+   //Clamp RGB to 0..+ and apply interlacing gamma correction adjustment
+   pixel_out = max(pixel_out, vec3(0.0));
+   pixel_out.rgb = pow(pixel_out.rgb, vec3(vPixelgrid_intr_gamma_adj));
+
+   
    if (DO_PPERSISTENCE == 1.0) {
       if (params.OutputSize.xy == global.colortools_and_ntsc_passFeedbackSize.xy) {
          vec3 feedback = texture(colortools_and_ntsc_passFeedback, co).rgb;
@@ -763,13 +769,8 @@ void main() {
       }
    }
  
-  
-   //Clamp RGB to 0..1000.0
-   pixel_out = max(pixel_out, vec3(0.0));
    
-   pixel_out.rgb = pow(pixel_out.rgb, vec3(vPixelgrid_intr_gamma_adj));
-   
-   // Store detected megadrive fake transparencies in the alpha channel
+   // Store detected |||/=== fake transparencies in the alpha channel
    // to be consumed by in_glow_x and shift_and_bleed.
    float waterfall = 0.0;
    if (DO_WTFL == 1.0) {
