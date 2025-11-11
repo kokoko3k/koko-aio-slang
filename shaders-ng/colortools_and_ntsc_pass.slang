@@ -755,34 +755,10 @@ void main() {
       pixel_out = vec3(0.0);    
    */
 
-  
-   //Clamp RGB to 0..+ and apply interlacing gamma correction adjustment
-   pixel_out = max(pixel_out, vec3(0.0));
-   pixel_out.rgb = pow(pixel_out.rgb, vec3(vPixelgrid_intr_gamma_adj));
-
    
-   if (DO_PPERSISTENCE == 1.0) {
-      if (params.OutputSize.xy == global.colortools_and_ntsc_passFeedbackSize.xy) {
-         vec3 feedback = texture(colortools_and_ntsc_passFeedback, co).rgb;
-         float motion_blur_cancel = 2.5;
-         pixel_out = persistence(feedback, pixel_out, PPERSISTENCE_START, PPERSISTENCE_END, motion_blur_cancel);
-      }
-   }
- 
-   
-   // Store detected |||/=== fake transparencies in the alpha channel
-   // to be consumed by in_glow_x and shift_and_bleed.
-   float waterfall = 0.0;
-   if (DO_WTFL == 1.0) {
-      waterfall = get_waterfall();
-   }
-   
-   
-
-
    // Past field interlace emulation:
    if (is_interlaced()) {
-      if ( !low_fps(FPS_ESTIMATE_PASS) ) {
+      //if ( !low_fps(FPS_ESTIMATE_PASS) ) {
          
          bool even_line = line_is_even(vTexCoord.y, params.OriginalSize.y);
          vec3 past =  texture(colortools_and_ntsc_passFeedback, vTexCoord).rgb;
@@ -795,9 +771,30 @@ void main() {
             if (even_line)
                pixel_out.rgb = mymix;
          }
+      //    }
+   }
+
+   
+   //Clamp RGB to 0..+ and apply interlacing gamma correction adjustment
+   pixel_out = max(pixel_out, vec3(0.0));
+   pixel_out.rgb = pow(pixel_out.rgb, vec3(vPixelgrid_intr_gamma_adj));
+
+   
+   if (DO_PPERSISTENCE == 1.0) {
+      if (params.OutputSize.xy == global.colortools_and_ntsc_passFeedbackSize.xy) {
+         vec3 feedback = texture(colortools_and_ntsc_passFeedback, co).rgb;
+         float motion_blur_cancel = 2.5;
+         pixel_out = persistence(feedback, pixel_out, PPERSISTENCE_START, PPERSISTENCE_END, motion_blur_cancel);
       }
    }
 
+   
+   // Store detected |||/=== fake transparencies in the alpha channel
+   // to be consumed by in_glow_x and shift_and_bleed.
+   float waterfall = 0.0;
+   if (DO_WTFL == 1.0) {
+      waterfall = get_waterfall();
+   }
    
    FragColor = vec4(pixel_out, waterfall);
 }
