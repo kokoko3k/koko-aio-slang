@@ -758,7 +758,7 @@ void main() {
    
    // Past field interlace emulation:
    if (is_interlaced()) {
-      //if ( !low_fps(FPS_ESTIMATE_PASS) ) {
+      if ( !low_fps(FPS_ESTIMATE_PASS) ) {
          
          bool even_line = line_is_even(vTexCoord.y, params.OriginalSize.y);
          vec3 past =  texture(colortools_and_ntsc_passFeedback, vTexCoord).rgb;
@@ -771,7 +771,7 @@ void main() {
             if (even_line)
                pixel_out.rgb = mymix;
          }
-      //    }
+          }
    }
 
    
