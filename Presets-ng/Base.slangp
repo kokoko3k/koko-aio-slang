@@ -1,4 +1,5 @@
 #reference "../koko-aio-ng.slangp"
+#reference "../refs/bezel-dark.slangp"
 
 DO_CCORRECTION = "1.000000"
 	IN_GLOW_POWER = "1.500000"

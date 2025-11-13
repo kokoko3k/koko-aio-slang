@@ -1,4 +1,6 @@
 #reference "../koko-aio-ng.slangp"
+#reference "../refs/bezel-dark.slangp"
+
 
 DO_CCORRECTION = "1.0"
 	GAMMA_OUT = "0.51"	
@@ -58,14 +60,8 @@ DO_CURVATURE = "1.0"
 	GEOM_CORNER_SMOOTH = "500.0"
 	
 DO_BEZEL = "0.0"
-        BEZEL_R = "-0.19"
-        BEZEL_G = "-0.19"
-        BEZEL_B = "-0.19"
-        BEZEL_CON = "2.18"
-		BEZEL_FRAME_ZOOM = "0.179000"
-		BEZEL_RFL_BLR_SHD = "-0.200000"
-		BEZEL_REFL_STRENGTH = "0.37"
-		BEZEL_DIFFUSION_STR = "0.15"
+
+	BEZEL_FRAME_ZOOM = "0.179000"
 	
 DO_VIGNETTE = "1.0"
 	V_SIZE = "1.08"

@@ -1,4 +1,5 @@
 #reference "../koko-aio-ng.slangp"
+#reference "../refs/bezel-dark.slangp"
 
 DO_CCORRECTION = "1.000000"
 	LUMINANCE = "0.100000"
@@ -43,12 +44,7 @@ DO_BLOOM = "1.000000"
 
 DO_BEZEL = "1.000000"
 	BEZEL_FRAME_ZOOM = "0.179000"
-	BEZEL_R = "-0.190000"
-	BEZEL_G = "-0.190000"
-	BEZEL_B = "-0.190000"
-	BEZEL_CON = "2.180000"
-	BEZEL_REFL_STRENGTH = "0.37"
-	BEZEL_DIFFUSION_STR = "0.15"
+
 
 DO_VIGNETTE = "1.000000"
 	V_SIZE = "1.08"

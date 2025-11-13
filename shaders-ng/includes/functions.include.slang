@@ -512,7 +512,7 @@ vec2 apply_fuzzy_main_pass_stage_1() {
 	color_out = pow(color_out,IN_GLOW_GAMMA);
 	
 	if (DO_CCORRECTION == 1.0) {
-		color_out *= IN_GLOW_POWER;
+		color_out *= clamp(IN_GLOW_POWER, 0.0, 3.0);
 	}
 
 
@@ -559,7 +559,7 @@ vec2 apply_fuzzy_main_pass_stage_1_no_gamma_in() {
 	gamma_out = gamma_out * GAMMA_OUT;
 
 	if (DO_CCORRECTION == 1.0) {
-		color_out = color_out * IN_GLOW_POWER;
+		color_out = color_out * clamp(IN_GLOW_POWER, 0.0, 3.0);
 	}
 	
 	if (DO_PIXELGRID == 1.0) {
