@@ -12,7 +12,7 @@ layout(location = 1) out float vIn_aspect;
 layout(location = 2) out vec2 vTexCoord_rotated_maybe;
 layout(location = 3) out float vUniformity_return_current; //or feedback
 layout(location = 4) out float vIsRotated;
-layout(location = 5) out float v;
+layout(location = 5) out float vEnough_res_y;
 
 void main() {
 	gl_Position = global.MVP * Position;
@@ -42,9 +42,14 @@ void main() {
                                          (!deltarender_preconditions_met(bIs_Interlaced)) || 
                                          (params.FrameCount == 0.0)
 								 );
-	
-	
-	
+	/*
+	float do_tate = need_tate(bIsRotated);
+	float vScanlinePeriod = 1.0;
+	if (scanlines_will_alternate(bIs_Interlaced))
+		vScanlinePeriod = 0.5;
+		
+	vEnough_res_y = float(!fn_very_lowres_y(global.final_passFeedbackSize.xy, params.OriginalSize.xyzw, do_tate, bIsRotated, need_integer_scale(), get_in_aspect(), vScanlinePeriod));
+	*/
 	
 }
 
@@ -55,7 +60,7 @@ layout(location = 1) in float vIn_aspect;
 layout(location = 2) in vec2 vTexCoord_rotated_maybe;
 layout(location = 3) in float vUniformity_return_current; //or feedback
 layout(location = 4) in float vIsRotated;
-
+layout(location = 5) in float vEnough_res_y;
 
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 2) uniform sampler2D monitor_body_curved;
@@ -193,9 +198,10 @@ void main() {
 		}
 		
 		//Distance from center for progressive defocusing
-		//if (DO_SHIFT_RGB == 1.0) {
-		//	float decon_y_strength = DO_SHIFT_RGB * NEW_SCALEMOD_Y;
-		//	
-		//}
+		
+		/*if (DO_SHIFT_RGB == 1.0) {
+			float decon_y_strength = DO_SHIFT_RGB * NEW_SCALEMOD_Y * vEnough_res_y ;
+			FragColor.x = decon_y_strength;
+		}*/
 
 }

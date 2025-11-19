@@ -674,6 +674,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
                 float fakeslot_stagger_offset =  is_even * PIXELGRID_OFFSET_CORE * pi;
             //get 3 staggers for y deconvergence.
                  vec3 decon_stagger = vec3(DECON_RY,DECON_GY,DECON_BY) * decon_y_strength;
+                 //vec3 decon_stagger = vec3(DECON_RY,DECON_GY,DECON_BY) * texture(helper_pass, in_coords).x;
  
             #ifdef HQ_DECON
                 //Sync decon stagger to deconvergence set in shift_and_bleed pass.
