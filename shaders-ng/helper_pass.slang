@@ -12,6 +12,7 @@ layout(location = 1) out float vIn_aspect;
 layout(location = 2) out vec2 vTexCoord_rotated_maybe;
 layout(location = 3) out float vUniformity_return_current; //or feedback
 layout(location = 4) out float vIsRotated;
+layout(location = 5) out float v;
 
 void main() {
 	gl_Position = global.MVP * Position;
@@ -35,11 +36,16 @@ void main() {
 	#endif
 
     bool bIs_Interlaced = is_interlaced();
-
+	
+	
     vUniformity_return_current = float ( (!bdelta_render_enabled()) || 
                                          (!deltarender_preconditions_met(bIs_Interlaced)) || 
                                          (params.FrameCount == 0.0)
 								 );
+	
+	
+	
+	
 }
 
 #pragma stage fragment
@@ -185,5 +191,11 @@ void main() {
 			                     vec2(   S_POSITION_X     * vIn_aspect, S_POSITION_Y) );
 			FragColor.w = smoothstep(S_SIZE,0.0,dist) * S_POWER;
 		}
+		
+		//Distance from center for progressive defocusing
+		//if (DO_SHIFT_RGB == 1.0) {
+		//	float decon_y_strength = DO_SHIFT_RGB * NEW_SCALEMOD_Y;
+		//	
+		//}
 
 }

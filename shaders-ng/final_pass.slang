@@ -179,46 +179,6 @@ vec2 get_bg_image_coords(vec2 in_vOutputCoord) {
     return bg_img_coords;
 }
 
-vec2 get_zooms_modifier(float do_tate, bool bNeed_NO_integer_scale, bool isrotated) {
-    // This function is meant to live in vertex shader; its purpose is to
-    // give the final scale factor by taking in consideration various zoom modifiers.
-    //It works by calculating the new 0.0 and 1.0 coords then measuring the new distance between them
-
-    // WARNING: This has to be in sync with the code, so everytime a scaling flow is modified, this needs to be updated. WARNING
-    // WARNING: This has to be in sync with the code, so everytime a scaling flow is modified, this needs to be updated. WARNING
-    // WARNING: This has to be in sync with the code, so everytime a scaling flow is modified, this needs to be updated. WARNING
-
-    vec2 co_scaled_min = vec2(0.0);
-    vec2 co_scaled_max = vec2(1.0);
-
-    if ( bNeed_NO_integer_scale ) {
-        co_scaled_min = get_scaled_coords_aspect(co_scaled_min, global.FinalViewportSize, vIn_aspect, isrotated);
-        co_scaled_max = get_scaled_coords_aspect(co_scaled_max, global.FinalViewportSize, vIn_aspect, isrotated);
-    } else {
-        co_scaled_min = integer_scale(co_scaled_min, vIn_aspect, isrotated, do_tate, GAME_GEOM_INT_SCALE-1.0 );
-        co_scaled_max = integer_scale(co_scaled_max, vIn_aspect, isrotated, do_tate, GAME_GEOM_INT_SCALE-1.0 );
-    }
-
-    //Other zoom modifiers allowed only without integer scaling.
-    if ( bNeed_NO_integer_scale ) {
-        co_scaled_min = (zoom(co_scaled_min + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM ) * DO_GLOBAL_SHZO) +
-                    (co_scaled_min * (1-DO_GLOBAL_SHZO) );
-        co_scaled_max = (zoom(co_scaled_max + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM ) * DO_GLOBAL_SHZO) +
-                    (co_scaled_max * (1-DO_GLOBAL_SHZO) );
-        if (DO_GAME_GEOM_OVERRIDE == 1.0) {
-            co_scaled_min = content_geom_override_zoom(co_scaled_min, GAME_GEOM_ASPECT, vIn_aspect, GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
-            co_scaled_max = content_geom_override_zoom(co_scaled_max, GAME_GEOM_ASPECT, vIn_aspect, GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
-        }
-    }
-    
-
-
-    //vfprintvalue = 1/(co_scaled_max.y - co_scaled_min.y);
-    return 1 / vec2(co_scaled_max.x - co_scaled_min.x,
-                co_scaled_max.y - co_scaled_min.y );
-
-}
-
 
 void main() {
     gl_Position = global.MVP * Position;
@@ -348,7 +308,7 @@ void main() {
     //For simplicity and (my) mental health, take only y into account.
         vDotMat_Grid_Sharpness = DOT_M_G_SHARP;
         if (DOT_M_G_SHARP == 0.0) {
-            float zooms_modifier  = get_zooms_modifier(vDo_Tate, bNeed_NO_integer_scale, bIsRotated).y;
+            float zooms_modifier  = get_zooms_modifier(vDo_Tate, bNeed_NO_integer_scale, bIsRotated, vIn_aspect).y;
             float dotmat_insize  = global.upscale_passSize.y;
             float dotmat_outsize = global.FinalViewportSize.y  * zooms_modifier;
             vDotMat_Grid_Sharpness = (dotmat_outsize / dotmat_insize);
@@ -368,25 +328,9 @@ void main() {
     // For automatic Fake scanline managment, we compute a treshold under which
     // fake integer scanlines will be used.
     // (Logic is skipped if integer scaling is requested.)
-        bool very_lowres_y = false;
-        #define MIN_SCREEN_CORE_RATIO 3.5 //We want at least that screen lines per single scanline.
-        if ( bNeed_NO_integer_scale ) {
-            vec4 out_size = params.OutputSize;
-            vec4 ori_size = params.OriginalSize;
-            vec2 zoom_modifier = get_zooms_modifier(vDo_Tate, bNeed_NO_integer_scale,bIsRotated);
-            if (vDo_Tate == 1.0) {
-                out_size.xy = out_size.yx;
-                ori_size.xyzw = ori_size.yxwz;
-                zoom_modifier.xy = zoom_modifier.yx;
-            }
-            if (need_doublescan()) ori_size.yw*=vec2(2.0, 1/2.0); //double period?
-            ori_size.y*=vScanlinePeriod; //helve period?
-            float OutputHeightZoomed = out_size.y*zoom_modifier.y;
-            float screen_core_ratio = OutputHeightZoomed / ori_size.y;
-            if (screen_core_ratio < MIN_SCREEN_CORE_RATIO)
-                very_lowres_y = true;
-        }
+    bool very_lowres_y = fn_very_lowres_y(params.OutputSize.xy, params.OriginalSize.xyzw, vDo_Tate, bIsRotated, !bNeed_NO_integer_scale, vIn_aspect, vScanlinePeriod);
     
+
     //Conditions for fake scanlines are: 
     // - user wants fake/faker integer scanlines when content is interlaced (*1)
     //   or
@@ -408,7 +352,7 @@ void main() {
         vec4 out_size = params.OutputSize;
         vec4 ori_size = params.OriginalSize;
         vec2 out_coord = vOutputCoord;
-        vec2 zoom_modifier = get_zooms_modifier(vDo_Tate, bNeed_NO_integer_scale,bIsRotated);
+        vec2 zoom_modifier = get_zooms_modifier(vDo_Tate, bNeed_NO_integer_scale, bIsRotated, vIn_aspect);
         if (vDo_Tate == 1.0) {
             out_size.xy = out_size.yx;
             ori_size.xyzw = ori_size.yxwz;
