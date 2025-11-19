@@ -287,9 +287,6 @@
 // #define PIXELGRID_NO_INTERBLEED_H  1.0    //          . Inter line extra steepness (1.0 to disable)
 // #define PIXELGRID_OFFSET_CORE   0.0       //          . Slotmask(fake) offset
 // #define PIXELGRID_OFFSET_CORE_W 0.0       //            . Slotmask(fake) width override (0=no override)
-// #define PIXELGRID_DECON_R_H  0.0          //          . Deconvergence Y: R phosphor
-// #define PIXELGRID_DECON_G_H  0.0          //          . Deconvergence Y: G phosphor
-// #define PIXELGRID_DECON_B_H  0.0          //          . Deconvergence Y: B phosphor
 // #define PIXELGRID_H_DEDOT  0.0            //          . Dedot mask between scanlines (use only if needed!)
 
 // #define DO_PIXELGRID_W  1.0         //       ★ Horizontal mask (0 to disable)

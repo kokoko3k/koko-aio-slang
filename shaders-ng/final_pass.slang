@@ -727,13 +727,13 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
             //We can offset trias to emulate fake core level slotmask by applying the optional offset to emulate the slotmask on even cells
                 float fakeslot_stagger_offset =  is_even * PIXELGRID_OFFSET_CORE * pi;
             //get 3 staggers for y deconvergence.
-                vec3 decon_stagger = vec3( PIXELGRID_DECON_R_H, PIXELGRID_DECON_G_H, PIXELGRID_DECON_B_H);
+                vec3 decon_stagger = vec3(DECON_RY,DECON_GY,DECON_BY) * DO_SHIFT_RGB * NEW_SCALEMOD_Y;
                 
             #ifdef HQ_DECON
                 //Sync decon stagger to deconvergence set in shift_and_bleed pass.
                 float dist_from_edge = distance_from_edge_linear(in_coords, EDGE_DEFOCUS_AREA_INV);
                 float offset_multiplier = mix(EDGE_DEFOCUS, 0.0, dist_from_edge) * (DO_SHIFT_RGB * OFFSET_STRENGTH);
-                decon_stagger = vec3(DECON_RY,DECON_GY,DECON_BY)*pi/2.0 * (offset_multiplier * NEW_SCALEMOD_Y) ;
+                decon_stagger = vec3(DECON_RY,DECON_GY,DECON_BY) * (offset_multiplier * NEW_SCALEMOD_Y) ;
             #endif
           
             //Compute final sin mask with staggering

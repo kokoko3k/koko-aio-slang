@@ -189,6 +189,7 @@ However nice effects may be obtained (eg: with vector games). <br>
 
 **Deconvergence:**<br>
     Shift R,G,B components separately to mimic channel deconvergence.<br>
+    Scanlines will be "staggered" according to the Y setting.
     
     Red,Green,Blue X,Y:
         The channels deconvergence offsets
@@ -353,16 +354,11 @@ However nice effects may be obtained (eg: with vector games). <br>
             The previous effect staggers scanlines at "triad width interval", but here you can alter
             that interval.
             Setting an interval of 1.0 can be used to hide moire patterns.
-        Deconvergence Y: R,G,B phosphor" 
-            This emulates Y deconvergence on phosphor level rather than on image level as seen in
-            the previous deconvergence section.
-            Emulating deconvergence here is good because phosphors will be able to brighten the
-            dark gap left by scanlines.
         Dedot mask between scanlines
             When using Horizontal masks, you mai notice a disturbing dot pattern left between high
             scanlines, that's the residual of horizontal mask.
             Use this parameter to clear it and use it only if needed or it would have counter-effects.
-            Also, mutating dots to straight lines would make moiree more visible when using curvature.
+            Also, mutating dots to straight lines would make moire more visible when using curvature.
     
     
     Horizontal mask (rgb subpixel mask strength)
@@ -881,7 +877,7 @@ Changes are applied after a shader reload.*<br>
 
 **Higher quality defocus:**<br>
     Use higher quality deconvergence by flattering rgb scanlines when <br>
-    deconvergence is high and by syncing them to the deconvergence settings.<br>
+    deconvergence is high.<br>
     This has a measurable performance impact on lower spec GPUs.<br><br>
     To use it, in file config-user-optional.txt, write:
     ```#define HQ_DECON```<br>
