@@ -665,11 +665,13 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
         in_coords.xy = mix_step(in_coords.xy, in_coords.yx, vDo_Tate);
        //in_coords = in_coords - global.flick_and_noise_passSize.zw*0.5; //<-- needed if for whatever reason you want to draw scanlines and vgaps in first_pass
 
-        vec2 freq_base_core = in_coords * vPG_OriginalSize_tated_mul_pi; 
+        vec2 freq_base_core = in_coords * vPG_OriginalSize_tated_mul_pi;
 
-        //Use fake scanlines?
-        if (vFake_scanline_period > 0.0)
+        float decon_y_strength = DO_SHIFT_RGB * NEW_SCALEMOD_Y;
+        if (vFake_scanline_period > 0.0) {
             freq_base_core.y = vFake_scanline_period;
+            decon_y_strength = 0.0;
+        }
 
     //Screen coords:
     //Floor x screen coords when using non 1.0x sizes.
@@ -727,13 +729,13 @@ vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inL
             //We can offset trias to emulate fake core level slotmask by applying the optional offset to emulate the slotmask on even cells
                 float fakeslot_stagger_offset =  is_even * PIXELGRID_OFFSET_CORE * pi;
             //get 3 staggers for y deconvergence.
-                vec3 decon_stagger = vec3(DECON_RY,DECON_GY,DECON_BY) * DO_SHIFT_RGB * NEW_SCALEMOD_Y;
-                
+                 vec3 decon_stagger = vec3(DECON_RY,DECON_GY,DECON_BY) * decon_y_strength;
+ 
             #ifdef HQ_DECON
                 //Sync decon stagger to deconvergence set in shift_and_bleed pass.
                 float dist_from_edge = distance_from_edge_linear(in_coords, EDGE_DEFOCUS_AREA_INV);
-                float offset_multiplier = mix(EDGE_DEFOCUS, 0.0, dist_from_edge) * (DO_SHIFT_RGB * OFFSET_STRENGTH);
-                decon_stagger = vec3(DECON_RY,DECON_GY,DECON_BY) * (offset_multiplier * NEW_SCALEMOD_Y) ;
+                float offset_multiplier = mix(EDGE_DEFOCUS, 0.0, dist_from_edge) * OFFSET_STRENGTH;
+                decon_stagger = (vec3(DECON_RY,DECON_GY,DECON_BY) * offset_multiplier) * decon_y_strength;
             #endif
           
             //Compute final sin mask with staggering
