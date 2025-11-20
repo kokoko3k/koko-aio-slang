@@ -815,18 +815,6 @@
     #define PIXELGRID_BASAL_GRID global.PIXELGRID_BASAL_GRID
 #endif
 
-#ifndef PIXELGRID_DECON_R_H
-    #define PIXELGRID_DECON_R_H		global.PIXELGRID_DECON_R_H
-#endif
-
-#ifndef PIXELGRID_DECON_G_H
-    #define PIXELGRID_DECON_G_H		global.PIXELGRID_DECON_G_H
-#endif
-
-#ifndef PIXELGRID_DECON_B_H
-    #define PIXELGRID_DECON_B_H		global.PIXELGRID_DECON_B_H
-#endif
-
 #ifndef PIXELGRID_Y_MASK
     #define PIXELGRID_Y_MASK	global.PIXELGRID_Y_MASK
 #endif
