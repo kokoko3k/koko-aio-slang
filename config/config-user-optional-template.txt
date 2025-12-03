@@ -63,11 +63,14 @@
 
 
 // Enable Antiburn protection (OLEDs)
-// It works by slowly shaking the content image in order to prevent image retention
-// The value defines the speed of the effect, leave it to 1.0 if unsure.
+// It works by slowly shaking the image in order to prevent image retention
+// The value of ANTIBURN_X/Y defines the speed of the effect, leave it to 1.0 if unsure.
+// If ANTIBURN_COMPLETE is enabled, not only the content, but the whole screen will shake.
+// ANTIBURN_AMPLITUDE modulates the shake size.
 // #define ANTIBURN_Y 1.0
 // #define ANTIBURN_X 1.0
-
+// #define ANTIBURN_COMPLETE
+// #define ANTIBURN_AMPLITUDE 1.0
 
 // Enable lcd antighosting.
 // It works by temporal sharpening pixels, and the  

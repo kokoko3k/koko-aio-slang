@@ -965,3 +965,7 @@ Changes are applied after a shader reload.*<br>
     ```#define ANTIBURN_Y 1.0```<br>
     ```#define ANTIBURN_X 1.0```<br><br>
     (1.0 is the effect speed).<br>
+    By enabling the following, not just the content, but the whole screen will shake:
+    ```#define ANTIBURN_COMPLETE```<br>
+    The following modulates the shake size:
+    ```#define ANTIBURN_AMPLITUDE 1.0```<br>

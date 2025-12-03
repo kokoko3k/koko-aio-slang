@@ -1890,3 +1890,40 @@ bool fn_very_lowres_y (vec2 out_size_xy, vec4 ori_size, float do_tate, bool bIsR
 	}
 	return very_lowres_y;
 }
+
+float antiburn_flip_even(float toflip){
+	#ifdef ANTIBURN_Y
+	bool flip = sin(params.FrameCount*pi*ANTIBURN_Y/2000.0) >= 0.0;
+	if (flip) return 1-toflip;
+	#endif
+	return toflip;
+}
+
+vec2 antiburn(vec2 coords) {
+	#ifdef ANTIBURN_Y
+	coords.y += sin(params.FrameCount*pi*ANTIBURN_Y/1000.0)*params.OriginalSize.w*0.5*ANTIBURN_AMPLITUDE;
+	#endif
+
+	#ifdef ANTIBURN_X
+	coords.x += cos(params.FrameCount*pi*ANTIBURN_X/100.0)*global.FinalViewportSize.z*0.5*ANTIBURN_AMPLITUDE;
+	#endif
+
+	return coords;
+}
+
+vec2 antiburn_screen(vec2 coords) {
+
+	#ifdef ANTIBURN_Y
+	float offy = sin(params.FrameCount*pi*ANTIBURN_Y/10000.0)*global.FinalViewportSize.w*ANTIBURN_AMPLITUDE;
+	offy = floor(offy*global.FinalViewportSize.y)/global.FinalViewportSize.y;
+	coords.y += offy;
+	#endif
+
+	#ifdef ANTIBURN_X
+	float offx = cos(params.FrameCount*pi*ANTIBURN_X/10000.0)*global.FinalViewportSize.z*ANTIBURN_AMPLITUDE;
+	offx = floor(offx*global.FinalViewportSize.x)/global.FinalViewportSize.x;
+	coords.x += offx;
+	#endif
+
+	return coords;
+}

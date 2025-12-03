@@ -189,12 +189,18 @@ void main() {
 
     vIn_aspect = get_in_aspect();
 
+    #ifdef ANTIBURN_COMPLETE
+        vec2 antiburn_TexCoord = antiburn_screen(TexCoord);
+    #else
+        vec2 antiburn_TexCoord = TexCoord;
+    #endif
+
     //Calculate vTexcoord as fractional or integer scaled?
         bool bNeed_NO_integer_scale = need_NO_integer_scale();
         if ( bNeed_NO_integer_scale )
-            vTexCoord = get_scaled_coords_aspect(TexCoord,global.FinalViewportSize, vIn_aspect, bIsRotated);
+            vTexCoord = get_scaled_coords_aspect(antiburn_TexCoord,global.FinalViewportSize, vIn_aspect, bIsRotated);
         else
-            vTexCoord = integer_scale(TexCoord, vIn_aspect, bIsRotated, vDo_Tate, GAME_GEOM_INT_SCALE-1.0 ) + vec2( GAME_GEOM_OFF_FIX /10000);
+            vTexCoord = integer_scale(antiburn_TexCoord, vIn_aspect, bIsRotated, vDo_Tate, GAME_GEOM_INT_SCALE-1.0 ) + vec2( GAME_GEOM_OFF_FIX /10000);
 
     vTexCoord += 0.00001;
     
@@ -207,7 +213,7 @@ void main() {
                 (vTexCoord * (1-DO_GLOBAL_SHZO) );
     }
 
-    vOutputCoord = TexCoord ;
+    vOutputCoord = antiburn_TexCoord ;
 
     vBg_img_coords = get_bg_image_coords(vOutputCoord);
     vUnrotated_Output_coords = get_unrotated_output_coords(vOutputCoord);
@@ -395,8 +401,9 @@ void main() {
         
         vAdaptive_strobe_oscillator = cos(iFrameMod * pi);
     #endif
-    
+
 }
+
 
 
 
@@ -578,27 +585,6 @@ vec3 downsample_x( sampler2D tex, vec2 uv, vec4 sourcesize, float sharpness_add 
 
     return mix( bl, br, dist.x );
 
-}
-
-
-float antiburn_flip_even(float toflip){
-    #ifdef ANTIBURN_Y
-        bool flip = sin(params.FrameCount*pi*ANTIBURN_Y/2000.0) >= 0.0;
-        if (flip) return 1-toflip;
-    #endif
-    return toflip;
-}
-
-vec2 antiburn(vec2 coords) {
-    #ifdef ANTIBURN_Y
-        coords.y += sin(params.FrameCount*pi*ANTIBURN_Y/1000.0)*params.OriginalSize.w*0.5;
-    #endif
-        
-    #ifdef ANTIBURN_X
-        coords.x += cos(params.FrameCount*pi*ANTIBURN_X/100.0)*global.FinalViewportSize.z*0.5;
-    #endif
-        
-    return coords;
 }
 
 
@@ -1103,7 +1089,9 @@ float gaussian_coefficient(float x, float sigma) {
 
 vec3 fn_pixel_content(vec2 coords) { 
     
-    coords = antiburn(coords);
+    #ifndef ANTIBURN_COMPLETE
+        coords = antiburn(coords);
+    #endif
         
     vec2 warpedglow = vec2(0.0);
     
