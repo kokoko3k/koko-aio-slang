@@ -1277,6 +1277,14 @@ vec2 quasirandom(vec2 n) {
 }
 
 vec3 antighost(vec3 c) {
+    #ifdef ANTIBURN_X
+        return c;
+    #endif
+
+    #ifdef ANTIBURN_X
+        return c;
+    #endif
+
 	#ifndef D3D_WORKAROUND
 		if (!bdelta_render_enabled()) {
 				if (frame_is_even()) {

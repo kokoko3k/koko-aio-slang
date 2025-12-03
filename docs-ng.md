@@ -919,6 +919,7 @@ Changes are applied after a shader reload.*<br>
     . Not compatible Direct3D<br>
     . Disabled with DELTA_RENDER)<br>
     . Disabled with Adaptive strobe<br>
+    . Disabled with Antiburn<br>
     
     LCD displays often suffer from high pixel refresh times <br>
     which produces ghosting when game changes on screen.<br>
@@ -969,3 +970,4 @@ Changes are applied after a shader reload.*<br>
     ```#define ANTIBURN_COMPLETE```<br>
     The following modulates the shake size:
     ```#define ANTIBURN_AMPLITUDE 1.0```<br>
+    Antiburn disables LCD antighosting.
