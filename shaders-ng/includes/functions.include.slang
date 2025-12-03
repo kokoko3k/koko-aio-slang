@@ -40,20 +40,20 @@ bool low_fps(sampler2D estimatesampler) {
 
 	//Can't do anything without frametime uniforms.
 	#ifndef _HAS_FRAMETIME_UNIFORMS
-	return false;
+		return false;
 	#endif
 
 	//No need to estimate if we trust frametime uniforms.
 	#ifdef ORIGINAL_FPS_TRUSTED
-	return (global.OriginalFPS < 40);
+		return (global.OriginalFPS < 40);
 	#endif
 
 	#ifndef D3D_WORKAROUND
 	//To estimate we need to poll an alpha from a future
 	//pass feedback, so no D3D support.
-	return texture(estimatesampler, vec2(0.5)).a < FPS_MEAN;
+		return texture(estimatesampler, vec2(0.5)).a < FPS_MEAN;
 	#else
-	return false;
+		return false;
 	#endif
 }
 
@@ -127,24 +127,24 @@ bool is_rotated_new(){
 
 bool fps_halver_is_skipped_frame()  {
 	#ifdef FPS_HALVER
-	#ifdef _HAS_FRAMETIME_UNIFORMS
-	if (global.OriginalFPS >= 49) {
-		if ( frame_is_even() ) {
-			return true;
-		}
-	}
-	#endif
+		#ifdef _HAS_FRAMETIME_UNIFORMS
+			if (global.OriginalFPS >= 49) {
+				if ( frame_is_even() ) {
+					return true;
+				}
+			}
+		#endif
 	#endif
 	return false;
 }
 
 bool skip_subframe() {
 	#ifdef DO_ADPT_STROBE
-	return false;
+		return false;
 	#endif
 
 	#ifdef SUBFRAMES_OPTIMIZATIONS
-	if (is_subframe()) return true;
+		if (is_subframe()) return true;
 	#endif
 
 	return false;
@@ -172,9 +172,9 @@ bool is_rotated_old(){
 
 bool is_rotated() {
 	#ifdef _HAS_ROTATION_UNIFORM
-	return is_rotated_new();
+		return is_rotated_new();
 	#else
-	return is_rotated_old();
+		return is_rotated_old();
 	#endif
 }
 
@@ -738,7 +738,7 @@ vec2 round_step(vec2 x, vec2 p) {
 
 float random(float power, vec2 seed) {
 	#ifdef SKIP_RANDOM
-	return 0.0;
+		return 0.0;
 	#endif
 	//From pal-singlepass.slang
 	//https://github.com/svofski/CRT
@@ -771,7 +771,7 @@ float deband_temporal(vec2 co, float power) {
 //The following produces weird results when with dynamic seed like framecount.
 float random_fast(vec2 seed) {
 	#ifdef SKIP_RANDOM
-	return 0.0;
+		return 0.0;
 	#endif
 	//return 0.0;
 	//return deband_static(seed, 0.001);
@@ -853,7 +853,7 @@ float get_in_aspect() {
 		StretchedAspect = global.FinalViewportSize.y/global.FinalViewportSize.x;
 
 	#ifdef _HAS_ORIGINALASPECT_UNIFORMS
-	OriginalAspectRotated = global.OriginalAspectRotated;
+		OriginalAspectRotated = global.OriginalAspectRotated;
 	#endif
 
 	if (ASPECT_X == -7) {
@@ -1005,12 +1005,12 @@ vec2 content_geom_override_zoom(vec2 co, float aspect, float in_aspect, float vs
 	float scale_y;
 
 	#ifdef _HAS_ORIGINALASPECT_UNIFORMS
-	/* for aspect < 0.0, just use core aspect */
-	if (aspect < 0.0) {
-		aspect = global.OriginalAspectRotated;
-		scale_y = aspect/in_aspect;
-	} else
-		#endif
+		/* for aspect < 0.0, just use core aspect */
+		if (aspect < 0.0) {
+			aspect = global.OriginalAspectRotated;
+			scale_y = aspect/in_aspect;
+		} else
+	#endif
 
 		if (aspect > 0.01)
 			scale_y = aspect/in_aspect;
@@ -1309,23 +1309,23 @@ vec2 rgb2hv(vec3 c) {
 
 float delta_render_enabled(){
 	#ifdef DELTA_RENDER
-	return 1.0;
+		return 1.0;
 	#else
-	return 0.0;
+		return 0.0;
 	#endif
 }
 
 bool bdelta_render_enabled(){
 	#ifdef DELTA_RENDER
-	return true;
+		return true;
 	#else
-	return false;
+		return false;
 	#endif
 }
 
 float delta_render_get_force_refresh() {
 	#ifdef DELTA_RENDER_FORCE_REFRESH
-	return DELTA_RENDER_FORCE_REFRESH;
+		return DELTA_RENDER_FORCE_REFRESH;
 	#else
 	return 4.0;
 	#endif
@@ -1333,9 +1333,9 @@ float delta_render_get_force_refresh() {
 
 float delta_render_get_check_area() {
 	#ifdef DELTA_RENDER_CHECK_AREA
-	return DELTA_RENDER_CHECK_AREA;
+		return DELTA_RENDER_CHECK_AREA;
 	#else
-	return 1.0;
+		return 1.0;
 	#endif
 }
 
@@ -1615,12 +1615,12 @@ vec4 PG_get_hmask_preset() {
 	vec4 c = PG_get_hmask_preset_wrapped();
 	//alternate submask color positions to help sample-and-hold induced blurring
 	#ifndef D3D_WORKAROUND
-	#ifdef DO_LCD_ANTIGHOSTING
-	if (LCD_ANTIGHOSTING_FLIP_MASK == 1.0) {
-		if (frame_is_even())
-			c.xyz = c.zxy;
-	}
-	#endif
+		#ifdef DO_LCD_ANTIGHOSTING
+		if (LCD_ANTIGHOSTING_FLIP_MASK == 1.0) {
+			if (frame_is_even())
+				c.xyz = c.zxy;
+		}
+		#endif
 	#endif
 	return c;
 }
@@ -1713,10 +1713,10 @@ vec3 adaptive_strobe_checkerboard(vec3 pixel_out, vec2 co, vec2 outputsize) {
 
 		//#define SPLIT_SCREEN
 		#ifdef SPLIT_SCREEN
-		if (co.x > 0.5)
-			pixel_out.rgb = pixel_out.rgb+ checkerboard;
+			if (co.x > 0.5)
+				pixel_out.rgb = pixel_out.rgb+ checkerboard;
 		#else
-		pixel_out.rgb = pixel_out.rgb+ checkerboard;
+			pixel_out.rgb = pixel_out.rgb+ checkerboard;
 		#endif
 
 	}
@@ -1893,8 +1893,8 @@ bool fn_very_lowres_y (vec2 out_size_xy, vec4 ori_size, float do_tate, bool bIsR
 
 float antiburn_flip_even(float toflip){
 	#ifdef ANTIBURN_Y
-	bool flip = sin(params.FrameCount*pi*ANTIBURN_Y/2000.0) >= 0.0;
-	if (flip) return 1-toflip;
+		bool flip = sin(params.FrameCount*pi*ANTIBURN_Y/2000.0) >= 0.0;
+		if (flip) return 1-toflip;
 	#endif
 	return toflip;
 }
@@ -1902,15 +1902,15 @@ float antiburn_flip_even(float toflip){
 vec2 antiburn(vec2 coords) {
 	float amp = 1.0;
 	#ifdef ANTIBURN_AMPLITUDE
-	amp = ANTIBURN_AMPLITUDE;
+		amp = ANTIBURN_AMPLITUDE;
 	#endif
 
 	#ifdef ANTIBURN_Y
-	coords.y += sin(params.FrameCount*pi*ANTIBURN_Y/1000.0)*params.OriginalSize.w*0.5*amp;
+		coords.y += sin(params.FrameCount*pi*ANTIBURN_Y/1000.0)*params.OriginalSize.w*0.5*amp;
 	#endif
 
 	#ifdef ANTIBURN_X
-	coords.x += cos(params.FrameCount*pi*ANTIBURN_X/100.0)*global.FinalViewportSize.z*0.5*amp;
+		coords.x += cos(params.FrameCount*pi*ANTIBURN_X/100.0)*global.FinalViewportSize.z*0.5*amp;
 	#endif
 
 	return coords;
@@ -1919,19 +1919,19 @@ vec2 antiburn(vec2 coords) {
 vec2 antiburn_screen(vec2 coords) {
 	float amp = 1.0;
 	#ifdef ANTIBURN_AMPLITUDE
-	amp = ANTIBURN_AMPLITUDE;
+		amp = ANTIBURN_AMPLITUDE;
 	#endif
 
 	#ifdef ANTIBURN_Y
-	float offy = sin(params.FrameCount*pi*ANTIBURN_Y/10000.0)*global.FinalViewportSize.w*amp;
-	offy = floor(offy*global.FinalViewportSize.y)/global.FinalViewportSize.y;
-	coords.y += offy;
+		float offy = sin(params.FrameCount*pi*ANTIBURN_Y/10000.0)*global.FinalViewportSize.w*amp;
+		offy = floor(offy*global.FinalViewportSize.y)/global.FinalViewportSize.y;
+		coords.y += offy;
 	#endif
 
 	#ifdef ANTIBURN_X
-	float offx = cos(params.FrameCount*pi*ANTIBURN_X/10000.0)*global.FinalViewportSize.z*amp;
-	offx = floor(offx*global.FinalViewportSize.x)/global.FinalViewportSize.x;
-	coords.x += offx;
+		float offx = cos(params.FrameCount*pi*ANTIBURN_X/10000.0)*global.FinalViewportSize.z*amp;
+		offx = floor(offx*global.FinalViewportSize.x)/global.FinalViewportSize.x;
+		coords.x += offx;
 	#endif
 
 	return coords;
