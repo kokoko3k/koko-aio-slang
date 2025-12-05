@@ -57,7 +57,8 @@ layout(location = 1) out vec3 vTemperature_rgb;
 layout(location = 2) out float vNTSC_FILTER_FC;
 layout(location = 3) out float vPixelgrid_intr_gamma_adj;
 layout(location = 4) out vec3 vDebug;
-layout(location = 5) out float vNTSC_weights[NTSC_FILTER_WIDTH_MAX];
+layout(location = 5) out vec2 vTexCoord_unshifted;
+layout(location = 6) out float vNTSC_weights[NTSC_FILTER_WIDTH_MAX];
 
 
 #include "includes/functions.include.slang"
@@ -92,6 +93,7 @@ void main() {
    //Or else the picture will be slightly blurred (visible only when output gamma is low).
    //Let's hope this will not break anything (classic diagonally broken screen).
    vTexCoord = TexCoord;
+   vTexCoord_unshifted = TexCoord;
 
    if (DO_GAME_GEOM_OVERRIDE > 0.5) {
       vec2 shift = vec2(GAME_GEOM_HSHIFT,GAME_GEOM_VSHIFT);
@@ -203,7 +205,8 @@ layout(location = 1) in vec3 vTemperature_rgb;
 layout(location = 2) in float vNTSC_FILTER_FC;
 layout(location = 3) in float vPixelgrid_intr_gamma_adj;
 layout(location = 4) in vec3 vDebug;
-layout(location = 5) in float vNTSC_weights[NTSC_FILTER_WIDTH_MAX];
+layout(location = 5) in vec2 vTexCoord_unshifted;
+layout(location = 6) in float vNTSC_weights[NTSC_FILTER_WIDTH_MAX];
 
 layout(location = 0) out vec4 FragColor;
 
@@ -717,7 +720,7 @@ void main() {
 	}
 
    if (DO_DOT_MATRIX + DOT_M_MBLUR_STR > 1.0) {
-      vec3 feedback = texture(colortools_and_ntsc_passFeedback, co).rgb;
+      vec3 feedback = texture(colortools_and_ntsc_passFeedback, vTexCoord_unshifted).rgb;
       
       //Dot matrix motion blur inertia on white or black (not both)?
       vec3 adaption = mix_step (pixel_out - feedback,

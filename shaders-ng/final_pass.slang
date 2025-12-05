@@ -6,8 +6,8 @@
  */
 
 // #define DEBUG_TEXTURE Original
-// #define DEBUG_TEXTURE colortools_and_ntsc_pass
-#define DEBUG_TEXTURE halo_pre_gamma_pass
+#define DEBUG_TEXTURE colortools_and_ntsc_pass
+//#define DEBUG_TEXTURE halo_pre_gamma_pass
 
 // #define DEBUG_PRINT_VALUE
 // #define PRINTED_VALUE global.FinalViewportSize.x
