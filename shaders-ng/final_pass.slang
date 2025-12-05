@@ -10,6 +10,7 @@
 #define DEBUG_TEXTURE halo_pre_gamma_pass
 
 // #define DEBUG_PRINT_VALUE
+// #define PRINTED_VALUE global.FinalViewportSize.x
 // #define PRINTED_VALUE texture(DEBUG_TEXTURE, vec2(0.5)).a
 // #define PRINTED_VALUE (1000.0/(global.FrameTimeDelta/1000.0)) 
     

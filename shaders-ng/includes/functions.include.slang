@@ -950,36 +950,95 @@ vec2 integer_scale(vec2 in_coords, float target_aspect, bool is_rotated, float d
 		raw_in_aspect = params.OriginalSize.x/params.OriginalSize.y;
 	}
 
+	//Keep aspect?
+	float adapted_aspect = target_aspect / raw_in_aspect;
+	adapted_aspect = mix_step(adapted_aspect, 1.0, uncorrected_aspect);
+	vec2 OriginalSize_adapted = params.OriginalSize.xy;
+
+	if (do_tate == 0.0) {
+		in_coords.x = zoom1D(in_coords.x, adapted_aspect);
+		OriginalSize_adapted.x = OriginalSize_adapted.x * adapted_aspect;
+	} else {
+		in_coords.y = zoom1D(in_coords.y, adapted_aspect);
+		OriginalSize_adapted.y = OriginalSize_adapted.y * adapted_aspect;
+	}
+
+	vec2 izoom;
+
+	if (!is_rotated) {
+		//This is 1X integer zoom:
+		izoom = params.OriginalSize.xy / global.FinalViewportSize.xy;
+		vec2 int_zoom = floor(global.FinalViewportSize.xy / (OriginalSize_adapted.xy / (GAME_GEOM_INT_SCALE_OVR)));
+
+		int_zoom = clamp(int_zoom, 1.0, GAME_GEOM_INT_SCALE_MAX);
+		izoom *= min(int_zoom.x, int_zoom.y);
+
+	} else {
+		//This is 1X integer zoom:
+		izoom = params.OriginalSize.xy / global.FinalViewportSize.yx;
+		vec2 int_zoom = floor(global.FinalViewportSize.xy / (OriginalSize_adapted.yx / (GAME_GEOM_INT_SCALE_OVR)));
+
+		int_zoom = clamp(int_zoom, 1.0, GAME_GEOM_INT_SCALE_MAX);
+		izoom *= min(int_zoom.x, int_zoom.y);
+	}
+
+
+// 	} else {
+// 		//This is 1X integer zoom:
+// 		izoom = params.OriginalSize.xy / global.FinalViewportSize.yx;
+// 		vec2 int_zoom = floor(global.FinalViewportSize.yx / (OriginalSize_adapted.yx / (GAME_GEOM_INT_SCALE_OVR)));
+//
+// 		int_zoom = clamp(int_zoom, 1.0, GAME_GEOM_INT_SCALE_MAX);
+// 		izoom *= min(int_zoom.x, int_zoom.y);
+// 	}
+
+	return zoomxy(in_coords, izoom);
+}
+
+/*vec2 integer_scale(vec2 in_coords, float target_aspect, bool is_rotated, float do_tate, float uncorrected_aspect) {
+
+	float raw_in_aspect;
+
+	if (do_tate == 1.0) {
+		target_aspect = 1/target_aspect;
+		raw_in_aspect = params.OriginalSize.y/params.OriginalSize.x;
+	} else {
+		raw_in_aspect = params.OriginalSize.x/params.OriginalSize.y;
+	}
+
 	float adapted_aspect = target_aspect / raw_in_aspect;
 
 	//Keep aspect?
 	adapted_aspect = mix_step(adapted_aspect, 1.0, uncorrected_aspect);
-	if (do_tate == 0.0)
-		in_coords.x = zoom1D(in_coords.x, adapted_aspect);
-	else
+	vec2 OriginalSize_adapted = params.OriginalSize.xy;
+	if (do_tate == 0.0) {
+		in_coords.x = zoom1D(in_coords.x, adapted_aspect); //qua io sto allargando l'immagine, quindi in qualche modo devo tenerlo presente quando scalo.
+		//ossia quando vado a calcolare int_zoom, devo operare sulla dimensione scalata.
+		OriginalSize_adapted.x = OriginalSize_adapted.x*adapted_aspect;
+
+	} else {
 		in_coords.y = zoom1D(in_coords.y, adapted_aspect);
+		OriginalSize_adapted.y = OriginalSize_adapted.y*adapted_aspect;
+	}
 
 	vec2 izoom;
 	if (!is_rotated) {
 		//This is 1X integer zoom:
 		izoom = params.OriginalSize.xy / global.FinalViewportSize.xy;
 		//Find the maximum zoom allowed
-		vec2 int_zoom = floor(global.FinalViewportSize.yx / (params.OriginalSize.yx/(GAME_GEOM_INT_SCALE_OVR) ));
+		vec2 int_zoom = floor(global.FinalViewportSize.yx / (OriginalSize_adapted.yx/(GAME_GEOM_INT_SCALE_OVR) ));
 		int_zoom = clamp(int_zoom, 1.0, GAME_GEOM_INT_SCALE_MAX);
+		izoom *= min(int_zoom.x, int_zoom.y);
 
-		if (raw_in_aspect < target_aspect)
-			izoom *= min(int_zoom.x*adapted_aspect, int_zoom.y);
-		else
-			izoom *= min(int_zoom.x, int_zoom.y/adapted_aspect);
 
 	} else {
 		izoom = params.OriginalSize.xy / global.FinalViewportSize.yx;
-		vec2 int_zoom = floor(global.FinalViewportSize.yx / (  (params.OriginalSize.xy*adapted_aspect)/(GAME_GEOM_INT_SCALE_OVR) ));
+		vec2 int_zoom = floor(global.FinalViewportSize.yx / (  (OriginalSize_adapted.xy*adapted_aspect)/(GAME_GEOM_INT_SCALE_OVR) ));
 		int_zoom = clamp(int_zoom, 1.0, GAME_GEOM_INT_SCALE_MAX);
-		izoom *= min(int_zoom.x, int_zoom.y*adapted_aspect);
+		izoom *= min(int_zoom.x, int_zoom.y);
 	}
 	return zoomxy(in_coords, izoom);
-}
+}*/
 
 bool need_NO_integer_scale() {
 	//returns if no integer scaling is requested.
