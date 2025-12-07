@@ -206,12 +206,16 @@ void main() {
     vTexCoord += 0.00001;
     
 
-    
-
-    //Global zoom, but only if not integer scaling
-    if (bNeed_NO_integer_scale) {
-        vTexCoord = (zoom(vTexCoord + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM ) * DO_GLOBAL_SHZO) +
-                (vTexCoord * (1-DO_GLOBAL_SHZO) );
+        
+    //Global zoom/shift:
+    if (DO_GLOBAL_SHZO == 1.0) {
+        if (bNeed_NO_integer_scale) {
+            //zoom + shift
+            vTexCoord = zoom(vTexCoord + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM );
+        } else {
+            //Just shift with integer scaling
+            vTexCoord += vec2(-GLOBAL_OFFX, -GLOBAL_OFFY);
+        }
     }
 
     vOutputCoord = antiburn_TexCoord ;

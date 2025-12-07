@@ -598,10 +598,10 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter LABEL0024 " " 0 0 0 1
 
 //Global Zoom/Offset
-#pragma parameter DO_GLOBAL_SHZO	 "★ Global shift/zoom enable? (ignored if integer scaling) ==>"	0.0   0.0  1.0 	  1.0
+#pragma parameter DO_GLOBAL_SHZO	 "★ Global shift/zoom enable? ==>"	0.0   0.0  1.0 	  1.0
 #pragma parameter GLOBAL_OFFX	 "        X axis shift "			0.0  -1.0  1.0    0.0005
 #pragma parameter GLOBAL_OFFY	 "        Y axis shift "			0.0  -1.0  1.0    0.0005
-#pragma parameter GLOBAL_ZOOM	 "        Zoom"					1.2   0.0  3.0    0.0005
+#pragma parameter GLOBAL_ZOOM	 "        Zoom (ignored with integer scaling) "	1.2   0.0  3.0    0.0005
 #pragma parameter LABEL0029 " " 0 0 0 1
 
 

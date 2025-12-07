@@ -1911,11 +1911,15 @@ vec2 get_zooms_modifier(float do_tate, bool bNeed_NO_integer_scale, bool isrotat
 	}
 
 	//Other zoom modifiers allowed only without integer scaling.
+	float global_zoom = GLOBAL_ZOOM;
+	if (!bNeed_NO_integer_scale) global_zoom = 1.0; //no global zoom when integer scaling
+	
+	if (DO_GLOBAL_SHZO == 1.0) {
+		co_scaled_min = zoom(co_scaled_min + vec2( -GLOBAL_OFFX, -GLOBAL_OFFY), global_zoom );
+		co_scaled_max = zoom(co_scaled_max + vec2( -GLOBAL_OFFX, -GLOBAL_OFFY), global_zoom );
+	}
+	
 	if ( bNeed_NO_integer_scale ) {
-		co_scaled_min = (zoom(co_scaled_min + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM ) * DO_GLOBAL_SHZO) +
-		(co_scaled_min * (1-DO_GLOBAL_SHZO) );
-		co_scaled_max = (zoom(co_scaled_max + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM ) * DO_GLOBAL_SHZO) +
-		(co_scaled_max * (1-DO_GLOBAL_SHZO) );
 		if (DO_GAME_GEOM_OVERRIDE == 1.0) {
 			co_scaled_min = content_geom_override_zoom(co_scaled_min, GAME_GEOM_ASPECT, in_aspect, GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
 			co_scaled_max = content_geom_override_zoom(co_scaled_max, GAME_GEOM_ASPECT, in_aspect, GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
