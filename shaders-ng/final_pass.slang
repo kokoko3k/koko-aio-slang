@@ -213,7 +213,7 @@ void main() {
             //zoom + shift
             vTexCoord = zoom(vTexCoord + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM );
         } else {
-            //Just shift with integer scaling
+            //Just shift with integer sFcaling
             vTexCoord += vec2(-GLOBAL_OFFX, -GLOBAL_OFFY);
         }
     }
@@ -593,7 +593,7 @@ vec3 downsample_x( sampler2D tex, vec2 uv, vec4 sourcesize, float sharpness_add 
 }
 
 
-vec4 fn_pixel_grid(vec2 in_coords, vec4 pixel_in, float min_inLum, float max_inLum) {
+vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inLum) {
     //^ 15fps ^
 
     //Tate ? (other outputsize,originalsize and outputcoords "tated" in vertex shader.)
@@ -1112,9 +1112,9 @@ vec3 fn_pixel_content(vec2 coords) {
 
     //#define USE_QUILEZ   
     #ifdef USE_QUILEZ
-        vec4 pixel_out = texture(in_glow_pass, coords_QULEZ(coords, global.upscale_passSize));
+        vec3 pixel_out = texture(in_glow_pass, coords_QULEZ(coords, global.upscale_passSize)).rgb;
     #else
-        vec4 pixel_out = texture(in_glow_pass, coords);
+        vec3 pixel_out = texture(in_glow_pass, coords).rgb;
     #endif
         
     float dot_mat_or_pixelgrid = 1.0; //init dot grid or scanline mask to 1.0
@@ -1130,7 +1130,7 @@ vec3 fn_pixel_content(vec2 coords) {
             if (DO_CCORRECTION == 1.0)
                  vMax_inLum = apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS) * max(IN_GLOW_POWER, 1.0);
             */
-            vec4 pixel_grid = fn_pixel_grid(coords, pixel_out, 0.0, vMax_inLum);
+            vec4 pixel_grid = fn_pixel_grid(coords, pixel_out.rgb, 0.0, vMax_inLum);
             //grid mask only is needed by halo to selectively light the grid.
                 dot_mat_or_pixelgrid = pixel_grid.a;
                 pixel_out.rgb = pixel_grid.rgb;
