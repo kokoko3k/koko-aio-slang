@@ -1338,7 +1338,12 @@ void main() {
     if (DO_CURVATURE == 1.0)  {
         content_mask = fn_border(co_content);
     } else {
-        content_mask = float(is_first_inside_rect(co_content, RECT01));
+        // Since we're wrapping to border (to show black border when zooming out via content override),
+        // edge sampling will be darker and this is bad for dmg look, so we mangle 1/4 input pixels.
+        // maybe in te future this will go away and dmg will have its proper shader/preset.
+        #define eps2 (global.upscale_passSize.zw*0.5)
+        #define RECTEPS vec4(eps2.x, eps2.y, 1.0-eps2.x, 1.0-eps2.y)
+        content_mask = float(is_first_inside_rect(co_content, RECTEPS));
     }
 
     // Mirror/reflection coords need to be calculated here, before geom override, but after curvature.
