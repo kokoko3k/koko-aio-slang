@@ -1341,9 +1341,12 @@ void main() {
         // Since we're wrapping to border (to show black border when zooming out via content override),
         // edge sampling will be darker and this is bad for dmg look, so we mangle 1/4 input pixels.
         // maybe in te future this will go away and dmg will have its proper shader/preset.
-        #define eps2 (global.upscale_passSize.zw*0.5)
-        #define RECTEPS vec4(eps2.x, eps2.y, 1.0-eps2.x, 1.0-eps2.y)
-        content_mask = float(is_first_inside_rect(co_content, RECTEPS));
+        //#define eps2 (global.upscale_passSize.zw*0.5)
+        //#define RECTEPS vec4(eps2.x, eps2.y, 1.0-eps2.x, 1.0-eps2.y)
+        //content_mask = float(is_first_inside_rect(co_content, RECTEPS));
+        //...in the end I decided that the best way is that affected presets (Gameboy DMG) will
+        //reference a preset that wrap with mirror repeat.
+        content_mask = float(is_first_inside_rect(co_content, RECT01));
     }
 
     // Mirror/reflection coords need to be calculated here, before geom override, but after curvature.
