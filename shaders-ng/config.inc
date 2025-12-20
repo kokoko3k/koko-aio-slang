@@ -534,7 +534,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter DOT_M_MBLUR_STR	"        Ghosting"				0.45  0.0 0.9 0.05
 #pragma parameter DOT_M_MBLUR_MODE  "           . Apply on: both,white,black"	0.0  0.0 2.0 1.0
 #pragma parameter DOT_M_SHADOW_STR  "        Diorama/shadow strength (disables deconvergence)"	0.0  0.0 1.0 0.01
-#pragma parameter DOT_M_SHADOW_OFF  "           . Shadow offset"								0.0  -1.0 1.0 0.01
+#pragma parameter DOT_M_SHADOW_OFF  "           . Shadow offset"								0.0  -2.0 2.0 0.05
 #pragma parameter LABEL0020 " " 0 0 0 1
 
 
