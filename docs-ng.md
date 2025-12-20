@@ -488,8 +488,8 @@ However nice effects may be obtained (eg: with vector games). <br>
             0: display is always slow to refresh (Game gear)
             1: display is slow to refresh bright pixels (??)
             2: display is slow to refresh dark pixels (Game Boy)
-    Shadow strength:
-        Emulates the typical shadow seen on Gameboy mono handhelds
+    Diorama/Shadow strength:
+        Emulates the typical diorama effect seen on Gameboy mono handhelds
         casted by on the underlying screen.
         Shadow offset:
             Moves the shadow left or right.

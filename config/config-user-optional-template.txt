@@ -328,7 +328,6 @@
 // #define DOT_M_G_SHARP  0.0     //            . Grid sharpness (0.0 for auto)
 // #define DOT_M_MBLUR_STR  0.45  //         Ghosting
 // #define DOT_M_MBLUR_MODE  0.0  //            . Apply on: both,white,black
-// #define DOT_M_SHADOW_STR  0.0  //         Shadow strength (disables deconvergence)
 // #define DOT_M_SHADOW_OFF  0.0  //            . Shadow offset
 
 
