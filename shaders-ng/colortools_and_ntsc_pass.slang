@@ -18,7 +18,7 @@
 
 
 
-//#define DEBUG
+#define DEBUG
    //#define DEBUG_COLOR_CALIB
    //#define DEBUG_TIME_FADE
    //#define DEBUG_SOLID_COLOR
@@ -614,7 +614,7 @@ vec3 pixel_dedither(sampler2D tex, vec2 coords, vec4 sourcesize, float tmin, flo
 }
 
 
-vec3 persistence(vec3 feedback, vec3 pixel_now, float start_decay, float late_persistence, float motion_blur_cancel) {
+vec3 persistence(vec3 feedback, vec3 pixel_now, vec3 start_decay, vec3 late_persistence, float motion_blur_cancel) {
    //start_decay: is the initial decay, the fast one: 1.0 means instantaneous, try around 0.8
    //end decay the higher, the more the persistance in the long run, try around 1.0;
    //motion_blur_cancel: 0.0 means full blur on bright areas; try around 2.5
@@ -787,7 +787,9 @@ void main() {
       if (params.OutputSize.xy == global.colortools_and_ntsc_passFeedbackSize.xy) {
          vec3 feedback = texture(colortools_and_ntsc_passFeedback, co).rgb;
          float motion_blur_cancel = 2.5;
-         pixel_out = persistence(feedback, pixel_out, PPERSISTENCE_START, PPERSISTENCE_END, motion_blur_cancel);
+         vec3 early_decay      = vec3(PPERSISTENCE_START) / vec3(PPERSISTENCE_MUL_R,PPERSISTENCE_MUL_G,1);
+         vec3 late_persistance = vec3(PPERSISTENCE_END)   * vec3(PPERSISTENCE_MUL_R,PPERSISTENCE_MUL_G,1);
+         pixel_out = persistence(feedback, pixel_out, early_decay, late_persistance, motion_blur_cancel);
       }
    }
 

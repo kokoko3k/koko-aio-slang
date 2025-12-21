@@ -183,9 +183,12 @@ However nice effects may be obtained (eg: with vector games). <br>
 **Persistence of phosphors:**<br>
     This emulates the unexcited phosphors that continue to emit light.
 
-    Early decay: is the immediate light cut after the phosphor is no more/less excited.
-    Late persistence: modulates the time the residual light will stay on screen
-
+    Early decay (blue): is the immediate light cut after the blue phosphor is no more/less excited.
+    Late persistence (blue): modulates the time the residual blue light will stay on screen
+    Red/Green decay time multiplier: 
+                       Chemical composition makes different phosphors have different decay times.
+                       Highering this parameter will make them slower than blue.
+    
 
 **Deconvergence:**<br>
     Shift R,G,B components separately to mimic channel deconvergence.<br>

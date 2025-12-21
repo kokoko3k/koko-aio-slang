@@ -229,9 +229,10 @@
 // #define DOT_C_SPEED 8.0				//         Speed
 
 // #define DO_PPERSISTENCE  0.0         // ★ Persistence of phosphors enable?
-// #define PPERSISTENCE_START  0.9      //         Early decay
-// #define PPERSISTENCE_END  0.5        //         Late Persistence
-
+// #define PPERSISTENCE_START  0.9      //         Early decay (blue)
+// #define PPERSISTENCE_END  0.5        //         Late Persistence (blue)
+// #define PPERSISTENCE_MUL_R           //         Red decay time multiplier
+// #define PPERSISTENCE_MUL_G           //         Green decay time multiplier
 
 // #define DO_SHIFT_RGB  1.0           // ★ Deconvergence enable?
 // #define OFFSET_STRENGTH  0.3        //         Strength
