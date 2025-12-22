@@ -35,26 +35,32 @@ float get_lod(vec2 smp_size, vec2 out_size) {
 	return log2(maxRatio);
 }
 
-bool low_fps(sampler2D estimatesampler) {
-	/* returns if core fps is inside [25..30] interval */
-
-	//Can't do anything without frametime uniforms.
+float get_fps(sampler2D estimatesampler) {
 	#ifndef _HAS_FRAMETIME_UNIFORMS
-		return false;
+		return 60.0;
 	#endif
 
 	//No need to estimate if we trust frametime uniforms.
 	#ifdef ORIGINAL_FPS_TRUSTED
-		return (global.OriginalFPS < 40);
+		return global.OriginalFPS;
 	#endif
 
 	#ifndef D3D_WORKAROUND
 	//To estimate we need to poll an alpha from a future
 	//pass feedback, so no D3D support.
-		return texture(estimatesampler, vec2(0.5)).a < FPS_MEAN;
+		return texture(estimatesampler, vec2(0.5)).a;
 	#else
-		return false;
+		return global.OriginalFPS;
 	#endif
+}
+
+
+
+bool low_fps(sampler2D estimatesampler) {
+	/* returns if core fps is inside [25..30] interval */
+	float fps = get_fps(estimatesampler);
+	return (fps < 40);
+
 }
 
 vec2 _unpack_21(float f){
@@ -1913,12 +1919,12 @@ vec2 get_zooms_modifier(float do_tate, bool bNeed_NO_integer_scale, bool isrotat
 	//Other zoom modifiers allowed only without integer scaling.
 	float global_zoom = GLOBAL_ZOOM;
 	if (!bNeed_NO_integer_scale) global_zoom = 1.0; //no global zoom when integer scaling
-	
+
 	if (DO_GLOBAL_SHZO == 1.0) {
 		co_scaled_min = zoom(co_scaled_min + vec2( -GLOBAL_OFFX, -GLOBAL_OFFY), global_zoom );
 		co_scaled_max = zoom(co_scaled_max + vec2( -GLOBAL_OFFX, -GLOBAL_OFFY), global_zoom );
 	}
-	
+
 	if ( bNeed_NO_integer_scale ) {
 		if (DO_GAME_GEOM_OVERRIDE == 1.0) {
 			co_scaled_min = content_geom_override_zoom(co_scaled_min, GAME_GEOM_ASPECT, in_aspect, GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);

@@ -157,6 +157,7 @@
 // Cores may or not update OriginalFps uniform. So you may trust it or not.
 // In case you don't, it is derived by averaging frametimes.
 // The latter is less reliable depending on the video driver behaviour, and slower.
+// if D3D_WORKAROUND is defined, OriginalFps is always used.
 // #define ORIGINAL_FPS_TRUSTED
 
 ////////////////////////////////////////////////////////////////////////////

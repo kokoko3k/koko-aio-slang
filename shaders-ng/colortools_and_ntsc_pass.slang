@@ -801,6 +801,9 @@ void main() {
       waterfall = get_waterfall();
    }
    
+
+   //if (low_fps(FPS_ESTIMATE_PASS)) { pixel_out = vec3(1,0,0); }
+
    FragColor = vec4(pixel_out, waterfall);
 }
 
