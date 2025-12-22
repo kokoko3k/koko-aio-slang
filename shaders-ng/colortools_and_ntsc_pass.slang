@@ -44,6 +44,7 @@
 #ifndef D3D_WORKAROUND
    #define FPS_ESTIMATE_PASS halo_pre_gamma_passFeedback
 #else
+   //this is just a STUB to make the shader compile, but fps are never estimated with D3D_WORKAROUND
    #define FPS_ESTIMATE_PASS Original
 #endif
 
