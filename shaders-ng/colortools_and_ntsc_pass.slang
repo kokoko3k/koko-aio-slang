@@ -333,7 +333,7 @@ vec3 debug() {
       pixel_debug *= DEBUG_COLOR;
       
    #elif defined DEBUG_WALKING_CIRCLE
-      float speed = 4.0;
+      float speed = 8.0;
       vec2 center = vec2(  mod(params.FrameCount*speed, params.SourceSize.x*1.2)/params.SourceSize.x  -0.1      , 0.5);
       center = vTexCoord - center;
       float radius = 0.05;
@@ -614,7 +614,7 @@ vec3 pixel_dedither(sampler2D tex, vec2 coords, vec4 sourcesize, float tmin, flo
 }
 
 
-vec3 persistence(vec3 feedback, vec3 pixel_now, vec3 start_decay, vec3 late_persistence, float motion_blur_cancel) {
+vec3 persistence(vec3 feedback, vec3 pixel_now, vec3 start_decay, vec3 late_persistence, float motion_blur_cancel, float fps) {
    //start_decay: is the initial decay, the fast one: 1.0 means instantaneous, try around 0.8
    //end decay the higher, the more the persistance in the long run, try around 1.0;
    //motion_blur_cancel: 0.0 means full blur on bright areas; try around 2.5
@@ -636,7 +636,8 @@ vec3 persistence(vec3 feedback, vec3 pixel_now, vec3 start_decay, vec3 late_pers
    
 
    //Compute the persistent light by mixing pixel current and previous one
-   vec3 pixel_persistent = mix(feedback, pixel_now, fade_speed );  
+   fade_speed *= 60/fps;
+   vec3 pixel_persistent = mix(feedback, pixel_now, fade_speed);
    
    //blend only if we are fading out
       vec3 light_fading_out = vec3(greaterThan(feedback, pixel_now));
@@ -789,7 +790,8 @@ void main() {
          float motion_blur_cancel = 2.5;
          vec3 early_decay      = vec3(PPERSISTENCE_START) / vec3(PPERSISTENCE_MUL_R,PPERSISTENCE_MUL_G,1);
          vec3 late_persistance = vec3(PPERSISTENCE_END)   * vec3(PPERSISTENCE_MUL_R,PPERSISTENCE_MUL_G,1);
-         pixel_out = persistence(feedback, pixel_out, early_decay, late_persistance, motion_blur_cancel);
+         float fps = get_fps(FPS_ESTIMATE_PASS);
+         pixel_out = persistence(feedback, pixel_out, early_decay, late_persistance, motion_blur_cancel, fps);
       }
    }
 
@@ -802,7 +804,7 @@ void main() {
    }
    
 
-   //if (low_fps(FPS_ESTIMATE_PASS)) { pixel_out = vec3(1,0,0); }
+   //if (low_fps(FPS_ESTIMATE_PASS) && vTexCoord.y < 0.05) { pixel_out = vec3(1,0,0); }
 
    FragColor = vec4(pixel_out, waterfall);
 }
