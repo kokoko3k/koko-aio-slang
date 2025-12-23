@@ -910,6 +910,8 @@ Changes are applied after a shader reload.*<br>
     
     Strength:
         This modulates the clarity and the perceived flickering.
+    Hard limit strobe effect to:
+        This limit the maximum oscillation to reduce flickering on mid-tones 
     Gain adjustment, post gamma adjustment, Less gain on dark colors:
         Since the perceived image depends on the display pixel refresh speed,
         it may be needed to adjust this.

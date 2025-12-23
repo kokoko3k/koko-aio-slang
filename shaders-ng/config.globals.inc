@@ -947,6 +947,10 @@
     #define ADPT_STROBE_STR global.ADPT_STROBE_STR
 #endif
 
+#ifndef ADPT_STROBE_CEIL
+    #define ADPT_STROBE_CEIL global.ADPT_STROBE_CEIL
+#endif
+
 #ifndef ADPT_STROBE_GAIN_ADJ
     #define ADPT_STROBE_GAIN_ADJ global.ADPT_STROBE_GAIN_ADJ
 #endif

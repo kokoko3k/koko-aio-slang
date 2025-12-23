@@ -1718,6 +1718,8 @@ vec3 adaptive_strobe(vec3 c, float osc) {
 	}
 
 	vec3 room = (0.5 - abs(0.5-c));
+	room = min(room, vec3(ADPT_STROBE_CEIL));
+		
 	c += room * osc3 * ADPT_STROBE_STR ;
 
 	float gamma_adj = mix(1.0, ADPT_STROBE_GAMMA_ADJ, ADPT_STROBE_STR);
@@ -1725,6 +1727,7 @@ vec3 adaptive_strobe(vec3 c, float osc) {
 
 	return c;
 }
+
 
 vec3 adaptive_strobe_old( vec3 c) {
 	#define STRENGTH 0.1375; //effect strength

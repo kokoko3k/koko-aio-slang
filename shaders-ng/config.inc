@@ -323,6 +323,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float ADPT_STROBE_GAMMA_ADJ;
 	float ADPT_LCD_RETENTION_FIX;
 	float ADPT_STROBE_GAIN_ADJ_NODARK;
+	float ADPT_STROBE_CEIL;
 	
 	float UNIFORMITY;
 	float V_SHAPE;
@@ -736,6 +737,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter LABEL0063 " " 0 0 0 1
 
 #pragma parameter ADPT_STROBE_STR	            "[#] Adaptive Strobe ≈BFI Strength (#define DO_ADPT_STROBE):"   0.8   0.0  1.0  0.05
+#pragma parameter ADPT_STROBE_CEIL              "   .   Hard limit strobe effect to (less is more):"   0.5   0.0  0.5  0.05
 #pragma parameter ADPT_STROBE_GAIN_ADJ          "   .   Gain adjustment"    0.9   0.0  1.0  0.05
 #pragma parameter ADPT_STROBE_GAIN_ADJ_NODARK   "          Less gain on dark colors"    1.0   0.0  1.0  0.05
 #pragma parameter ADPT_STROBE_GAMMA_ADJ         "   .   Post Gamma adjustment"   0.9   0.5  4.0  0.05
