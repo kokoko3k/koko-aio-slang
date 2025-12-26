@@ -165,7 +165,7 @@ vec3 dotc(sampler2D in_texture, vec3 pixel_in, vec2 co, vec4 tex_size){
    return yiq2rgb( pixel_in );
 }
 
-vec4 pixel_bleed(vec4 pixel_in, vec2 co, sampler2D in_texture, float sourcesize_z) { //FIXME pixelin.a è passante, non serve vec4
+vec3 pixel_bleed(vec3 pixel_in, vec2 co, sampler2D in_texture, float sourcesize_z) { //FIXME pixelin.a è passante, non serve vec4
    //sometimes first frame has 0x0 size, that makes gpu mad in a way or another.
    //hopefully fixes: https://github.com/kokoko3k/koko-aio-slang/issues/28   
    if (sourcesize_z > 1.0) return pixel_in;
@@ -212,7 +212,7 @@ vec4 pixel_bleed(vec4 pixel_in, vec2 co, sampler2D in_texture, float sourcesize_
    // Clamping min to 0.0 is needed for nvidia to avoid bad graphical glitches, why?
    pixel_bleeded = clamp(pixel_bleeded, 0.0, 1.0);
    
-   return vec4( pixel_bleeded, pixel_in.a);
+   return pixel_bleeded;
 }
 
 void main() {
@@ -231,7 +231,7 @@ void main() {
    
    //bleed
    if (DO_SAT_BLEED > 0.5)
-      pixel_out = pixel_bleed(pixel_out, vTexCoord, upscale_pass, params.OriginalSize.z*0.5);
+      pixel_out.rgb = pixel_bleed(pixel_out.rgb, vTexCoord, upscale_pass, params.OriginalSize.z*0.5);
 
    if (DOT_C > 0.0)
       pixel_out.rgb = dotc(upscale_pass, pixel_out.rgb, vTexCoord, params.OriginalSize);
