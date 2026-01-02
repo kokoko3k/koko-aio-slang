@@ -637,10 +637,6 @@
     #define GAME_GEOM_ZOOM		global.GAME_GEOM_ZOOM
 #endif
 
-#ifndef GAME_GEOM_OFF_FIX
-    #define GAME_GEOM_OFF_FIX   global.GAME_GEOM_OFF_FIX
-#endif
-
 #ifndef DO_TILT
     #define DO_TILT			global.DO_TILT
 #endif

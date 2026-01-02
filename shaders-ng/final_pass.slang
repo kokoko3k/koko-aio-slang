@@ -201,9 +201,8 @@ void main() {
         if ( bNeed_NO_integer_scale )
             vTexCoord = get_scaled_coords_aspect(antiburn_TexCoord,global.FinalViewportSize, vIn_aspect, bIsRotated);
         else
-            vTexCoord = integer_scale(antiburn_TexCoord, vIn_aspect, bIsRotated, vDo_Tate, GAME_GEOM_INT_SCALE-1.0 ) + vec2( GAME_GEOM_OFF_FIX /10000);
-
-    vTexCoord += 0.00001;
+            vTexCoord = integer_scale(antiburn_TexCoord, vIn_aspect, bIsRotated, vDo_Tate, GAME_GEOM_INT_SCALE-1.0 )
+            + vec2(0,params.OriginalSize.w/4.0); //<-- last offset aligns the sampling point and the scanline
     
 
         

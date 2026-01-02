@@ -460,7 +460,6 @@
 // #define GAME_GEOM_VSHIFT  0.0   //         Vertical position
 // #define GAME_GEOM_HSHIFT  0.0   //         Horizontal position	
 // #define GAME_GEOM_ZOOM  1.0     //         Zoom	
-// #define GAME_GEOM_OFF_FIX  0.0  //         Sharp hack through offset (0.0=disable)
 
 // LCD Antighosting 
 // #define LCD_ANTIGHOSTING            0.5 //    Strength

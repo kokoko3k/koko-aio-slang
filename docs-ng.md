@@ -824,11 +824,7 @@ However nice effects may be obtained (eg: with vector games). <br>
             * beware: the following options in this group overrides the integer scale.
         Permit integer overscale by:
             When doing integer scaling, allow the image to be slightly overscanned (goes off screen).
-        Sharp hack through offset:
-            When using integer scaling, it may be not possible to draw sharp rounded lines.
-            This hack add a small offset to the image that allows for sharp lines 
-            at the cost of a slightly lower draw precision.
-            Use 0.0 to disable the hack.
+
     Aspect:
         Forces an aspect ratio.
         Use a negative value to use Core provided aspect ratio (requires RetroArch > 1.19.1)
