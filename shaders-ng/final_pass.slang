@@ -1513,6 +1513,7 @@ void main() {
     pixel_out = mix (pixel_under_content, pixel_out, content_and_bezel_mask);
 
     //Foreground image
+    float pixel_fg_image_alpha = 0.0;
     if (DO_BG_IMAGE + BG_IMAGE_OVER == 2.0) {
         vec4 pixel_fg_image = fn_pixel_fgbg_image(bg_over);
         // if geometry content is overridden, ambientlight may have not been sample yet due to some skip logic
@@ -1545,7 +1546,7 @@ void main() {
         } else {
             pixel_out = mix(pixel_out, pixel_fg_image.rgb, pixel_fg_image.a);
         }
-        
+        pixel_fg_image_alpha = pixel_fg_image.a;
         //FragColor = vec4(pixel_fg_image.a) ; return;
     }
 
@@ -1553,7 +1554,7 @@ void main() {
     // Backdrop
     if (DO_BACKDROP > 0.0 ) {
         if (BACKDROP_JUST_TUBE == 0.0) {
-            pixel_out += pixel_backdrop_image();
+            pixel_out += pixel_backdrop_image() * (1-pixel_fg_image_alpha);
         }
     }
     
