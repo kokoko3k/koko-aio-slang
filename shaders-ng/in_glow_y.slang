@@ -187,25 +187,35 @@ void main() {
      }
    }
    
-   //Warped Glow Y
-   //The result will be stored in the alpha channel to be consumed by final pass.
-   float warpedglow_y = eps; //see down note: (**)
-   #ifndef SKIP_WARPEDGLOW_Y
-      if (DO_IN_GLOW == 1.0) {
-         float max_inLum = max( 1.0, DO_CCORRECTION * apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS));
-         vec3 gy = texture(Source, vec2(vTexCoord.x, vWarpedglow_vtexcoord_offsets_plus) ).rgb
-                 - texture(Source, vec2(vTexCoord.x, vWarpedglow_vtexcoord_offsets_minus)  ).rgb;
-               
-         gy /=max_inLum;
-               
-         warpedglow_y = (gy.x+gy.y+gy.z) / 3.0;
-                                 
-         warpedglow_y = pow( abs(warpedglow_y), IN_GLOW_WARPSHARP_GAMMA) * sign(warpedglow_y);
-         
-         warpedglow_y = warpedglow_y *  vWarpedglow + (eps * delta_render_enabled()); 
-                                 
-         // (**) This eps is needed because we multiplex deltarender and warpedglow and we NEED to have dr = 0.0 (and not a positive number)
-         //To reuse old pixels, only that way (using 0.0 to reuse pixels) multiplexing is possible.
+    //Warped Glow Y
+    //The result will be stored in the alpha channel to be consumed by final pass.
+    float warpedglow_y = eps; //see down note: (**)
+    #ifndef SKIP_WARPEDGLOW
+        if (DO_IN_GLOW == 1.0) {
+            float max_inLum = max( 1.0, DO_CCORRECTION * apply_contrast_brightness(1.0, CONTRAST, BRIGHTNESS));
+            vec3 gy = texture(Source, vec2(vTexCoord.x, vWarpedglow_vtexcoord_offsets_plus) ).rgb
+                    - texture(Source, vec2(vTexCoord.x, vWarpedglow_vtexcoord_offsets_minus)  ).rgb;
+                
+            gy /=max_inLum;
+                
+            warpedglow_y = (gy.x+gy.y+gy.z) / 3.0;
+                                    
+            warpedglow_y = pow( abs(warpedglow_y), IN_GLOW_WARPSHARP_GAMMA) * sign(warpedglow_y);
+
+            warpedglow_y = warpedglow_y *  vWarpedglow; 
+                                    
+            #ifndef HQ_WARPEDGLOW_X
+                if (IN_GLOW_WARPSHARP_X < 0.0) {
+                    //se tate inverti vtexcoord e origin da x a y.
+                    float m =  sin(vTexCoord.x* params.OriginalSize.x * pi * 2);
+                    //warpedglow_y *= m + 0.25;
+                }
+            #endif
+            
+            warpedglow_y = warpedglow_y + (eps * delta_render_enabled()); 
+            
+            // (**) This eps is needed because we multiplex deltarender and warpedglow and we NEED to have dr = 0.0 (and not a positive number)
+            //To reuse old pixels, only that way (using 0.0 to reuse pixels) multiplexing is possible.
       }
    #endif
 

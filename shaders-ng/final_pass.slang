@@ -1099,22 +1099,36 @@ vec3 fn_pixel_content(vec2 coords) {
         
     vec2 warpedglow = vec2(0.0);
     
-    #ifndef SKIP_WARPEDGLOW_Y
-        warpedglow.y = texture(in_glow_pass, coords + delta_render_enabled() * eps).a;
+    #ifndef SKIP_WARPEDGLOW
+    
+        float wglow_sampling_offset_1 = 0.0;
+        #ifndef HQ_WARPEDGLOW_X
+            //Scanline modulated warpedglow_x needs this offset.
+            if (vDo_Tate == 1.0 && IN_GLOW_WARPSHARP_X < 0.0)
+                wglow_sampling_offset_1 = global.upscale_passSize.z*-0.5;
+        #endif
+    
+        warpedglow.y = texture(in_glow_pass, coords + delta_render_enabled() * eps + vec2(wglow_sampling_offset_1,0.0 ) ).a;
         // ^^ Delta render performance suffer alot if not adding eps here on my haswell for unknown reasons.
         // ...probably some failed compiler optimization issue.
-    #endif
-    #ifndef SKIP_WARPEDGLOW_X
-        warpedglow.x = texture(in_glow_pass_x, coords).a;
+    
+        #ifdef HQ_WARPEDGLOW_X
+            warpedglow.x = texture(in_glow_pass_x, coords).a;
+            float freq = vPG_OriginalSize_tated_mul_pi.y * 2.0;
+            if (IN_GLOW_WARPSHARP_X < 0.0) {
+                if (vDo_Tate == 0.0)
+                    warpedglow.x *= -cos(coords.y * freq)+0.25;
+                        else
+                    warpedglow.y *= -cos(coords.x * freq)+0.25;
+            }
+        #else
+            float wglow_sampling_offset = 0.0;
+            //Scanline modulated warpedglow_x needs this offset.
+            if (vDo_Tate == 0.0 && IN_GLOW_WARPSHARP_X < 0.0)
+                wglow_sampling_offset = global.upscale_passSize.w*-0.5;
+                warpedglow.x = texture(in_glow_pass_x, coords + vec2(0.0, wglow_sampling_offset ) ).a;        
+        #endif
         
-        float freq = vPG_OriginalSize_tated_mul_pi.y * 2.0;
-        
-        if (IN_GLOW_WARPSHARP_X < 0.0) {
-            if (vDo_Tate == 0.0)
-                warpedglow.x *= -cos(coords.y * freq)+0.25;
-                    else
-                warpedglow.y *= -cos(coords.x * freq)+0.25;
-        }
     #endif
     
     coords += warpedglow.xy;

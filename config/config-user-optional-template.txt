@@ -118,6 +118,10 @@
 // To enable high quality deconvergence, remove leading "//"
 // #define HQ_DECON
 
+// Use a finer (apply in final viewport) and slower way to modulate WARPED GLOW X with scanlines
+// Difference is very, very subtle.
+// #define HQ_WARPEDGLOW_X
+
 // FXAA tuning: select an FXAA preset here.
 // 1 is a dumb and fast preset, 2 is still fast, but rounder (the default)
 // Higher numbers are useful to antialias high resolution content.
@@ -136,10 +140,9 @@
 // possibly heavier banding when using the spot feature.
 // #define SKIP_RANDOM
 
-// Uncommenting this is the only way to statically disable Warped Glow (X) and
+// Uncommenting this is the only way to statically disable Warped Glow
 // spare a lookup in the final pass;
-// When the screen is rotated, skipping SKIP_WARPEDGLOW_X means skipping SKIP_WARPEDGLOW_Y
-// #define SKIP_WARPEDGLOW_X
+// #define SKIP_WARPEDGLOW
 
 // Uncomment this is the only way to statically disable Warped Glow (Y)
 // When the screen is rotated, skipping SKIP_WARPEDGLOW_Y means skipping SKIP_WARPEDGLOW_X
