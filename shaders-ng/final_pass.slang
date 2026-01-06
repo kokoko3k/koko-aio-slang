@@ -1106,7 +1106,17 @@ vec3 fn_pixel_content(vec2 coords) {
     #endif
     #ifndef SKIP_WARPEDGLOW_X
         warpedglow.x = texture(in_glow_pass_x, coords).a;
+        
+        float freq = vPG_OriginalSize_tated_mul_pi.y * 2.0;
+        
+        if (IN_GLOW_WARPSHARP_X < 0.0) {
+            if (vDo_Tate == 0.0)
+                warpedglow.x *= -cos(coords.y * freq)+0.25;
+                    else
+                warpedglow.y *= -cos(coords.x * freq)+0.25;
+        }
     #endif
+    
     coords += warpedglow.xy;
 
     //#define USE_QUILEZ   

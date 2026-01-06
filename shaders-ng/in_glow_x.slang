@@ -53,9 +53,9 @@ void main() {
    vWarpedglow_vtexcoord_offsets_plus = vTexCoord.x  + warpedglow_delta;
    vWarpedglow_vtexcoord_offsets_minus = vTexCoord.x - warpedglow_delta;
    
-   vWarpedglow_scale_tated = IN_GLOW_WARPSHARP_X;
+   vWarpedglow_scale_tated = abs(IN_GLOW_WARPSHARP_X);
    if (need_tate(is_rotated()) == 1.0)
-      vWarpedglow_scale_tated = IN_GLOW_WARPSHARP_Y;
+      vWarpedglow_scale_tated = abs(IN_GLOW_WARPSHARP_Y);
    
    vWarpedglow_scale_tated = vWarpedglow_scale_tated * 0.6 / 1400.0 * 3.0;
 

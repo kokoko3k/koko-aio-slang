@@ -70,9 +70,9 @@ void main() {
    if (DO_PIXELGRID > 0.0 && DO_PIXELGRID_H > 0.0)
       warpedglow_scale = PIXELGRID_MAX_H;
    
-   float IN_GLOW_WARPSHARP_TATED = IN_GLOW_WARPSHARP_Y;
+   float IN_GLOW_WARPSHARP_TATED = abs(IN_GLOW_WARPSHARP_Y);
    if (need_tate(is_rotated()) == 1.0)
-      IN_GLOW_WARPSHARP_TATED = IN_GLOW_WARPSHARP_X;
+      IN_GLOW_WARPSHARP_TATED = abs(IN_GLOW_WARPSHARP_X);
 
    vWarpedglow = (IN_GLOW_WARPSHARP_TATED * warpedglow_scale) * 0.6 / 1400.0 * 3.0;   //*3.0 needed because we scale to 0->1 to use pow in the fragment.
 
