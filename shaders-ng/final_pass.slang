@@ -1105,8 +1105,10 @@ vec3 fn_pixel_content(vec2 coords) {
         // ...probably some failed compiler optimization issue.
     
         warpedglow.x = texture(in_glow_pass_x, coords).a;
-        float freq = vPG_OriginalSize_tated_mul_pi.y * 2.0;
+        
+        //Modulate warpedglow x via scanline?
         if (IN_GLOW_WARPSHARP_X < 0.0) {
+            float freq = vPG_OriginalSize_tated_mul_pi.y * 2.0;
             if (vDo_Tate == 0.0)
                 warpedglow.x *= -cos(coords.y * freq)+0.25;
                     else
