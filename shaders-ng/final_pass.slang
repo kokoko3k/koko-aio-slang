@@ -340,7 +340,7 @@ void main() {
     // (Logic is skipped if integer scaling is requested.)
     bool very_lowres_y = fn_very_lowres_y(params.OutputSize.xy, params.OriginalSize.xyzw, vDo_Tate, bIsRotated, !bNeed_NO_integer_scale, vIn_aspect, vScanlinePeriod);
                                       
-    if ( fake_scanlines_needed(very_lowres_y, bIs_Interlaced)) {
+    if ( fake_scanlines_needed(very_lowres_y, bIs_Interlaced) ) {
         vec4 out_size = params.OutputSize;
         vec4 ori_size = params.OriginalSize;
         vec2 out_coord = vOutputCoord;

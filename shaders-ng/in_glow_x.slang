@@ -54,6 +54,11 @@ void main() {
     vWarpedglow_vtexcoord_offsets_minus = vTexCoord.x - warpedglow_delta;
     
     vWarpedglow_scale_tated = abs(IN_GLOW_WARPSHARP_X);
+    
+    //Disable warpdglow x if user requested scanline modulation on particular conditions like:
+    //fake integer scanlines and interlacing (leave it on on real interlacing)
+    vWarpedglow_scale_tated *= warpedglow_x_allowed(IN_GLOW_WARPSHARP_X);
+    
     if (need_tate(is_rotated()) == 1.0)
         vWarpedglow_scale_tated = abs(IN_GLOW_WARPSHARP_Y);
     

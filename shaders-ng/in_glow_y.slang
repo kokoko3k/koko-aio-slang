@@ -71,9 +71,13 @@ void main() {
       warpedglow_scale = PIXELGRID_MAX_H;
    
    float IN_GLOW_WARPSHARP_TATED = abs(IN_GLOW_WARPSHARP_Y);
-   if (need_tate(is_rotated()) == 1.0)
+   if (need_tate(is_rotated()) == 1.0) {
       IN_GLOW_WARPSHARP_TATED = abs(IN_GLOW_WARPSHARP_X);
-
+      //Disable warpdglow x if user requested scanline modulation on particular conditions like:
+      //fake integer scanlines and interlacing (leave it on on real interlacing)
+      warpedglow_scale *= warpedglow_x_allowed(IN_GLOW_WARPSHARP_X);
+   }
+   
    vWarpedglow = (IN_GLOW_WARPSHARP_TATED * warpedglow_scale) * 0.6 / 1400.0 * 3.0;   //*3.0 needed because we scale to 0->1 to use pow in the fragment.
 
    float warpedglow_delta = params.OriginalSize.w * 0.5;

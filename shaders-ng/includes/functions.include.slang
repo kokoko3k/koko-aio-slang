@@ -2023,3 +2023,30 @@ vec2 antiburn_screen(vec2 coords) {
 
 	return coords;
 }
+
+float warpedglow_x_allowed( float in_glow_warpsharp_x ) {
+	if (in_glow_warpsharp_x >= 0.0)
+		return 1.0;
+		
+	bool bIsRotated = is_rotated();
+	float do_tate = need_tate(bIsRotated);
+	float vScanlinePeriod = 1.0;
+	bool bIs_Interlaced = is_interlaced();
+	if (scanlines_will_alternate(bIs_Interlaced))
+		vScanlinePeriod = 0.5;
+
+	bool lowres_y = fn_very_lowres_y(global.final_passFeedbackSize.xy, 
+										params.OriginalSize.xyzw, 
+										do_tate, 
+										bIsRotated, 
+										need_integer_scale(), 
+										get_in_aspect(), 
+										vScanlinePeriod);
+
+	if (fake_scanlines_needed( lowres_y, bIs_Interlaced ))
+		return 0.0;
+	if (scanlines_will_alternate( bIs_Interlaced ))
+		return 0.0;
+	
+	return 1.0;
+}
