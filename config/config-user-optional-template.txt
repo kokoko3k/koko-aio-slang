@@ -118,10 +118,6 @@
 // To enable high quality deconvergence, remove leading "//"
 // #define HQ_DECON
 
-// Use a finer (apply in final viewport) and slower way to modulate WARPED GLOW X with scanlines
-// Difference is very, very subtle.
-// #define HQ_WARPEDGLOW_X
-
 // FXAA tuning: select an FXAA preset here.
 // 1 is a dumb and fast preset, 2 is still fast, but rounder (the default)
 // Higher numbers are useful to antialias high resolution content.
