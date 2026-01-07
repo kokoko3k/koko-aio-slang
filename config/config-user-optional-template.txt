@@ -136,10 +136,9 @@
 // possibly heavier banding when using the spot feature.
 // #define SKIP_RANDOM
 
-// Uncommenting this is the only way to statically disable Warped Glow (X) and
+// Uncommenting this is the only way to statically disable Warped Glow
 // spare a lookup in the final pass;
-// When the screen is rotated, skipping SKIP_WARPEDGLOW_X means skipping SKIP_WARPEDGLOW_Y
-// #define SKIP_WARPEDGLOW_X
+// #define SKIP_WARPEDGLOW
 
 // Uncomment this is the only way to statically disable Warped Glow (Y)
 // When the screen is rotated, skipping SKIP_WARPEDGLOW_Y means skipping SKIP_WARPEDGLOW_X

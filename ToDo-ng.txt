@@ -172,4 +172,9 @@ TODO:
 		    vec4 pixel_out = texture(in_glow_pass, coords_smp);
 	[ ] fps dependant effects that uses temporal mix() should be scaled not only by fps,
 	    but by subframes too.
+	[ ] scanlines_will_alternate() returns false even when interlace mode is set to "NO SCANLINES"
+	    conceptually it is wrong, and it will cause new warpedglow x to be disabled under such condition.
+	    ...which can even be desidered, unsure.
+	    However, check if scanlines_will_alternate() is used in a way we can safely make it return 0.0
+	    when no scanlines are requested in interlaced screens.
 

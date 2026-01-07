@@ -339,26 +339,8 @@ void main() {
     // fake integer scanlines will be used.
     // (Logic is skipped if integer scaling is requested.)
     bool very_lowres_y = fn_very_lowres_y(params.OutputSize.xy, params.OriginalSize.xyzw, vDo_Tate, bIsRotated, !bNeed_NO_integer_scale, vIn_aspect, vScanlinePeriod);
-    
-
-    //Conditions for fake scanlines are: 
-    // - user wants fake/faker integer scanlines when content is interlaced (*1)
-    //   or
-    // - user always wants fake integer scanlines. (*2)
-    //   or
-    // - user wants automatic fake integer scanlines managment and screen is too low res (*3)
-    //   or
-    // - user wants fake integer scanlines when content is double-scanned (*4) // <-- edit, ditched as it seems useless to me.
-    
-
-    
-    bool fake_scanlines_needed =  (PIXELGRID_INTR_DISABLE_Y <= -1.0 && bIs_Interlaced) || //(*1)
-                                  (PIXELGRID_COREY_FAKE_SCAN == 1.0) ||                   //(*2)
-                                  (PIXELGRID_COREY_FAKE_SCAN == -1.0 && very_lowres_y);    //(*3)
-                                  //(PIXELGRID_COREY_FAKE_SCAN == 2.0 &&  need_doublescan() ); //(*4)
-                
-                                  
-    if ( fake_scanlines_needed ) {
+                                      
+    if ( fake_scanlines_needed(very_lowres_y, bIs_Interlaced) ) {
         vec4 out_size = params.OutputSize;
         vec4 ori_size = params.OriginalSize;
         vec2 out_coord = vOutputCoord;
@@ -1099,14 +1081,23 @@ vec3 fn_pixel_content(vec2 coords) {
         
     vec2 warpedglow = vec2(0.0);
     
-    #ifndef SKIP_WARPEDGLOW_Y
-        warpedglow.y = texture(in_glow_pass, coords + delta_render_enabled() * eps).a;
+    #ifndef SKIP_WARPEDGLOW
+        warpedglow.y = texture(in_glow_pass, coords + delta_render_enabled() * eps ).a;
         // ^^ Delta render performance suffer alot if not adding eps here on my haswell for unknown reasons.
         // ...probably some failed compiler optimization issue.
-    #endif
-    #ifndef SKIP_WARPEDGLOW_X
+    
         warpedglow.x = texture(in_glow_pass_x, coords).a;
+        
+        //Modulate warpedglow x via scanline?
+        if (IN_GLOW_WARPSHARP_X < 0.0) {
+            float freq = vPG_OriginalSize_tated_mul_pi.y * 2.0;
+            if (vDo_Tate == 0.0)
+                warpedglow.x *= -cos(coords.y * freq)+0.25;
+                    else
+                warpedglow.y *= -cos(coords.x * freq)+0.25;
+        }
     #endif
+    
     coords += warpedglow.xy;
 
     //#define USE_QUILEZ   
