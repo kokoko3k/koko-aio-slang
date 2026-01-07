@@ -1,5 +1,5 @@
 #reference "monitor-slotmask-bloom-bezelwider.slangp"
-SATURATION = "1.00000"
+SATURATION = "0.9"
 CONTRAST = "0.050000"
 BRIGHTNESS = "0.050000"
 GAMMA_OUT = "0.50"
@@ -27,7 +27,7 @@ HALO_POWER = "0.5"
 HALO_SHARPNESS = "6.5"
 HALO_VS_SCAN = "0.900000"
 
-BLOOM_MIX = "0.55"
+BLOOM_MIX = "0.4"
 BLOOM_EYE_ADPT_SRT = "0.80"
 
 PIXELGRID_MIN_W = "0.500000"
