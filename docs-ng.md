@@ -235,12 +235,16 @@ However nice effects may be obtained (eg: with vector games). <br>
         - Less than 0: will use box blur and will progressively
           add visual sharpness to image when approaching lower values.
 
-    Warped glow (X,Y):
+    Warped glow:
         Embolds bright pixels near dark ones using a warpsharp like algorithm.
         This is a cheap way to emulate phosphor glowing.
-        The Y parameter will also allow scanlines to be higher.
-        It will also help (if coupled with) antialiasing to stay sharp.
-
+        It will also help FXAA to stay sharp.
+        
+        When Warped glow X is set to a negative value, the horizontal embolding
+        will be modulated with a scanline shape to btter mimics CRT behaviour.
+        The latter will be auto-disabled in presence of Fake integer scanlines
+        and interlaced content.
+        
     Warped Dynamics:
         Change the amount of warpsharp applied based on the contrast between 
         nearby pixels, thereby altering their "Warped" shape.
