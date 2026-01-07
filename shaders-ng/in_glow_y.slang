@@ -203,15 +203,7 @@ void main() {
             warpedglow_y = pow( abs(warpedglow_y), IN_GLOW_WARPSHARP_GAMMA) * sign(warpedglow_y);
 
             warpedglow_y = warpedglow_y *  vWarpedglow; 
-                                    
-            #ifndef HQ_WARPEDGLOW_X
-                if (IN_GLOW_WARPSHARP_X < 0.0) {
-                    //se tate inverti vtexcoord e origin da x a y.
-                    float m =  sin(vTexCoord.x* params.OriginalSize.x * pi * 2);
-                    //warpedglow_y *= m + 0.25;
-                }
-            #endif
-            
+
             warpedglow_y = warpedglow_y + (eps * delta_render_enabled()); 
             
             // (**) This eps is needed because we multiplex deltarender and warpedglow and we NEED to have dr = 0.0 (and not a positive number)

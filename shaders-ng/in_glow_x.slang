@@ -121,13 +121,6 @@ void main() {
             warpedglow_x = (gx.x+gx.y+gx.z) / 3.0 ;
             warpedglow_x = pow( abs(warpedglow_x), IN_GLOW_WARPSHARP_GAMMA) * sign(warpedglow_x);
             warpedglow_x =  warpedglow_x * vWarpedglow_scale_tated;
-
-            #ifndef HQ_WARPEDGLOW_X
-                if (IN_GLOW_WARPSHARP_X < 0.0) {
-                    float m =  sin(vTexCoord.y* params.OriginalSize.y * pi * 2);
-                    warpedglow_x *= m + 0.25;
-                }
-            #endif
         }
     #endif        
     
