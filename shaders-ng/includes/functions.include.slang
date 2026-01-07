@@ -1963,6 +1963,21 @@ bool fn_very_lowres_y (vec2 out_size_xy, vec4 ori_size, float do_tate, bool bIsR
 	return very_lowres_y;
 }
 
+bool fake_scanlines_needed(bool very_lowres_y, bool bIs_Interlaced) {
+    //Conditions for fake scanlines are: 
+    // - user wants fake/faker integer scanlines when content is interlaced (*1)
+    //   or
+    // - user always wants fake integer scanlines. (*2)
+    //   or
+    // - user wants automatic fake integer scanlines managment and screen is too low res (*3)
+    //   or
+    // - user wants fake integer scanlines when content is double-scanned (*4) // <-- edit, ditched as it seems useless to me.
+	return (PIXELGRID_INTR_DISABLE_Y <= -1.0 && bIs_Interlaced) || //(*1)
+                                  (PIXELGRID_COREY_FAKE_SCAN == 1.0) ||                   //(*2)
+                                  (PIXELGRID_COREY_FAKE_SCAN == -1.0 && very_lowres_y);    //(*3)
+                                  //(PIXELGRID_COREY_FAKE_SCAN == 2.0 &&  need_doublescan() ); //(*4)
+}
+
 float antiburn_flip_even(float toflip){
 	#ifdef ANTIBURN_Y
 		bool flip = sin(params.FrameCount*pi*ANTIBURN_Y/2000.0) >= 0.0;
