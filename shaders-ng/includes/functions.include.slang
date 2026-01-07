@@ -1947,7 +1947,7 @@ vec2 get_zooms_modifier(float do_tate, bool bNeed_NO_integer_scale, bool isrotat
 bool fn_very_lowres_y (vec2 out_size_xy, vec4 ori_size, float do_tate, bool bIsRotated, bool bInteger_scaled, float in_aspect, float scanline_period) {
 	bool very_lowres_y = false;
 	if ( !bInteger_scaled ) {
-		vec2 zoom_modifier = get_zooms_modifier(do_tate, bInteger_scaled, bIsRotated, in_aspect);
+		vec2 zoom_modifier = get_zooms_modifier(do_tate, !bInteger_scaled, bIsRotated, in_aspect);
 		if (do_tate == 1.0) {
 			out_size_xy.xy = out_size_xy.yx;
 			ori_size.xyzw = ori_size.yxwz;
