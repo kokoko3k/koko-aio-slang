@@ -49,10 +49,11 @@ void main() {
     
     //RESSWITCH shaking:
         vResSwitch_res_changed = 0.0;
-        if (abs(params.OutputSize.y - params.avglum_passFeedbackSize.y) / params.OutputSize.y > RESSWITCH_GLITCH_TRESHOLD)
-            if (params.FrameCount > 30) //needed to avoid shaking at start
+        if (abs(params.OutputSize.y - params.avglum_passFeedbackSize.y) / params.OutputSize.y > RESSWITCH_GLITCH_TRESHOLD
+            || (params.FrameCount < 1) ) {
                 vResSwitch_res_changed = 1.0;
-    
+        }
+        
     //AID Scene chnge detection
         vResChanged =  float(params.OutputSize.xy - params.avglum_passFeedbackSize.xy != vec2(0.0));
         //float lod_max = lodmax(params.OriginalSize.xy);
@@ -141,8 +142,8 @@ float get_avglum() {
             float prev_lum = texture(avglum_passFeedback,vTexCoord).a;
             float myframecount = params.FrameCount;
             float transition_speed = SMOOTHNESS_SPEED;
+            
             //Tube warmup:
-                
                 //Uncomment this to see the effect continuously
                 //myframecount = (mod(params.FrameCount, 60*4));
                 //Use this to have an higher speed when the screen is "small"
