@@ -114,8 +114,8 @@ float get_avg_lum_from_mip_nocc() {
 float get_avglum() {
     /* avglum alpha has some zones:
      * 0.25 -> reduced sampling, used for to aid scene detection
-     * 0.50 -> smoothed_sampling, no color corrections.
-     * 0.75 -> smoothed_sampling, used to adapt fullscreen zoom and adaptive black
+     * 0.50 -> smoothed_sampling, no color corrections, adaptived black (/crush) use this..
+     * 0.75 -> temporal smoothed_sampling, used to adapt fullscreen zoom
      * AUTOCROP_SAMPLING_POINT (0.825) -> autocrop zoom value pixked up by final pass.
      * RESSWITCH_SAMPLING_POINT (0.900) -> resolution change detection
      * anything else: continuous sampling
@@ -123,7 +123,7 @@ float get_avglum() {
             
     bool reduced_sampling_co  = is_first_inside_rect(vTexCoord, vec4(0.24,0.24 , 0.26,0.26) );
     //WARNING: Use this for dynamic zoom only, since it returns 0.0 when dynzoom is disabled or when integer scaling is requested.
-    bool smoothed_sampling_co_dynzoom = is_first_inside_rect(vTexCoord, vec4(0.74,0.74 , 0.76,0.76) );
+    bool smoothed_sampling_co_dynzoom = is_first_inside_rect(vTexCoord, vec4(DYN_ZOOM_SAMPLING_POINT-0.1, DYN_ZOOM_SAMPLING_POINT+0.1));
     bool smoothed_sampling_co_nocc = is_first_inside_rect(vTexCoord, vec4(0.49,0.49 , 0.51,0.51)) ;
     #ifndef D3D_WORKAROUND
         if (reduced_sampling_co) {
@@ -137,7 +137,29 @@ float get_avglum() {
         }
 
         if (smoothed_sampling_co_dynzoom) {
-            return mix(texture(avglum_passFeedback,vTexCoord).a, get_avg_lum_from_mip(), SMOOTHNESS_SPEED) * vDo_dynzoom;
+
+            float prev_lum = texture(avglum_passFeedback,vTexCoord).a;
+            float myframecount = params.FrameCount;
+            float transition_speed = SMOOTHNESS_SPEED;
+            //Tube warmup:
+                
+                //Uncomment this to see the effect continuously
+                //myframecount = (mod(params.FrameCount, 60*4));
+                //Use this to have an higher speed when the screen is "small"
+                /*float multiply = 2.0;
+                float ramp_up_frames = 60;
+                float transition_speed = (ramp_up_frames - myframecount)/ramp_up_frames;
+                transition_speed = clamp(transition_speed, SMOOTHNESS_SPEED, SMOOTHNESS_SPEED*multiply);
+                */
+                
+
+                if (myframecount < 1.0) {
+                    //prev_lum = mix(0.0, -1.0, clamp( DO_DYNZOOM*100.0, 0.0, 1.0 ) );
+                    prev_lum = -1/((DO_DYNZOOM+eps)*5.0);
+                }
+            //
+
+            return mix( prev_lum, get_avg_lum_from_mip(), transition_speed) * vDo_dynzoom;
         }
         
         if (smoothed_sampling_co_nocc) {
