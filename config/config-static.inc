@@ -153,7 +153,7 @@
 	//How much the resolution have to change for shake to be activated (in relation to the old size).
 #define RESSWITCH_GLITCH_TRESHOLD 0.1
 	//How fast is the shake [0.01 -> 1]
-#define RESSWITCH_SHAKE_SPEED 0.3
+#define RESSWITCH_SHAKE_SPEED 0.4
 
 
 

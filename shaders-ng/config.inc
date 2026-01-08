@@ -446,7 +446,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 
 
-#pragma parameter RESSWITCH_GLITCH_SIZE		"★ Glitch amount if vertical resolution changes"		0.1		0.0 0.5 0.05
+#pragma parameter RESSWITCH_GLITCH_SIZE		"★ Glitch amount if vertical resolution changes"		0.3		0.0 1.0 0.02
 #pragma parameter LABEL0013 " " 0 0 0 1
 
 

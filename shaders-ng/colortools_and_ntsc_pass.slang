@@ -655,9 +655,22 @@ void main() {
                     1-params.OriginalSize.zw * AUTOCROP_MIN );
    
    #ifndef D3D_WORKAROUND
-      float shake = texture(avglum_passFeedback, RESSWITCH_SAMPLING_POINT).a;
-      //co.y += sin(shake * 2 * pi) * RESSWITCH_GLITCH_SIZE;
-      co.y = co.y + (sin(shake * 2 * pi) * RESSWITCH_GLITCH_SIZE);
+      /* RESSWITCH GLITCH */
+      float fadeout = texture(avglum_passFeedback, RESSWITCH_SAMPLING_POINT).a;
+      float wobbly_freq = mod(params.FrameCount,pi*100);
+      vec2 shake = vec2(0.0);
+
+      #define X_SHAKE_NUM_WAVES 5.0
+      #define X_SHAKE_AMP 1
+      shake.x = sin( co.y * X_SHAKE_NUM_WAVES + wobbly_freq );
+      
+      #define Y_SHAKE_SPEED 1.5
+      #define Y_SHAKE_AMP 8.0
+      shake.y = sin( wobbly_freq * Y_SHAKE_SPEED );
+      
+      shake *= vec2(X_SHAKE_AMP, Y_SHAKE_AMP);
+      
+      co += (RESSWITCH_GLITCH_SIZE * RESSWITCH_GLITCH_SIZE) * (shake * fadeout);
    #endif
 
    vec3 pixel_in = texture(Source, co).rgb;

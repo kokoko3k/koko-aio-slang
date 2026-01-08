@@ -358,7 +358,7 @@ void main() {
             pixel_out.a = 1;  
         } else {
             #ifndef D3D_WORKAROUND
-                pixel_out.a = max(texture(avglum_passFeedback,vTexCoord_unscaled).a - RESSWITCH_SHAKE_SPEED, 0.0);
+                pixel_out.a = mix(texture(avglum_passFeedback,vTexCoord_unscaled).a, 0.0, RESSWITCH_SHAKE_SPEED);
             #else
                  pixel_out.a = 0.0;
             #endif
