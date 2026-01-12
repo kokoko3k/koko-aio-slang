@@ -666,9 +666,11 @@ void main() {
    
    // screen shake/glitch:
    #ifndef D3D_WORKAROUND
-      float fadeout = texture(avglum_passFeedback, RESSWITCH_SAMPLING_POINT).a;
-      float shake = sin( vShake_sin_arg );
-      co.y += shake * fadeout;
+      if (RESSWITCH_SYNC_SPEED < 1.0) {
+            float fadeout = texture(avglum_passFeedback, RESSWITCH_SAMPLING_POINT).a;
+            float shake = sin( vShake_sin_arg );
+            co.y += shake * fadeout;
+      }
    #endif
       
    vec3 pixel_in = texture(Source, co).rgb;
