@@ -1,7 +1,6 @@
 #version 450
 
 //#pragma format R32G32B32A32_SFLOAT
-
 #define CWHITE  vec3(1.0)
 #define CGRAY   vec3(0.5)
 #define CBLACK  vec3(0.0)
@@ -59,7 +58,8 @@ layout(location = 2) out float vNTSC_FILTER_FC;
 layout(location = 3) out float vPixelgrid_intr_gamma_adj;
 layout(location = 4) out vec3 vDebug;
 layout(location = 5) out vec2 vTexCoord_unshifted;
-layout(location = 6) out float vNTSC_weights[NTSC_FILTER_WIDTH_MAX];
+layout(location = 6) out float vShake_sin_arg;
+layout(location = 7) out float vNTSC_weights[NTSC_FILTER_WIDTH_MAX];
 
 
 #include "includes/functions.include.slang"
@@ -95,7 +95,7 @@ void main() {
    //Let's hope this will not break anything (classic diagonally broken screen).
    vTexCoord = TexCoord;
    vTexCoord_unshifted = TexCoord;
-
+   
    if (DO_GAME_GEOM_OVERRIDE > 0.5) {
       vec2 shift = vec2(GAME_GEOM_HSHIFT,GAME_GEOM_VSHIFT);
       vTexCoord = content_geom_override_shift(vTexCoord, GAME_GEOM_ASPECT, get_in_aspect(), shift.y, shift.x, GAME_GEOM_ZOOM);
@@ -129,6 +129,15 @@ void main() {
       vPixelgrid_intr_gamma_adj = 1.0;
       if (pixelgrid_h_needed() && scanlines_will_alternate(is_interlaced()))
           vPixelgrid_intr_gamma_adj = PIXELGRID_INTR_GAMMA_ADJ;
+   
+   //For screen shaking:
+      #define Y_SHAKE_SPEED 1.5
+      #define X_SHAKE_NUM_WAVES 2.0
+      float wobbly_freq = mod(params.FrameCount,pi*100);
+      //vShake_sin_arg =  vec2( wobbly_freq * Y_SHAKE_SPEED, vTexCoord.y * X_SHAKE_NUM_WAVES + wobbly_freq);
+      vShake_sin_arg =  vTexCoord.y * X_SHAKE_NUM_WAVES + wobbly_freq;
+      if (params.FrameCount == 0.0) vShake_sin_arg = pi; //skip first frame
+   
    
    vDebug = vec3(0.0); //need to initialize to something.
    
@@ -207,7 +216,8 @@ layout(location = 2) in float vNTSC_FILTER_FC;
 layout(location = 3) in float vPixelgrid_intr_gamma_adj;
 layout(location = 4) in vec3 vDebug;
 layout(location = 5) in vec2 vTexCoord_unshifted;
-layout(location = 6) in float vNTSC_weights[NTSC_FILTER_WIDTH_MAX];
+layout(location = 6) in float vShake_sin_arg;
+layout(location = 7) in float vNTSC_weights[NTSC_FILTER_WIDTH_MAX];
 
 layout(location = 0) out vec4 FragColor;
 
@@ -654,25 +664,13 @@ void main() {
       co = clamp(co,  params.OriginalSize.zw * AUTOCROP_MIN, 
                     1-params.OriginalSize.zw * AUTOCROP_MIN );
    
+   // screen shake/glitch:
    #ifndef D3D_WORKAROUND
-      /* RESSWITCH GLITCH */
       float fadeout = texture(avglum_passFeedback, RESSWITCH_SAMPLING_POINT).a;
-      float wobbly_freq = mod(params.FrameCount,pi*100);
-      vec2 shake = vec2(0.0);
-
-      #define X_SHAKE_NUM_WAVES 5.0
-      #define X_SHAKE_AMP 1
-      shake.x = sin( co.y * X_SHAKE_NUM_WAVES + wobbly_freq );
-      
-      #define Y_SHAKE_SPEED 1.5
-      #define Y_SHAKE_AMP 8.0
-      shake.y = sin( wobbly_freq * Y_SHAKE_SPEED );
-      
-      shake *= vec2(X_SHAKE_AMP, Y_SHAKE_AMP);
-      
-      co += (RESSWITCH_GLITCH_SIZE * RESSWITCH_GLITCH_SIZE) * (shake * fadeout);
+      float shake = sin( vShake_sin_arg );
+      co.y += shake * fadeout;
    #endif
-
+      
    vec3 pixel_in = texture(Source, co).rgb;
    
    //eventually return black pixel

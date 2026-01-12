@@ -22,7 +22,7 @@
     d3d10 is completely unsupported.
     <br>
     Be warned that the following functions do not work if you enable the workaround: <br>
-        * CRT glitch on resolution changes <br>
+        * Resync speed when core resolution changes <br>
         * Adaptive Black <br>
         * CVBS Bleed size is limited to 5.0 <br>
         * Ambientlight scene change detection <br>
@@ -259,10 +259,10 @@ However nice effects may be obtained (eg: with vector games). <br>
     0: Never.
     
     
-**Glitch if vertical resolution changes:**<br>
-    Emulates the crt circuits syncing to the new signal timing.<br>
+**Resync speed when core resolution changes:**<br>
+    Emulates the crt circuits syncing to the new signal timings.<br>
     Will shake the screen for a while when the resolution changes.<br>
-    The Hiher the value, the more the amplitude.
+    The higher the value, the lower the effect duration.
     
 **Hi-resolution scanlines handling:**<br>
         There you can choose how to handle scanlines when a game is Hi-Resolution.<br>

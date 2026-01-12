@@ -45,14 +45,22 @@ void main() {
 
     vReduced_sample_time_is_now = mod(params.FrameCount,AMBI_AVGLUM_DIVIDER);
     
-    vAvglum_needed = DO_BLOOM + DO_AMBILIGHT + DO_BEZEL + (DO_DYNZOOM*10.0) + (RESSWITCH_GLITCH_SIZE*10.0) + AUTOCROP_MAX ;
+    vAvglum_needed = DO_BLOOM + DO_AMBILIGHT + DO_BEZEL + (DO_DYNZOOM*10.0) + (1-RESSWITCH_SYNC_SPEED) + AUTOCROP_MAX ;
     
     //RESSWITCH shaking:
+        #define RESSWITCH_FORCE_GLITCH_INITIAL_FRAMES 5
         vResSwitch_res_changed = 0.0;
         if (abs(params.OutputSize.y - params.avglum_passFeedbackSize.y) / params.OutputSize.y > RESSWITCH_GLITCH_TRESHOLD
-            || (params.FrameCount < 1) ) {
-                vResSwitch_res_changed = 1.0;
-        }
+            || params.FrameCount < RESSWITCH_FORCE_GLITCH_INITIAL_FRAMES)
+        vResSwitch_res_changed = 1.0;
+    
+        if (params.FrameCount == 0.0 || RESSWITCH_SYNC_SPEED == 1.0)
+            vResSwitch_res_changed = 0.0;
+    
+    
+        //Uncomment to continuously test glitch effect
+        //if (mod(params.FrameCount, 100) > 100-2 && RESSWITCH_SYNC_SPEED < 1.0)
+        //    vResSwitch_res_changed = 1.0;
         
     //AID Scene chnge detection
         vResChanged =  float(params.OutputSize.xy - params.avglum_passFeedbackSize.xy != vec2(0.0));
@@ -153,8 +161,8 @@ float get_avglum() {
                 transition_speed = clamp(transition_speed, SMOOTHNESS_SPEED, SMOOTHNESS_SPEED*multiply);
                 */
                 
-
-                if (myframecount < 1.0) {
+                
+                if (myframecount < 10.0) {
                     //prev_lum = mix(0.0, -1.0, clamp( DO_DYNZOOM*100.0, 0.0, 1.0 ) );
                     prev_lum = -1/((DO_DYNZOOM+eps)*5.0);
                 }
@@ -378,10 +386,11 @@ void main() {
     //The value stored will be used by the first pass as an argument to sin() to shake the image.
     if (is_first_inside_rect(vTexCoord_unscaled, vec4(RESSWITCH_SAMPLING_POINT-0.01 , RESSWITCH_SAMPLING_POINT+0.01) )) {
         if (vResSwitch_res_changed == 1.0 ) {
-            pixel_out.a = 1;  
+            pixel_out.a = 1.0;  
         } else {
             #ifndef D3D_WORKAROUND
-                pixel_out.a = mix(texture(avglum_passFeedback,vTexCoord_unscaled).a, 0.0, RESSWITCH_SHAKE_SPEED);
+                pixel_out.a = mix(texture(avglum_passFeedback,vTexCoord_unscaled).a, 0.0, 0.02 );
+                if (pixel_out.a < RESSWITCH_SYNC_SPEED) pixel_out.a *= 0.7;
             #else
                  pixel_out.a = 0.0;
             #endif

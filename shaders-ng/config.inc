@@ -187,7 +187,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float BACKDROP_OFFY;
 	float BACKDROP_ZOOM;
 	
-	float RESSWITCH_GLITCH_SIZE;
+	float RESSWITCH_SYNC_SPEED;
 	float TATE;
 
 	float DO_DOT_MATRIX;
@@ -446,7 +446,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 
 
-#pragma parameter RESSWITCH_GLITCH_SIZE		"★ Glitch amount if vertical resolution changes"		0.3		0.0 1.0 0.02
+#pragma parameter RESSWITCH_SYNC_SPEED		"★ Resync speed when core resolution changes"		0.7		0.1 1.0 0.05
 #pragma parameter LABEL0013 " " 0 0 0 1
 
 

@@ -683,8 +683,8 @@
     #define TATE	global.TATE
 #endif
 
-#ifndef RESSWITCH_GLITCH_SIZE
-    #define RESSWITCH_GLITCH_SIZE	global.RESSWITCH_GLITCH_SIZE
+#ifndef RESSWITCH_SYNC_SPEED
+    #define RESSWITCH_SYNC_SPEED	global.RESSWITCH_SYNC_SPEED
 #endif
 
 #ifndef DO_DOT_MATRIX

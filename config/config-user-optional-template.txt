@@ -268,7 +268,7 @@
 // #define TATE  1.0                   // ★ Tate mode (0:disabled 1:auto 2:forced)
 
 
-// #define RESSWITCH_GLITCH_SIZE 0.1   // ★ Glitch amount if vertical resolution changes
+// #define RESSWITCH_SYNC_SPEED 0.7   // ★ Resync speed when core resolution changes
 
 
 // #define MIN_LINES_INTERLACED  380.0     //     . Consider Hi-Resolution above # lines (0=never):
