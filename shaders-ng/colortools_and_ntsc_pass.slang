@@ -800,7 +800,7 @@ void main() {
    
    if (DO_PPERSISTENCE == 1.0) {
       if (params.OutputSize.xy == global.colortools_and_ntsc_passFeedbackSize.xy) {
-         vec3 feedback = texture(colortools_and_ntsc_passFeedback, co).rgb;
+         vec3 feedback = texture(colortools_and_ntsc_passFeedback, vTexCoord_unshifted).rgb;
          float motion_blur_cancel = 2.5;
          vec3 early_decay      = vec3(PPERSISTENCE_START) / vec3(PPERSISTENCE_MUL_R,PPERSISTENCE_MUL_G,1);
          vec3 late_persistance = vec3(PPERSISTENCE_END)   * vec3(PPERSISTENCE_MUL_R,PPERSISTENCE_MUL_G,1);
