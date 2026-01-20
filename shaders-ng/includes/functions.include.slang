@@ -1899,7 +1899,7 @@ vec3 adaptive_black(vec3 c, float lum_in, float range, bool dark_crush) {
 	return scale_to_range_vec3(c, -lum_in*range,1.0);
 }
 
-vec2 get_zooms_modifier(float do_tate, bool bNeed_NO_integer_scale, bool isrotated, float in_aspect) {
+vec2 get_zooms_modifier(float do_tate, bool bNeed_NO_integer_scale, bool isrotated, float in_aspect, vec2 out_size_xy) {
 	// This function is meant to live in vertex shader; its purpose is to
 	// give the final scale factor by taking in consideration various zoom modifiers.
 	//It works by calculating the new 0.0 and 1.0 coords then measuring the new distance between them
@@ -1936,10 +1936,10 @@ vec2 get_zooms_modifier(float do_tate, bool bNeed_NO_integer_scale, bool isrotat
 	}
 
 
+	vec2 zoom_modifier_raw = 1 / vec2(co_scaled_max.x - co_scaled_min.x,
+					   co_scaled_max.y - co_scaled_min.y );
 
-	//vfprintvalue = 1/(co_scaled_max.y - co_scaled_min.y);
-	return 1 / vec2(co_scaled_max.x - co_scaled_min.x,
-					co_scaled_max.y - co_scaled_min.y );
+	return (out_size_xy * zoom_modifier_raw) / params.OriginalSize.xy ;
 
 }
 
@@ -1947,7 +1947,7 @@ vec2 get_zooms_modifier(float do_tate, bool bNeed_NO_integer_scale, bool isrotat
 bool fn_very_lowres_y (vec2 out_size_xy, vec4 ori_size, float do_tate, bool bIsRotated, bool bInteger_scaled, float in_aspect, float scanline_period) {
 	bool very_lowres_y = false;
 	if ( !bInteger_scaled ) {
-		vec2 zoom_modifier = get_zooms_modifier(do_tate, !bInteger_scaled, bIsRotated, in_aspect);
+		vec2 zoom_modifier = get_zooms_modifier(do_tate, !bInteger_scaled, bIsRotated, in_aspect, out_size_xy);
 		if (do_tate == 1.0) {
 			out_size_xy.xy = out_size_xy.yx;
 			ori_size.xyzw = ori_size.yxwz;
@@ -1955,9 +1955,8 @@ bool fn_very_lowres_y (vec2 out_size_xy, vec4 ori_size, float do_tate, bool bIsR
 		}
 		if (need_doublescan()) ori_size.yw*=vec2(2.0, 1/2.0); //double period?
 		ori_size.y*=scanline_period; //helve period?
-		float OutputHeightZoomed = out_size_xy.y*zoom_modifier.y;
-		float screen_core_ratio = OutputHeightZoomed / ori_size.y;
-		if (screen_core_ratio < MIN_SCREEN_CORE_RATIO)
+
+		if (zoom_modifier.y < MIN_SCREEN_CORE_RATIO)
 			very_lowres_y = true;
 	}
 	return very_lowres_y;
@@ -2050,3 +2049,36 @@ float warpedglow_x_allowed( float in_glow_warpsharp_x ) {
 	
 	return 1.0;
 }
+
+float get_dotmat_auto_sharpness(float do_tate, bool no_integer_scale, bool rotated, float aspect) {
+    vec2 zooms_modifier_xy = get_zooms_modifier(do_tate, no_integer_scale, rotated, aspect, global.FinalViewportSize.xy);
+    float z = min(zooms_modifier_xy.x, zooms_modifier_xy.y);
+
+    // Control nodes
+	const int NUM_STEPS = 6;
+    float  zoom_steps[NUM_STEPS] = float[](1.0,                   2.7, 3.0, 4.0, 7.0,  10.0);
+	float sharp_steps[NUM_STEPS] = float[](DOT_M_SHARP_AUTO_MIN, 0.05, 1.4, 3.0, 10.0, DOT_M_SHARP_AUTO_MAX);
+
+
+    float s = sharp_steps[0];
+
+    // Sequential mixing: each condition overwrites 's' based on the current zoom level.
+	/*
+	    if (z > zoom_steps[0]) s = mix(sharp_steps[0], sharp_steps[1], (z - zoom_steps[0]) / (zoom_steps[1] - zoom_steps[0]));
+		if (z > zoom_steps[1]) s = mix(sharp_steps[1], sharp_steps[2], (z - zoom_steps[1]) / (zoom_steps[2] - zoom_steps[1]));
+		if (z > zoom_steps[2]) s = mix(sharp_steps[2], sharp_steps[3], (z - zoom_steps[2]) / (zoom_steps[3] - zoom_steps[2]));
+	*/
+
+	for (int i = NUM_STEPS - 2; i >= 0; i--) {
+        if (z > zoom_steps[i]) {
+            s = mix(sharp_steps[i], sharp_steps[i+1], (z - zoom_steps[i]) / (zoom_steps[i+1] - zoom_steps[i]));
+            break;
+        }
+    }
+
+    float grid_sharpness = clamp(s, sharp_steps[0], sharp_steps[NUM_STEPS-1]);
+	//increase sharpness if grid strength is low:
+	grid_sharpness = mix(grid_sharpness*1.5+0.1, grid_sharpness, DOT_M_G_STR);
+	return grid_sharpness;
+}
+

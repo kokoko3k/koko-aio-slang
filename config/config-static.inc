@@ -180,4 +180,9 @@
 //We want at least that screen lines per single scanline; this is also used to trigger fake integer scanlines
 #define MIN_SCREEN_CORE_RATIO 3.5 
 
+
+// Dot matrix related
+#define DOT_M_SHARP_AUTO_MIN 0.01
+#define DOT_M_SHARP_AUTO_MAX 16.0
+
 // STATIC CONFIG ENDS HERE ##########################################################################################

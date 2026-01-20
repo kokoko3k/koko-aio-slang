@@ -180,7 +180,6 @@ vec2 get_bg_image_coords(vec2 in_vOutputCoord) {
     return bg_img_coords;
 }
 
-
 void main() {
     gl_Position = global.MVP * Position;
     bool bIsRotated = is_rotated();
@@ -237,15 +236,6 @@ void main() {
                 if (frame_is_even())
                     vInterlace_offset += PI_15;
             }
-
-
-    //Calc dotmat grid color
-        vDotMat_Grid_Color = vec3(DOT_M_G_BRT);
-        if (DO_DOT_MATRIX + DO_CCORRECTION > 1.1) {
-            vDotMat_Grid_Color = color_tools(vec3(DOT_M_G_BRT), kelvin2rgb(TEMPERATURE));
-            //Since we modify grid brightness via a specific use parameter, explicitely multiply it by that:
-                vDotMat_Grid_Color *= DOT_M_G_BRT ;
-        }
 
     //Pixelgrid: get mask type; .rgb contains layout, .a contains the size.
         vPG_offsets_and_size = PG_get_hmask_preset() ;
@@ -315,18 +305,26 @@ void main() {
 
 
     //Dot matrix: measure the final picture size to choose a right sharpness level
-    //For simplicity and (my) mental health, take only y into account.
         vDotMat_Grid_Sharpness = DOT_M_G_SHARP;
-        if (DOT_M_G_SHARP == 0.0) {
-            float zooms_modifier  = get_zooms_modifier(vDo_Tate, bNeed_NO_integer_scale, bIsRotated, vIn_aspect).y;
-            float dotmat_insize  = global.upscale_passSize.y;
-            float dotmat_outsize = global.FinalViewportSize.y  * zooms_modifier;
-            vDotMat_Grid_Sharpness = (dotmat_outsize / dotmat_insize);
-            vDotMat_Grid_Sharpness = vDotMat_Grid_Sharpness * 3.6 - 3.1;
-            vDotMat_Grid_Sharpness = clamp(vDotMat_Grid_Sharpness, 0.1, 20.0);
-            //vfprintvalue = vDotMat_Grid_Sharpness;
+
+        if (DOT_M_G_SHARP == 0.0)
+            vDotMat_Grid_Sharpness = get_dotmat_auto_sharpness(vDo_Tate,bNeed_NO_integer_scale,bIsRotated,vIn_aspect);
+
+    //Dot matrix: Calc dotmat grid color
+        vDotMat_Grid_Color = vec3(DOT_M_G_BRT);
+        if (DO_DOT_MATRIX + DO_CCORRECTION > 1.1) {
+            vDotMat_Grid_Color = color_tools(vec3(DOT_M_G_BRT), kelvin2rgb(TEMPERATURE));
+            //Since we modify grid brightness via a specific use parameter, explicitely multiply it by that:
+                vDotMat_Grid_Color *= DOT_M_G_BRT ;
         }
-        
+
+/*
+    if (mod(params.FrameCount,100) > 80)
+        vfprintvalue = vDotMat_Grid_Sharpness*10.0;
+    else
+        vfprintvalue = get_zooms_modifier(vDo_Tate, bNeed_NO_integer_scale, bIsRotated, vIn_aspect, global.FinalViewportSize.xy).y*10.0;
+        }
+*/
     vDeltaRenderOk = is_deltarender_allowed(bIs_Interlaced); //carries DR mandatory conditions, including forced refreshed frames
         
     // Fake or Faker integer scanlines:
@@ -344,7 +342,7 @@ void main() {
         vec4 out_size = params.OutputSize;
         vec4 ori_size = params.OriginalSize;
         vec2 out_coord = vOutputCoord;
-        vec2 zoom_modifier = get_zooms_modifier(vDo_Tate, bNeed_NO_integer_scale, bIsRotated, vIn_aspect);
+        vec2 zoom_modifier = get_zooms_modifier(vDo_Tate, bNeed_NO_integer_scale, bIsRotated, vIn_aspect, global.FinalViewportSize.xy);
         if (vDo_Tate == 1.0) {
             out_size.xy = out_size.yx;
             ori_size.xyzw = ori_size.yxwz;
@@ -361,7 +359,7 @@ void main() {
             }
             
         // compute a rounded number of lines that integer fits the screen
-            float rounded_denominator = round( (out_size.y*zoom_modifier.y) * target_line_size);
+            float rounded_denominator = round( zoom_modifier.y * params.OriginalSize.y * target_line_size);
                   rounded_denominator = max(rounded_denominator, 2.0); // avoid division by 0  and ensure (, 2.0)
                                                                        // scanline gaps are drawn even on tiny output sizes.
             
@@ -824,29 +822,34 @@ vec4 fn_pixel_dotmat(vec2 coords, vec3 pixel_in) {
         grid = pow(grid, vec2(s_grid));
         grid = 1 - grid;
 
-
     //Combine gridx and gridy into a single one
         //float fgrid = min(grid.x, grid.y);
         float fgrid = grid.x* grid.y;
 
     //Modify strength for "paint on background" option
 
-        //Smoothly fadeout grid on background
-            //The fadeout size:
-                float fade_size = 0.3;
+    //Smoothly fadeout grid on background
+        //The fadeout size:
+            float fade_size = 0.3;
 
-            //We invert the smooth logic if threshold is negative. this allow to fadeout
-            //the grid on bright or dark backgrounds.
-                float lum_scaled = dot(pixel_in, vec3(0.33333));
-                lum_scaled = clamp(lum_scaled, 0.0, 1.0);
-                lum_scaled = mix_step(1-lum_scaled, lum_scaled, float(DOT_M_G_TRESH > 0.0));
+        //We invert the smooth logic if threshold is negative. this allow to fadeout
+        //the grid on bright or dark backgrounds.
+            float lum_scaled = dot(pixel_in, vec3(0.33333));
+            lum_scaled = clamp(lum_scaled, 0.0, 1.0);
+            lum_scaled = mix_step(1-lum_scaled, lum_scaled, float(DOT_M_G_TRESH > 0.0));
 
-            float smooth_threshold = abs(DOT_M_G_TRESH);
-            vec2 smooth_range  = vec2(smooth_threshold, smooth_threshold+fade_size);
-            float grid_smoothstep = 1- smoothstep(smooth_range.x, smooth_range.y, lum_scaled);
+        float smooth_threshold = abs(DOT_M_G_TRESH);
+        vec2 smooth_range  = vec2(smooth_threshold, smooth_threshold+fade_size);
+        float grid_smoothstep = 1-smoothstep(smooth_range.x, smooth_range.y, lum_scaled);
 
     //Adapt grid strength
-        float grid_str = DOT_M_G_STR * grid_smoothstep;
+        //reduce grid strength when grid sharpness is low.
+            float m = normalize_range(vDotMat_Grid_Sharpness, DOT_M_SHARP_AUTO_MIN, DOT_M_SHARP_AUTO_MAX);
+            m=pow(m,0.25);
+            float dot_m_g_str = mix(DOT_M_G_STR*0.4, DOT_M_G_STR, m);
+            float grid_str = dot_m_g_str * grid_smoothstep;
+
+
     //Apply strength modifier
         float fgrid_adpt = mix(1.0, fgrid, grid_str);
 
