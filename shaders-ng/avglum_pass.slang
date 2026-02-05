@@ -17,18 +17,18 @@
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
-layout(location = 1) out float lod;
-layout(location = 2) out vec2 vFuzzy_main_pass_stage_1;
-layout(location = 3) out float vReduced_sample_time_is_now;
-layout(location = 4) out float vAvglum_needed;
+layout(location = 1) flat out float lod;
+layout(location = 2) flat out vec2 vFuzzy_main_pass_stage_1;
+layout(location = 3) flat out float vReduced_sample_time_is_now;
+layout(location = 4) flat out float vAvglum_needed;
 
-layout(location = 6) out float vResSwitch_res_changed;
-layout(location = 7) out float vResChanged;
+layout(location = 6) flat out float vResSwitch_res_changed;
+layout(location = 7) flat out float vResChanged;
 layout(location = 8) out vec2 vTexCoord_unscaled;
-layout(location = 9) out float vDo_autocrop;
-layout(location = 10) out float vDo_dynzoom;
+layout(location = 9) flat out float vDo_autocrop;
+layout(location = 10) flat out float vDo_dynzoom;
 
-//layout(location = 9) out vec2 vLods;
+//layout(location = 9) flat out vec2 vLods;
 #include "includes/functions.include.slang"
 
 
@@ -77,16 +77,16 @@ void main() {
 
 #pragma stage fragment
 layout(location = 0) in vec2 vTexCoord;
-layout(location = 1) in float lod;
-layout(location = 2) in vec2 vFuzzy_main_pass_stage_1;
-layout(location = 3) in float vReduced_sample_time_is_now;
-layout(location = 4) in float vAvglum_needed;
+layout(location = 1) flat in float lod;
+layout(location = 2) flat in vec2 vFuzzy_main_pass_stage_1;
+layout(location = 3) flat in float vReduced_sample_time_is_now;
+layout(location = 4) flat in float vAvglum_needed;
 
-layout(location = 6) in float vResSwitch_res_changed;
-layout(location = 7) in float vResChanged;
+layout(location = 6) flat in float vResSwitch_res_changed;
+layout(location = 7) flat in float vResChanged;
 layout(location = 8) in vec2 vTexCoord_unscaled;
-layout(location = 9) in float vDo_autocrop;
-layout(location = 10) in float vDo_dynzoom;
+layout(location = 9) flat in float vDo_autocrop;
+layout(location = 10) flat in float vDo_dynzoom;
 
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 1) uniform sampler2D colortools_and_ntsc_passFeedback;
