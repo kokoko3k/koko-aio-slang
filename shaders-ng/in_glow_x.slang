@@ -13,8 +13,8 @@ layout(location = 4) flat out float vDo_wtfl;
 layout(location = 12) flat out float vWarpedglow_scale_tated;
 layout(location = 14) flat out float vIn_glow_edge_sharpness;
 layout(location = 15) flat out float vIn_glow_edge_defocus_strength;
-layout(location = 16) flat out float vWarpedglow_vtexcoord_offsets_plus;
-layout(location = 17) flat out float vWarpedglow_vtexcoord_offsets_minus;
+layout(location = 16) out float vWarpedglow_vtexcoord_offsets_plus;
+layout(location = 17) out float vWarpedglow_vtexcoord_offsets_minus;
 
 void main() {
     gl_Position = global.MVP * Position;
@@ -86,8 +86,8 @@ layout(location = 12) flat in float vWarpedglow_scale_tated;
 
 layout(location = 14) flat in float vIn_glow_edge_sharpness;
 layout(location = 15) flat in float vIn_glow_edge_defocus_strength;
-layout(location = 16) flat in float vWarpedglow_vtexcoord_offsets_plus;
-layout(location = 17) flat in float vWarpedglow_vtexcoord_offsets_minus;
+layout(location = 16) in float vWarpedglow_vtexcoord_offsets_plus;
+layout(location = 17) in float vWarpedglow_vtexcoord_offsets_minus;
 
 
 layout(location = 0) out vec4 FragColor;
