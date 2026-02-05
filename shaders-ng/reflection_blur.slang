@@ -5,11 +5,11 @@
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 
-layout(location = 0) out vec2 vTexCoord;
+layout(location = 0) noperspective out vec2 vTexCoord;
 layout(location = 1) flat out vec2 vFuzzy_main_pass_stage_1;
-layout(location = 2) out vec2 vCoords_zoomout;
+layout(location = 2) noperspective out vec2 vCoords_zoomout;
 layout(location = 3) flat out float vDo_Curvature;
-layout(location = 4) out vec2 vTexCoord_rotated_maybe;
+layout(location = 4) noperspective out vec2 vTexCoord_rotated_maybe;
 layout(location = 5) flat out vec3 vShadesUDS;
 layout(location = 6) flat out float vIn_Aspect;
 
@@ -69,11 +69,11 @@ void main() {
 }
 
 #pragma stage fragment
-layout(location = 0) in vec2 vTexCoord;
+layout(location = 0) noperspective in vec2 vTexCoord;
 layout(location = 1) flat in vec2 vFuzzy_main_pass_stage_1;
-layout(location = 2) in vec2 vCoords_zoomout;
+layout(location = 2) noperspective in vec2 vCoords_zoomout;
 layout(location = 3) flat in float vDo_Curvature;
-layout(location = 4) in vec2 vTexCoord_rotated_maybe;
+layout(location = 4) noperspective in vec2 vTexCoord_rotated_maybe;
 layout(location = 5) flat in vec3 vShadesUDS;
 layout(location = 6) flat in float vIn_Aspect;
 

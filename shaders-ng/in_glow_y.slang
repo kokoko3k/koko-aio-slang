@@ -5,7 +5,7 @@
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
-layout(location = 0) out vec2 vTexCoord;
+layout(location = 0) noperspective out vec2 vTexCoord;
 layout(location = 1) flat out float glow_h_inside_interval;
 layout(location = 2) flat out float vDoInGlowBias;
 layout(location = 3) flat out float vGlow_Gain;
@@ -14,11 +14,11 @@ layout(location = 5) flat out float vDo_wtfl;
 layout(location = 6) flat out float vIn_glow_h_adapted;
 layout(location = 7) flat out float vDeltaRenderOk;
 layout(location = 8) flat out float vWarpedglow;
-layout(location = 9) out vec2 vDynamicSeed;
+layout(location = 9) noperspective out vec2 vDynamicSeed;
 layout(location = 10) flat out float vIn_glow_edge_sharpness;
 layout(location = 11) flat out float vIn_glow_edge_defocus_strength;
-layout(location = 12) out float vWarpedglow_vtexcoord_offsets_plus;
-layout(location = 13) out float vWarpedglow_vtexcoord_offsets_minus;
+layout(location = 12) noperspective out float vWarpedglow_vtexcoord_offsets_plus;
+layout(location = 13) noperspective out float vWarpedglow_vtexcoord_offsets_minus;
 
 void main() {
    gl_Position = global.MVP * Position;
@@ -122,7 +122,7 @@ void main() {
 
 #pragma stage fragment
 
-layout(location = 0) in vec2 vTexCoord;
+layout(location = 0) noperspective in vec2 vTexCoord;
 layout(location = 1) flat in float glow_h_inside_interval;
 layout(location = 2) flat in float vDoInGlowBias;
 layout(location = 3) flat in float vGlow_Gain;
@@ -131,11 +131,11 @@ layout(location = 5) flat in float vDo_wtfl;
 layout(location = 6) flat in float vIn_glow_h_adapted;
 layout(location = 7) flat in float vDeltaRenderOk;
 layout(location = 8) flat in float vWarpedglow;
-layout(location = 9) in vec2 vDynamicSeed;
+layout(location = 9) noperspective in vec2 vDynamicSeed;
 layout(location = 10) flat in float vIn_glow_edge_sharpness;
 layout(location = 11) flat in float vIn_glow_edge_defocus_strength;
-layout(location = 12) in float vWarpedglow_vtexcoord_offsets_plus;
-layout(location = 13) in float vWarpedglow_vtexcoord_offsets_minus;
+layout(location = 12) noperspective in float vWarpedglow_vtexcoord_offsets_plus;
+layout(location = 13) noperspective in float vWarpedglow_vtexcoord_offsets_minus;
 
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 4) uniform sampler2D upscale_pass;

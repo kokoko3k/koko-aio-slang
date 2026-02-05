@@ -6,7 +6,7 @@
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
-layout(location = 0) out vec2 vTexCoord;
+layout(location = 0) noperspective out vec2 vTexCoord;
 layout(location = 1) flat out vec2 vR_offset;
 layout(location = 2) flat out vec2 vG_offset;
 layout(location = 3) flat out vec2 vB_offset;
@@ -15,7 +15,7 @@ layout(location = 5) flat out float vDecon_or_JustShadow;
 layout(location = 6) flat out vec3 vCVBS_bandwidths;
 
 layout(location = 9) flat out float vDotCrawlShift;
-layout(location = 10) out vec4 vDotCrawlCoords_and_period;
+layout(location = 10) noperspective out vec4 vDotCrawlCoords_and_period;
 #include "includes/functions.include.slang"
 
 void main()
@@ -71,7 +71,7 @@ void main()
 
 #pragma stage fragment
 #include "includes/functions.include.slang"
-layout(location = 0) in vec2 vTexCoord;
+layout(location = 0) noperspective in vec2 vTexCoord;
 layout(location = 1) flat in vec2 vR_offset;
 layout(location = 2) flat in vec2 vG_offset;
 layout(location = 3) flat in vec2 vB_offset;
@@ -80,7 +80,7 @@ layout(location = 5) flat in float vDecon_or_JustShadow;
 layout(location = 6) flat in vec3 vCVBS_bandwidths;
 
 layout(location = 9) flat in float vDotCrawlShift;
-layout(location = 10) in vec4 vDotCrawlCoords_and_period;
+layout(location = 10) noperspective in vec4 vDotCrawlCoords_and_period;
 
 layout(location = 0) out vec4 FragColor;
 

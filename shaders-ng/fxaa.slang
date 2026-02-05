@@ -20,22 +20,22 @@
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
-layout(location = 0) out vec2 vTexCoord;
+layout(location = 0) noperspective out vec2 vTexCoord;
 
-layout(location = 3) out vec2 vDynamicSeed;
+layout(location = 3) noperspective out vec2 vDynamicSeed;
 
-layout(location = 5) out vec4 vpt1;
-layout(location = 6) out vec4 vpt2;
+layout(location = 5) noperspective out vec4 vpt1;
+layout(location = 6) noperspective out vec4 vpt2;
 
-layout(location = 7) out vec4 vhqt1;
-layout(location = 8) out vec4 vhqt2;
-layout(location = 9) out vec4 vhqt3;
-layout(location = 10) out vec4 vhqt4;
+layout(location = 7) noperspective out vec4 vhqt1;
+layout(location = 8) noperspective out vec4 vhqt2;
+layout(location = 9) noperspective out vec4 vhqt3;
+layout(location = 10) noperspective out vec4 vhqt4;
 
-layout(location = 11) out vec4 vxt1;
+layout(location = 11) noperspective out vec4 vxt1;
 
 layout(location = 12) flat out float vDo_flickering;
-layout(location = 13) out vec2  vFlickerCoords;
+layout(location = 13) noperspective out vec2  vFlickerCoords;
 
 void main() {
 
@@ -94,22 +94,22 @@ void main() {
 }
 
 #pragma stage fragment
-layout(location = 0) in vec2 vTexCoord;
+layout(location = 0) noperspective in vec2 vTexCoord;
 
-layout(location = 3) in vec2 vDynamicSeed;
+layout(location = 3) noperspective in vec2 vDynamicSeed;
 
-layout(location = 5) in vec4 vpt1;
-layout(location = 6) in vec4 vpt2;
+layout(location = 5) noperspective in vec4 vpt1;
+layout(location = 6) noperspective in vec4 vpt2;
 
-layout(location = 7) in vec4 vhqt1;
-layout(location = 8) in vec4 vhqt2;
-layout(location = 9) in vec4 vhqt3;
-layout(location = 10) in vec4 vhqt4;
+layout(location = 7) noperspective in vec4 vhqt1;
+layout(location = 8) noperspective in vec4 vhqt2;
+layout(location = 9) noperspective in vec4 vhqt3;
+layout(location = 10) noperspective in vec4 vhqt4;
 
-layout(location = 11) in vec4 vxt1;
+layout(location = 11) noperspective in vec4 vxt1;
 
 layout(location = 12) flat in float vDo_flickering;
-layout(location = 13) in vec2  vFlickerCoords;
+layout(location = 13) noperspective in vec2  vFlickerCoords;
 
 layout(location = 0) out vec4 FragColor;
 

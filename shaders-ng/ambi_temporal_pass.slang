@@ -14,12 +14,12 @@
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
-layout(location = 0) out vec2 vTexCoord;
+layout(location = 0) noperspective out vec2 vTexCoord;
 layout(location = 1) flat out float vLedBorder_min;
 layout(location = 2) flat out float vLedBorder_max;
 layout(location = 3) flat out float vLed_step;
 layout(location = 4) flat out float lod;
-layout(location = 5) out vec2 pre_pass_coords;
+layout(location = 5) noperspective out vec2 pre_pass_coords;
 layout(location = 6) flat out float vIs_rotated;
 layout(location = 7) flat out float vAMBI_STRETCH;
 layout(location = 8) flat out float vAMBI_POWER;
@@ -112,12 +112,12 @@ void main() {
 }
 
 #pragma stage fragment
-layout(location = 0) in vec2 vTexCoord;
+layout(location = 0) noperspective in vec2 vTexCoord;
 layout(location = 1) flat in float vLedBorder_min;
 layout(location = 2) flat in float vLedBorder_max;
 layout(location = 3) flat in float vLed_step;
 layout(location = 4) flat in float lod;
-layout(location = 5) in vec2 pre_pass_coords;
+layout(location = 5) noperspective in vec2 pre_pass_coords;
 layout(location = 6) flat in float vIs_rotated;
 layout(location = 7) flat in float vAMBI_STRETCH;
 layout(location = 8) flat in float vAMBI_POWER;
