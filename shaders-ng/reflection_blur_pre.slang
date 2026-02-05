@@ -8,7 +8,7 @@ layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
 layout(location = 1) out vec2 vCoordsAdapted;
 layout(location = 2) out vec2 vCoords_shade;
-layout(location = 5) out float vIn_Aspect;
+layout(location = 5) flat out float vIn_Aspect;
 
 #include "includes/functions.include.slang"
 
@@ -31,7 +31,7 @@ void main() {
 layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) in vec2 vCoordsAdapted;
 layout(location = 2) in vec2 vCoords_shade;
-layout(location = 5) in float vIn_Aspect;
+layout(location = 5) flat in float vIn_Aspect;
 
 layout(location = 0) out vec4 FragColor;
 
