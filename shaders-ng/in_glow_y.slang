@@ -123,17 +123,17 @@ void main() {
 #pragma stage fragment
 
 layout(location = 0) in vec2 vTexCoord;
-layout(location = 1) in float glow_h_inside_interval;
-layout(location = 2) in float vDoInGlowBias;
-layout(location = 3) in float vGlow_Gain;
-layout(location = 4) in float vSharp_sub;
-layout(location = 5) in float vDo_wtfl;
-layout(location = 6) in float vIn_glow_h_adapted;
-layout(location = 7) in float vDeltaRenderOk;
-layout(location = 8) in float vWarpedglow;
-layout(location = 9) in float vDynamicSeed;
-layout(location = 10) in float vIn_glow_edge_sharpness;
-layout(location = 11) in float vIn_glow_edge_defocus_strength;
+layout(location = 1) flat in float glow_h_inside_interval;
+layout(location = 2) flat in float vDoInGlowBias;
+layout(location = 3) flat in float vGlow_Gain;
+layout(location = 4) flat in float vSharp_sub;
+layout(location = 5) flat in float vDo_wtfl;
+layout(location = 6) flat in float vIn_glow_h_adapted;
+layout(location = 7) flat in float vDeltaRenderOk;
+layout(location = 8) flat in float vWarpedglow;
+layout(location = 9) flat in float vDynamicSeed;
+layout(location = 10) flat in float vIn_glow_edge_sharpness;
+layout(location = 11) flat in float vIn_glow_edge_defocus_strength;
 layout(location = 12) in float vWarpedglow_vtexcoord_offsets_plus;
 layout(location = 13) in float vWarpedglow_vtexcoord_offsets_minus;
 
