@@ -9,8 +9,8 @@
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
-layout(location = 1) out vec2 vFuzzy_main_pass_stage_1;
-layout(location = 5) out vec2 blur_radius_adpt;
+layout(location = 1) flat out vec2 vFuzzy_main_pass_stage_1;
+layout(location = 5) flat out vec2 blur_radius_adpt;
 
 
 void main() {
@@ -26,8 +26,8 @@ void main() {
 #pragma stage fragment
 
 layout(location = 0) in vec2 vTexCoord;
-layout(location = 1) in vec2 vFuzzy_main_pass_stage_1;
-layout(location = 5) in vec2 blur_radius_adpt;
+layout(location = 1) flat in vec2 vFuzzy_main_pass_stage_1;
+layout(location = 5) flat in vec2 blur_radius_adpt;
  
 layout(location = 0) out vec4 FragColor;
 
