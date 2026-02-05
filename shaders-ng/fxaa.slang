@@ -34,7 +34,7 @@ layout(location = 10) out vec4 vhqt4;
 
 layout(location = 11) out vec4 vxt1;
 
-layout(location = 12) out float vDo_flickering;
+layout(location = 12) flat out float vDo_flickering;
 layout(location = 13) out vec2  vFlickerCoords;
 
 void main() {
@@ -108,7 +108,7 @@ layout(location = 10) in vec4 vhqt4;
 
 layout(location = 11) in vec4 vxt1;
 
-layout(location = 12) in float vDo_flickering;
+layout(location = 12) flat in float vDo_flickering;
 layout(location = 13) in vec2  vFlickerCoords;
 
 layout(location = 0) out vec4 FragColor;
