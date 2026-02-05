@@ -22,7 +22,7 @@ layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
 
-layout(location = 3) out float vDynamicSeed;
+layout(location = 3) out vec2 vDynamicSeed;
 
 layout(location = 5) out vec4 vpt1;
 layout(location = 6) out vec4 vpt2;
@@ -43,7 +43,7 @@ void main() {
    vTexCoord = TexCoord;
    
    //noise
-   vDynamicSeed = mod(params.FrameCount, 120.0001);
+   vDynamicSeed = mod(params.FrameCount, 120.0001) * vTexCoord;
    
    //flickering helper
    vDo_flickering  = float ( scanline_have_to_flicker(is_interlaced()) ) ; 
@@ -96,7 +96,7 @@ void main() {
 #pragma stage fragment
 layout(location = 0) in vec2 vTexCoord;
 
-layout(location = 3) in float vDynamicSeed;
+layout(location = 3) in vec2 vDynamicSeed;
 
 layout(location = 5) in vec4 vpt1;
 layout(location = 6) in vec4 vpt2;
@@ -918,7 +918,7 @@ void main() {
          //It should be possible to change the noise function to just emit positive
          //numbers and pre-lowering the brightness of pixel_out in the very first pass tho.
 
-            float rfnoise = get_rf_noise(vTexCoord * vDynamicSeed);
+            float rfnoise = get_rf_noise(vDynamicSeed);
             pixel_out.rgb += rfnoise;
             pixel_out.rgb = max(pixel_out.rgb, vec3(0.0));
       }
