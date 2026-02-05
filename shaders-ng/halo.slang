@@ -6,8 +6,8 @@
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 layout(location = 0) out vec2 vTexCoord;
-layout(location = 1) out vec2 vHALO_SHARPNESS;
-layout(location = 2) out float vHALO_POWER;
+layout(location = 1) flat out vec2 vHALO_SHARPNESS;
+layout(location = 2) flat out float vHALO_POWER;
 
 void main() {
     gl_Position = global.MVP * Position;
@@ -37,8 +37,8 @@ void main() {
 
 #pragma stage fragment
 layout(location = 0) in vec2 vTexCoord;
-layout(location = 1) in vec2 vHALO_SHARPNESS;
-layout(location = 2) in float vHALO_POWER;
+layout(location = 1) flat in vec2 vHALO_SHARPNESS;
+layout(location = 2) flat in float vHALO_POWER;
 
 layout(location = 0) out vec4 FragColor;
 
