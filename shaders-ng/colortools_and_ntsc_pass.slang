@@ -53,13 +53,13 @@ layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 
 layout(location = 0) out vec2 vTexCoord;
-layout(location = 1) out vec3 vTemperature_rgb;
-layout(location = 2) out float vNTSC_FILTER_FC;
-layout(location = 3) out float vPixelgrid_intr_gamma_adj;
+layout(location = 1) flat out vec3 vTemperature_rgb;
+layout(location = 2) flat out float vNTSC_FILTER_FC;
+layout(location = 3) flat out float vPixelgrid_intr_gamma_adj;
 layout(location = 4) out vec3 vDebug;
 layout(location = 5) out vec2 vTexCoord_unshifted;
 layout(location = 6) out float vShake_sin_arg;
-layout(location = 7) out float vNTSC_weights[NTSC_FILTER_WIDTH_MAX];
+layout(location = 7) flat out float vNTSC_weights[NTSC_FILTER_WIDTH_MAX];
 
 
 #include "includes/functions.include.slang"
@@ -211,13 +211,13 @@ void main() {
 #include "includes/functions.include.slang"
 
 layout(location = 0) in vec2 vTexCoord;
-layout(location = 1) in vec3 vTemperature_rgb;
-layout(location = 2) in float vNTSC_FILTER_FC;
-layout(location = 3) in float vPixelgrid_intr_gamma_adj;
+layout(location = 1) flat in vec3 vTemperature_rgb;
+layout(location = 2) flat in float vNTSC_FILTER_FC;
+layout(location = 3) flat in float vPixelgrid_intr_gamma_adj;
 layout(location = 4) in vec3 vDebug;
 layout(location = 5) in vec2 vTexCoord_unshifted;
 layout(location = 6) in float vShake_sin_arg;
-layout(location = 7) in float vNTSC_weights[NTSC_FILTER_WIDTH_MAX];
+layout(location = 7) flat in float vNTSC_weights[NTSC_FILTER_WIDTH_MAX];
 
 layout(location = 0) out vec4 FragColor;
 
