@@ -1297,66 +1297,124 @@ vec3 antighost(vec3 c) {
 }
 
 void main() {
+    /*bgimage
+     * ambient
+     * fnboirder
+     * content
+     * backdrop content
+     * bezel
+     * ambient
+     * fg_image_offset ambient
+     * backdrop
+     */
 
-    // Early whole frameskipping
+
+    //*** Early whole frameskipping
     #ifndef D3D_WORKAROUND
         bool skipframe = false;
         if (skip_subframe()) skipframe = true;
         if (fps_halver_is_skipped_frame()) skipframe = true;
-            
+
         if (skipframe) {
             FragColor.rgb = texture(final_passFeedback, vOutputCoord).rgb ;
             return;
         }
     #endif
-  
-    // Initial content coords
+
+
+    vec3 pixel_under_content = vec3(0.0);
+
+    //*** Ambient light
+    if (DO_AMBILIGHT == 1.0) {
+        vec3 pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb;
+        //debanding
+        #ifndef SKIPRANDOM
+            float dynamicseed = mod(params.FrameCount, 30.0001);
+            float anoise = random_fast(vTexCoord*dynamicseed) * (-NOISEPOWER_AMBI);
+            anoise =  fma(-anoise, pixel_ambi.g, anoise); //ASM PROOF FASTER
+            pixel_ambi += anoise;
+        #endif
+        pixel_under_content = pixel_ambi;
+    }
+
+
+    //*** BG IMAGE
+    if ( DO_BG_IMAGE == 1.0 && BG_IMAGE_OVER == 0.0) {
+        vec3 pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb;
+        vec4 pixel_bg_image = fn_pixel_fgbg_image(bg_under);
+        vec3 anti_nightify_ambi = (pixel_ambi * AMBI_BG_IMAGE_BLEND_MODE) *
+                                   max(AMBI_BG_IMAGE_FORCE, 1-pixel_bg_image.a) ;
+
+        pixel_bg_image.rgb = fn_pixel_nightify(pixel_bg_image.rgb, BG_IMAGE_NIGHTIFY, anti_nightify_ambi );
+        pixel_bg_image.rgb = ambi_blend_image(pixel_bg_image, pixel_ambi, AMBI_BG_IMAGE_BLEND_MODE);
+        pixel_under_content = pixel_bg_image.rgb;
+    }
+
+
+    //*** Content and black frame border.
     vec2 co_content = vTexCoord;
 
-    // Tilt?
+    //Tilt?
     if (DO_TILT == 1.0)
         co_content = tilt(co_content, vIsRotated, TILT_X);
-    
-    
-    // Curvature: has to come after inner zoom or bezel curved border will not match
-    // content curved border when inner zoom changes.
+
+    //Curvature
     if ( curvature_needed() > 0.0 ) {
         co_content = Warp_koko(co_content, vec2(GEOM_WARP_X, GEOM_WARP_Y*float(need_NO_integer_scale())), 0.5);
     }
 
-    
-    // content_mask is a mask used to save GPU cycles by skipping already processed areas.
-    // It is initialized as inner/outer border mask. 
-    float content_mask = 0.0;
-    if (DO_CURVATURE == 1.0)  {
-        content_mask = fn_border(co_content);
-    } else {
-        // Since we're wrapping to border (to show black border when zooming out via content override),
-        // edge sampling will be darker and this is bad for dmg look, so we mangle 1/4 input pixels.
-        // maybe in te future this will go away and dmg will have its proper shader/preset.
-        //#define eps2 (global.upscale_passSize.zw*0.5)
-        //#define RECTEPS vec4(eps2.x, eps2.y, 1.0-eps2.x, 1.0-eps2.y)
-        //content_mask = float(is_first_inside_rect(co_content, RECTEPS));
-        //...in the end I decided that the best way is that affected presets (Gameboy DMG) will
-        //reference a preset that wrap with mirror repeat.
-        content_mask = float(is_first_inside_rect(co_content, RECT01));
+
+    //*** black frame/border
+    float border_corner_smooth = 1000;
+    float border_corner_size = 0.001;
+
+    if (DO_CURVATURE == 1.0) {
+        border_corner_smooth = GEOM_CORNER_SMOOTH;
+        border_corner_size = GEOM_CORNER_SIZE;
     }
 
-    // Mirror/reflection coords need to be calculated here, before geom override, but after curvature.
-    // It is still not perfect but a reasonable tradeoff by now.
-    vec2 co_mirror = zoom(co_content, 1/BEZEL_REFL_ZOOMOUT_ROOM);
+    float border = fn_border(co_content, border_corner_smooth, border_corner_size);
 
+    //** bezel
+    float ambi_colorize_shade_mask = 1.0;
+    if (DO_BEZEL == 1.0) {
+        vec2 co_mirror = zoom(co_content, 1/BEZEL_REFL_ZOOMOUT_ROOM);
+        vec2 co_bezel = get_scaled_coords_for_bezel(vTexCoord, vIsRotated);
+        vec3 pixel_ambi = vec3(0.0);
+
+        if (DO_AMBILIGHT == 1.0) {
+            pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb;
+
+            if ( DO_BG_IMAGE + BG_IMAGE_OVER + AMBI_BG_IMAGE_BLEND_MODE == 3.0)
+                ambi_colorize_shade_mask = create_ambi_colorize_shade(co_bezel); //used by image over functions later on.
+
+        }
+        vec4 pixel_bezel = fn_pixel_bezel(co_bezel, co_mirror, BG_IMAGE_NIGHTIFY * DO_BG_IMAGE, pixel_ambi);
+
+        if (is_first_outside_rect(co_bezel, vec4(BEZEL_FRAME_SURROUND_MARGIN, BEZEL_FRAME_SURROUND_MARGIN, 1.0 - BEZEL_FRAME_SURROUND_MARGIN, 1.0 - BEZEL_FRAME_SURROUND_MARGIN)))
+            pixel_under_content = mix(pixel_under_content, pixel_bezel.rgb, pixel_bezel.a);
+        else
+            pixel_under_content = pixel_bezel.rgb;
+
+        border *= (1-pixel_bezel.a);
+
+    }
+
+
+
+
+
+    //*** content
     // Apply other content coords modifiers
     if (DO_GAME_GEOM_OVERRIDE == 1.0)
         co_content = content_geom_override_zoom(co_content, GAME_GEOM_ASPECT, vIn_aspect, GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
- 
-    
+
     // If delta render is active, return the pass feedback when color didn't changed.
     #ifndef D3D_WORKAROUND
         if (delta_render_enabled() == 1.0) {
             bool reuse_old = false;
-            if (vDeltaRenderOk > 0.0 && content_mask > 1.0 - eps ){
-                reuse_old = (vDeltaRenderOk > 0.0) && (texture(in_glow_pass, co_content).a == 0.0); 
+            if (vDeltaRenderOk > 0.0 && border > 1.0 - eps ){
+                reuse_old = (vDeltaRenderOk > 0.0) && (texture(in_glow_pass, co_content).a == 0.0);
             }
 
             if (reuse_old) {
@@ -1365,150 +1423,53 @@ void main() {
             }
         }
     #endif
-        
+
     // Dynamic lum dependant full screen zoom and autocrop
     #ifndef D3D_WORKAROUND
         if (DO_DYNZOOM > 0.0)
             co_content = zoom(co_content, get_dyn_zoom(avglum_pass) );
-    
+
         if (AUTOCROP_MAX > 0.0)
             co_content = zoom(co_content, get_autocrop_zoom(avglum_pass) );
     #endif
 
-    
-    // Draw content only over the alpha mask, and sample ambientlight outside it.
-    vec3 pixel_ambi = vec3(0.0);
-    vec3 pixel_under_content = vec3(0.0);
-    vec3 pixel_out = vec3(0.0);
-    
-    if (content_mask > 0.5) {
-        
-        pixel_out = fn_pixel_content(co_content);
-        
-        if (DO_BACKDROP * BACKDROP_JUST_TUBE > 0.0) {
-            vec3 backdrop = pixel_backdrop_image().rgb;
+    //content itself
+    vec3 content = fn_pixel_content(co_content);
 
-            pixel_out.rgb += (DO_BACKDROP*backdrop) * (1-pixel_out.rgb);
-            //pixel_out = max(pixel_out, backdrop*DO_BACKDROP);
-        }
+    if ( DO_SPOT + DO_VIGNETTE > 0.0 ) {
+        float perlin = (random_fast(vTexCoord)-0.5) * (1/255.0);
+        vec2 vignette_spot = texture(helper_pass, vTexCoord).zw;
+        content = content * vignette_spot.x;
+        content = mix(content+abs(perlin), vec3(1.0), vec3(vignette_spot.y)) ;
 
-        if ( DO_SPOT + DO_VIGNETTE > 0.0 ) {
-            float perlin = (random_fast(vTexCoord)-0.5) * (1/255.0);
-            vec2 vignette_spot = texture(helper_pass, vTexCoord).zw;
-            pixel_out = pixel_out * vignette_spot.x;
-            //pixel_out = mix(pixel_out+perlin, vec3(content_mask), vec3(vignette_spot.y) );
-            pixel_out = mix(pixel_out+abs(perlin), pixel_out+vec3(content_mask), vec3(vignette_spot.y) );
-        }
-        
-        #ifdef DO_ADPT_STROBE
-            pixel_out = adaptive_strobe(pixel_out, vAdaptive_strobe_oscillator);
-        #else
-            #ifdef DO_LCD_ANTIGHOSTING
-                pixel_out = antighost(pixel_out);
-            #endif
-        #endif
-        
-
-    } else {
-
-        // Can we halve border update to spare some cycles?
-        bool skip_border = false;
-        #ifdef HALVE_BORDER_UPDATE
-            // By using !frame_is_even() and not frame_is_even(), we solve the issue of inner frame jagged lines
-            // when using HALVE_BORDER_UPDATE + DELTA_RENDER
-            if (!frame_is_even()) skip_border = true;
-        #endif
-        
-        // We can skip border update on subframes.
-        // The following may seem redundant because we skip whole subframes already
-        // But when we use strobing, we always reach this point/code.
-        bool skip_because_is_subframe = false;
-        #ifdef SUBFRAMES_OPTIMIZATIONS
-            if (is_subframe()) skip_border = true;
-        #endif
-            
-        #ifndef D3D_WORKAROUND
-            if ( skip_border ) {
-                FragColor.rgb = texture(final_passFeedback, vOutputCoord).rgb;
-                return;
-            }
-        #endif
-
-        // Ambient light
-        if (DO_AMBILIGHT == 1.0) {
-            pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb ;
-            
-            // Debanding when not using bg images.
-            #ifndef SKIPRANDOM
-            if (DO_BG_IMAGE != 1.0) {
-                const float noise_power = -NOISEPOWER_AMBI;
-                float dynamicseed = mod(params.FrameCount, 30.0001);
-                float anoise1 = random_fast(vTexCoord*dynamicseed) * noise_power;
-                // anoise1 *=  (1 - pixel_ambi.g);
-                //anoise1 =  (anoise1 - anoise1 * pixel_ambi.g); //ASM PROOF FASTER
-                anoise1 =  fma(-anoise1, pixel_ambi.g, anoise1); //ASM PROOF FASTER
-                pixel_ambi += anoise1;
-            }
-            #endif
-            
-            //pixel_under_content = clamp(pixel_ambi, 0.0,1.0) * (1-content_mask); //<-- this one is better because will antialias borders
-                                                                                    //    better (via canvas-busy) when ambientlight > 0.0
-            //pixel_under_content = pixel_ambi * (1-content_mask);
-            //pixel_under_content = pixel_ambi - content_mask * pixel_ambi; //ASM PROOF: FASTER
-            pixel_under_content = fma(vec3(-content_mask), pixel_ambi, pixel_ambi); //ASM PROOF: FASTER
-        }
     }
 
-    // Apply smooth border to soften jagged edges.
-    pixel_out *= content_mask;
-       
-    
-    // This represents the inner bezel alpha (when using bezel)
-    // or the pixel_content canvas (when not using bezel)
-    // It is used to draw spot on the whole inner tube even when toe content does not
-    // fill the whole tube.
-    float content_and_bezel_mask = content_mask;
+    #ifdef DO_ADPT_STROBE
+        content = adaptive_strobe(content, vAdaptive_strobe_oscillator);
+    #else
+        #ifdef DO_LCD_ANTIGHOSTING
+            content = antighost(content);
+        #endif
+    #endif
 
-    // Draw Bezel
-    vec2 co_bezel = vec2(0.0);
-    if (DO_BEZEL == 1.0) {
-        
-        co_bezel = get_scaled_coords_for_bezel(vTexCoord, vIsRotated);
-        
-        if (is_bezel_paint_area(co_bezel)) {
-            
-            vec4 pixel_bezel = fn_pixel_bezel(co_bezel, co_mirror, BG_IMAGE_NIGHTIFY * DO_BG_IMAGE, pixel_ambi);
-            pixel_out = mix(pixel_out, pixel_bezel.rgb, pixel_bezel.a);
-        
-            // Update alpha mask.
-            // We can't use the bezel alpha channel to update the alpha mask since it is transparent
-            // on the tube and we don't want to paint anything there, so use a dumb rect and add it to content_mask:
-            float rect_bezel = float(is_first_inside_rect(co_bezel, vec4(BEZEL_FRAME_SURROUND_MARGIN, BEZEL_FRAME_SURROUND_MARGIN, 1.0 - BEZEL_FRAME_SURROUND_MARGIN, 1.0 - BEZEL_FRAME_SURROUND_MARGIN)));
-            content_and_bezel_mask = max(pixel_bezel.a, rect_bezel);
-        }
-        //FragColor = vec4(content_and_bezel_mask); return; // <- uncomment to debug BEZEL_FRAME_SURROUND_MARGIN
+    //backdrop/middle image/reflection
+    vec3 backdrop_reflection = vec3(0.0);
+    if (DO_BACKDROP * BACKDROP_JUST_TUBE > 0.0) {
+        backdrop_reflection = DO_BACKDROP * pixel_backdrop_image().rgb;
+        content += backdrop_reflection * (1-content.rgb);
     }
 
-    // Background image have no need to paint if not in the outer border:
-    if ( (DO_BG_IMAGE == 1.0 && BG_IMAGE_OVER == 0.0) && (content_and_bezel_mask < 1.0) ) {
-        vec4 pixel_bg_image = fn_pixel_fgbg_image(bg_under);
+    //compose content with under_content
+    vec3 pixel_out = mix(pixel_under_content, content, border);
 
-        vec3 anti_nightify_ambi = (pixel_ambi * AMBI_BG_IMAGE_BLEND_MODE) *
-                                    max(AMBI_BG_IMAGE_FORCE, 1-pixel_bg_image.a) ;
-
-        pixel_bg_image.rgb = fn_pixel_nightify(pixel_bg_image.rgb, BG_IMAGE_NIGHTIFY, anti_nightify_ambi );
-        pixel_bg_image.rgb = ambi_blend_image(pixel_bg_image, pixel_ambi, AMBI_BG_IMAGE_BLEND_MODE);
-
-        pixel_under_content = pixel_bg_image.rgb;
-    }
-
-
-    // Blend content and border:
-    pixel_out = mix (pixel_under_content, pixel_out, content_and_bezel_mask);
 
     //Foreground image
     float pixel_fg_image_alpha = 0.0;
     if (DO_BG_IMAGE + BG_IMAGE_OVER == 2.0) {
+        vec3 pixel_ambi = vec3(0.0);
+        if (DO_AMBILIGHT == 1.0)
+            pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb;
+
         vec4 pixel_fg_image = fn_pixel_fgbg_image(bg_over);
         // if geometry content is overridden, ambientlight may have not been sample yet due to some skip logic
         /*if (DO_AMBILIGHT == 1.0 && (pixel_fg_image.a+AMBI_BG_IMAGE_FORCE) > 0.0  && content_and_bezel_mask < 0.01) {
@@ -1524,18 +1485,14 @@ void main() {
         //   Do only for add mode, since some inplace presets relies on the blackness with AMBI_BG_IMAGE_BLEND_MODE mix mode.
         // long explaination:
         //   We want to show the underlying game content when the image is transparent.
-        //   This mean that alpha channel reveals the underlying content, but doing that even
+        //   This means that alpha channel reveals the underlying content, but doing that even
         //   when the underlyinig content is void is not only pointless, but even counterproductive.
         //   Think at when we want to use ambient lights to *light* the part of the image
         //   that have a low alpha channel, that part would be black.
         if (DO_AMBILIGHT + AMBI_BG_IMAGE_BLEND_MODE == 2.0) {
-            float ambi_mask = create_ambi_colorize_shade(co_bezel);
-            float alpha_selective = clamp( pixel_fg_image.a + (1-content_and_bezel_mask) , 0.0, 1.0); 
-            //float alpha_selective = min( pixel_fg_image.a + (1-content_and_bezel_mask) , 1.0);  //<- this is enough, but cycles won't scale.
-            
-            pixel_out = mix(pixel_out, pixel_fg_image.rgb, alpha_selective );
+            pixel_out = mix(pixel_out, pixel_fg_image.rgb, pixel_fg_image.a );
             float fg_image_alpha_adapted = max(pixel_fg_image.a - AMBI_BG_IMAGE_FORCE, 0.0);
-            vec3 light = pixel_ambi.rgb * (ambi_mask) * (1- fg_image_alpha_adapted);
+            vec3 light = pixel_ambi.rgb * (ambi_colorize_shade_mask) * (1- fg_image_alpha_adapted);
             pixel_out = light_over_image(light, pixel_out, AMBI_ADD_ON_BLACK);
         } else {
             pixel_out = mix(pixel_out, pixel_fg_image.rgb, pixel_fg_image.a);
@@ -1544,15 +1501,14 @@ void main() {
         //FragColor = vec4(pixel_fg_image.a) ; return;
     }
 
-    
     // Backdrop
     if (DO_BACKDROP > 0.0 ) {
         if (BACKDROP_JUST_TUBE == 0.0) {
             pixel_out += pixel_backdrop_image() * (1-pixel_fg_image_alpha);
         }
     }
-    
-    
+
+
     #ifndef RENDER_BOGUS_FRAMES
         // Some cores set first frame size to 1x1 which may cause glitches.
         // This has less performance impact if kept here, at the end of the shader.
@@ -1606,7 +1562,12 @@ void main() {
             if (clip  > 1.0)
                 pixel_out = 1-pixel_out;//;-clip;
         #endif
-    
+
+
+
     FragColor.rgb = pixel_out;
+
+    return;
+
 
 }
