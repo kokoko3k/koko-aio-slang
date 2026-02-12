@@ -1307,8 +1307,7 @@ void main() {
      * fg_image_offset ambient
      * backdrop
      */
-
-
+    
     //*** Early whole frameskipping
     #ifndef D3D_WORKAROUND
         bool skipframe = false;
@@ -1320,35 +1319,6 @@ void main() {
             return;
         }
     #endif
-
-
-    vec3 pixel_under_content = vec3(0.0);
-
-    //*** Ambient light
-    if (DO_AMBILIGHT == 1.0) {
-        vec3 pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb;
-        //debanding
-        #ifndef SKIPRANDOM
-            float dynamicseed = mod(params.FrameCount, 30.0001);
-            float anoise = random_fast(vTexCoord*dynamicseed) * (-NOISEPOWER_AMBI);
-            anoise =  fma(-anoise, pixel_ambi.g, anoise); //ASM PROOF FASTER
-            pixel_ambi += anoise;
-        #endif
-        pixel_under_content = pixel_ambi;
-    }
-
-
-    //*** BG IMAGE
-    if ( DO_BG_IMAGE == 1.0 && BG_IMAGE_OVER == 0.0) {
-        vec3 pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb;
-        vec4 pixel_bg_image = fn_pixel_fgbg_image(bg_under);
-        vec3 anti_nightify_ambi = (pixel_ambi * AMBI_BG_IMAGE_BLEND_MODE) *
-                                   max(AMBI_BG_IMAGE_FORCE, 1-pixel_bg_image.a) ;
-
-        pixel_bg_image.rgb = fn_pixel_nightify(pixel_bg_image.rgb, BG_IMAGE_NIGHTIFY, anti_nightify_ambi );
-        pixel_bg_image.rgb = ambi_blend_image(pixel_bg_image, pixel_ambi, AMBI_BG_IMAGE_BLEND_MODE);
-        pixel_under_content = pixel_bg_image.rgb;
-    }
 
 
     //*** Content and black frame border.
@@ -1363,6 +1333,41 @@ void main() {
         co_content = Warp_koko(co_content, vec2(GEOM_WARP_X, GEOM_WARP_Y*float(need_NO_integer_scale())), 0.5);
     }
 
+    
+    vec3 pixel_under_content = vec3(0.0);
+
+    vec3 pixel_ambi = vec3(0.0);
+    
+    if (is_first_outside_rect( co_content, RECT01)) {
+    
+        //*** Ambient light
+        if (DO_AMBILIGHT == 1.0) {
+            pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb;
+            //debanding
+            #ifndef SKIPRANDOM
+                float dynamicseed = mod(params.FrameCount, 30.0001);
+                float anoise = random_fast(vTexCoord*dynamicseed) * (-NOISEPOWER_AMBI);
+                anoise =  fma(-anoise, pixel_ambi.g, anoise); //ASM PROOF FASTER
+                pixel_ambi += anoise;
+            #endif
+            pixel_under_content = pixel_ambi;
+        }
+
+
+        //*** BG IMAGE
+        if ( DO_BG_IMAGE == 1.0 && BG_IMAGE_OVER == 0.0) {
+
+            vec4 pixel_bg_image = fn_pixel_fgbg_image(bg_under);
+            vec3 anti_nightify_ambi = (pixel_ambi * AMBI_BG_IMAGE_BLEND_MODE) *
+                                    max(AMBI_BG_IMAGE_FORCE, 1-pixel_bg_image.a) ;
+
+            pixel_bg_image.rgb = fn_pixel_nightify(pixel_bg_image.rgb, BG_IMAGE_NIGHTIFY, anti_nightify_ambi );
+            pixel_bg_image.rgb = ambi_blend_image(pixel_bg_image, pixel_ambi, AMBI_BG_IMAGE_BLEND_MODE);
+            pixel_under_content = pixel_bg_image.rgb;
+        }
+
+    } 
+
 
     //*** black frame/border
     float border_corner_smooth = 1000;
@@ -1375,31 +1380,25 @@ void main() {
 
     float border = fn_border(co_content, border_corner_smooth, border_corner_size);
 
-    //** bezel
-    float ambi_colorize_shade_mask = 1.0;
-    if (DO_BEZEL == 1.0) {
-        vec2 co_mirror = zoom(co_content, 1/BEZEL_REFL_ZOOMOUT_ROOM);
-        vec2 co_bezel = get_scaled_coords_for_bezel(vTexCoord, vIsRotated);
-        vec3 pixel_ambi = vec3(0.0);
 
-        if (DO_AMBILIGHT == 1.0) {
-            pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb;
+    
+        //** bezel
+        if (DO_BEZEL == 1.0) {
+            vec2 co_bezel = get_scaled_coords_for_bezel(vTexCoord, vIsRotated);
+            
+            if (is_bezel_paint_area(co_bezel)) {
+                vec2 co_mirror = zoom(co_content, 1/BEZEL_REFL_ZOOMOUT_ROOM);
+            
+                vec4 pixel_bezel = fn_pixel_bezel(co_bezel, co_mirror, BG_IMAGE_NIGHTIFY * DO_BG_IMAGE, pixel_ambi);
 
-            if ( DO_BG_IMAGE + BG_IMAGE_OVER + AMBI_BG_IMAGE_BLEND_MODE == 3.0)
-                ambi_colorize_shade_mask = create_ambi_colorize_shade(co_bezel); //used by image over functions later on.
+                if (is_first_outside_rect(co_bezel, vec4(BEZEL_FRAME_SURROUND_MARGIN, BEZEL_FRAME_SURROUND_MARGIN, 1.0 - BEZEL_FRAME_SURROUND_MARGIN, 1.0 - BEZEL_FRAME_SURROUND_MARGIN)))
+                    pixel_under_content = mix(pixel_under_content, pixel_bezel.rgb, pixel_bezel.a);
+                else
+                    pixel_under_content = pixel_bezel.rgb;
 
+                border *= (1-pixel_bezel.a);
+            }
         }
-        vec4 pixel_bezel = fn_pixel_bezel(co_bezel, co_mirror, BG_IMAGE_NIGHTIFY * DO_BG_IMAGE, pixel_ambi);
-
-        if (is_first_outside_rect(co_bezel, vec4(BEZEL_FRAME_SURROUND_MARGIN, BEZEL_FRAME_SURROUND_MARGIN, 1.0 - BEZEL_FRAME_SURROUND_MARGIN, 1.0 - BEZEL_FRAME_SURROUND_MARGIN)))
-            pixel_under_content = mix(pixel_under_content, pixel_bezel.rgb, pixel_bezel.a);
-        else
-            pixel_under_content = pixel_bezel.rgb;
-
-        border *= (1-pixel_bezel.a);
-
-    }
-
 
 
 
@@ -1434,7 +1433,9 @@ void main() {
     #endif
 
     //content itself
-    vec3 content = fn_pixel_content(co_content);
+    vec3 content = vec3(0.0);
+    if (is_first_inside_rect(co_content, RECT01))
+        content = fn_pixel_content(co_content);
 
     if ( DO_SPOT + DO_VIGNETTE > 0.0 ) {
         float perlin = (random_fast(vTexCoord)-0.5) * (1/255.0);
@@ -1452,9 +1453,10 @@ void main() {
         #endif
     #endif
 
+            
     //backdrop/middle image/reflection
-    vec3 backdrop_reflection = vec3(0.0);
     if (DO_BACKDROP * BACKDROP_JUST_TUBE > 0.0) {
+        vec3 backdrop_reflection = vec3(0.0);
         backdrop_reflection = DO_BACKDROP * pixel_backdrop_image().rgb;
         content += backdrop_reflection * (1-content.rgb);
     }
@@ -1466,41 +1468,31 @@ void main() {
     //Foreground image
     float pixel_fg_image_alpha = 0.0;
     if (DO_BG_IMAGE + BG_IMAGE_OVER == 2.0) {
-        vec3 pixel_ambi = vec3(0.0);
-        if (DO_AMBILIGHT == 1.0)
-            pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb;
 
         vec4 pixel_fg_image = fn_pixel_fgbg_image(bg_over);
-        // if geometry content is overridden, ambientlight may have not been sample yet due to some skip logic
-        /*if (DO_AMBILIGHT == 1.0 && (pixel_fg_image.a+AMBI_BG_IMAGE_FORCE) > 0.0  && content_and_bezel_mask < 0.01) {
-            pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb * (1- content_and_bezel_mask ); //ALREADY TRIED COMMON fma() optimization, failed.
-        }*/
         vec3 anti_nightify_ambi = (pixel_ambi * AMBI_BG_IMAGE_BLEND_MODE) *
                                     max(AMBI_BG_IMAGE_FORCE, 1-pixel_fg_image.a) ;
 
         pixel_fg_image.rgb = fn_pixel_nightify(pixel_fg_image.rgb, BG_IMAGE_NIGHTIFY, anti_nightify_ambi );
 
-        // tl:dr:
-        //   dont "black" the transparent areas outside the game content when we use AMBI_BG_IMAGE_BLEND_MODE ADD blend mode.
-        //   Do only for add mode, since some inplace presets relies on the blackness with AMBI_BG_IMAGE_BLEND_MODE mix mode.
-        // long explaination:
-        //   We want to show the underlying game content when the image is transparent.
-        //   This means that alpha channel reveals the underlying content, but doing that even
-        //   when the underlyinig content is void is not only pointless, but even counterproductive.
-        //   Think at when we want to use ambient lights to *light* the part of the image
-        //   that have a low alpha channel, that part would be black.
+
         if (DO_AMBILIGHT + AMBI_BG_IMAGE_BLEND_MODE == 2.0) {
             pixel_out = mix(pixel_out, pixel_fg_image.rgb, pixel_fg_image.a );
             float fg_image_alpha_adapted = max(pixel_fg_image.a - AMBI_BG_IMAGE_FORCE, 0.0);
+            
+            //vec2 co_bezel = get_scaled_coords_for_bezel(vTexCoord, vIsRotated);
+            float ambi_colorize_shade_mask = 1.0 ; //create_ambi_colorize_shade(co_bezel); //used by image over functions later on.
+            
             vec3 light = pixel_ambi.rgb * (ambi_colorize_shade_mask) * (1- fg_image_alpha_adapted);
             pixel_out = light_over_image(light, pixel_out, AMBI_ADD_ON_BLACK);
         } else {
             pixel_out = mix(pixel_out, pixel_fg_image.rgb, pixel_fg_image.a);
         }
         pixel_fg_image_alpha = pixel_fg_image.a;
-        //FragColor = vec4(pixel_fg_image.a) ; return;
     }
 
+
+/*
     // Backdrop
     if (DO_BACKDROP > 0.0 ) {
         if (BACKDROP_JUST_TUBE == 0.0) {
@@ -1508,7 +1500,7 @@ void main() {
         }
     }
 
-
+*/
     #ifndef RENDER_BOGUS_FRAMES
         // Some cores set first frame size to 1x1 which may cause glitches.
         // This has less performance impact if kept here, at the end of the shader.
