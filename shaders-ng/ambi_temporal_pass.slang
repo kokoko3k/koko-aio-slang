@@ -310,6 +310,7 @@ void main() {
     
     if ( vMod_FrameCount_FrameDivider != 1.0 ) { 
         vec4 past_sampler = texture(PastSampler, vTexCoord);
+        past_sampler = max(past_sampler, 0.0); // <- Sanitize input to avoid glitches when enabling the option runtime; it may also avoid glitches when switching shader runtime (?)
         FragColor = past_sampler;
         return;
     }
