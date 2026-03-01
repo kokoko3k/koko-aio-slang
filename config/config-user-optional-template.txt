@@ -47,13 +47,10 @@
 
 ////////////////////////////////////////////////////////////////////////////
 //
-// SPECIFIC SYSTEM PARAMETERS:
-//   There yoy have a chance to boost your FPS, or tune koko-aio for your specific
-//   the more lines you insert (or uncomment), the more your FPS will be high.
-//   
-//   The downside of using this method is that every setting
-//   you will write here, will be static and so that 
-//   you will NOT BE ABLE RO MODIFY it "on-the-fly" in Retroarch anymore.
+// SPECIFIC HOST SYSTEM PARAMETERS:
+// There you can configure parameters that are specific to your machine
+// Like the need for an antiburn strategy, or acivatinc D3D workarounds
+// or mitigating ghosting due to your monitor and so on.
 //
 ////////////////////////////////////////////////////////////////////////////
 
