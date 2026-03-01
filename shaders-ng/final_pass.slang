@@ -32,7 +32,7 @@ layout(location = 0) noperspective out vec2 vTexCoord;
 layout(location = 1) noperspective out vec2 vOutputCoord;
 layout(location = 2) noperspective out vec2 vBg_img_coords;
 layout(location = 3) flat out float vIsRotated;
-layout(location = 4) flat out float vScanlinePeriod;
+layout(location = 4) flat out float vScanlinePeriod_multiplier;
 layout(location = 5) flat out float vInterlace_offset;
 layout(location = 6) flat out float vIn_aspect;
 layout(location = 7) flat out float vDo_Tate;
@@ -225,12 +225,17 @@ void main() {
         bool bIs_Interlaced = is_interlaced();
 
         //Scanline period:
-            vScanlinePeriod = 1.0; //Base 1x period
+            vScanlinePeriod_multiplier = 1.0; //Base 1x period
+            
+            #ifdef SCANLINES_FREQUENCY_MULTIPLIER_OVERRIDE
+                vScanlinePeriod_multiplier *= SCANLINES_FREQUENCY_MULTIPLIER_OVERRIDE;
+            #endif
+            
             vInterlace_offset = 0.0; //No interlace
 
             if (scanlines_will_alternate(bIs_Interlaced))  {
                 //Halve the scanline period, since they will interlace:
-                vScanlinePeriod = 0.5;
+                vScanlinePeriod_multiplier = 0.5;
                 vInterlace_offset = PI_15*0.5;
                 //Alternate scanlines on even/odd frames
                 if (frame_is_even())
@@ -336,7 +341,7 @@ void main() {
     // For automatic Fake scanline managment, we compute a treshold under which
     // fake integer scanlines will be used.
     // (Logic is skipped if integer scaling is requested.)
-    bool very_lowres_y = fn_very_lowres_y(params.OutputSize.xy, params.OriginalSize.xyzw, vDo_Tate, bIsRotated, !bNeed_NO_integer_scale, vIn_aspect, vScanlinePeriod);
+    bool very_lowres_y = fn_very_lowres_y(params.OutputSize.xy, params.OriginalSize.xyzw, vDo_Tate, bIsRotated, !bNeed_NO_integer_scale, vIn_aspect, vScanlinePeriod_multiplier);
                                       
     if ( fake_scanlines_needed(very_lowres_y, bIs_Interlaced) ) {
         vec4 out_size = params.OutputSize;
@@ -396,7 +401,7 @@ layout(location = 0) in vec2 vTexCoord;
 layout(location = 1) noperspective in vec2 vOutputCoord;
 layout(location = 2) noperspective in vec2 vBg_img_coords;
 layout(location = 3) flat in float vIsRotated;
-layout(location = 4) flat in float vScanlinePeriod;
+layout(location = 4) flat in float vScanlinePeriod_multiplier;
 layout(location = 5) flat in float vInterlace_offset;
 layout(location = 6) flat in float vIn_aspect;
 layout(location = 7) flat in float vDo_Tate;
@@ -654,7 +659,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             #endif
           
             //Compute final sin mask with staggering
-            vec3 rgb_h_sin = sin( (freq_base_core.y * vScanlinePeriod) + fakeslot_stagger_offset - decon_stagger + vInterlace_offset );
+            vec3 rgb_h_sin = sin( (freq_base_core.y * vScanlinePeriod_multiplier) + fakeslot_stagger_offset - decon_stagger + vInterlace_offset );
 
             //make it positve with doubled frequency:
                 rgb_h_sin = (rgb_h_sin * rgb_h_sin);

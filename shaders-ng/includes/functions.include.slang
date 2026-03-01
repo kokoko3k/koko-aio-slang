@@ -1952,9 +1952,9 @@ bool fn_very_lowres_y (vec2 out_size_xy, vec4 ori_size, float do_tate, bool bIsR
 			zoom_modifier.xy = zoom_modifier.yx;
 		}
 
-		zoom_modifier.y *= scanline_period_multiplier;
+		zoom_modifier.y /= scanline_period_multiplier;
         
-        //this shouldnt' stay here, as we already chech for need_doublescan() in final pass's vertex shader.
+        //this shouldnt' stay here, as we already check for need_doublescan() in final pass's vertex shader.
         //ideally, need_doublescan() would have to modify scanline_period_multiplier itself.
 		if (need_doublescan())
             zoom_modifier.y *=0.5;

@@ -156,6 +156,17 @@
 // if D3D_WORKAROUND is defined, OriginalFps is always used.
 // #define ORIGINAL_FPS_TRUSTED
 
+
+////////////////////////////////////////////////////////////////////////////
+//
+// Hacks that are very specific and generally not of public interest.
+//
+////////////////////////////////////////////////////////////////////////////
+
+// NEC PC-88 and NEC PC-98 Have a 200p output mode that Core outputs as 400p
+// By using the following (set it t 0.5) you can effectively halve scnalines density.
+// #define SCANLINES_FREQUENCY_MULTIPLIER_OVERRIDE 0.5
+
 ////////////////////////////////////////////////////////////////////////////
 //
 // RUNTIME PARAMETERS OVERRIDES:
