@@ -1944,18 +1944,21 @@ vec2 get_zooms_modifier(float do_tate, bool bNeed_NO_integer_scale, bool isrotat
 }
 
 
-bool fn_very_lowres_y (vec2 out_size_xy, vec4 ori_size, float do_tate, bool bIsRotated, bool bInteger_scaled, float in_aspect, float scanline_period) {
+bool fn_very_lowres_y (vec2 out_size_xy, vec4 ori_size, float do_tate, bool bIsRotated, bool bInteger_scaled, float in_aspect, float scanline_period_multiplier) {
 	bool very_lowres_y = false;
 	if ( !bInteger_scaled ) {
 		vec2 zoom_modifier = get_zooms_modifier(do_tate, !bInteger_scaled, bIsRotated, in_aspect, out_size_xy);
 		if (do_tate == 1.0) {
-			out_size_xy.xy = out_size_xy.yx;
-			ori_size.xyzw = ori_size.yxwz;
 			zoom_modifier.xy = zoom_modifier.yx;
 		}
-		if (need_doublescan()) ori_size.yw*=vec2(2.0, 1/2.0); //double period?
-		ori_size.y*=scanline_period; //helve period?
 
+		zoom_modifier.y *= scanline_period_multiplier;
+        
+        //this shouldnt' stay here, as we already chech for need_doublescan() in final pass's vertex shader.
+        //ideally, need_doublescan() would have to modify scanline_period_multiplier itself.
+		if (need_doublescan())
+            zoom_modifier.y *=0.5;
+		
 		if (zoom_modifier.y < MIN_SCREEN_CORE_RATIO)
 			very_lowres_y = true;
 	}
