@@ -260,10 +260,23 @@ vec3 ambi_step_rgb(vec3 s,vec3 d, vec3 mystep){
 }
 
 
+vec3 pixel_sanitize(vec3 color_in) {
+    return clamp(color_in, vec3(0), vec3(1));
+    //return max(color_in.rgb, vec3(0.0));
+}
+
+vec4 pixel_sanitize(vec4 color_in) {
+    return clamp(color_in, vec4(0), vec4(1));
+    //return max(color_in, vec4(0.0));
+}
+
+
 vec4 pixel_ambilight(vec2 local_pre_pass_coords) {
 
     vec3 present_pixel =  ambi_pre_pass(local_pre_pass_coords).rgb;
 
+    present_pixel.rgb = pixel_sanitize(present_pixel.rgb);
+    
     if ( dot(global.colortools_and_ntsc_passSize.xy, vec2(1.0)) != dot(global.colortools_and_ntsc_passFeedbackSize.xy, vec2(1.0) ) ) {
         // Under vulkan, when the framebuffer chain is reconfigured (due to the source resolution changed?)
         // Feeedback status is unrlieble, so to avoid glitches, return current color.
@@ -310,7 +323,7 @@ void main() {
     
     if ( vMod_FrameCount_FrameDivider != 1.0 ) { 
         vec4 past_sampler = texture(PastSampler, vTexCoord);
-        past_sampler = max(past_sampler, 0.0); // <- Sanitize input to avoid glitches when enabling the option runtime; it may also avoid glitches when switching shader runtime (?)
+        past_sampler = pixel_sanitize(past_sampler); // <- Sanitize input to avoid glitches when enabling the option runtime; it may also avoid glitches when switching shader runtime (?)
         FragColor = past_sampler;
         return;
     }
