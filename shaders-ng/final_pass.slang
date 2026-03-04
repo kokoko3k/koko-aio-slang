@@ -887,7 +887,7 @@ vec3 pixel_backdrop_image() {
 
     backdrop_coords=zoom(backdrop_coords, BACKDROP_ZOOM);
     //return textureLod(backdrop, backdrop_coords, backdrop_lod).rgb;
-    return texture(backdrop, backdrop_coords).rgb;
+    return texture(backdrop, backdrop_coords).rgb *  texture(backdrop, backdrop_coords).a;
 }
 
 

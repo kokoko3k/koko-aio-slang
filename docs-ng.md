@@ -630,7 +630,7 @@ However nice effects may be obtained (eg: with vector games). <br>
     <br>
     You can choose to emulate a "backdrop", as seen in some old arcades which 
     used a mirror trick to overlay the game over an high definition printed image.<br>
-    Or you can use some image representing tube glass reflections, scratches and so on.
+    Or you can use some image representing tube glass reflections.<br>
     
         Shift(Zoom) Backdrop over X(Y) axis:
             move or zoom the whole background image.
