@@ -299,7 +299,7 @@ void main() {
          //return;
          pixel_glowed = glow_blur_bias(shift_and_bleed_pass, vTexCoord, pixel_glowed, in_glow_bias_faded);
       }
-   
+
    pixel_glowed = pixel_glowed * vGlow_Gain;
    pixel_glowed = clip_to_white_maybe(pixel_glowed);
    FragColor = vec4(pixel_glowed, warpedglow_or_DR);

@@ -329,6 +329,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	
 	float PPERSISTENCE_MUL_R;
 	float PPERSISTENCE_MUL_G;
+
+	float CVBS_UNSHARP_COMPENSATION;
 	
 } global;
 
@@ -406,10 +408,11 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 // YIQ/YUV bandwidth limited chroma bleeding.
 #pragma parameter DO_SAT_BLEED "★ CVBS: Bandwidth limited chroma enable? (cv) ==>"	0.0 	0.0 1.0 1.0
-#pragma parameter SAT_BLEED_PAL           "        Colorspace (NTSC, PAL)"	0.0 	 0.0 1.0 1.0
-#pragma parameter SAT_BLEED_STRENGTH      "        Strength"						1.0	 0.0 5.0  0.01
-#pragma parameter SAT_BLEED_SIZE          "        Size/quality (capped to 5.0 in d3d)"		5.0  1.0 20.0  1.0
-#pragma parameter SAT_BLEED_FALLOFF  	  "        Sharpness"				1.7 	 1.0 2.0 0.01        
+#pragma parameter SAT_BLEED_PAL             "        Colorspace (NTSC, PAL)"	0.0 	 0.0 1.0 1.0
+#pragma parameter SAT_BLEED_STRENGTH        "        Strength"						1.0	 0.0 5.0  0.01
+#pragma parameter SAT_BLEED_SIZE            "        Size/quality (capped to 5.0 in d3d)"		5.0  1.0 20.0  1.0
+#pragma parameter SAT_BLEED_FALLOFF  	    "        Sharpness"				1.7 	 1.0 2.0 0.01
+#pragma parameter CVBS_UNSHARP_COMPENSATION "        Post sharpness filter" 0.0  0.0 3.0 0.1
 #pragma parameter LABEL0008 " " 0 0 0 1
 
 
@@ -460,15 +463,15 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 
 // Input Blur / light glowing
-#pragma parameter DO_IN_GLOW               "★ Glow/Blur enable? (gl) ==>"	 					0.0	0.0 1.0 1.0
-#pragma parameter IN_GLOW_BIAS             "        Glow to blur bias (Ignored with Fake transparencie)"	1.0     0.0 1.0 0.1
-#pragma parameter IN_GLOW_SPREAD           "        .  Glow light gain"		0.6 	0.0 4.0 0.05
-#pragma parameter IN_GLOW_SPREAD_SHARPNESS "        .  Glow light sharpness"	2.0 	0.01 2.0 0.01
-#pragma parameter IN_GLOW_W                "        Sharp X (neg=use BOX unsharp)"		2.5	-2.0 7.0 0.05
-#pragma parameter IN_GLOW_H                "        Sharp Y (neg=use BOX unsharp)"		2.5	-2.0 7.0 0.05
-#pragma parameter IN_GLOW_WARPSHARP_X      "        Warped glow X (neg = scanlined)"    -0.3  -2.0 2.0 0.05
-#pragma parameter IN_GLOW_WARPSHARP_Y      "        Warped glow Y"                      0.4  0.0  2.0 0.05
-#pragma parameter IN_GLOW_WARPSHARP_GAMMA  "        Warped glow dynamics (1.0=linear)"  1.0  0.2 1.0 0.05
+#pragma parameter DO_IN_GLOW                "★ Glow/Blur enable? (gl) ==>"	 					0.0	0.0 1.0 1.0
+#pragma parameter IN_GLOW_BIAS              "        Glow to blur bias (Ignored with Fake transparencie)"	1.0     0.0 1.0 0.1
+#pragma parameter IN_GLOW_SPREAD            "        .  Glow light gain"		0.6 	0.0 4.0 0.05
+#pragma parameter IN_GLOW_SPREAD_SHARPNESS  "        .  Glow light sharpness"	2.0 	0.01 2.0 0.01
+#pragma parameter IN_GLOW_W                 "        Sharp X (neg=use BOX unsharp)"		2.5	-2.0 7.0 0.05
+#pragma parameter IN_GLOW_H                 "        Sharp Y (neg=use BOX unsharp)"		2.5	-2.0 7.0 0.05
+#pragma parameter IN_GLOW_WARPSHARP_X       "        Warped glow X (neg = scanlined)"    -0.3  -2.0 2.0 0.05
+#pragma parameter IN_GLOW_WARPSHARP_Y       "        Warped glow Y"                      0.4  0.0  2.0 0.05
+#pragma parameter IN_GLOW_WARPSHARP_GAMMA   "        Warped glow dynamics (1.0=linear)"  1.0  0.2 1.0 0.05
 #pragma parameter LABEL0011 " " 0 0 0 1
 
 

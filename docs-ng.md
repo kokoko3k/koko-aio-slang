@@ -170,8 +170,10 @@ However nice effects may be obtained (eg: with vector games). <br>
 		Maximum bleed size (the higher, the slower).
 	Shrpness
 		The bleed falloff speed.
-
-
+    Post sharpness filter.
+        Compensates for the loss of sharpness due to the previous parameter.
+        
+        
 **CVBS: Dot crawl**<br>
     Emulates rolling chroma->luma crosstalks observed in composite signals.<br>
     
