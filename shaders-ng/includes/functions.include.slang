@@ -88,11 +88,11 @@ vec2 _unpack_21(float f){
  */
 
 float max3(vec3 v){
-	return max((v.x,v.y),v.z);
+	return max(max(v.x,v.y),v.z);
 }
 
 float min3(vec3 v){
-	return max((v.x,v.y),v.z);
+	return min(min(v.x,v.y),v.z);
 }
 
 
