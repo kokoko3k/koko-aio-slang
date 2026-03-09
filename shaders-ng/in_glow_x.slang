@@ -194,10 +194,9 @@ void main() {
 
     if ( CVBS_UNSHARP_COMPENSATION * DO_SAT_BLEED  > 0.0 ) {
         vec3 pixel_out_unsharp = unsharp_compensation(pixel_out,vTexCoord,CVBS_UNSHARP_COMPENSATION);
-        pixel_out = mix(pixel_out_unsharp, pixel_out, waterfall);
-
+        float bypass_unsharp = max(waterfall, 1-dist_from_edge*vIn_glow_edge_defocus_strength);
+        pixel_out = mix(pixel_out_unsharp, pixel_out, bypass_unsharp);
     }
     FragColor = vec4(pixel_out, warpedglow_x);
-
 }
 
