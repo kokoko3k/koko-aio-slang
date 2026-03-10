@@ -65,7 +65,7 @@ void main()
         else
             composite_mhz = vec3(4.2, 1.5, 0.5);  //ntsc YIQ
             
-        composite_mhz.yz /= vec2(4.0);
+        //composite_mhz.yz /= vec2(2.0);
     
         //0.5 because it is the minimum bandwidth present (Q in ntsc)
         vCVBS_blur_weights = 0.5/composite_mhz;

@@ -409,9 +409,9 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 // YIQ/YUV bandwidth limited chroma bleeding.
 #pragma parameter DO_CVBS_BLEED "★ CVBS: Bandwidth limited chroma enable? (cv) ==>"	0.0 	0.0 1.0 1.0
 #pragma parameter CVBS_BLEED_PAL             "        Bandwidth distribution (NTSC, PAL)"	0.0  0.0 1.0 1.0
-#pragma parameter CVBS_BLEED_ADJUST         "        Bandwith multiplier"					1.0	 0.7 5.0 0.1
+#pragma parameter CVBS_BLEED_ADJUST         "        Bandwith multiplier"					0.7	 0.1 5.0 0.1
 #pragma parameter CVBS_BLEED_SAMPLES        "        Quality (capped to 5.0 in d3d)"		5.0  1.0 20.0  1.0
-#pragma parameter CVBS_BLEED_COARSE	  	    "        Use coarse sampling"					0.0  0.0 1.0 0.05
+#pragma parameter CVBS_BLEED_COARSE	  	    "        Use coarse sampling"					0.3  0.0 1.0 0.05
 #pragma parameter CVBS_UNSHARP_COMPENSATION "        Post sharpness filter" 0.0  0.0 3.0 0.1
 #pragma parameter LABEL0008 " " 0 0 0 1
 
