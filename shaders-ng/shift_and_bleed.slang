@@ -1,7 +1,16 @@
 #version 450
 #include "config.inc"
 
-#define RGB_SHIFT_RANGE 20
+float CVBS_get_bleed_size() {
+    // This will be called by Fragment and vertex shader
+    #ifdef D3D_WORKAROUND
+        // d3d11 compiler complains it is unable to unroll the loop because it is
+        // clueless about the maximum pragma value; d3d12 hangs somewhere.
+        return min(5.0,CVBS_BLEED_SAMPLES);
+    #else
+        return min(20.0,CVBS_BLEED_SAMPLES);
+    #endif
+}
 
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
@@ -12,7 +21,7 @@ layout(location = 2) flat out vec2 vG_offset;
 layout(location = 3) flat out vec2 vB_offset;
 layout(location = 4) flat out float vDo_shadow_mode;
 layout(location = 5) flat out float vDecon_or_JustShadow;
-layout(location = 6) flat out vec3 vCVBS_bandwidths;
+layout(location = 6) flat out vec3 vCVBS_blur_weights;
 
 layout(location = 9) flat out float vDotCrawlShift;
 layout(location = 10) noperspective out vec4 vDotCrawlCoords_and_period;
@@ -47,13 +56,25 @@ void main()
    bool do_shadow = (DO_DOT_MATRIX == 1.0 && DOT_M_SHADOW_STR > 0.0);
    vDecon_or_JustShadow =  float(DO_SHIFT_RGB > 0.0 || do_shadow    );
 
-   //https://www.sciencedirect.com/topics/computer-science/color-subcarrier
-   //YIQ/YUV Ntsc/Pal bandwidths
-   if (SAT_BLEED_PAL == 0.0)
-      vCVBS_bandwidths = vec3(4.2, 1.5, 0.5); //NTSC
-   else
-      vCVBS_bandwidths = vec3(5.0, 1.3, 1.3); //PAL
-   
+    // Help CVBS blur:
+    //https://www.sciencedirect.com/topics/computer-science/color-subcarrier
+    //YIQ/YUV Ntsc/Pal bandwidths
+        vec3 composite_mhz = vec3(0.0);
+        if (CVBS_BLEED_PAL == 1.0)
+            composite_mhz = vec3(5.0, 1.3, 1.3); //pal YUV
+        else
+            composite_mhz = vec3(4.2, 1.5, 0.5);  //ntsc YIQ
+            
+        composite_mhz.yz /= vec2(4.0);
+    
+        //0.5 because it is the minimum bandwidth present (Q in ntsc)
+        vCVBS_blur_weights = 0.5/composite_mhz;
+
+        vCVBS_blur_weights *= CVBS_get_bleed_size()+1;
+  
+        vCVBS_blur_weights /= (CVBS_BLEED_ADJUST+eps); //modulate bandwidths via parameter
+        
+                
    //Mod framecount for animating dot crawl (needed to avoid precision errors)   
       float dot_c_steps = 6.0; // frames needed to reach sin period; higher = slower;
       dot_c_steps = 22-( abs(DOT_C_SPEED) *2)+0.0001;
@@ -77,7 +98,7 @@ layout(location = 2) flat in vec2 vG_offset;
 layout(location = 3) flat in vec2 vB_offset;
 layout(location = 4) flat in float vDo_shadow_mode;
 layout(location = 5) flat in float vDecon_or_JustShadow;
-layout(location = 6) flat in vec3 vCVBS_bandwidths;
+layout(location = 6) flat in vec3 vCVBS_blur_weights;
 
 layout(location = 9) flat in float vDotCrawlShift;
 layout(location = 10) noperspective in vec4 vDotCrawlCoords_and_period;
@@ -165,55 +186,48 @@ vec3 dotc(sampler2D in_texture, vec3 pixel_in, vec2 co, vec4 tex_size){
    return yiq2rgb( pixel_in );
 }
 
-vec3 pixel_bleed(vec3 pixel_in, vec2 co, sampler2D in_texture, float sourcesize_z) { //FIXME pixelin.a è passante, non serve vec4
-   //sometimes first frame has 0x0 size, that makes gpu mad in a way or another.
-   //hopefully fixes: https://github.com/kokoko3k/koko-aio-slang/issues/28   
+vec3 pixel_bleed(vec3 pixel_in, vec2 co, sampler2D in_texture, float sourcesize_z) { 
+   //Sometimes first frame has 0x0 size, that makes gpu mad in a way or another.
+   //Fixes: https://github.com/kokoko3k/koko-aio-slang/issues/28
    if (sourcesize_z > 1.0) return pixel_in;
-      
    mat3 colorspace_out;
    mat3 colorspace_rgb;
-
    //https://www.sciencedirect.com/topics/computer-science/color-subcarrier
-   if (SAT_BLEED_PAL > 0.5) {
+   if (CVBS_BLEED_PAL > 0.5) {
       colorspace_out = RGB2YUV;
       colorspace_rgb = YUV2RGB;
    } else {
       colorspace_out = RGB2YIQ;
       colorspace_rgb = YIQ2RGB;
    }
-   
-   #ifdef D3D_WORKAROUND
-      // d3d11 compiler complains it is unable to unroll the loop because it is
-      // clueless about the maximum pragma value; d3d12 hangs somewhere.
-      float size = min(5.0,SAT_BLEED_SIZE) ;
-   #else
-      float size = min(20.0,SAT_BLEED_SIZE) ;
-   #endif
-   
-   //Initial mix strength.
-   float w = SAT_BLEED_STRENGTH;
-
-   //Initial color in yiq space
-   vec3 out_YIQ = colorspace_out * ( pixel_in.rgb );
-   
-   for ( float off = sourcesize_z ; off <= sourcesize_z*size ; off+=sourcesize_z ){
-      //float new_offset = i*initial_offset;
-      vec3 smp_YIQ  = colorspace_out * ( texture(in_texture, co - vec2(off,0.0) ).rgb) * 0.5; //sample left
-           smp_YIQ += colorspace_out * ( texture(in_texture, co + vec2(off,0.0) ).rgb) * 0.5; //sample right
-
-      //Blur Y,I,Q
-      w=w/SAT_BLEED_FALLOFF;  //w = w * exp(i*i*(1-SAT_BLEED_FALLOFF)*0.1);
-      //out_YIQ = mix(out_YIQ.xyz, smp_YIQ.xyz, w/vCVBS_bandwidths);
-      out_YIQ = mix(out_YIQ.xyz,smp_YIQ.xyz, clamp(w/vCVBS_bandwidths, 0.0, 1.0));
-     
-   }
-   vec3 pixel_bleeded = colorspace_rgb * ( out_YIQ ); //return to RGB colorspace
-
-   // Clamping min to 0.0 is needed for nvidia to avoid bad graphical glitches, why?
-   pixel_bleeded = clamp(pixel_bleeded, 0.0, 1.0);
-   
-   return pixel_bleeded;
+      //Initial color in yiq or yuv space
+      vec3 pixel_YIQ = colorspace_out * pixel_in.rgb;
+      float size = CVBS_get_bleed_size(); //number of samples.
+      vec3 sum_color = pixel_YIQ * vCVBS_blur_weights;
+      vec3 total_weight = vCVBS_blur_weights;
+      for (float i = 1.0; i <= size; i++) {
+          
+         float offset = sourcesize_z * (i + i*i*CVBS_BLEED_COARSE); //optional use coarse sampling
+      
+         vec3 smp_RGB = (texture(in_texture, vTexCoord + vec2(offset, 0.0)).rgb +
+                        texture(in_texture, vTexCoord - vec2(offset, 0.0)).rgb) * 0.5;
+         vec3 smp_YIQ = colorspace_out * smp_RGB;
+         
+         vec3 current_weight = max(2.0 * (vCVBS_blur_weights - vec3(i)), vec3(0.0));
+         
+         sum_color += smp_YIQ * current_weight;
+         total_weight += current_weight;
+      }
+      // Normalizzazione finale
+      pixel_YIQ = sum_color / total_weight;
+      vec3 pixel_RGB = colorspace_rgb * pixel_YIQ;
+      
+      return pixel_RGB;
 }
+
+
+
+
 
 void main() {
    #ifndef D3D_WORKAROUND
@@ -230,8 +244,8 @@ void main() {
    // between the two.
    
    //bleed
-   if (DO_SAT_BLEED > 0.5)
-      pixel_out.rgb = pixel_bleed(pixel_out.rgb, vTexCoord, upscale_pass, params.OriginalSize.z*0.5);
+   if (DO_CVBS_BLEED > 0.5)
+      pixel_out.rgb = pixel_bleed(pixel_out.rgb, vTexCoord, upscale_pass, global.upscale_passSize.z);
 
    if (DOT_C > 0.0)
       pixel_out.rgb = dotc(upscale_pass, pixel_out.rgb, vTexCoord, params.OriginalSize);

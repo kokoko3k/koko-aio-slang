@@ -1604,19 +1604,7 @@ vec3 color_tools(vec3 pixel_out, vec3 Temperature_rgb) {
 		pixel_out.rgb = vibrance_set(pixel_out.rgb, VIBRANCE);
 	}
 
-	//Modify composite chroma
-	/*	if (DO_SAT_BLEED > 0.0) {
-	 *		mat3 mat3_in = RGB2YIQ;
-	 *		mat3 mat3_out = YIQ2RGB;
-	 *		if (SAT_BLEED_PAL == 1.0){
-	 *			mat3_in = RGB2YUV;
-	 *			mat3_out = YUV2RGB;
-}
-vec3 composite = mat3_in * pixel_out.rgb;
-composite.yz *= vec2(CVBS_SAT);
-pixel_out = mat3_out * composite;
-}
-*/
+
 	//Modify saturation
 	if (SATURATION != 1.0) {
 		vec3 intensity = vec3(dot(pixel_out.rgb, W_C_TO_GRAY));

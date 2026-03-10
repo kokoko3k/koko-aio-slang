@@ -162,14 +162,14 @@ However nice effects may be obtained (eg: with vector games). <br>
 **CVBS: Bandwidth limited chroma:**<br>
     Will cause an horizontal chroma bleed typical of band constrained composite signals.
     
-	Colorspace (NTSC, PAL)
-		Switch bandwidths to match different standards.
-	Strength
-		Self explanatory.
-	Size/Quality
-		Maximum bleed size (the higher, the slower).
-	Shrpness
-		The bleed falloff speed.
+	Bandwidths (NTSC, PAL)
+		Switch composite bandwidth distribution to match different standards.
+	Bandwidth multiplier
+        Adjust bandwidths; more bandwith = more sharpnes.
+	Quality
+		Smearing visual quality (the higher, the more samples, the slower).
+    Use coarse sampling
+        Useful to increase the apparent blur size while when the samples number is low.
     Post sharpness filter.
         Compensates for the loss of sharpness due to the previous parameter.
         

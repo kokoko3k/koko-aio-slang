@@ -227,11 +227,11 @@
 // #define NTSC_ARTF_ZAP  0.0           //         . Cancel artifacts under the treshold"
 // #define NTSC_SHOW_ARTF_MASK  0.0     //         . Show the mask of selected artifacts (debug)
 
-// #define DO_SAT_BLEED  0.0             // ★ CVBS: Bandwidth limited chroma enable?
-// #define SAT_BLEED_PAL  0.0            //         Colorspace (NTSC, PAL)
-// #define SAT_BLEED_STRENGTH  1.0       //         Strength
-// #define SAT_BLEED_SIZE  5.0           //         Size/Quality (capped to 5.0 in d3d)
-// #define SAT_BLEED_FALLOFF  1.7        //         Sharpness
+// #define DO_CVBS_BLEED  0.0             // ★ CVBS: Bandwidth limited chroma enable?
+// #define CVBS_BLEED_PAL  0.0            //         Bandwidth distribution (NTSC, PAL)
+// #define CVBS_BLEED_ADJUST   1.0       //         Bandwidth multiplier
+// #define CVBS_BLEED_SAMPLES  5.0       //         Quality (capped to 5.0 in d3d)
+// #define CVBS_BLEED_COARSE  1.0        //         Use coarse sampling
 // #define CVBS_UNSHARP_COMPENSATION 0.0 //         Post sharpness filter
 
 // #define DOT_C 0.0                    // ★ CVBS: Dot crawl

@@ -177,4 +177,4 @@ TODO:
 	    ...which can even be desidered, unsure.
 	    However, check if scanlines_will_alternate() is used in a way we can safely make it return 0.0
 	    when no scanlines are requested in interlaced screens.
-
+	[ ] cvbs unsharp does not work good (again) when blur /glow is active.

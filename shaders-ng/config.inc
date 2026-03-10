@@ -72,11 +72,11 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	
 	float DO_FXAA;
 	
-	float DO_SAT_BLEED;
-	float SAT_BLEED_SIZE;
-	float SAT_BLEED_FALLOFF;
-	float SAT_BLEED_STRENGTH;
-	float SAT_BLEED_PAL;
+	float DO_CVBS_BLEED;
+	float CVBS_BLEED_SAMPLES;
+	float CVBS_BLEED_COARSE;
+	float CVBS_BLEED_ADJUST;
+	float CVBS_BLEED_PAL;
 	
 	float DO_PPERSISTENCE;
 	float PPERSISTENCE_START;
@@ -400,18 +400,18 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter NTSC_FILTER_FC    "        Frequency cutoff"			2.5	0.0 10.0 0.1
 #pragma parameter NTSC_PHASE_SHIFT  "        Phase shift"			0.0	0.0 1.0  1.0
 #pragma parameter NTSC_ARTF_TRSH      "      Artifacts upper threshold"			0.1	0.0 1.0 0.01
-#pragma parameter NTSC_ARTF_ZAP       "      . Cancel artifacts under the threshold"		0.0	0.0 1.0 0.01
-#pragma parameter NTSC_SHOW_ARTF_MASK "      . Show selected artifacts mask (need glow/blur enabled)"				0.0	0.0 1.0 1.0
+#pragma parameter NTSC_ARTF_ZAP       "        . Cancel artifacts under the threshold"		0.0	0.0 1.0 0.01
+#pragma parameter NTSC_SHOW_ARTF_MASK "        . Show selected artifacts mask (need glow/blur enabled)"				0.0	0.0 1.0 1.0
 #pragma parameter LABEL0007 " " 0 0 0 1
 
 
 
 // YIQ/YUV bandwidth limited chroma bleeding.
-#pragma parameter DO_SAT_BLEED "★ CVBS: Bandwidth limited chroma enable? (cv) ==>"	0.0 	0.0 1.0 1.0
-#pragma parameter SAT_BLEED_PAL             "        Colorspace (NTSC, PAL)"	0.0 	 0.0 1.0 1.0
-#pragma parameter SAT_BLEED_STRENGTH        "        Strength"						1.0	 0.0 5.0  0.01
-#pragma parameter SAT_BLEED_SIZE            "        Size/quality (capped to 5.0 in d3d)"		5.0  1.0 20.0  1.0
-#pragma parameter SAT_BLEED_FALLOFF  	    "        Sharpness"				1.7 	 1.0 2.0 0.01
+#pragma parameter DO_CVBS_BLEED "★ CVBS: Bandwidth limited chroma enable? (cv) ==>"	0.0 	0.0 1.0 1.0
+#pragma parameter CVBS_BLEED_PAL             "        Bandwidth distribution (NTSC, PAL)"	0.0  0.0 1.0 1.0
+#pragma parameter CVBS_BLEED_ADJUST         "        Bandwith multiplier"					1.0	 0.7 5.0 0.1
+#pragma parameter CVBS_BLEED_SAMPLES        "        Quality (capped to 5.0 in d3d)"		5.0  1.0 20.0  1.0
+#pragma parameter CVBS_BLEED_COARSE	  	    "        Use coarse sampling"					0.0  0.0 1.0 0.05
 #pragma parameter CVBS_UNSHARP_COMPENSATION "        Post sharpness filter" 0.0  0.0 3.0 0.1
 #pragma parameter LABEL0008 " " 0 0 0 1
 

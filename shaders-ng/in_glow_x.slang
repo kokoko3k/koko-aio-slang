@@ -143,7 +143,7 @@ void main() {
         if ( vGlow_w_needed == 0.0) {
             //passthrough, almost, apply unsharp if requested.
             vec3 pixel_out_early = texture(shift_and_bleed_pass, vTexCoord).rgb;
-            if ( CVBS_UNSHARP_COMPENSATION * DO_SAT_BLEED  > 0.0)
+            if ( CVBS_UNSHARP_COMPENSATION * DO_CVBS_BLEED  > 0.0)
                 pixel_out_early = unsharp_compensation(pixel_out_early, vTexCoord, CVBS_UNSHARP_COMPENSATION);
             FragColor =vec4(pixel_out_early, warpedglow_x);
             return;
@@ -192,7 +192,7 @@ void main() {
             
     vec3 pixel_out = blur_select_wrap(shift_and_bleed_pass, vTexCoord, global.upscale_passSize, in_glow_w_adapted, sharp_sub_adapted, (IN_GLOW_W >= 0.0));
 
-    if ( CVBS_UNSHARP_COMPENSATION * DO_SAT_BLEED  > 0.0 ) {
+    if ( CVBS_UNSHARP_COMPENSATION * DO_CVBS_BLEED  > 0.0 ) {
         vec3 pixel_out_unsharp = unsharp_compensation(pixel_out,vTexCoord,CVBS_UNSHARP_COMPENSATION);
         float bypass_unsharp = max(waterfall, 1-dist_from_edge*vIn_glow_edge_defocus_strength);
         pixel_out = mix(pixel_out_unsharp, pixel_out, bypass_unsharp);
