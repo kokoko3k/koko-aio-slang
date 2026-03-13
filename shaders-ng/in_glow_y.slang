@@ -221,17 +221,6 @@ void main() {
       warpedglow_or_DR = DR_changed;
    }
    
-   //Passthrough
-   if (glow_h_inside_interval == 0.0) {
-      vec3 glowed_passthrough = texture(Source, vTexCoord).rgb;
-      glowed_passthrough*=vGlow_Gain;
-      glowed_passthrough = clip_to_white_maybe(glowed_passthrough.rgb);      
-      if (DO_RF_NOISE < -0.5)
-         glowed_passthrough = apply_noise_to(glowed_passthrough);
-      
-      FragColor = vec4(glowed_passthrough, warpedglow_or_DR);
-   }
-   
    
    if (DO_IN_GLOW == 0.0 && WTFL_SHARPNESS_Y == 3.0 ) {
       vec3 glowed = texture(shift_and_bleed_pass, vTexCoord).rgb * vGlow_Gain;
