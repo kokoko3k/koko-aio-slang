@@ -19,6 +19,9 @@ layout(location = 10) flat out float vIn_glow_edge_sharpness;
 layout(location = 11) flat out float vIn_glow_edge_defocus_strength;
 layout(location = 12) noperspective out float vWarpedglow_vtexcoord_offsets_plus;
 layout(location = 13) noperspective out float vWarpedglow_vtexcoord_offsets_minus;
+layout(location = 14) flat out vec2 vR_offset;
+layout(location = 15) flat out vec2 vG_offset;
+layout(location = 16) flat out vec2 vB_offset;
 
 void main() {
    gl_Position = global.MVP * Position;
@@ -88,6 +91,7 @@ void main() {
    //Generate a seed that changes over time for temporal random noise
    vDynamicSeed = mod(params.FrameCount, 120.0001) * vTexCoord;
    
+   
    if (EDGE_DEFOCUS_DO_BLUR*DO_SHIFT_RGB > 0.001) {
       vIn_glow_edge_defocus_strength = EDGE_DEFOCUS_DO_BLUR;
       //defocusing produces double scanlines, which is not the intended effect.
@@ -117,6 +121,13 @@ void main() {
    if (vIn_glow_edge_defocus_strength > 0.0 && DO_IN_GLOW == 0.0)
       vIn_glow_h_adapted = 7.0;
  
+   if (DO_SHIFT_RGB == 1.0) {
+      // divide y by pi/2.0 to sync with sin() period in pixelgrid code in final pass.
+      vR_offset=-(vec2(DECON_RX, DECON_RY) * vec2(NEW_SCALEMOD_X, NEW_SCALEMOD_Y) / global.upscale_passSize.xy) / vec2(pi/2.0);
+      vG_offset=-(vec2(DECON_GX, DECON_GY) * vec2(NEW_SCALEMOD_X, NEW_SCALEMOD_Y) / global.upscale_passSize.xy) / vec2(pi/2.0);
+      vB_offset=-(vec2(DECON_BX, DECON_BY) * vec2(NEW_SCALEMOD_X, NEW_SCALEMOD_Y) / global.upscale_passSize.xy) / vec2(pi/2.0);
+   }
+   
 }
 
 
@@ -136,6 +147,9 @@ layout(location = 10) flat in float vIn_glow_edge_sharpness;
 layout(location = 11) flat in float vIn_glow_edge_defocus_strength;
 layout(location = 12) noperspective in float vWarpedglow_vtexcoord_offsets_plus;
 layout(location = 13) noperspective in float vWarpedglow_vtexcoord_offsets_minus;
+layout(location = 14) flat in vec2 vR_offset;
+layout(location = 15) flat in vec2 vG_offset;
+layout(location = 16) flat in vec2 vB_offset;
 
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 4) uniform sampler2D upscale_pass;
@@ -173,6 +187,14 @@ vec3 apply_noise_to(vec3 c) {
    return c;
 }
 
+
+vec3 decon_passthrough(sampler2D smp, vec2 co, float dist_from_edge) {
+   float offset_multiplier = mix(EDGE_DEFOCUS, 1.0, dist_from_edge);
+   return vec3( texture(smp, co + vR_offset * offset_multiplier).r,
+                texture(smp, co + vG_offset * offset_multiplier).g,
+                texture(smp, co + vB_offset * offset_multiplier).b);
+}
+   
 
 void main() { 
    
@@ -221,15 +243,21 @@ void main() {
       warpedglow_or_DR = DR_changed;
    }
    
+   float dist_from_edge = distance_from_edge_linear(vTexCoord, EDGE_DEFOCUS_AREA_INV);
    
    if (DO_IN_GLOW == 0.0 && WTFL_SHARPNESS_Y == 3.0 ) {
-      vec3 glowed = texture(shift_and_bleed_pass, vTexCoord).rgb * vGlow_Gain;
-      glowed = clip_to_white_maybe(glowed.rgb);      
-      FragColor = vec4(glowed, warpedglow_or_DR);
+      vec3 c; 
+      if (DO_SHIFT_RGB != 1.0) {
+         c = texture(shift_and_bleed_pass, vTexCoord).rgb;
+      } else {
+         c = decon_passthrough(shift_and_bleed_pass, vTexCoord, dist_from_edge);
+      }
       
+      c *= vGlow_Gain;
+      c = clip_to_white_maybe(c.rgb);      
       if (DO_RF_NOISE < -0.5)
-          FragColor.rgb = apply_noise_to(FragColor.rgb);
-      
+          c.rgb = apply_noise_to(c.rgb);
+      FragColor = vec4(c, warpedglow_or_DR);
       return;
    }
 
@@ -250,10 +278,7 @@ void main() {
       }
    
    // Edge defocus:
-      float dist_from_edge = 1.0;
       if (vIn_glow_edge_defocus_strength > 0.0) {
-         dist_from_edge = distance_from_edge_linear(vTexCoord, EDGE_DEFOCUS_AREA_INV);
-         
          //never decrease blur:
             float new_in_glow_h_adapted = mix(vIn_glow_edge_sharpness, in_glow_h_adapted,  dist_from_edge );
             in_glow_h_adapted = min(new_in_glow_h_adapted, in_glow_h_adapted);
@@ -272,9 +297,21 @@ void main() {
       
    //If over the max sharp, then just passthrough, else do the blur.
       if (glow_h_inside_interval == 1.0) {
-         pixel_glowed = blur_select_wrap(Source, vTexCoord, global.upscale_passSize, in_glow_h_adapted, (IN_GLOW_H >= 0.0), sharp_sub_adapted );
-      } else {
-         pixel_glowed = texture(Source, vTexCoord).rgb;
+         bool use_gauss = IN_GLOW_H >= 0.0 ; 
+         if (DO_SHIFT_RGB == 1.0) {
+            float m = mix(EDGE_DEFOCUS, 1.0, dist_from_edge);
+            
+            pixel_glowed = vec3 ( blur_select_wrap(Source, vTexCoord + vR_offset * m, global.upscale_passSize, in_glow_h_adapted, use_gauss, sharp_sub_adapted ).r,
+                                  blur_select_wrap(Source, vTexCoord + vG_offset * m, global.upscale_passSize, in_glow_h_adapted, use_gauss, sharp_sub_adapted ).g,
+                                  blur_select_wrap(Source, vTexCoord + vB_offset * m, global.upscale_passSize, in_glow_h_adapted, use_gauss, sharp_sub_adapted ).b);
+         } else {
+            pixel_glowed = blur_select_wrap(Source, vTexCoord, global.upscale_passSize, in_glow_h_adapted, use_gauss, sharp_sub_adapted );
+         }
+      } else { //Just passthrough
+         if (DO_SHIFT_RGB == 1.0) 
+            pixel_glowed = decon_passthrough(Source, vTexCoord, dist_from_edge).rgb;
+         else 
+            pixel_glowed = texture(Source, vTexCoord).rgb;
       }
    
    

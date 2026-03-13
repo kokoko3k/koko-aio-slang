@@ -243,10 +243,7 @@
 // #define PPERSISTENCE_MUL_R           //         Red decay time multiplier
 // #define PPERSISTENCE_MUL_G           //         Green decay time multiplier
 
-// #define DO_SHIFT_RGB  1.0           // ★ Deconvergence enable?
-// #define OFFSET_STRENGTH  0.3        //         Strength
-
-
+// #define DO_SHIFT_RGB  1.0              // ★ Deconvergence enable?
 // #define DECON_RX 0.0                   // Red x offset
 // #define DECON_RY -1.0                  // Red y offset
 // #define DECON_GX 1.0                   // Green x offset

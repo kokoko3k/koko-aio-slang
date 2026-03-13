@@ -16,11 +16,6 @@ float CVBS_get_bleed_size() {
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 layout(location = 0) noperspective out vec2 vTexCoord;
-layout(location = 1) flat out vec2 vR_offset;
-layout(location = 2) flat out vec2 vG_offset;
-layout(location = 3) flat out vec2 vB_offset;
-layout(location = 4) flat out float vDo_shadow_mode;
-layout(location = 5) flat out float vDecon_or_JustShadow;
 layout(location = 6) flat out vec3 vCVBS_blur_weights;
 
 layout(location = 9) flat out float vDotCrawlShift;
@@ -31,31 +26,9 @@ void main()
 {
    gl_Position = global.MVP * Position;
    vTexCoord = TexCoord ;  
-   
-   //...to tell fragment shader if dot matrix feature requests shadows.
-      vDo_shadow_mode = float(DOT_M_SHADOW_STR + DO_DOT_MATRIX > 1 + eps);
-   
-   //Shadow mode disables deconvergence, they do not coexist in real life.
-   if (vDo_shadow_mode == 1.0) {
-      vR_offset = vec2(DOT_M_SHADOW_OFF, abs(DOT_M_SHADOW_OFF));
-      vG_offset = vR_offset;
-      vB_offset = vR_offset;
-      vec2 d = -params.OutputSize.zw * 0.5;
-      vR_offset *= d;
-      vG_offset *= d;
-      vB_offset *= d;
-   } else if (DO_SHIFT_RGB == 1.0) {
-      // divide y by pi/2.0 to sync with sin() period in pixelgrid code in final pass.
-      vR_offset=-(vec2(DECON_RX, DECON_RY) * vec2(NEW_SCALEMOD_X, NEW_SCALEMOD_Y) / global.upscale_passSize.xy) / vec2(pi/2.0);
-      vG_offset=-(vec2(DECON_GX, DECON_GY) * vec2(NEW_SCALEMOD_X, NEW_SCALEMOD_Y) / global.upscale_passSize.xy) / vec2(pi/2.0);
-      vB_offset=-(vec2(DECON_BX, DECON_BY) * vec2(NEW_SCALEMOD_X, NEW_SCALEMOD_Y) / global.upscale_passSize.xy) / vec2(pi/2.0);
-   }   
+
 
    
-   //Precalc some conditions:
-   bool do_shadow = (DO_DOT_MATRIX == 1.0 && DOT_M_SHADOW_STR > 0.0);
-   vDecon_or_JustShadow =  float(DO_SHIFT_RGB > 0.0 || do_shadow    );
-
     // Help CVBS blur:
     //https://www.sciencedirect.com/topics/computer-science/color-subcarrier
     //YIQ/YUV Ntsc/Pal bandwidths
@@ -93,11 +66,6 @@ void main()
 #pragma stage fragment
 #include "includes/functions.include.slang"
 layout(location = 0) noperspective in vec2 vTexCoord;
-layout(location = 1) flat in vec2 vR_offset;
-layout(location = 2) flat in vec2 vG_offset;
-layout(location = 3) flat in vec2 vB_offset;
-layout(location = 4) flat in float vDo_shadow_mode;
-layout(location = 5) flat in float vDecon_or_JustShadow;
 layout(location = 6) flat in vec3 vCVBS_blur_weights;
 
 layout(location = 9) flat in float vDotCrawlShift;
@@ -108,40 +76,11 @@ layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 1) uniform sampler2D upscale_pass;
 
 
-vec3 deconvergence_shadow(vec2 coords, sampler2D in_texture, vec3 source_pixel) {
-      //Emulates deconvergence or shadowing for dot matrix screens like Gameboy.
-      //Since both effects should not coexist in real life, we use a singe function for both.
-      //The function stays more or less the same, but rgb offsets calculated in vertex shader
-      //will be the same for shadow mode. Hopefully shader texture cache will take care of
-      //multiple sampling for the same tex coords.
-   
-      vec3 pixel_offsetted;
-      //Since we are sampling from a "clamp-to-border" texture, ensure we've no black bleeding
-      //by clamping the texture coords
-      //Removed, since shader chain changed, and this is now useless (?) WARNING <----
-      //coords = clamp(coords,params.SourceSize.zw*1 ,1.0-params.SourceSize.zw);
-
-      vec2 R_offset=vR_offset;
-      vec2 G_offset=vG_offset;
-      vec2 B_offset=vB_offset;
-
-      if (DOT_M_SHADOW_STR == 0.0) {
-         // Edge defocus:
-         float dist_from_edge = distance_from_edge_linear(coords, EDGE_DEFOCUS_AREA_INV);
-         float offset_multiplier = mix(EDGE_DEFOCUS, 1.0, dist_from_edge);
-         R_offset *= offset_multiplier;
-         G_offset *= offset_multiplier;
-         B_offset *= offset_multiplier;
-      }
-
-      pixel_offsetted.r=texture(in_texture,coords + R_offset).r;
-      pixel_offsetted.g=texture(in_texture,coords + G_offset).g;
-      pixel_offsetted.b=texture(in_texture,coords + B_offset).b;
-     
-      vec3 deconvergence_mode = mix(source_pixel.rgb, pixel_offsetted, OFFSET_STRENGTH);
-      vec3 shadow_mode = source_pixel.rgb - max( (source_pixel.rgb - pixel_offsetted), vec3(0.0) ) * DOT_M_SHADOW_STR;
-     
-      return mix_step(deconvergence_mode, shadow_mode, vDo_shadow_mode);
+vec3 shadow(vec2 coords, sampler2D in_texture, vec3 source_pixel) {
+    //Emulates shadowing for dot matrix screens like Gameboy.
+    vec2 off = vec2(DOT_M_SHADOW_OFF, abs(DOT_M_SHADOW_OFF)) * -params.OutputSize.zw * 0.5;
+    vec3 pixel_shadow = texture(in_texture,coords + off).rgb;
+    return source_pixel.rgb - max( (source_pixel.rgb - pixel_shadow), vec3(0.0) ) * DOT_M_SHADOW_STR;
 }
 
 float dotc_carrier(vec2 co, vec2 OriginalSize) {  
@@ -251,8 +190,8 @@ void main() {
       pixel_out.rgb = dotc(upscale_pass, pixel_out.rgb, vTexCoord, params.OriginalSize);
 
    //... and shift
-   if (vDecon_or_JustShadow > 0.0 )
-      pixel_out.rgb = deconvergence_shadow(vTexCoord, upscale_pass, pixel_out.rgb);
+    if (DO_DOT_MATRIX == 1.0)
+        pixel_out.rgb = shadow(vTexCoord, upscale_pass, pixel_out.rgb);
 
    pixel_out.rgb = max(vec3(0.0), pixel_out.rgb);  //make sure everything is over 0.0
 

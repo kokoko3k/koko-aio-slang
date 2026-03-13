@@ -654,7 +654,7 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             #ifdef HQ_DECON
                 //Sync decon stagger to deconvergence set in shift_and_bleed pass.
                 float dist_from_edge = distance_from_edge_linear(in_coords, EDGE_DEFOCUS_AREA_INV);
-                float offset_multiplier = mix(EDGE_DEFOCUS, 0.0, dist_from_edge) * OFFSET_STRENGTH;
+                float offset_multiplier = mix(EDGE_DEFOCUS, 0.0, dist_from_edge);
                 decon_stagger = (vec3(DECON_RY,DECON_GY,DECON_BY) * offset_multiplier) * decon_y_strength;
             #endif
           

@@ -340,12 +340,6 @@ However nice effects may be obtained (eg: with vector games). <br>
             You may want them to blend or not, depending on your preference to keep scanlines separated.
             This function is useful when you want to emulate handhelds screens using integer scaling, 
             where cells are well separated.
-        Anti-moire sweet spot:
-            When dealing with curvature and deep scanlines gaps, moire patterns could appear on screen.
-            This setting staggers screen phosphors by the configured amount and that halps in mitigating
-            the disturbing effect.
-            I observed that a value of 0.17 does a good job for low-res games rendered at 1080p height.
-            Any value > 0.0 disables the, following functions: Slotmask(fake) and Deconvergence Y
         Slotmask(fake) offset(*):
             This will cause every triad to be vertically shifted by the configured amount to
             fake a slotmask phosphors layout.

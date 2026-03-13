@@ -212,10 +212,6 @@
     #define EDGE_DEFOCUS_DO_BLUR		global.EDGE_DEFOCUS_DO_BLUR
 #endif
 
-#ifndef OFFSET_STRENGTH
-    #define OFFSET_STRENGTH	global.OFFSET_STRENGTH
-#endif
-
 #ifndef DO_IN_GLOW
     #define DO_IN_GLOW		global.DO_IN_GLOW
 #endif
