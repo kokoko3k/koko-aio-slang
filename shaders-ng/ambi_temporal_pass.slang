@@ -261,12 +261,12 @@ vec3 ambi_step_rgb(vec3 s,vec3 d, vec3 mystep){
 
 
 vec3 pixel_sanitize(vec3 color_in) {
-    return clamp(color_in, vec3(0), vec3(1));
+    return clamp(color_in, vec3(0), vec3(10.0));
     //return max(color_in.rgb, vec3(0.0));
 }
 
 vec4 pixel_sanitize(vec4 color_in) {
-    return clamp(color_in, vec4(0), vec4(1));
+    return clamp(color_in, vec4(0), vec4(10.0,10.0,10.0,1.0));
     //return max(color_in, vec4(0.0));
 }
 
