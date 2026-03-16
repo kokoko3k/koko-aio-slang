@@ -820,6 +820,12 @@ void main() {
 
    //if (low_fps(FPS_ESTIMATE_PASS) && vTexCoord.y < 0.05) { pixel_out = vec3(1,0,0); }
 
+ /*  
+   pixel_out = RGB2YIQ*pixel_out;
+   pixel_out *= mix( vec3(1.0) ,     (vec3(4.2, 1.5, 0.5) / 4.2) , SERVICE1);
+   pixel_out = YIQ2RGB*pixel_out;
+   pixel_out = saturation_set_gain(pixel_out, mix(1.0, 3.0, SERVICE1));
+   */
    FragColor = vec4(pixel_out, waterfall);
 }
 
