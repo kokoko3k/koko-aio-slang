@@ -1,4 +1,4 @@
-#reference "tv-BASE.slangp"
+#reference "../../Presets-4.1/tv-BASE.slangp"
 
 IN_GLOW_GAMMA = "2.220000"
 GAMMA_OUT = "0.42000"

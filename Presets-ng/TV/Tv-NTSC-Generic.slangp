@@ -1,4 +1,4 @@
-#reference "tv-NTSC-Megadrive-Genesis.slangp"
+#reference "Tv-NTSC-Megadrive-Genesis.slangp"
 
 	DO_WTFL = "0.000000"
 	
