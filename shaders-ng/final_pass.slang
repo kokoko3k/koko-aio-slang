@@ -1380,7 +1380,7 @@ void main() {
             } else {
                 blended = pixel_out.rgb + ( (DO_BACKDROP * backdrop_img.rgb) * (1.0 - pixel_out.rgb) );
             }
-            pixel_out = mix( pixel_out.rgb, blended, backdrop_img.a * DO_BACKDROP);
+            pixel_out = mix( pixel_out.rgb, blended, backdrop_img.a );
            
         }
         

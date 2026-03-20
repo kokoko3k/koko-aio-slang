@@ -140,8 +140,9 @@ vec3 ambi_push_pass(vec2 coords, float f_lod) {
     vec3 pixel_out = textureLod(colortools_and_ntsc_pass, smp_coords, f_lod).rgb;
 
     if (DO_BACKDROP * BACKDROP_JUST_TUBE > 0.0) {
-        vec3 backdrop_img = pixel_overlay_image_stretch(backdrop, coords).rgb;//, BACKDROP_AR, global.FinalViewportSize , 0.0);
-        pixel_out.rgb = (pixel_out.rgb + DO_BACKDROP) * backdrop_img;
+        vec4 backdrop_img = pixel_overlay_image_stretch(backdrop, coords);
+        vec3 blended = (pixel_out.rgb + DO_BACKDROP) * backdrop_img.rgb;
+        pixel_out = mix( pixel_out.rgb, blended, backdrop_img.a );
     }
 
     pixel_out = pow(pixel_out, vec3(AMBI_GAMMA)); 

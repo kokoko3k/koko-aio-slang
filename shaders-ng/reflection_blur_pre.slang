@@ -107,7 +107,7 @@ void main() {
       if (DO_BACKDROP * BACKDROP_JUST_TUBE  > 0.0) {
          vec4 backdrop_img = pixel_overlay_image_stretch(backdrop, coords);
          vec3 blended = (pixel_out.rgb + DO_BACKDROP) * backdrop_img.rgb;
-         blended = mix( pixel_out.rgb, blended, backdrop_img.a * DO_BACKDROP);
+         pixel_out.rgb = mix( pixel_out.rgb, blended, backdrop_img.a );
       }
       
    FragColor = vec4(pixel_out,shade_sharp_blur );
