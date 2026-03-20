@@ -1373,12 +1373,15 @@ void main() {
         pixel_out = fn_pixel_content(co_content);
         
         if (DO_BACKDROP * BACKDROP_JUST_TUBE > 0.0) {
-            vec3 backdrop_img = pixel_overlay_image_stretch(backdrop, co_content);
+            vec3 blended = vec3(0.0);
+            vec4 backdrop_img = pixel_overlay_image_stretch(backdrop, co_content);
             if (BACKDROP_BLEND_MODE == 1.0) {
-                pixel_out.rgb = (pixel_out.rgb + DO_BACKDROP) * backdrop_img;
+                blended = (pixel_out.rgb + DO_BACKDROP) * backdrop_img.rgb;
             } else {
-                pixel_out.rgb += (DO_BACKDROP * backdrop_img) * (1.0 - pixel_out.rgb);
+                blended = pixel_out.rgb + ( (DO_BACKDROP * backdrop_img.rgb) * (1.0 - pixel_out.rgb) );
             }
+            pixel_out = mix( pixel_out.rgb, blended, backdrop_img.a * DO_BACKDROP);
+           
         }
         
         if ( DO_SPOT + DO_VIGNETTE > 0.0 ) {

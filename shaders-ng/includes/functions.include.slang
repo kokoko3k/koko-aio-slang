@@ -2100,8 +2100,8 @@ vec3 pixel_overlay_image_keep_aspect(sampler2D tex, vec2 co, float aspect_overla
 	return texture(tex, co).rgb;
 }
 
-vec3 pixel_overlay_image_stretch(sampler2D tex, vec2 co) {
+vec4 pixel_overlay_image_stretch(sampler2D tex, vec2 co) {
 	co = zoom( co + vec2(BACKDROP_OFFX,BACKDROP_OFFY), BACKDROP_ZOOM);
-	return texture(tex, co).rgb;
+	return texture(tex, co);
 }
 

@@ -105,8 +105,9 @@ void main() {
       vec3 pixel_out = bloom(shift_and_bleed_pass, coords, global.FinalViewportSize, blur_radius_adpt, 1.0, 0.0, 1.0) ;
       
       if (DO_BACKDROP * BACKDROP_JUST_TUBE  > 0.0) {
-         vec3 backdrop_img = pixel_overlay_image_stretch(backdrop, coords);
-         pixel_out.rgb = (pixel_out.rgb + DO_BACKDROP) * backdrop_img;
+         vec4 backdrop_img = pixel_overlay_image_stretch(backdrop, coords);
+         vec3 blended = (pixel_out.rgb + DO_BACKDROP) * backdrop_img.rgb;
+         blended = mix( pixel_out.rgb, blended, backdrop_img.a * DO_BACKDROP);
       }
       
    FragColor = vec4(pixel_out,shade_sharp_blur );
