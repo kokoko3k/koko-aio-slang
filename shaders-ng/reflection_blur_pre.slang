@@ -37,7 +37,7 @@ layout(location = 0) out vec4 FragColor;
 
 layout(set = 0, binding = 1) uniform sampler2D shift_and_bleed_pass;
 layout(set = 0, binding = 2) uniform sampler2D avglum_pass;
-
+layout(set = 0, binding = 3) uniform sampler2D backdrop;
 #include "includes/functions.include.slang"
 #include "includes/blooms.include.slang"
 
@@ -103,7 +103,12 @@ void main() {
       
       
       vec3 pixel_out = bloom(shift_and_bleed_pass, coords, global.FinalViewportSize, blur_radius_adpt, 1.0, 0.0, 1.0) ;
-
+      
+      if (DO_BACKDROP * BACKDROP_JUST_TUBE  > 0.0) {
+         vec3 backdrop_img = pixel_overlay_image_stretch(backdrop, coords);
+         pixel_out.rgb = (pixel_out.rgb + DO_BACKDROP) * backdrop_img;
+      }
+      
    FragColor = vec4(pixel_out,shade_sharp_blur );
 //FragColor = vec4(shade_sharp_blur );
    

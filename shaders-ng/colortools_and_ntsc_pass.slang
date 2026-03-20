@@ -228,6 +228,7 @@ layout(set = 0, binding = 4) uniform sampler2D avglum_passFeedback;
 #endif
 layout(set = 0, binding = 5) uniform sampler2D FPS_ESTIMATE_PASS;
 
+
 vec3 colorwheel(vec2 uv){
    float timeoffset = params.FrameCount / 120.0;
    vec2 uvc = -1.0 * ((2.0 * uv) - 1.0);
@@ -672,7 +673,7 @@ void main() {
             co.y += shake * fadeout;
       }
    #endif
-      
+
    vec3 pixel_in = texture(Source, co).rgb;
    
    //eventually return black pixel
@@ -826,6 +827,7 @@ void main() {
    pixel_out = YIQ2RGB*pixel_out;
    pixel_out = saturation_set_gain(pixel_out, mix(1.0, 3.0, SERVICE1));
    */
+
    FragColor = vec4(pixel_out, waterfall);
 }
 

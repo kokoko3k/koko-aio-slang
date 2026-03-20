@@ -96,7 +96,7 @@ vec2 get_unrotated_output_coords(vec2 in_coords) {
     
     return in_coords;
 }
-    
+
 vec2 get_bg_image_coords(vec2 in_vOutputCoord) {
     vec2 bg_img_coords = in_vOutputCoord;
 
@@ -873,24 +873,6 @@ float get_clamped_white_reference(vec3 pixel_in){
     return white_reference;
 }
 
-vec3 pixel_backdrop_image() {
-    vec2 backdrop_offset=vec2(BACKDROP_OFFX,BACKDROP_OFFY);
-
-    vec2 backdrop_tex_size = textureSize(backdrop, 0);
-    //float backdrop_lod = log2(backdrop_tex_size.y * global.FinalViewportSize.w);
-
-    vec2 backdrop_coords =  get_scaled_coords_aspect(
-                            vUnrotated_Output_coords+backdrop_offset,
-                            global.FinalViewportSize,
-                            backdrop_tex_size.x/backdrop_tex_size.y,
-                            false);
-
-    backdrop_coords=zoom(backdrop_coords, BACKDROP_ZOOM);
-    //return textureLod(backdrop, backdrop_coords, backdrop_lod).rgb;
-    return texture(backdrop, backdrop_coords).rgb;
-}
-
-
 vec4 textureLod_wrap(sampler2D tex, vec2 co, float lod, float wrap_mode) {
     #ifndef DISALLOW_BG_IMAGE_TEXTURE_WRAP_IN_SHADER
         /*
@@ -1391,12 +1373,14 @@ void main() {
         pixel_out = fn_pixel_content(co_content);
         
         if (DO_BACKDROP * BACKDROP_JUST_TUBE > 0.0) {
-            vec3 backdrop = pixel_backdrop_image().rgb;
-
-            pixel_out.rgb += (DO_BACKDROP*backdrop) * (1-pixel_out.rgb);
-            //pixel_out = max(pixel_out, backdrop*DO_BACKDROP);
+            vec3 backdrop_img = pixel_overlay_image_stretch(backdrop, co_content);
+            if (BACKDROP_BLEND_MODE == 1.0) {
+                pixel_out.rgb = (pixel_out.rgb + DO_BACKDROP) * backdrop_img;
+            } else {
+                pixel_out.rgb += (DO_BACKDROP * backdrop_img) * (1.0 - pixel_out.rgb);
+            }
         }
-
+        
         if ( DO_SPOT + DO_VIGNETTE > 0.0 ) {
             float perlin = (random_fast(vTexCoord)-0.5) * (1/255.0);
             vec2 vignette_spot = texture(helper_pass, vTexCoord).zw;
@@ -1550,11 +1534,10 @@ void main() {
     }
 
     
-    // Backdrop
-    if (DO_BACKDROP > 0.0 ) {
-        if (BACKDROP_JUST_TUBE == 0.0) {
-            pixel_out += pixel_backdrop_image() * (1-pixel_fg_image_alpha);
-        }
+   // Backdrop
+   if ( (1-BACKDROP_JUST_TUBE) + DO_BACKDROP > 1.0 ) {
+        vec3 backdrop_img = pixel_backdrop_image(backdrop, vUnrotated_Output_coords, global.FinalViewportSize );
+        pixel_out += backdrop_img * (1-pixel_fg_image_alpha);
     }
     
     
