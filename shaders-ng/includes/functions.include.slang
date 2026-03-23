@@ -2100,8 +2100,14 @@ vec3 pixel_overlay_image_keep_aspect(sampler2D tex, vec2 co, float aspect_overla
 	return texture(tex, co).rgb;
 }
 
+vec2 overlay_image_coords(vec2 co) {
+	//over-abstracting because stretched coords are useful to get the correct
+	//skip size on reflections.
+	return zoom( co + vec2(BACKDROP_OFFX,BACKDROP_OFFY), BACKDROP_ZOOM);
+}
+
 vec4 pixel_overlay_image_stretch(sampler2D tex, vec2 co) {
-	co = zoom( co + vec2(BACKDROP_OFFX,BACKDROP_OFFY), BACKDROP_ZOOM);
+	co = overlay_image_coords(co);
 	return texture(tex, co);
 }
 
