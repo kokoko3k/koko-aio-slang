@@ -448,7 +448,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 
 
-#pragma parameter RESSWITCH_SYNC_SPEED		"★ Resync speed when core resolution changes"		0.7		0.1 1.0 0.05
+#pragma parameter RESSWITCH_SYNC_SPEED		"★ Resync speed when core resolution changes"		0.8		0.1 1.0 0.05
 #pragma parameter LABEL0013 " " 0 0 0 1
 
 

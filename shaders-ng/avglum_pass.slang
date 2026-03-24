@@ -1,5 +1,11 @@
 #version 450
 
+#ifndef D3D_WORKAROUND
+   #define FPS_ESTIMATE_PASS halo_pre_gamma_passFeedback
+#else
+   #define FPS_ESTIMATE_PASS Original
+#endif
+
 #define AUTOCROP_TOLERANCE (1.0/255.0) 
 //How many pseudorandom samplings per line
 
@@ -92,7 +98,7 @@ layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 1) uniform sampler2D colortools_and_ntsc_passFeedback;
 layout(set = 0, binding = 2) uniform sampler2D colortools_and_ntsc_pass;
 layout(set = 0, binding = 3) uniform sampler2D avglum_passFeedback;
-
+layout(set = 0, binding = 4) uniform sampler2D FPS_ESTIMATE_PASS;
 
 /* The following will allow to sample at reduced interval
    The scene change detection logic will take advantage of it
@@ -389,11 +395,19 @@ void main() {
             pixel_out.a = 1.0;  
         } else {
             #ifndef D3D_WORKAROUND
-                pixel_out.a = mix(texture(avglum_passFeedback,vTexCoord_unscaled).a, 0.0, 0.02 );
-                if (pixel_out.a < RESSWITCH_SYNC_SPEED) pixel_out.a *= 0.7;
+                vec2 early_late_cut = vec2(0.03,1.6); // decay rate before/after RESSWITCH_SYNC_SPEED threshold;
+                if (low_fps(FPS_ESTIMATE_PASS)) early_late_cut*= 2.0;
+
+                float t = texture(avglum_passFeedback,vTexCoord_unscaled).a;
+                if (t >= RESSWITCH_SYNC_SPEED) {
+                    pixel_out.a = clamp( t - early_late_cut.x, 0,1);
+                } else {
+                    pixel_out.a = t/early_late_cut.y;
+                }
             #else
                  pixel_out.a = 0.0;
             #endif
+                 
         }
         
 
