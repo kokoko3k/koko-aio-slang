@@ -1272,7 +1272,7 @@ vec3 antighost(vec3 c) {
 
 	#ifndef D3D_WORKAROUND
 		if (!bdelta_render_enabled()) {
-				if (frame_is_even()) {
+				if (frame_is_even() && (vInterlace_offset == 0.0)) {
 					vec3 feedback = texture(final_passFeedback, vOutputCoord).rgb;
 					vec3 diff=(feedback - c)*LCD_ANTIGHOSTING;
 					diff = sign(diff) * min( abs(diff), vec3(LCD_ANTIGHOSTING_CEIL));
