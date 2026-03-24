@@ -32,7 +32,8 @@ void main() {
    //    * we don't want to show ntsc artifact masks if we're doing ntsc artifacts
    //    * we don't use fake transparencies.
    // Then do in glow bias
-   vDoInGlowBias = float (  IN_GLOW_BIAS < IN_GLOW_BIAS_MAX && 
+   vDoInGlowBias = float (  DO_IN_GLOW == 1.0 &&
+                            IN_GLOW_BIAS < IN_GLOW_BIAS_MAX && 
                             (abs(IN_GLOW_W) < GLOW_SHARP_MAX || IN_GLOW_H < GLOW_SHARP_MAX) &&
                             (DO_NTSC_ARTIFACTS + NTSC_SHOW_ARTF_MASK < 1.5) &&
                             (DO_WTFL < 0.5)
