@@ -159,13 +159,12 @@ layout(set = 0, binding = 6) uniform sampler2D Source;
 layout(set = 0, binding = 8) uniform sampler2D colortools_and_ntsc_passFeedback;
 layout(set = 0, binding = 9) uniform sampler2D colortools_and_ntsc_pass;
 
-vec3 glow_blur_bias(sampler2D source_tex, vec2 co, vec3 pixel_glowed, float bias){
-   vec3 pixel_source = texture(source_tex, co).rgb;
+vec3 glow_blur_bias(vec3 naked_color, vec2 co, vec3 pixel_glowed, float bias){
    //good with sx,sy=1.3; light gain 2.7, light sharpness 1.1
-   vec3 glow_light = pixel_glowed - pixel_source;
+   vec3 glow_light = pixel_glowed - naked_color;
    glow_light = clamp(glow_light * IN_GLOW_SPREAD, 0.0, 1.0);
    glow_light = pow(glow_light, vec3(IN_GLOW_SPREAD_SHARPNESS));
-   vec3 proper_glow = glow_light  + pixel_source;  
+   vec3 proper_glow = glow_light  + naked_color;  
    return mix(proper_glow, pixel_glowed, max(0.0, bias));            
 }
 
@@ -244,21 +243,24 @@ void main() {
       warpedglow_or_DR = DR_changed;
    }
    
-   float dist_from_edge = distance_from_edge_linear(vTexCoord, EDGE_DEFOCUS_AREA_INV);
+   
+    vec3 passthrough = vec3(0.0);
+    float dist_from_edge = 1.0;
+    
+    if (DO_SHIFT_RGB == 1.0) {
+        dist_from_edge = distance_from_edge_linear(vTexCoord, EDGE_DEFOCUS_AREA_INV);
+        passthrough = decon_passthrough(shift_and_bleed_pass, vTexCoord, dist_from_edge);
+    } else {
+        passthrough = texture(shift_and_bleed_pass, vTexCoord).rgb;
+    }
+   
    
    if (DO_IN_GLOW == 0.0 && WTFL_SHARPNESS_Y == 3.0 ) {
-      vec3 c; 
-      if (DO_SHIFT_RGB != 1.0) {
-         c = texture(shift_and_bleed_pass, vTexCoord).rgb;
-      } else {
-         c = decon_passthrough(shift_and_bleed_pass, vTexCoord, dist_from_edge);
-      }
-      
-      c *= vGlow_Gain;
-      c = clip_to_white_maybe(c.rgb);      
+      passthrough *= vGlow_Gain;
+      passthrough = clip_to_white_maybe(passthrough.rgb);      
       if (DO_RF_NOISE < -0.5)
-          c.rgb = apply_noise_to(c.rgb);
-      FragColor = vec4(c, warpedglow_or_DR);
+          passthrough.rgb = apply_noise_to(passthrough.rgb);
+      FragColor = vec4(passthrough, warpedglow_or_DR);
       return;
    }
 
@@ -309,14 +311,9 @@ void main() {
             pixel_glowed = blur_select_wrap(Source, vTexCoord, global.upscale_passSize, in_glow_h_adapted, use_gauss, sharp_sub_adapted );
          }
       } else { //Just passthrough
-         if (DO_SHIFT_RGB == 1.0) 
-            pixel_glowed = decon_passthrough(Source, vTexCoord, dist_from_edge).rgb;
-         else 
-            pixel_glowed = texture(Source, vTexCoord).rgb;
+         pixel_glowed = passthrough;
       }
    
-   
-
    
    //Series of conditions to do in glow bias done in vertex shader:
       if (vDoInGlowBias == 1.0) {
@@ -324,7 +321,7 @@ void main() {
          float in_glow_bias_faded = mix(IN_GLOW_BIAS, 1.0,  (1-dist_from_edge) *  (DO_SHIFT_RGB * EDGE_DEFOCUS_DO_BLUR ) );
          //FragColor = vec4(vec3(in_glow_bias_faded), 0.0);
          //return;
-         pixel_glowed = glow_blur_bias(shift_and_bleed_pass, vTexCoord, pixel_glowed, in_glow_bias_faded);
+         pixel_glowed = glow_blur_bias(passthrough, vTexCoord, pixel_glowed, in_glow_bias_faded);
       }
 
    pixel_glowed = pixel_glowed * vGlow_Gain;
