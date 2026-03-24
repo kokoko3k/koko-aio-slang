@@ -150,11 +150,14 @@
 // and avoid performance hits.
 // #define RENDER_BOGUS_FRAMES
 
-// Cores may or not update OriginalFps uniform. So you may trust it or not.
-// In case you don't, it is derived by averaging frametimes.
-// The latter is less reliable depending on the video driver behaviour, and slower.
-// if D3D_WORKAROUND is defined, OriginalFps is always used.
-// #define ORIGINAL_FPS_TRUSTED
+// Temporal based features need to know the source fps to have a fixed duration
+// across multiple input refresh rates (25,30,50,60...).
+// But since some cores do not report it correctly, you may trust them, or not.
+// In case you don't, koko-aio derives the information by averaging frametimes.
+// Such estimation is activated by enabling ORIGINAL_FPS_UNTRUSTED.
+// however it is slower and on some video drivers isn't reliable either.
+// if D3D_WORKAROUND is defined, Core reported fps value is always trusted.
+// #define ORIGINAL_FPS_UNTRUSTED
 
 
 ////////////////////////////////////////////////////////////////////////////

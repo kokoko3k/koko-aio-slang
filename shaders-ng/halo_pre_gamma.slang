@@ -33,7 +33,7 @@ layout(set = 0, binding = 4) uniform sampler2D in_glow_pass;
 
 #ifndef D3D_WORKAROUND
     #ifdef _HAS_FRAMETIME_UNIFORMS
-        #ifndef ORIGINAL_FPS_TRUSTED
+        #ifdef ORIGINAL_FPS_UNTRUSTED
             layout(set = 0, binding = 5) uniform sampler2D halo_pre_gamma_passFeedback;
         #endif
     #endif
@@ -43,7 +43,7 @@ void main() {
     
     #ifndef D3D_WORKAROUND
         #ifdef _HAS_FRAMETIME_UNIFORMS
-            #ifndef ORIGINAL_FPS_TRUSTED
+            #ifdef ORIGINAL_FPS_UNTRUSTED
                 if (global.OriginalFPS < 35.0) {
                     //always trust cores that reports under 35fps (30,25).
                     FragColor.a = global.OriginalFPS;

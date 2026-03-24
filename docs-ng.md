@@ -24,7 +24,7 @@
     Be warned that the following functions do not work if you enable the workaround: <br>
         * Resync speed when core resolution changes <br>
         * Adaptive Black <br>
-        * CVBS Bleed size is limited to 5.0 <br>
+<!--         * CVBS Bleed size is limited to 5.0 <br> -->
         * Ambientlight scene change detection <br>
         * Halving border updates refresh <br>
         * Lcd antighosting <br>
@@ -977,3 +977,15 @@ Changes are applied after a shader reload.*<br>
     The following modulates the shake size:
     ```#define ANTIBURN_AMPLITUDE 1.0```<br>
     Antiburn disables LCD antighosting.
+    
+**Core fps estimation**<br>
+    Temporal based features need to know the source fps to have a fixed duration<br>
+    across multiple input refresh rates (25,30,50,60...).<br>
+    But since some cores do not report it correctly, you may trust them, or not.<br>
+    In case you don't, koko-aio derives the information by averaging frametimes.<br>
+    Such estimation is activated by enabling the following in config-user-optional.txt:<br>
+    ```#define ORIGINAL_FPS_UNTRUSTED```<br>
+    ...however ORIGINAL_FPS_UNTRUSTED is slower and on some<br>
+    video drivers isn't reliable either.<br>
+    if D3D_WORKAROUND is defined, Core reported fps value is always trusted.<br>
+

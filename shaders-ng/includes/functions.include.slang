@@ -36,18 +36,20 @@ float get_lod(vec2 smp_size, vec2 out_size) {
 }
 
 float get_fps(sampler2D estimatesampler) {
+	//No way to get core fps? return 60.0
 	#ifndef _HAS_FRAMETIME_UNIFORMS
 		return 60.0;
 	#endif
 
 	//No need to estimate if we trust frametime uniforms.
-	#ifdef ORIGINAL_FPS_TRUSTED
+	#ifndef ORIGINAL_FPS_UNTRUSTED
 		return global.OriginalFPS;
 	#endif
 
+	//user does not trust OriginalFPS? estimate it.
 	#ifndef D3D_WORKAROUND
-	//To estimate we need to poll an alpha from a future
-	//pass feedback, so no D3D support.
+		//To estimate we need to poll an alpha from a future
+		//pass feedback, so no D3D support.
 		return texture(estimatesampler, vec2(0.5)).a;
 	#else
 		return global.OriginalFPS;
