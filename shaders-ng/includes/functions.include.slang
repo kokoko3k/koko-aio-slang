@@ -2073,3 +2073,41 @@ float get_dotmat_auto_sharpness(float do_tate, bool no_integer_scale, bool rotat
 	return grid_sharpness;
 }
 
+
+vec3 pixel_backdrop_image(sampler2D tex, vec2 unrotated_coords, vec4 output_size) {
+    vec2 backdrop_offset=vec2(BACKDROP_OFFX,BACKDROP_OFFY);
+
+    vec2 backdrop_tex_size = textureSize(tex, 0);
+    //float backdrop_lod = log2(backdrop_tex_size.y * global.FinalViewportSize.w);
+
+    vec2 backdrop_coords =  get_scaled_coords_aspect(
+                            unrotated_coords+backdrop_offset,
+                            output_size,
+                            backdrop_tex_size.x/backdrop_tex_size.y,
+                            false);
+
+    backdrop_coords=zoom(backdrop_coords, BACKDROP_ZOOM);
+    //return textureLod(tex, backdrop_coords, backdrop_lod).rgb;
+    return texture(tex, backdrop_coords).rgb;
+}
+
+vec3 pixel_overlay_image_keep_aspect(sampler2D tex, vec2 co, float aspect_overlay, float rotated) {
+	float content_aspect = get_in_aspect();
+	float aspect_adj = content_aspect/aspect_overlay;
+	vec2 aspect_correction = vec2(1,aspect_adj);
+	if (rotated == 1.0) aspect_correction.xy=aspect_correction.yx;
+	co = zoomxy( co + vec2(BACKDROP_OFFX,BACKDROP_OFFY), aspect_correction*BACKDROP_ZOOM);
+	return texture(tex, co).rgb;
+}
+
+vec2 overlay_image_coords(vec2 co) {
+	//over-abstracting because stretched coords are useful to get the correct
+	//skip size on reflections.
+	return zoom( co + vec2(BACKDROP_OFFX,BACKDROP_OFFY), BACKDROP_ZOOM);
+}
+
+vec4 pixel_overlay_image_stretch(sampler2D tex, vec2 co) {
+	co = overlay_image_coords(co);
+	return texture(tex, co);
+}
+

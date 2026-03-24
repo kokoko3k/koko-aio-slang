@@ -509,6 +509,10 @@
     #define BACKDROP_JUST_TUBE		global.BACKDROP_JUST_TUBE
 #endif
 
+#ifndef BACKDROP_BLEND_MODE
+    #define BACKDROP_BLEND_MODE		global.BACKDROP_BLEND_MODE
+#endif
+
 #ifndef BACKDROP_OFFX
     #define BACKDROP_OFFX		global.BACKDROP_OFFX
 #endif

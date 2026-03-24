@@ -22,7 +22,7 @@ layout(location = 4) flat out float lod;
 layout(location = 5) noperspective out vec2 pre_pass_coords;
 layout(location = 6) flat out float vIs_rotated;
 layout(location = 7) flat out float vAMBI_STRETCH;
-layout(location = 8) flat out float vAMBI_POWER;
+
 layout(location = 9) flat out float vSmpBorder_min;
 layout(location = 10) flat out float vSmpBorder_max;
 layout(location = 11) flat out float vSmp_step;
@@ -97,14 +97,9 @@ void main() {
     
     if (bNeed_NO_integer_scale) {
         if (DO_GAME_GEOM_OVERRIDE > 0.5)
-            pre_pass_coords = content_geom_override_zoom(pre_pass_coords, GAME_GEOM_ASPECT, get_in_aspect(), GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
+            pre_pass_coords = content_geom_override_zoom(pre_pass_coords, GAME_GEOM_ASPECT, in_aspect, GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
     }
-
-
-    //Every cycle counts!
-        vAMBI_POWER = AMBI_POWER -1;
-
-        
+       
     //3.0 makes scene detection not working.
         #define FRAME_DIVIDER 2.0
         vMod_FrameCount_FrameDivider = mod(params.FrameCount, FRAME_DIVIDER);
@@ -120,7 +115,7 @@ layout(location = 4) flat in float lod;
 layout(location = 5) noperspective in vec2 pre_pass_coords;
 layout(location = 6) flat in float vIs_rotated;
 layout(location = 7) flat in float vAMBI_STRETCH;
-layout(location = 8) flat in float vAMBI_POWER;
+
 layout(location = 9) flat in float vSmpBorder_min;
 layout(location = 10) flat in float vSmpBorder_max;
 layout(location = 11) flat in float vSmp_step;
@@ -132,7 +127,7 @@ layout(set = 0, binding = 1) uniform sampler2D PastSampler;
 layout(set = 0, binding = 2) uniform sampler2D avglum_pass;
 layout(set = 0, binding = 3) uniform sampler2D avglum_passFeedback;
 layout(set = 0, binding = 4) uniform sampler2D colortools_and_ntsc_pass;
-
+layout(set = 0, binding = 5) uniform sampler2D backdrop;
 
 
 vec3 ambi_push_pass(vec2 coords, float f_lod) {
@@ -143,9 +138,16 @@ vec3 ambi_push_pass(vec2 coords, float f_lod) {
     }
     
     vec3 pixel_out = textureLod(colortools_and_ntsc_pass, smp_coords, f_lod).rgb;
+
+    if (DO_BACKDROP * BACKDROP_JUST_TUBE > 0.0) {
+        vec4 backdrop_img = pixel_overlay_image_stretch(backdrop, coords);
+        vec3 blended = (pixel_out.rgb + DO_BACKDROP) * backdrop_img.rgb;
+        pixel_out = mix( pixel_out.rgb, blended, backdrop_img.a );
+    }
+
     pixel_out = pow(pixel_out, vec3(AMBI_GAMMA)); 
 
-    pixel_out = pixel_push_luminance(pixel_out, vAMBI_POWER);
+    pixel_out = pixel_push_luminance(pixel_out, AMBI_POWER - 1);
     return pixel_out;
 }
 

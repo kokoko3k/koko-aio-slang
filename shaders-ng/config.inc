@@ -26,7 +26,7 @@ layout(push_constant) uniform Push {
 	float AMBI_STRETCH_VERTICAL;
 	float AMBI_INT_OFFSET ;
 	float AMBI_SMP_INT_OFFSET ;
-
+	
 } params;
 
 layout(std140, set = 0, binding = 0) uniform UBO {
@@ -185,6 +185,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float BACKDROP_OFFX;
 	float BACKDROP_OFFY;
 	float BACKDROP_ZOOM;
+	float BACKDROP_BLEND_MODE;
 	
 	float RESSWITCH_SYNC_SPEED;
 	float TATE;
@@ -626,11 +627,12 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 
 //Backdrop image
-#pragma parameter DO_BACKDROP		 "★ Mid Overlay image (backdrop, scratches) enable? ==>"	0.0  0.0  1.0   0.05
-#pragma parameter BACKDROP_JUST_TUBE "        Display only on content"						0.0  0.0  1.0     1.0
-#pragma parameter BACKDROP_OFFX		 "        Shift Overlay image over X axis"				0.0  -1.0  1.0    0.0005
-#pragma parameter BACKDROP_OFFY 	 "        Shift Overlay image over Y axis"				0.0  -1.0  1.0    0.0005
-#pragma parameter BACKDROP_ZOOM 	 "        Zoom Overlay image"					 		1.0  -1.0  3.0    0.0005
+#pragma parameter DO_BACKDROP		  "★ Mid image (backdrop,reflections,overlay...) enable? ==>"	0.0  0.0  1.0   0.05
+#pragma parameter BACKDROP_JUST_TUBE  "       Display only on content"						0.0  0.0  1.0     1.0
+#pragma parameter BACKDROP_BLEND_MODE "       . Content blend mode (0=add, 1=mul)"		0.0  0.0  1.0     1.0
+#pragma parameter BACKDROP_OFFX		  "       Shift Overlay image over X axis"				0.0  -1.0  1.0    0.0005
+#pragma parameter BACKDROP_OFFY 	  "       Shift Overlay image over Y axis"				0.0  -1.0  1.0    0.0005
+#pragma parameter BACKDROP_ZOOM 	  "       Zoom Overlay image"					 		1.0  -1.0  3.0    0.0005
 #pragma parameter LABEL0026 " " 0 0 0 1
 
 //Background Image
