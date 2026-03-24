@@ -188,8 +188,7 @@ vec3 apply_noise_to(vec3 c) {
 }
 
 
-vec3 decon_passthrough(sampler2D smp, vec2 co, float dist_from_edge) {
-   float offset_multiplier = mix(EDGE_DEFOCUS, 1.0, dist_from_edge);
+vec3 decon_passthrough(sampler2D smp, vec2 co, float offset_multiplier) {
    return vec3( texture(smp, co + vR_offset * offset_multiplier).r,
                 texture(smp, co + vG_offset * offset_multiplier).g,
                 texture(smp, co + vB_offset * offset_multiplier).b);
@@ -246,10 +245,12 @@ void main() {
    
     vec3 passthrough = vec3(0.0);
     float dist_from_edge = 1.0;
+    float offset_multiplier = 1.0;
     
     if (DO_SHIFT_RGB == 1.0) {
         dist_from_edge = distance_from_edge_linear(vTexCoord, EDGE_DEFOCUS_AREA_INV);
-        passthrough = decon_passthrough(shift_and_bleed_pass, vTexCoord, dist_from_edge);
+        offset_multiplier = mix(EDGE_DEFOCUS, 1.0, dist_from_edge);
+        passthrough = decon_passthrough(shift_and_bleed_pass, vTexCoord, offset_multiplier);
     } else {
         passthrough = texture(shift_and_bleed_pass, vTexCoord).rgb;
     }
@@ -302,11 +303,13 @@ void main() {
       if (glow_h_inside_interval == 1.0) {
          bool use_gauss = IN_GLOW_H >= 0.0 ; 
          if (DO_SHIFT_RGB == 1.0) {
-            float m = mix(EDGE_DEFOCUS, 1.0, dist_from_edge);
             
-            pixel_glowed = vec3 ( blur_select_wrap(Source, vTexCoord + vR_offset * m, global.upscale_passSize, in_glow_h_adapted, use_gauss, sharp_sub_adapted ).r,
-                                  blur_select_wrap(Source, vTexCoord + vG_offset * m, global.upscale_passSize, in_glow_h_adapted, use_gauss, sharp_sub_adapted ).g,
-                                  blur_select_wrap(Source, vTexCoord + vB_offset * m, global.upscale_passSize, in_glow_h_adapted, use_gauss, sharp_sub_adapted ).b);
+            pixel_glowed = vec3 ( 
+                blur_select_wrap(Source, vTexCoord+vR_offset*offset_multiplier, global.upscale_passSize, in_glow_h_adapted, use_gauss, sharp_sub_adapted ).r,
+                blur_select_wrap(Source, vTexCoord+vG_offset*offset_multiplier, global.upscale_passSize, in_glow_h_adapted, use_gauss, sharp_sub_adapted ).g,
+                blur_select_wrap(Source, vTexCoord+vB_offset*offset_multiplier, global.upscale_passSize, in_glow_h_adapted, use_gauss, sharp_sub_adapted ).b
+            );
+            
          } else {
             pixel_glowed = blur_select_wrap(Source, vTexCoord, global.upscale_passSize, in_glow_h_adapted, use_gauss, sharp_sub_adapted );
          }
