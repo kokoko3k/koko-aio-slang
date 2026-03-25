@@ -25,7 +25,7 @@ layout(location = 1) in vec2 TexCoord;
 layout(location = 0) noperspective out vec2 vTexCoord;
 layout(location = 1) flat out float lod;
 layout(location = 2) flat out vec2 vFuzzy_main_pass_stage_1;
-layout(location = 3) flat out float vReduced_sample_time_is_now;
+
 layout(location = 4) flat out float vAvglum_needed;
 
 layout(location = 6) flat out float vResSwitch_res_changed;
@@ -48,8 +48,6 @@ void main() {
 
 	//Get fuzzy mul and pow factor
 		vFuzzy_main_pass_stage_1 = apply_fuzzy_main_pass_stage_1();    
-
-    vReduced_sample_time_is_now = mod(params.FrameCount,AMBI_AVGLUM_DIVIDER);
     
     vAvglum_needed = DO_BLOOM + DO_AMBILIGHT + DO_BEZEL + (DO_DYNZOOM*10.0) + (1-RESSWITCH_SYNC_SPEED) + AUTOCROP_MAX ;
     
@@ -85,7 +83,6 @@ void main() {
 layout(location = 0) noperspective in vec2 vTexCoord;
 layout(location = 1) flat in float lod;
 layout(location = 2) flat in vec2 vFuzzy_main_pass_stage_1;
-layout(location = 3) flat in float vReduced_sample_time_is_now;
 layout(location = 4) flat in float vAvglum_needed;
 
 layout(location = 6) flat in float vResSwitch_res_changed;
@@ -128,29 +125,18 @@ float get_avg_lum_from_mip_nocc() {
 
 float get_avglum() {
     /* avglum alpha has some zones:
-     * 0.25 -> reduced sampling, used for to aid scene detection
-     * 0.50 -> smoothed_sampling, no color corrections, adaptived black (/crush) use this..
-     * 0.75 -> temporal smoothed_sampling, used to adapt fullscreen zoom
-     * AUTOCROP_SAMPLING_POINT (0.825) -> autocrop zoom value pixked up by final pass.
-     * RESSWITCH_SAMPLING_POINT (0.900) -> resolution change detection
+     * TSMOOTH_NOCC_SAMPLING_POINT -> smoothed_sampling, no color corrections, adaptived black (/crush) uses this..
+     * DYN_ZOOM_SAMPLING_POINT -> temporal smoothed_sampling, used to adapt fullscreen zoom
+     * AUTOCROP_SAMPLING_POINT -> autocrop zoom value pixked up by final pass.
+     * RESSWITCH_SAMPLING_POINT -> resolution change detection
      * anything else: continuous sampling
      */
             
-    bool reduced_sampling_co  = is_first_inside_rect(vTexCoord, vec4(SCENE_CHANGE_SAMPLING_POINT-0.1, SCENE_CHANGE_SAMPLING_POINT+0.1) );
+
     //WARNING: Use this for dynamic zoom only, since it returns 0.0 when dynzoom is disabled or when integer scaling is requested.
     bool smoothed_sampling_co_dynzoom = is_first_inside_rect(vTexCoord, vec4(DYN_ZOOM_SAMPLING_POINT-0.1, DYN_ZOOM_SAMPLING_POINT+0.1));
     bool smoothed_sampling_co_nocc = is_first_inside_rect(vTexCoord, vec4(TSMOOTH_NOCC_SAMPLING_POINT-0.1 , TSMOOTH_NOCC_SAMPLING_POINT+0.1)) ;
     #ifndef D3D_WORKAROUND
-        if (reduced_sampling_co) {
-            //in the reduced sampling zone, only update at right time; else return the previous frame.
-            if (vReduced_sample_time_is_now == 1.0) 
-                return get_avg_lum_from_mip();
-            
-            float avglum_feedback = texture(avglum_passFeedback,vTexCoord).a;
-            avglum_feedback = max(avglum_feedback, 0.0); // <- Sanitize input to avoid glitches when enabling the option runtime.
-            return avglum_feedback;
-        }
-
         if (smoothed_sampling_co_dynzoom) {
 
             float prev_lum = texture(avglum_passFeedback,vTexCoord).a;

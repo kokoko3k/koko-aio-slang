@@ -26,7 +26,7 @@ layout(location = 7) flat out float vAMBI_STRETCH;
 layout(location = 9) flat out float vSmpBorder_min;
 layout(location = 10) flat out float vSmpBorder_max;
 layout(location = 11) flat out float vSmp_step;
-layout(location = 12) flat out float vMod_FrameCount_FrameDivider;
+
 
 void main() {
     gl_Position = global.MVP * Position;
@@ -99,11 +99,7 @@ void main() {
         if (DO_GAME_GEOM_OVERRIDE > 0.5)
             pre_pass_coords = content_geom_override_zoom(pre_pass_coords, GAME_GEOM_ASPECT, in_aspect, GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
     }
-       
-    //3.0 makes scene detection not working.
-        #define FRAME_DIVIDER 2.0
-        vMod_FrameCount_FrameDivider = mod(params.FrameCount, FRAME_DIVIDER);
-        
+
 }
 
 #pragma stage fragment
@@ -119,7 +115,6 @@ layout(location = 7) flat in float vAMBI_STRETCH;
 layout(location = 9) flat in float vSmpBorder_min;
 layout(location = 10) flat in float vSmpBorder_max;
 layout(location = 11) flat in float vSmp_step;
-layout(location = 12) flat in float vMod_FrameCount_FrameDivider;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -127,7 +122,8 @@ layout(set = 0, binding = 1) uniform sampler2D PastSampler;
 layout(set = 0, binding = 2) uniform sampler2D avglum_pass;
 layout(set = 0, binding = 3) uniform sampler2D avglum_passFeedback;
 layout(set = 0, binding = 4) uniform sampler2D colortools_and_ntsc_pass;
-layout(set = 0, binding = 5) uniform sampler2D backdrop;
+layout(set = 0, binding = 5) uniform sampler2D colortools_and_ntsc_passFeedback;
+layout(set = 0, binding = 6) uniform sampler2D backdrop;
 
 
 vec3 ambi_push_pass(vec2 coords, float f_lod) {
@@ -272,11 +268,40 @@ vec4 pixel_sanitize(vec4 color_in) {
     //return max(color_in, vec4(0.0));
 }
 
+
 bool scene_changed() {
-    float past_avg_lum    = texture(avglum_passFeedback, SCENE_CHANGE_SAMPLING_POINT).a;
-    float present_avg_lum = texture(avglum_pass        , SCENE_CHANGE_SAMPLING_POINT).a;
-    float diff_avg_lum = abs(past_avg_lum - present_avg_lum);            
-    return (diff_avg_lum >= AMBI_SCENE_CHG_THRSHLD);
+    vec3 present_color = textureLod(colortools_and_ntsc_pass, vec2(0.5), 20.0).rgb;
+    vec3 past_color    = textureLod(colortools_and_ntsc_passFeedback, vec2(0.5), 20.0).rgb;
+    float past_lum = rgb_to_gray(past_color);
+    float present_lum = rgb_to_gray(present_color);
+    float diff_lum = abs(past_lum - present_lum);
+    return (diff_lum >= AMBI_SCENE_CHG_THRSHLD );
+}
+
+
+bool scene_changed_test() {
+    vec3 present_color = textureLod(colortools_and_ntsc_pass, vec2(0.5), 20.0).rgb;
+    vec3 past_color    = textureLod(colortools_and_ntsc_passFeedback, vec2(0.5), 20.0).rgb;
+    
+    float past_lum = rgb_to_gray(past_color);
+    float present_lum = rgb_to_gray(present_color);
+    
+    float past_hue = rgb2hsv(past_color).x;
+    float present_hue = rgb2hsv(present_color).x;
+    float diff_hue = abs(past_hue - present_hue);
+    float diff_lum = abs(past_lum - present_lum);
+    
+    float lum_weight = 1.0;
+    float hue_weight = 0.0;
+        
+    float diff = diff_hue * hue_weight + diff_lum * lum_weight;
+    
+    
+    float t = AMBI_SCENE_CHG_THRSHLD*(lum_weight+hue_weight);
+    
+    t=0.25;
+    
+    return (diff >= t );
 }
 
 vec4 pixel_ambilight(vec2 local_pre_pass_coords) {
@@ -318,24 +343,6 @@ void main() {
         FragColor = vec4(0,0,0,1);
         return;
     }
-    
-    //Nvidia + flycast core + glcore goes crazy with modulo operation and instead of returning 0,1,2 0,1,2 they returns 1,2,3 1,2,3 and so on.
-    //Don't check for != 0.0 here, but use != 1.0.
-    //Also this particular bug does not seem to happen in the last pass.
-    
-    if ( vMod_FrameCount_FrameDivider != 1.0 ) { 
-        vec4 past_sampler = texture(PastSampler, vTexCoord);
-        past_sampler = pixel_sanitize(past_sampler); // <- Sanitize input to avoid glitches when enabling the option runtime; it may also avoid glitches when switching shader runtime (?)
-        FragColor = past_sampler;
-        return;
-    }
 
-    /*vec2 dx = dFdx(pre_pass_coords);
-    vec2 dy = dFdy(pre_pass_coords);
-    float mylod = 0.5 * log2(max(dot(dx, dx), dot(dy, dy)));
-
-    FragColor.rgb = textureLod(colortools_and_ntsc_pass, pre_pass_coords, mylod).rgb;
-    return;*/
-    
     FragColor = pixel_ambilight(pre_pass_coords);
 }

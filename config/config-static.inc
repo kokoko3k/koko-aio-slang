@@ -85,11 +85,7 @@
 // AMBIENT LIGHT STATIC CONFIG ##########################################################################################
 
 	// 0.0-1.0: sensitivity to scene change (ambilike stuff), 0.0 changes more
-#define AMBI_SCENE_CHG_THRSHLD 0.07  
-	// The following will allow to sample at reduced interval
-	// The scene change detection logic will take advantage of it
-	// So that quick fades will still be treated as scene changes
-#define AMBI_AVGLUM_DIVIDER 3
+#define AMBI_SCENE_CHG_THRSHLD 0.25  
 
 	// The following defines the speed of the color fades 
 	// when changing scene. (range 0..1)
@@ -134,9 +130,6 @@
 	// AUTOCROP
 //which coords holds the autocrop zoom value
 #define AUTOCROP_SAMPLING_POINT vec2(0.125)
-
-	// Scene change aid sampling point
-#define SCENE_CHANGE_SAMPLING_POINT vec2(0.25)
 
 	// temporal smoothed sampling point without color correction
 #define TSMOOTH_NOCC_SAMPLING_POINT vec2(0.5)
