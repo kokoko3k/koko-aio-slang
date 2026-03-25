@@ -119,10 +119,6 @@ float get_avg_lum_from_mip_nocc() {
     return rgb_to_gray(mip);
 }
 
-// 0.1 seems like a good tradeoff that works well with exposure and fullscreen zoom
-// ...maybe exposure works best at 0.05; you may consider another zone of smooth sampling.
-#define SMOOTHNESS_SPEED 0.1
-
 float get_avglum() {
     /* avglum alpha has some zones:
      * TSMOOTH_NOCC_SAMPLING_POINT -> smoothed_sampling, no color corrections, adaptived black (/crush) uses this..
@@ -141,7 +137,7 @@ float get_avglum() {
 
             float prev_lum = texture(avglum_passFeedback,vTexCoord).a;
             float myframecount = params.FrameCount;
-            float transition_speed = SMOOTHNESS_SPEED;
+            float transition_speed_breathing = 0.2;
             
             //Tube warmup:
                 //Uncomment this to see the effect continuously
@@ -150,7 +146,7 @@ float get_avglum() {
                 /*float multiply = 2.0;
                 float ramp_up_frames = 60;
                 float transition_speed = (ramp_up_frames - myframecount)/ramp_up_frames;
-                transition_speed = clamp(transition_speed, SMOOTHNESS_SPEED, SMOOTHNESS_SPEED*multiply);
+                transition_speed = clamp(transition_speed, 0.1, 0.1*multiply);
                 */
                 
                 
@@ -158,13 +154,14 @@ float get_avglum() {
                     //prev_lum = mix(0.0, -1.0, clamp( DO_DYNZOOM*100.0, 0.0, 1.0 ) );
                     prev_lum = -1/((DO_DYNZOOM+eps)*5.0);
                 }
-            //
-
-            return mix( prev_lum, get_avg_lum_from_mip(), transition_speed) * vDo_dynzoom;
+            // little breath-in effect when res-switching, less on high speed
+            if (vResSwitch_res_changed == 1.0) prev_lum = prev_lum - (1.75 - RESSWITCH_SYNC_SPEED);
+            return mix( prev_lum, get_avg_lum_from_mip(), transition_speed_breathing) * vDo_dynzoom;
         }
         
         if (smoothed_sampling_co_nocc) {
-            return mix(texture(avglum_passFeedback,vTexCoord).a, get_avg_lum_from_mip_nocc(), SMOOTHNESS_SPEED);
+            float transition_speed_adaptive_black = 0.1;
+            return mix(texture(avglum_passFeedback,vTexCoord).a, get_avg_lum_from_mip_nocc(), transition_speed_adaptive_black);
         }
     #endif
     
