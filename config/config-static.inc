@@ -85,7 +85,7 @@
 // AMBIENT LIGHT STATIC CONFIG ##########################################################################################
 
 	// 0.0-1.0: sensitivity to scene change (ambilike stuff), 0.0 changes more
-#define AMBI_SCENE_CHG_THRSHLD 0.25  
+#define AMBI_SCENE_CHG_THRSHLD 0.3  
 
 	// The following defines the speed of the color fades 
 	// when changing scene. (range 0..1)
