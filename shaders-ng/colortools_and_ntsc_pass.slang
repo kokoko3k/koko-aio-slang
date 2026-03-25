@@ -132,7 +132,7 @@ void main() {
    
    //For screen shaking:
       #define Y_SHAKE_SPEED 1.5
-      #define X_SHAKE_NUM_WAVES 2.0
+      #define X_SHAKE_NUM_WAVES 1.0
       float wobbly_freq = mod(params.FrameCount,pi*100);
       //vShake_sin_arg =  vec2( wobbly_freq * Y_SHAKE_SPEED, vTexCoord.y * X_SHAKE_NUM_WAVES + wobbly_freq);
       vShake_sin_arg =  vTexCoord.y * X_SHAKE_NUM_WAVES + wobbly_freq;

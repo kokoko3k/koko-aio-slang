@@ -381,7 +381,7 @@ void main() {
             pixel_out.a = 1.0;  
         } else {
             #ifndef D3D_WORKAROUND
-                vec2 early_late_cut = vec2(0.03,1.6); // decay rate before/after RESSWITCH_SYNC_SPEED threshold;
+                vec2 early_late_cut = vec2(0.04,2.0); // decay rate before/after RESSWITCH_SYNC_SPEED threshold;
                 if (low_fps(FPS_ESTIMATE_PASS)) early_late_cut*= 2.0;
 
                 float t = texture(avglum_passFeedback,vTexCoord_unscaled).a;
@@ -395,7 +395,6 @@ void main() {
             #endif
                  
         }
-        
 
     } else if (is_first_inside_rect(vTexCoord_unscaled, vec4(AUTOCROP_SAMPLING_POINT-0.01, AUTOCROP_SAMPLING_POINT+0.01) ))  {
         if (vDo_autocrop == 1.0)
