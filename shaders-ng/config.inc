@@ -436,11 +436,11 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 //Deconvergence
 #pragma parameter DO_SHIFT_RGB       "★ Deconvergence/Defocus enable? (de) ==>"	0.0	 0.0 1.0 1.0
 #pragma parameter DECON_RX         "        Red x offset"	    0.0 -5.0 5.0 0.05
-#pragma parameter DECON_RY         "        Red y offset"	   -1.6 -5.0 5.0 0.05
-#pragma parameter DECON_GX         "        Green x offset"		1.0 -5.0 5.0 0.05
+#pragma parameter DECON_RY         "        Red y offset"	   -0.8 -5.0 5.0 0.05
+#pragma parameter DECON_GX         "        Green x offset"		0.5 -5.0 5.0 0.05
 #pragma parameter DECON_GY         "        Green y offset"		0.0 -5.0 5.0 0.05
 #pragma parameter DECON_BX         "        Blue x offset"		0.0 -5.0 5.0 0.05
-#pragma parameter DECON_BY         "        Blue y offset"		1.6 -5.0 5.0 0.05
+#pragma parameter DECON_BY         "        Blue y offset"		0.8 -5.0 5.0 0.05
 #pragma parameter EDGE_DEFOCUS              "         . Deconvergence increases near edges (1=no increase)" 2.0 1.0 10.0 0.1
 #pragma parameter EDGE_DEFOCUS_DO_BLUR      "         . Blur screen edges" 0.0 0.0 1.0 0.01
 #pragma parameter EDGE_DEFOCUS_AREA_INV     "         . Focused Area" 0.4 0.0 0.5 0.01
