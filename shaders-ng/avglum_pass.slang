@@ -111,14 +111,14 @@ layout(set = 0, binding = 4) uniform sampler2D FPS_ESTIMATE_PASS;
 
 #define RGB_TO_GRAYSCALE vec3(0.299, 0.587, 0.114)
 float get_avg_lum_from_mip() {
-    vec3 mip = textureLod(colortools_and_ntsc_pass, TSMOOTH_NOCC_SAMPLING_POINT,20.0).rgb;
+    vec3 mip = textureLod(colortools_and_ntsc_pass, vec2(0.5),20.0).rgb;
      mip = apply_fuzzy_main_pass_stage_2(mip, vFuzzy_main_pass_stage_1);
     //return (mip.r+mip.g+mip.b)/3.0;
     return rgb_to_gray(mip);
 }
 
 float get_avg_lum_from_mip_nocc() {
-    vec3 mip = textureLod(colortools_and_ntsc_pass, TSMOOTH_NOCC_SAMPLING_POINT,20.0).rgb;
+    vec3 mip = textureLod(colortools_and_ntsc_pass, vec2(0.5),20.0).rgb;
     return rgb_to_gray(mip);
 }
 
@@ -190,8 +190,8 @@ float get_avglum() {
 
 bool scene_changed( sampler2D pre_smp, sampler2D cur_smp, float threshold) {
     
-    vec3 pre_mip = textureLod( pre_smp, TSMOOTH_NOCC_SAMPLING_POINT, 20.0).rgb;
-    vec3 cur_mip = textureLod( cur_smp, TSMOOTH_NOCC_SAMPLING_POINT, 20.0).rgb;
+    vec3 pre_mip = textureLod( pre_smp, vec2(0.5), 20.0).rgb;
+    vec3 cur_mip = textureLod( cur_smp, vec2(0.5), 20.0).rgb;
     
     //If resolution changes, we definitely need to change scene.
     //This should be optimal for Amiga games.
@@ -219,8 +219,8 @@ bool scene_changed( sampler2D pre_smp, sampler2D cur_smp, float threshold) {
     // This compares different lod mipmaps from the same samplig point
     // to guess if the screen is solid or not.
     vec3 pre_mip_l20 = pre_mip;    
-    vec3 pre_mip_l1 =  textureLod( pre_smp, TSMOOTH_NOCC_SAMPLING_POINT, vLods.x).rgb;
-    vec3 pre_mip_l2 =  textureLod( pre_smp, TSMOOTH_NOCC_SAMPLING_POINT, vLods.y).rgb;
+    vec3 pre_mip_l1 =  textureLod( pre_smp, vec2(0.5), vLods.x).rgb;
+    vec3 pre_mip_l2 =  textureLod( pre_smp, vec2(0.5), vLods.y).rgb;
 
     if ( pre_mip_l1 == pre_mip_l2 && pre_mip_l2 == pre_mip_l20 )
         return true;
