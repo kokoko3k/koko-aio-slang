@@ -250,9 +250,9 @@ void main() {
     if (DO_SHIFT_RGB == 1.0) {
         dist_from_edge = distance_from_edge_linear(vTexCoord, EDGE_DEFOCUS_AREA_INV);
         offset_multiplier = mix(EDGE_DEFOCUS, 1.0, dist_from_edge);
-        passthrough = decon_passthrough(shift_and_bleed_pass, vTexCoord, offset_multiplier);
+        passthrough = decon_passthrough(Source, vTexCoord, offset_multiplier);
     } else {
-        passthrough = texture(shift_and_bleed_pass, vTexCoord).rgb;
+        passthrough = texture(Source, vTexCoord).rgb;
     }
    
    
@@ -322,9 +322,14 @@ void main() {
       if (vDoInGlowBias == 1.0) {
          //edge defocus: the more near edge, the more the blur
          float in_glow_bias_faded = mix(IN_GLOW_BIAS, 1.0,  (1-dist_from_edge) *  (DO_SHIFT_RGB * EDGE_DEFOCUS_DO_BLUR ) );
-         //FragColor = vec4(vec3(in_glow_bias_faded), 0.0);
-         //return;
-         pixel_glowed = glow_blur_bias(passthrough, vTexCoord, pixel_glowed, in_glow_bias_faded);
+         vec3 naked_pixel = vec3(0.0);
+         
+         if (DO_SHIFT_RGB == 1.0)
+            naked_pixel = decon_passthrough(shift_and_bleed_pass, vTexCoord, offset_multiplier);
+         else
+            naked_pixel = texture(shift_and_bleed_pass, vTexCoord).rgb;
+         
+         pixel_glowed = glow_blur_bias(naked_pixel, vTexCoord, pixel_glowed, in_glow_bias_faded);
       }
 
    pixel_glowed = pixel_glowed * vGlow_Gain;
