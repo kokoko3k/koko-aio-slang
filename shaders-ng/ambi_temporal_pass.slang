@@ -290,8 +290,8 @@ vec4 pixel_ambilight(vec2 local_pre_pass_coords) {
 
 
     #ifndef D3D_WORKAROUND
-        float past_avg_lum    = texture(avglum_passFeedback,vec2(0.25,0.25)).a;
-        float present_avg_lum = texture(avglum_pass        ,vec2(0.25,0.25)).a;
+        float past_avg_lum    = texture(avglum_passFeedback, SCENE_CHANGE_SAMPLING_POINT).a;
+        float present_avg_lum = texture(avglum_pass        , SCENE_CHANGE_SAMPLING_POINT).a;
         float diff_avg_lum = abs(past_avg_lum - present_avg_lum);
 
         if (diff_avg_lum >= AMBI_SCENE_CHG_THRSHLD) {

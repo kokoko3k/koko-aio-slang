@@ -135,8 +135,16 @@
 //which coords holds the autocrop zoom value
 #define AUTOCROP_SAMPLING_POINT vec2(0.125)
 
+	// Scene change aid sampling point
+#define SCENE_CHANGE_SAMPLING_POINT vec2(0.25)
+
+	// temporal smoothed sampling point without color correction
+#define TSMOOTH_NOCC_SAMPLING_POINT vec2(0.5)
+
 	// Luminosity tied zoom sampling point
 #define DYN_ZOOM_SAMPLING_POINT vec2(0.75)
+	
+
 	
 	//Sampling points from test pass
 #define SMP_RANGE1 vec4(0.24,0.24  ,  0.26,0.26)
