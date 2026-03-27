@@ -30,7 +30,7 @@ layout(location = 4) flat out float vAvglum_needed;
 
 layout(location = 6) flat out float vResSwitch_res_changed;
 layout(location = 7) flat out float vResChanged;
-layout(location = 8) noperspective out vec2 vTexCoord_unscaled;
+layout(location = 8) noperspective out vec2 vTexCoord_scaled;
 layout(location = 9) flat out float vDo_autocrop;
 layout(location = 10) flat out float vDo_dynzoom;
 
@@ -42,9 +42,11 @@ void main() {
     gl_Position = global.MVP * Position;
    
     vTexCoord = TexCoord;
-    vTexCoord_unscaled = TexCoord;
+    
+    vTexCoord_scaled = TexCoord;
+    
     if (DO_GAME_GEOM_OVERRIDE > 0.5)
-        vTexCoord = content_geom_override_zoom(vTexCoord, GAME_GEOM_ASPECT, get_in_aspect(), GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
+        vTexCoord_scaled = content_geom_override_zoom(vTexCoord, GAME_GEOM_ASPECT, get_in_aspect(), GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
 
 	//Get fuzzy mul and pow factor
 		vFuzzy_main_pass_stage_1 = apply_fuzzy_main_pass_stage_1();    
@@ -87,7 +89,7 @@ layout(location = 4) flat in float vAvglum_needed;
 
 layout(location = 6) flat in float vResSwitch_res_changed;
 layout(location = 7) flat in float vResChanged;
-layout(location = 8) noperspective in vec2 vTexCoord_unscaled;
+layout(location = 8) noperspective in vec2 vTexCoord_scaled;
 layout(location = 9) flat in float vDo_autocrop;
 layout(location = 10) flat in float vDo_dynzoom;
 
@@ -130,7 +132,7 @@ float get_avglum() {
             
 
     //WARNING: Use this for dynamic zoom only, since it returns 0.0 when dynzoom is disabled or when integer scaling is requested.
-    bool smoothed_sampling_co_dynzoom = is_first_inside_rect(vTexCoord_unscaled, vec4(DYN_ZOOM_SAMPLING_POINT-0.1, DYN_ZOOM_SAMPLING_POINT+0.1));
+    bool smoothed_sampling_co_dynzoom = is_first_inside_rect(vTexCoord, vec4(DYN_ZOOM_SAMPLING_POINT-0.1, DYN_ZOOM_SAMPLING_POINT+0.1));
     #ifndef D3D_WORKAROUND
         if (smoothed_sampling_co_dynzoom) {
 
@@ -157,7 +159,7 @@ float get_avglum() {
             if (vResSwitch_res_changed == 1.0) prev_lum = prev_lum - (1.75 - RESSWITCH_SYNC_SPEED);
             return mix( prev_lum, get_avg_lum_from_mip(), transition_speed_breathing) * vDo_dynzoom;
         }
-        bool smoothed_sampling_co_nocc = is_first_inside_rect(vTexCoord_unscaled, vec4(TSMOOTH_NOCC_SAMPLING_POINT-0.1 , TSMOOTH_NOCC_SAMPLING_POINT+0.1)) ;
+        bool smoothed_sampling_co_nocc = is_first_inside_rect(vTexCoord, vec4(TSMOOTH_NOCC_SAMPLING_POINT-0.1 , TSMOOTH_NOCC_SAMPLING_POINT+0.1)) ;
         if (smoothed_sampling_co_nocc) {
             float transition_speed_adaptive_black = 0.1;
             return mix(texture(avglum_passFeedback,TSMOOTH_NOCC_SAMPLING_POINT).a, get_avg_lum_from_mip_nocc(), transition_speed_adaptive_black);
@@ -372,7 +374,7 @@ void main() {
     
     //We also reserve a sampling point in alpha channel to store if the resolution has changed.
     //The value stored will be used by the first pass as an argument to sin() to shake the image.
-    if (is_first_inside_rect(vTexCoord_unscaled, vec4(RESSWITCH_SAMPLING_POINT-0.01 , RESSWITCH_SAMPLING_POINT+0.01) )) {
+    if (is_first_inside_rect(vTexCoord, vec4(RESSWITCH_SAMPLING_POINT-0.01 , RESSWITCH_SAMPLING_POINT+0.01) )) {
         if (vResSwitch_res_changed == 1.0 ) {
             pixel_out.a = 1.0;  
         } else {
@@ -380,7 +382,7 @@ void main() {
                 vec2 early_late_cut = vec2(0.04,2.0); // decay rate before/after RESSWITCH_SYNC_SPEED threshold;
                 if (low_fps(FPS_ESTIMATE_PASS)) early_late_cut*= 2.0;
 
-                float t = texture(avglum_passFeedback,vTexCoord_unscaled).a;
+                float t = texture(avglum_passFeedback,vTexCoord).a;
                 if (t >= RESSWITCH_SYNC_SPEED) {
                     pixel_out.a = clamp( t - early_late_cut.x, 0,1);
                 } else {
@@ -392,7 +394,7 @@ void main() {
                  
         }
 
-    } else if (is_first_inside_rect(vTexCoord_unscaled, vec4(AUTOCROP_SAMPLING_POINT-0.01, AUTOCROP_SAMPLING_POINT+0.01) ))  {
+    } else if (is_first_inside_rect(vTexCoord, vec4(AUTOCROP_SAMPLING_POINT-0.01, AUTOCROP_SAMPLING_POINT+0.01) ))  {
         if (vDo_autocrop == 1.0)
             pixel_out.a = get_autocrop();
         
@@ -405,7 +407,7 @@ void main() {
     //Create a small mipmap to be used to light the bezel corners
     //and by the bloom pass to identify bright areas.
     if (DO_BEZEL > 0.0) 
-        pixel_out.rgb = textureLod(colortools_and_ntsc_pass, vTexCoord, mip_lod).rgb;
+        pixel_out.rgb = textureLod(colortools_and_ntsc_pass, vTexCoord_scaled, mip_lod).rgb;
 
 
     FragColor = pixel_out;
