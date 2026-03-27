@@ -132,6 +132,9 @@ void main() {
       float start_offset = (pi*2.0/8.0/4.0);
 
       vec3 pixel_out = bloom(Source, vCoords_zoomout, global.FinalViewportSize, blur_radius_adpt, 1.0, start_offset, 0.0) ;
+      
+      //pixel_out.rgb *= pixel_out.rgb; //seems to improve reflections (counteracted by the previous pass)
+      
       pixel_out *= BEZEL_REFL_STRENGTH;
      
    //Next simulate a diffused light
@@ -162,6 +165,7 @@ void main() {
             
    //Corners: less reflections:
       float fcorners_dark = 1 - corners_shade(vTexCoord, 1.125) * BEZEL_CORNER_DARK ;
+
 
    
    FragColor = vec4(pixel_out * fcorners_dark, side_shade);

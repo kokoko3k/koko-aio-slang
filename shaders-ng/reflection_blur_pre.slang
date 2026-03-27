@@ -113,6 +113,9 @@ void main() {
       
       vec3 pixel_out = bloom(shift_and_bleed_pass, coords, global.FinalViewportSize, blur_radius_adpt, 1.0, 0.0, 1.0) ;
       
+      //pixel_out.rgb = pow(pixel_out.rgb, vec3(0.5)); //seems to improve reflections (counteracted by the next pass)
+      
+      
       if (DO_BACKDROP * BACKDROP_JUST_TUBE  > 0.0) {
          vec4 backdrop_img = texture(backdrop, vCoordsBackdrop);
          vec3 blended = (pixel_out.rgb + DO_BACKDROP) * backdrop_img.rgb;

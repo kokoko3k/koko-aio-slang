@@ -65,7 +65,7 @@ DO_SPOT = "0.0"
 	S_POWER = "0.067"
 	
 
-DO_DYNZOOM = "0.025"
+DO_DYNZOOM = "0.02"
 DO_CURVATURE = "1.000000"
 
 	
