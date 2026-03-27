@@ -130,12 +130,11 @@ float get_avglum() {
             
 
     //WARNING: Use this for dynamic zoom only, since it returns 0.0 when dynzoom is disabled or when integer scaling is requested.
-    bool smoothed_sampling_co_dynzoom = is_first_inside_rect(vTexCoord, vec4(DYN_ZOOM_SAMPLING_POINT-0.1, DYN_ZOOM_SAMPLING_POINT+0.1));
-    bool smoothed_sampling_co_nocc = is_first_inside_rect(vTexCoord, vec4(TSMOOTH_NOCC_SAMPLING_POINT-0.1 , TSMOOTH_NOCC_SAMPLING_POINT+0.1)) ;
+    bool smoothed_sampling_co_dynzoom = is_first_inside_rect(vTexCoord_unscaled, vec4(DYN_ZOOM_SAMPLING_POINT-0.1, DYN_ZOOM_SAMPLING_POINT+0.1));
     #ifndef D3D_WORKAROUND
         if (smoothed_sampling_co_dynzoom) {
 
-            float prev_lum = texture(avglum_passFeedback,vTexCoord).a;
+            float prev_lum = texture(avglum_passFeedback,DYN_ZOOM_SAMPLING_POINT).a;
             float myframecount = params.FrameCount;
             float transition_speed_breathing = 0.2;
             
@@ -158,10 +157,10 @@ float get_avglum() {
             if (vResSwitch_res_changed == 1.0) prev_lum = prev_lum - (1.75 - RESSWITCH_SYNC_SPEED);
             return mix( prev_lum, get_avg_lum_from_mip(), transition_speed_breathing) * vDo_dynzoom;
         }
-        
+        bool smoothed_sampling_co_nocc = is_first_inside_rect(vTexCoord_unscaled, vec4(TSMOOTH_NOCC_SAMPLING_POINT-0.1 , TSMOOTH_NOCC_SAMPLING_POINT+0.1)) ;
         if (smoothed_sampling_co_nocc) {
             float transition_speed_adaptive_black = 0.1;
-            return mix(texture(avglum_passFeedback,vTexCoord).a, get_avg_lum_from_mip_nocc(), transition_speed_adaptive_black);
+            return mix(texture(avglum_passFeedback,TSMOOTH_NOCC_SAMPLING_POINT).a, get_avg_lum_from_mip_nocc(), transition_speed_adaptive_black);
         }
     #endif
     
