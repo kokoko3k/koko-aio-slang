@@ -184,7 +184,8 @@ void main() {
    
    //bleed
    if (DO_CVBS_BLEED > 0.5)
-      pixel_out.rgb = pixel_bleed(pixel_out.rgb, vTexCoord, upscale_pass, global.upscale_passSize.z);
+      // do not use upscale_pass size, but params.OriginalSize.z*0.5 so that hiresgames presets will look the same
+      pixel_out.rgb = pixel_bleed(pixel_out.rgb, vTexCoord, upscale_pass, params.OriginalSize.z*0.5);
 
    if (DOT_C > 0.0)
       pixel_out.rgb = dotc(upscale_pass, pixel_out.rgb, vTexCoord, params.OriginalSize);
