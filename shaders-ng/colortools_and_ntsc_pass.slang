@@ -684,18 +684,19 @@ void main() {
    
    vec3 pixel_out = pixel_in;
 
-   float artifact_mask = 0.0;
    if (DO_NTSC_ARTIFACTS > 0.5) {
       //Get ntsc picture
          vec4 ntsc_decoded = ntscdec(co * 1.0001, pixel_in);
          ntsc_decoded = clamp(ntsc_decoded, vec4(0.0), vec4(1.0));
 
       //apply the minimum treshold to artifact mask
-         artifact_mask = smoothstep_fast(NTSC_ARTF_TRSH , 1.0, ntsc_decoded.a);
+         float artifact_mask = smoothstep_fast(NTSC_ARTF_TRSH , 1.0, ntsc_decoded.a);
 
       //Optionally completely cut-off artifacts under treshold:
          ntsc_decoded = mix(ntsc_decoded, vec4(pixel_in, 0.0) , (1-artifact_mask)*NTSC_ARTF_ZAP );
-      //Update the artifact mask if something has been cancelled
+
+         //ntsc_decoded = mix(ntsc_decoded, vec4(pixel_in, 0.0) , step(0.99, 1-artifact_mask)*NTSC_ARTF_ZAP );//<--this respects an hard treshold.
+         //Update the artifact mask if something has been cancelled
          artifact_mask = min(artifact_mask, ntsc_decoded.a);
          
 
