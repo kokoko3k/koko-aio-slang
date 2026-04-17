@@ -18,50 +18,54 @@
     <br>
     Vulkan ang Glcore have no problems, you can test both to see<br>
     which performs better.<br>
+    d3d10 is completely unsupported.<br>
     <br>
-    d3d10 is completely unsupported.
-    <br>
-    Be warned that the following functions do not work if you enable the workaround: <br>
-        * Resync speed when core resolution changes <br>
-        * Adaptive Black <br>
-<!--         * CVBS Bleed size is limited to 5.0 <br> -->
-        * Ambientlight scene change detection <br>
-        * Halving border updates refresh <br>
-        * Lcd antighosting <br>
-        * Delta render <br>
-        * Possibly others (?) <br>
+    Be warned that the following functions do not work if you enable the workaround:<br>
+	* Resync speed when core resolution changes <br>
+	* Adaptive Black <br>
+	* CVBS Bleed size is limited to 5.0 <br>
+	* Ambientlight scene change detection <br>
+	* Halving border updates refresh <br>
+	* Lcd antighosting <br>
+	* Delta render <br>
+	* Possibly others (?) <br>
     
 ---------------------------
     
 **USEFUL LOCATIONS/FILES:**
         
     config/config-user-optional.txt:    
-        Shader parameters that can be changed within Retroarch.
-        can be set within this file too.
-        PRO: The shader will be faster
+        Shader parameters that can be changed within Retroarch can be set within this file too.
+        PRO: The shader will be faster!
         CON: The parameters can no longer be modified within Retroarch. 
         Please read config-user-optional-template.txt for instructions.
                
     textures/background_under.png
-        This is the image shown by default under the game and the bezel.
-        Read further for details. 
+        When enabled, this is the default image shown under the game and the bezel.
+        Read further for details.
         
     textures/background_over.png
-        This is the image shown by default over the game and the bezel.
+        When enabled, this is the default image shown over the game and the bezel.
         Read further for details.
         
     textures/monitor_body_curved.png, textures/monitor_body_straight.png
-        This is the image used to draw the bezel.
+        When enabled, this is the image used to draw the bezel.
         Read further in the bezel section of this document for details.
         
     textures/side_shade-helper.png
-        This file helps the shader to cast different shadows on different sides of the reflective part of the bezel (so, the inner area).
+        This file helps the shader to cast different shadows on different sides 
+		of the reflective part of the bezel (so, the inner area).
         Green color represents the side, while blue and red represents upper and lower side.
-        Color blue<->green<->red color transitions are smoothed to produce smoothed shadows, you can tweak that to alter the shadows look.
-        The file is also useful to overcome a bug in Retroarch, where some 3D accelerated cores like flycast, if coupled with GLCore video driver, flips the bezel upside down. In those cases, you should/could flip the image itself.
+        Color blue<->green<->red color transitions are smoothed 
+		to produce smoothed shadows, you can tweak that to alter the shadows look.
+        The file is also useful to overcome a bug in Retroarch, 
+		where some 3D accelerated cores like flycast, if coupled with GLCore video driver, 
+		flips the bezel upside down. 
+		In those cases, you should/could flip the image itself.
+		
     config/config-static.inc:
         Some obscure shader parameters can't be changed within retroarch,
-        use this file instead.
+        use this file instead, see the fiole content itself for details.
         
 Texture "sources", including the main gimp project file for the <br>
 default curved and straight monitor frame are on the following repo: <br>
@@ -71,7 +75,7 @@ https://github.com/kokoko3k/koko-aio-slang-misc/tree/main
 ---------------------------
 
 **PARAMETERS:**<br>
-*koko-aio as tons of configurable parameters, and for this reason it comes with a lot of pre-configured presets.<br>
+*koko-aio has tons of configurable parameters, and for this reason it comes with a lot of pre-configured presets.<br>
 My advice is to start with a preset you like, and then tweak it by following this documentation, rather than starting from scratch.*
 
 
@@ -79,14 +83,13 @@ My advice is to start with a preset you like, and then tweak it by following thi
 Input Gamma: set it around 2.2 to linearize values.
         
 **Gamma out:**<br>
-Output Gamma: set it around "1/Gamma in"; small tweaks allowed.
+Output Gamma: set it around "1/Gamma in", but tweaks allowed to brighten the image.
         
 **Clip to white:**<br>
 Human brain perceives strong colors as white, but <br>
 in crt shaders you don't want this to preserve colors.<br>
 However nice effects may be obtained (eg: with vector games). <br>
         
-
 **Color corrections:**<br>
     Modify signal color at "input" stage.<br>
 
@@ -104,7 +107,7 @@ However nice effects may be obtained (eg: with vector games). <br>
             The amount of (de) colorization applied.
         Hue bright, Hue dark:
             Set the hue for bright and dark colors. in [0..1] range.
-            To emulate different monochrome models, the process is quite easy:
+            To emulate different monochrome models, the process is:
             . Provided you have screenshots, use a color picker tool with hue expressed in 1…360
               range and identify the hue of the original naked background hue1
             . Do the same for the darkest pixel on the screen, hue2
@@ -125,7 +128,7 @@ However nice effects may be obtained (eg: with vector games). <br>
     
     Sensitivity: Avoid to dedither "legit" zones by lowering this.
     Basic search strength: Blends basic dedithering and original image.
-    Extensive search strength: Blends extensive dedithering and original image .
+    Extensive search strength: Blends extensive dedithering and original image.
                                may produce posterization effects.
 
 
@@ -154,9 +157,7 @@ However nice effects may be obtained (eg: with vector games). <br>
     Cancel artifacts under the threshold
         How much of the artifacts under the threshold will be completely removed.
     Show selected artifacts mask.
-        This will show only the part of the image that contains artifacts.
-        Use it to for a better visual feedback of the following parameters.
-        "glow/blur shader parameter" needs to be enabled for this to work.
+        This will show only the part of the image that contains artifacts over the treshold.
         
     
 **CVBS: Bandwidth limited chroma:**<br>
@@ -169,7 +170,7 @@ However nice effects may be obtained (eg: with vector games). <br>
 	Quality
 		Smearing visual quality (the higher, the more samples, the slower).
     Use coarse sampling
-        Useful to increase the apparent blur size while when the samples number is low.
+        Useful to increase the apparent blur size while thmber of samples (quality) is low.
     Post sharpness filter.
         Compensates for the loss of sharpness due to the previous parameter.
         
@@ -188,8 +189,8 @@ However nice effects may be obtained (eg: with vector games). <br>
     Early decay (blue): is the immediate light cut after the blue phosphor is no more/less excited.
     Late persistence (blue): modulates the time the residual blue light will stay on screen
     Red/Green decay time multiplier: 
-                       Chemical composition makes different phosphors have different decay times.
-                       Highering this parameter will make them slower than blue.
+		   Chemical composition makes different phosphors have different decay times.
+		   Highering this parameter will make them slower than blue.
     
 
 **Deconvergence:**<br>
@@ -208,6 +209,7 @@ However nice effects may be obtained (eg: with vector games). <br>
         
 **RF Noise:**<br>
     Emulates radio frequency noise with a given strength<br>
+	
     1 produce noise before the Glow/Blur pass, while -1 will move it after.
     Suggestions:
     If you're blurring the image, is better to use 1.<br>
@@ -221,9 +223,9 @@ However nice effects may be obtained (eg: with vector games). <br>
 	Blur the image and/or embolds bright pixels.
 
     Glow to blur bias:
-        Higher negative values -> more glow : brighter colors expands over darker ones.
-        Higher positive values -> means blur: all the colors are blurred.
-        0.0 means no blur, no glow.
+		(glow means that brighter colors expands over darker ones, 
+		while blur will "defocus" the whole image).
+        Higher negative values will turn the glow into a blur.
         Please note that this always reverts to full blur (1.0) when using "Fake transparencies/blending" feature
     Glow spread amount:
         The higher, the more the bright colors will smoothly expand.
@@ -232,6 +234,7 @@ However nice effects may be obtained (eg: with vector games). <br>
 
     Sharpness (horizontal, vertical):
         Modulates the sharpness of the image.
+		
         - Max (actually 7.0) will not alter the image sharpness.
         - More than 0: will use gauss blur
         - Less than 0: will use box blur and will progressively
@@ -243,14 +246,13 @@ However nice effects may be obtained (eg: with vector games). <br>
         It will also help FXAA to stay sharp.
         
         When Warped glow X is set to a negative value, the horizontal embolding
-        will be modulated with a scanline shape to btter mimics CRT behaviour.
+        will be modulated with a scanline shape to better mimics CRT behaviour.
         The latter will be auto-disabled in presence of Fake integer scanlines
         and interlaced content.
         
     Warped Dynamics:
         Change the amount of warpsharp applied based on the contrast between 
         nearby pixels, thereby altering their "Warped" shape.
-
 
 
 **Tate mode (use horizontal scanlines):**<br>
@@ -265,7 +267,8 @@ However nice effects may be obtained (eg: with vector games). <br>
     Emulates the crt circuits syncing to the new signal timings.<br>
     Will shake the screen for a while when the resolution changes.<br>
     The higher the value, the lower the effect duration.
-    
+
+	
 **Hi-resolution scanlines handling:**<br>
         There you can choose how to handle scanlines when a game is Hi-Resolution.<br>
         Special handling may be needed to mitigate glitches/moire at 1080p or lower resolutions.
@@ -300,6 +303,7 @@ However nice effects may be obtained (eg: with vector games). <br>
         where the brighter lines flickers when they are near dark ones.
         You can choose to produce the flickering: never, always or only 
         when the input picture is considered High resolution.
+		
     Interlace Flicker power: The strength of the effect.
         
         
