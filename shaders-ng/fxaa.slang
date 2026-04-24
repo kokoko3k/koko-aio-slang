@@ -957,7 +957,7 @@ void main() {
       border = clamp(border, 0,3.0);
    }
 
-   #define TRESHOLD_AA 0.15 //speedup by skipping uniform zones.
+   #define TRESHOLD_AA 0.05 //speedup by skipping uniform zones.
 
    if (border >= TRESHOLD_AA) {
       if (DO_FXAA == 1.0) {
@@ -969,7 +969,7 @@ void main() {
       if (DO_FXAA == 3.0) {
          pixel_out.rgb = aa_2xbrz(colortools_and_ntsc_pass, vTexCoord);
       }
-   }
+   } 
 
 /*
    if (DO_FXAA == 1.0) {
