@@ -957,7 +957,7 @@ void main() {
       border = clamp(border, 0,3.0);
    }
 
-   #define TRESHOLD_AA = 0.15 //speedup by skipping uniform zones.
+   #define TRESHOLD_AA 0.15 //speedup by skipping uniform zones.
 
    if (border >= TRESHOLD_AA) {
       if (DO_FXAA == 1.0) {
