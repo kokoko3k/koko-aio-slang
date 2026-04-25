@@ -481,6 +481,7 @@
 // #define ADPT_STROBE_GAIN_ADJ_NODARK 1.0    // Less gain on dark colors
 // #define ADPT_STROBE_GAMMA_ADJ       0.9    // Post Gamma adjustment
 // #define ADPT_LCD_RETENTION_FIX      3600.0 // LCD Retention workaround cadence (frames)
+// #define ADPT_STROBE_SELECTIVE       0.0    // Apply only to moving areas
 
 // #define ADPT_STROBE_GAMMA_ADJ      0.9    // Gamma adjustment
 

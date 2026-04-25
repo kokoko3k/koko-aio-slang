@@ -6,7 +6,7 @@
  */
 
 // #define DEBUG_TEXTURE Original
-#define DEBUG_TEXTURE colortools_and_ntsc_pass
+#define DEBUG_TEXTURE in_glow_passFeedback
 //#define DEBUG_TEXTURE halo_pre_gamma_pass
 
 // #define DEBUG_PRINT_VALUE
@@ -1283,6 +1283,7 @@ vec3 antighost(vec3 c) {
 	return c;
 }
 
+
 void main() {
 
     // Early whole frameskipping
@@ -1372,6 +1373,7 @@ void main() {
         
         pixel_out = fn_pixel_content(co_content);
         
+            
         if (DO_BACKDROP * BACKDROP_JUST_TUBE > 0.0) {
             vec3 blended = vec3(0.0);
             vec4 backdrop_img = pixel_overlay_image_stretch(backdrop, co_content);
@@ -1392,13 +1394,13 @@ void main() {
             pixel_out = mix(pixel_out+abs(perlin), pixel_out+vec3(content_mask), vec3(vignette_spot.y) );
         }
         
-        #ifdef DO_ADPT_STROBE
-            pixel_out = adaptive_strobe(pixel_out, vAdaptive_strobe_oscillator);
-        #else
-            #ifdef DO_LCD_ANTIGHOSTING
-                pixel_out = antighost(pixel_out);
+            #ifdef DO_ADPT_STROBE
+                pixel_out = adaptive_strobe(pixel_out, vAdaptive_strobe_oscillator, final_passFeedback, vOutputCoord);
+            #else
+                #ifdef DO_LCD_ANTIGHOSTING
+                    pixel_out = antighost(pixel_out);
+                #endif
             #endif
-        #endif
         
 
     } else {

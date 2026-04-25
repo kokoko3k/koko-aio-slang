@@ -1692,16 +1692,24 @@ vec3 strobe( vec3 c) {
 }
 
 
-vec3 adaptive_strobe(vec3 c, float osc) {
+vec3 adaptive_strobe(vec3 c, float osc, sampler2D feedback_smp, vec2 feedback_smp_co) {
 
 	#ifndef DO_ADPT_STROBE
-	return c;
+        return c;
 	#endif
 
-	c = clamp(c, vec3(0.0), vec3(1.0));
+    float str_adjusted = ADPT_STROBE_STR;
+    
+    if (ADPT_STROBE_SELECTIVE == 1.0) {
+        vec3 f = texture(feedback_smp, feedback_smp_co).rgb;
+        float diff= dot( abs( texture(feedback_smp, feedback_smp_co).rgb - c)  , vec3(0.666));
+        str_adjusted *= diff;
+        str_adjusted = clamp(str_adjusted, 0, 1);
+    }
+        
+	float gain_adj =  mix(1.0, ADPT_STROBE_GAIN_ADJ,  str_adjusted);
 
-	float gain_adj =  mix(1.0, ADPT_STROBE_GAIN_ADJ,  ADPT_STROBE_STR);
-
+    c = clamp(c, vec3(0.0), vec3(1.0));
 	vec3 osc3 = vec3(osc);
 	if (osc > 0.0) {
 		osc3 = mix( osc3*gain_adj, osc3 * gain_adj * c, ADPT_STROBE_GAIN_ADJ_NODARK) ;
@@ -1710,9 +1718,9 @@ vec3 adaptive_strobe(vec3 c, float osc) {
 	vec3 room = (0.5 - abs(0.5-c));
 	room = min(room, vec3(ADPT_STROBE_CEIL));
 		
-	c += room * osc3 * ADPT_STROBE_STR ;
+	c += room * osc3 * str_adjusted  ;
 
-	float gamma_adj = mix(1.0, ADPT_STROBE_GAMMA_ADJ, ADPT_STROBE_STR);
+	float gamma_adj = mix(1.0, ADPT_STROBE_GAMMA_ADJ, str_adjusted);
 	c = pow(c, vec3(gamma_adj));
 
 	return c;
