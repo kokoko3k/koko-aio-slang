@@ -1702,7 +1702,7 @@ vec3 adaptive_strobe(vec3 c, float osc, sampler2D feedback_smp, vec2 feedback_sm
     
     if (ADPT_STROBE_SELECTIVE == 1.0) {
         vec3 f = texture(feedback_smp, feedback_smp_co).rgb;
-        float diff= dot( abs( texture(feedback_smp, feedback_smp_co).rgb - c)  , vec3(0.666));
+        float diff= dot( abs(f - c)  , vec3(1.0));
         str_adjusted *= diff;
         str_adjusted = clamp(str_adjusted, 0, 1);
     }
