@@ -745,7 +745,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter ADPT_STROBE_GAIN_ADJ_NODARK   "          Less gain on dark colors"    1.0   0.0  1.0  0.05
 #pragma parameter ADPT_STROBE_GAMMA_ADJ         "   .   Post Gamma adjustment"   0.9   0.5  4.0  0.05
 #pragma parameter ADPT_LCD_RETENTION_FIX        "   .   LCD Retention workaround cadence (frames)"   3600.0   0.0  300000.0  50.0
-#pragma parameter ADPT_STROBE_SELECTIVE         "   .   Apply only to moving areas"    0.0   0.0  1.0  1.0 
+#pragma parameter ADPT_STROBE_SELECTIVE         "   .   Apply only to moving areas (subframes unsupported)"    0.0   0.0  1.0  1.0 
 
 #pragma parameter LABEL9999 " " 0 0 0 1
 
