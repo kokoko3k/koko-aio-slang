@@ -387,8 +387,8 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 // Fake transparency handling
 #pragma parameter DO_WTFL             "★ Fake transparencies blending enable (eg: sonic waterfall)?"    0.0 0.0 1.0 1.0
-#pragma parameter WTFL_SHARPNESS_X      "        Overridden X-sharpness"             0.6 0.35 3.0 0.05
-#pragma parameter WTFL_SHARPNESS_Y      "        Overridden Y-sharpness"             0.6 0.35 3.0 0.05
+#pragma parameter WTFL_SHARPNESS_X      "        Overridden X-sharpness"             0.0 0.0 3.0 0.05
+#pragma parameter WTFL_SHARPNESS_Y      "        Overridden Y-sharpness"             3.0 0.0 3.0 0.05
 //#pragma parameter WTFL_THRESHOLD      "        Detection threshold"                1.0 0.0 2.0 0.01
 #pragma parameter LABEL0057 " " 0 0 0 1
 
