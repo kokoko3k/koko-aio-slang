@@ -1271,11 +1271,12 @@ vec3 antighost(vec3 c) {
     #endif
 
 	#ifndef D3D_WORKAROUND
-		if (!bdelta_render_enabled()) {
+		if (!bdelta_render_enabled() && mod(params.FrameCount, 100 ) > 50.0) {
 				if (frame_is_even() && (vInterlace_offset == 0.0)) {
 					vec3 feedback = texture(final_passFeedback, vOutputCoord).rgb;
 					vec3 diff=(feedback - c)*LCD_ANTIGHOSTING;
-					diff = sign(diff) * min( abs(diff), vec3(LCD_ANTIGHOSTING_CEIL));
+					//diff = sign(diff) * min( abs(diff), vec3(LCD_ANTIGHOSTING_CEIL));
+                    diff = clamp(diff, -LCD_ANTIGHOSTING_CEIL, LCD_ANTIGHOSTING_CEIL); //probably faster.
 					c = mix(c, c-diff, 0.5);
 				}
 		}
