@@ -1245,7 +1245,7 @@ vec3 blur9_y(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_y) {
 	vec2 off2 = vec2(0.0, 3.2307692308 / resolution) ;
 	vec3 w = vec3(0.2270270270,0.3162162162,0.0702702703);
 	color += texture(image, uv).rgb * w.x;
-	color += (texture(image, uv + off1).rgb + texture(image, uv - off2).rgb) * w.y;
+	color += (texture(image, uv + off1).rgb + texture(image, uv - off1).rgb) * w.y;
 	color += (texture(image, uv + off2).rgb + texture(image, uv - off2).rgb) * w.z;
 	return color;
 }
