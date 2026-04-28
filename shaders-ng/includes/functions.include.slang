@@ -1176,8 +1176,7 @@ vec3 blur9_x_box(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_x, f
 	vec2 off1 = vec2(1.0 / resolution, 0.0) ;
 	vec2 off2 = vec2(2.0 / resolution, 0.0) ;
 	vec3 color = texture(image, uv).rgb ;
-	color += texture(image, uv + off1).rgb ;
-	color += texture(image, uv - off1).rgb ;
+    color += texture(image, uv + off1).rgb + texture(image, uv - off1).rgb;
 	color += (texture(image, uv + off2).rgb + texture(image, uv - off2).rgb) * sharp_sub;
 	color = color/(3.0 + sharp_sub*2);
 	return max(vec3(0.0), color);
@@ -1189,8 +1188,7 @@ vec3 blur9_y_box(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_y, f
 	vec2 off1 = vec2(0.0, 1.0 / resolution) ;
 	vec2 off2 = vec2(0.0, 2.0 / resolution) ;
 	vec3 color = texture(image, uv).rgb ;
-	color += texture(image, uv + off1).rgb ;
-	color += texture(image, uv - off1).rgb ;
+    color += texture(image, uv + off1).rgb + texture(image, uv - off1).rgb;
 	color += (texture(image, uv + off2).rgb + texture(image, uv - off2).rgb) * sharp_sub;
 	color = color/(3.0 + sharp_sub*2);
 	return max(vec3(0.0), color);
@@ -1202,11 +1200,10 @@ vec3 glow_dumb(sampler2D in_texture, float glow_power, float gamma, vec2 coords)
 
 vec3 blur9_x(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_x) {
 	float resolution = sourcesize.x * sharpness_x;
-	vec3 color = vec3(0.0);
 	vec2 off1 = vec2(1.3846153846 / resolution, 0.0);
 	vec2 off2 = vec2(3.2307692308 / resolution, 0.0);
 	vec3 w = vec3(0.2270270270,0.3162162162,0.0702702703);
-	color += texture(image, uv).rgb * w.x;
+	vec3 color = texture(image, uv).rgb * w.x;
 	color += (texture(image, uv + off1).rgb + texture(image, uv - off1).rgb) * w.y;
 	color += (texture(image, uv + off2).rgb + texture(image, uv - off2).rgb) * w.z;
 	return color;
@@ -1240,11 +1237,10 @@ vec3 blur9_y_gamma(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_y,
 
 vec3 blur9_y(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_y) {
 	float resolution = sourcesize.y * sharpness_y;
-	vec3 color = vec3(0.0);
 	vec2 off1 = vec2(0.0, 1.3846153846 / resolution) ;
 	vec2 off2 = vec2(0.0, 3.2307692308 / resolution) ;
 	vec3 w = vec3(0.2270270270,0.3162162162,0.0702702703);
-	color += texture(image, uv).rgb * w.x;
+	vec3 color = texture(image, uv).rgb * w.x;
 	color += (texture(image, uv + off1).rgb + texture(image, uv - off1).rgb) * w.y;
 	color += (texture(image, uv + off2).rgb + texture(image, uv - off2).rgb) * w.z;
 	return color;
@@ -1252,14 +1248,12 @@ vec3 blur9_y(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_y) {
 
 vec3 blur9_x_box1tap(sampler2D image, vec2 uv, vec2 sourcesize, float sharpness_x) {
 	float resolution = sourcesize.x * sharpness_x;
-	vec3 color = vec3(0.0);
 
 	vec2 off1 = vec2(1.0 / resolution, 0.0)  ;
 	vec2 off2 = vec2(2.0 / resolution, 0.0)  ;
 
-	color += texture(image, uv).rgb        ;
-	color += texture(image, uv + off1).rgb ;
-	color += texture(image, uv - off1).rgb ;
+	vec3 color = texture(image, uv).rgb        ;
+	color += texture(image, uv + off1).rgb + texture(image, uv - off1).rgb;
 	color = color/3.0;
 	return color;
 }
