@@ -1082,9 +1082,9 @@ vec3 fn_pixel_content(vec2 coords) {
         if (IN_GLOW_WARPSHARP_X < 0.0) {
             float freq = vPG_OriginalSize_tated_mul_pi.y * 2.0;
             if (vDo_Tate == 0.0)
-                warpedglow.x *= -cos(coords.y * freq)+0.25;
+                warpedglow.x *= 0.25 - 0.75 * cos(coords.y * freq); //warpedglow.x = warpedglow.x * mix( 1.0, -cos(coords.y * freq),0.75);
                     else
-                warpedglow.y *= -cos(coords.x * freq)+0.25;
+                warpedglow.y *= 0.25 - 0.75 * cos(coords.x * freq);//warpedglow.y = warpedglow.y * mix( 1.0, -cos(coords.x * freq),0.75);
         }
     #endif
     
