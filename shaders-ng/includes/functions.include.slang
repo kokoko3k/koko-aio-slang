@@ -2005,7 +2005,13 @@ float warpedglow_x_allowed( float in_glow_warpsharp_x ) {
 	if (scanlines_will_alternate(bIs_Interlaced))
 		vScanlinePeriod = 0.5;
 
-	bool lowres_y = fn_very_lowres_y(global.final_passFeedbackSize.xy, 
+
+	#ifndef D3D_WORKAROUND
+		vec2 out_size = global.final_passFeedbackSize.xy;
+	#else
+		vec2 out_size = global.FinalViewportSize.xy;
+	#endif
+	bool lowres_y = fn_very_lowres_y(out_size.xy,
 										params.OriginalSize.xyzw, 
 										do_tate, 
 										bIsRotated, 
