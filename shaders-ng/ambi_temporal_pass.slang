@@ -14,18 +14,18 @@
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
-layout(location = 0) _NOPERSPECTIVE out vec2 vTexCoord;
-layout(location = 1) _FLAT out float vLedBorder_min;
-layout(location = 2) _FLAT out float vLedBorder_max;
-layout(location = 3) _FLAT out float vLed_step;
-layout(location = 4) _FLAT out float lod;
-layout(location = 5) _NOPERSPECTIVE out vec2 pre_pass_coords;
-layout(location = 6) _FLAT out float vIs_rotated;
-layout(location = 7) _FLAT out float vAMBI_STRETCH;
+layout(location = 0) noperspective out vec2 vTexCoord;
+layout(location = 1) flat out float vLedBorder_min;
+layout(location = 2) flat out float vLedBorder_max;
+layout(location = 3) flat out float vLed_step;
+layout(location = 4) flat out float lod;
+layout(location = 5) noperspective out vec2 pre_pass_coords;
+layout(location = 6) flat out float vIs_rotated;
+layout(location = 7) flat out float vAMBI_STRETCH;
 
-layout(location = 9) _FLAT out float vSmpBorder_min;
-layout(location = 10) _FLAT out float vSmpBorder_max;
-layout(location = 11) _FLAT out float vSmp_step;
+layout(location = 9) flat out float vSmpBorder_min;
+layout(location = 10) flat out float vSmpBorder_max;
+layout(location = 11) flat out float vSmp_step;
 
 
 void main() {
@@ -103,18 +103,18 @@ void main() {
 }
 
 #pragma stage fragment
-layout(location = 0) _NOPERSPECTIVE in vec2 vTexCoord;
-layout(location = 1) _FLAT in float vLedBorder_min;
-layout(location = 2) _FLAT in float vLedBorder_max;
-layout(location = 3) _FLAT in float vLed_step;
-layout(location = 4) _FLAT in float lod;
-layout(location = 5) _NOPERSPECTIVE in vec2 pre_pass_coords;
-layout(location = 6) _FLAT in float vIs_rotated;
-layout(location = 7) _FLAT in float vAMBI_STRETCH;
+layout(location = 0) noperspective in vec2 vTexCoord;
+layout(location = 1) flat in float vLedBorder_min;
+layout(location = 2) flat in float vLedBorder_max;
+layout(location = 3) flat in float vLed_step;
+layout(location = 4) flat in float lod;
+layout(location = 5) noperspective in vec2 pre_pass_coords;
+layout(location = 6) flat in float vIs_rotated;
+layout(location = 7) flat in float vAMBI_STRETCH;
 
-layout(location = 9) _FLAT in float vSmpBorder_min;
-layout(location = 10) _FLAT in float vSmpBorder_max;
-layout(location = 11) _FLAT in float vSmp_step;
+layout(location = 9) flat in float vSmpBorder_min;
+layout(location = 10) flat in float vSmpBorder_max;
+layout(location = 11) flat in float vSmp_step;
 
 layout(location = 0) out vec4 FragColor;
 

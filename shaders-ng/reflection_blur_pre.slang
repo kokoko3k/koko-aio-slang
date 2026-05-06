@@ -5,11 +5,11 @@
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 
-layout(location = 0) _NOPERSPECTIVE out vec2 vTexCoord;
-layout(location = 1) _NOPERSPECTIVE out vec2 vCoordsAdapted;
-layout(location = 2) _NOPERSPECTIVE out vec2 vCoords_shade;
-layout(location = 3) _NOPERSPECTIVE out vec2 vCoordsBackdrop;
-layout(location = 5) _FLAT out float vIn_Aspect;
+layout(location = 0) noperspective out vec2 vTexCoord;
+layout(location = 1) noperspective out vec2 vCoordsAdapted;
+layout(location = 2) noperspective out vec2 vCoords_shade;
+layout(location = 3) noperspective out vec2 vCoordsBackdrop;
+layout(location = 5) flat out float vIn_Aspect;
 
 #include "includes/functions.include.slang"
 
@@ -35,11 +35,11 @@ void main() {
 }
 
 #pragma stage fragment
-layout(location = 0) _NOPERSPECTIVE in vec2 vTexCoord;
-layout(location = 1) _NOPERSPECTIVE in vec2 vCoordsAdapted;
-layout(location = 2) _NOPERSPECTIVE in vec2 vCoords_shade;
-layout(location = 3) _NOPERSPECTIVE in vec2 vCoordsBackdrop;
-layout(location = 5) _FLAT in float vIn_Aspect;
+layout(location = 0) noperspective in vec2 vTexCoord;
+layout(location = 1) noperspective in vec2 vCoordsAdapted;
+layout(location = 2) noperspective in vec2 vCoords_shade;
+layout(location = 3) noperspective in vec2 vCoordsBackdrop;
+layout(location = 5) flat in float vIn_Aspect;
 
 layout(location = 0) out vec4 FragColor;
 

@@ -52,14 +52,14 @@
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 
-layout(location = 0) _NOPERSPECTIVE out vec2 vTexCoord;
-layout(location = 1) _FLAT out vec3 vTemperature_rgb;
-layout(location = 2) _FLAT out float vNTSC_FILTER_FC;
-layout(location = 3) _FLAT out float vPixelgrid_intr_gamma_adj;
-layout(location = 4) _NOPERSPECTIVE out vec3 vDebug;
-layout(location = 5) _NOPERSPECTIVE out vec2 vTexCoord_unshifted;
-layout(location = 6) _NOPERSPECTIVE out float vShake_sin_arg;
-layout(location = 7) _FLAT out float vNTSC_weights[NTSC_FILTER_WIDTH_MAX];
+layout(location = 0) noperspective out vec2 vTexCoord;
+layout(location = 1) flat out vec3 vTemperature_rgb;
+layout(location = 2) flat out float vNTSC_FILTER_FC;
+layout(location = 3) flat out float vPixelgrid_intr_gamma_adj;
+layout(location = 4) noperspective out vec3 vDebug;
+layout(location = 5) noperspective out vec2 vTexCoord_unshifted;
+layout(location = 6) noperspective out float vShake_sin_arg;
+layout(location = 7) flat out float vNTSC_weights[NTSC_FILTER_WIDTH_MAX];
 
 
 #include "includes/functions.include.slang"
@@ -210,14 +210,14 @@ void main() {
 
 #include "includes/functions.include.slang"
 
-layout(location = 0) _NOPERSPECTIVE in vec2 vTexCoord;
-layout(location = 1) _FLAT in vec3 vTemperature_rgb;
-layout(location = 2) _FLAT in float vNTSC_FILTER_FC;
-layout(location = 3) _FLAT in float vPixelgrid_intr_gamma_adj;
-layout(location = 4) _NOPERSPECTIVE in vec3 vDebug;
-layout(location = 5) _NOPERSPECTIVE in vec2 vTexCoord_unshifted;
-layout(location = 6) _NOPERSPECTIVE in float vShake_sin_arg;
-layout(location = 7) _FLAT in float vNTSC_weights[NTSC_FILTER_WIDTH_MAX];
+layout(location = 0) noperspective in vec2 vTexCoord;
+layout(location = 1) flat in vec3 vTemperature_rgb;
+layout(location = 2) flat in float vNTSC_FILTER_FC;
+layout(location = 3) flat in float vPixelgrid_intr_gamma_adj;
+layout(location = 4) noperspective in vec3 vDebug;
+layout(location = 5) noperspective in vec2 vTexCoord_unshifted;
+layout(location = 6) noperspective in float vShake_sin_arg;
+layout(location = 7) flat in float vNTSC_weights[NTSC_FILTER_WIDTH_MAX];
 
 layout(location = 0) out vec4 FragColor;
 
