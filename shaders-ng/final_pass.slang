@@ -28,32 +28,32 @@
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
-layout(location = 0) noperspective out vec2 vTexCoord;
-layout(location = 1) noperspective out vec2 vOutputCoord;
-layout(location = 2) noperspective out vec2 vBg_img_coords;
-layout(location = 3) flat out float vIsRotated;
-layout(location = 4) flat out float vScanlinePeriod_multiplier;
-layout(location = 5) flat out float vInterlace_offset;
-layout(location = 6) flat out float vIn_aspect;
-layout(location = 7) flat out float vDo_Tate;
-layout(location = 8) flat out vec3 vDotMat_Grid_Color;
-layout(location = 9) flat out vec4 vPG_offsets_and_size;
-layout(location = 10) noperspective out float vInteger_fragment_x;
-layout(location = 11) noperspective out vec2 vPG_freq_base_screen;
-layout(location = 12) flat out vec2 vPG_OriginalSize_tated_mul_pi;
-layout(location = 13) flat out float vDotMat_Grid_Sharpness;
-layout(location = 14) flat out float vPG_mask_height;
-layout(location = 15) flat out float vDeltaRenderOk;
-layout(location = 16) flat out float vDo_pixelgrid_h;
-layout(location = 17) noperspective out float vFake_scanline_period;
-layout(location = 18) flat out float vPG_y_shift;
-layout(location = 19) noperspective out vec2 vUnrotated_Output_coords;
+layout(location = 0) _NOPERSPECTIVE out vec2 vTexCoord;
+layout(location = 1) _NOPERSPECTIVE out vec2 vOutputCoord;
+layout(location = 2) _NOPERSPECTIVE out vec2 vBg_img_coords;
+layout(location = 3) _FLAT out float vIsRotated;
+layout(location = 4) _FLAT out float vScanlinePeriod_multiplier;
+layout(location = 5) _FLAT out float vInterlace_offset;
+layout(location = 6) _FLAT out float vIn_aspect;
+layout(location = 7) _FLAT out float vDo_Tate;
+layout(location = 8) _FLAT out vec3 vDotMat_Grid_Color;
+layout(location = 9) _FLAT out vec4 vPG_offsets_and_size;
+layout(location = 10) _NOPERSPECTIVE out float vInteger_fragment_x;
+layout(location = 11) _NOPERSPECTIVE out vec2 vPG_freq_base_screen;
+layout(location = 12) _FLAT out vec2 vPG_OriginalSize_tated_mul_pi;
+layout(location = 13) _FLAT out float vDotMat_Grid_Sharpness;
+layout(location = 14) _FLAT out float vPG_mask_height;
+layout(location = 15) _FLAT out float vDeltaRenderOk;
+layout(location = 16) _FLAT out float vDo_pixelgrid_h;
+layout(location = 17) _NOPERSPECTIVE out float vFake_scanline_period;
+layout(location = 18) _FLAT out float vPG_y_shift;
+layout(location = 19) _NOPERSPECTIVE out vec2 vUnrotated_Output_coords;
 #ifdef DO_ADPT_STROBE
-    layout(location = 20) flat out float vAdaptive_strobe_oscillator;
+    layout(location = 20) _FLAT out float vAdaptive_strobe_oscillator;
 #endif
     
 #ifdef DEBUG_PRINT_VALUE
-    layout(location = 31) flat out float vfprintvalue;
+    layout(location = 31) _FLAT out float vfprintvalue;
 #endif
 
 // I_am_a_placeholder_keep_reading;
@@ -398,32 +398,32 @@ void main() {
 
 #pragma stage fragment
 layout(location = 0) in vec2 vTexCoord;
-layout(location = 1) noperspective in vec2 vOutputCoord;
-layout(location = 2) noperspective in vec2 vBg_img_coords;
-layout(location = 3) flat in float vIsRotated;
-layout(location = 4) flat in float vScanlinePeriod_multiplier;
-layout(location = 5) flat in float vInterlace_offset;
-layout(location = 6) flat in float vIn_aspect;
-layout(location = 7) flat in float vDo_Tate;
-layout(location = 8) flat in vec3 vDotMat_Grid_Color;
-layout(location = 9) flat in vec4 vPG_offsets_and_size;
-layout(location = 10) noperspective in float vInteger_fragment_x;
-layout(location = 11) noperspective in vec2 vPG_freq_base_screen;
-layout(location = 12) flat in vec2 vPG_OriginalSize_tated_mul_pi;
-layout(location = 13) flat in float vDotMat_Grid_Sharpness;
-layout(location = 14) flat in float vPG_mask_height;
-layout(location = 15) flat in float vDeltaRenderOk;
-layout(location = 16) flat in float vDo_pixelgrid_h;
-layout(location = 17) noperspective in float vFake_scanline_period;
-layout(location = 18) flat in float vPG_y_shift;
-layout(location = 19) noperspective in vec2 vUnrotated_Output_coords;
+layout(location = 1) _NOPERSPECTIVE in vec2 vOutputCoord;
+layout(location = 2) _NOPERSPECTIVE in vec2 vBg_img_coords;
+layout(location = 3) _FLAT in float vIsRotated;
+layout(location = 4) _FLAT in float vScanlinePeriod_multiplier;
+layout(location = 5) _FLAT in float vInterlace_offset;
+layout(location = 6) _FLAT in float vIn_aspect;
+layout(location = 7) _FLAT in float vDo_Tate;
+layout(location = 8) _FLAT in vec3 vDotMat_Grid_Color;
+layout(location = 9) _FLAT in vec4 vPG_offsets_and_size;
+layout(location = 10) _NOPERSPECTIVE in float vInteger_fragment_x;
+layout(location = 11) _NOPERSPECTIVE in vec2 vPG_freq_base_screen;
+layout(location = 12) _FLAT in vec2 vPG_OriginalSize_tated_mul_pi;
+layout(location = 13) _FLAT in float vDotMat_Grid_Sharpness;
+layout(location = 14) _FLAT in float vPG_mask_height;
+layout(location = 15) _FLAT in float vDeltaRenderOk;
+layout(location = 16) _FLAT in float vDo_pixelgrid_h;
+layout(location = 17) _NOPERSPECTIVE in float vFake_scanline_period;
+layout(location = 18) _FLAT in float vPG_y_shift;
+layout(location = 19) _NOPERSPECTIVE in vec2 vUnrotated_Output_coords;
 #ifdef DO_ADPT_STROBE
-    layout(location = 20) flat in float vAdaptive_strobe_oscillator;
+    layout(location = 20) _FLAT in float vAdaptive_strobe_oscillator;
 #endif
 
 
 #ifdef DEBUG_PRINT_VALUE
-    layout(location = 31) flat in float vfprintvalue;
+    layout(location = 31) _FLAT in float vfprintvalue;
 #endif
 
 layout(location = 0)     out vec4 FragColor;

@@ -770,5 +770,27 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #include "../config/config-user.txt" //Don't indent this!
 #endif
 
+// Disable or enable interpolation qualifiers
+
+
+/*#ifdef D3D_WORKAROUND
+#ifndef _SKIP_NOPERSPECTIVE_QUALIFIER
+#define _SKIP_NOPERSPECTIVE_QUALIFIER
+#endif
+#endif
+*/
+
+#ifdef _SKIP_FLAT_QUALIFIER
+#define _FLAT
+#else
+#define _FLAT flat
+#endif
+
+#ifdef _SKIP_NOPERSPECTIVE_QUALIFIER
+#define _NOPERSPECTIVE
+#else
+#define _NOPERSPECTIVE noperspective
+#endif
+
 // The following translates global.PARAMETER to PARAMETER
 #include "config.globals.inc"

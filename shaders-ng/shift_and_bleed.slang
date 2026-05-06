@@ -15,11 +15,11 @@ float CVBS_get_bleed_size() {
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
-layout(location = 0) noperspective out vec2 vTexCoord;
-layout(location = 6) flat out vec3 vCVBS_blur_weights;
+layout(location = 0) _NOPERSPECTIVE out vec2 vTexCoord;
+layout(location = 6) _FLAT out vec3 vCVBS_blur_weights;
 
-layout(location = 9) flat out float vDotCrawlShift;
-layout(location = 10) noperspective out vec4 vDotCrawlCoords_and_period;
+layout(location = 9) _FLAT out float vDotCrawlShift;
+layout(location = 10) _NOPERSPECTIVE out vec4 vDotCrawlCoords_and_period;
 #include "includes/functions.include.slang"
 
 void main()
@@ -65,11 +65,11 @@ void main()
 
 #pragma stage fragment
 #include "includes/functions.include.slang"
-layout(location = 0) noperspective in vec2 vTexCoord;
-layout(location = 6) flat in vec3 vCVBS_blur_weights;
+layout(location = 0) _NOPERSPECTIVE in vec2 vTexCoord;
+layout(location = 6) _FLAT in vec3 vCVBS_blur_weights;
 
-layout(location = 9) flat in float vDotCrawlShift;
-layout(location = 10) noperspective in vec4 vDotCrawlCoords_and_period;
+layout(location = 9) _FLAT in float vDotCrawlShift;
+layout(location = 10) _NOPERSPECTIVE in vec4 vDotCrawlCoords_and_period;
 
 layout(location = 0) out vec4 FragColor;
 

@@ -6,16 +6,16 @@
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
-layout(location = 0) noperspective out vec2 vTexCoord;
-layout(location = 2) flat out float vGlow_w_needed;
-layout(location = 3) flat out float vSharp_sub;
-layout(location = 4) flat out float vDo_wtfl;
-layout(location = 5) flat out float vWtfl_sharpness_x;
-layout(location = 12) flat out float vWarpedglow_scale_tated;
-layout(location = 14) flat out float vIn_glow_edge_sharpness;
-layout(location = 15) flat out float vIn_glow_edge_defocus_strength;
-layout(location = 16) noperspective out float vWarpedglow_vtexcoord_offsets_plus;
-layout(location = 17) noperspective out float vWarpedglow_vtexcoord_offsets_minus;
+layout(location = 0) _NOPERSPECTIVE out vec2 vTexCoord;
+layout(location = 2) _FLAT out float vGlow_w_needed;
+layout(location = 3) _FLAT out float vSharp_sub;
+layout(location = 4) _FLAT out float vDo_wtfl;
+layout(location = 5) _FLAT out float vWtfl_sharpness_x;
+layout(location = 12) _FLAT out float vWarpedglow_scale_tated;
+layout(location = 14) _FLAT out float vIn_glow_edge_sharpness;
+layout(location = 15) _FLAT out float vIn_glow_edge_defocus_strength;
+layout(location = 16) _NOPERSPECTIVE out float vWarpedglow_vtexcoord_offsets_plus;
+layout(location = 17) _NOPERSPECTIVE out float vWarpedglow_vtexcoord_offsets_minus;
 
 void main() {
     gl_Position = global.MVP * Position;
@@ -84,17 +84,17 @@ void main() {
 
 #pragma stage fragment
 
-layout(location = 0) noperspective in vec2 vTexCoord;
-layout(location = 2) flat in float vGlow_w_needed;
-layout(location = 3) flat in float vSharp_sub;
-layout(location = 4) flat in float vDo_wtfl;
-layout(location = 5) flat in float vWtfl_sharpness_x;
-layout(location = 12) flat in float vWarpedglow_scale_tated;
+layout(location = 0) _NOPERSPECTIVE in vec2 vTexCoord;
+layout(location = 2) _FLAT in float vGlow_w_needed;
+layout(location = 3) _FLAT in float vSharp_sub;
+layout(location = 4) _FLAT in float vDo_wtfl;
+layout(location = 5) _FLAT in float vWtfl_sharpness_x;
+layout(location = 12) _FLAT in float vWarpedglow_scale_tated;
 
-layout(location = 14) flat in float vIn_glow_edge_sharpness;
-layout(location = 15) flat in float vIn_glow_edge_defocus_strength;
-layout(location = 16) noperspective in float vWarpedglow_vtexcoord_offsets_plus;
-layout(location = 17) noperspective in float vWarpedglow_vtexcoord_offsets_minus;
+layout(location = 14) _FLAT in float vIn_glow_edge_sharpness;
+layout(location = 15) _FLAT in float vIn_glow_edge_defocus_strength;
+layout(location = 16) _NOPERSPECTIVE in float vWarpedglow_vtexcoord_offsets_plus;
+layout(location = 17) _NOPERSPECTIVE in float vWarpedglow_vtexcoord_offsets_minus;
 
 
 layout(location = 0) out vec4 FragColor;

@@ -22,19 +22,19 @@
 #pragma stage vertex
 layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
-layout(location = 0) noperspective out vec2 vTexCoord;
-layout(location = 1) flat out float lod;
-layout(location = 2) flat out vec2 vFuzzy_main_pass_stage_1;
+layout(location = 0) _NOPERSPECTIVE out vec2 vTexCoord;
+layout(location = 1) _FLAT out float lod;
+layout(location = 2) _FLAT out vec2 vFuzzy_main_pass_stage_1;
 
-layout(location = 4) flat out float vAvglum_needed;
+layout(location = 4) _FLAT out float vAvglum_needed;
 
-layout(location = 6) flat out float vResSwitch_res_changed;
-layout(location = 7) flat out float vResChanged;
-layout(location = 8) noperspective out vec2 vTexCoord_scaled;
-layout(location = 9) flat out float vDo_autocrop;
-layout(location = 10) flat out float vDo_dynzoom;
+layout(location = 6) _FLAT out float vResSwitch_res_changed;
+layout(location = 7) _FLAT out float vResChanged;
+layout(location = 8) _NOPERSPECTIVE out vec2 vTexCoord_scaled;
+layout(location = 9) _FLAT out float vDo_autocrop;
+layout(location = 10) _FLAT out float vDo_dynzoom;
 
-//layout(location = 9) flat out vec2 vLods;
+//layout(location = 9) _FLAT out vec2 vLods;
 #include "includes/functions.include.slang"
 
 
@@ -82,16 +82,16 @@ void main() {
 }
 
 #pragma stage fragment
-layout(location = 0) noperspective in vec2 vTexCoord;
-layout(location = 1) flat in float lod;
-layout(location = 2) flat in vec2 vFuzzy_main_pass_stage_1;
-layout(location = 4) flat in float vAvglum_needed;
+layout(location = 0) _NOPERSPECTIVE in vec2 vTexCoord;
+layout(location = 1) _FLAT in float lod;
+layout(location = 2) _FLAT in vec2 vFuzzy_main_pass_stage_1;
+layout(location = 4) _FLAT in float vAvglum_needed;
 
-layout(location = 6) flat in float vResSwitch_res_changed;
-layout(location = 7) flat in float vResChanged;
-layout(location = 8) noperspective in vec2 vTexCoord_scaled;
-layout(location = 9) flat in float vDo_autocrop;
-layout(location = 10) flat in float vDo_dynzoom;
+layout(location = 6) _FLAT in float vResSwitch_res_changed;
+layout(location = 7) _FLAT in float vResChanged;
+layout(location = 8) _NOPERSPECTIVE in vec2 vTexCoord_scaled;
+layout(location = 9) _FLAT in float vDo_autocrop;
+layout(location = 10) _FLAT in float vDo_dynzoom;
 
 layout(location = 0) out vec4 FragColor;
 layout(set = 0, binding = 1) uniform sampler2D colortools_and_ntsc_passFeedback;

@@ -159,6 +159,13 @@
 // if D3D_WORKAROUND is defined, Core reported fps value is always trusted.
 // #define ORIGINAL_FPS_UNTRUSTED
 
+// Interpolation qualifiers can be used to provide a modest speed increase.
+// However some implementations may not support them or misbehave.
+// You can explicitely disable them by uncommenting the following:
+// #define _SKIP_NOPERSPECTIVE_QUALIFIER
+// #define _SKIP_FLAT_QUALIFIER
+
+
 
 ////////////////////////////////////////////////////////////////////////////
 //
