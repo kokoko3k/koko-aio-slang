@@ -19,7 +19,7 @@ layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 layout(location = 0) noperspective out vec2 vTexCoord;
 
-layout(location = 3) noperspective out vec2 vDynamicSeed;
+layout(location = 3) noperspective out vec2 vDynamicSeed_noise;
 
 layout(location = 5) noperspective out vec4 vpt1;
 layout(location = 6) noperspective out vec4 vpt2;
@@ -44,7 +44,8 @@ void main() {
    vTexCoord = TexCoord;
 
    //noise
-   vDynamicSeed = mod(params.FrameCount, 120.0001) * vTexCoord;
+   vDynamicSeed_noise = vTexCoord;
+   if (RF_NOISE_STRENGTH > 0.0) vDynamicSeed_noise *= mod(params.FrameCount, 120.0001) ;
 
    //flickering helper
    vDo_flickering  = float ( scanline_have_to_flicker(is_interlaced()) ) ;
@@ -77,7 +78,7 @@ void main() {
 #pragma stage fragment
 layout(location = 0) noperspective in vec2 vTexCoord;
 
-layout(location = 3) noperspective in vec2 vDynamicSeed;
+layout(location = 3) noperspective in vec2 vDynamicSeed_noise;
 
 layout(location = 5) noperspective in vec4 vpt1;
 layout(location = 6) noperspective in vec4 vpt2;
@@ -1001,7 +1002,7 @@ void main() {
          //It should be possible to change the noise function to just emit positive
          //numbers and pre-lowering the brightness of pixel_out in the very first pass tho.
 
-            float rfnoise = get_rf_noise(vDynamicSeed);
+            float rfnoise = get_rf_noise(vDynamicSeed_noise);
             pixel_out.rgb += rfnoise;
             pixel_out.rgb = max(pixel_out.rgb, vec3(0.0));
       }

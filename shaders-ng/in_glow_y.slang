@@ -14,7 +14,7 @@ layout(location = 5) flat out float vDo_wtfl;
 layout(location = 6) flat out float vIn_glow_h_adapted;
 layout(location = 7) flat out float vDeltaRenderOk;
 layout(location = 8) flat out float vWarpedglow;
-layout(location = 9) noperspective out vec2 vDynamicSeed;
+layout(location = 9) noperspective out vec2 vDynamicSeed_noise;
 layout(location = 10) flat out float vIn_glow_edge_sharpness;
 layout(location = 11) flat out float vIn_glow_edge_defocus_strength;
 layout(location = 12) noperspective out float vWarpedglow_vtexcoord_offsets_plus;
@@ -90,8 +90,9 @@ void main() {
    vWarpedglow_vtexcoord_offsets_plus =  vTexCoord.y + warpedglow_delta;
    
    
-   //Generate a seed that changes over time for temporal random noise
-   vDynamicSeed = mod(params.FrameCount, 120.0001) * vTexCoord;
+   //noise
+   vDynamicSeed_noise = vTexCoord;
+   if (RF_NOISE_STRENGTH > 0.0) vDynamicSeed_noise *= mod(params.FrameCount, 120.0001) ;
    
    
    if (EDGE_DEFOCUS_DO_BLUR*DO_SHIFT_RGB > 0.001) {
@@ -146,7 +147,7 @@ layout(location = 5) flat in float vDo_wtfl;
 layout(location = 6) flat in float vIn_glow_h_adapted;
 layout(location = 7) flat in float vDeltaRenderOk;
 layout(location = 8) flat in float vWarpedglow;
-layout(location = 9) noperspective in vec2 vDynamicSeed;
+layout(location = 9) noperspective in vec2 vDynamicSeed_noise;
 layout(location = 10) flat in float vIn_glow_edge_sharpness;
 layout(location = 11) flat in float vIn_glow_edge_defocus_strength;
 layout(location = 12) noperspective in float vWarpedglow_vtexcoord_offsets_plus;
@@ -185,7 +186,7 @@ vec3 apply_noise_to(vec3 c) {
       return c;
    
    c.rgb = pow(c.rgb, vec3(1/IN_GLOW_GAMMA));
-      c += get_rf_noise(vDynamicSeed);
+      c += get_rf_noise(vDynamicSeed_noise);
       c = max(c, vec3(0.0));
    c.rgb = pow(c.rgb, vec3(IN_GLOW_GAMMA));
    return c;

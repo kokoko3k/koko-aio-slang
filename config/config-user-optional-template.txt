@@ -204,7 +204,7 @@
 // #define DO_FXAA  0.0                 // ★ Antialiasing enable ? 
 
 
-// #define DO_RF_NOISE  0.0             // ★ RF Noise enable?
+// #define DO_RF_NOISE  0.0             // ★ (RF) Noise enable?
 // #define RF_NOISE_STRENGTH  0.05      //         Strength
 // #define RF_NOISE_SPARK     0.07      //         Snow noise
 
