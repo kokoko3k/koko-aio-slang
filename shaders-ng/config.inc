@@ -333,7 +333,17 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float PPERSISTENCE_MUL_G;
 
 	float CVBS_UNSHARP_COMPENSATION;
-	
+
+	float LED_HALO;
+	float LED_SIZE;
+	float LED1_X;
+	float LED1_Y;
+	float LED1_HUE;
+	float LED2_X;
+	float LED2_Y;
+	float LED2_HUE;
+
+
 } global;
 
 
@@ -647,6 +657,20 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BG_IMAGE_ROTATION  "      Rotate/flip (0=auto,1=no change,<0 for rotated games)"  0.0  -8.0  8.0    1.0
 #pragma parameter BG_IMAGE_NIGHTIFY  "      Nightify image"                                 0.0   0.0  1.0    0.05
 #pragma parameter BG_IMAGE_WRAP_MODE "      Wrap mode: default, clamp to border, edge, repeat" 0.0  0.0    3.0    1.0
+
+
+#pragma include_optional "../config/plugins/enabled/leds.txt"
+// #include "../config/plugins/enabled/leds.txt"
+// #define USE_LEDS
+// #pragma parameter LED_SIZE	         "      Power leds size (0 to disable) (Image over only)"	0.5  0.0  1.0    0.01
+// #pragma parameter LED1_HUE	         "         Power led 1 hue"  1.0  0.0  1.0    0.01
+// #pragma parameter LED1_X	         "         Power led 1 X"	  0.5  -1.0  1.0   0.01
+// #pragma parameter LED1_Y	         "         Power led 1 Y"	  0.5  -1.0  1.0   0.01
+// #pragma parameter LED2_HUE	         "         Power led 2 hue"  1.0  0.0  1.0    0.01
+// #pragma parameter LED2_X	         "         Power led 2 X"	  0.5  -1.0  1.0   0.01
+// #pragma parameter LED2_Y	         "         Power led 2 Y"	  0.5  -1.0  1.0   0.01
+// #pragma parameter LED_HALO	         "         Power leds halo"  0.25  0.0  1.0    0.01
+
 #pragma parameter LABEL0025 " " 0 0 0 1
 
 
@@ -728,24 +752,22 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter GAME_GEOM_ZOOM	  "        Zoom"					1.0    0.0  2.0  0.01
 #pragma parameter LABEL0034 " " 0 0 0 1
 
-#pragma parameter LABEL0058	  "==============================================================="	0 0 0 1
-#pragma parameter LABEL0059	  " The Following features could be disabled by default."	  0 0 0 1
-#pragma parameter LABEL0060	  " Enable them in config/config-user-optional.txt"	 0 0 0 1
-#pragma parameter LABEL0061	  "==============================================================="	0 0 0 1
 
-#pragma parameter LABEL0062	                  "[#] LCD Antighosting (#define DO_LCD_ANTIGHOSTING):"   0 0 0 1
-#pragma parameter LCD_ANTIGHOSTING            "    .    Strength"    0.5   0.0  2.0  0.01
-#pragma parameter LCD_ANTIGHOSTING_CEIL       "    .    Ceil"        1.0   0.0  1.0  0.01
-#pragma parameter LCD_ANTIGHOSTING_FLIP_MASK  "    .    Flip Mask"   0.0   0.0  1.0  1.0
-#pragma parameter LABEL0063 " " 0 0 0 1
+#pragma include_optional "../config/plugins/enabled/lcd_antighosting.txt"
+// #pragma parameter LABEL0062	                  "[#] LCD Antighosting (#define DO_LCD_ANTIGHOSTING):"   0 0 0 1
+// #pragma parameter LCD_ANTIGHOSTING            "    .    Strength"    0.5   0.0  2.0  0.01
+// #pragma parameter LCD_ANTIGHOSTING_CEIL       "    .    Ceil"        1.0   0.0  1.0  0.01
+// #pragma parameter LCD_ANTIGHOSTING_FLIP_MASK  "    .    Flip Mask"   0.0   0.0  1.0  1.0
+// #pragma parameter LABEL0063 " " 0 0 0 1
 
-#pragma parameter ADPT_STROBE_STR	            "[#] Adaptive Strobe ≈BFI Strength (#define DO_ADPT_STROBE):"   0.8   0.0  1.0  0.05
-#pragma parameter ADPT_STROBE_CEIL              "   .   Hard limit strobe effect to (less is more):"   0.5   0.0  0.5  0.05
-#pragma parameter ADPT_STROBE_GAIN_ADJ          "   .   Gain adjustment"    0.9   0.0  1.0  0.05
-#pragma parameter ADPT_STROBE_GAIN_ADJ_NODARK   "          Less gain on dark colors"    1.0   0.0  1.0  0.05
-#pragma parameter ADPT_STROBE_GAMMA_ADJ         "   .   Post Gamma adjustment"   0.9   0.5  4.0  0.05
-#pragma parameter ADPT_LCD_RETENTION_FIX        "   .   LCD Retention workaround cadence (frames)"   3600.0   0.0  300000.0  50.0
-#pragma parameter ADPT_STROBE_SELECTIVE         "   .   Apply only to moving areas (subframes unsupported)"    0.0   0.0  1.0  1.0 
+#pragma include_optional "../config/plugins/enabled/adaptive_strobe.txt"
+// #pragma parameter ADPT_STROBE_STR	            "[#] Adaptive Strobe ≈BFI Strength (#define DO_ADPT_STROBE):"   0.8   0.0  1.0  0.05
+// #pragma parameter ADPT_STROBE_CEIL              "   .   Hard limit strobe effect to (less is more):"   0.5   0.0  0.5  0.05
+// #pragma parameter ADPT_STROBE_GAIN_ADJ          "   .   Gain adjustment"    0.9   0.0  1.0  0.05
+// #pragma parameter ADPT_STROBE_GAIN_ADJ_NODARK   "          Less gain on dark colors"    1.0   0.0  1.0  0.05
+// #pragma parameter ADPT_STROBE_GAMMA_ADJ         "   .   Post Gamma adjustment"   0.9   0.5  4.0  0.05
+// #pragma parameter ADPT_LCD_RETENTION_FIX        "   .   LCD Retention workaround cadence (frames)"   3600.0   0.0  300000.0  50.0
+// #pragma parameter ADPT_STROBE_SELECTIVE         "   .   Apply only to moving areas (subframes unsupported)"    0.0   0.0  1.0  1.0
 
 #pragma parameter LABEL9999 " " 0 0 0 1
 

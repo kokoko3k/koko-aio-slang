@@ -971,6 +971,38 @@
     #define ADPT_STROBE_SELECTIVE global.ADPT_STROBE_SELECTIVE
 #endif
 
+#ifndef LED_SIZE
+    #define LED_SIZE global.LED_SIZE
+#endif
+
+#ifndef LED_HALO
+    #define LED_HALO global.LED_HALO
+#endif
+
+#ifndef LED1_HUE
+    #define LED1_HUE global.LED1_HUE
+#endif
+
+#ifndef LED1_X
+    #define LED1_X global.LED1_X
+#endif
+
+#ifndef LED1_Y
+    #define LED1_Y global.LED1_Y
+#endif
+
+#ifndef LED2_HUE
+    #define LED2_HUE global.LED2_HUE
+#endif
+
+#ifndef LED2_X
+    #define LED2_X global.LED2_X
+#endif
+
+#ifndef LED2_Y
+    #define LED2_Y global.LED2_Y
+#endif
+
 #ifndef SERVICE1
     #define SERVICE1 global.SERVICE1
 #endif

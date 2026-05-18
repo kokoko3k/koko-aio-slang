@@ -2,12 +2,10 @@
 
 /* This pass:
  * Composes the previous passes
- * Does masks, spot, bezel, vignette, background image (anything else?)
+ * Does masks, spot, bezel, vignette, background image (and so on)
  */
 
-// #define DEBUG_TEXTURE Original
-#define DEBUG_TEXTURE in_glow_passFeedback
-//#define DEBUG_TEXTURE halo_pre_gamma_pass
+#define DEBUG_TEXTURE in_glow_pass
 
 // #define DEBUG_PRINT_VALUE
 // #define PRINTED_VALUE global.FinalViewportSize.x
@@ -441,11 +439,11 @@ layout(set = 0, binding = 9)  uniform sampler2D bg_over;
 layout(set = 0, binding = 10) uniform sampler2D in_glow_pass_x;
 layout(set = 0, binding = 11) uniform sampler2D in_glow_pass;
 layout(set = 0, binding = 12) uniform sampler2D halo_pass;
+layout(set = 0, binding = 13) uniform sampler2D helper_pass;
+layout(set = 0, binding = 14) uniform sampler2D led;
 #ifndef D3D_WORKAROUND
-    layout(set = 0, binding = 13) uniform sampler2D final_passFeedback;
+    layout(set = 0, binding = 15) uniform sampler2D final_passFeedback;
 #endif
-    layout(set = 0, binding = 14) uniform sampler2D helper_pass;
-layout(set = 0, binding = 15) uniform sampler2D DEBUG_TEXTURE;
 
 
 
@@ -995,22 +993,24 @@ float create_ambi_colorize_shade(vec2 co) {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
-vec4 fn_pixel_fgbg_image(sampler2D smp) {
+vec4 fn_pixel_fgbg_image(sampler2D smp, out vec2 image_coords, out float image_aspect) {
     vec2 tex_size = textureSize(smp, 0); // * BG_ZOOM;
-    //if (BG_IMAGE_ROTATION > 0.0  || ( BG_IMAGE_ROTATION < 0.0 && bool(vIsRotated) )  ) tex_size.xy = tex_size.yx;
+    image_aspect = tex_size.x/tex_size.y; //FIXME image_aspect needs to be inverted for rotated contents.
+                                          //get_scaled_coords_aspect_fgbg() already does that, so we can take the inverted
+                                          //value from there.
 
     //FIXME isrotated deve essere true anche quando l'immagine di sfondo è ruotata.
     //vec2 fg_image_offset=vec2(BG_IMAGE_OFFX,BG_IMAGE_OFFY);
-    //back_coords = get_scaled_coords_aspect(vBg_img_coords + fg_image_offset, global.FinalViewportSize, tex_size.x/tex_size.y, bool(vIsRotated));
+    //image_coords = get_scaled_coords_aspect(vBg_img_coords + fg_image_offset, global.FinalViewportSize, image_aspect, bool(vIsRotated));
 
     //bool rotated = bool(vIsRotated) || BG_IMAGE_ROTATION > 4.5;
     bool rotated_bg = BG_IMAGE_ROTATION > 3.5;
 
-    vec2 back_coords = get_scaled_coords_aspect_fgbg(vBg_img_coords, global.FinalViewportSize, tex_size.x/tex_size.y, rotated_bg, vIsRotated, vIn_aspect);
+    image_coords = get_scaled_coords_aspect_fgbg(vBg_img_coords, global.FinalViewportSize, image_aspect, rotated_bg, vIsRotated, vIn_aspect);
 
 
     float bg_over_lod = log2(tex_size.y * global.FinalViewportSize.w);
-    vec4 pixel_bgover = textureLod_wrap(smp, back_coords, bg_over_lod, BG_IMAGE_WRAP_MODE);
+    vec4 pixel_bgover = textureLod_wrap(smp, image_coords, bg_over_lod, BG_IMAGE_WRAP_MODE);
     return pixel_bgover;
 }
 
@@ -1288,6 +1288,16 @@ vec3 antighost(vec3 c) {
 }
 
 
+float get_led(sampler2D lut, vec2 co, vec2 off, float ar) {
+    vec2 led_co = co - off;
+    led_co = led_co/vec2(1.0, ar);
+    led_co = zoom(led_co, LED_SIZE);
+    vec3 led_lut = texture(lut, led_co).rgb;
+    float led_bulb = led_lut.r;
+    float led_halo = led_lut.g;
+    return clamp(led_bulb + led_halo*LED_HALO, 0.0, 1.0);
+}
+
 void main() {
 
     // Early whole frameskipping
@@ -1489,10 +1499,12 @@ void main() {
 
     // Background image have no need to paint if not in the outer border:
     if ( (DO_BG_IMAGE == 1.0 && BG_IMAGE_OVER == 0.0) && (content_and_bezel_mask < 1.0) ) {
-        vec4 pixel_bg_image = fn_pixel_fgbg_image(bg_under);
+        vec2 image_coords; //it gets the value from fn_pixel_fgbg_image output parameter.
+        float image_size ; //(unused here, it gets the value from fn_pixel_fgbg_image output parameter.
+        vec4 pixel_bg_image = fn_pixel_fgbg_image(bg_over, image_coords, image_size);
 
         vec3 anti_nightify_ambi = (pixel_ambi * AMBI_BG_IMAGE_BLEND_MODE) *
-                                    max(AMBI_BG_IMAGE_FORCE, 1-pixel_bg_image.a) ;
+                                   max(AMBI_BG_IMAGE_FORCE, 1-pixel_bg_image.a);
 
         pixel_bg_image.rgb = fn_pixel_nightify(pixel_bg_image.rgb, BG_IMAGE_NIGHTIFY, anti_nightify_ambi );
         pixel_bg_image.rgb = ambi_blend_image(pixel_bg_image, pixel_ambi, AMBI_BG_IMAGE_BLEND_MODE);
@@ -1507,15 +1519,37 @@ void main() {
     //Foreground image
     float pixel_fg_image_alpha = 0.0;
     if (DO_BG_IMAGE + BG_IMAGE_OVER == 2.0) {
-        vec4 pixel_fg_image = fn_pixel_fgbg_image(bg_over);
-        // if geometry content is overridden, ambientlight may have not been sample yet due to some skip logic
-        /*if (DO_AMBILIGHT == 1.0 && (pixel_fg_image.a+AMBI_BG_IMAGE_FORCE) > 0.0  && content_and_bezel_mask < 0.01) {
-            pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb * (1- content_and_bezel_mask ); //ALREADY TRIED COMMON fma() optimization, failed.
-        }*/
+        vec2  image_coords; //it gets the value from fn_pixel_fgbg_image output parameter.
+        float image_aspect; //it gets the value from fn_pixel_fgbg_image output parameter.
+        vec4 pixel_fg_image = fn_pixel_fgbg_image(bg_over, image_coords, image_aspect);
         vec3 anti_nightify_ambi = (pixel_ambi * AMBI_BG_IMAGE_BLEND_MODE) *
-                                    max(AMBI_BG_IMAGE_FORCE, 1-pixel_fg_image.a) ;
+                                   max(AMBI_BG_IMAGE_FORCE, 1-pixel_fg_image.a);
 
         pixel_fg_image.rgb = fn_pixel_nightify(pixel_fg_image.rgb, BG_IMAGE_NIGHTIFY, anti_nightify_ambi );
+
+        #ifdef USE_LEDS
+        //Leds:
+        if (LED_SIZE > 0.0) {
+
+            float led1_controller = float( mod(params.FrameCount,100) > 50.0);
+            float led1_light = get_led(led, image_coords, vec2(LED1_X, LED1_Y), image_aspect);
+            vec3 led1_color = clamp(abs(mod(LED1_HUE * 6.0 + vec3(0.0, 4.0, 2.0), 6.0) - 3.0) - 1.0, 0.0, 1.0); //hue to rgb
+            vec3 led1_light_color = led1_color * led1_light;
+
+            float led2_light = get_led(led, image_coords, vec2(LED2_X, LED2_Y), image_aspect);
+            vec3 led2_color = clamp(abs(mod(LED2_HUE * 6.0 + vec3(0.0, 4.0, 2.0), 6.0) - 3.0) - 1.0, 0.0, 1.0); //hue to rgb
+            vec3 led2_light_color = led2_color * led2_light;
+
+            vec3 leds_light_color = led1_light_color + led2_light_color;
+
+
+            vec3 added            = pixel_fg_image.rgb + leds_light_color;
+            #define tint_mix 0.25 //SERVICE1 //could spare some cycles by setting it to 1.0.
+            vec3 tinted1          = mix(pixel_fg_image.rgb, pixel_fg_image.rgb * led1_color, led1_light * tint_mix);
+            vec3 tinted2          = mix(tinted1, tinted1 * led2_color, led2_light * tint_mix);
+            pixel_fg_image.rgb   = mix(added, tinted2, pixel_fg_image.rgb);
+        }
+        #endif
 
         // tl:dr:
         //   dont "black" the transparent areas outside the game content when we use AMBI_BG_IMAGE_BLEND_MODE ADD blend mode.
