@@ -1,3 +1,15 @@
+// Emulate 2 power leds with an halo.
+// led x hue: the color of the led
+// X,Y the position on screen
+// leds are drawn over the foreground image, which needs to be enabled.
+//
+// To use:
+// 1 - Have a transparent foreground png overlay image setted up; leds in the png should appear as powered on.
+// 2 - With a gfx program, lower the alpha channel of the pixel that correspond to leds, make it "just almost" zero so that colors informations are preserved, and save.
+// 3 - In koko-aio parameters, set x and y values of each led so that they correspond to the real led position.
+// 4 - tweak hue so that it matches the led color of the png.
+
+
 #ifndef USE_LEDS
 #define USE_LEDS
 #endif

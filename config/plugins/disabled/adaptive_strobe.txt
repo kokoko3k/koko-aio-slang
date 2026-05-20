@@ -1,3 +1,22 @@
+// ** Adaptive strobe (not compatible with LCD_ANTIGHOSTING):**
+//     Similar to black frame insertion, this works by alternating the image
+//     brightness across frames and subframes (enabling the latter is recommended).
+//     Doing so, will reduce the motion induced blur and image clarity, hopefully
+//     approaching CRT behaviour.
+//
+//     Strength:
+//         This modulates the clarity and the perceived flickering.
+//     Hard limit strobe effect to:
+//         This limit the maximum oscillation to reduce flickering on mid-tones
+//     Gain adjustment, post gamma adjustment, Less gain on dark colors:
+//         Since the perceived image depends on the display pixel refresh speed,
+//         it may be needed to adjust this.
+//     LCD Retention workaround cadence (frames):
+//         Some (IPS?) panels may suffer from temporary image retention when BFI/like is used.
+//         This parameter will invert the flipping every number of frames configured
+//         hopefully preventing that issue.
+
+
 #ifndef DO_ADPT_STROBE
 #define DO_ADPT_STROBE
 #endif

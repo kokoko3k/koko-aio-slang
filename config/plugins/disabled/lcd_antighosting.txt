@@ -1,3 +1,25 @@
+// **LCD antighosting:**
+//     . Not compatible Direct3D
+//     . Disabled with DELTA_RENDER)
+//     . Disabled with Adaptive strobe
+//     . Disabled with Antiburn
+//
+//     LCD displays often suffer from high pixel refresh times
+//     which produces ghosting when game changes on screen.
+//     By inducing larger color transitions, it prompts the LCD cells
+//     to adjust their states more rapidly, thereby reducing ghosting.
+//     The following parameters can be changed runtime:
+//
+//     Strength:
+//         The effect strength; it has to be tuned depending on your LCD response time.
+//     Ceil:
+//         The effect is proportional to the color difference over time,
+//         however you can set an hard maximum here.
+//     Flip Mask:
+//         Enabling this will cause the horizontal mask to be flipped at every frame.
+//         It is an experimental measure to mitigate ghosting that could work or not,
+//         depending on your display.
+
 #ifndef DO_LCD_ANTIGHOSTING
 #define DO_LCD_ANTIGHOSTING
 #endif
