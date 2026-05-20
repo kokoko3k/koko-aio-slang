@@ -1613,7 +1613,7 @@ void main() {
             if (is_first_inside_rect(image_coords, led2_area)) {
                 float controller = 1.0;
                 #ifdef _USE_DENISE_EMU
-                    controller = params.autoEmu_driveLED; //this will be optionally tied to denise uniform in the next commit.
+                    controller = global.autoEmu_driveLED; //this will be optionally tied to denise uniform in the next commit.
                 #endif
                 pixel_out.rgb = apply_power_led(vec4(pixel_out.rgb,pixel_fg_image.a), pixel_fg_image_no_night, image_coords, image_aspect, led2_pos, LED2_HUE, led_halo_size, controller);
             }
