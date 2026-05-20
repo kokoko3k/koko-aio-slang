@@ -342,6 +342,9 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float LED2_Y;
 	float LED2_HUE;
 
+	#ifdef _USE_DENISE_EMU
+		float autoEmu_driveLED;
+	#endif
 
 } global;
 
