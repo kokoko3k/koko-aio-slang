@@ -440,7 +440,7 @@ layout(set = 0, binding = 10) uniform sampler2D in_glow_pass_x;
 layout(set = 0, binding = 11) uniform sampler2D in_glow_pass;
 layout(set = 0, binding = 12) uniform sampler2D halo_pass;
 layout(set = 0, binding = 13) uniform sampler2D helper_pass;
-layout(set = 0, binding = 14) uniform sampler2D led;
+
 #ifndef D3D_WORKAROUND
     layout(set = 0, binding = 15) uniform sampler2D final_passFeedback;
 #endif
@@ -1287,15 +1287,54 @@ vec3 antighost(vec3 c) {
 	return c;
 }
 
+float led_halo(vec2 co, float aspect, vec2 center, float smoothshade) {
+    vec2  delta = (co - center) * vec2(aspect, 1.0);
+    float d = length(delta);
+    float hv = 1.0 - smoothstep(0.0, smoothshade, d);
+    return hv * hv;
+}
 
-float get_led(sampler2D lut, vec2 co, vec2 off, float ar) {
-    vec2 led_co = co - off;
-    led_co = led_co/vec2(1.0, ar);
-    led_co = zoom(led_co, LED_SIZE);
-    vec3 led_lut = texture(lut, led_co).rgb;
-    float led_bulb = led_lut.r;
-    float led_halo = led_lut.g;
-    return clamp(led_bulb + led_halo*LED_HALO, 0.0, 1.0);
+float led_halo_no(vec2 co, vec2 corner,float smoothshade, float night) {
+	vec4 rect = vec4(corner.x, corner.y, corner.x, corner.y);
+	vec2 hv = smoothstep(rect.xy - smoothshade, rect.xy, co) * smoothstep_fast(co - smoothshade, co, rect.zw);
+	return (hv.x*hv.y)*(hv.x*hv.y) * night;
+}
+
+
+vec3 apply_power_led( vec4 bgimage, vec3 bgimage_nonight, vec2 image_coords, float image_aspect, vec2 led_pos, float led_hue, float halo_size, float controller ) {
+        #define _LED_HALO_POWER 0.5          //how much the halo around the led is visible
+        #define _LED_POWEROFF_STRENGTH 0.5   //how much the led will be darkened
+
+
+        vec3  led_color = clamp(abs(mod(led_hue * 6.0 + vec3(0.0, 4.0, 2.0), 6.0) - 3.0) - 1.0, 0.0, 1.0);
+        float halo_bw   = led_halo(image_coords, image_aspect, led_pos, halo_size) * _LED_HALO_POWER;
+
+        float halo_mul_controller = halo_bw * controller;
+        vec3  added = bgimage.rgb + led_color * halo_mul_controller;
+
+        //define #_BLEND1
+        #ifdef _BLEND1
+            vec3 tinted = mix(bgimage.rgb, bgimage.rgb * led_color, halo_bw * 0.25);
+            bgimage.rgb = mix(added, tinted, bgimage.rgb);
+        #else
+            bgimage.rgb = mix(added, bgimage.rgb, min(bgimage.rgb*2,1.0));
+        #endif
+
+
+        //bgimage.a deve avere peso solo se l'alone è centrale
+        float alpha_inv = 1-bgimage.a;
+        float b = alpha_inv*halo_bw * (1/_LED_HALO_POWER) * _LED_POWEROFF_STRENGTH;
+
+        // don't nightify led area (alpha driven)
+        // bgimage.rgb = mix(bgimage.rgb, bgimage_nonight.rgb, b*controller );
+        // turn off led area if controller is low
+        // bgimage.rgb = mix(bgimage.rgb, vec3(0.0),  b*(1-controller) );
+        // both fused into this:
+        float b_mul_controller = alpha_inv * halo_mul_controller;
+        bgimage.rgb = mix(bgimage.rgb, bgimage_nonight.rgb, b_mul_controller)
+                      * (1.0 - b + b_mul_controller);
+
+        return bgimage.rgb;
 }
 
 void main() {
@@ -1525,31 +1564,13 @@ void main() {
         vec3 anti_nightify_ambi = (pixel_ambi * AMBI_BG_IMAGE_BLEND_MODE) *
                                    max(AMBI_BG_IMAGE_FORCE, 1-pixel_fg_image.a);
 
+        #ifdef USE_LEDS
+            vec3 pixel_fg_image_no_night = pixel_fg_image.rgb;
+            vec3 pixel_out_pre = pixel_out.rgb;
+        #endif
+
         pixel_fg_image.rgb = fn_pixel_nightify(pixel_fg_image.rgb, BG_IMAGE_NIGHTIFY, anti_nightify_ambi );
 
-        #ifdef USE_LEDS
-        //Leds:
-        if (LED_SIZE > 0.0) {
-
-            float led1_controller = float( mod(params.FrameCount,100) > 50.0);
-            float led1_light = get_led(led, image_coords, vec2(LED1_X, LED1_Y), image_aspect);
-            vec3 led1_color = clamp(abs(mod(LED1_HUE * 6.0 + vec3(0.0, 4.0, 2.0), 6.0) - 3.0) - 1.0, 0.0, 1.0); //hue to rgb
-            vec3 led1_light_color = led1_color * led1_light;
-
-            float led2_light = get_led(led, image_coords, vec2(LED2_X, LED2_Y), image_aspect);
-            vec3 led2_color = clamp(abs(mod(LED2_HUE * 6.0 + vec3(0.0, 4.0, 2.0), 6.0) - 3.0) - 1.0, 0.0, 1.0); //hue to rgb
-            vec3 led2_light_color = led2_color * led2_light;
-
-            vec3 leds_light_color = led1_light_color + led2_light_color;
-
-
-            vec3 added            = pixel_fg_image.rgb + leds_light_color;
-            #define tint_mix 0.25 //SERVICE1 //could spare some cycles by setting it to 1.0.
-            vec3 tinted1          = mix(pixel_fg_image.rgb, pixel_fg_image.rgb * led1_color, led1_light * tint_mix);
-            vec3 tinted2          = mix(tinted1, tinted1 * led2_color, led2_light * tint_mix);
-            pixel_fg_image.rgb   = mix(added, tinted2, pixel_fg_image.rgb);
-        }
-        #endif
 
         // tl:dr:
         //   dont "black" the transparent areas outside the game content when we use AMBI_BG_IMAGE_BLEND_MODE ADD blend mode.
@@ -1573,7 +1594,31 @@ void main() {
             pixel_out = mix(pixel_out, pixel_fg_image.rgb, pixel_fg_image.a);
         }
         pixel_fg_image_alpha = pixel_fg_image.a;
+
         //FragColor = vec4(pixel_fg_image.a) ; return;
+        #ifdef USE_LEDS
+        //Leds:
+        if (LED_SIZE > 0.0) {
+            float led_halo_size = LED_SIZE*0.1;
+            //image_coords/=vec2(1.0,image_aspect);
+
+            vec2 led1_pos = vec2(LED1_X, LED1_Y);
+            vec4 led1_area = vec4( led1_pos-led_halo_size, led1_pos+led_halo_size );
+            if (is_first_inside_rect(image_coords, led1_area)) {
+                 pixel_out.rgb = apply_power_led(vec4(pixel_out.rgb,pixel_fg_image.a), pixel_fg_image_no_night, image_coords, image_aspect, led1_pos, LED1_HUE, led_halo_size, 1.0);
+            }
+
+            vec2 led2_pos = vec2(LED2_X, LED2_Y);
+            vec4 led2_area = vec4( led2_pos-led_halo_size, led2_pos+led_halo_size);
+            if (is_first_inside_rect(image_coords, led2_area)) {
+                float controller = float((mod(params.FrameCount,100)>50.0));
+                pixel_out.rgb = apply_power_led(vec4(pixel_out.rgb,pixel_fg_image.a), pixel_fg_image_no_night, image_coords, image_aspect, led2_pos, LED2_HUE, led_halo_size, controller);
+            }
+
+        }
+
+        #endif
+
     }
 
     

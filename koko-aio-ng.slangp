@@ -24,7 +24,7 @@
 //   - The blue channel represents the part of the bezel that will be filled by the game reflection.
 
 
-                textures = "monitor_body_curved;monitor_body_straight;bg_under;bg_over;backdrop;sideshade;led"
+                textures = "monitor_body_curved;monitor_body_straight;bg_under;bg_over;backdrop;sideshade"
                 
             monitor_body_curved = "textures/monitor_body_curved.png"
      monitor_body_curved_linear = "true"
@@ -58,10 +58,6 @@
       sideshade_wrap_mode = "mirrored_repeat"
          sideshade_mipmap = "false"
 
-                      led = "textures/led.png"
-               led_linear = "true"
-            led_wrap_mode = "clamp_to_border"
-               led_mipmap = "false"
 
 shaders = 17
 
