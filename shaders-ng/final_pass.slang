@@ -1312,14 +1312,13 @@ vec3 apply_power_led( vec4 bgimage, vec3 bgimage_nonight, vec2 image_coords, flo
         float halo_mul_controller = halo_bw * controller;
         vec3  added = bgimage.rgb + led_color * halo_mul_controller;
 
-        //define #_BLEND1
+        //#define _BLEND1
         #ifdef _BLEND1
             vec3 tinted = mix(bgimage.rgb, bgimage.rgb * led_color, halo_bw * 0.25);
             bgimage.rgb = mix(added, tinted, bgimage.rgb);
         #else
             bgimage.rgb = mix(added, bgimage.rgb, min(bgimage.rgb*2,1.0));
         #endif
-
 
         //bgimage.a deve avere peso solo se l'alone è centrale
         float alpha_inv = 1-bgimage.a;
@@ -1613,7 +1612,8 @@ void main() {
             if (is_first_inside_rect(image_coords, led2_area)) {
                 float controller = 1.0;
                 #ifdef _USE_DENISE_EMU
-                    controller = global.autoEmu_driveLED; //this will be optionally tied to denise uniform in the next commit.
+                    if (global.LED2_IS_DRIVE == 1.0)
+                        controller = global.autoEmu_driveLED;
                 #endif
                 pixel_out.rgb = apply_power_led(vec4(pixel_out.rgb,pixel_fg_image.a), pixel_fg_image_no_night, image_coords, image_aspect, led2_pos, LED2_HUE, led_halo_size, controller);
             }

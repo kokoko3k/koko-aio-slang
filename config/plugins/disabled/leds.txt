@@ -14,11 +14,15 @@
 #define USE_LEDS
 #endif
 
-#pragma parameter LED_SIZE	         "      Power leds halo size (0 to disable) (Image over only)"	0.5  0.0  3.0    0.01
-#pragma parameter LED1_HUE	         "         Power led 1 hue"   1.0   0.0  1.0    0.01
-#pragma parameter LED1_X	         "         Power led 1 X"	  0.1  -1.0  2.0   0.001
-#pragma parameter LED1_Y	         "         Power led 1 Y"	  0.1  -1.0  2.0   0.001
-#pragma parameter LED2_HUE	         "         Power led 2 hue"   0.3   0.0  1.0    0.01
-#pragma parameter LED2_X	         "         Power led 2 X"	  0.1  -1.0  2.0   0.001
-#pragma parameter LED2_Y	         "         Power led 2 Y"	  0.2  -1.0  2.0   0.001
+//denise drive led support
+#pragma parameter_denise autoEmu_driveLED "what here?" 1 0 1 1
+
+#pragma parameter LED_SIZE	            "      Power leds halo size (0 to disable) (Image over only)"	0.5  0.0  3.0    0.01
+#pragma parameter LED1_HUE	            "         Power led 1 hue"   1.0   0.0  1.0    0.01
+#pragma parameter LED1_X	            "         Power led 1 X"	  0.1  -1.0  2.0   0.001
+#pragma parameter LED1_Y	            "         Power led 1 Y"	  0.1  -1.0  2.0   0.001
+#pragma parameter_denise LED2_IS_DRIVE  "         Power led 2 is bound to drive led"   1 0 1 1
+#pragma parameter LED2_HUE	            "         Power led 2 hue"   0.3   0.0  1.0    0.01
+#pragma parameter LED2_X	            "         Power led 2 X"	  0.1  -1.0  2.0   0.001
+#pragma parameter LED2_Y	            "         Power led 2 Y"	  0.2  -1.0  2.0   0.001
 
