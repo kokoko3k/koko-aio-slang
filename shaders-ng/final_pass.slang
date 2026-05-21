@@ -1605,21 +1605,28 @@ void main() {
             float led_halo_size = LED_SIZE*0.1;
             image_aspect;
 
+            float led_controller1 = 1.0;
+            #ifdef BLINK_LED
+                led_controller1 = float(mod(params.FrameCount, 100) > 50.0);
+            #endif
+
             vec2 led1_pos = vec2(LED1_X, LED1_Y);
             vec4 led1_area = vec4( led1_pos-led_halo_size, led1_pos+led_halo_size );
             if (is_first_inside_rect(image_coords, led1_area)) {
-                 pixel_out.rgb = apply_power_led(vec4(pixel_out.rgb,pixel_fg_image.a), pixel_fg_image_no_night, image_coords, image_aspect, led1_pos, LED1_HUE, led_halo_size, 1.0);
+                 pixel_out.rgb = apply_power_led(vec4(pixel_out.rgb,pixel_fg_image.a), pixel_fg_image_no_night, image_coords, image_aspect, led1_pos, LED1_HUE, led_halo_size, led_controller1);
             }
 
             vec2 led2_pos = vec2(LED2_X, LED2_Y);
             vec4 led2_area = vec4( led2_pos-led_halo_size, led2_pos+led_halo_size);
             if (is_first_inside_rect(image_coords, led2_area)) {
-                float controller = 0.0;
+                float led_controller2 = 1.0;
                 #ifdef _USE_DENISE_EMU
                     if (global.LED2_IS_DRIVE == 1.0)
-                        controller = global.autoEmu_driveLED;
+                        led_controller2 = global.autoEmu_driveLED;
                 #endif
-                pixel_out.rgb = apply_power_led(vec4(pixel_out.rgb,pixel_fg_image.a), pixel_fg_image_no_night, image_coords, image_aspect, led2_pos, LED2_HUE, led_halo_size, controller);
+
+
+                pixel_out.rgb = apply_power_led(vec4(pixel_out.rgb,pixel_fg_image.a), pixel_fg_image_no_night, image_coords, image_aspect, led2_pos, LED2_HUE, led_halo_size, led_controller2);
             }
 
         }
