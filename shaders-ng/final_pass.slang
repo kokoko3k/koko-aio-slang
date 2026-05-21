@@ -1306,7 +1306,6 @@ float led_halo_no(vec2 co, vec2 corner,float smoothshade, float night) {
 
 vec3 apply_power_led( vec4 bgimage, vec3 bgimage_nonight, vec2 image_coords, float image_aspect, vec2 led_pos, float led_hue, float halo_size, float controller ) {
         #define _LED_HALO_POWER 0.5          //how much the halo around the led is visible
-        #define _LED_POWEROFF_STRENGTH 0.5   //how much the led will be darkened
 
         //get led rgb color from Hue:
         vec3  led_color = clamp(abs(mod(led_hue * 6.0 + vec3(0.0, 4.0, 2.0), 6.0) - 3.0) - 1.0, 0.0, 1.0);
@@ -1316,15 +1315,16 @@ vec3 apply_power_led( vec4 bgimage, vec3 bgimage_nonight, vec2 image_coords, flo
 
         // blend led halo with the underlying image; the more the image is bright, the less the halo visible.
         // This works well when coupled with the nightify and even ambientlight function applied,
-        bgimage.rgb = mix(bgimage.rgb, led_color, halo_bw*(1-bgimage.rgb) );
+
+        //bgimage.rgb = mix(bgimage.rgb, led_color, halo_bw*(1-bgimage.rgb)*(1-bgimage.rgb));
+        bgimage.rgb = bgimage.rgb + led_color * halo_bw * (1-bgimage.rgb);
+//bgimage.rgb = max (bgimage.rgb, led_color * halo_bw);
 
 
-        //bgimage.a deve avere peso solo se l'alone è centrale
-        float alpha_inv = 1-bgimage.a;
-        float b = alpha_inv*halo_bw * (1/_LED_HALO_POWER) * _LED_POWEROFF_STRENGTH;
+
 
         // don't nightify led area (alpha driven)
-            bgimage.rgb = mix(bgimage_nonight.rgb, bgimage.rgb, ceil(bgimage.a) );
+            bgimage.rgb = mix(bgimage_nonight.rgb, bgimage.rgb, ceil(bgimage.a) ); //use ceil to account for bgimage alpha linear interpolation
         // turn off led area if controller is low
             bgimage.rgb = mix(
                                bgimage.rgb*clamp(controller,0.2,1),  // darken on controller: _low_
@@ -1333,12 +1333,14 @@ vec3 apply_power_led( vec4 bgimage, vec3 bgimage_nonight, vec2 image_coords, flo
                              );
 
 
-        float over_exposure = LED_EXPOSURE;
-        bgimage_nonight.rgb =  mix(bgimage_nonight.rgb, vec3(1.0), over_exposure);
+        //overexpose led light?
+        vec3 bgimage_overexposed =  mix(bgimage_nonight.rgb, vec3(1.0), LED_EXPOSURE);
 
-        float b_mul_controller = alpha_inv * halo_bw * controller;
-        bgimage.rgb = mix(bgimage.rgb, bgimage_nonight.rgb, b_mul_controller)
-                      * (1.0 - b + b_mul_controller);
+
+        float m = (1.0 - bgimage.a) *                                // where image is transparent
+                  halo_bw *                                          // ...and halo is high
+                  controller;                                        // ...and led is powered on:
+        bgimage.rgb = mix(bgimage.rgb, bgimage_overexposed.rgb, m); // apply optionally overexposed light
 
         return bgimage.rgb;
 }
@@ -1610,7 +1612,7 @@ void main() {
 
             float led_controller1 = 1.0;
             #ifdef BLINK_LED
-                led_controller1 = float(mod(params.FrameCount, 100) > 50.0);
+                //led_controller1 = float(mod(params.FrameCount, 100) > 50.0);
             #endif
 
             vec2 led1_pos = vec2(LED1_X, LED1_Y);
