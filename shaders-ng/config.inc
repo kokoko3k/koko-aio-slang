@@ -333,13 +333,17 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 	float CVBS_UNSHARP_COMPENSATION;
 
-	float LED_SIZE;
-	float LED1_X;
-	float LED1_Y;
-	float LED1_HUE;
-	float LED2_X;
-	float LED2_Y;
-	float LED2_HUE;
+	//plugin LEDS:
+		float LED_SIZE;
+		float LED_SHAPE;
+		float LED_ASPECT;
+		float LED_EXPOSURE;
+		float LED1_X;
+		float LED1_Y;
+		float LED1_HUE;
+		float LED2_X;
+		float LED2_Y;
+		float LED2_HUE;
 
 	float autoEmu_driveLED; //for denise
 	float LED2_IS_DRIVE;    //for denise
@@ -660,17 +664,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 
 #pragma include_optional "../config/plugins/enabled/leds.txt"
-// #include "../config/plugins/enabled/leds.txt"
-// #define USE_LEDS
-// #pragma parameter LED_SIZE	         "      Power leds size (0 to disable) (Image over only)"	0.5  0.0  1.0    0.01
-// #pragma parameter LED1_HUE	         "         Power led 1 hue"  1.0  0.0  1.0    0.01
-// #pragma parameter LED1_X	         "         Power led 1 X"	  0.5  -1.0  1.0   0.01
-// #pragma parameter LED1_Y	         "         Power led 1 Y"	  0.5  -1.0  1.0   0.01
-// #pragma parameter LED2_HUE	         "         Power led 2 hue"  1.0  0.0  1.0    0.01
-// #pragma parameter LED2_X	         "         Power led 2 X"	  0.5  -1.0  1.0   0.01
-// #pragma parameter LED2_Y	         "         Power led 2 Y"	  0.5  -1.0  1.0   0.01
-// #pragma parameter LED_HALO	         "         Power leds halo"  0.25  0.0  1.0    0.01
-
 #pragma parameter LABEL0025 " " 0 0 0 1
 
 

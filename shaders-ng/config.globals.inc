@@ -975,6 +975,18 @@
     #define LED_SIZE global.LED_SIZE
 #endif
 
+#ifndef LED_SHAPE
+    #define LED_SHAPE global.LED_SHAPE
+#endif
+
+#ifndef LED_ASPECT
+    #define LED_ASPECT global.LED_ASPECT
+#endif
+
+#ifndef LED_EXPOSURE
+    #define LED_EXPOSURE global.LED_EXPOSURE
+#endif
+
 #ifndef LED_HALO
     #define LED_HALO global.LED_HALO
 #endif

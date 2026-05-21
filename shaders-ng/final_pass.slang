@@ -1288,8 +1288,11 @@ vec3 antighost(vec3 c) {
 }
 
 float led_halo(vec2 co, float aspect, vec2 center, float smoothshade) {
-    vec2  delta = (co - center) * vec2(aspect, 1.0);
-    float d = length(delta);
+    vec2  delta = (co - center) * vec2(aspect, 1.0/LED_ASPECT);
+    float dist_circle = length(delta);
+    float dist_square   = max(abs(delta.x), abs(delta.y));
+    float d = mix(dist_circle, dist_square, LED_SHAPE);
+
     float hv = 1.0 - smoothstep(0.0, smoothshade, d);
     return hv * hv;
 }
@@ -1305,20 +1308,16 @@ vec3 apply_power_led( vec4 bgimage, vec3 bgimage_nonight, vec2 image_coords, flo
         #define _LED_HALO_POWER 0.5          //how much the halo around the led is visible
         #define _LED_POWEROFF_STRENGTH 0.5   //how much the led will be darkened
 
-
+        //get led rgb color from Hue:
         vec3  led_color = clamp(abs(mod(led_hue * 6.0 + vec3(0.0, 4.0, 2.0), 6.0) - 3.0) - 1.0, 0.0, 1.0);
+
+        //Bw halo shape
         float halo_bw   = led_halo(image_coords, image_aspect, led_pos, halo_size) * _LED_HALO_POWER;
 
-        float halo_mul_controller = halo_bw * controller;
-        vec3  added = bgimage.rgb + led_color * halo_mul_controller;
+        // blend led halo with the underlying image; the more the image is bright, the less the halo visible.
+        // This works well when coupled with the nightify and even ambientlight function applied,
+        bgimage.rgb = mix(bgimage.rgb, led_color, halo_bw*(1-bgimage.rgb) );
 
-        //#define _BLEND1
-        #ifdef _BLEND1
-            vec3 tinted = mix(bgimage.rgb, bgimage.rgb * led_color, halo_bw * 0.25);
-            bgimage.rgb = mix(added, tinted, bgimage.rgb);
-        #else
-            bgimage.rgb = mix(added, bgimage.rgb, min(bgimage.rgb*2,1.0));
-        #endif
 
         //bgimage.a deve avere peso solo se l'alone è centrale
         float alpha_inv = 1-bgimage.a;
@@ -1329,7 +1328,12 @@ vec3 apply_power_led( vec4 bgimage, vec3 bgimage_nonight, vec2 image_coords, flo
         // turn off led area if controller is low
         // bgimage.rgb = mix(bgimage.rgb, vec3(0.0),  b*(1-controller) );
         // both fused into this:
-        float b_mul_controller = alpha_inv * halo_mul_controller;
+
+
+        float over_exposure = LED_EXPOSURE;
+        bgimage_nonight.rgb =  mix(bgimage_nonight.rgb, vec3(1.0), over_exposure);
+
+        float b_mul_controller = alpha_inv * halo_bw * controller;
         bgimage.rgb = mix(bgimage.rgb, bgimage_nonight.rgb, b_mul_controller)
                       * (1.0 - b + b_mul_controller);
 
@@ -1599,7 +1603,7 @@ void main() {
         //Leds:
         if (LED_SIZE > 0.0) {
             float led_halo_size = LED_SIZE*0.1;
-            //image_coords/=vec2(1.0,image_aspect);
+            image_aspect;
 
             vec2 led1_pos = vec2(LED1_X, LED1_Y);
             vec4 led1_area = vec4( led1_pos-led_halo_size, led1_pos+led_halo_size );
@@ -1610,7 +1614,7 @@ void main() {
             vec2 led2_pos = vec2(LED2_X, LED2_Y);
             vec4 led2_area = vec4( led2_pos-led_halo_size, led2_pos+led_halo_size);
             if (is_first_inside_rect(image_coords, led2_area)) {
-                float controller = 1.0;
+                float controller = 0.0;
                 #ifdef _USE_DENISE_EMU
                     if (global.LED2_IS_DRIVE == 1.0)
                         controller = global.autoEmu_driveLED;
