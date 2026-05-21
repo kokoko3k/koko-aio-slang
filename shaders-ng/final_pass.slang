@@ -1327,7 +1327,7 @@ vec3 apply_power_led( vec4 bgimage, vec3 bgimage_nonight, vec2 image_coords, flo
             bgimage.rgb = mix(bgimage_nonight.rgb, bgimage.rgb, bgimage.a );
         // turn off led area if controller is low
             bgimage.rgb = mix(
-                               mix(vec3(0.2), bgimage.rgb, clamp(controller,0.1,1)  ),  //desaturate and darken on controller _low_
+                               bgimage.rgb*clamp(controller,0.2,1),  // darken on controller: _low_
                                bgimage.rgb,  //then mix it with original image...
                                bgimage.a     //...depending on the alpha value
                              );
