@@ -1324,7 +1324,7 @@ vec3 apply_power_led( vec4 bgimage, vec3 bgimage_nonight, vec2 image_coords, flo
         float b = alpha_inv*halo_bw * (1/_LED_HALO_POWER) * _LED_POWEROFF_STRENGTH;
 
         // don't nightify led area (alpha driven)
-            bgimage.rgb = mix(bgimage_nonight.rgb, bgimage.rgb, bgimage.a );
+            bgimage.rgb = mix(bgimage_nonight.rgb, bgimage.rgb, ceil(bgimage.a) );
         // turn off led area if controller is low
             bgimage.rgb = mix(
                                bgimage.rgb*clamp(controller,0.2,1),  // darken on controller: _low_
