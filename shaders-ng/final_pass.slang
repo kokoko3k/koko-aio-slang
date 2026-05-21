@@ -1324,16 +1324,19 @@ vec3 apply_power_led( vec4 bgimage, vec3 bgimage_nonight, vec2 image_coords, flo
         float b = alpha_inv*halo_bw * (1/_LED_HALO_POWER) * _LED_POWEROFF_STRENGTH;
 
         // don't nightify led area (alpha driven)
-        // bgimage.rgb = mix(bgimage.rgb, bgimage_nonight.rgb, b*controller );
+            bgimage.rgb = mix(bgimage_nonight.rgb, bgimage.rgb, bgimage.a );
         // turn off led area if controller is low
-        // bgimage.rgb = mix(bgimage.rgb, vec3(0.0),  b*(1-controller) );
-        // both fused into this:
+            bgimage.rgb = mix(
+                               mix(vec3(0.2), bgimage.rgb, clamp(controller,0.1,1)  ),  //desaturate and darken on controller _low_
+                               bgimage.rgb,  //then mix it with original image...
+                               bgimage.a     //...depending on the alpha value
+                             );
 
 
         float over_exposure = LED_EXPOSURE;
         bgimage_nonight.rgb =  mix(bgimage_nonight.rgb, vec3(1.0), over_exposure);
 
-        float b_mul_controller = alpha_inv * halo_bw;
+        float b_mul_controller = alpha_inv * halo_bw * controller;
         bgimage.rgb = mix(bgimage.rgb, bgimage_nonight.rgb, b_mul_controller)
                       * (1.0 - b + b_mul_controller);
 
