@@ -1312,7 +1312,7 @@ vec3 apply_power_led( vec4 bgimage, vec3 bgimage_nonight, vec2 image_coords, flo
         vec3  led_color = clamp(abs(mod(led_hue * 6.0 + vec3(0.0, 4.0, 2.0), 6.0) - 3.0) - 1.0, 0.0, 1.0);
 
         //Bw halo shape
-        float halo_bw   = led_halo(image_coords, image_aspect, led_pos, halo_size) * _LED_HALO_POWER;
+        float halo_bw   = led_halo(image_coords, image_aspect, led_pos, halo_size) * _LED_HALO_POWER * controller;
 
         // blend led halo with the underlying image; the more the image is bright, the less the halo visible.
         // This works well when coupled with the nightify and even ambientlight function applied,
@@ -1333,7 +1333,7 @@ vec3 apply_power_led( vec4 bgimage, vec3 bgimage_nonight, vec2 image_coords, flo
         float over_exposure = LED_EXPOSURE;
         bgimage_nonight.rgb =  mix(bgimage_nonight.rgb, vec3(1.0), over_exposure);
 
-        float b_mul_controller = alpha_inv * halo_bw * controller;
+        float b_mul_controller = alpha_inv * halo_bw;
         bgimage.rgb = mix(bgimage.rgb, bgimage_nonight.rgb, b_mul_controller)
                       * (1.0 - b + b_mul_controller);
 
