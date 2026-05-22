@@ -1,4 +1,5 @@
 #reference "Base.slangp"
+#reference "../refs/leds_on_1084s.slangp"
 
 IN_GLOW_POWER = "1.3"
 GAMMA_OUT = "0.43"
@@ -53,12 +54,3 @@ DO_GLOBAL_SHZO = "1.000000"
 
 	S_POWER = "0.056"
 
-	LED_SIZE = "0.300000"
-	LED_SHAPE = "0.500000"
-	LED_ASPECT = "0.600000"
-	LED_EXPOSURE = "1.300000"
-	LED1_X = "0.739001"
-	LED1_Y = "0.937999"
-	LED2_HUE = "1.000000"
-	LED2_X = "-1.000000"
-	LED2_Y = "-1.000000"
