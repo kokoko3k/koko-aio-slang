@@ -1310,17 +1310,18 @@ vec3 apply_power_led( vec4 bgimage, vec3 bgimage_nonight, vec2 image_coords, flo
         //get led rgb color from Hue:
         vec3  led_color = clamp(abs(mod(led_hue * 6.0 + vec3(0.0, 4.0, 2.0), 6.0) - 3.0) - 1.0, 0.0, 1.0);
 
+        //when LED_EXPOSURE is negative, modulate maximum exposure depending on the difference between
+        //the nightified image and the original one.
+        float led_exposure = LED_EXPOSURE;
+        if (LED_EXPOSURE < 0.0)
+            led_exposure = abs(LED_EXPOSURE * rgb_to_gray(bgimage.rgb - bgimage_nonight.rgb))  ;
+
         //Bw halo shape
-        float halo_bw   = led_halo(image_coords, image_aspect, led_pos, halo_size) * _LED_HALO_POWER * controller;
+        float halo_bw   = led_halo(image_coords, image_aspect, led_pos, halo_size) * _LED_HALO_POWER *  (led_exposure/10.0+1) * controller;
 
-        // blend led halo with the underlying image; the more the image is bright, the less the halo visible.
+        // blend led halo with the underlying image less halo on bright background.
         // This works well when coupled with the nightify and even ambientlight function applied,
-
-        //bgimage.rgb = mix(bgimage.rgb, led_color, halo_bw*(1-bgimage.rgb)*(1-bgimage.rgb));
         bgimage.rgb = bgimage.rgb + led_color * halo_bw * (1-bgimage.rgb);
-//bgimage.rgb = max (bgimage.rgb, led_color * halo_bw);
-
-
 
 
         // don't nightify led area (alpha driven)
@@ -1334,7 +1335,7 @@ vec3 apply_power_led( vec4 bgimage, vec3 bgimage_nonight, vec2 image_coords, flo
 
 
         //overexpose led light?
-        vec3 bgimage_overexposed =  mix(bgimage_nonight.rgb, vec3(1.0), LED_EXPOSURE);
+        vec3 bgimage_overexposed =  mix(bgimage_nonight.rgb, vec3(1.0), led_exposure);
 
 
         float m = (1.0 - bgimage.a) *                                // where image is transparent
