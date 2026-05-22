@@ -38,7 +38,7 @@
 #pragma parameter LED_SIZE	            "      Power leds halo size (0 to disable) (Image over only)"	0.0    0.0  3.0    0.01
 #pragma parameter LED_SHAPE             "      Power leds halo shape (circle to square)"                0.0    0.0  0.5    0.1
 #pragma parameter LED_ASPECT            "      Power leds halo Aspect"                                  1.0    0.2  5.0    0.05
-#pragma parameter LED_EXPOSURE          "      Power leds Overexposure (<0.0=auto)"                     -1.0  -10.0  2.0    0.1
+#pragma parameter LED_EXPOSURE          "      Power leds Overexposure (<0.0=auto)"                    -4.0  -10.0  2.0    0.1
 #pragma parameter LED1_HUE	            "         Power led 1 hue"   1.0   0.0  1.0    0.01
 #pragma parameter LED1_X	            "         Power led 1 X"	  0.1  -1.0  2.0   0.0005
 #pragma parameter LED1_Y	            "         Power led 1 Y"	  0.1  -1.0  2.0   0.0005

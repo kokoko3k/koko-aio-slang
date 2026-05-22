@@ -1305,6 +1305,21 @@ float led_halo_no(vec2 co, vec2 corner,float smoothshade, float night) {
 
 
 vec3 apply_power_led( vec4 bgimage, vec3 bgimage_nonight, vec2 image_coords, float image_aspect, vec2 led_pos, float led_hue, float halo_size, float controller ) {
+
+        //Controller low ? darken led and exit early:
+        controller = float(mod(params.FrameCount,100)>50);
+        #define MIN_CONTROLLER 0.2
+        controller = clamp(controller,MIN_CONTROLLER,1);
+        if (controller < MIN_CONTROLLER+0.01) {
+            // turn off led area if controller is low
+            bgimage.rgb = mix( bgimage.rgb*MIN_CONTROLLER, // darken on controller: _low_
+                               bgimage.rgb,                //then mix it with original image...
+                               bgimage.a        //...depending on the alpha value
+                             );
+            return bgimage.rgb;
+        }
+
+
         #define _LED_HALO_POWER 0.5          //how much the halo around the led is visible
 
         //get led rgb color from Hue:
@@ -1312,7 +1327,7 @@ vec3 apply_power_led( vec4 bgimage, vec3 bgimage_nonight, vec2 image_coords, flo
 
         //when LED_EXPOSURE is negative, modulate maximum exposure depending on the difference between
         //the nightified image and the original one.
-        float led_exposure = LED_EXPOSURE;
+        float led_exposure = LED_EXPOSURE * controller;
         if (LED_EXPOSURE < 0.0)
             led_exposure = abs(LED_EXPOSURE * rgb_to_gray(bgimage.rgb - bgimage_nonight.rgb))  ;
 
@@ -1324,24 +1339,15 @@ vec3 apply_power_led( vec4 bgimage, vec3 bgimage_nonight, vec2 image_coords, flo
         bgimage.rgb = bgimage.rgb + led_color * halo_bw * (1-bgimage.rgb);
 
 
-        // don't nightify led area (alpha driven)
-            bgimage.rgb = mix(bgimage_nonight.rgb, bgimage.rgb, ceil(bgimage.a) ); //use ceil to account for bgimage alpha linear interpolation
-        // turn off led area if controller is low
-            bgimage.rgb = mix(
-                               bgimage.rgb*clamp(controller,0.2,1),  // darken on controller: _low_
-                               bgimage.rgb,  //then mix it with original image...
-                               bgimage.a     //...depending on the alpha value
-                             );
-
-
         //overexpose led light?
-        vec3 bgimage_overexposed =  mix(bgimage_nonight.rgb, vec3(1.0), led_exposure);
+        bgimage_nonight = mix(bgimage_nonight.rgb, vec3(1.0), led_exposure);
+        bgimage.rgb = mix(bgimage.rgb, vec3(1.0), led_exposure*(1-bgimage.a));
 
 
         float m = (1.0 - bgimage.a) *                                // where image is transparent
                   halo_bw *                                          // ...and halo is high
                   controller;                                        // ...and led is powered on:
-        bgimage.rgb = mix(bgimage.rgb, bgimage_overexposed.rgb, m); // apply optionally overexposed light
+        bgimage.rgb = mix(bgimage.rgb, bgimage_nonight.rgb, m);      // apply no night light
 
         return bgimage.rgb;
 }
