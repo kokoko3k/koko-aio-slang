@@ -1307,7 +1307,7 @@ float led_halo_no(vec2 co, vec2 corner,float smoothshade, float night) {
 vec3 apply_power_led( vec4 bgimage, vec3 bgimage_nonight, vec2 image_coords, float image_aspect, vec2 led_pos, float led_hue, float halo_size, float controller ) {
 
         //Controller low ? darken led and exit early:
-        controller = float(mod(params.FrameCount,100)>50);
+        //controller = float(mod(params.FrameCount,100)>50);
         #define MIN_CONTROLLER 0.2
         controller = clamp(controller,MIN_CONTROLLER,1);
         if (controller < MIN_CONTROLLER+0.01) {
