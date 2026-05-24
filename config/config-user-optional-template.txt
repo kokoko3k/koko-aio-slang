@@ -1,15 +1,6 @@
 //DON'T DELETE THIS LINE
 
 //   To use this file, first copy it to a new file named: config-user-optional.txt
-//
-//
-//   This file will NOT be overwritten by an update, so you're safe,
-//   and will likely to conflict with the old/deprecated config-user.txt
-//   So my advice is to migrate config-user.txt content to config-user-optional.txt
-//   the syntax is the same.
-//
-//
-//
 
 
 //   Lines have this format: //#define PARAMETER VALUE //DESCRIPTION
