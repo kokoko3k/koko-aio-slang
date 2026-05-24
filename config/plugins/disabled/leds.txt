@@ -34,7 +34,7 @@
 //denise drive led support
 #pragma parameter_denise autoEmu_driveLED "what here?" 1 0 1 1
 
-#pragma parameter LED_LABEL1            "      == PLUGIN: LEDS =="	0.0 0.0 0.0 1.0
+#pragma parameter LED_LABEL1            "      [Plugin] Power leds:"	0.0 0.0 0.0 1.0
 #pragma parameter LED_SIZE	            "      Power leds halo size (0 to disable) (Image over only)"	0.0    0.0  3.0    0.01
 #pragma parameter LED_SHAPE             "      Power leds halo shape (circle to square)"                0.0    0.0  0.5    0.1
 #pragma parameter LED_ASPECT            "      Power leds halo Aspect"                                  1.0    0.2  5.0    0.05
@@ -46,4 +46,4 @@
 #pragma parameter LED2_HUE	            "         Power led 2 hue"    0.3   0.0  1.0    0.01
 #pragma parameter LED2_X	            "         Power led 2 X"	  0.1  -1.0  2.0   0.0005
 #pragma parameter LED2_Y	            "         Power led 2 Y"	  0.2  -1.0  2.0   0.0005
-#pragma parameter LED_LABEL2            "      =="	0.0 0.0 0.0 1.0
+#pragma parameter LED_LABEL2            ""	0.0 0.0 0.0 1.0
