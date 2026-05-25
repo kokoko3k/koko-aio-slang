@@ -333,20 +333,32 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 	float CVBS_UNSHARP_COMPENSATION;
 
-	//plugin LEDS:
-		float LED_SIZE;
-		float LED_SHAPE;
-		float LED_ASPECT;
-		float LED_EXPOSURE;
-		float LED1_X;
-		float LED1_Y;
-		float LED1_HUE;
-		float LED2_X;
-		float LED2_Y;
-		float LED2_HUE;
 
+	float LED1_SIZE;
+	float LED1_SHAPE;
+	float LED1_ASPECT;
+	float LED1_EXPOSURE;
+	float LED1_HUE;
+	float LED1_X;
+	float LED1_Y;
+	float LED1_IS_DRIVE;
 	float autoEmu_driveLED; //for denise
-	float LED2_IS_DRIVE;    //for denise
+
+	float LED2_SIZE;
+	float LED2_SHAPE;
+	float LED2_ASPECT;
+	float LED2_EXPOSURE;
+	float LED2_HUE;
+	float LED2_X;
+	float LED2_Y;
+
+	float LED3_SIZE;
+	float LED3_SHAPE;
+	float LED3_ASPECT;
+	float LED3_EXPOSURE;
+	float LED3_HUE;
+	float LED3_X;
+	float LED3_Y;
 
 } global;
 
@@ -663,7 +675,9 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter BG_IMAGE_WRAP_MODE "      Wrap mode: default, clamp to border, edge, repeat" 0.0  0.0    3.0    1.0
 
 
-#pragma include_optional "../config/plugins/enabled/leds.txt"
+#pragma include_optional "../config/plugins/enabled/led1.txt"
+#pragma include_optional "../config/plugins/enabled/led2.txt"
+#pragma include_optional "../config/plugins/enabled/led3.txt"
 #pragma parameter LABEL0025 " " 0 0 0 1
 
 

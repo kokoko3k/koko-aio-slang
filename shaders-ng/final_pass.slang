@@ -1287,70 +1287,83 @@ vec3 antighost(vec3 c) {
 	return c;
 }
 
-float led_halo(vec2 co, float aspect, vec2 center, float smoothshade) {
-    vec2  delta = (co - center) * vec2(aspect, 1.0/LED_ASPECT);
+float led_halo(vec2 co, float image_aspect, vec2 center, float smoothshade, float led_aspect, float led_shape) {
+    vec2  delta = (co - center) * vec2(image_aspect, 1.0/led_aspect); //FIXME avoid mix and branch is any better?
     float dist_circle = length(delta);
-    float dist_square   = max(abs(delta.x), abs(delta.y));
-    float d = mix(dist_circle, dist_square, LED_SHAPE);
+    float dist_square   = max(abs(delta.x), abs(delta.y)); //FIXME try: vec2 ad = abs(delta); ; float dist_square = max(ad.x, ad.y);
+    float d = mix(dist_circle, dist_square, led_shape);
 
     float hv = 1.0 - smoothstep(0.0, smoothshade, d);
     return hv * hv;
 }
 
-float led_halo_no(vec2 co, vec2 corner,float smoothshade, float night) {
-	vec4 rect = vec4(corner.x, corner.y, corner.x, corner.y);
-	vec2 hv = smoothstep(rect.xy - smoothshade, rect.xy, co) * smoothstep_fast(co - smoothshade, co, rect.zw);
-	return (hv.x*hv.y)*(hv.x*hv.y) * night;
-}
+vec3 apply_power_led( vec4 bgimage, vec3 bgimage_nonight, vec2 image_coords, float image_aspect, vec2 led_pos, float led_hue, float halo_size, float led_aspect, float led_shape, float controller, float led_exposure ) {
+
+    if (halo_size == 0.0) return bgimage.rgb;
+
+    halo_size*=0.1;
+
+    //vec2 extent = vec2( halo_size / image_aspect, halo_size * led_aspect );
+    //vec4 led_area = vec4( led_pos - extent, led_pos + extent );//FIXME which is faster?
+
+    //float halo_extent = halo_size * 0.8;
+    //vec2 extent = vec2( halo_extent / image_aspect, halo_extent * led_aspect );
+    //vec4 led_area = vec4( led_pos - extent, led_pos + extent );//FIXME which is faster?
+
+    vec4 led_area = vec4( led_pos - halo_size, led_pos + halo_size ); //FIXME which is faster?
+
+    if (is_first_outside_rect(image_coords, led_area)) return bgimage.rgb;
 
 
-vec3 apply_power_led( vec4 bgimage, vec3 bgimage_nonight, vec2 image_coords, float image_aspect, vec2 led_pos, float led_hue, float halo_size, float controller ) {
-
-        //Controller low ? darken led and exit early:
-        //controller = float(mod(params.FrameCount,100)>50);
-        #define MIN_CONTROLLER 0.2
-        controller = clamp(controller,MIN_CONTROLLER,1);
-        if (controller < MIN_CONTROLLER+0.01) {
-            // turn off led area if controller is low
-            bgimage.rgb = mix( bgimage.rgb*MIN_CONTROLLER, // darken on controller: _low_
-                               bgimage.rgb,                //then mix it with original image...
-                               bgimage.a        //...depending on the alpha value
-                             );
-            return bgimage.rgb;
-        }
-
-
-        #define _LED_HALO_POWER 0.5          //how much the halo around the led is visible
-
-        //get led rgb color from Hue:
-        vec3  led_color = clamp(abs(mod(led_hue * 6.0 + vec3(0.0, 4.0, 2.0), 6.0) - 3.0) - 1.0, 0.0, 1.0);
-
-        //when LED_EXPOSURE is negative, modulate maximum exposure depending on the difference between
-        //the nightified image and the original one.
-        float led_exposure = LED_EXPOSURE * controller;
-        if (LED_EXPOSURE < 0.0)
-            led_exposure = abs(LED_EXPOSURE * rgb_to_gray(bgimage.rgb - bgimage_nonight.rgb))  ;
-
-        //Bw halo shape
-        float halo_bw   = led_halo(image_coords, image_aspect, led_pos, halo_size) * _LED_HALO_POWER *  (led_exposure/10.0+1) * controller;
-
-        // blend led halo with the underlying image less halo on bright background.
-        // This works well when coupled with the nightify and even ambientlight function applied,
-        bgimage.rgb = bgimage.rgb + led_color * halo_bw * (1-bgimage.rgb);
-
-
-        //overexpose led light?
-        bgimage_nonight = mix(bgimage_nonight.rgb, vec3(1.0), led_exposure);
-        bgimage.rgb = mix(bgimage.rgb, vec3(1.0), led_exposure*(1-bgimage.a));
-
-
-        float m = (1.0 - bgimage.a) *                                // where image is transparent
-                  halo_bw *                                          // ...and halo is high
-                  controller;                                        // ...and led is powered on:
-        bgimage.rgb = mix(bgimage.rgb, bgimage_nonight.rgb, m);      // apply no night light
-
+    //Controller low ? darken led and exit early:
+    //controller = float(mod(params.FrameCount,100)>50);
+    #define MIN_CONTROLLER 0.2
+    controller = clamp(controller,MIN_CONTROLLER,1);
+    if (controller < MIN_CONTROLLER+0.01) {
+        // turn off led area if controller is low
+        bgimage.rgb = mix( bgimage.rgb*MIN_CONTROLLER, // darken on controller: _low_
+                           bgimage.rgb,                //then mix it with original image...
+                           bgimage.a        //...depending on the alpha value
+                         );
         return bgimage.rgb;
+    }
+
+    #define _LED_HALO_POWER 0.5          //how much the halo around the led is visible
+
+    //get led rgb color from Hue:
+    vec3  led_color = clamp(abs(mod(led_hue * 6.0 + vec3(0.0, 4.0, 2.0), 6.0) - 3.0) - 1.0, 0.0, 1.0);
+
+    //when led_exposure is negative, modulate maximum exposure depending on the difference between
+    //the nightified image and the original one.
+    float led_exposure_controlled;
+    if (led_exposure < 0.0)
+        led_exposure_controlled = abs(led_exposure * rgb_to_gray(bgimage.rgb - bgimage_nonight.rgb));
+    else
+        led_exposure_controlled = led_exposure * controller;
+
+    //Bw halo shape
+    float halo_bw   = led_halo(image_coords, image_aspect, led_pos, halo_size, led_aspect, led_shape) * _LED_HALO_POWER *  (led_exposure_controlled/10.0+1);
+    //The latter mul by controller is useful only if controller can assume values inside [0..1], but usually it is just binary, and since led_exposure_controlled is pre-multiplied
+    //by controller, the latter can be stripped.
+
+    // blend led halo with the underlying image less halo on bright background.
+    // This works well when coupled with the nightify and even ambientlight function applied,
+    bgimage.rgb = bgimage.rgb + led_color * halo_bw * (1-bgimage.rgb);
+
+
+    //overexpose led light?
+    bgimage_nonight = mix(bgimage_nonight.rgb, vec3(1.0), led_exposure_controlled);
+    bgimage.rgb = mix(bgimage.rgb, vec3(1.0), led_exposure_controlled*(1-bgimage.a));
+
+
+    float m = (1.0 - bgimage.a) *                                // where image is transparent
+                halo_bw *                                        // ...and halo is high
+                controller;                                      // ...and led is powered on:
+    bgimage.rgb = mix(bgimage.rgb, bgimage_nonight.rgb, m);      // apply no night light
+
+    return bgimage.rgb;
 }
+
 
 void main() {
 
@@ -1579,9 +1592,8 @@ void main() {
         vec3 anti_nightify_ambi = (pixel_ambi * AMBI_BG_IMAGE_BLEND_MODE) *
                                    max(AMBI_BG_IMAGE_FORCE, 1-pixel_fg_image.a);
 
-        #ifdef USE_LEDS
+        #if defined(USE_LED1) || defined(USE_LED2) || defined(USE_LED3)
             vec3 pixel_fg_image_no_night = pixel_fg_image.rgb;
-            vec3 pixel_out_pre = pixel_out.rgb;
         #endif
 
         pixel_fg_image.rgb = fn_pixel_nightify(pixel_fg_image.rgb, BG_IMAGE_NIGHTIFY, anti_nightify_ambi );
@@ -1610,40 +1622,29 @@ void main() {
         }
         pixel_fg_image_alpha = pixel_fg_image.a;
 
-        //FragColor = vec4(pixel_fg_image.a) ; return;
-        #ifdef USE_LEDS
-        //Leds:
-        if (LED_SIZE > 0.0) {
-            float led_halo_size = LED_SIZE*0.1;
-            image_aspect;
-
-            float led_controller1 = 1.0;
-            #ifdef BLINK_LED
-                //led_controller1 = float(mod(params.FrameCount, 100) > 50.0);
+        #ifdef USE_LED1
+            float led_controller = 1.0;
+            #ifdef _USE_DENISE_EMU
+                if (global.LED1_IS_DRIVE == 1.0)
+                    led_controller = global.autoEmu_driveLED; //under Denise led1 can optionally blink on drive access.
             #endif
-
-            vec2 led1_pos = vec2(LED1_X, LED1_Y);
-            vec4 led1_area = vec4( led1_pos-led_halo_size, led1_pos+led_halo_size );
-            if (is_first_inside_rect(image_coords, led1_area)) {
-                 pixel_out.rgb = apply_power_led(vec4(pixel_out.rgb,pixel_fg_image.a), pixel_fg_image_no_night, image_coords, image_aspect, led1_pos, LED1_HUE, led_halo_size, led_controller1);
-            }
-
-            vec2 led2_pos = vec2(LED2_X, LED2_Y);
-            vec4 led2_area = vec4( led2_pos-led_halo_size, led2_pos+led_halo_size);
-            if (is_first_inside_rect(image_coords, led2_area)) {
-                float led_controller2 = 1.0;
-                #ifdef _USE_DENISE_EMU
-                    if (global.LED2_IS_DRIVE == 1.0)
-                        led_controller2 = global.autoEmu_driveLED;
-                #endif
-
-
-                pixel_out.rgb = apply_power_led(vec4(pixel_out.rgb,pixel_fg_image.a), pixel_fg_image_no_night, image_coords, image_aspect, led2_pos, LED2_HUE, led_halo_size, led_controller2);
-            }
-
-        }
-
+            pixel_out.rgb = apply_power_led( vec4(pixel_out.rgb, pixel_fg_image.a),  pixel_fg_image_no_night, image_coords, image_aspect,
+                                             vec2(global.LED1_X, global.LED1_Y), global.LED1_HUE, global.LED1_SIZE, global.LED1_ASPECT,
+                                             global.LED1_SHAPE, led_controller, global.LED1_EXPOSURE );
         #endif
+
+        #ifdef USE_LED2
+            pixel_out.rgb = apply_power_led( vec4(pixel_out.rgb, pixel_fg_image.a),  pixel_fg_image_no_night, image_coords, image_aspect,
+                                             vec2(global.LED2_X, global.LED2_Y), global.LED2_HUE, global.LED2_SIZE, global.LED2_ASPECT,
+                                             global.LED2_SHAPE, 1.0, global.LED2_EXPOSURE );
+        #endif
+
+        #ifdef USE_LED3
+            pixel_out.rgb = apply_power_led( vec4(pixel_out.rgb, pixel_fg_image.a),  pixel_fg_image_no_night, image_coords, image_aspect,
+                                             vec2(global.LED3_X, global.LED3_Y), global.LED3_HUE, global.LED3_SIZE, global.LED3_ASPECT,
+                                             global.LED3_SHAPE, 1.0, global.LED3_EXPOSURE );
+        #endif
+
 
     }
 
