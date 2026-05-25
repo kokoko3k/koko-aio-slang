@@ -1568,7 +1568,7 @@ void main() {
     if ( (DO_BG_IMAGE == 1.0 && BG_IMAGE_OVER == 0.0) && (content_and_bezel_mask < 1.0) ) {
         vec2 image_coords; //it gets the value from fn_pixel_fgbg_image output parameter.
         float image_size ; //(unused here, it gets the value from fn_pixel_fgbg_image output parameter.
-        vec4 pixel_bg_image = fn_pixel_fgbg_image(bg_over, image_coords, image_size);
+        vec4 pixel_bg_image = fn_pixel_fgbg_image(bg_under, image_coords, image_size);
 
         vec3 anti_nightify_ambi = (pixel_ambi * AMBI_BG_IMAGE_BLEND_MODE) *
                                    max(AMBI_BG_IMAGE_FORCE, 1-pixel_bg_image.a);
