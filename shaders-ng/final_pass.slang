@@ -1288,11 +1288,10 @@ vec3 antighost(vec3 c) {
 }
 
 float led_halo(vec2 co, float image_aspect, vec2 center, float smoothshade, float led_aspect, float led_shape) {
-    vec2  delta = (co - center) * vec2(image_aspect, 1.0/led_aspect); //FIXME avoid mix and branch is any better?
+    vec2  delta = (co - center) * vec2(image_aspect, 1.0/led_aspect);
     float dist_circle = length(delta);
-    float dist_square   = max(abs(delta.x), abs(delta.y)); //FIXME try: vec2 ad = abs(delta); ; float dist_square = max(ad.x, ad.y);
+    float dist_square   = max(abs(delta.x), abs(delta.y));
     float d = mix(dist_circle, dist_square, led_shape);
-
     float hv = 1.0 - smoothstep(0.0, smoothshade, d);
     return hv * hv;
 }
@@ -1303,14 +1302,10 @@ vec3 apply_power_led( vec4 bgimage, vec3 bgimage_nonight, vec2 image_coords, flo
 
     halo_size*=0.1;
 
-    //vec2 extent = vec2( halo_size / image_aspect, halo_size * led_aspect );
-    //vec4 led_area = vec4( led_pos - extent, led_pos + extent );//FIXME which is faster?
-
-    //float halo_extent = halo_size * 0.8;
-    //vec2 extent = vec2( halo_extent / image_aspect, halo_extent * led_aspect );
-    //vec4 led_area = vec4( led_pos - extent, led_pos + extent );//FIXME which is faster?
-
-    vec4 led_area = vec4( led_pos - halo_size, led_pos + halo_size ); //FIXME which is faster?
+    //vec4 led_area = vec4( led_pos - halo_size, led_pos + halo_size );  //maybe a bit slower?
+    vec2 extent = vec2( halo_size / image_aspect, halo_size * led_aspect );
+    vec4 led_area = vec4( led_pos - extent, led_pos + extent );
+    
 
     if (is_first_outside_rect(image_coords, led_area)) return bgimage.rgb;
 
@@ -1622,30 +1617,30 @@ void main() {
         }
         pixel_fg_image_alpha = pixel_fg_image.a;
 
-        #ifdef USE_LED1
-            float led_controller = 1.0;
-            #ifdef _USE_DENISE_EMU
-                if (global.LED1_IS_DRIVE == 1.0)
-                    led_controller = global.autoEmu_driveLED; //under Denise led1 can optionally blink on drive access.
+        if (content_and_bezel_mask < 1) { //who said big branches are bad? gains 1fps more per led.
+            #ifdef USE_LED1
+                float led_controller = 1.0;
+                #ifdef _USE_DENISE_EMU
+                    if (global.LED1_IS_DRIVE == 1.0)
+                        led_controller = global.autoEmu_driveLED; //under Denise led1 can optionally blink on drive access.
+                #endif
+                pixel_out.rgb = apply_power_led( vec4(pixel_out.rgb, pixel_fg_image_alpha),  pixel_fg_image_no_night, image_coords, image_aspect,
+                                                vec2(global.LED1_X, global.LED1_Y), global.LED1_HUE, global.LED1_SIZE, global.LED1_ASPECT,
+                                                global.LED1_SHAPE, led_controller, global.LED1_EXPOSURE );
             #endif
-            pixel_out.rgb = apply_power_led( vec4(pixel_out.rgb, pixel_fg_image.a),  pixel_fg_image_no_night, image_coords, image_aspect,
-                                             vec2(global.LED1_X, global.LED1_Y), global.LED1_HUE, global.LED1_SIZE, global.LED1_ASPECT,
-                                             global.LED1_SHAPE, led_controller, global.LED1_EXPOSURE );
-        #endif
 
-        #ifdef USE_LED2
-            pixel_out.rgb = apply_power_led( vec4(pixel_out.rgb, pixel_fg_image.a),  pixel_fg_image_no_night, image_coords, image_aspect,
-                                             vec2(global.LED2_X, global.LED2_Y), global.LED2_HUE, global.LED2_SIZE, global.LED2_ASPECT,
-                                             global.LED2_SHAPE, 1.0, global.LED2_EXPOSURE );
-        #endif
+            #ifdef USE_LED2
+                pixel_out.rgb = apply_power_led( vec4(pixel_out.rgb, pixel_fg_image_alpha),  pixel_fg_image_no_night, image_coords, image_aspect,
+                                                vec2(global.LED2_X, global.LED2_Y), global.LED2_HUE, global.LED2_SIZE, global.LED2_ASPECT,
+                                                global.LED2_SHAPE, 1.0, global.LED2_EXPOSURE );
+            #endif
 
-        #ifdef USE_LED3
-            pixel_out.rgb = apply_power_led( vec4(pixel_out.rgb, pixel_fg_image.a),  pixel_fg_image_no_night, image_coords, image_aspect,
-                                             vec2(global.LED3_X, global.LED3_Y), global.LED3_HUE, global.LED3_SIZE, global.LED3_ASPECT,
-                                             global.LED3_SHAPE, 1.0, global.LED3_EXPOSURE );
-        #endif
-
-
+            #ifdef USE_LED3
+                pixel_out.rgb = apply_power_led( vec4(pixel_out.rgb, pixel_fg_image_alpha),  pixel_fg_image_no_night, image_coords, image_aspect,
+                                                vec2(global.LED3_X, global.LED3_Y), global.LED3_HUE, global.LED3_SIZE, global.LED3_ASPECT,
+                                                global.LED3_SHAPE, 1.0, global.LED3_EXPOSURE );
+            #endif
+        }
     }
 
     
