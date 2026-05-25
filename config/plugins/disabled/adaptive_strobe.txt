@@ -17,8 +17,8 @@
 //         hopefully preventing that issue.
 
 
-#ifndef DO_ADPT_STROBE
-#define DO_ADPT_STROBE
+#ifndef DO_ADPT_STROBE_PLUGIN
+#define DO_ADPT_STROBE_PLUGIN
 #endif
 
 #pragma parameter ADPT_STROBE_STR	            "[Plugin] Adaptive Strobe ≈BFI Strength:"   0.8   0.0  1.0  0.05

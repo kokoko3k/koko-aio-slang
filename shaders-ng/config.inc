@@ -760,28 +760,11 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 #pragma parameter LABEL0034 " " 0 0 0 1
 
 
+//Post parameters from plugins
 #pragma include_optional "../config/plugins/enabled/lcd_antighosting.txt"
-// #pragma parameter LABEL0062	                  "[#] LCD Antighosting (#define DO_LCD_ANTIGHOSTING):"   0 0 0 1
-// #pragma parameter LCD_ANTIGHOSTING            "    .    Strength"    0.5   0.0  2.0  0.01
-// #pragma parameter LCD_ANTIGHOSTING_CEIL       "    .    Ceil"        1.0   0.0  1.0  0.01
-// #pragma parameter LCD_ANTIGHOSTING_FLIP_MASK  "    .    Flip Mask"   0.0   0.0  1.0  1.0
-// #pragma parameter LABEL0063 " " 0 0 0 1
-
 #pragma include_optional "../config/plugins/enabled/adaptive_strobe.txt"
-// #pragma parameter ADPT_STROBE_STR	            "[#] Adaptive Strobe ≈BFI Strength (#define DO_ADPT_STROBE):"   0.8   0.0  1.0  0.05
-// #pragma parameter ADPT_STROBE_CEIL              "   .   Hard limit strobe effect to (less is more):"   0.5   0.0  0.5  0.05
-// #pragma parameter ADPT_STROBE_GAIN_ADJ          "   .   Gain adjustment"    0.9   0.0  1.0  0.05
-// #pragma parameter ADPT_STROBE_GAIN_ADJ_NODARK   "          Less gain on dark colors"    1.0   0.0  1.0  0.05
-// #pragma parameter ADPT_STROBE_GAMMA_ADJ         "   .   Post Gamma adjustment"   0.9   0.5  4.0  0.05
-// #pragma parameter ADPT_LCD_RETENTION_FIX        "   .   LCD Retention workaround cadence (frames)"   3600.0   0.0  300000.0  50.0
-// #pragma parameter ADPT_STROBE_SELECTIVE         "   .   Apply only to moving areas (subframes unsupported)"    0.0   0.0  1.0  1.0
-// #pragma parameter LABEL9999 " " 0 0 0 1
-
 
 #pragma parameter SERVICE1 "Don't use me, for debug purposes only" 	0.0 -5.0 5.0 0.01
-
-// This is for a patched retroarch version I'm testing (24/03/04)
-#pragma inject_preset_code DEFINES_FROM_PRESET
 
 // User parameters goes here, they overrides almost everything:
 // Retroarch releases past October 2024 (v1.17) support this:

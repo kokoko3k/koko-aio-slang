@@ -46,7 +46,7 @@ layout(location = 16) flat out float vDo_pixelgrid_h;
 layout(location = 17) noperspective out float vFake_scanline_period;
 layout(location = 18) flat out float vPG_y_shift;
 layout(location = 19) noperspective out vec2 vUnrotated_Output_coords;
-#ifdef DO_ADPT_STROBE
+#ifdef DO_ADPT_STROBE_PLUGIN
     layout(location = 20) flat out float vAdaptive_strobe_oscillator;
 #endif
     
@@ -378,7 +378,7 @@ void main() {
     //Fragment shader will use that just one time that way. => precalc.
     vPG_offsets_and_size.a = pi/vPG_offsets_and_size.a;
 
-    #ifdef DO_ADPT_STROBE
+    #ifdef DO_ADPT_STROBE_PLUGIN
         float iFrameMod = 0.0;
         //+1 should take care of oscillator invertion to avoid voltage accumuation in IPS panels (?)
         if (ADPT_LCD_RETENTION_FIX > 0.0)
@@ -415,7 +415,7 @@ layout(location = 16) flat in float vDo_pixelgrid_h;
 layout(location = 17) noperspective in float vFake_scanline_period;
 layout(location = 18) flat in float vPG_y_shift;
 layout(location = 19) noperspective in vec2 vUnrotated_Output_coords;
-#ifdef DO_ADPT_STROBE
+#ifdef DO_ADPT_STROBE_PLUGIN
     layout(location = 20) flat in float vAdaptive_strobe_oscillator;
 #endif
 
@@ -1475,10 +1475,10 @@ void main() {
             pixel_out = mix(pixel_out+abs(perlin), pixel_out+vec3(content_mask), vec3(vignette_spot.y) );
         }
         
-            #ifdef DO_ADPT_STROBE
+            #ifdef DO_ADPT_STROBE_PLUGIN
                 pixel_out = adaptive_strobe(pixel_out, vAdaptive_strobe_oscillator, final_passFeedback, vOutputCoord);
             #else
-                #ifdef DO_LCD_ANTIGHOSTING
+                #ifdef DO_LCD_ANTIGHOSTING_PLUGIN
                     pixel_out = antighost(pixel_out);
                 #endif
             #endif

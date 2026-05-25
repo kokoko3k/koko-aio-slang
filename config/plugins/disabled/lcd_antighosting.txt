@@ -20,8 +20,8 @@
 //         It is an experimental measure to mitigate ghosting that could work or not,
 //         depending on your display.
 
-#ifndef DO_LCD_ANTIGHOSTING
-#define DO_LCD_ANTIGHOSTING
+#ifndef DO_LCD_ANTIGHOSTING_PLUGIN
+#define DO_LCD_ANTIGHOSTING_PLUGIN
 #endif
 
 #pragma parameter LABEL0062	                  "[Plugin] LCD Antighosting:"   0 0 0 1
