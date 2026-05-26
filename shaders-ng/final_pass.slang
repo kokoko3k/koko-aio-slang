@@ -1298,8 +1298,6 @@ float led_halo(vec2 co, float image_aspect, vec2 center, float smoothshade, floa
 
 vec3 apply_power_led( vec4 bgimage, vec3 bgimage_nonight, vec2 image_coords, float image_aspect, vec2 led_pos, float led_hue, float halo_size, float led_aspect, float led_shape, float controller, float led_exposure ) {
 
-    if (halo_size == 0.0) return bgimage.rgb;
-
     halo_size*=0.1;
 
     //vec4 led_area = vec4( led_pos - halo_size, led_pos + halo_size );  //maybe a bit slower?
@@ -1620,27 +1618,31 @@ void main() {
         }
         pixel_fg_image_alpha = pixel_fg_image.a;
 
-        if (content_and_bezel_mask < 1) { //who said big branches are bad? gains 1fps more per led.
+        if (content_and_bezel_mask < 1) { // Who said big branches are bad? Spare 1fps per led @Haswell.
             #ifdef USE_LED1
-                pixel_out.rgb = apply_power_led( vec4(pixel_out.rgb, pixel_fg_image_alpha),  pixel_fg_image_no_night, image_coords, image_aspect,
-                                                vec2(global.LED2_X, global.LED2_Y), global.LED2_HUE, global.LED2_SIZE, global.LED2_ASPECT,
-                                                global.LED2_SHAPE, 1.0, global.LED2_EXPOSURE );
+                if (global.LED1_SIZE != 0.0)
+                    pixel_out.rgb = apply_power_led( vec4(pixel_out.rgb, pixel_fg_image_alpha),  pixel_fg_image_no_night, image_coords, image_aspect,
+                                                     vec2(global.LED1_X, global.LED1_Y), global.LED1_HUE, global.LED1_SIZE, global.LED1_ASPECT,
+                                                     global.LED1_SHAPE, 1.0, global.LED1_EXPOSURE );
             #endif
 
             #ifdef USE_LED2
+                if (global.LED2_SIZE != 0.0)
                 pixel_out.rgb = apply_power_led( vec4(pixel_out.rgb, pixel_fg_image_alpha),  pixel_fg_image_no_night, image_coords, image_aspect,
-                                                vec2(global.LED3_X, global.LED3_Y), global.LED3_HUE, global.LED3_SIZE, global.LED3_ASPECT,
-                                                global.LED3_SHAPE, 1.0, global.LED3_EXPOSURE );
+                                                 vec2(global.LED2_X, global.LED2_Y), global.LED2_HUE, global.LED2_SIZE, global.LED2_ASPECT,
+                                                 global.LED2_SHAPE, 1.0, global.LED2_EXPOSURE );
             #endif
 
             #ifdef USE_LED3
-                float led_controller = 1.0;
-                #ifdef _USE_DENISE_EMU
-                    led_controller = global.LedDriveState; //under Denise led3 blinks on drive access.
-                #endif
-                pixel_out.rgb = apply_power_led( vec4(pixel_out.rgb, pixel_fg_image_alpha),  pixel_fg_image_no_night, image_coords, image_aspect,
-                                                vec2(global.LED1_X, global.LED1_Y), global.LED1_HUE, global.LED1_SIZE, global.LED1_ASPECT,
-                                                global.LED1_SHAPE, led_controller, global.LED1_EXPOSURE );
+                if (global.LED3_SIZE != 0.0) {
+                    float led_controller = 1.0;
+                    #ifdef _USE_DENISE_EMU
+                        led_controller = global.LedDriveState; //under Denise led3 blinks on drive access.
+                    #endif
+                    pixel_out.rgb = apply_power_led( vec4(pixel_out.rgb, pixel_fg_image_alpha),  pixel_fg_image_no_night, image_coords, image_aspect,
+                                                     vec2(global.LED3_X, global.LED3_Y), global.LED3_HUE, global.LED3_SIZE, global.LED3_ASPECT,
+                                                     global.LED3_SHAPE, led_controller, global.LED3_EXPOSURE );
+                }
             #endif
         }
     }
