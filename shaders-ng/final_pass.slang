@@ -1636,7 +1636,7 @@ void main() {
             #ifdef USE_LED3
                 float led_controller = 1.0;
                 #ifdef _USE_DENISE_EMU
-                    led_controller = global.LedDriveState; //under Denise led1 can optionally blink on drive access.
+                    led_controller = global.LedDriveState; //under Denise led3 blinks on drive access.
                 #endif
                 pixel_out.rgb = apply_power_led( vec4(pixel_out.rgb, pixel_fg_image_alpha),  pixel_fg_image_no_night, image_coords, image_aspect,
                                                 vec2(global.LED1_X, global.LED1_Y), global.LED1_HUE, global.LED1_SIZE, global.LED1_ASPECT,
