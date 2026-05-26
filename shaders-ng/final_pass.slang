@@ -1347,7 +1347,10 @@ vec3 apply_power_led( vec4 bgimage, vec3 bgimage_nonight, vec2 image_coords, flo
 
 
     //overexpose led light?
+    //led_exposure_controlled=clamp(pow(led_exposure_controlled, 3.0),0,1);
     bgimage_nonight = mix(bgimage_nonight.rgb, vec3(1.0), led_exposure_controlled);
+
+
     bgimage.rgb = mix(bgimage.rgb, vec3(1.0), led_exposure_controlled*(1-bgimage.a));
 
 
@@ -1619,26 +1622,25 @@ void main() {
 
         if (content_and_bezel_mask < 1) { //who said big branches are bad? gains 1fps more per led.
             #ifdef USE_LED1
-                float led_controller = 1.0;
-                #ifdef _USE_DENISE_EMU
-                    if (global.LED1_IS_DRIVE == 1.0)
-                        led_controller = global.autoEmu_driveLED; //under Denise led1 can optionally blink on drive access.
-                #endif
-                pixel_out.rgb = apply_power_led( vec4(pixel_out.rgb, pixel_fg_image_alpha),  pixel_fg_image_no_night, image_coords, image_aspect,
-                                                vec2(global.LED1_X, global.LED1_Y), global.LED1_HUE, global.LED1_SIZE, global.LED1_ASPECT,
-                                                global.LED1_SHAPE, led_controller, global.LED1_EXPOSURE );
-            #endif
-
-            #ifdef USE_LED2
                 pixel_out.rgb = apply_power_led( vec4(pixel_out.rgb, pixel_fg_image_alpha),  pixel_fg_image_no_night, image_coords, image_aspect,
                                                 vec2(global.LED2_X, global.LED2_Y), global.LED2_HUE, global.LED2_SIZE, global.LED2_ASPECT,
                                                 global.LED2_SHAPE, 1.0, global.LED2_EXPOSURE );
             #endif
 
-            #ifdef USE_LED3
+            #ifdef USE_LED2
                 pixel_out.rgb = apply_power_led( vec4(pixel_out.rgb, pixel_fg_image_alpha),  pixel_fg_image_no_night, image_coords, image_aspect,
                                                 vec2(global.LED3_X, global.LED3_Y), global.LED3_HUE, global.LED3_SIZE, global.LED3_ASPECT,
                                                 global.LED3_SHAPE, 1.0, global.LED3_EXPOSURE );
+            #endif
+
+            #ifdef USE_LED3
+                float led_controller = 1.0;
+                #ifdef _USE_DENISE_EMU
+                    led_controller = global.LedDriveState; //under Denise led1 can optionally blink on drive access.
+                #endif
+                pixel_out.rgb = apply_power_led( vec4(pixel_out.rgb, pixel_fg_image_alpha),  pixel_fg_image_no_night, image_coords, image_aspect,
+                                                vec2(global.LED1_X, global.LED1_Y), global.LED1_HUE, global.LED1_SIZE, global.LED1_ASPECT,
+                                                global.LED1_SHAPE, led_controller, global.LED1_EXPOSURE );
             #endif
         }
     }

@@ -23,7 +23,8 @@
 //
 // Power led hue: The color of the led
 // Power led X,Y: The position of the led
-// Power led 2 is bound to drive led: (Denise emulator only) The led will be driven by the floppy access.
+//
+// Power led 3, when using denise emulator is bound to drive led and will be driven by the floppy access.
 
 
 
@@ -31,16 +32,11 @@
 #define USE_LED1
 #endif
 
-//denise drive led support
-#pragma parameter_denise autoEmu_driveLED "Needed for Denise support" 1 0 1 1
-
 #pragma parameter LED1_LABEL_PRE        "      [Plugin] Power led 1"	0.0 0.0 0.0 1.0
 #pragma parameter LED1_SIZE	            "         halo size (0 to disable) (Image over only)"	0.0    0.0  3.0    0.01
 #pragma parameter LED1_SHAPE            "         halo shape (circle to square)"                0.0    0.0  0.5    0.1
 #pragma parameter LED1_ASPECT           "         halo aspect"                                  1.0    0.2  5.0    0.05
 #pragma parameter LED1_EXPOSURE         "         Overexposure (<0.0=auto)"                    -4.0  -10.0  2.0    0.1
 #pragma parameter LED1_HUE	            "         Hue"    1.0   0.0  1.0    0.01
-#pragma parameter LED1_X	            "         X"	  0.1  -1.0  2.0   0.0005
-#pragma parameter LED1_Y	            "         Y"	  0.1  -1.0  2.0   0.0005
-#pragma parameter_denise LED1_IS_DRIVE  "         Bind to drive led"   1 0 1 1
-
+#pragma parameter LED1_X	            "         Pos X"	  0.1  -1.0  2.0   0.0005
+#pragma parameter LED1_Y	            "         Pos Y"	  0.1  -1.0  2.0   0.0005

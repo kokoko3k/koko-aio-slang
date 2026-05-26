@@ -342,7 +342,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float LED1_X;
 	float LED1_Y;
 	float LED1_IS_DRIVE;
-	float autoEmu_driveLED; //for denise
+	float LedDriveState; //for denise
 
 	float LED2_SIZE;
 	float LED2_SHAPE;

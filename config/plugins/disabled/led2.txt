@@ -12,6 +12,6 @@
 #pragma parameter LED2_ASPECT           "         halo aspect"                                  1.0    0.2  5.0    0.05
 #pragma parameter LED2_EXPOSURE         "         Overexposure (<0.0=auto)"                    -4.0  -10.0  2.0    0.1
 #pragma parameter LED2_HUE	            "         Hue"    0.33  0.0  1.0    0.01
-#pragma parameter LED2_X	            "         X"	  0.1  -1.0  2.0   0.0005
-#pragma parameter LED2_Y	            "         Y"	  0.2  -1.0  2.0   0.0005
+#pragma parameter LED2_X	            "         Pos X"	  0.1  -1.0  2.0   0.0005
+#pragma parameter LED2_Y	            "         Pos Y"	  0.2  -1.0  2.0   0.0005
 
