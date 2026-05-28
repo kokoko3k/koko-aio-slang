@@ -1307,12 +1307,12 @@ vec3 apply_power_led( vec4 bgimage, vec3 bgimage_nonight, vec2 image_coords, flo
 
     if (is_first_outside_rect(image_coords, led_area)) return bgimage.rgb;
 
-    //Controller low ? darken led and exit early:
     //controller = float(mod(params.FrameCount,100)>50);
     if (controller < 0.5) {
         // turn off led area if controller is low
-        bgimage.rgb = mix( bgimage.rgb*0.2, // darken on controller: _low_
-                           bgimage.rgb,                //then mix it with original image...
+        vec3 led_off = mix(bgimage.rgb, vec3(0.0), 0.25);
+        bgimage.rgb = mix(led_off,           // darken on controller: _low_
+                           bgimage.rgb,       //then mix it with original image...
                            bgimage.a        //...depending on the alpha value
                          );
         return bgimage.rgb;
