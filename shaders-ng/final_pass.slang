@@ -1329,10 +1329,13 @@ vec3 apply_power_led( vec4 bgimage, vec3 bgimage_nonight, vec2 image_coords, flo
     //when led_exposure is negative, modulate maximum exposure depending on the difference between
     //the nightified image and the original one.
     float led_exposure_controlled;
-    if (led_exposure < 0.0)
-        led_exposure_controlled = abs(led_exposure * rgb_to_gray(bgimage.rgb - bgimage_nonight.rgb));
-    else
+    if (led_exposure < 0.0) {
+        // Exposure driven by full scene average lum
+        float scene_lum = texture(avglum_pass,FULL_SCENE_LUM_SAMPLING_POINT).a;
+        led_exposure_controlled = mix(0.0, abs(led_exposure) , 1-scene_lum) * controller;
+    } else {
         led_exposure_controlled = led_exposure * controller;
+    }
 
     //Bw halo shape
     float halo_bw   = led_halo(image_coords, image_aspect, led_pos, halo_size, led_aspect, led_shape) * _LED_HALO_POWER *  (led_exposure_controlled/10.0+1);
