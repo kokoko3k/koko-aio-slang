@@ -1307,16 +1307,16 @@ vec3 apply_power_led( vec4 bgimage, vec3 bgimage_nonight, vec2 image_coords, flo
 
     if (is_first_outside_rect(image_coords, led_area)) return bgimage.rgb;
 
-
     //Controller low ? darken led and exit early:
     //controller = float(mod(params.FrameCount,100)>50);
-    #define MIN_CONTROLLER 0.2
-    controller = clamp(controller,MIN_CONTROLLER,1);
-    if (controller < MIN_CONTROLLER+0.01) {
+    if (controller < 0.5) {
         // turn off led area if controller is low
-        bgimage.rgb = mix( bgimage.rgb*MIN_CONTROLLER, // darken on controller: _low_
-                           bgimage.rgb,                //then mix it with original image...
-                           bgimage.a        //...depending on the alpha value
+        vec3 led_off = vec3(0.0);
+
+
+        bgimage.rgb = mix( led_off,         // darken on controller: _low_
+                           bgimage.rgb,     // then mix it with original image...
+                           bgimage.a        // ...depending on the alpha value
                          );
         return bgimage.rgb;
     }
@@ -1328,19 +1328,15 @@ vec3 apply_power_led( vec4 bgimage, vec3 bgimage_nonight, vec2 image_coords, flo
 
     //when led_exposure is negative, modulate maximum exposure depending on the difference between
     //the nightified image and the original one.
-    float led_exposure_controlled;
     if (led_exposure < 0.0) {
         // Exposure driven by full scene average lum
         float scene_lum = texture(avglum_pass,FULL_SCENE_LUM_SAMPLING_POINT).a;
-        led_exposure_controlled = mix(0.0, abs(led_exposure) , 1-scene_lum) * controller;
-    } else {
-        led_exposure_controlled = led_exposure * controller;
+        led_exposure = mix(0.0, abs(led_exposure) , 1-scene_lum);
     }
 
     //Bw halo shape
-    float halo_bw   = led_halo(image_coords, image_aspect, led_pos, halo_size, led_aspect, led_shape) * _LED_HALO_POWER *  (led_exposure_controlled/10.0+1);
-    //The latter mul by controller is useful only if controller can assume values inside [0..1], but usually it is just binary, and since led_exposure_controlled is pre-multiplied
-    //by controller, the latter can be stripped.
+    float halo_bw   = led_halo(image_coords, image_aspect, led_pos, halo_size, led_aspect, led_shape) * _LED_HALO_POWER *  (led_exposure/10.0+1);
+
 
     // blend led halo with the underlying image less halo on bright background.
     // This works well when coupled with the nightify and even ambientlight function applied,
@@ -1348,11 +1344,10 @@ vec3 apply_power_led( vec4 bgimage, vec3 bgimage_nonight, vec2 image_coords, flo
 
 
     //overexpose led light?
-    //led_exposure_controlled=clamp(pow(led_exposure_controlled, 3.0),0,1);
-    bgimage_nonight = mix(bgimage_nonight.rgb, vec3(1.0), led_exposure_controlled);
+    bgimage_nonight = mix(bgimage_nonight.rgb, vec3(1.0), led_exposure);
 
 
-    bgimage.rgb = mix(bgimage.rgb, vec3(1.0), led_exposure_controlled*(1-bgimage.a));
+    bgimage.rgb = mix(bgimage.rgb, vec3(1.0), led_exposure*(1-bgimage.a));
 
 
     float m = (1.0 - bgimage.a) *                                // where image is transparent
