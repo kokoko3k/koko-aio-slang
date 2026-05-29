@@ -1296,7 +1296,7 @@ float led_halo(vec2 co, float image_aspect, vec2 center, float smoothshade, floa
     return hv * hv;
 }
 
-vec3 apply_power_led( vec4 bgimage, vec3 bgimage_nonight, vec2 image_coords, float image_aspect, vec2 led_pos, float led_hue, float halo_size, float led_aspect, float led_shape, float controller, float led_exposure ) {
+vec3 apply_power_led( vec4 bgimage, vec3 bgimage_nonight, vec2 image_coords, float image_aspect, vec2 led_pos, float led_hue, float halo_size, float led_aspect, float led_shape, float controller, float led_exposure, bool source_led_off ) {
 
     halo_size*=0.1;
 
@@ -1304,18 +1304,24 @@ vec3 apply_power_led( vec4 bgimage, vec3 bgimage_nonight, vec2 image_coords, flo
     vec2 extent = vec2( halo_size / image_aspect, halo_size * led_aspect );
     vec4 led_area = vec4( led_pos - extent, led_pos + extent );
     
-
     if (is_first_outside_rect(image_coords, led_area)) return bgimage.rgb;
 
-    //controller = float(mod(params.FrameCount,100)>50);
-    if (controller < 0.5) {
-        // turn off led area if controller is low
-        vec3 led_off = mix(bgimage.rgb, vec3(0.0), 0.25);
-        bgimage.rgb = mix(led_off,           // darken on controller: _low_
-                           bgimage.rgb,       //then mix it with original image...
-                           bgimage.a        //...depending on the alpha value
-                         );
-        return bgimage.rgb;
+    if (source_led_off) {
+        if (controller < 0.5) {
+            //no need to do anything.
+            return bgimage.rgb;
+        } else {
+            //put led on:
+
+             vec3 led_on = pow(bgimage_nonight, vec3(1.0));
+             led_on = saturation_set_gain(led_on, 15.0);
+             //led_on = clamp(led_on, vec3(0.0), vec3(1.0));
+
+            bgimage.rgb = mix(led_on,           //  on controller: _low_
+                            bgimage.rgb,       //then mix it with original image...
+                            bgimage.a   //...depending on the alpha value
+                            );
+        }
     }
 
     #define _LED_HALO_POWER 0.5          //how much the halo around the led is visible
@@ -1347,9 +1353,7 @@ vec3 apply_power_led( vec4 bgimage, vec3 bgimage_nonight, vec2 image_coords, flo
     bgimage.rgb = mix(bgimage.rgb, vec3(1.0), led_exposure*(1-bgimage.a));
 
 
-    float m = (1.0 - bgimage.a) *                                // where image is transparent
-                halo_bw *                                        // ...and halo is high
-                controller;                                      // ...and led is powered on:
+    float m = (1.0 - bgimage.a) * halo_bw; // where image is transparent and halo is high
     bgimage.rgb = mix(bgimage.rgb, bgimage_nonight.rgb, m);      // apply no night light
 
     return bgimage.rgb;
@@ -1618,25 +1622,31 @@ void main() {
                 if (global.LED1_SIZE != 0.0)
                     pixel_out.rgb = apply_power_led( vec4(pixel_out.rgb, pixel_fg_image_alpha),  pixel_fg_image_no_night, image_coords, image_aspect,
                                                      vec2(global.LED1_X, global.LED1_Y), global.LED1_HUE, global.LED1_SIZE, global.LED1_ASPECT,
-                                                     global.LED1_SHAPE, 1.0, global.LED1_EXPOSURE );
+                                                     global.LED1_SHAPE, 1.0, global.LED1_EXPOSURE, false );
             #endif
 
             #ifdef USE_LED2
                 if (global.LED2_SIZE != 0.0)
                 pixel_out.rgb = apply_power_led( vec4(pixel_out.rgb, pixel_fg_image_alpha),  pixel_fg_image_no_night, image_coords, image_aspect,
                                                  vec2(global.LED2_X, global.LED2_Y), global.LED2_HUE, global.LED2_SIZE, global.LED2_ASPECT,
-                                                 global.LED2_SHAPE, 1.0, global.LED2_EXPOSURE );
+                                                 global.LED2_SHAPE, 1.0, global.LED2_EXPOSURE, false );
             #endif
 
             #ifdef USE_LED3
                 if (global.LED3_SIZE != 0.0) {
-                    float led_controller = 1.0;
+                    float led_controller = 1.0; // Init var since denise can "power on" leds on drive access
+                    bool source_led_is_off = false;    // and in that case the led on the source image is off.
                     #ifdef _USE_DENISE_EMU
                         led_controller = global.LedDriveState; //under Denise led3 blinks on drive access.
+                        source_led_is_off = true;
                     #endif
+                    // test denise
+                    // led_controller = float(mod(params.FrameCount,100)>50);
+                    // source_led_is_off = true;
+                    //
                     pixel_out.rgb = apply_power_led( vec4(pixel_out.rgb, pixel_fg_image_alpha),  pixel_fg_image_no_night, image_coords, image_aspect,
                                                      vec2(global.LED3_X, global.LED3_Y), global.LED3_HUE, global.LED3_SIZE, global.LED3_ASPECT,
-                                                     global.LED3_SHAPE, led_controller, global.LED3_EXPOSURE );
+                                                     global.LED3_SHAPE, led_controller, global.LED3_EXPOSURE, source_led_is_off );
                 }
             #endif
         }
