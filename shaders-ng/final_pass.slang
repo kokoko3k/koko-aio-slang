@@ -1640,10 +1640,13 @@ void main() {
                         led_controller = global.LedDriveState; //under Denise led3 blinks on drive access.
                         source_led_is_off = true;
                     #endif
-                    // test denise
-                    // led_controller = float(mod(params.FrameCount,100)>50);
-                    // source_led_is_off = true;
-                    //
+                    #ifdef _DEBUG_DENISE_EMU
+                        float t = 10000.0; //timespan
+                        float f = 5.0; //frequency
+                        led_controller = random_fast(vec2(   float(floor(mod(params.FrameCount,t)/t*(t/f))/t)     ));
+                        //float(mod(params.FrameCount,100)>75);
+                        source_led_is_off = true;
+                    #endif
                     pixel_out.rgb = apply_power_led( vec4(pixel_out.rgb, pixel_fg_image_alpha),  pixel_fg_image_no_night, image_coords, image_aspect,
                                                      vec2(global.LED3_X, global.LED3_Y), global.LED3_HUE, global.LED3_SIZE, global.LED3_ASPECT,
                                                      global.LED3_SHAPE, led_controller, global.LED3_EXPOSURE, source_led_is_off );
