@@ -63,7 +63,7 @@ void main() {
     if (need_tate(is_rotated()) == 1.0) { //turn to vertical scanlines? Apply IN_GLOW_WARPSHARP_Y
         vWarpedglow_scale_tated = abs(IN_GLOW_WARPSHARP_Y);
         // adapt warpedglow height depending on the input Y-resoluition
-        vWarpedglow_scale_tated *= global.upscale_passSize.y/640.0;
+        vWarpedglow_scale_tated *= global.upscale_passSize.y/480.0;
     } else {
         // adapt warpedglow wideness depending on the input X-resoluition
         vWarpedglow_scale_tated *= global.upscale_passSize.x/640.0;

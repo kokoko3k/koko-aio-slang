@@ -82,7 +82,7 @@ void main() {
       //fake integer scanlines and interlacing (leave it on on real interlacing)
       warpedglow_scale *= warpedglow_x_allowed(IN_GLOW_WARPSHARP_X);
       // adapt warpedglow height depending on the input X-resoluition
-      warpedglow_scale *= global.upscale_passSize.x/480.0;
+      warpedglow_scale *= global.upscale_passSize.x/640.0;
    } else {
       // adapt warpedglow height depending on the input Y-resoluition
       warpedglow_scale *= global.upscale_passSize.y/480.0;
