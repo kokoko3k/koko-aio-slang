@@ -937,20 +937,7 @@ Changes are applied after a shader reload.*<br>
     Enable it only if using subframes, as it has a performance cost itself.
     To use it, in file config-user-optional.txt, write:<br>
     ```#define SUBFRAMES_OPTIMIZATIONS```<br><br>
-    
-**Antiburn protection**<br>
-    By enabling this options, shader will slowly shake the content over Y/X axis to
-    prevent image retention on affected screens like OLEDs.<br>
-    To use it, in file config-user-optional.txt, write one or both:<br>
-    ```#define ANTIBURN_Y 1.0```<br>
-    ```#define ANTIBURN_X 1.0```<br><br>
-    (1.0 is the effect speed).<br>
-    By enabling the following, not just the content, but the whole screen will shake:
-    ```#define ANTIBURN_COMPLETE```<br>
-    The following modulates the shake size:
-    ```#define ANTIBURN_AMPLITUDE 1.0```<br>
-    Antiburn disables LCD antighosting.
-    
+        
 **Core fps estimation**<br>
     Temporal based features need to know the source fps to have a fixed duration<br>
     across multiple input refresh rates (25,30,50,60...).<br>
