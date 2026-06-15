@@ -308,10 +308,23 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float DO_WTFL;
 	float WTFL_SHARPNESS_X;
 	float WTFL_SHARPNESS_Y;
-
+	
+	float LCD_ANTIGHOSTING;
+	float LCD_ANTIGHOSTING_CEIL;
+	float LCD_ANTIGHOSTING_FLIP_MASK;
+	
 	uint TotalSubFrames;
 	uint CurrentSubFrame;
 	
+	float ADPT_STROBE_STR;
+	float ADPT_STROBE_GAIN_ADJ;
+	float ADPT_STROBE_GAMMA_ADJ;
+	float ADPT_LCD_RETENTION_FIX;
+	float ADPT_STROBE_GAIN_ADJ_NODARK;
+	float ADPT_STROBE_CEIL;
+	float ADPT_STROBE_SELECTIVE;
+    
+    
 	float UNIFORMITY;
 	float V_SHAPE;
 	
@@ -320,52 +333,32 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 	float CVBS_UNSHARP_COMPENSATION;
 
-	//LEDS PLUGIN:
-		float LED1_SIZE;
-		float LED1_SHAPE;
-		float LED1_ASPECT;
-		float LED1_EXPOSURE;
-		float LED1_HUE;
-		float LED1_X;
-		float LED1_Y;
-		float LED1_IS_DRIVE;
-		float LedDriveState; //for denise
 
-		float LED2_SIZE;
-		float LED2_SHAPE;
-		float LED2_ASPECT;
-		float LED2_EXPOSURE;
-		float LED2_HUE;
-		float LED2_X;
-		float LED2_Y;
+	float LED1_SIZE;
+	float LED1_SHAPE;
+	float LED1_ASPECT;
+	float LED1_EXPOSURE;
+	float LED1_HUE;
+	float LED1_X;
+	float LED1_Y;
+	float LED1_IS_DRIVE;
+	float LedDriveState; //for denise
 
-		float LED3_SIZE;
-		float LED3_SHAPE;
-		float LED3_ASPECT;
-		float LED3_EXPOSURE;
-		float LED3_HUE;
-		float LED3_X;
-		float LED3_Y;
+	float LED2_SIZE;
+	float LED2_SHAPE;
+	float LED2_ASPECT;
+	float LED2_EXPOSURE;
+	float LED2_HUE;
+	float LED2_X;
+	float LED2_Y;
 
-	//LCD Antighosting plugin
-		float LCD_ANTIGHOSTING;
-		float LCD_ANTIGHOSTING_CEIL;
-		float LCD_ANTIGHOSTING_FLIP_MASK;
-
-	//Adaptive strobe plugin
-		float ADPT_STROBE_STR;
-		float ADPT_STROBE_GAIN_ADJ;
-		float ADPT_STROBE_GAMMA_ADJ;
-		float ADPT_LCD_RETENTION_FIX;
-		float ADPT_STROBE_GAIN_ADJ_NODARK;
-		float ADPT_STROBE_CEIL;
-		float ADPT_STROBE_SELECTIVE;
-
-	//ANTIBURN PLUGIN:
-		float ANTIBURN_COMPLETE;
-		float ANTIBURN_AMPLITUDE;
-		float ANTIBURN_X;
-		float ANTIBURN_Y;
+	float LED3_SIZE;
+	float LED3_SHAPE;
+	float LED3_ASPECT;
+	float LED3_EXPOSURE;
+	float LED3_HUE;
+	float LED3_X;
+	float LED3_Y;
 
 } global;
 
@@ -770,7 +763,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 //Post parameters from plugins
 #pragma include_optional "../config/plugins/enabled/lcd_antighosting.txt"
 #pragma include_optional "../config/plugins/enabled/adaptive_strobe.txt"
-#pragma include_optional "../config/plugins/enabled/oled_antiburn.txt"
 
 #pragma parameter SERVICE1 "Don't use me, for debug purposes only" 	0.0 -5.0 5.0 0.01
 

@@ -40,12 +40,25 @@
 //
 // SPECIFIC HOST SYSTEM PARAMETERS:
 // There you can configure parameters that are specific to your machine
-// Like activatinc D3D workarounds
+// Like the need for an antiburn strategy, or acivatinc D3D workarounds
+// or mitigating ghosting due to your monitor and so on.
+//
 ////////////////////////////////////////////////////////////////////////////
 
 // D3D/XBOX users should enable Direct3D workarounds to avoid glitches or crashes
 // by removing the leading "//" from the following line:
 // #define D3D_WORKAROUND
+
+
+// Enable Antiburn protection (OLEDs)
+// It works by slowly shaking the image in order to prevent image retention
+// The value of ANTIBURN_X/Y defines the speed of the effect, leave it to 1.0 if unsure.
+// If ANTIBURN_COMPLETE is enabled, not only the content, but the whole screen will shake.
+// ANTIBURN_AMPLITUDE modulates the shake size.
+// #define ANTIBURN_Y 1.0
+// #define ANTIBURN_X 1.0
+// #define ANTIBURN_COMPLETE
+// #define ANTIBURN_AMPLITUDE 1.0
 
 // By enabling this options, shader will take steps to speed-up subframes processing.
 // It could  display the previous rendered frame if possible or just part of it.

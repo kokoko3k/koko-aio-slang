@@ -1949,43 +1949,47 @@ bool fake_scanlines_needed(bool very_lowres_y, bool bIs_Interlaced) {
 }
 
 float antiburn_flip_even(float toflip){
-	#ifndef DO_ANTIBURN_PLUGIN
-		return toflip;
-	#endif
-
-	if (global.ANTIBURN_Y > 0.0) {
-		bool flip = sin(params.FrameCount*pi*global.ANTIBURN_Y/2000.0) >= 0.0;
+	#ifdef ANTIBURN_Y
+		bool flip = sin(params.FrameCount*pi*ANTIBURN_Y/2000.0) >= 0.0;
 		if (flip) return 1-toflip;
-	}
+	#endif
 	return toflip;
 }
 
 vec2 antiburn(vec2 coords) {
-	#ifndef DO_ANTIBURN_PLUGIN
-		return coords;
+	float amp = 1.0;
+	#ifdef ANTIBURN_AMPLITUDE
+		amp = ANTIBURN_AMPLITUDE;
 	#endif
 
-	float amp = global.ANTIBURN_AMPLITUDE;
-	coords.y += sin(params.FrameCount*pi*global.ANTIBURN_Y/1000.0)*params.OriginalSize.w*0.5*amp;
-	coords.x += cos(params.FrameCount*pi*global.ANTIBURN_X/100.0)*global.FinalViewportSize.z*0.5*amp;
+	#ifdef ANTIBURN_Y
+		coords.y += sin(params.FrameCount*pi*ANTIBURN_Y/1000.0)*params.OriginalSize.w*0.5*amp;
+	#endif
+
+	#ifdef ANTIBURN_X
+		coords.x += cos(params.FrameCount*pi*ANTIBURN_X/100.0)*global.FinalViewportSize.z*0.5*amp;
+	#endif
 
 	return coords;
 }
 
 vec2 antiburn_screen(vec2 coords) {
-	#ifndef DO_ANTIBURN_PLUGIN
-		return coords;
+	float amp = 1.0;
+	#ifdef ANTIBURN_AMPLITUDE
+		amp = ANTIBURN_AMPLITUDE;
 	#endif
 
-	float amp = global.ANTIBURN_AMPLITUDE;
+	#ifdef ANTIBURN_Y
+		float offy = sin(params.FrameCount*pi*ANTIBURN_Y/10000.0)*global.FinalViewportSize.w*amp;
+		offy = floor(offy*global.FinalViewportSize.y)/global.FinalViewportSize.y;
+		coords.y += offy;
+	#endif
 
-	float offy = sin(params.FrameCount*pi*global.ANTIBURN_Y/10000.0)*global.FinalViewportSize.w*amp;
-	offy = floor(offy*global.FinalViewportSize.y)/global.FinalViewportSize.y;
-	coords.y += offy;
-
-	float offx = cos(params.FrameCount*pi*global.ANTIBURN_X/10000.0)*global.FinalViewportSize.z*amp;
-	offx = floor(offx*global.FinalViewportSize.x)/global.FinalViewportSize.x;
-	coords.x += offx;
+	#ifdef ANTIBURN_X
+		float offx = cos(params.FrameCount*pi*ANTIBURN_X/10000.0)*global.FinalViewportSize.z*amp;
+		offx = floor(offx*global.FinalViewportSize.x)/global.FinalViewportSize.x;
+		coords.x += offx;
+	#endif
 
 	return coords;
 }

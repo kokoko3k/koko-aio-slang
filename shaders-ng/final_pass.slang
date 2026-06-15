@@ -187,9 +187,10 @@ void main() {
 
     vIn_aspect = get_in_aspect();
 
-    vec2 antiburn_TexCoord = TexCoord;
-    #ifdef DO_ANTIBURN_PLUGIN
-        if (global.ANTIBURN_COMPLETE == 1.0) antiburn_TexCoord = antiburn_screen(TexCoord);
+    #ifdef ANTIBURN_COMPLETE
+        vec2 antiburn_TexCoord = antiburn_screen(TexCoord);
+    #else
+        vec2 antiburn_TexCoord = TexCoord;
     #endif
 
     //Calculate vTexcoord as fractional or integer scaled?
@@ -1063,8 +1064,9 @@ float gaussian_coefficient(float x, float sigma) {
 
 
 vec3 fn_pixel_content(vec2 coords) { 
-    #ifdef DO_ANTIBURN_PLUGIN
-        if (global.ANTIBURN_COMPLETE == 0.0) coords = antiburn(coords);
+    
+    #ifndef ANTIBURN_COMPLETE
+        coords = antiburn(coords);
     #endif
         
     vec2 warpedglow = vec2(0.0);
@@ -1263,7 +1265,11 @@ vec2 quasirandom(vec2 n) {
 }
 
 vec3 antighost(vec3 c) {
-    #ifdef DO_ANTIBURN_PLUGIN
+    #ifdef ANTIBURN_X
+        return c;
+    #endif
+
+    #ifdef ANTIBURN_X
         return c;
     #endif
 
