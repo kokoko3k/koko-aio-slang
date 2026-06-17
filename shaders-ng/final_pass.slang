@@ -134,7 +134,7 @@ vec2 get_bg_image_coords(vec2 in_vOutputCoord) {
         } 
         
         bg_img_coords += vec2( BG_IMAGE_OFFX,BG_IMAGE_OFFY);
-        bg_img_coords=zoom(bg_img_coords, get_BG_IMAGE_ZOOM());
+        bg_img_coords=zoom(bg_img_coords, BG_IMAGE_ZOOM);
         return bg_img_coords;
     }
 
@@ -174,7 +174,7 @@ vec2 get_bg_image_coords(vec2 in_vOutputCoord) {
         bg_img_coords.xy = vec2(1-bg_img_coords.y, 1- bg_img_coords.x);
 
     bg_img_coords += vec2( BG_IMAGE_OFFX,BG_IMAGE_OFFY);
-    bg_img_coords=zoom(bg_img_coords, get_BG_IMAGE_ZOOM());
+    bg_img_coords=zoom(bg_img_coords, BG_IMAGE_ZOOM);
     return bg_img_coords;
 }
 
@@ -207,7 +207,7 @@ void main() {
     if (DO_GLOBAL_SHZO == 1.0) {
         if (bNeed_NO_integer_scale) {
             //zoom + shift
-            vTexCoord = zoom(vTexCoord + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), get_GLOBAL_ZOOM() );
+            vTexCoord = zoom(vTexCoord + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM );
         } else {
             //Just shift with integer sFcaling
             vTexCoord += vec2(-GLOBAL_OFFX, -GLOBAL_OFFY);

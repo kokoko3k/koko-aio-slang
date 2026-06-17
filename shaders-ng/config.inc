@@ -154,7 +154,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float GLOBAL_ZOOM;
 	float GLOBAL_OFFX;
 	float GLOBAL_OFFY;
-	float VIEWPORT_ZOOM;
 
 	float DO_RF_NOISE;
 	float RF_NOISE_STRENGTH;
@@ -649,10 +648,9 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 
 //Global Zoom/Offset
 #pragma parameter DO_GLOBAL_SHZO	 "★ Global shift/zoom enable? ==>"	0.0   0.0  1.0 	  1.0
-#pragma parameter GLOBAL_OFFX	 "        Bezel + Content X axis shift "			0.0  -1.0  1.0    0.0005
-#pragma parameter GLOBAL_OFFY	 "        Bezel + Content Y axis shift "			0.0  -1.0  1.0    0.0005
-#pragma parameter GLOBAL_ZOOM	 "        Bezel + Content Zoom (ignored with integer scaling) "	1.2   0.0  3.0  0.0005
-#pragma parameter VIEWPORT_ZOOM	 "        Full viewport Zoom (ignored with integer scaling) "	1.0  0.0  10.0    0.01
+#pragma parameter GLOBAL_OFFX	 "        X axis shift "			0.0  -1.0  1.0    0.0005
+#pragma parameter GLOBAL_OFFY	 "        Y axis shift "			0.0  -1.0  1.0    0.0005
+#pragma parameter GLOBAL_ZOOM	 "        Zoom (ignored with integer scaling) "	1.2   0.0  3.0    0.0005
 #pragma parameter LABEL0029 " " 0 0 0 1
 
 

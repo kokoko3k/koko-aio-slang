@@ -368,10 +368,9 @@
 
 
 // #define DO_GLOBAL_SHZO  0.0  // ★ Global shift/zoom enable?
-// #define GLOBAL_OFFX  0.0     //         Bezel + Content X axis shift 
-// #define GLOBAL_OFFY  0.0     //         Bezel + Content Y axis shift 
-// #define GLOBAL_ZOOM  2.0     //         Bezel + Content Zoom
-// #define VIEWPORT_ZOOM 1.0    //         Full Viewport Zoom
+// #define GLOBAL_OFFX  0.0     //         X axis shift 
+// #define GLOBAL_OFFY  0.0     //         Y axis shift 
+// #define GLOBAL_ZOOM  2.0     //         Zoom
 
 // #define DO_BG_IMAGE  0.0           // ★ Back/Foreground image enable?
 // #define BG_IMAGE_OVER  0.0         //       Image over game (alpha channel driven)?
