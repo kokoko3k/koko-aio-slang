@@ -97,6 +97,22 @@ float min3(vec3 v){
 	return min(min(v.x,v.y),v.z);
 }
 
+float get_VIEWPORT_ZOOM() {
+	float k = 1.0;
+	/*float v_amp=1/100.0;
+	float v_speed=1/500.0;
+	k = (sin(params.FrameCount*pi*v_speed)*v_amp+(1-v_amp));
+	*/
+	return VIEWPORT_ZOOM * k;
+}
+
+float get_BG_IMAGE_ZOOM() {
+	return BG_IMAGE_ZOOM * get_VIEWPORT_ZOOM();
+}
+
+float get_GLOBAL_ZOOM() {
+	return GLOBAL_ZOOM * get_VIEWPORT_ZOOM();
+}
 
 vec3 mask_enhance(vec3 mask, vec3 ref, float factor) {
 	return mix( factor * (mask - 0.5) + 0.5, mask, abs(ref - vec3(0.5)*2) );
@@ -923,7 +939,7 @@ vec2 get_scaled_coords_aspect_fgbg(vec2 pTexCoord, vec4 destsize, float aspect_i
 		off_adj.x = -BG_IMAGE_OFFX *
 		(1 - destsize.x/destsize.y) /
 		aspect_image /
-		BG_IMAGE_ZOOM;
+		get_BG_IMAGE_ZOOM();
 	} else {
 		// fit height
 		scale.x = aspect_content * (1.0/aspect_image);
@@ -932,11 +948,11 @@ vec2 get_scaled_coords_aspect_fgbg(vec2 pTexCoord, vec4 destsize, float aspect_i
 		off_adj.x = -BG_IMAGE_OFFX *
 		(1-aspect_content) /
 		aspect_image /
-		BG_IMAGE_ZOOM;
+		get_BG_IMAGE_ZOOM();
 
 		off_adj.y = -BG_IMAGE_OFFY *
 		(1 - (destsize.y*aspect_content)/destsize.x) /
-		BG_IMAGE_ZOOM;
+		get_BG_IMAGE_ZOOM();
 	}
 
 
@@ -1888,7 +1904,7 @@ vec2 get_zooms_modifier(float do_tate, bool bNeed_NO_integer_scale, bool isrotat
 	}
 
 	//Other zoom modifiers allowed only without integer scaling.
-	float global_zoom = GLOBAL_ZOOM;
+	float global_zoom = get_GLOBAL_ZOOM();
 	if (!bNeed_NO_integer_scale) global_zoom = 1.0; //no global zoom when integer scaling
 
 	if (DO_GLOBAL_SHZO == 1.0) {

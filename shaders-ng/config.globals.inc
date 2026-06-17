@@ -601,6 +601,10 @@
     #define GLOBAL_ZOOM	global.GLOBAL_ZOOM
 #endif
 
+#ifndef VIEWPORT_ZOOM
+    #define VIEWPORT_ZOOM global.VIEWPORT_ZOOM
+#endif
+
 #ifndef GLOBAL_OFFX
     #define GLOBAL_OFFX	global.GLOBAL_OFFX
 #endif

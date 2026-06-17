@@ -90,7 +90,7 @@ void main() {
 
     if (DO_GLOBAL_SHZO >0.5) {
         if (bNeed_NO_integer_scale)
-            pre_pass_coords = zoom(pre_pass_coords + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), GLOBAL_ZOOM );
+            pre_pass_coords = zoom(pre_pass_coords + vec2(-GLOBAL_OFFX, -GLOBAL_OFFY), get_GLOBAL_ZOOM() );
         else
             pre_pass_coords += vec2(-GLOBAL_OFFX, -GLOBAL_OFFY);
     }

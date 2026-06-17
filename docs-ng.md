@@ -622,7 +622,10 @@ However nice effects may be obtained (eg: with vector games). <br>
 
     
 **Global shift/zoom:**<br>
-    Zoom and shift everything on screen, but background pictures.<br>
+    Bezel + Content: 
+        Zoom and shift everything on screen, but background/foreground images.<br>
+    Full Viewport Zoom:
+        Zoom in/out everything on the screen.
 
     
 **Mid image (backdrop, reflections, overlay...):**<br>
