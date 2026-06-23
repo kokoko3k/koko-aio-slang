@@ -1276,8 +1276,12 @@ vec3 antighost(vec3 c) {
 	#ifndef D3D_WORKAROUND
 		if (!bdelta_render_enabled()) {
 				if (frame_is_even() && (vInterlace_offset == 0.0)) {
-					vec3 feedback = texture(final_passFeedback, vOutputCoord).rgb;
-					vec3 diff=(feedback - c)*LCD_ANTIGHOSTING;
+					vec3 f = texture(final_passFeedback, vOutputCoord).rgb;
+                    //since feedback is not float framebuffer, we need to clamp current color (only)
+                    c=clamp(c,vec3(0),vec3(1));
+                    //f=clamp(f,vec3(0),vec3(1));
+                    c = clamp(c, vec3(0), vec3(1));
+					vec3 diff=(f - c)*LCD_ANTIGHOSTING;
 					//diff = sign(diff) * min( abs(diff), vec3(LCD_ANTIGHOSTING_CEIL));
                     diff = clamp(diff, -LCD_ANTIGHOSTING_CEIL, LCD_ANTIGHOSTING_CEIL); //probably faster.
 					c = mix(c, c-diff, 0.5);
