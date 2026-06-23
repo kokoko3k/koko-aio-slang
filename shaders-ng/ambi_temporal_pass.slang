@@ -270,6 +270,11 @@ vec4 pixel_sanitize(vec4 color_in) {
 
 
 bool scene_changed() {
+    //Prevent glitches when viewport size changes (instant update)
+    if (global.final_passFeedbackSize.xy != global.FinalViewportSize.xy)
+        return true;
+
+
     vec3 present_color = textureLod(colortools_and_ntsc_pass, vec2(0.5), 20.0).rgb;
     vec3 past_color    = textureLod(colortools_and_ntsc_passFeedback, vec2(0.5), 20.0).rgb;
     float past_lum = rgb_to_gray(past_color);
