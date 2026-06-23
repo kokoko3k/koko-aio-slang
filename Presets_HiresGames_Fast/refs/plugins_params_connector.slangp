@@ -1,0 +1,12 @@
+// Load plugins parameters.
+// There are 2 references for each plugin, so that Presets_HiresGames_Fast will
+// load them too.
+
+// Lucky thing Retroarch does not fail when references are not present.
+
+#reference "../config/plugins/enabled/adaptive_strobe_params.slangp"
+#reference "../../config/plugins/enabled/adaptive_strobe_params.slangp"
+
+#reference "../config/plugins/enabled/lcd_antighosting.slangp"
+#reference "../../config/plugins/enabled/lcd_antighosting.slangp"
+

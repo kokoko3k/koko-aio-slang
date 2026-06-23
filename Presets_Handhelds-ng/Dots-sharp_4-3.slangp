@@ -1,4 +1,5 @@
 #reference "../koko-aio-ng.slangp"
+#reference "../refs/plugins_params_connector.slangp"
 
 DO_BEZEL = "0.0"
 DO_CURVATURE = "0.0"

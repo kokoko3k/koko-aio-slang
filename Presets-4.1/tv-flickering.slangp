@@ -1,6 +1,7 @@
 #reference "../koko-aio-ng.slangp"
 #reference "../refs/bezel-dark.slangp"
 #reference "../refs/deconvergence-std.slangp"
+#reference "../refs/plugins_params_connector.slangp"
 
 DO_CCORRECTION = "1.000000"
 	LUMINANCE = "0.100000"

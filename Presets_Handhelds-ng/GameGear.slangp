@@ -1,4 +1,5 @@
 #reference "../koko-aio-ng.slangp"
+#reference "../refs/plugins_params_connector.slangp"
 
 bg_under = "../textures/overlays/gamegear.jpg"
 bg_over = "../textures/overlays/gamegear.jpg"

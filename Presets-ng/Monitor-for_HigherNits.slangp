@@ -1,5 +1,6 @@
 #reference "../koko-aio-ng.slangp"
 #reference "../refs/bezel-dark.slangp"
+#reference "../refs/plugins_params_connector.slangp"
 
 IN_GLOW_GAMMA = "2.200000"
 GAMMA_OUT = "0.450000"
