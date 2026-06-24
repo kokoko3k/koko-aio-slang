@@ -1729,11 +1729,6 @@ void main() {
                 pixel_out = 1-pixel_out;//;-clip;
         #endif
     
-    vec3 debug = vec3(0,1,0);
-    if (low_fps(FPS_ESTIMATE_PASS)) debug = vec3(1,0,1);
-    pixel_out.rgb *= debug;
-
-
     FragColor.rgb = pixel_out;
 
 }
