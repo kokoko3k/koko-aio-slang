@@ -165,13 +165,13 @@ float get_avglum() {
         }
         bool smoothed_sampling_co_nocc = is_first_inside_rect(vTexCoord, vec4(TSMOOTH_NOCC_SAMPLING_POINT-0.1 , TSMOOTH_NOCC_SAMPLING_POINT+0.1)) ;
         if (smoothed_sampling_co_nocc) {
-            float transition_speed_adaptive_black = 0.1;
-            return mix(texture(avglum_passFeedback,TSMOOTH_NOCC_SAMPLING_POINT).a, get_avg_lum_from_mip_nocc(), transition_speed_adaptive_black);
+            float transition_speed_adaptive_black = 0.9;
+            transition_speed_adaptive_black =  adjust_feedback_mixer_by(transition_speed_adaptive_black, (get_fps(FPS_ESTIMATE_PASS)/60)*global.TotalSubFrames);
+            return mix(get_avg_lum_from_mip_nocc(), texture(avglum_passFeedback,TSMOOTH_NOCC_SAMPLING_POINT).a, transition_speed_adaptive_black);
         }
 
         bool instant_sampling_no_cc = is_first_inside_rect(vTexCoord, vec4(FULL_SCENE_LUM_SAMPLING_POINT-0.1 , FULL_SCENE_LUM_SAMPLING_POINT+0.1)) ;
         if (instant_sampling_no_cc) {
-            float transition_speed_adaptive_black = 0.1;
             return get_avg_lum_from_mip_nocc();
         }
 
