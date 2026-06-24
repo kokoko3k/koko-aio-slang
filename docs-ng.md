@@ -3,7 +3,7 @@
 ---------------------------
 
 **REQUIREMENTS** <br>
-    koko-aio needs at least retroarch 1.16 <br>
+    koko-aio needs at least retroarch 1.18 <br>
     Also it expects the following options set in Retroarch:
     
     Settings -> Core -> Allow Rotation: ON
