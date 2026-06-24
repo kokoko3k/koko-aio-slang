@@ -17,7 +17,7 @@
 
 
 
-//#define DEBUG
+#define DEBUG
    //#define DEBUG_COLOR_CALIB
    //#define DEBUG_TIME_FADE
    //#define DEBUG_SOLID_COLOR
@@ -647,9 +647,9 @@ vec3 persistence(vec3 feedback, vec3 pixel_now, vec3 start_decay, vec3 late_pers
    fade_speed=clamp(fade_speed, min_speed, 1.0);
    
 
+   //We need to scale the fade speed by the input fps and the total subframes. 60fps is the reference speed.
+   fade_speed = adjust_feedback_mixer_by(fade_speed, (60/fps)*global.TotalSubFrames);
    //Compute the persistent light by mixing pixel current and previous one
-   fps*=global.TotalSubFrames;
-   fade_speed = adjust_feedback_mixer_by_subframes(fade_speed);
    vec3 pixel_persistent = mix(feedback, pixel_now, fade_speed);
    
    //blend only if we are fading out
@@ -760,7 +760,8 @@ void main() {
       }
       
       vec3 diff = abs(pixel_out - feedback);
-      m_blur_adapted = adjust_feedback_mixer_by_subframes(m_blur_adapted);
+      //scale the fade speed by subframes (we assume every core with a dot matrix outputs 60fps)
+      m_blur_adapted = adjust_feedback_mixer_by(m_blur_adapted, global.TotalSubFrames);
       m_blur_adapted *= step(vec3(1/128.0), m_blur_adapted);
       pixel_out = mix(pixel_out, feedback, m_blur_adapted  );
    }
