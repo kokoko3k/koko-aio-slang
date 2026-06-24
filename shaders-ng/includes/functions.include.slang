@@ -61,10 +61,36 @@ bool low_fps_from_uniform() {
 	return (global.OriginalFPS < 40);
 }
 
+
 bool low_fps(sampler2D estimatesampler) {
-	/* returns if core fps is inside [25..30] interval */
-	float fps = get_fps(estimatesampler);
-	return (fps < 40);
+	#ifndef _HAS_FRAMETIME_UNIFORMS
+		// without FRAMETIME_UNIFORMS estimation is not possible
+		// and OriginalFps uniform is not available.
+		return false;
+	#endif
+
+	//From now on, we have frametime uniforms.
+
+	// Trust global.OriginalFPS?
+	if (global.OriginalFPS < 35.0)
+		return true; // Always trust cores that reports under 35fps (30,25).
+
+	// Trust OriginalFPS? user selects
+	#ifndef ORIGINAL_FPS_UNTRUSTED
+		return global.OriginalFPS < 40.0; //User trusts OriginalFPS
+	#endif
+
+	// from now on OriginalFPS is untrusted.
+	// So we should rely on estimation.
+	#ifdef D3D_WORKAROUND
+		//...but estimation isn't available on flacky D3D
+		// ...so fallback to OriginalFPS despite user preference
+		return global.OriginalFPS < 40.0;
+		// Or worst case: Flacky D3D and no FRAMETIME_UNIFORMS, pretend high fps.
+	#endif
+
+	//glcore,vulkan, finally estimate fps:
+	return texture(estimatesampler, FPS_ESTIMATION_SAMPLING_POINT).a < 40.0;
 }
 
 vec2 _unpack_21(float f){
@@ -1664,13 +1690,13 @@ vec3 strobe( vec3 c) {
 }
 
 
-vec3 adaptive_strobe(vec3 c, float osc, sampler2D feedback_smp, vec2 feedback_smp_co) {
+vec3 adaptive_strobe(vec3 c, float osc, sampler2D feedback_smp, vec2 feedback_smp_co, sampler2D EstimateFPSSampler) {
 
 	#ifndef DO_ADPT_STROBE_PLUGIN
         return c;
 	#endif
 
-	if (low_fps_from_uniform() && (global.TotalSubFrames == 1.0))
+	if (low_fps(EstimateFPSSampler) && (global.TotalSubFrames == 1.0))
 		return c;
 
     float str_adjusted = ADPT_STROBE_STR;

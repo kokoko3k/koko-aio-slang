@@ -41,10 +41,10 @@
 //#define UNROLL_N
 
 #ifndef D3D_WORKAROUND
-   #define FPS_ESTIMATE_PASS halo_pre_gamma_passFeedback
+   #define FPS_ESTIMATE_PASS avglum_passFeedback
 #else
    //this is just a STUB to make the shader compile, but fps are never estimated with D3D_WORKAROUND
-   #define FPS_ESTIMATE_PASS Original
+   #define FPS_ESTIMATE_PASS colortools_and_ntsc_passFeedback
 #endif
 
 
@@ -226,7 +226,7 @@ layout(set = 0, binding = 3) uniform sampler2D colortools_and_ntsc_passFeedback;
 #ifndef D3D_WORKAROUND
 layout(set = 0, binding = 4) uniform sampler2D avglum_passFeedback;
 #endif
-layout(set = 0, binding = 5) uniform sampler2D FPS_ESTIMATE_PASS;
+
 
 
 vec3 colorwheel(vec2 uv){

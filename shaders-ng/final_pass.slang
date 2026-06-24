@@ -7,6 +7,14 @@
 
 #define DEBUG_TEXTURE in_glow_pass
 
+#ifndef D3D_WORKAROUND
+   #define FPS_ESTIMATE_PASS avglum_pass
+#else
+   //this is just a STUB to make the shader compile, but fps are never estimated with D3D_WORKAROUND
+   #define FPS_ESTIMATE_PASS monitor_body_curved
+#endif
+
+
 // #define DEBUG_PRINT_VALUE
 // #define PRINTED_VALUE global.FinalViewportSize.x
 // #define PRINTED_VALUE texture(DEBUG_TEXTURE, vec2(0.5)).a
@@ -1475,7 +1483,7 @@ void main() {
         }
         
             #ifdef DO_ADPT_STROBE_PLUGIN
-                pixel_out = adaptive_strobe(pixel_out, vAdaptive_strobe_oscillator, final_passFeedback, vOutputCoord);
+                pixel_out = adaptive_strobe(pixel_out, vAdaptive_strobe_oscillator, final_passFeedback, vOutputCoord, FPS_ESTIMATE_PASS);
             #else
                 #ifdef DO_LCD_ANTIGHOSTING_PLUGIN
                     pixel_out = antighost(pixel_out);
@@ -1721,6 +1729,11 @@ void main() {
                 pixel_out = 1-pixel_out;//;-clip;
         #endif
     
+    vec3 debug = vec3(0,1,0);
+    if (low_fps(FPS_ESTIMATE_PASS)) debug = vec3(1,0,1);
+    pixel_out.rgb *= debug;
+
+
     FragColor.rgb = pixel_out;
 
 }
