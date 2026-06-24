@@ -648,7 +648,8 @@ vec3 persistence(vec3 feedback, vec3 pixel_now, vec3 start_decay, vec3 late_pers
    
 
    //Compute the persistent light by mixing pixel current and previous one
-   fade_speed *= 60/fps;
+   fps*=global.TotalSubFrames;
+   fade_speed = adjust_feedback_mixer_by_subframes(fade_speed);
    vec3 pixel_persistent = mix(feedback, pixel_now, fade_speed);
    
    //blend only if we are fading out
