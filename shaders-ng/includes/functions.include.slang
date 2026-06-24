@@ -57,12 +57,14 @@ float get_fps(sampler2D estimatesampler) {
 }
 
 
+bool low_fps_from_uniform() {
+	return (global.OriginalFPS < 40);
+}
 
 bool low_fps(sampler2D estimatesampler) {
 	/* returns if core fps is inside [25..30] interval */
 	float fps = get_fps(estimatesampler);
 	return (fps < 40);
-
 }
 
 vec2 _unpack_21(float f){
@@ -1667,6 +1669,9 @@ vec3 adaptive_strobe(vec3 c, float osc, sampler2D feedback_smp, vec2 feedback_sm
 	#ifndef DO_ADPT_STROBE_PLUGIN
         return c;
 	#endif
+
+	if (low_fps_from_uniform() && (global.TotalSubFrames == 1.0))
+		return c;
 
     float str_adjusted = ADPT_STROBE_STR;
     
