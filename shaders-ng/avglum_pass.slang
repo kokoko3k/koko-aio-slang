@@ -415,9 +415,8 @@ void main() {
         } else {
             #ifndef D3D_WORKAROUND
                 vec2 early_late_cut = vec2(0.04,2.0); // decay rate before/after RESSWITCH_SYNC_SPEED threshold;
-                if (low_fps(FPS_ESTIMATE_PASS)) early_late_cut*= 2.0;
-                early_late_cut*=global.TotalSubFrames;
-
+                float fps = get_fps(FPS_ESTIMATE_PASS);
+                early_late_cut = early_late_cut * (fps/60.0) * global.TotalSubFrames;
                 float t = texture(avglum_passFeedback,vTexCoord).a;
                 if (t >= RESSWITCH_SYNC_SPEED) {
                     pixel_out.a = clamp( t - early_late_cut.x, 0,1);
