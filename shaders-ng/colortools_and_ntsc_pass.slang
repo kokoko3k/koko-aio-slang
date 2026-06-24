@@ -17,7 +17,7 @@
 
 
 
-#define DEBUG
+//#define DEBUG
    //#define DEBUG_COLOR_CALIB
    //#define DEBUG_TIME_FADE
    //#define DEBUG_SOLID_COLOR
@@ -648,7 +648,7 @@ vec3 persistence(vec3 feedback, vec3 pixel_now, vec3 start_decay, vec3 late_pers
    
 
    //We need to scale the fade speed by the input fps and the total subframes. 60fps is the reference speed.
-   fade_speed = adjust_feedback_mixer_by(fade_speed, (60/fps)*global.TotalSubFrames);
+   fade_speed = adjust_feedback_mixer_by(fade_speed, (fps/60)*global.TotalSubFrames);
    //Compute the persistent light by mixing pixel current and previous one
    vec3 pixel_persistent = mix(feedback, pixel_now, fade_speed);
    
