@@ -1718,8 +1718,9 @@ void main() {
             #else
                 float fvalue = vfprintvalue;
             #endif
+            fvalue = get_fps(FPS_ESTIMATE_PASS);
             vec2 vFragCoord = vec2( floor(vOutputCoord.x * params.OutputSize.x),
-                                floor(vOutputCoord.y * params.OutputSize.y));
+                                    floor(vOutputCoord.y * params.OutputSize.y));
             pixel_out += PrintValueVec3( vTexCoord, vFragCoord, fvalue, maxdigits, decimalplaces );
         #endif
 

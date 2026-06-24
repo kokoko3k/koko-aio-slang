@@ -35,6 +35,11 @@ float get_lod(vec2 smp_size, vec2 out_size) {
 	return log2(maxRatio);
 }
 
+
+bool low_fps_from_uniform() {
+	return (global.OriginalFPS < 40);
+}
+
 float get_fps(sampler2D estimatesampler) {
 	//No way to get core fps? return 60.0
 	#ifndef _HAS_FRAMETIME_UNIFORMS
@@ -50,47 +55,22 @@ float get_fps(sampler2D estimatesampler) {
 	#ifndef D3D_WORKAROUND
 		//To estimate we need to poll an alpha from a future
 		//pass feedback, so no D3D support.
-		return texture(estimatesampler, vec2(0.5)).a;
+		return texture(estimatesampler, vec2(FPS_ESTIMATION_SAMPLING_POINT)).a;
 	#else
 		return global.OriginalFPS;
 	#endif
 }
 
-
-bool low_fps_from_uniform() {
-	return (global.OriginalFPS < 40);
-}
-
-
 bool low_fps(sampler2D estimatesampler) {
-	#ifndef _HAS_FRAMETIME_UNIFORMS
-		// without FRAMETIME_UNIFORMS estimation is not possible
-		// and OriginalFps uniform is not available.
-		return false;
-	#endif
+    #ifndef _HAS_FRAMETIME_UNIFORMS
+        return false;
+    #endif
 
-	//From now on, we have frametime uniforms.
+    // Always trust CoreFPS for fps less than 35:
+    if (global.OriginalFPS < 35.0)
+        return true;
 
-	// Trust global.OriginalFPS?
-	if (global.OriginalFPS < 35.0)
-		return true; // Always trust cores that reports under 35fps (30,25).
-
-	// Trust OriginalFPS? user selects
-	#ifndef ORIGINAL_FPS_UNTRUSTED
-		return global.OriginalFPS < 40.0; //User trusts OriginalFPS
-	#endif
-
-	// from now on OriginalFPS is untrusted.
-	// So we should rely on estimation.
-	#ifdef D3D_WORKAROUND
-		//...but estimation isn't available on flacky D3D
-		// ...so fallback to OriginalFPS despite user preference
-		return global.OriginalFPS < 40.0;
-		// Or worst case: Flacky D3D and no FRAMETIME_UNIFORMS, pretend high fps.
-	#endif
-
-	//glcore,vulkan, finally estimate fps:
-	return texture(estimatesampler, FPS_ESTIMATION_SAMPLING_POINT).a < 40.0;
+    return get_fps(estimatesampler) < 40.0;
 }
 
 vec2 _unpack_21(float f){

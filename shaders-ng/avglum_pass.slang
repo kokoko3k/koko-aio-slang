@@ -431,8 +431,7 @@ void main() {
         }
 
     } else if (is_first_inside_rect(vTexCoord, vec4(AUTOCROP_SAMPLING_POINT-0.01, AUTOCROP_SAMPLING_POINT+0.01) ))  {
-        if (vDo_autocrop == 1.0)
-            pixel_out.a = get_autocrop();
+        if (vDo_autocrop == 1.0) { pixel_out.a = get_autocrop(); }
     } else if (is_first_inside_rect(vTexCoord, vec4(FPS_ESTIMATION_SAMPLING_POINT-0.01, FPS_ESTIMATION_SAMPLING_POINT+0.01) ))  {
             pixel_out.a = fps_estimation();
     } else {
