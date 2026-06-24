@@ -759,8 +759,7 @@ void main() {
       }
       
       vec3 diff = abs(pixel_out - feedback);
-      
-      
+      m_blur_adapted = adjust_feedback_mixer_by_subframes(m_blur_adapted);
       m_blur_adapted *= step(vec3(1/128.0), m_blur_adapted);
       pixel_out = mix(pixel_out, feedback, m_blur_adapted  );
    }

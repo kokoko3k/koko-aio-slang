@@ -2131,3 +2131,10 @@ vec4 pixel_overlay_image_stretch(sampler2D tex, vec2 co) {
 	return texture(tex, co);
 }
 
+vec3 adjust_feedback_mixer_by_subframes(vec3 m) {
+	return pow(1-(1-m), vec3(global.TotalSubFrames));
+}
+
+float adjust_feedback_mixer_by_subframes(float  m) {
+	return pow(1-(1-m), global.TotalSubFrames);
+}
