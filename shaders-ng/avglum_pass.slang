@@ -143,7 +143,7 @@ float get_avglum() {
             float prev_lum = texture(avglum_passFeedback,DYN_ZOOM_SAMPLING_POINT).a;
             float myframecount = params.FrameCount;
             float transition_speed_breathing = 0.2;
-            
+            transition_speed_breathing =  adjust_feedback_mixer_by(transition_speed_breathing, (get_fps(FPS_ESTIMATE_PASS)/60)*global.TotalSubFrames);
             //Tube warmup:
                 //Uncomment this to see the effect continuously
                 //myframecount = (mod(params.FrameCount, 60*4));
