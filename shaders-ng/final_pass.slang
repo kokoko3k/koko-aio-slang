@@ -510,6 +510,38 @@ vec3 fn_pixel_nightify(vec3 color_in, float strength, vec3 ambilight) {
     return pixel_out;
 }
 
+vec3 morph_shape_full_vec3_with_area(vec3 shape, vec3 l, float steep, float gamma, out vec3 area) {
+    vec3 l_pow = pow(l, vec3(gamma));
+    vec3 l2    = min(l_pow * 16.0, steep);      // min faster than clamp
+    vec3 p     = inversesqrt(l2);
+
+    vec3 s1 = pow(shape, p);                    // shape^p
+    vec3 s2 = fma(-l_pow, s1, l_pow);            // l_pow*(1-s1), ASM proof
+
+    // --- Compute the area under the curve, shape is a positive bell-shaped sine ---
+    vec3 A     = inversesqrt(fma(p, vec3(3.0), vec3(1.0)));
+    vec3 ratio = l_pow / steep;
+    area = fma(A, 1.0 - ratio, ratio);
+
+    return (s2 / steep) + s1;
+}
+
+
+vec3 morph_shape_full_no_steepness_vec3_with_area(vec3 shape, vec3 l, float gamma, out vec3 area) {
+    vec3 l_pow = pow(l, vec3(gamma));
+    vec3 l2    = clamp(l_pow * 16.0, 0.0, 1.0);  // clamp faster than min (qui, come da tuo commento)
+    vec3 p     = inversesqrt(l2);
+
+    vec3 s1 = pow(shape, p);
+    vec3 s2 = fma(-l_pow, s1, l_pow);             // l_pow*(1-s1), ASM proof
+
+    // --- Compute the area under the curve, shape is a positive bell-shaped sine ---
+    vec3 A = inversesqrt(fma(p, vec3(3.0), vec3(1.0)));
+    area   = fma(A, 1.0 - l_pow, l_pow);
+
+    return s2 + s1;
+}
+
 
 vec3 morph_shape_full_vec3(vec3 shape, vec3 l, float steep, float gamma ) {
     vec3 l_pow = pow(l,vec3(gamma));
