@@ -656,8 +656,8 @@ vec3 pixel_flickering(vec3 pixel_cur) {
    float lumdiff = abs( dot(flickline.rgb, vec3(1.0)) - dot(pixel_cur.rgb, vec3(1.0)));// 1685 1750 2948 //ASM PROOF: Faster on SIMD8 and SIMD16, slower on SIMD32
 
 
-   // disable flickering on 25 and 30fps content:
-   if (low_fps(FPS_ESTIMATE_PASS)) lumdiff = 0.0;
+   // Halve flickering on 25 and 30fps content:
+   if (low_fps(FPS_ESTIMATE_PASS)) lumdiff *= 0.5;
 
    lumdiff = min(lumdiff * PIXELGRID_INTR_FLICK_POWR, 1.0);
 
