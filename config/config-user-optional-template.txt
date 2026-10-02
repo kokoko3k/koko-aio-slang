@@ -49,6 +49,10 @@
 // by removing the leading "//" from the following line:
 // #define D3D_WORKAROUND
 
+// Retroid pocket 5 with Default Qualcomm Vulkan driver has a little error when sampling from the feedback.
+// You notice it with deltarender and steep masks which slowly smears till the next update.
+// Uncomment the following to workaround it.
+// #define FEEDBACK_SAMPLING_WORKAROUND vec2(0.00000003,0.0)
 
 // Enable Antiburn protection (OLEDs)
 // It works by slowly shaking the image in order to prevent image retention

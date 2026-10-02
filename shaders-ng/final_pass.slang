@@ -1464,7 +1464,11 @@ void main() {
             }
 
             if (reuse_old) {
-                FragColor.rgb = texture(final_passFeedback, vOutputCoord).rgb;
+                vec2 drfix = vec2(0.0);
+                #ifdef FEEDBACK_SAMPLING_WORKAROUND
+                    drfix = FEEDBACK_SAMPLING_WORKAROUND;
+                #endif
+                FragColor.rgb = texture(final_passFeedback, vOutputCoord+drfix).rgb;
                 return;
             }
         }
