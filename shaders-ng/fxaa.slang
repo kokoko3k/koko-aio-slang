@@ -239,8 +239,8 @@ vec4 texture_ovr_nearest_lod0( sampler2D tex, vec2 co) {
 
 
    // Snap delle coordinate: sostituisce il calcolo interno a texture_ovr_nearest_lod0
-      vec2 sz  = params.SourceSize.xy;
-      vec2 isz = params.SourceSize.zw;
+      vec2 sz  = params.SourceSize.xy*SERVICE1;
+      vec2 isz = params.SourceSize.zw/SERVICE1;
 
       // snap coords to get NN filtering
       float sx_l = (floor(co.x * sz.x - 1.0) + 0.5) * isz.x; // -dx
@@ -425,7 +425,7 @@ vec4 texture_ovr_nearest_lod0( sampler2D tex, vec2 co) {
             dst[0] = tempDst3;
          }
 
-      vec2 f = step(0.5, fract(co*params.SourceSize.xy));
+      vec2 f = step(0.5, fract(co*params.SourceSize.xy*SERVICE1));
       vec3 res = mix( mix(dst[0], dst[1], f.x),
                               mix(dst[3], dst[2], f.x), f.y );
       return res;
