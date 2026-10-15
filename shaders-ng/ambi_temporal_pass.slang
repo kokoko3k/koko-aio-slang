@@ -270,7 +270,7 @@ vec4 pixel_sanitize(vec4 color_in) {
 
 bool scene_changed() {
     //Prevent glitches when viewport size changes (instant update)
-    if (global.final_passFeedbackSize.xy != global.FinalViewportSize.xy)
+    if (global.LAST_FEEDBACK_PASS_SIZE.xy != global.FinalViewportSize.xy)
         return true;
 
 

@@ -446,7 +446,7 @@ layout(set = 0, binding = 12) uniform sampler2D halo_pass;
 layout(set = 0, binding = 13) uniform sampler2D helper_pass;
 
 #ifndef D3D_WORKAROUND
-    layout(set = 0, binding = 15) uniform sampler2D final_passFeedback;
+    layout(set = 0, binding = 15) uniform sampler2D LAST_FEEDBACK_PASS;
 #endif
 
 
@@ -1312,7 +1312,7 @@ vec3 antighost(vec3 c) {
 	#ifndef D3D_WORKAROUND
 		if (!bdelta_render_enabled()) {
 				if (frame_is_even() && (vInterlace_offset == 0.0)) {
-					vec3 f = texture(final_passFeedback, vOutputCoord).rgb;
+					vec3 f = texture(LAST_FEEDBACK_PASS, vOutputCoord).rgb;
                     //since feedback is not float framebuffer, we need to clamp current color (only)
                     c=clamp(c,vec3(0),vec3(1));
                     //f=clamp(f,vec3(0),vec3(1));
@@ -1409,7 +1409,7 @@ void main() {
         if (fps_halver_is_skipped_frame()) skipframe = true;
             
         if (skipframe) {
-            FragColor.rgb = texture(final_passFeedback, vOutputCoord).rgb ;
+            FragColor.rgb = texture(LAST_FEEDBACK_PASS, vOutputCoord).rgb ;
             return;
         }
     #endif
@@ -1468,7 +1468,7 @@ void main() {
                 #ifdef FEEDBACK_SAMPLING_WORKAROUND
                     drfix = FEEDBACK_SAMPLING_WORKAROUND;
                 #endif
-                FragColor.rgb = texture(final_passFeedback, vOutputCoord+drfix).rgb;
+                FragColor.rgb = texture(LAST_FEEDBACK_PASS, vOutputCoord+drfix).rgb;
                 return;
             }
         }
@@ -1515,7 +1515,7 @@ void main() {
         }
         
             #ifdef DO_ADPT_STROBE_PLUGIN
-                pixel_out = adaptive_strobe(pixel_out, vAdaptive_strobe_oscillator, final_passFeedback, vOutputCoord, FPS_ESTIMATE_PASS);
+                pixel_out = adaptive_strobe(pixel_out, vAdaptive_strobe_oscillator, LAST_FEEDBACK_PASS, vOutputCoord, FPS_ESTIMATE_PASS);
             #else
                 #ifdef DO_LCD_ANTIGHOSTING_PLUGIN
                     pixel_out = antighost(pixel_out);
@@ -1543,7 +1543,7 @@ void main() {
             
         #ifndef D3D_WORKAROUND
             if ( skip_border ) {
-                FragColor.rgb = texture(final_passFeedback, vOutputCoord).rgb;
+                FragColor.rgb = texture(LAST_FEEDBACK_PASS, vOutputCoord).rgb;
                 return;
             }
         #endif

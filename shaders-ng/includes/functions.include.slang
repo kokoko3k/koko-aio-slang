@@ -2021,7 +2021,7 @@ float warpedglow_x_allowed( float in_glow_warpsharp_x ) {
 
 
 	#ifndef D3D_WORKAROUND
-		vec2 out_size = global.final_passFeedbackSize.xy;
+		vec2 out_size = global.LAST_FEEDBACK_PASS_SIZE.xy;
 	#else
 		vec2 out_size = global.FinalViewportSize.xy;
 	#endif
