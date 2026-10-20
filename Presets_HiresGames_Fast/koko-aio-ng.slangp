@@ -331,7 +331,7 @@ float_framebuffer15 = true
 // * Bezel
 // * Background images
 // ASMDEBUG: GLSL75
-           shader16 = ../shaders-ng/final_pass.slang
+           shader16 = shaders-ng/final_pass.slang
             alias16 = "final_pass"
     filter_linear16 = true
         //This needs to be clamp_to_edge or displacing vignette would dark screen borders
