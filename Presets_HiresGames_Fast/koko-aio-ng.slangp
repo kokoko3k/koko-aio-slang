@@ -331,16 +331,13 @@ float_framebuffer15 = true
 // * Bezel
 // * Background images
 // ASMDEBUG: GLSL75
-           shader16 = shaders-ng/final_pass.slang
+           shader16 = ../shaders-ng/final_pass.slang
             alias16 = "final_pass"
     filter_linear16 = true
+       scale_type16 = viewport
+            scale16 = 1.0
         //This needs to be clamp_to_edge or displacing vignette would dark screen borders
         wrap_mode16 = "clamp_to_edge" 
-  
-// A bug(?) in Retroarch adds an (useless?) pass if we set the last scale_type,
-// even if it is set to viewport wasting gpu cycles (10 fps on haswell measured with my bench)
-// ...however setting it is still needed to append more presets.
-// If you need to appena presets to koko-aio, uncomment the following scale_type16 and scale16
 
-//       scale_type16 = viewport
-//            scale16 = 1.0
+        
+
