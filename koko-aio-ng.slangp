@@ -340,8 +340,8 @@ float_framebuffer15 = true
         wrap_mode16 = "clamp_to_edge" 
         
 // Till retroarch 1.22.2 you can gain some performance by commenting the following 
-// retroarch past 1.22.2 does not need to do that manually.
-// Be warned that commenting the following has some side effects:
+// retroarch past 1.22.2 does not need to do that manually and you can instead use config-user-optional.txt
+// Be warned that there are some side effects:
 //      delta render, frame halving (content and border), prevent glitches on window resize will not work.
 //      plugins like antistrobe and antighosting
 

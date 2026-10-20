@@ -1,40 +1,19 @@
 //DON'T DELETE THIS LINE
 
 //   To use this file, first copy it to a new file named: config-user-optional.txt
+//   Usage schemna is: "Uncomment a line to change the shader behaviour."
+
+//   Lines have this format: 
+//   "// #define SOMETHING"
+//   Everything that comes after "//" is simply ignored, so
+//   deleting the leading "//" will enable the line.
 
 
-//   Lines have this format: //#define PARAMETER VALUE //DESCRIPTION
-//   where:
-//       "//" means a comment; read: Everything after "//" is simply ignored.
-//       * PARAMETER is the shader parameter as defined in config.inc
-//         (look for lines starting with #pragma there).
-//       * VALUE is the value you want to assign to that parameter.
-//         (it is the same you would assign to that within retroarch)
-//       * DESCRIPTION is the associated label in retroarch menu, reported here just for convenience 
-//         (not needed nor taken into account, so if they differ a bit, it don't mind)
-//
-//   Almost if not all of the parameters are reported here but commented (prepended with the double slash //)
-//   Since a double slash means that everything after it is ignored, 
-//   then you have to remove the leadings "//"
-//
-//   Notice, there is no equal sign, nor double quotes, so, eg:
-//       If you know that you will always use the bezel frame, you will have:
-//       #define DO_BEZEL 1.0  //Bezel enable?
-//
-//       If you know you'll never alter the contrast:
-//       #define CONTRAST 0.0 //Contrast in
-//
-//       If you know your curvature // will never change:
-//       #define GEOM_WARP_X //Warp X
-//
-//   As said, you can disable a line by erasing it or,
-//   since everything after "//" is ignored,
-//   by prepending "//", eg:
-//
-//       // #define DO_BEZEL 1.0
-//   
-//   
-//   
+
+
+
+
+
 
 ////////////////////////////////////////////////////////////////////////////
 //
@@ -69,17 +48,24 @@
 // Enable it only if using subframes, as it has a performance cost itself.
 // #define SUBFRAMES_OPTIMIZATIONS
 
+
+
+
+
+
 ////////////////////////////////////////////////////////////////////////////
 //
 // STATIC PERFORMANCE RELATED PARAMETERS:
-//   There yoy have a chance to boost your FPS, or tune koko-aio for your specific
-//   the more lines you insert (or uncomment), the more your FPS will be high.
-//   
-//   The downside of using this method is that every setting
-//   you will write here, will be static and so that 
-//   you will NOT BE ABLE RO MODIFY it "on-the-fly" in Retroarch anymore.
 //
 ////////////////////////////////////////////////////////////////////////////
+
+// Disable last pass feedback? huge boost to fps.
+// some effects or plugins will not work, eg: adaptive strobe, delta render, 
+// fps halver, border fps halver, antighosting
+// #define DISABLE_LAST_FEEDBACK_PASS 
+
+
+
 
 // Renders only changed parts of screen; uncomment (remove leading //).
 // to lower power consumption / mitigate throttling, uncomment this:
@@ -91,28 +77,29 @@
 // #define DELTA_RENDER_CHECK_AREA      // Delta render area size.
                                         // Defaults to 1.0 if commented 
 
-// Use higher quality deconvergence flattering rgb scanlines when deconvergence is high
-// and by syncing them to the deconvergence settings
-// To enable high quality deconvergence, remove leading "//"
-// #define HQ_DECON
 
-// FXAA tuning: select an FXAA preset here.
-// 1 is a dumb and fast preset, 2 is still fast, but rounder (the default)
-// Higher numbers are useful to antialias high resolution content.
-// Allowed values from 1 to 5
-// #define FXAA_PRESET 2
+
 
 // Disallow texture wrapping as a shader parameter, comment to gain some performance.
 // But in that case the wrap mode has to be defined in the preset file.
 // #define DISALLOW_BG_IMAGE_TEXTURE_WRAP_IN_SHADER
 
+
+
+
 // Halve rendering refresh on bezel and ambilight, uncomment to gain performance:
 // #define HALVE_BORDER_UPDATE
+
+
+
 
 // Skip random() function used for noise, debanding, bezel roughness.
 // uncomment to gain some performance, expect some banding on ambilight and
 // possibly heavier banding when using the spot feature.
 // #define SKIP_RANDOM
+
+
+
 
 // Uncommenting this is the only way to statically disable Warped Glow
 // spare a lookup in the final pass;
@@ -122,23 +109,15 @@
 // When the screen is rotated, skipping SKIP_WARPEDGLOW_Y means skipping SKIP_WARPEDGLOW_X
 // #define SKIP_WARPEDGLOW_Y
 
+
+
+
 // Enable Conditional FPS Halver (60->30, 30->30, 50->25, 25->25)
 // #define FPS_HALVER
 
-// Some cores may produce glitches in the first frames, so koko-aio renders
-// it just black; however this check has a little performance hit.
-// Uncomment the following line to keep the glitch in some cores
-// and avoid performance hits.
-// #define RENDER_BOGUS_FRAMES
 
-// Temporal based features need to know the source fps to have a fixed duration
-// across multiple input refresh rates (25,30,50,60...).
-// But since some cores do not report it correctly, you may trust them, or not.
-// In case you don't, koko-aio derives the information by averaging frametimes.
-// Such estimation is activated by enabling ORIGINAL_FPS_UNTRUSTED.
-// however it is slower and on some video drivers isn't reliable either.
-// if D3D_WORKAROUND is defined, Core reported fps value is always trusted.
-// #define ORIGINAL_FPS_UNTRUSTED
+
+
 
 
 ////////////////////////////////////////////////////////////////////////////
@@ -151,6 +130,43 @@
 // By using the following (set it t 0.5) you can effectively halve scnalines density.
 // #define SCANLINES_FREQUENCY_MULTIPLIER_OVERRIDE 0.5
 
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////
+//
+// NOT CATEGORIZED
+//
+////////////////////////////////////////////////////////////////////////////
+
+// Some cores may produce glitches in the first frames, so koko-aio renders
+// it just black; however this check has a little performance hit.
+// Uncomment the following line to keep the glitch in some cores
+// and avoid performance hits.
+// #define RENDER_BOGUS_FRAMES
+
+
+// Use higher quality deconvergence flattering rgb scanlines when deconvergence is high
+// and by syncing them to the deconvergence settings
+// To enable high quality deconvergence, remove leading "//"
+// #define HQ_DECON
+
+// Temporal based features need to know the source fps to have a fixed duration
+// across multiple input refresh rates (25,30,50,60...).
+// But since some cores do not report it correctly, you may trust them, or not.
+// In case you don't, koko-aio derives the information by averaging frametimes.
+// Such estimation is activated by enabling ORIGINAL_FPS_UNTRUSTED.
+// however it is slower and on some video drivers isn't reliable either.
+// if D3D_WORKAROUND is defined, Core reported fps value is always trusted.
+// #define ORIGINAL_FPS_UNTRUSTED
+
+
+
+
+
+
 ////////////////////////////////////////////////////////////////////////////
 //
 // RUNTIME PARAMETERS OVERRIDES:
@@ -159,7 +175,27 @@
 //   
 //   The downside of using this method is that every setting
 //   you will write here, will be static and so that 
-//   you will NOT BE ABLE RO MODIFY it "on-the-fly" in Retroarch anymore.
+//   you will NOT BE ABLE TO MODIFY it "on-the-fly" in Retroarch anymore.
+//
+//   The format is:
+//   // #define PARAMETER VALUE //DESCRIPTION
+//   where:
+//       "//" means a comment; read: Everything after "//" is simply ignored.
+//       * PARAMETER is the shader parameter as defined in config.inc
+//       * VALUE is the value you want to statically assign to that parameter.
+//         (it is the same you would assign to that within retroarch)
+//       * DESCRIPTION is the associated label in retroarch menu, reported here just for convenience 
+//         (not needed nor taken into account, so if they differ a bit, it doesn't matter)
+//
+//   Notice, there is no equal sign, nor double quotes, so, eg:
+//       If you know that you will always use the bezel frame, you will have:
+//       #define DO_BEZEL 1.0  //Bezel enable?
+//
+//       If you know you'll never alter the contrast:
+//       #define CONTRAST 0.0 //Contrast in
+//
+//       If you know your curvature // will never change:
+//       #define GEOM_WARP_X //Warp X
 //
 ////////////////////////////////////////////////////////////////////////////
 

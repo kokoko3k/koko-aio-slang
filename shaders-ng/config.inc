@@ -5,16 +5,6 @@
 #define TAU 6.28318530717958647693
 #define alpha_mark 0.1
 
-//#define DISABLE_LAST_FEEDBACK_PASS
-
-#ifdef DISABLE_LAST_FEEDBACK_PASS
-	#define LAST_FEEDBACK_PASS Source
-	#define LAST_FEEDBACK_PASS_SIZE FinalViewportSize
-#else
-	#define LAST_FEEDBACK_PASS final_pass##Feedback
-	#define LAST_FEEDBACK_PASS_SIZE final_pass##FeedbackSize
-#endif
-
 layout(push_constant) uniform Push {
 	vec4 SourceSize;
 	vec4 OriginalSize;
@@ -42,9 +32,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	mat4 MVP;
 	
 	vec4 FinalViewportSize;
-	#ifndef DISABLE_LAST_FEEDBACK_PASS
-		vec4 LAST_FEEDBACK_PASS_SIZE;
-	#endif
+	vec4 final_passFeedbackSize;
 	vec4 in_glow_passSize;
 	vec4 placeholder;
 
@@ -779,6 +767,16 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 // User parameters goes here, they overrides almost everything:
 // Retroarch releases past October 2024 (v1.17) support this:
 #pragma include_optional "../config/config-user-optional.txt"
+
+
+//Use fake definitions to quickly disable feedbacks
+	#ifdef DISABLE_LAST_FEEDBACK_PASS
+		#define LAST_FEEDBACK_PASS Source
+		#define LAST_FEEDBACK_PASS_SIZE FinalViewportSize
+	#else
+		#define LAST_FEEDBACK_PASS final_pass##Feedback
+		#define LAST_FEEDBACK_PASS_SIZE final_pass##FeedbackSize
+	#endif
 
 
 // The following translates global.PARAMETER to PARAMETER
