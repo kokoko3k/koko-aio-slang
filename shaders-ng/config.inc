@@ -5,14 +5,13 @@
 #define TAU 6.28318530717958647693
 #define alpha_mark 0.1
 
-#define DISABLE_LAST_FEEDBACK_PASS
 
 #ifdef DISABLE_LAST_FEEDBACK_PASS
 	#define LAST_FEEDBACK_PASS Source
 	#define LAST_FEEDBACK_PASS_SIZE FinalViewportSize
 #else
-	#define LAST_FEEDBACK_PASS final_pass##Feedback
-	#define LAST_FEEDBACK_PASS_SIZE final_pass##FeedbackSize
+	#define LAST_FEEDBACK_PASS final_passFeedback
+	#define LAST_FEEDBACK_PASS_SIZE final_passFeedbackSize
 #endif
 
 layout(push_constant) uniform Push {
@@ -42,9 +41,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	mat4 MVP;
 	
 	vec4 FinalViewportSize;
-	#ifndef DISABLE_LAST_FEEDBACK_PASS
-		vec4 LAST_FEEDBACK_PASS_SIZE;
-	#endif
+	vec4 LAST_FEEDBACK_PASS_SIZE;
 	vec4 in_glow_passSize;
 	vec4 placeholder;
 
