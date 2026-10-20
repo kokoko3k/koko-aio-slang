@@ -338,12 +338,11 @@ float_framebuffer15 = true
     filter_linear16 = true
         //This needs to be clamp_to_edge or displacing vignette would dark screen borders
         wrap_mode16 = "clamp_to_edge" 
-        
-// Till retroarch 1.22.2 you can gain some performance by commenting the following 
-// retroarch past 1.22.2 does not need to do that manually.
-// Be warned that commenting the following has some side effects:
-//      delta render, frame halving (content and border), prevent glitches on window resize will not work.
-//      plugins like antistrobe and antighosting
+  
+// A bug(?) in Retroarch adds an (useless?) pass if we set the last scale_type,
+// even if it is set to viewport wasting gpu cycles (10 fps on haswell measured with my bench)
+// ...however setting it is still needed to append more presets.
+// If you need to appena presets to koko-aio, uncomment the following scale_type16 and scale16
 
-       scale_type16 = viewport
-            scale16 = 1.0
+//       scale_type16 = viewport
+//            scale16 = 1.0
