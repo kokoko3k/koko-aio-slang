@@ -36,7 +36,7 @@ layout(location = 0) in vec4 Position;
 layout(location = 1) in vec2 TexCoord;
 layout(location = 0) noperspective out vec2 vTexCoord;
 layout(location = 1) noperspective out vec2 vOutputCoord;
-layout(location = 2) noperspective out vec2 vBg_img_coords;
+
 layout(location = 3) flat out float vIsRotated;
 layout(location = 4) flat out float vScanlinePeriod_multiplier;
 layout(location = 5) flat out float vInterlace_offset;
@@ -54,9 +54,7 @@ layout(location = 16) flat out float vDo_pixelgrid_h;
 layout(location = 17) noperspective out float vFake_scanline_period;
 layout(location = 18) flat out float vPG_y_shift;
 layout(location = 19) noperspective out vec2 vUnrotated_Output_coords;
-#ifdef DO_ADPT_STROBE_PLUGIN
-    layout(location = 20) flat out float vAdaptive_strobe_oscillator;
-#endif
+
     
 #ifdef DEBUG_PRINT_VALUE
     layout(location = 31) flat out float vfprintvalue;
@@ -103,88 +101,6 @@ vec2 get_unrotated_output_coords(vec2 in_coords) {
     return in_coords;
 }
 
-vec2 get_bg_image_coords(vec2 in_vOutputCoord) {
-    vec2 bg_img_coords = in_vOutputCoord;
-
-	#ifdef _HAS_ROTATION_UNIFORM
-        uint Rotation=params.Rotation;
-	#else
-		uint Rotation=uint(is_rotated_old());
-	#endif
-    
-    
-    //   0 = auto
-    //   1, -1 = identity
-    // >+1 = manual rotation for straight games
-    // <-1 = manual rotation for rotated games
-
-    //user selected auto rotation handling, so query params.Rotation.
-    if (BG_IMAGE_ROTATION == 0.0 ) {
-        
-        //0
-        //nothing to do.
-        
-        //90
-        if (Rotation == 1) {
-            bg_img_coords.xy = bg_img_coords.yx;
-            bg_img_coords.y = 1 - bg_img_coords.y;
-        } else
-        
-        //180
-        if (Rotation == 2) {
-            bg_img_coords = 1 - bg_img_coords;
-        } else
-        
-        //270
-        if (Rotation == 3) {
-            bg_img_coords.xy = bg_img_coords.yx;      
-            bg_img_coords.x = 1 - bg_img_coords.x;
-        } 
-        
-        bg_img_coords += vec2( BG_IMAGE_OFFX,BG_IMAGE_OFFY);
-        bg_img_coords=zoom(bg_img_coords, BG_IMAGE_ZOOM);
-        return bg_img_coords;
-    }
-
-
-    //User forced a rotation, handle manually.
-    
-    //User selected a negative value (force rotation),
-    //flip coords.
-    //This is needed for correct aspect handling on rotated games.
-    if (BG_IMAGE_ROTATION < 0.0) {
-        bg_img_coords.xy = bg_img_coords.yx;
-        bg_img_coords.y = 1 - bg_img_coords.y;
-    }
-
-    if (abs(BG_IMAGE_ROTATION) == 1.0) // identity
-        bg_img_coords.xy = bg_img_coords.xy;
-
-    else if (abs(BG_IMAGE_ROTATION) == 2.0) // +180
-       bg_img_coords.xy =   vec2(1-bg_img_coords.x, 1 - bg_img_coords.y);
-
-    else if (abs(BG_IMAGE_ROTATION) == 3.0) // 0 mirror x
-       bg_img_coords.xy =   vec2( 1 - bg_img_coords.x, bg_img_coords.y);
-
-    else if (abs(BG_IMAGE_ROTATION) == 4.0) // 0 mirror y
-       bg_img_coords.xy =   vec2( bg_img_coords.x, 1 - bg_img_coords.y);
-
-    else if (abs(BG_IMAGE_ROTATION) == 5.0) // +90
-        bg_img_coords.xy = vec2(bg_img_coords.y, 1- bg_img_coords.x);
-
-    else if (abs(BG_IMAGE_ROTATION) == 6.0) // +270
-       bg_img_coords.xy =   vec2( 1- bg_img_coords.y, bg_img_coords.x);
-
-    else if (abs(BG_IMAGE_ROTATION) == 7.0) // 90 mirror x
-       bg_img_coords.xy =   vec2(bg_img_coords.y, bg_img_coords.x);
-
-    else if (abs(BG_IMAGE_ROTATION) == 8.0) // +90 mirror y
-        bg_img_coords.xy = vec2(1-bg_img_coords.y, 1- bg_img_coords.x);
-
-    bg_img_coords += vec2( BG_IMAGE_OFFX,BG_IMAGE_OFFY);
-    bg_img_coords=zoom(bg_img_coords, BG_IMAGE_ZOOM);
-    return bg_img_coords;
-}
 
 void main() {
     gl_Position = global.MVP * Position;
@@ -195,18 +111,12 @@ void main() {
 
     vIn_aspect = get_in_aspect();
 
-    #ifdef ANTIBURN_COMPLETE
-        vec2 antiburn_TexCoord = antiburn_screen(TexCoord);
-    #else
-        vec2 antiburn_TexCoord = TexCoord;
-    #endif
-
     //Calculate vTexcoord as fractional or integer scaled?
         bool bNeed_NO_integer_scale = need_NO_integer_scale();
         if ( bNeed_NO_integer_scale )
-            vTexCoord = get_scaled_coords_aspect(antiburn_TexCoord,global.FinalViewportSize, vIn_aspect, bIsRotated);
+            vTexCoord = get_scaled_coords_aspect(TexCoord,global.FinalViewportSize, vIn_aspect, bIsRotated);
         else
-            vTexCoord = integer_scale(antiburn_TexCoord, vIn_aspect, bIsRotated, vDo_Tate, GAME_GEOM_INT_SCALE-1.0 )
+            vTexCoord = integer_scale(TexCoord, vIn_aspect, bIsRotated, vDo_Tate, GAME_GEOM_INT_SCALE-1.0 )
             + vec2(0,params.OriginalSize.w/4.0); //<-- last offset aligns the sampling point and the scanline
     
 
@@ -222,9 +132,8 @@ void main() {
         }
     }
 
-    vOutputCoord = antiburn_TexCoord ;
+    vOutputCoord = TexCoord ;
 
-    vBg_img_coords = get_bg_image_coords(vOutputCoord);
     vUnrotated_Output_coords = get_unrotated_output_coords(vOutputCoord);
     
     //Help scanline/pixelgrid code too:
@@ -365,7 +274,7 @@ void main() {
                 target_line_size /= 1.5; //reduce line size for fakeR scanlines on interlaced screens.
             }
             
-        // compute a rounded number of lines that integer fits the screen
+        // compute a rounded number of lines that integerly fit the screen
             float rounded_denominator = round( zoom_modifier.y * params.OriginalSize.y * target_line_size);
                   rounded_denominator = max(rounded_denominator, 2.0); // avoid division by 0  and ensure (, 2.0)
                                                                        // scanline gaps are drawn even on tiny output sizes.
@@ -401,7 +310,7 @@ void main() {
 #pragma stage fragment
 layout(location = 0) noperspective in vec2 vTexCoord;
 layout(location = 1) noperspective in vec2 vOutputCoord;
-layout(location = 2) noperspective in vec2 vBg_img_coords;
+
 layout(location = 3) flat in float vIsRotated;
 layout(location = 4) flat in float vScanlinePeriod_multiplier;
 layout(location = 5) flat in float vInterlace_offset;
@@ -431,15 +340,12 @@ layout(location = 19) noperspective in vec2 vUnrotated_Output_coords;
 layout(location = 0)     out vec4 FragColor;
 
 
-layout(set = 0, binding = 1)  uniform sampler2D backdrop;
 layout(set = 0, binding = 2)  uniform sampler2D bloom_pass_final;
 layout(set = 0, binding = 3)  uniform sampler2D reflected_blurred_pass;
 layout(set = 0, binding = 4)  uniform sampler2D ambi_temporal_pass;
 layout(set = 0, binding = 5)  uniform sampler2D avglum_pass;
 layout(set = 0, binding = 6)  uniform sampler2D monitor_body_straight;
 layout(set = 0, binding = 7)  uniform sampler2D monitor_body_curved;
-layout(set = 0, binding = 8)  uniform sampler2D bg_under;
-layout(set = 0, binding = 9)  uniform sampler2D bg_over;
 layout(set = 0, binding = 10) uniform sampler2D in_glow_pass_x;
 layout(set = 0, binding = 11) uniform sampler2D in_glow_pass;
 layout(set = 0, binding = 12) uniform sampler2D halo_pass;
@@ -907,97 +813,6 @@ float get_clamped_white_reference(vec3 pixel_in){
     return white_reference;
 }
 
-vec4 textureLod_wrap(sampler2D tex, vec2 co, float lod, float wrap_mode) {
-    #ifndef DISALLOW_BG_IMAGE_TEXTURE_WRAP_IN_SHADER
-        /*
-        // Mirrored repeat, once, useless since is done by default
-        if (co.x > 1.0 || co.x < 0.0)
-            co.x = 1- mod(co.x, 1.0);
-        if (co.y > 1.0 || co.y < 0.0)
-            co.y = 1- mod(co.y, 1.0);
-        */
-
-        if (wrap_mode == 1.0) {
-            //Clamp to border, black.
-            //bool bOutside = (co.x < 0.0 || co.x > 1.0 || co.y < 0.0 || co.y > 1.0 ) ;
-            //if (bOutside) return vec4(0.0,0.0,0.0,1.0);
-            
-            if (is_first_outside_rect(co, vec4(0.0,0.0,1.0,1.0))) //ASM PROOF, FASTER.
-                return vec4(0.0,0.0,0.0,1.0);
-
-        } else if (wrap_mode == 2.0) {
-            //Clamp to edge:
-            co = clamp(co, 0.00, 1.0);
-        } else if (wrap_mode == 3.0) {
-            //Repeat no mirror:
-            co = mod(co, 1.0);
-        }
-    #endif
-    return textureLod(tex, co, lod);
-}
-
-
-
-/*vec3 pixel_blank_alternate_v2(vec2 co, vec4 texsize, float strength, vec3 c) {
-
-	c = pow(c, vec3(2.2));
-
-    vec3 S=vec3(strength);
-    vec3 ref = clamp(c, 0.0,1.0);
-    S = min(S, vec3(1.0)-ref);
-    S = min(S, ref);
-
-    float line = co.y * texsize.y;
-    float column = co.x * texsize.x;
-
-    float l_period_half = ALT_BLANK_PERIOD / 2;
-
-    float sinlinea= sin(line*pi/ALT_BLANK_PERIOD);
-    sinlinea*=sinlinea;
-
-    float sincolonna= sin(column*pi/ALT_BLANK_PERIOD);
-    sincolonna*=sincolonna;
-
-
-    bool linea_pari = sinlinea > 0.5;
-    bool frame_pari =  mod(float(params.FrameCount),2.0  ) == 1 ;
-
-    if (frame_pari) {
-        if (linea_pari)
-            S = -S;
-                else
-            S = +S;
-	} else {
-
-		if (!frame_pari) {
-			if (linea_pari)
-				S = S;
-					else
-				S = -S;
-		}
-    }
-
-    c = c+S;
-
-	c = pow(c, vec3(1/2.2));
-
-    return c;
-}
-
-
-vec3 pixel_blank_alternate(vec3 strength, vec3 pixel_in) {
-    //strength *= 1-pixel_in; <<--- less on bright areas?
-    strength =  1-strength;
-
-    float square_wave_line = float(mod((vTexCoord.y+0.0001) * params.OutputSize.y, ALT_BLANK_PERIOD) > ALT_BLANK_PERIOD / 2);
-    if ( mod(params.FrameCount, 2.0) == 1.0) {
-        return min(square_wave_line + strength, vec3(1.0));
-    } else {
-        return min(1 - square_wave_line + strength, vec3(1.0));
-    }
-
-}
-*/
 
 vec3 bezel_color(float lum)  {
     //Colorize bezel frame
@@ -1025,31 +840,6 @@ float create_ambi_colorize_shade(vec2 co) {
 }
 
 
-
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-
-vec4 fn_pixel_fgbg_image(sampler2D smp, out vec2 image_coords, out float image_aspect) {
-    vec2 tex_size = textureSize(smp, 0); // * BG_ZOOM;
-    image_aspect = tex_size.x/tex_size.y; //FIXME image_aspect needs to be inverted for rotated contents.
-                                          //get_scaled_coords_aspect_fgbg() already does that, so we can take the inverted
-                                          //value from there.
-
-    //FIXME isrotated deve essere true anche quando l'immagine di sfondo è ruotata.
-    //vec2 fg_image_offset=vec2(BG_IMAGE_OFFX,BG_IMAGE_OFFY);
-    //image_coords = get_scaled_coords_aspect(vBg_img_coords + fg_image_offset, global.FinalViewportSize, image_aspect, bool(vIsRotated));
-
-    //bool rotated = bool(vIsRotated) || BG_IMAGE_ROTATION > 4.5;
-    bool rotated_bg = BG_IMAGE_ROTATION > 3.5;
-
-    image_coords = get_scaled_coords_aspect_fgbg(vBg_img_coords, global.FinalViewportSize, image_aspect, rotated_bg, vIsRotated, vIn_aspect);
-
-
-    float bg_over_lod = log2(tex_size.y * global.FinalViewportSize.w);
-    vec4 pixel_bgover = textureLod_wrap(smp, image_coords, bg_over_lod, BG_IMAGE_WRAP_MODE);
-    return pixel_bgover;
-}
-
 vec3 light_over_image(vec3 light, vec3 image, float black_illumination) {
     //Simulates illumination.
     //It works by adding the light on the image.
@@ -1070,26 +860,6 @@ vec3 light_over_image(vec3 light, vec3 image, float black_illumination) {
     return modulated_on_black;
 }
 
-vec3 ambi_blend_image(vec4 image, vec3 ambi, float blend_mode) {
-    //mix or add ambient light with image, also allow force colorization in add mode.
-    if (DO_AMBILIGHT == 0.0) return image.rgb;
-
-    // Fake a transparent image when force colorization is requested
-    // So that we can use the same code used for alpha blend.
-    // Also multiply AMBI_BG_IMAGE_FORCE * AMBI_BG_IMAGE_BLEND_MODE to skip
-    // force colorization when mode blend mode is not "ADD".
-        float image_alpha_adapted = image.a - (AMBI_BG_IMAGE_FORCE * AMBI_BG_IMAGE_BLEND_MODE);
-
-    if (AMBI_BG_IMAGE_BLEND_MODE == 0.0) {
-        image.rgb = mix(ambi.rgb, image.rgb, image_alpha_adapted);
-    } else {
-        //vec3 ambi_alpha_masked = ambi.rgb *  (1 -image_alpha_adapted);
-            // (ambi.rgb * -image_alpha_adapted) + (ambi * 1)
-        vec3 ambi_alpha_masked = fma(ambi.rgb, vec3(-image_alpha_adapted),  ambi.rgb) ; //ASM PROOF: FASTER
-        image.rgb = light_over_image(ambi_alpha_masked, image.rgb, AMBI_ADD_ON_BLACK);
-    }
-    return image.rgb;
-}
 
 float gaussian_coefficient(float x, float sigma) {
     //restituisce un coefficiente gaussiano per x compreso tra 0 ed 1
@@ -1491,20 +1261,7 @@ void main() {
     
     if (content_mask > 0.5) {
         
-        pixel_out = fn_pixel_content(co_content);
-        
-            
-        if (DO_BACKDROP * BACKDROP_JUST_TUBE > 0.0) {
-            vec3 blended = vec3(0.0);
-            vec4 backdrop_img = pixel_overlay_image_stretch(backdrop, co_content);
-            if (BACKDROP_BLEND_MODE == 1.0) {
-                blended = (pixel_out.rgb + DO_BACKDROP) * backdrop_img.rgb;
-            } else {
-                blended = pixel_out.rgb + ( (DO_BACKDROP * backdrop_img.rgb) * (1.0 - pixel_out.rgb) );
-            }
-            pixel_out = mix( pixel_out.rgb, blended, backdrop_img.a );
-           
-        }
+        pixel_out = fn_pixel_content(co_content)+vec3(0,0,5);
         
         if ( DO_SPOT + DO_VIGNETTE > 0.0 ) {
             float perlin = (random_fast(vTexCoord)-0.5) * (1/255.0);
@@ -1548,33 +1305,12 @@ void main() {
             }
         #endif
 
-        // Ambient light
-        if (DO_AMBILIGHT == 1.0) {
-            pixel_ambi = texture(ambi_temporal_pass, vOutputCoord).rgb ;
-            
-            // Debanding when not using bg images.
-            #ifndef SKIPRANDOM
-            if (DO_BG_IMAGE != 1.0) {
-                const float noise_power = -NOISEPOWER_AMBI;
-                float dynamicseed = mod(params.FrameCount, 30.0001);
-                float anoise1 = random_fast(vTexCoord*dynamicseed) * noise_power;
-                // anoise1 *=  (1 - pixel_ambi.g);
-                //anoise1 =  (anoise1 - anoise1 * pixel_ambi.g); //ASM PROOF FASTER
-                anoise1 =  fma(-anoise1, pixel_ambi.g, anoise1); //ASM PROOF FASTER
-                pixel_ambi += anoise1;
-            }
-            #endif
-            
-            //pixel_under_content = clamp(pixel_ambi, 0.0,1.0) * (1-content_mask); //<-- this one is better because will antialias borders
-                                                                                    //    better (via canvas-busy) when ambientlight > 0.0
-            //pixel_under_content = pixel_ambi * (1-content_mask);
-            //pixel_under_content = pixel_ambi - content_mask * pixel_ambi; //ASM PROOF: FASTER
-            pixel_under_content = fma(vec3(-content_mask), pixel_ambi, pixel_ambi); //ASM PROOF: FASTER
-        }
     }
 
     // Apply smooth border to soften jagged edges.
     pixel_out *= content_mask;
+    
+    pixel_out += vec3(0,0,5);
        
     
     // This represents the inner bezel alpha (when using bezel)
@@ -1591,7 +1327,7 @@ void main() {
         
         if (is_bezel_paint_area(co_bezel)) {
             
-            vec4 pixel_bezel = fn_pixel_bezel(co_bezel, co_mirror, BG_IMAGE_NIGHTIFY * DO_BG_IMAGE, pixel_ambi);
+            vec4 pixel_bezel = fn_pixel_bezel(co_bezel, co_mirror, BG_IMAGE_NIGHTIFY * DO_BG_IMAGE, pixel_ambi)+vec4(0,5,0,0);
             pixel_out = mix(pixel_out, pixel_bezel.rgb, pixel_bezel.a);
         
             // Update alpha mask.
@@ -1603,109 +1339,11 @@ void main() {
         //FragColor = vec4(content_and_bezel_mask); return; // <- uncomment to debug BEZEL_FRAME_SURROUND_MARGIN
     }
 
-    // Background image have no need to paint if not in the outer border:
-    if ( (DO_BG_IMAGE == 1.0 && BG_IMAGE_OVER == 0.0) && (content_and_bezel_mask < 1.0) ) {
-        vec2 image_coords; //it gets the value from fn_pixel_fgbg_image output parameter.
-        float image_size ; //(unused here, it gets the value from fn_pixel_fgbg_image output parameter.
-        vec4 pixel_bg_image = fn_pixel_fgbg_image(bg_under, image_coords, image_size);
 
-        vec3 anti_nightify_ambi = (pixel_ambi * AMBI_BG_IMAGE_BLEND_MODE) *
-                                   max(AMBI_BG_IMAGE_FORCE, 1-pixel_bg_image.a);
-
-        pixel_bg_image.rgb = fn_pixel_nightify(pixel_bg_image.rgb, BG_IMAGE_NIGHTIFY, anti_nightify_ambi );
-        pixel_bg_image.rgb = ambi_blend_image(pixel_bg_image, pixel_ambi, AMBI_BG_IMAGE_BLEND_MODE);
-
-        pixel_under_content = pixel_bg_image.rgb;
+    if (content_and_bezel_mask <= 0.0) {
+        FragColor.b = -1.0;
+        return;
     }
-
-
-    // Blend content and border:
-    pixel_out = mix (pixel_under_content, pixel_out, content_and_bezel_mask);
-
-    //Foreground image
-    float pixel_fg_image_alpha = 0.0;
-    if (DO_BG_IMAGE + BG_IMAGE_OVER == 2.0) {
-        vec2  image_coords; //it gets the value from fn_pixel_fgbg_image output parameter.
-        float image_aspect; //it gets the value from fn_pixel_fgbg_image output parameter.
-        vec4 pixel_fg_image = fn_pixel_fgbg_image(bg_over, image_coords, image_aspect);
-        vec3 anti_nightify_ambi = (pixel_ambi * AMBI_BG_IMAGE_BLEND_MODE) *
-                                   max(AMBI_BG_IMAGE_FORCE, 1-pixel_fg_image.a);
-
-        #if defined(USE_LED1) || defined(USE_LED2) || defined(USE_LED3)
-            vec3 pixel_fg_image_no_night = pixel_fg_image.rgb;
-        #endif
-
-        pixel_fg_image.rgb = fn_pixel_nightify(pixel_fg_image.rgb, BG_IMAGE_NIGHTIFY, anti_nightify_ambi );
-
-
-        // tl:dr:
-        //   dont "black" the transparent areas outside the game content when we use AMBI_BG_IMAGE_BLEND_MODE ADD blend mode.
-        //   Do only for add mode, since some inplace presets relies on the blackness with AMBI_BG_IMAGE_BLEND_MODE mix mode.
-        // long explaination:
-        //   We want to show the underlying game content when the image is transparent.
-        //   This mean that alpha channel reveals the underlying content, but doing that even
-        //   when the underlyinig content is void is not only pointless, but even counterproductive.
-        //   Think at when we want to use ambient lights to *light* the part of the image
-        //   that have a low alpha channel, that part would be black.
-        if (DO_AMBILIGHT + AMBI_BG_IMAGE_BLEND_MODE == 2.0) {
-            float ambi_mask = create_ambi_colorize_shade(co_bezel);
-            float alpha_selective = clamp( pixel_fg_image.a + (1-content_and_bezel_mask) , 0.0, 1.0); 
-            //float alpha_selective = min( pixel_fg_image.a + (1-content_and_bezel_mask) , 1.0);  //<- this is enough, but cycles won't scale.
-            
-            pixel_out = mix(pixel_out, pixel_fg_image.rgb, alpha_selective );
-            float fg_image_alpha_adapted = max(pixel_fg_image.a - AMBI_BG_IMAGE_FORCE, 0.0);
-            vec3 light = pixel_ambi.rgb * (ambi_mask) * (1- fg_image_alpha_adapted);
-            pixel_out = light_over_image(light, pixel_out, AMBI_ADD_ON_BLACK);
-        } else {
-            pixel_out = mix(pixel_out, pixel_fg_image.rgb, pixel_fg_image.a);
-        }
-        pixel_fg_image_alpha = pixel_fg_image.a;
-
-        if (content_and_bezel_mask < 1) { // Who said big branches are bad? Spare 1fps per led @Haswell.
-            #ifdef USE_LED1
-                if (global.LED1_SIZE != 0.0)
-                    pixel_out.rgb = apply_power_led( vec4(pixel_out.rgb, pixel_fg_image_alpha),  pixel_fg_image_no_night, image_coords, image_aspect,
-                                                     vec2(global.LED1_X, global.LED1_Y), global.LED1_HUE, global.LED1_SIZE, global.LED1_ASPECT,
-                                                     global.LED1_SHAPE, 1.0, global.LED1_EXPOSURE, false );
-            #endif
-
-            #ifdef USE_LED2
-                if (global.LED2_SIZE != 0.0)
-                pixel_out.rgb = apply_power_led( vec4(pixel_out.rgb, pixel_fg_image_alpha),  pixel_fg_image_no_night, image_coords, image_aspect,
-                                                 vec2(global.LED2_X, global.LED2_Y), global.LED2_HUE, global.LED2_SIZE, global.LED2_ASPECT,
-                                                 global.LED2_SHAPE, 1.0, global.LED2_EXPOSURE, false );
-            #endif
-
-            #ifdef USE_LED3
-                if (global.LED3_SIZE != 0.0) {
-                    float led_controller = 1.0; // Init var since denise can "power on" leds on drive access
-                    bool source_led_is_off = false;    // and in that case the led on the source image is off.
-                    #ifdef _USE_DENISE_EMU
-                        led_controller = global.LedDriveState; //under Denise led3 blinks on drive access.
-                        source_led_is_off = true;
-                    #endif
-                    #ifdef _DEBUG_DENISE_EMU
-                        float t = 10000.0; //timespan
-                        float f = 5.0; //frequency
-                        led_controller = random_fast(vec2(   float(floor(mod(params.FrameCount,t)/t*(t/f))/t)     ));
-                        //float(mod(params.FrameCount,100)>75);
-                        source_led_is_off = true;
-                    #endif
-                    pixel_out.rgb = apply_power_led( vec4(pixel_out.rgb, pixel_fg_image_alpha),  pixel_fg_image_no_night, image_coords, image_aspect,
-                                                     vec2(global.LED3_X, global.LED3_Y), global.LED3_HUE, global.LED3_SIZE, global.LED3_ASPECT,
-                                                     global.LED3_SHAPE, led_controller, global.LED3_EXPOSURE, source_led_is_off );
-                }
-            #endif
-        }
-    }
-
-    
-   // Backdrop
-   if ( (1-BACKDROP_JUST_TUBE) + DO_BACKDROP > 1.0 ) {
-        vec3 backdrop_img = pixel_backdrop_image(backdrop, vUnrotated_Output_coords, global.FinalViewportSize );
-        pixel_out += backdrop_img * (1-pixel_fg_image_alpha);
-    }
-    
     
     #ifndef RENDER_BOGUS_FRAMES
         // Some cores set first frame size to 1x1 which may cause glitches.

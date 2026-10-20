@@ -59,7 +59,7 @@
          sideshade_mipmap = "false"
 
 
-shaders = 17
+shaders = 18
 
 
 // The very first pass emulates:
@@ -324,22 +324,21 @@ float_framebuffer15 = true
         wrap_mode15 = "mirrored_repeat"
     
 
-// This pass pass will do everything needed to happen at screen coordinates:
-// * The composition of the previous passes with the bloomed image, 
-// * vignette and spot light
-// * Scanlines
-// * Phosphors masks 
-// * Black frame insertions
-// * Bezel
-// * Background images
+// This pass pass will render screen content 
+
 // ASMDEBUG: GLSL75
            shader16 = shaders-ng/final_pass.slang
             alias16 = "final_pass"
     filter_linear16 = true
        scale_type16 = viewport
             scale16 = 1.0
+float_framebuffer16 = true
         //This needs to be clamp_to_edge or displacing vignette would dark screen borders
         wrap_mode16 = "clamp_to_edge" 
 
 
+//This pass draws borders.
+           shader17 = shaders-ng/final_pass2.slang
+            alias17 = "final_pass2"
+            scale17 = 1.0
 
