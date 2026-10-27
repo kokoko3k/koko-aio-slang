@@ -464,7 +464,7 @@ vec2 get_vOutputCoord_adapted() {
 }
 
 vec2 get_scaled_coords_for_bezel(vec2 co, float isrotated) {
-
+    //putting co computation into vertex shader does not bring any gain.
     co = zoomout_coords(co, -BEZEL_FRAME_ZOOM); //FIXME COULD BE FASTER.
     //co.y = zoom1D(co.y, BEZEL_ASPECT_CORRECTION );
     //co = zoomxy(co, vec2(1+SERVICE1*0.001, 1-SERVICE1*0.001));
