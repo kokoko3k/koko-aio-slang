@@ -1535,7 +1535,6 @@ void main() {
         // We can skip border update on subframes.
         // The following may seem redundant because we skip whole subframes already
         // But when we use strobing, we always reach this point/code.
-        bool skip_because_is_subframe = false;
         #ifdef SUBFRAMES_OPTIMIZATIONS
             if (is_subframe()) skip_border = true;
         #endif
