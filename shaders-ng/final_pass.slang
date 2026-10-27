@@ -1319,7 +1319,7 @@ vec3 antighost(vec3 c) {
 					vec3 diff=(f - c)*LCD_ANTIGHOSTING;
 					//diff = sign(diff) * min( abs(diff), vec3(LCD_ANTIGHOSTING_CEIL));
                     diff = clamp(diff, -LCD_ANTIGHOSTING_CEIL, LCD_ANTIGHOSTING_CEIL); //probably faster.
-					c = mix(c, c-diff, 0.5);
+					c = c - diff * 0.5;   // same as: mix(c, c-diff, 0.5) 
 				}
 		}
 	#endif
