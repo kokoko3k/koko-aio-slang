@@ -300,8 +300,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 } global;
 
 
-#include "config.globals.inc"
-
 #pragma parameter LABEL0000 "Read the documentation in docs-ng.md text file" 		0 0 0 1
 #pragma parameter LABEL0001 "==================================================" 		0 0 0 1
 #pragma parameter DO_TEST "★ Show test pattern ==>" 		0.0 	0.0 12.0 1.0
