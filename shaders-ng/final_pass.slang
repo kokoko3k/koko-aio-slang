@@ -649,10 +649,11 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
     // Shadowmask
     // Works by staggering odd rows by 1.5X triad
     // Pay attention to phosphor width; if too low may, vanify shadowmask.
-    vec3 PG_offsets = vPG_offsets_and_size.rgb + //base offsets staggered (+)
-                float( PIXELGRID_DO_SHADOWMASK *                                      // user wants shadowmask
-                       sin(freq_base_screen.y * 2.0 / PIXELGRID_SHADOWMASK_H ) > 0.0  // sin > 0.0 means the row is even
-                      ) * PIXELGRID_SHADOWMASK_SHIFT ;                                // stagger by 1.5
+    // performance: small branch seems a bit better than arithmetic.
+    vec3 PG_offsets = vPG_offsets_and_size.rgb; //base offsets staggered (+)
+    if (PIXELGRID_DO_SHADOWMASK > 0.0)                                    // user wants shadowmask
+        if (sin(freq_base_screen.y * 2.0 / PIXELGRID_SHADOWMASK_H) > 0.0) // sin > 0.0 means the row is even
+            PG_offsets += PIXELGRID_SHADOWMASK_SHIFT;                     // stagger by 1.5
 
         
     vec3 freq_rgb = freq_base.xxx - PG_offsets;
