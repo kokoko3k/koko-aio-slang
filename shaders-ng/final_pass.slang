@@ -1493,7 +1493,7 @@ void main() {
         
         pixel_out = fn_pixel_content(co_content);
         
-            
+        //Backdrop/mid image just on the tube (eg ambient reflections, GEL)
         if (DO_BACKDROP * BACKDROP_JUST_TUBE > 0.0) {
             vec3 blended = vec3(0.0);
             vec4 backdrop_img = pixel_overlay_image_stretch(backdrop, co_content);
@@ -1699,10 +1699,10 @@ void main() {
     }
 
     
-   // Backdrop
-   if ( (1-BACKDROP_JUST_TUBE) + DO_BACKDROP > 1.0 ) {
-        vec3 backdrop_img = pixel_backdrop_image(backdrop, vUnrotated_Output_coords, global.FinalViewportSize );
-        pixel_out += backdrop_img * (1-pixel_fg_image_alpha);
+    // Backdrop on the whole picture:
+    if ( ((1.0 - BACKDROP_JUST_TUBE) + DO_BACKDROP > 1.0) && (pixel_fg_image_alpha < 1.0) ) {
+        vec3 backdrop_img = pixel_backdrop_image(backdrop, vUnrotated_Output_coords, global.FinalViewportSize);
+        pixel_out += backdrop_img * (1.0 - pixel_fg_image_alpha);
     }
     
     
