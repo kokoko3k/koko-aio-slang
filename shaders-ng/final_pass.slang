@@ -54,8 +54,9 @@ layout(location = 16) flat out float vDo_pixelgrid_h;
 layout(location = 17) noperspective out float vFake_scanline_period;
 layout(location = 18) flat out float vPG_y_shift;
 layout(location = 19) noperspective out vec2 vUnrotated_Output_coords;
+layout(location = 20) noperspective out float vEarly_exit_on_content_possible;
 #ifdef DO_ADPT_STROBE_PLUGIN
-    layout(location = 20) flat out float vAdaptive_strobe_oscillator;
+    layout(location = 21) flat out float vAdaptive_strobe_oscillator;
 #endif
     
 #ifdef DEBUG_PRINT_VALUE
@@ -393,6 +394,11 @@ void main() {
         vAdaptive_strobe_oscillator = cos(iFrameMod * pi);
     #endif
 
+    vEarly_exit_on_content_possible = 0.0;
+    if (DO_BACKDROP == 0.0 || (DO_BACKDROP == 1.0 && BACKDROP_JUST_TUBE > 0.0))
+        if (DO_BG_IMAGE == 0.0 || (DO_BG_IMAGE == 1.0 && BG_IMAGE_OVER == 0.0)) 
+            vEarly_exit_on_content_possible = 1.0;
+        
 }
 
 
@@ -419,8 +425,9 @@ layout(location = 16) flat in float vDo_pixelgrid_h;
 layout(location = 17) noperspective in float vFake_scanline_period;
 layout(location = 18) flat in float vPG_y_shift;
 layout(location = 19) noperspective in vec2 vUnrotated_Output_coords;
+layout(location = 20) noperspective in float vEarly_exit_on_content_possible;
 #ifdef DO_ADPT_STROBE_PLUGIN
-    layout(location = 20) flat in float vAdaptive_strobe_oscillator;
+    layout(location = 21) flat in float vAdaptive_strobe_oscillator;
 #endif
 
 
@@ -1522,7 +1529,21 @@ void main() {
                 #endif
             #endif
         
-
+            float t = 80.0; //  percent of the inner content is supposed to always stay visible.
+                             // allows an early exit and gain fps, but too much higer value
+                             // may lead to jagged borders (for override geometry zoom)
+                             // or mangled content over bezel borders (for low bezel frame alignment)
+            t = (1-(t/100.0))/2.0;
+            if (vEarly_exit_on_content_possible == 1.0) 
+                if (is_first_inside_rect(co_content, vec4(vec2(0.0+t) , vec2(1.0-t))))
+                {
+                    FragColor.rgb = pixel_out.rgb;
+                    return;
+                }
+            
+        
+                    
+                    
     } else {
 
         // Can we halve border update to spare some cycles?
