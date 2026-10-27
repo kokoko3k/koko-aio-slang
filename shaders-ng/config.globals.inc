@@ -278,27 +278,27 @@
 #endif
 
 #ifndef HALO_SHARPNESS
-    #define HALO_SHARPNESS	params.HALO_SHARPNESS
+    #define HALO_SHARPNESS	global.HALO_SHARPNESS
 #endif
 
 #ifndef HALO_NO_PREGAIN
-    #define HALO_NO_PREGAIN params.HALO_NO_PREGAIN
+    #define HALO_NO_PREGAIN global.HALO_NO_PREGAIN
 #endif
 
 #ifndef HALO_POWER
-    #define HALO_POWER	params.HALO_POWER
+    #define HALO_POWER	global.HALO_POWER
 #endif
 
 #ifndef HALO_GAMMA
-    #define HALO_GAMMA	params.HALO_GAMMA
+    #define HALO_GAMMA	global.HALO_GAMMA
 #endif
 
 #ifndef HALO_VS_SCAN
-    #define HALO_VS_SCAN	params.HALO_VS_SCAN
+    #define HALO_VS_SCAN	global.HALO_VS_SCAN
 #endif
 
 #ifndef HALO_GAMMA_OUT
-    #define HALO_GAMMA_OUT	params.HALO_GAMMA_OUT
+    #define HALO_GAMMA_OUT	global.HALO_GAMMA_OUT
 #endif
 
 #ifndef DO_BLOOM
@@ -322,7 +322,7 @@
 #endif
 
 #ifndef BLOOM_QUALITY
-    #define BLOOM_QUALITY		params.BLOOM_QUALITY
+    #define BLOOM_QUALITY		global.BLOOM_QUALITY
 #endif
 
 #ifndef BLOOM_SIZE
@@ -350,15 +350,15 @@
 #endif
 
 #ifndef DO_CURVATURE
-    #define DO_CURVATURE		global.DO_CURVATURE
+    #define DO_CURVATURE		params.DO_CURVATURE
 #endif
 
 #ifndef GEOM_WARP_X
-    #define GEOM_WARP_X		global.GEOM_WARP_X
+    #define GEOM_WARP_X		params.GEOM_WARP_X
 #endif
 
 #ifndef GEOM_WARP_Y
-    #define GEOM_WARP_Y		global.GEOM_WARP_Y
+    #define GEOM_WARP_Y		params.GEOM_WARP_Y
 #endif
 
 #ifndef GEOM_CORNER_SIZE
@@ -370,7 +370,7 @@
 #endif
 
 #ifndef DO_BEZEL
-    #define DO_BEZEL		global.DO_BEZEL
+    #define DO_BEZEL		params.DO_BEZEL
 #endif
 
 #ifndef BEZEL_R
@@ -470,11 +470,11 @@
 #endif
 
 #ifndef DO_BG_IMAGE
-    #define DO_BG_IMAGE		global.DO_BG_IMAGE
+    #define DO_BG_IMAGE		params.DO_BG_IMAGE
 #endif
 
 #ifndef BG_IMAGE_OVER
-    #define BG_IMAGE_OVER		global.BG_IMAGE_OVER
+    #define BG_IMAGE_OVER		params.BG_IMAGE_OVER
 #endif
 
 #ifndef BG_IMAGE_OFFY
@@ -502,11 +502,11 @@
 #endif
 
 #ifndef DO_BACKDROP
-    #define DO_BACKDROP		global.DO_BACKDROP
+    #define DO_BACKDROP		params.DO_BACKDROP
 #endif
 
 #ifndef BACKDROP_JUST_TUBE
-    #define BACKDROP_JUST_TUBE		global.BACKDROP_JUST_TUBE
+    #define BACKDROP_JUST_TUBE		params.BACKDROP_JUST_TUBE
 #endif
 
 #ifndef BACKDROP_BLEND_MODE
@@ -526,7 +526,7 @@
 #endif
 
 #ifndef DO_AMBILIGHT
-    #define DO_AMBILIGHT		global.DO_AMBILIGHT
+    #define DO_AMBILIGHT		params.DO_AMBILIGHT
 #endif
 
 #ifndef AMBI_STEPS
@@ -546,11 +546,11 @@
 #endif
 
 #ifndef AMBI_STRETCH
-    #define AMBI_STRETCH		params.AMBI_STRETCH
+    #define AMBI_STRETCH		global.AMBI_STRETCH
 #endif
 
 #ifndef AMBI_STRETCH_VERTICAL
-    #define AMBI_STRETCH_VERTICAL 	params.AMBI_STRETCH_VERTICAL
+    #define AMBI_STRETCH_VERTICAL 	global.AMBI_STRETCH_VERTICAL
 #endif
 
 #ifndef AMBI_OVER_BEZEL
@@ -570,15 +570,15 @@
 #endif
 
 #ifndef AMBI_ADD_ON_BLACK
-    #define AMBI_ADD_ON_BLACK		params.AMBI_ADD_ON_BLACK
+    #define AMBI_ADD_ON_BLACK		global.AMBI_ADD_ON_BLACK
 #endif
 
 #ifndef AMBI_INT_OFFSET
-    #define AMBI_INT_OFFSET			params.AMBI_INT_OFFSET
+    #define AMBI_INT_OFFSET			global.AMBI_INT_OFFSET
 #endif
 
 #ifndef AMBI_SMP_INT_OFFSET
-    #define AMBI_SMP_INT_OFFSET params.AMBI_SMP_INT_OFFSET
+    #define AMBI_SMP_INT_OFFSET global.AMBI_SMP_INT_OFFSET
 #endif
 
 #ifndef ASPECT_X
@@ -610,11 +610,11 @@
 #endif
 
 #ifndef DO_GAME_GEOM_OVERRIDE
-    #define DO_GAME_GEOM_OVERRIDE	global.DO_GAME_GEOM_OVERRIDE
+    #define DO_GAME_GEOM_OVERRIDE	params.DO_GAME_GEOM_OVERRIDE
 #endif
 
 #ifndef GAME_GEOM_INT_SCALE
-    #define GAME_GEOM_INT_SCALE	global.GAME_GEOM_INT_SCALE
+    #define GAME_GEOM_INT_SCALE	params.GAME_GEOM_INT_SCALE
 #endif
 
 #ifndef GAME_GEOM_INT_SCALE_OVR
@@ -642,7 +642,7 @@
 #endif
 
 #ifndef DO_TILT
-    #define DO_TILT			global.DO_TILT
+    #define DO_TILT			params.DO_TILT
 #endif
 
 #ifndef TILT_X
@@ -748,7 +748,7 @@
 #endif
 
 #ifndef DO_PIXELGRID
-    #define DO_PIXELGRID			global.DO_PIXELGRID
+    #define DO_PIXELGRID			params.DO_PIXELGRID
 #endif
 
 #ifndef PIXELGRID_OVERMASK

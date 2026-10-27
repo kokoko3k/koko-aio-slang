@@ -12,187 +12,193 @@ layout(push_constant) uniform Push {
 	vec4 avglum_passFeedbackSize;
 	uint FrameCount;
 	uint Rotation;
-	float HALO_SHARPNESS ;
-	float HALO_NO_PREGAIN;
-	float HALO_POWER ;
-	float HALO_GAMMA ;
-	float HALO_GAMMA_OUT;
-	float HALO_VS_SCAN ;
-	
-	float DO_BLOOM ; //4
- 	float BLOOM_QUALITY ; //1
-	float AMBI_ADD_ON_BLACK;
-	float AMBI_STRETCH;
-	float AMBI_STRETCH_VERTICAL;
-	float AMBI_INT_OFFSET ;
-	float AMBI_SMP_INT_OFFSET ;
+	float DO_TILT;
+	float DO_CURVATURE;
+	float GEOM_WARP_X;
+	float GEOM_WARP_Y;
+	float DO_GAME_GEOM_OVERRIDE;
+	float GAME_GEOM_INT_SCALE;
+	float DO_PIXELGRID;
+	float DO_BEZEL;
+	float DO_BG_IMAGE;
+	float BG_IMAGE_OVER;
+	float DO_AMBILIGHT;
+	float DO_BACKDROP;
+	float BACKDROP_JUST_TUBE;
+	float DO_BLOOM;
 } params;
 
 layout(std140, set = 0, binding = 0) uniform UBO {
 	mat4 MVP;
-	
+
 	vec4 FinalViewportSize;
 	vec4 final_passFeedbackSize;
 	vec4 in_glow_passSize;
 	vec4 placeholder;
-
 	vec4 avglum_passSize;
 	vec4 upscale_passSize;
 	vec4 colortools_and_ntsc_passSize;
 	vec4 colortools_and_ntsc_passFeedbackSize;
 
+	// ===== HOT: read by final_pass fragment =====
+	float OriginalFPS;
+	uint CurrentSubFrame;
+	uint TotalSubFrames;
+	float TILT_X;
+	float GEOM_CORNER_SIZE;
+	float GEOM_CORNER_SMOOTH;
+	float DO_DYNZOOM;
+	float AUTOCROP_MAX;
+	float GAME_GEOM_ASPECT;
+	float GAME_GEOM_ZOOM;
+	float BEZEL_RFL_ZOOM;
+	float IN_GLOW_WARPSHARP_X;
+	float DO_DOT_MATRIX;
+	float DO_HALO;
+	float HALO_VS_SCAN;
+	float GAMMA_OUT;
+	float BLOOM_OVER_WHITE;
+	float BLOOM_BYPASS;
+	float DO_SPOT;
+	float DO_VIGNETTE;
+	float DO_CCORRECTION;
+	float CONTRAST;
+	float BRIGHTNESS;
+	float IN_GLOW_POWER;
+	float DO_SHIFT_RGB;
+	float PIXELGRID_SIZE_W;
+	float PIXELGRID_DO_SHADOWMASK;
+	float PIXELGRID_SHADOWMASK_H;
+	float PIXELGRID_SHADOWMASK_SHIFT;
+	float PIXELGRID_MIN_H;
+	float PIXELGRID_MAX_H;
+	float PIXELGRID_OFFSET_CORE;
+	float DECON_RY;
+	float DECON_GY;
+	float DECON_BY;
+	float PIXELGRID_H_DEDOT;
+	float PIXELGRID_GAMMA_H;
+	float PIXELGRID_NO_INTERBLEED_H;
+	float DO_PIXELGRID_H;
+	float DO_PIXELGRID_W;
+	float PIXELGRID_MIN_W;
+	float PIXELGRID_MAX_W;
+	float PIXELGRID_GAMMA_W;
+	float PIXELGRID_BASAL_GRID;
+	float PIXELGRID_OVERMASK;
+	float PIXELGRID_Y_MASK;
+	float PIXELGRID_Y_MASK_COORDS;
+	float PIXELGRID_Y_MASK_OFFSET;
+	float PIXELGRID_Y_MASK_STEEP;
+	float PIXELGRID_Y_MASK_ON_WHITE;
+	float PIXELGRID_Y_MASK_OFFSET_DEHIVE;
+	float PIXELGRID_Y_SPARK;
+	float EDGE_DEFOCUS;
+	float EDGE_DEFOCUS_AREA_INV;
+	float EDGE_DEFOCUS_DO_BLUR;
+	float DOT_M_G_TRESH;
+	float DOT_M_G_STR;
+	float BEZEL_FRAME_ZOOM;
+	float BEZEL_USE_STRAIGHT;
+	float BEZEL_SPCL_STRENGTH;
+	float BEZEL_ROUGHNESS;
+	float BEZEL_R;
+	float BEZEL_G;
+	float BEZEL_B;
+	float BEZEL_CON;
+	float AMBI_OVER_BEZEL;
+	float AMBI_OVER_BEZEL_SIZE;
+	float AMBI_ADD_ON_BLACK;
+	float BG_IMAGE_NIGHTIFY;
+	float AMBI_BG_IMAGE_BLEND_MODE;
+	float AMBI_BG_IMAGE_FORCE;
+	float BG_IMAGE_ROTATION;
+	float BG_IMAGE_OFFX;
+	float BG_IMAGE_OFFY;
+	float BG_IMAGE_ZOOM;
+	float BG_IMAGE_WRAP_MODE;
+	float BACKDROP_BLEND_MODE;
+	float BACKDROP_OFFX;
+	float BACKDROP_OFFY;
+	float BACKDROP_ZOOM;
+
+	float LCD_ANTIGHOSTING;
+	float LCD_ANTIGHOSTING_CEIL;
+	float ADPT_STROBE_STR;
+	float ADPT_STROBE_GAIN_ADJ;
+	float ADPT_STROBE_GAMMA_ADJ;
+	float ADPT_STROBE_GAIN_ADJ_NODARK;
+	float ADPT_STROBE_CEIL;
+	float ADPT_STROBE_SELECTIVE;
+
+	// ===== COLD: vertex-only or used by other passes =====
 	float COLOR_MONO_COLORIZE;
 	float COLOR_MONO_HUE1;
 	float COLOR_MONO_HUE2;
 	float COLOR_MONO_HUE_BIAS;
-	
 	float DO_IN_GLOW;
-
-	float DO_HALO ;
-	float DO_CCORRECTION;
-	float IN_GLOW_BIAS ;
-	float IN_GLOW_SPREAD ;
-
+	float IN_GLOW_BIAS;
+	float IN_GLOW_SPREAD;
 	float IN_GLOW_W;
 	float IN_GLOW_H;
-	float IN_GLOW_POWER;
 	float IN_GLOW_GAMMA;
-	
 	float BLOOM_MIX;
 	float BLOOM_EYE_ADPT_SRT;
 	float BLOOM_SOFT_LIMITER;
- 	float BLOOM_SIZE;
+	float BLOOM_SIZE;
 	float BLOOM_GAMMA;
-	float BLOOM_BYPASS;
 	float BLOOM_POWER;
 	float BLOOM_HALATION_MIX;
-	float BLOOM_OVER_WHITE;
-  	float BLOOM_GAMMA_OUT;
-	
+	float BLOOM_GAMMA_OUT;
 	float DO_FXAA;
-	
 	float DO_CVBS_BLEED;
 	float CVBS_BLEED_SAMPLES;
 	float CVBS_BLEED_COARSE;
 	float CVBS_BLEED_ADJUST;
 	float CVBS_BLEED_PAL;
-	
 	float DO_PPERSISTENCE;
 	float PPERSISTENCE_START;
 	float PPERSISTENCE_END;
-	
-	float GAMMA_OUT ;
 	float SATURATION;
 	float LUMINANCE;
 	float VIBRANCE;
-	float CONTRAST;
 	float ADAPTIVE_BLACK;
-	float BRIGHTNESS;
 	float TEMPERATURE;
-	
-	float DO_CURVATURE;
-	float GEOM_WARP_X;
-	float GEOM_WARP_Y;
-	float GEOM_CORNER_SIZE;
-	float GEOM_CORNER_SMOOTH;
-
-	float DO_BEZEL;
-	float BEZEL_R;
-	float BEZEL_G;
-	float BEZEL_B;
-	float BEZEL_CON;
-
-	float BEZEL_FRAME_ZOOM;
-	float BEZEL_USE_STRAIGHT;
 	float BEZEL_RFL_BLR_SHD;
-	float BEZEL_RFL_ZOOM;
 	float BEZEL_REFL_STRENGTH;
 	float BEZEL_DIFFUSION_STR;
-	float BEZEL_SPCL_STRENGTH;
-	float BEZEL_ROUGHNESS;
 	float BEZEL_CORNER_DARK;
-	
-	float DO_SPOT;
-	float S_POSITION_X; 
-	float S_POSITION_Y; 
+	float S_POSITION_X;
+	float S_POSITION_Y;
 	float S_SIZE;
 	float S_POWER;
-
-	float DO_VIGNETTE;
 	float V_SIZE;
 	float V_POWER;
-
-	float DO_DYNZOOM;
-
-	float DO_AMBILIGHT;
 	float AMBI_FALLOFF;
 	float AMBI_POWER;
 	float AMBI_GAMMA;
-
-	float AMBI_OVER_BEZEL;
-	float AMBI_OVER_BEZEL_SIZE;
 	float AMBI_STEPS;
-	float AMBI_BG_IMAGE_BLEND_MODE;
-	float AMBI_BG_IMAGE_FORCE;
-
-	
 	float ASPECT_X;
 	float ASPECT_Y;
-	
-	float DO_BG_IMAGE;
-	float BG_IMAGE_OVER;
-	float BG_IMAGE_OFFY;
-	float BG_IMAGE_OFFX;
-	float BG_IMAGE_ZOOM;
-	float BG_IMAGE_ROTATION;
-	float BG_IMAGE_NIGHTIFY;
-	float BG_IMAGE_WRAP_MODE;
-
-	float DO_SHIFT_RGB;
-	
 	float DO_GLOBAL_SHZO;
 	float GLOBAL_ZOOM;
 	float GLOBAL_OFFX;
 	float GLOBAL_OFFY;
-
 	float DO_RF_NOISE;
 	float RF_NOISE_STRENGTH;
-	
-	float DO_GAME_GEOM_OVERRIDE;
-	float GAME_GEOM_INT_SCALE;
 	float GAME_GEOM_INT_SCALE_OVR;
 	float GAME_GEOM_INT_SCALE_MAX;
-	float GAME_GEOM_ASPECT;
 	float GAME_GEOM_VSHIFT;
 	float GAME_GEOM_HSHIFT;
-	float GAME_GEOM_ZOOM;
-	
-	float DO_TILT;
-	float TILT_X;
-		
 	float PIXELGRID_INTR_GAMMA_ADJ;
-
-	float AUTOCROP_MAX;
 	float AUTOCROP_MIN;
 	float AUTOCROP_SAMPLES;
 	float AUTOCROP_SAMPLE_SIZE;
 	float AUTOCROP_TRANSITION_SPEED;
 	float AUTOCROP_STEADINESS;
-	
-	float DO_BACKDROP; 
-	float BACKDROP_JUST_TUBE; 
-	float BACKDROP_OFFX;
-	float BACKDROP_OFFY;
-	float BACKDROP_ZOOM;
-	float BACKDROP_BLEND_MODE;
-	
 	float RESSWITCH_SYNC_SPEED;
 	float TATE;
-
-	float DO_DOT_MATRIX;
 	float DOT_M_G_SHARP;
-	float DOT_M_G_TRESH;
-	float DOT_M_G_STR;
 	float DOT_M_G_BRT;
 	float DOT_M_RGB_SHARP;
 	float DOT_M_RGB_STR;
@@ -202,137 +208,62 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float DOT_M_MULTIPLY;
 	float DOT_M_SHADOW_STR;
 	float DOT_M_SHADOW_OFF;
-	
 	float MIN_LINES_INTERLACED;
-	float DO_PIXELGRID;
-	float PIXELGRID_OVERMASK;
-	float DO_PIXELGRID_W;
-	float DO_PIXELGRID_H;
 	float PIXELGRID_COREY_FAKE_SCAN;
 	float PIXELGRID_DOUBLESCAN;
-	float PIXELGRID_MIN_H;
-	float PIXELGRID_MIN_W;
-	float PIXELGRID_MAX_H;
-	float PIXELGRID_MAX_W;
-	float PIXELGRID_SIZE_W;
-	
 	float BEZEL_LIGHT_NO_FADEOUT;
 	float IN_GLOW_SPREAD_SHARPNESS;
-
 	float PIXELGRID_MUL_X;
-	float PIXELGRID_TVL_X;													
-	
-	float PIXELGRID_OFFSET_CORE;
+	float PIXELGRID_TVL_X;
 	float PIXELGRID_NO_INTERBLEED_W;
-	float PIXELGRID_NO_INTERBLEED_H;
-	float PIXELGRID_H_DEDOT;
-	
 	float PIXELGRID_INTR_FLICK_MODE;
 	float PIXELGRID_INTR_FLICK_POWR;
 	float PIXELGRID_INTR_DISABLE_Y;
 	float PIXELGRID_INTR_PAST_FIELD;
-		
-	float PIXELGRID_Y_MASK;
-	float PIXELGRID_Y_MASK_ON_WHITE;
 	float PIXELGRID_Y_MASK_HEIGHT;
-	float PIXELGRID_Y_MASK_OFFSET;
-	float PIXELGRID_Y_MASK_OFFSET_DEHIVE;
-	float PIXELGRID_Y_MASK_STEEP;
-	float PIXELGRID_Y_MASK_COORDS;
 	float PIXELGRID_Y_MASK_SHIFT;
-	float PIXELGRID_Y_SPARK;
 	float PIXELGRID_R_SHIFT;
 	float PIXELGRID_G_SHIFT;
 	float PIXELGRID_B_SHIFT;
 	float PIXELGRID_H_COUNT;
 	float PIXELGRID_H_PRST;
-	float PIXELGRID_GAMMA_H;
-	float PIXELGRID_GAMMA_W;
-	float PIXELGRID_DO_SHADOWMASK;
-	float PIXELGRID_SHADOWMASK_H;
-	float PIXELGRID_SHADOWMASK_SHIFT;
-	//float PIXELGRID_HMASK_NO_BRIGHT;
-	//float MOIRE_SWEET_SPOT;
-	
-	float PIXELGRID_BASAL_GRID;
-	
 	float DO_DEDITHER;
 	float DEDITHER_STRENGTH;
 	float DEDITHER_STRENGTH2;
 	float DEDITHER_TRESHMAX;
-	
 	float DO_NTSC_ARTIFACTS;
 	float NTSC_FILTER_WIDTH;
 	float NTSC_FILTER_SCF;
 	float NTSC_FILTER_FC;
 	float NTSC_MIX;
 	float NTSC_PHASE_SHIFT;
-
 	float NTSC_ARTF_TRSH;
 	float NTSC_SHOW_ARTF_MASK;
 	float NTSC_ARTF_ZAP;
-	
 	float SERVICE1;
-	
-	float IN_GLOW_WARPSHARP_X;
 	float IN_GLOW_WARPSHARP_Y;
 	float IN_GLOW_WARPSHARP_GAMMA;
-	
-	float DO_TEST ;
-	
+	float DO_TEST;
 	float DECON_RX;
-	float DECON_RY;
 	float DECON_GX;
-	float DECON_GY;
 	float DECON_BX;
-	float DECON_BY;
-	float EDGE_DEFOCUS;
-	float EDGE_DEFOCUS_AREA_INV;
-	float EDGE_DEFOCUS_DO_BLUR;
-	
 	float RF_NOISE_SPARK;
-	
 	float DOT_C;
 	float DOT_C_SPEED;
-	
 	float OriginalAspectRotated;
-	
 	float BEZEL_RFL_CONTRAST;
-	
 	float CLIP_TO_WHITE;
-	
-	float OriginalFPS;
 	uint FrameTimeDelta;
-	
 	float DO_WTFL;
 	float WTFL_SHARPNESS_X;
 	float WTFL_SHARPNESS_Y;
-	
-	float LCD_ANTIGHOSTING;
-	float LCD_ANTIGHOSTING_CEIL;
 	float LCD_ANTIGHOSTING_FLIP_MASK;
-	
-	uint TotalSubFrames;
-	uint CurrentSubFrame;
-	
-	float ADPT_STROBE_STR;
-	float ADPT_STROBE_GAIN_ADJ;
-	float ADPT_STROBE_GAMMA_ADJ;
 	float ADPT_LCD_RETENTION_FIX;
-	float ADPT_STROBE_GAIN_ADJ_NODARK;
-	float ADPT_STROBE_CEIL;
-	float ADPT_STROBE_SELECTIVE;
-    
-    
 	float UNIFORMITY;
 	float V_SHAPE;
-	
 	float PPERSISTENCE_MUL_R;
 	float PPERSISTENCE_MUL_G;
-
 	float CVBS_UNSHARP_COMPENSATION;
-
-
 	float LED1_SIZE;
 	float LED1_SHAPE;
 	float LED1_ASPECT;
@@ -341,8 +272,7 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float LED1_X;
 	float LED1_Y;
 	float LED1_IS_DRIVE;
-	float LedDriveState; //for denise
-
+	float LedDriveState;
 	float LED2_SIZE;
 	float LED2_SHAPE;
 	float LED2_ASPECT;
@@ -350,7 +280,6 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float LED2_HUE;
 	float LED2_X;
 	float LED2_Y;
-
 	float LED3_SIZE;
 	float LED3_SHAPE;
 	float LED3_ASPECT;
@@ -358,9 +287,20 @@ layout(std140, set = 0, binding = 0) uniform UBO {
 	float LED3_HUE;
 	float LED3_X;
 	float LED3_Y;
-
+	float HALO_SHARPNESS;
+	float HALO_NO_PREGAIN;
+	float HALO_POWER;
+	float HALO_GAMMA;
+	float HALO_GAMMA_OUT;
+	float BLOOM_QUALITY;
+	float AMBI_STRETCH;
+	float AMBI_STRETCH_VERTICAL;
+	float AMBI_INT_OFFSET;
+	float AMBI_SMP_INT_OFFSET;
 } global;
 
+
+#include "config.globals.inc"
 
 #pragma parameter LABEL0000 "Read the documentation in docs-ng.md text file" 		0 0 0 1
 #pragma parameter LABEL0001 "==================================================" 		0 0 0 1
