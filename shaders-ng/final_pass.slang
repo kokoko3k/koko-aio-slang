@@ -1305,7 +1305,7 @@ vec3 antighost(vec3 c) {
         return c;
     #endif
 
-    #ifdef ANTIBURN_X
+    #ifdef ANTIBURN_Y
         return c;
     #endif
 
@@ -1314,9 +1314,8 @@ vec3 antighost(vec3 c) {
 				if (frame_is_even() && (vInterlace_offset == 0.0)) {
 					vec3 f = texture(LAST_FEEDBACK_PASS, vOutputCoord).rgb;
                     //since feedback is not float framebuffer, we need to clamp current color (only)
-                    c=clamp(c,vec3(0),vec3(1));
-                    //f=clamp(f,vec3(0),vec3(1));
                     c = clamp(c, vec3(0), vec3(1));
+                    //f=clamp(f,vec3(0),vec3(1));
 					vec3 diff=(f - c)*LCD_ANTIGHOSTING;
 					//diff = sign(diff) * min( abs(diff), vec3(LCD_ANTIGHOSTING_CEIL));
                     diff = clamp(diff, -LCD_ANTIGHOSTING_CEIL, LCD_ANTIGHOSTING_CEIL); //probably faster.
