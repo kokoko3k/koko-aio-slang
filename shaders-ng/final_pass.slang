@@ -449,6 +449,7 @@ layout(set = 0, binding = 8)  uniform sampler2D bg_under;
 layout(set = 0, binding = 9)  uniform sampler2D bg_over;
 layout(set = 0, binding = 10) uniform sampler2D in_glow_pass_x;
 layout(set = 0, binding = 11) uniform sampler2D in_glow_pass;
+layout(set = 0, binding = 14) uniform sampler2D in_glow_passFeedback;
 layout(set = 0, binding = 12) uniform sampler2D halo_pass;
 layout(set = 0, binding = 13) uniform sampler2D helper_pass;
 
@@ -742,8 +743,9 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             // and scale Max width according to pre-gains:
                 vec3 phosphor_width = map_range(pixel_in.rgb, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
         
+                vec3 freq_rgb_s = freq_rgb / (1+SERVICE1*0.1* pixel_in.rgb);
             //Get final phosphor width:
-                rgb_w = morph_shape_full_no_steepness_vec3( sin(freq_rgb) * sin(freq_rgb), phosphor_width, PIXELGRID_GAMMA_W); //2%
+                rgb_w = morph_shape_full_no_steepness_vec3( sin(freq_rgb_s) * sin(freq_rgb_s), phosphor_width, PIXELGRID_GAMMA_W); //2%
                 
             //Dedot rgb mask between h mask.
             //This work only when there are dots and have the countereffect when there are not.
@@ -1456,15 +1458,15 @@ void main() {
             //pixel_out = mix(pixel_out+perlin, vec3(content_mask), vec3(vignette_spot.y) );
             pixel_out = mix(pixel_out+abs(perlin), pixel_out+vec3(content_mask), vec3(vignette_spot.y) );
         }
-        
+
             #ifdef DO_ADPT_STROBE_PLUGIN
-                pixel_out = adaptive_strobe(pixel_out, vAdaptive_strobe_oscillator, LAST_FEEDBACK_PASS, vOutputCoord, FPS_ESTIMATE_PASS);
+                pixel_out = adaptive_strobe(pixel_out, vAdaptive_strobe_oscillator, FPS_ESTIMATE_PASS, co_content, in_glow_pass);
             #else
                 #ifdef DO_LCD_ANTIGHOSTING_PLUGIN
                     pixel_out = antighost(pixel_out);
                 #endif
             #endif
-        
+
             float t = 80.0; //  percent of the inner content is supposed to always stay visible.
                              // allows an early exit and gain fps, but too much higer value
                              // may lead to jagged borders (for override geometry zoom)

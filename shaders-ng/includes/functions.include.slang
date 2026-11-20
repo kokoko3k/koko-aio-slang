@@ -1670,7 +1670,7 @@ vec3 strobe( vec3 c) {
 }
 
 
-vec3 adaptive_strobe(vec3 c, float osc, sampler2D feedback_smp, vec2 feedback_smp_co, sampler2D EstimateFPSSampler) {
+vec3 adaptive_strobe(vec3 c, float osc, sampler2D EstimateFPSSampler, vec2 edge_coords, sampler2D edge_smp) {
 
 	#ifndef DO_ADPT_STROBE_PLUGIN
         return c;
@@ -1679,19 +1679,17 @@ vec3 adaptive_strobe(vec3 c, float osc, sampler2D feedback_smp, vec2 feedback_sm
 	if (low_fps(EstimateFPSSampler) && (global.TotalSubFrames == 1.0))
 		return c;
 
-    float str_adjusted = ADPT_STROBE_STR;
-    
-    if (ADPT_STROBE_SELECTIVE == 1.0) {
-        vec3 f = texture(feedback_smp, feedback_smp_co).rgb;
-		//since feedback is not float framebuffer, we need to clamp current color (only)
-		c=clamp(c,vec3(0),vec3(1));
-		//f=clamp(f,vec3(0),vec3(1));
-        float diff= dot( abs(f - c)  , vec3(1.0));
-        str_adjusted *= diff;
-        str_adjusted = clamp(str_adjusted, 0, 1);
-    }
-        
-	float gain_adj =  mix(1.0, ADPT_STROBE_GAIN_ADJ,  str_adjusted);
+	vec3 str_adjusted = vec3(ADPT_STROBE_STR);
+
+	if (ADPT_STROBE_SELECTIVE == 1.0) {
+		vec3 strength_edge = fwidth(texture(edge_smp, edge_coords)).rgb;
+		strength_edge = smoothstep(vec3(0.0),vec3(0.1), strength_edge);
+		str_adjusted *= strength_edge;
+	}
+
+
+
+	vec3 gain_adj =  mix(vec3(1.0), vec3(ADPT_STROBE_GAIN_ADJ),  str_adjusted);
 
     c = clamp(c, vec3(0.0), vec3(1.0));
 	vec3 osc3 = vec3(osc);
@@ -1702,9 +1700,9 @@ vec3 adaptive_strobe(vec3 c, float osc, sampler2D feedback_smp, vec2 feedback_sm
 	vec3 room = (0.5 - abs(0.5-c));
 	room = min(room, vec3(ADPT_STROBE_CEIL));
 		
-	c += room * osc3 * str_adjusted  ;
+	c += room * osc3 * str_adjusted ;
 
-	float gamma_adj = mix(1.0, ADPT_STROBE_GAMMA_ADJ, str_adjusted);
+	vec3 gamma_adj = mix(vec3(1.0), vec3(ADPT_STROBE_GAMMA_ADJ), str_adjusted);
 	c = pow(c, vec3(gamma_adj));
 
 	return c;
