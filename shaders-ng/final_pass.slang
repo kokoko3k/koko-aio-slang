@@ -743,9 +743,8 @@ vec4 fn_pixel_grid(vec2 in_coords, vec3 pixel_in, float min_inLum, float max_inL
             // and scale Max width according to pre-gains:
                 vec3 phosphor_width = map_range(pixel_in.rgb, min_inLum, max_inLum, PIXELGRID_MIN_W, PIXELGRID_MAX_W);
         
-                vec3 freq_rgb_s = freq_rgb / (1+SERVICE1*0.1* pixel_in.rgb);
             //Get final phosphor width:
-                rgb_w = morph_shape_full_no_steepness_vec3( sin(freq_rgb_s) * sin(freq_rgb_s), phosphor_width, PIXELGRID_GAMMA_W); //2%
+                rgb_w = morph_shape_full_no_steepness_vec3( sin(freq_rgb) * sin(freq_rgb), phosphor_width, PIXELGRID_GAMMA_W); //2%
                 
             //Dedot rgb mask between h mask.
             //This work only when there are dots and have the countereffect when there are not.
