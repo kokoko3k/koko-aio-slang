@@ -28,7 +28,7 @@ layout(location = 7) flat out float vAMBI_STRETCH;
 layout(location = 9) flat out float vSmpBorder_min;
 layout(location = 10) flat out float vSmpBorder_max;
 layout(location = 11) flat out float vSmp_step;
-
+layout(location = 12) flat out float vViewport_changed_size;
 
 void main() {
     gl_Position = global.MVP * Position;
@@ -102,6 +102,12 @@ void main() {
             pre_pass_coords = content_geom_override_zoom(pre_pass_coords, GAME_GEOM_ASPECT, in_aspect, GAME_GEOM_VSHIFT, GAME_GEOM_HSHIFT, GAME_GEOM_ZOOM);
     }
 
+    vViewport_changed_size = 0.0;
+    if (global.LAST_FEEDBACK_PASS_SIZE.xy !=
+        mix_step(global.FinalViewportSize.xy,global.FinalViewportSize.yx,vIs_rotated)
+    )
+        vViewport_changed_size = 1.0;
+
 }
 
 #pragma stage fragment
@@ -117,6 +123,7 @@ layout(location = 7) flat in float vAMBI_STRETCH;
 layout(location = 9) flat in float vSmpBorder_min;
 layout(location = 10) flat in float vSmpBorder_max;
 layout(location = 11) flat in float vSmp_step;
+layout(location = 12) flat in float vViewport_changed_size;
 
 layout(location = 0) out vec4 FragColor;
 
@@ -270,7 +277,7 @@ vec4 pixel_sanitize(vec4 color_in) {
 
 bool scene_changed() {
     //Prevent glitches when viewport size changes (instant update)
-    if (global.LAST_FEEDBACK_PASS_SIZE.xy != global.FinalViewportSize.xy)
+    if (vViewport_changed_size == 1.0)
         return true;
 
 
