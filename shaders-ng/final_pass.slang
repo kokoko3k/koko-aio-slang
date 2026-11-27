@@ -940,6 +940,7 @@ vec4 textureLod_wrap(sampler2D tex, vec2 co, float lod, float wrap_mode) {
             co = mod(co, 1.0);
         }
     #endif
+
     return textureLod(tex, co, lod);
 }
 
@@ -1317,7 +1318,7 @@ vec3 apply_power_led( vec4 bgimage, vec3 bgimage_nonight, vec2 image_coords, flo
     //the nightified image and the original one.
     if (led_exposure < 0.0) {
         // Exposure driven by full scene average lum
-        float scene_lum = texture(avglum_pass,FULL_SCENE_LUM_SAMPLING_POINT).a;
+        float scene_lum = texture(avglum_pass,TSMOOTH_NOCC_SAMPLING_POINT).a;
         led_exposure = mix(0.0, abs(led_exposure) , 1-scene_lum);
     }
 
